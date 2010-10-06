@@ -200,7 +200,7 @@ var prototype = {
 		preloadNode = preloadNode || create("tr", {
 			className: classes.preload
 		}, this.contentNode);
-		// this preload node is used to represent the area of the grid that hasn't been 
+		// this preload node is used to represent the area of the table that hasn't been 
 		// downloaded yet
 		preloadNode.preload = true;
 		preloadNode.query = query;
@@ -314,14 +314,14 @@ var prototype = {
 	},
 	renderHeader: function(){
 		// summary:
-		//		Setup the headers for the grid
+		//		Setup the headers for the table
 		var tr = create("tr",{
 		});
 		var ths = [];
-		var grid = this;
+		var table = this;
 		for(var i = 0, l = this.structure.length; i < l; i++){
 			var column = this.structure[i];
-			column.grid = this;
+			column.table = this;
 			if(column.editable){
 				column = dojox.table.TextEdit(column);
 			}
@@ -342,8 +342,8 @@ var prototype = {
 				(function(field){
 					dojo.connect(th, "click", function(){
 						// resort
-						var descending = grid.sortOrder && grid.sortOrder[0].attribute == field && !grid.sortOrder[0].descending; 
-						column.grid.sort(field, descending);
+						var descending = table.sortOrder && table.sortOrder[0].attribute == field && !table.sortOrder[0].descending; 
+						table.sort(field, descending);
 					});
 				})(column.field);
 			}

@@ -16,12 +16,12 @@ dojox.table.TextEdit = function(settings){
 				value: data
 			}, td);
 			input.focus();
-			var grid = settings.grid;
+			var table = settings.table;
 			input.onblur = input.onchange = function(){
-				var object = grid.getObject(td);
+				var object = table.getObject(td);
 				data = object[settings.field] = input.value;
-				if(grid.store){
-					grid.store.put(object);
+				if(table.store){
+					table.store.put(object);
 				}
 				td.removeChild(input);
 				originalRenderCell(data, td);
