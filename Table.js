@@ -20,6 +20,7 @@ dojo.require("dojox.table.TextEdit");
 		maxEmptySpace: 5000,
 		queryOptions: {},
 		query: {},
+		createNode: create,
 		_blankGif: (dojo.config.blankGif || dojo.moduleUrl("dojo", "resources/blank.gif")).toString(),
 		structure: [],
 		rowHeight: 0,
@@ -46,10 +47,6 @@ dojo.require("dojox.table.TextEdit");
 			this.renderHeader();
 			this.refreshContent();
 			var self = this;
-			// check visibility on scroll events
-			dojo.connect(this.scrollNode, "onscroll", function(){
-				self.checkVisible();
-			});
 			//this.inherited(arguments);
 			
 			// setup touch handling:
@@ -119,87 +116,6 @@ dojo.require("dojox.table.TextEdit");
 			this.sortOrder = [{attribute: attribute, descending: descending}];
 			this.refreshContent();
 		},
-		lastScrollTop: 0,
-		checkVisible: function(){
-			// summary:
-			//		Checks to make sure that everything in the viewable area has been 
-			// 		downloaded, and triggering a request for the necessary data when needed.
-			var scrollNode = this.scrollNode;
-			var visibleTop = scrollNode.scrollTop;
-			var visibleBottom = scrollNode.offsetHeight + visibleTop;
-			var priorPreload, preloadNode = this.preloadNode;
-			var lastScrollTop = this.lastScrollTop;
-			this.lastScrollTop = visibleTop;
-			// there can be multiple preloadNodes (if they split, or multiple queries are created),
-			//	so we can traverse them until we find whatever is in the current viewport, making
-			//	sure we don't backtrack
-			while(preloadNode && preloadNode != priorPreload){
-				priorPreload = this.preloadNode; 
-				this.preloadNode = preloadNode;
-				var preloadTop = preloadNode.offsetTop;
-				var preloadHeight;
-				if(visibleBottom < preloadTop){
-					// the preload is below the line of site
-					preloadNode = preloadNode.previous;
-				}else if(visibleTop > (preloadTop + (preloadHeight = preloadNode.offsetHeight))){
-					// the preload is above the line of site
-					preloadNode = preloadNode.next;
-				}else{
-					// the preload node is visible, or close to visible, better show it
-					var offset = (visibleTop - preloadTop) / this.rowHeight;
-					var count = (visibleBottom - visibleTop) / this.rowHeight;
-					// utilize momentum for predictions
-					var momentum = Math.max(Math.min((visibleTop - lastScrollTop) * this.rowHeight, this.maxRowsPerPage/2), this.maxRowsPerPage/-2);
-					count += Math.abs(momentum);
-					if(momentum < 0){ 
-						offset += momentum;
-					}
-					offset = Math.max(offset, 0);
-					if(offset < 10 && offset > 0 && count + offset < this.maxRowsPerPage){
-						// connect to the top of the preloadNode if possible to avoid splitting
-						count += offset;
-						offset = 0;
-					}
-					// TODO: do this for the bottom too
-					count = Math.max(count, this.minRowsPerPage);
-					count = Math.min(count, this.maxRowsPerPage);
-					count = Math.min(count, preloadNode.count);
-					if(count == 0){
-						return;
-					}
-					offset = Math.round(offset);
-					count = Math.round(count);
-					var options = this.queryOptions ? dojo.delegate(this.queryOptions) : {};
-					options.start = preloadNode.start + offset;
-					options.count = count;
-					if(offset > 0 && offset + count < preloadNode.count){
-						// TODO: need to do a split 
-						var second = dojo.clone(preloadNode);
-					}else{
-						preloadNode.start += count;
-						preloadNode.count -= count;
-						preloadNode.style.height = Math.min(preloadNode.count * this.rowHeight, this.maxEmptySpace);
-					}
-					// create a loading node as a placeholder while the data is loaded 
-					var loadingNode = create("tr",{
-						className: classes.loading,
-						style: {
-							height: count * this.rowHeight
-						}
-					});
-					this.contentNode.insertBefore(loadingNode, preloadNode);
-					// use the query associated with the preload node to get the next "page"
-					options.query = preloadNode.query;
-					var results = preloadNode.query(options);
-					dojo.when(this.renderCollection(results, loadingNode, options),
-						function(){
-							// can remove the loading node now
-							loadingNode.parentNode.removeChild(loadingNode);
-						}, console.error);
-				}
-			}
-		},
-		
 		renderQuery: function(query, preloadNode){
 			// summary:
 			//		Creates a preload node for rendering a query into, and executes the query
@@ -257,6 +173,7 @@ dojo.require("dojox.table.TextEdit");
 			//		is available (as it should be if it comes from an Observable data store).
 			var start = options.start || 0;
 			var self = this;
+			var contentNode = this.contentNode;
 			if(results.observe){
 				// observe the results for changes
 				this.observers.push(results.observe(function(object, from, to){
@@ -264,7 +181,7 @@ dojo.require("dojox.table.TextEdit");
 					if(from > -1){
 						// remove from old slot
 						var tr = trs.splice(from, 1)[0];
-						tr.parentNode.removeChild(tr);
+						contentNode.removeChild(tr);
 					}
 					if(to > -1){
 						// add to new slot

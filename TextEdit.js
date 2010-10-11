@@ -18,13 +18,18 @@ dojox.table.TextEdit = function(settings){
 			input.focus();
 			var table = settings.table;
 			input.onblur = input.onchange = function(){
-				var object = table.getObject(td);
-				data = object[settings.field] = input.value;
-				if(table.store){
-					table.store.put(object);
+				if(input){
+					var thisInput = input;
+					input = null;
+					if(table.store){
+						dojo.when(table.store.get(table.getObjectId(td)), function(object){ 
+							data = object[settings.field] = thisInput.value;
+							table.store.put(object);
+							originalRenderCell(data, td);
+						});
+					}
+					td.removeChild(thisInput);
 				}
-				td.removeChild(input);
-				originalRenderCell(data, td);
 			}
 		});
 	};

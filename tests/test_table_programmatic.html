@@ -22,7 +22,7 @@
 		<script type="text/javascript" src="../../../dojo/dojo.js" 
 			djConfig="isDebug:false, debugAtAllCosts: false, parseOnLoad: true"></script>
 		<script type="text/javascript">
-			dojo.require("dojox.table.Table");
+			dojo.require("dojox.table.QueryTable");
 			dojo.require("dojox.table.Tree");
 			dojo.require("dojox.table.Selection");
 			dojo.require("dojo.store.Observable");
@@ -43,7 +43,7 @@
 					return test_store.query({});
 				};
 				test_store = new dojo.store.Observable(test_store);
-				tableWidget = new dojox.table.Table({
+				tableWidget = new dojox.table.QueryTable({
 					id: "table",
 					store: test_store,
 					structure: layout
