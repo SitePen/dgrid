@@ -19,43 +19,61 @@
 				height: 30em;
 			}
 		</style>
+		<script>
+			require ={
+				baseUrl: "../../../"
+			};
+		</script>
+		<!--<script src="../../../allplugins-require.js"></script>-->
+		<script>
+			var start= new Date().getTime();
+		</script>
 		<script type="text/javascript" src="../../../dojo/dojo.js" 
 			djConfig="isDebug:false, debugAtAllCosts: false, parseOnLoad: true"></script>
 		<script type="text/javascript">
-			dojo.require("dojox.table.QueryTable");
-			dojo.require("dojox.table.Tree");
-			dojo.require("dojox.table.Selection");
-			dojo.require("dojo.store.Observable");
-			dojo.require("dojo.store.Memory");
-		</script>
-		<script type="text/javascript" src="test_data.js"></script>
-		<script type="text/javascript">
+			dojo.baseUrl =  "../../../dojo/";
 			var grid = null;
-			dojo.addOnLoad(function(){
-				var layout = [
-					new dojox.table.Tree({name: 'Column 1', field: 'col1'}),
-					{name: 'Column 2', field: 'col2'},
-					{name: 'Column 3', field: 'col3', editable: true, sortable: true},
-					{name: 'Column 4', field: 'col4', width: "150px", sortable: true},
-					{name: 'Column 5', field: 'col5', sortable: true}
-				];
-				test_store.getChildren = function(object, options){
-					return test_store.query({});
-				};
-				test_store = new dojo.store.Observable(test_store);
-				tableWidget = new dojox.table.QueryTable({
-					id: "table",
-					store: test_store,
-					structure: layout
-				}, "table");
-				dojox.table.Selection(tableWidget);
-				//dojo.byId("tableContainer").appendChild(table.domNode);
-				//table.startup();
-			});
+			define("test",["dojox/table/QueryTable","dojox/table/Tree","dojox/table/Selection", "dojo/store/Observable", "dijit/ProgressBar", "dojox/table/tests/test_data"], 
+				function(QueryTable, Tree, Selection, Observable, ProgressBar){
+					dojo.addOnLoad(function(){
+						console.log("loaded in " + (new Date().getTime() - start));
+						var layout = [
+							new Tree({name: 'Column 1', field: 'col1'}),
+							{name: 'Column 2', field: 'col2'},
+							{name: 'Column 3', field: 'col3', editable: true, sortable: true},
+							{name: 'Column 4', field: 'col4', width: "150px", sortable: true},
+							{name: 'Column 5', field: 'col5', sortable: true}
+						];
+						test_store.getChildren = function(object, options){
+							return test_store.query({});
+						};
+						test_store = new Observable(test_store);
+						tableWidget = new QueryTable({
+							id: "table",
+							store: test_store,
+							structure: layout
+						}, "table");
+						Selection(tableWidget);
+						//dojo.byId("tableContainer").appendChild(table.domNode);
+						//table.startup();
+						new ProgressBar({},"progress-bar");
+					});
+				});
+/*										define("my-module", ["dojo/store/Memory", "rql/js-array"],
+function(Memory, jsArray){
+  test_store
+  test_store.queryEngine = jsArray.query;
+  test_store.query("col5<20&sort(col5)").forEach(function(product){
+    console.log(product);
+  });
+});*/
+				
+			//require([]);
 		</script>
 	</head>
 	<body class="claro">
 		<div class="heading">Table Programmatic Instantiation Test</div>
 		<div id="table"></div>
+		<div id="progress-bar"></div>
 	</body>
 </html>

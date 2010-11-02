@@ -1,7 +1,5 @@
-dojo.provide("dojox.table.Selection");
-dojo.require("dojo.Stateful");
-
-dojox.table.Selection = function(table, options){
+define(["dojo/Stateful"], function(Stateful){
+return function(table, options){
 	// summary:
 	// 		Add selection capabilities to a table
 	// returns:
@@ -24,9 +22,10 @@ dojox.table.Selection = function(table, options){
 			 	break;
 		}
 	});
-	var selection = new dojo.Stateful();
+	var selection = new Stateful();
 	selection.watch(function(id, oldValue, value){
 		dojo[value ? "addClass" : "removeClass"](table.getRowNode(id), "dijitTreeRowSelected");
 	});
 	return selection;
 };
+});

@@ -1,6 +1,6 @@
-dojo.provide("dojox.table.Tree");
+define([], function(){
 
-dojo.declare("dojox.table.Tree", null, {
+return dojo.declare(null, {
 	constructor: function(settings){
 		// summary:
 		//		Creates an expanding tree column to a table
@@ -57,4 +57,5 @@ dojo.declare("dojox.table.Tree", null, {
 		
 		
 	}
+});
 });

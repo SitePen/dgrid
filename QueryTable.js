@@ -1,7 +1,5 @@
-dojo.provide("dojox.table.QueryTable");
-dojo.require("dojox.table.Table");
-
-dojo.declare("dojox.table.QueryTable", dojox.table.Table, {
+define(["dojo", "./Table"], function(dojo, Table){
+return dojo.declare(Table, {
 	create: function(params, srcNodeRef){
 		this.inherited(arguments);
 		var self = this;
@@ -94,3 +92,4 @@ dojo.declare("dojox.table.QueryTable", dojox.table.Table, {
 	}	
 });
 
+});

@@ -1,7 +1,6 @@
-dojo.provide("dojox.table.TextEdit");
-dojo.require("dojo.Stateful");
+define([], function(){
 
-dojox.table.TextEdit = function(settings){
+return function(settings){
 	// summary:
 	// 		Add text-box based editing to a column
 	var originalRenderCell = settings.renderCell || function(data, td){
@@ -35,3 +34,4 @@ dojox.table.TextEdit = function(settings){
 	};
 	return settings;
 };
+});

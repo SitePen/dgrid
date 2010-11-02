@@ -1,5 +1,5 @@
 // example sample data and code
-(function(){
+define(["dojo/store/Memory"],function(Memory){
 	// some sample data
 	// global var "data"
 	data = {
@@ -22,5 +22,5 @@
 	}
 
 	// global var "test_store"
-	test_store = new dojo.store.Memory({data: data});
-})();
+	test_store = new Memory({data: data});
+});

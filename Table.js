@@ -1,7 +1,4 @@
-dojo.provide("dojox.table.Table");
-dojo.require("dojox.table.TextEdit");
-
-(function(){
+define(["./TextEdit"], function(TextEdit){
 	// allow for custom CSS class definitions 
 	var classes = {
 		preload:"preload",
@@ -12,7 +9,7 @@ dojo.require("dojox.table.TextEdit");
 		header: "dijitTreeRow dijitTreeRowSelected"
 	};
 	var create = dojo.create;
-	dojo.declare("dojox.table.Table", dijit._Widget||null, {
+	return dojo.declare(typeof dijit._Widget == "function" ? dijit._Widget : null, {
 		_rowIdToObject:{},
 		classes: classes,
 		minRowsPerPage: 25,
@@ -248,7 +245,7 @@ dojo.require("dojox.table.TextEdit");
 				var column = this.structure[i];
 				column.table = this;
 				if(column.editable){
-					column = dojox.table.TextEdit(column);
+					column = TextEdit(column);
 				}
 				var th = create("th",{
 					className: classes.header,
@@ -329,4 +326,4 @@ dojo.require("dojox.table.TextEdit");
 			}while(node && node != this.domNode);
 		}
 	});
-})();
+});
