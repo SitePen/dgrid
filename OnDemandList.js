@@ -1,26 +1,92 @@
-define(["dojo", "./Table"], function(dojo, Table){
-return dojo.declare(Table, {
-	create: function(params, srcNodeRef){
-		this.inherited(arguments);
+define(["compose", "uber/when", "uber/listen", "./List"], function(Compose, when, listen, List){
+return Compose({
+	create: Compose.after(function(params, srcNodeRef){
 		var self = this;
 		// check visibility on scroll events
-		dojo.connect(this.scrollNode, "onscroll", function(){
+		listen(this.scrollNode, "scroll", function(){
 			self.checkVisible();
 		});
 		//this.inherited(arguments);
 		
+	}),
+	renderQuery: function(query, preloadNode){
+		// summary:
+		//		Creates a preload node for rendering a query into, and executes the query
+		//		for the first page of data. Subsequent data will be downloaded as it comes
+		//		into view.
+		preloadNode = preloadNode || this.createNode("div", {
+			className: "preload"
+		}, this.contentNode);
+		// this preload node is used to represent the area of the table that hasn't been 
+		// downloaded yet
+		preloadNode.preload = true;
+		preloadNode.query = query;
+		preloadNode.start = this.minRowsPerPage;
+		preloadNode.count = 0;
+		var priorPreload = this.preloadNode;
+		if(priorPreload){
+			// the preload nodes (if there are multiple) are represented as a linked list, need to insert it
+			if((preloadNode.next = priorPreload.next)){
+				var previous = preloadNode.next.previous; 
+			}
+			preloadNode.previous = previous;
+			preloadNode.next = preloadNode;
+		}else{
+			this.preloadNode = preloadNode;
+		}
+		var options = {start: 0, count: this.minRowsPerPage, query: query};
+		// execute the query
+		var results = query(options);
+		var self = this;
+		// render the result set
+		when(this.renderCollection(results, preloadNode, options), function(trs){
+			return when(results.total || results.length, function(total){
+				// now we need to adjust the height and total count based on the first result set
+				var height = 0;
+				for(var i = 0, l = trs.length; i < l; i++){
+					height += trs[i].offsetHeight;
+				} 
+				self.rowHeight = height / l;
+				total -= trs.length;
+				preloadNode.style.height = Math.min(total * self.rowHeight, self.maxEmptySpace) + "px";
+				preloadNode.count = total;
+				preloadNode.start = trs.length; 
+				// can remove the loading node now
+			});
+		}, console.error);
+		return preloadNode;
 	},
+	sortOrder: null,
+	sort: function(attribute, descending){
+		// summary:
+		//		Sort the content
+		this.sortOrder = [{attribute: attribute, descending: descending}];
+		this.refreshContent();
+	},
+	refreshContent: Compose.after(function(){
+		if(this.store){
+			// render the query
+			var self = this;
+			this.renderQuery(function(queryOptions){
+				queryOptions.sort = self.sortOrder;
+				return self.store.query(self.query, queryOptions);
+			});
+		}		
+	}),
 	lastScrollTop: 0,
 	checkVisible: function(){
 		// summary:
 		//		Checks to make sure that everything in the viewable area has been 
 		// 		downloaded, and triggering a request for the necessary data when needed.
 		var scrollNode = this.scrollNode;
-		var visibleTop = scrollNode.scrollTop;
+		var transform = this.contentNode.style.webkitTransform;
+		var visibleTop = scrollNode.scrollTop + (transform ? -transform.match(/translate[\w]*\(.*?,(.*?)px/)[1] : 0);
+		console.log("transform ", transform, visibleTop);
 		var visibleBottom = scrollNode.offsetHeight + visibleTop;
 		var priorPreload, preloadNode = this.preloadNode;
 		var lastScrollTop = this.lastScrollTop;
 		this.lastScrollTop = visibleTop;
+		
 		// there can be multiple preloadNodes (if they split, or multiple queries are created),
 		//	so we can traverse them until we find whatever is in the current viewport, making
 		//	sure we don't backtrack
@@ -60,12 +126,12 @@ return dojo.declare(Table, {
 				}
 				offset = Math.round(offset);
 				count = Math.round(count);
-				var options = this.queryOptions ? dojo.delegate(this.queryOptions) : {};
+				var options = this.queryOptions ? Compose.create(this.queryOptions) : {};
 				options.start = preloadNode.start + offset;
 				options.count = count;
 				if(offset > 0 && offset + count < preloadNode.count){
 					// TODO: need to do a split 
-					var second = dojo.clone(preloadNode);
+					var second = document.clone(preloadNode);
 				}else{
 					preloadNode.start += count;
 					preloadNode.count -= count;
@@ -73,7 +139,7 @@ return dojo.declare(Table, {
 				}
 				// create a loading node as a placeholder while the data is loaded 
 				var loadingNode = this.createNode("tr",{
-					className: this.classes.loading,
+					className: "list-loading",
 					style: {
 						height: count * this.rowHeight
 					}
@@ -81,8 +147,9 @@ return dojo.declare(Table, {
 				this.contentNode.insertBefore(loadingNode, preloadNode);
 				// use the query associated with the preload node to get the next "page"
 				options.query = preloadNode.query;
+				console.log("query", options)
 				var results = preloadNode.query(options);
-				dojo.when(this.renderCollection(results, loadingNode, options),
+				when(this.renderCollection(results, loadingNode, options),
 					function(){
 						// can remove the loading node now
 						loadingNode.parentNode.removeChild(loadingNode);

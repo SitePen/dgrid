@@ -15,8 +15,7 @@ return dojo.declare(null, {
 		td.style.paddingLeft = (level * 19) + "px";
 		var expanded, table = this.table;
 		// create the expando
-		var expando = dojo.create("img", {
-			src: table._blankGif,
+		var expando = dojo.create("div", {
 			className:"dijitTreeExpando dijitTreeExpandoClosed"
 		}, td);
 		var tr, query;

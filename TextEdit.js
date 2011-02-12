@@ -1,4 +1,4 @@
-define([], function(){
+define(["uber/listen", "uber/when"], function(){
 
 return function(settings){
 	// summary:
@@ -8,7 +8,7 @@ return function(settings){
 	};
 	settings.renderCell = function(data, td){
 		originalRenderCell(data, td);
-		dojo.connect(td, "dblclick", function(){
+		listen(td, "dblclick", function(){
 			td.removeChild(td.firstChild);
 			var input = dojo.create("input",{
 				type:"text",
@@ -21,7 +21,7 @@ return function(settings){
 					var thisInput = input;
 					input = null;
 					if(table.store){
-						dojo.when(table.store.get(table.getObjectId(td)), function(object){ 
+						when(table.store.get(table.getObjectId(td)), function(object){ 
 							data = object[settings.field] = thisInput.value;
 							table.store.put(object);
 							originalRenderCell(data, td);
@@ -35,3 +35,5 @@ return function(settings){
 	return settings;
 };
 });
+
+
