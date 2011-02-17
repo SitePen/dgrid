@@ -1,10 +1,10 @@
 define(["compose", "uber/when", "uber/listen", "./List"], function(Compose, when, listen, List){
-return Compose({
+return List.extend({
 	create: Compose.after(function(params, srcNodeRef){
 		var self = this;
 		// check visibility on scroll events
-		listen(this.scrollNode, "scroll", function(){
-			self.checkVisible();
+		listen(this.scrollNode, "scroll", function(event){
+			self.onscroll(event);
 		});
 		//this.inherited(arguments);
 		
@@ -74,14 +74,13 @@ return Compose({
 		}		
 	}),
 	lastScrollTop: 0,
-	checkVisible: function(){
+	onscroll: function(){
 		// summary:
 		//		Checks to make sure that everything in the viewable area has been 
 		// 		downloaded, and triggering a request for the necessary data when needed.
 		var scrollNode = this.scrollNode;
 		var transform = this.contentNode.style.webkitTransform;
 		var visibleTop = scrollNode.scrollTop + (transform ? -transform.match(/translate[\w]*\(.*?,(.*?)px/)[1] : 0);
-		console.log("transform ", transform, visibleTop);
 		var visibleBottom = scrollNode.offsetHeight + visibleTop;
 		var priorPreload, preloadNode = this.preloadNode;
 		var lastScrollTop = this.lastScrollTop;
@@ -139,7 +138,7 @@ return Compose({
 				}
 				// create a loading node as a placeholder while the data is loaded 
 				var loadingNode = this.createNode("tr",{
-					className: "list-loading",
+					className: "d-list-loading",
 					style: {
 						height: count * this.rowHeight
 					}

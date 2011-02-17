@@ -16,18 +16,15 @@ define(["compose", "uber/listen", "./TextEdit", "./List"], function(Compose, lis
 		return node;
 	};
 	
-	return Compose(List, {
+	return List.extend({
 		renderRowContents: function(tr, object, options){
-			for(var i = 0, l = this.structure.length; i < l; i++){
+			for(var i = 0, l = this.layout.length; i < l; i++){
 				// iterate through the columns
-				var column = this.structure[i];
+				var column = this.layout[i];
 				var td = create("div",{
-					className: "list-cell",
+					className: "d-list-cell",
 					style: {
-						width: column.width || "200px",
-						overflow: "hidden",
-						margin: "2px",
-						padding: "1px" // temporarily to match the css on the headers
+						width: column.width
 					}
 				});
 				var data = object;
@@ -61,19 +58,17 @@ define(["compose", "uber/listen", "./TextEdit", "./List"], function(Compose, lis
 			var tr = this.headerNode;
 			var ths = [];
 			var table = this;
-			for(var i = 0, l = this.structure.length; i < l; i++){
-				var column = this.structure[i];
+			for(var i = 0, l = this.layout.length; i < l; i++){
+				var column = this.layout[i];
 				column.table = this;
 				if(column.editable){
 					column = TextEdit(column);
 				}
 				var th = 
 				create("div",{
-					className: "ui-widget-header",
+					className: "d-list-header-cell ui-widget-header",
 					style: {
-						width: column.width || "200px",
-						"float": "left",
-						overflow: "hidden"
+						width: column.width
 					}
 				});
 				ths.push(th);

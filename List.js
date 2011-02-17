@@ -54,15 +54,12 @@ define(["compose", "uber/listen", "uber/aop", "./TextEdit", true || has("event-t
 		},{
 		minRowsPerPage: 25,
 		maxRowsPerPage: 100,
-		maxEmptySpace: 5000,
+		maxEmptySpace: 10000,
 		queryOptions: {},
 		query: {},
 		createNode: create,
 		structure: [],
 		rowHeight: 0,
-/*		postscript: function(params, srcNodeRef){
-			this.create(params, srcNodeRef);
-		},*/
 		create: function(params, srcNodeRef){
 			this.domNode = srcNodeRef.nodeType ? srcNodeRef : byId(srcNodeRef);
 			if(params){
@@ -73,59 +70,16 @@ define(["compose", "uber/listen", "uber/aop", "./TextEdit", true || has("event-t
 			if(this.domNode.tagName == "table"){
 				
 			}
+			this.domNode.className += "	ui-widget-content";
 			this.headerNode = create("div",{
+				className: "d-list-header"
 			},this.domNode);
 			this.scrollNode = create("div",{
-				style: {
-					overflowY:"auto",
-					overflowX:"hidden",
-					position: "absolute",
-					top:"21px",
-					bottom: "0px",
-					left: "0px",
-					right: "0px"
-					//height:(this.domNode.offsetHeight - 25) + "px" 
-				}
+				className: "d-list-scroller"
 			},this.domNode);
 			this.renderHeader();
 			this.refreshContent();
-			aop.after(this, "scrollTo", this.checkVisible);
-			// setup touch handling:
-			/*var momentum, movement, lastY;
-			function coords(andThen){
-				return function(e){
-					var touch = e.touches[0];
-					andThen(y = touch.pageY, e);
-					lastY = y;
-				}
-			}
-			// do the scrolling in response to touch gestures
-			function move(y){
-				self.scrollNode.scrollTop = self.scrollNode.scrollTop + y
-			}
-			listen(this.scrollNode, "touchstart", coords(function(y){
-				clearInterval(movement);
-			}));
-			listen(this.scrollNode, "touchmove",  coords(function(y, e){
-				e.preventDefault();
-				move(lastY - y);
-				// measure the momentum
-				momentum = lastY - y;
-			}));
-			listen(this.scrollNode, "touchend", function(){
-				// setup the continued movement of momentum after the gesture
-				movement = setInterval(function(){
-					// continue until we run out of steam
-					if(Math.abs(momentum) > 2){
-						move(momentum);
-						// gradually reduce the momentum
-						momentum += (momentum > 0 ? -1 : 1);
-					}else{
-						// we are done with the gesture
-						clearInterval(movement);
-					}				
-				}, 30);
-			});*/
+			aop.after(this, "scrollTo", this.onscroll);
 		},
 		on: function(eventType, listener){ 
 			// delegate events to the domNode
@@ -144,7 +98,6 @@ define(["compose", "uber/listen", "uber/aop", "./TextEdit", true || has("event-t
 				this.observers = [];
 			}
 			this.contentNode = create("div",{
-				className: "ui-widget-content",
 				style: {
 					width:"32000px"
 				}
@@ -196,17 +149,11 @@ define(["compose", "uber/listen", "uber/aop", "./TextEdit", true || has("event-t
 			// summary:
 			//		Renders a single row in the table
 			var tr = create("div",{
-				className: odd ? "list-row-odd" : "list-row-even"
+				className: "d-list-row " + (odd ? "d-list-row-odd" : "d-list-row-even")
 			});
 			// get the row id for easy retrieval
 			this._rowIdToObject[tr.id = this.id + "-row-" + ((this.store && this.store.getIdentity) ? this.store.getIdentity(object) : this._autoId++)] = object;
 			this.renderRowContents(tr, object, options);  
-			create("div",{
-					style: {
-						visibility: "hidden",
-						clear: "both"
-					}
-				}, tr);
 			this.contentNode.insertBefore(tr, beforeNode);
 			return tr;
 		},

@@ -1,23 +1,19 @@
-define([], function(){
+define(["compose"], function(Compose){
 
-return dojo.declare(null, {
-	constructor: function(settings){
-		// summary:
-		//		Creates an expanding tree column to a table
-		for(var i in settings){
-			this[i] = settings[i];
-		} 
-	},
+return Compose(Compose, {
 	renderCell: function(data, td, options){
 		// summary:
 		//		Renders a cell that can be expanded, creating more rows
-		var level = (options.query.level || 0) + 1;
-		td.style.paddingLeft = (level * 19) + "px";
+		var level = options.query.level + 1;
+		level = isNaN(level) ? 0 : level;
 		var expanded, table = this.table;
 		// create the expando
-		var expando = dojo.create("div", {
-			className:"dijitTreeExpando dijitTreeExpandoClosed"
-		}, td);
+		var expando = td.appendChild(document.createElement("div"));
+		if(this.field){
+			td.appendChild(document.createTextNode(data));
+		}
+		expando.className = "ui-icon ui-icon-triangle-1-e";
+		expando.setAttribute("style", "margin-left: " + (level * 19) + "px; float: left");
 		var tr, query;
 		var preloadNode;
 		expando.onclick = function(){
@@ -26,7 +22,7 @@ return dojo.declare(null, {
 				// if the children have not been created, create a preload node and do the 
 				// query for the children
 				tr = td.parentNode;
-				preloadNode = dojo.create("tr", {});
+				preloadNode = document.createElement("tr");
 				query.level = level;
 				tr.parentNode.insertBefore(preloadNode, tr.nextSibling);
 				var object = table.getObject(tr);
@@ -38,11 +34,9 @@ return dojo.declare(null, {
 			// update the expando display
 			var styleDisplay = (expanded = !expanded) ? "" : "none";
 			if(expanded){
-				dojo.removeClass(expando, "dijitTreeExpandoClosed"); 
-				dojo.addClass(expando, "dijitTreeExpandoOpened"); 
+				expando.className = "ui-icon ui-icon-triangle-1-se";
 			}else{
-				dojo.removeClass(expando, "dijitTreeExpandoOpened"); 
-				dojo.addClass(expando, "dijitTreeExpandoClosed"); 
+				expando.className = "ui-icon ui-icon-triangle-1-e";
 			}
 			// show or hide all the children
 			var childTr = tr;
