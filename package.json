@@ -1,0 +1,30 @@
+{
+  "name": "d-list",
+  "author": "Kris Zyp",
+  "description": "A lightweight, mobile-ready, data-driven, modular widget designed for lists and tables",
+  "licenses": [
+     {
+         "type": "AFLv2.1",
+         "url": "http://trac.dojotoolkit.org/browser/dojo/trunk/LICENSE#L43"
+     },
+     {
+         "type": "BSD",
+         "url": "http://trac.dojotoolkit.org/browser/dojo/trunk/LICENSE#L13"
+     }
+  ],
+  "repository": {
+    "type":"git",
+    "url":"http://github.com/kriszyp/d-list"
+  },
+  "dependencies": {
+    "dojo": "1.7-bootstrap-has-modularize"
+  },
+  "directories": {
+    "lib": "."
+  },
+  "main": "./OnDemandTable",
+  "mappings":{
+    "dojo": "http://github.com/kriszyp/dojo/zipball/1.7-bootstrap-has-modularize"
+  },
+  "icon": "http://packages.dojofoundation.org/images/d-list.png"
+}
