@@ -1,8 +1,4 @@
-(function(){
-function has(){
-	return document.createElement("div").ontouchstart === null;
-}
-define(["compose", "uber/listen", "uber/aop", "./TextEdit", true || has("event-touch") ? "./TouchScroll": null, "style/css!./css/list"], function(Compose, listen, aop, TextEdit, TouchScroll){
+define(["compose", "dojo/listen", "dojo/aspect", "./TextEdit", "dojo/has!touch?./TouchScroll", "cssx/css!./css/list.css"], function(Compose, listen, aspect, TextEdit, TouchScroll){
 	// allow for custom CSS class definitions 
 	// TODO: figure out what to depend for this
 	var byId = function(id){
@@ -10,9 +6,11 @@ define(["compose", "uber/listen", "uber/aop", "./TextEdit", true || has("event-t
 	};
 	var create = function(tag, props, target){
 		var node = document.createElement(tag);
+		var style = props.style;
+		delete props.style;
 		Compose.call(node, props);
-		if(props.style){
-			Compose.call(node.style, props.style);
+		if(style){
+			Compose.call(node.style, style);
 		}
 		if(target){
 			target.appendChild(node);
@@ -58,7 +56,6 @@ define(["compose", "uber/listen", "uber/aop", "./TextEdit", true || has("event-t
 		queryOptions: {},
 		query: {},
 		createNode: create,
-		structure: [],
 		rowHeight: 0,
 		create: function(params, srcNodeRef){
 			this.domNode = srcNodeRef.nodeType ? srcNodeRef : byId(srcNodeRef);
@@ -79,7 +76,7 @@ define(["compose", "uber/listen", "uber/aop", "./TextEdit", true || has("event-t
 			},this.domNode);
 			this.renderHeader();
 			this.refreshContent();
-			aop.after(this, "scrollTo", this.onscroll);
+			aspect.after(this, "scrollTo", this.onscroll);
 		},
 		on: function(eventType, listener){ 
 			// delegate events to the domNode
@@ -124,41 +121,41 @@ define(["compose", "uber/listen", "uber/aop", "./TextEdit", true || has("event-t
 					// a change in the data took place
 					if(from > -1){
 						// remove from old slot
-						var tr = trs.splice(from, 1)[0];
+						var tr = rows.splice(from, 1)[0];
 						contentNode.removeChild(tr);
 					}
 					if(to > -1){
 						// add to new slot
-						var tr = self.renderRow(object, trs[to], (options.start + to) % 2 == 1, options);
-						trs.splice(to, 0, tr);
+						var tr = self.createRow(object, rows[to], (options.start + to) % 2 == 1, options);
+						rows.splice(to, 0, tr);
 					}
 				}));
 			}
 			// now render the results
 			// TODO: if it is raw array, we can't rely on map
-			var trs = results.map(function(object){
-				return self.renderRow(object, beforeNode, start++ % 2 == 1, options);
+			var rows = results.map(function(object){
+				return self.createRow(object, beforeNode, start++ % 2 == 1, options);
 			}, console.error);
-			return trs;
+			return rows;
 		},
 		_autoId: 0,
 		renderHeader: function(){
 			// no-op in a place list 
 		},
-		renderRow: function(object, beforeNode, odd, options){
+		createRow: function(object, beforeNode, odd, options){
 			// summary:
 			//		Renders a single row in the table
-			var tr = create("div",{
+			var row = create("div",{
 				className: "d-list-row " + (odd ? "d-list-row-odd" : "d-list-row-even")
 			});
 			// get the row id for easy retrieval
-			this._rowIdToObject[tr.id = this.id + "-row-" + ((this.store && this.store.getIdentity) ? this.store.getIdentity(object) : this._autoId++)] = object;
-			this.renderRowContents(tr, object, options);  
-			this.contentNode.insertBefore(tr, beforeNode);
-			return tr;
+			this._rowIdToObject[row.id = this.id + "-row-" + ((this.store && this.store.getIdentity) ? this.store.getIdentity(object) : this._autoId++)] = object;
+			this.renderRow(row, object, options);  
+			this.contentNode.insertBefore(row, beforeNode);
+			return row;
 		},
-		renderRowContents: function(tr, value){
-			tr.innerHTML = value;
+		renderRow: function(row, value){
+			row.innerHTML = value;
 		},
 		getRowNode: function(objectOrId){
 			// summary:
@@ -170,7 +167,7 @@ define(["compose", "uber/listen", "uber/aop", "./TextEdit", true || has("event-t
 		},
 		getObject: function(node){
 			// summary:
-			//		Get the object for a given node (can be a tr or any child of it)
+			//		Get the object for a given node (can be a row or any child of it)
 			node = node.target || node;
 			var object;
 			do{
@@ -194,4 +191,3 @@ define(["compose", "uber/listen", "uber/aop", "./TextEdit", true || has("event-t
 		}
 	});
 });
-})();
