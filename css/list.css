@@ -1,25 +1,3 @@
-/*<div>{
-	attach: headerNode;
-}
-</div>
-<div>{
-	attach: scrollNode;
-	overflowY: auto;
-	overflowX: hidden;
-	position: absolute;
-	top: 21px;
-	bottom: 0px;
-	left: 0px;
-	right: 0px;
-}
-	<div>
-		/for-each {
-			<div>
-			</div>
-		}		
-	</div>
-</div>*/
-
 .d-list-scroller {
 	overflow-y: auto;
 	overflow-x: hidden;
@@ -31,14 +9,9 @@
 }
 .d-list-row {
 	clear: both;
-	-webkit-transition-property: background-color;
-	-webkit-transition-duration: .3s;
 	height: auto;
 	overflow: hidden;
 	width: 100%;
-}
-.d-list-row:hover {
-	background-color: #def;
 }
 .d-list-header-cell, .d-list-cell {
 	width: 200px;
@@ -46,7 +19,4 @@
 	padding: 1px;
 	float: left;
 	overflow: hidden;
-}
-.d-list-row-odd{
-	background-color: #eee;
 }
