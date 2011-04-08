@@ -1,4 +1,4 @@
-define(["uber/listen", "uber/when"], function(){
+define(["dojo/listen"], function(){
 
 return function(settings){
 	// summary:
@@ -21,7 +21,7 @@ return function(settings){
 					var thisInput = input;
 					input = null;
 					if(table.store){
-						when(table.store.get(table.getObjectId(td)), function(object){ 
+						dojo.when(table.store.get(table.getObjectId(td)), function(object){ 
 							data = object[settings.field] = thisInput.value;
 							table.store.put(object);
 							originalRenderCell(data, td);

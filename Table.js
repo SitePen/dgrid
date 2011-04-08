@@ -2,13 +2,15 @@
 function has(){
 	return document.createElement("div").ontouchstart === null;
 }
-define(["compose", "uber/listen", "./TextEdit", "./List"], function(Compose, listen, TextEdit, List){
+define(["compose", "dojo/listen", "./TextEdit", "./List"], function(Compose, listen, TextEdit, List){
 	// allow for custom CSS class definitions 
 	var create = function(tag, props, target){
 		var node = document.createElement(tag);
+		var style = props.style;
+		delete props.style;
 		Compose.call(node, props);
-		if(props.style){
-			Compose.call(node.style, props.style);
+		if(style){
+			Compose.call(node.style, style);
 		}
 		if(target){
 			target.appendChild(node);
@@ -17,7 +19,8 @@ define(["compose", "uber/listen", "./TextEdit", "./List"], function(Compose, lis
 	};
 	
 	return List.extend({
-		renderRowContents: function(tr, object, options){
+		layout: [],
+		renderRow: function(row, object, options){
 			for(var i = 0, l = this.layout.length; i < l; i++){
 				// iterate through the columns
 				var column = this.layout[i];
@@ -48,7 +51,7 @@ define(["compose", "uber/listen", "./TextEdit", "./List"], function(Compose, lis
 					column.renderCell(data, td, options);
 				}
 				// add the td to the tr at the end for better performance
-				tr.appendChild(td);
+				row.appendChild(td);
 			}
 			
 		},
@@ -61,6 +64,7 @@ define(["compose", "uber/listen", "./TextEdit", "./List"], function(Compose, lis
 			for(var i = 0, l = this.layout.length; i < l; i++){
 				var column = this.layout[i];
 				column.table = this;
+				column.field = column.field || column.child && column.child.substring(1);
 				if(column.editable){
 					column = TextEdit(column);
 				}

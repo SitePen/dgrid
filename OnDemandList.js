@@ -1,4 +1,4 @@
-define(["compose", "uber/when", "uber/listen", "./List"], function(Compose, when, listen, List){
+define(["compose", "dojo/_base/kernel", "dojo/_base/Deferred", "dojo/listen", "./List"], function(Compose, dojo, Deferred, listen, List){
 return List.extend({
 	create: Compose.after(function(params, srcNodeRef){
 		var self = this;
@@ -9,6 +9,7 @@ return List.extend({
 		//this.inherited(arguments);
 		
 	}),
+	store: null,
 	renderQuery: function(query, preloadNode){
 		// summary:
 		//		Creates a preload node for rendering a query into, and executes the query
@@ -39,8 +40,8 @@ return List.extend({
 		var results = query(options);
 		var self = this;
 		// render the result set
-		when(this.renderCollection(results, preloadNode, options), function(trs){
-			return when(results.total || results.length, function(total){
+		dojo.when(this.renderCollection(results, preloadNode, options), function(trs){
+			return dojo.when(results.total || results.length, function(total){
 				// now we need to adjust the height and total count based on the first result set
 				var height = 0;
 				for(var i = 0, l = trs.length; i < l; i++){
@@ -148,7 +149,7 @@ return List.extend({
 				options.query = preloadNode.query;
 				console.log("query", options)
 				var results = preloadNode.query(options);
-				when(this.renderCollection(results, loadingNode, options),
+				dojo.when(this.renderCollection(results, loadingNode, options),
 					function(){
 						// can remove the loading node now
 						loadingNode.parentNode.removeChild(loadingNode);
