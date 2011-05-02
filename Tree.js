@@ -1,6 +1,11 @@
-define(["compose"], function(Compose){
+define(["dojo/_base/declare"], function(declare){
 
-return Compose(Compose, {
+return declare([], {
+	constructor: function(mixin){
+		for(var i in mixin){
+			this[i] = mixin[i];
+		}
+	},
 	renderCell: function(data, td, options){
 		// summary:
 		//		Renders a cell that can be expanded, creating more rows

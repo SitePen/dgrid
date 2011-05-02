@@ -2,23 +2,10 @@
 function has(){
 	return document.createElement("div").ontouchstart === null;
 }
-define(["compose", "dojo/listen", "./TextEdit", "./List"], function(Compose, listen, TextEdit, List){
-	// allow for custom CSS class definitions 
-	var create = function(tag, props, target){
-		var node = document.createElement(tag);
-		var style = props.style;
-		delete props.style;
-		Compose.call(node, props);
-		if(style){
-			Compose.call(node.style, style);
-		}
-		if(target){
-			target.appendChild(node);
-		}
-		return node;
-	};
+define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "./TextEdit", "./List"], function(dojo, declare, listen, TextEdit, List){
+	var create = dojo.create;
 	
-	return List.extend({
+	return declare([List], {
 		layout: [],
 		renderRow: function(row, object, options){
 			for(var i = 0, l = this.layout.length; i < l; i++){

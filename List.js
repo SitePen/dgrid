@@ -1,24 +1,13 @@
-define(["compose", "dojo/listen", "dojo/aspect", "./TextEdit", "dojo/has!touch?./TouchScroll", "cssx/css!./css/list.css"], function(Compose, listen, aspect, TextEdit, TouchScroll){
+define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/aspect", "./TextEdit", "dojo/has!touch?./TouchScroll"], function(dojo, declare, listen, aspect, TextEdit, TouchScroll){
 	// allow for custom CSS class definitions 
 	// TODO: figure out what to depend for this
 	var byId = function(id){
 		return document.getElementById(id);
 	};
-	var create = function(tag, props, target){
-		var node = document.createElement(tag);
-		var style = props.style;
-		delete props.style;
-		Compose.call(node, props);
-		if(style){
-			Compose.call(node.style, style);
-		}
-		if(target){
-			target.appendChild(node);
-		}
-		return node;
-	};
+	var create = dojo.create;
 	
-	return Compose(TouchScroll, function(params, srcNodeRef){
+	return declare(TouchScroll ? [TouchScroll] : [], { 
+		constructor: function(params, srcNodeRef){
 		var self = this;
 		// summary:
 		//		The set of observers for the data
@@ -49,7 +38,7 @@ define(["compose", "dojo/listen", "dojo/aspect", "./TextEdit", "dojo/has!touch?.
 		self.contentNode.insertBefore(node, last);
 	};
 			this.create(params, srcNodeRef);
-		},{
+		},
 		minRowsPerPage: 25,
 		maxRowsPerPage: 100,
 		maxEmptySpace: 10000,
@@ -61,7 +50,9 @@ define(["compose", "dojo/listen", "dojo/aspect", "./TextEdit", "dojo/has!touch?.
 			this.domNode = srcNodeRef.nodeType ? srcNodeRef : byId(srcNodeRef);
 			if(params){
 				this.params = params;
-				Compose.call(this, params);
+				for(var i in params){
+					this[i] = params[i];
+				}
 			}
 
 			if(this.domNode.tagName == "table"){

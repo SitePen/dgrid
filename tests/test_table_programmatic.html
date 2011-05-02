@@ -7,7 +7,7 @@
 		<meta name="viewport" content="width=570" />
 		<style type="text/css">
 			@import "../../../dojo/resources/dojo.css";
-			@import "../../../dijit/themes/claro/claro.css";
+			@import "../css/list.css";
 			.heading {
 				font-weight: bold;
 				padding-bottom: 0.25em;
@@ -20,21 +20,16 @@
 			}
 		</style>
 		<script>
-			require ={
-				baseUrl: "../../../"
-			};
-		</script>
-		<!--<script src="../../../allplugins-require.js"></script>-->
-		<script>
 			var start= new Date().getTime();
 		</script>
 		<script type="text/javascript" src="../../../dojo/dojo.js" 
-			djConfig="isDebug:false, debugAtAllCosts: false, parseOnLoad: true"></script>
+			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			dojo.baseUrl =  "../../../dojo/";
 			var grid = null;
-			define("test",["dojox/table/QueryTable","dojox/table/Tree","dojox/table/Selection", "dojo/store/Observable", "dijit/ProgressBar", "dojox/table/tests/test_data"], 
-				function(QueryTable, Tree, Selection, Observable, ProgressBar){
+			require({"packages":[{"name":"d-list","location":"/packages/d-list", "lib":"."}]});
+
+			require(["d-list/OnDemandTable","d-list/Tree","d-list/Selection", "dojo/store/Observable", "dijit/ProgressBar", "dojox/table/tests/test_data"], 
+				function(Table, Tree, Selection, Observable, ProgressBar){
 					dojo.addOnLoad(function(){
 						console.log("loaded in " + (new Date().getTime() - start));
 						var layout = [
@@ -48,10 +43,10 @@
 							return test_store.query({});
 						};
 						test_store = new Observable(test_store);
-						tableWidget = new QueryTable({
+						tableWidget = new Table({
 							id: "table",
 							store: test_store,
-							structure: layout
+							layout: layout
 						}, "table");
 						Selection(tableWidget);
 						//dojo.byId("tableContainer").appendChild(table.domNode);

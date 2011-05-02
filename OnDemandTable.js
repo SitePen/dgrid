@@ -1,3 +1,3 @@
-define(["./Table", "./OnDemandList"], function(Table, OnDemandList){
-	return Table.extend(OnDemandList);
+define(["dojo/_base/declare", "./Table", "./OnDemandList"], function(declare, Table, OnDemandList){
+	return declare([Table, OnDemandList], {});
 });

@@ -1,6 +1,7 @@
-define(["compose", "dojo/_base/kernel", "dojo/_base/Deferred", "dojo/listen", "./List"], function(Compose, dojo, Deferred, listen, List){
-return List.extend({
-	create: Compose.after(function(params, srcNodeRef){
+define(["dojo/_base/declare", "dojo/_base/kernel", "dojo/_base/Deferred", "dojo/listen", "./List"], function(declare, dojo, Deferred, listen, List){
+return declare([List], {
+	create: function(params, srcNodeRef){
+		this.inherited(arguments);
 		var self = this;
 		// check visibility on scroll events
 		listen(this.scrollNode, "scroll", function(event){
@@ -8,7 +9,7 @@ return List.extend({
 		});
 		//this.inherited(arguments);
 		
-	}),
+	},
 	store: null,
 	renderQuery: function(query, preloadNode){
 		// summary:
@@ -64,7 +65,8 @@ return List.extend({
 		this.sortOrder = [{attribute: attribute, descending: descending}];
 		this.refreshContent();
 	},
-	refreshContent: Compose.after(function(){
+	refreshContent: function(){
+		this.inherited(arguments);
 		if(this.store){
 			// render the query
 			var self = this;
@@ -73,7 +75,7 @@ return List.extend({
 				return self.store.query(self.query, queryOptions);
 			});
 		}		
-	}),
+	},
 	lastScrollTop: 0,
 	onscroll: function(){
 		// summary:
