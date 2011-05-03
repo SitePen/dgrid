@@ -1,10 +1,10 @@
-define(["dojo/_base/declare", "dojo/_base/kernel", "dojo/_base/Deferred", "dojo/listen", "./List"], function(declare, dojo, Deferred, listen, List){
+define(["dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/listen", "./List"], function(declare, dojo, Deferred, listen, List){
 return declare([List], {
 	create: function(params, srcNodeRef){
 		this.inherited(arguments);
 		var self = this;
 		// check visibility on scroll events
-		listen(this.scrollNode, "scroll", function(event){
+		listen(this.bodyNode, "scroll", function(event){
 			self.onscroll(event);
 		});
 		//this.inherited(arguments);
@@ -81,7 +81,7 @@ return declare([List], {
 		// summary:
 		//		Checks to make sure that everything in the viewable area has been 
 		// 		downloaded, and triggering a request for the necessary data when needed.
-		var scrollNode = this.scrollNode;
+		var scrollNode = this.bodyNode;
 		var transform = this.contentNode.style.webkitTransform;
 		var visibleTop = scrollNode.scrollTop + (transform ? -transform.match(/translate[\w]*\(.*?,(.*?)px/)[1] : 0);
 		var visibleBottom = scrollNode.offsetHeight + visibleTop;
@@ -128,7 +128,7 @@ return declare([List], {
 				}
 				offset = Math.round(offset);
 				count = Math.round(count);
-				var options = this.queryOptions ? Compose.create(this.queryOptions) : {};
+				var options = this.queryOptions ? dojo.delegate(this.queryOptions) : {};
 				options.start = preloadNode.start + offset;
 				options.count = count;
 				if(offset > 0 && offset + count < preloadNode.count){

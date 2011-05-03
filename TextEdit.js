@@ -1,4 +1,4 @@
-define(["dojo/listen"], function(){
+define(["dojo/listen"], function(listen){
 
 return function(settings){
 	// summary:

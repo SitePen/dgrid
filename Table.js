@@ -1,26 +1,24 @@
-(function(){
-function has(){
-	return document.createElement("div").ontouchstart === null;
-}
-define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "./TextEdit", "./List"], function(dojo, declare, listen, TextEdit, List){
+define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "./TextEdit", "./List", "cssx/cssx"], function(dojo, declare, listen, TextEdit, List, cssx){
 	var create = dojo.create;
 	
 	return declare([List], {
 		layout: [],
 		renderRow: function(row, object, options){
+			row = dojo.create("table", null, row);
+			//row = dojo.create("tr", null, row);
 			for(var i = 0, l = this.layout.length; i < l; i++){
 				// iterate through the columns
 				var column = this.layout[i];
-				var td = create("div",{
-					className: "d-list-cell",
-					style: {
-						width: column.width
-					}
+				var td = create("td",{
+					className: "dojoxGridxCell",
+					colid: i
 				});
 				var data = object;
 				// we support the field, get, and formatter properties like the DataGrid
-				if(column.field){
-					data = data[column.field];
+				var field = column.field;
+				if(field){
+					data = data[field];
+					td.setAttribute("field", field);
 				}
 				if(column.get){
 					data = column.get(data);
@@ -45,7 +43,7 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "./TextEdit", ".
 		renderHeader: function(){
 			// summary:
 			//		Setup the headers for the table
-			var tr = this.headerNode;
+			var tr = dojo.create("table", null, this.headerNode);
 			var ths = [];
 			var table = this;
 			for(var i = 0, l = this.layout.length; i < l; i++){
@@ -56,12 +54,14 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "./TextEdit", ".
 					column = TextEdit(column);
 				}
 				var th = 
-				create("div",{
-					className: "d-list-header-cell ui-widget-header",
-					style: {
-						width: column.width
-					}
+				create("th",{
+					className: "dojoxGridxHeaderCell ui-widget-header",
+					colid: i
 				});
+				var field = column.field;
+				if(field){
+					th.setAttribute("field", field);
+				}
 				ths.push(th);
 				// allow for custom header manipulation
 				if(column.renderHeaderCell){
@@ -81,17 +81,6 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "./TextEdit", ".
 					})(column.field);
 				}
 			}
-			create("div",{
-					width: "20px"
-				}, tr);
-			create("div",{
-					style: {
-						visibility: "hidden",
-						clear: "both"
-					}
-				}, tr);
-			return 404;
 		}
 	});
 });
-})();

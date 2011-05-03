@@ -1,4 +1,4 @@
-define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/aspect", "./TextEdit", "dojo/has!touch?./TouchScroll"], function(dojo, declare, listen, aspect, TextEdit, TouchScroll){
+define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/aspect", "./TextEdit", "dojo/has!touch?./TouchScroll", "cssx/css!./css/gridx.css"], function(dojo, declare, listen, aspect, TextEdit, TouchScroll){
 	// allow for custom CSS class definitions 
 	// TODO: figure out what to depend for this
 	var byId = function(id){
@@ -9,12 +9,22 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/aspect", "
 	return declare(TouchScroll ? [TouchScroll] : [], { 
 		constructor: function(params, srcNodeRef){
 		var self = this;
+		if(typeof params == "function"){
+			// mixins/plugins are being provided, we will mix then into the instance 
+			var i = 0, mixin;
+			while(typeof (mixin = arguments[i++]) == "function"){
+				dojo.safeMixin(this, mixin.prototype);
+			} 
+			// shift the arguments to get the params and srcNodeRef for the new instantiation
+			params = arguments[i - 1];
+			srcNodeRef = arguments[i];
+		}
 		// summary:
 		//		The set of observers for the data
 		this.observers = [];
 		this._rowIdToObject = {};
 	clearTop = function(){
-		var scrollNode = self.scrollNode;
+		var scrollNode = self.bodyNode;
 		var transform = self.contentNode.style.webkitTransform;
 		var visibleTop = scrollNode.scrollTop + (transform ? -transform.match(/translate[\w]*\(.*?,(.*?)px/)[1] : 0);
 		
@@ -50,24 +60,27 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/aspect", "
 			this.domNode = srcNodeRef.nodeType ? srcNodeRef : byId(srcNodeRef);
 			if(params){
 				this.params = params;
-				for(var i in params){
-					this[i] = params[i];
-				}
+				dojo.safeMixin(this, params);
 			}
 
 			if(this.domNode.tagName == "table"){
 				
 			}
-			this.domNode.className += "	ui-widget-content";
+			this.domNode.className += "	ui-widget-content dojoxGridx";
+			this.refresh();
+		},
+		refresh: function(){
 			this.headerNode = create("div",{
-				className: "d-list-header"
+				className: "dojoxGridxHeader"
 			},this.domNode);
-			this.scrollNode = create("div",{
-				className: "d-list-scroller"
+			this.bodyNode = create("div",{
+				className: "dojoxGridxScroller"
 			},this.domNode);
 			this.renderHeader();
+			this.bodyNode.style.top = this.headerNode.offsetHeight + "px";
 			this.refreshContent();
 			aspect.after(this, "scrollTo", this.onscroll);
+			this.postCreate && this.postCreate();
 		},
 		on: function(eventType, listener){ 
 			// delegate events to the domNode
@@ -78,21 +91,19 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/aspect", "
 			//		refreshes the contents of the table
 			if(this.contentNode){
 				// remove the content so it can be recreated
-				this.scrollNode.removeChild(this.contentNode);
+				this.bodyNode.removeChild(this.contentNode);
 				// remove any listeners
 				for(var i = 0;i < this.observers.length; i++){
-					this.observers[i].dismiss();
+					this.observers[i].cancel();
 				}
 				this.observers = [];
 			}
 			this.contentNode = create("div",{
-				style: {
-					width:"32000px"
-				}
-			}, this.scrollNode);
+			}, create("div",{
+			},this.bodyNode));
 			if(this.init){
 				this.init({
-					domNode: this.scrollNode,
+					domNode: this.bodyNode,
 					containerNode: this.contentNode
 				});
 			}
@@ -124,9 +135,11 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/aspect", "
 			}
 			// now render the results
 			// TODO: if it is raw array, we can't rely on map
+			var startTime = new Date().getTime();
 			var rows = results.map(function(object){
 				return self.createRow(object, beforeNode, start++ % 2 == 1, options);
 			}, console.error);
+			console.log("rendered in", new Date().getTime() - startTime);
 			return rows;
 		},
 		_autoId: 0,
@@ -137,7 +150,7 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/aspect", "
 			// summary:
 			//		Renders a single row in the table
 			var row = create("div",{
-				className: "d-list-row " + (odd ? "d-list-row-odd" : "d-list-row-even")
+				className: "dojoxGridxRow " + (odd ? "dojoxGridxRowOdd" : "dojoxGridxRowEven")
 			});
 			// get the row id for easy retrieval
 			this._rowIdToObject[row.id = this.id + "-row-" + ((this.store && this.store.getIdentity) ? this.store.getIdentity(object) : this._autoId++)] = object;

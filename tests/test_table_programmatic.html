@@ -7,7 +7,6 @@
 		<meta name="viewport" content="width=570" />
 		<style type="text/css">
 			@import "../../../dojo/resources/dojo.css";
-			@import "../css/list.css";
 			.heading {
 				font-weight: bold;
 				padding-bottom: 0.25em;
@@ -15,8 +14,17 @@
 					
 			#table { 
 				border: 1px solid #333;
-				width: 50em;
+				width: 550px;
 				height: 30em;
+			}
+			#table [field=col1] {
+				width: 80px;
+			}
+			#table [field=col2] {
+				width: 50px;
+			}
+			#table [field=col4] {
+				width: 150px;
 			}
 		</style>
 		<script>
@@ -26,24 +34,28 @@
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
 			var grid = null;
-			require({"packages":[{"name":"d-list","location":"/packages/d-list", "lib":"."}]});
+			require({"packages":[
+				{"name":"d-list","location":"/packages/d-list", "lib":"."},
+				{"name":"cssx","location":"/packages/cssx", "lib":"src/cssx", "main":"./src/cssx/cssx"},
+				{"name":"gridx","location":"/packages/grid-2.0", "lib":"gridx"}
+				]});
 
-			require(["d-list/OnDemandTable","d-list/Tree","d-list/Selection", "dojo/store/Observable", "dijit/ProgressBar", "dojox/table/tests/test_data"], 
-				function(Table, Tree, Selection, Observable, ProgressBar){
+			require(["dojo", "d-list/OnDemandTable","d-list/Tree","d-list/Selection", "gridx/modules/ColumnResizer", "dojo/store/Observable", /*"dijit/ProgressBar",*/ "dojox/table/tests/test_data"], 
+				function(dojo, Table, Tree, Selection, ColumnResizer, Observable, ProgressBar){
 					dojo.addOnLoad(function(){
 						console.log("loaded in " + (new Date().getTime() - start));
 						var layout = [
 							new Tree({name: 'Column 1', field: 'col1'}),
 							{name: 'Column 2', field: 'col2'},
 							{name: 'Column 3', field: 'col3', editable: true, sortable: true},
-							{name: 'Column 4', field: 'col4', width: "150px", sortable: true},
+							{name: 'Column 4', field: 'col4', sortable: true},
 							{name: 'Column 5', field: 'col5', sortable: true}
 						];
 						test_store.getChildren = function(object, options){
 							return test_store.query({});
 						};
 						test_store = new Observable(test_store);
-						tableWidget = new Table({
+						tableWidget = new Table(ColumnResizer, {
 							id: "table",
 							store: test_store,
 							layout: layout
@@ -51,14 +63,14 @@
 						Selection(tableWidget);
 						//dojo.byId("tableContainer").appendChild(table.domNode);
 						//table.startup();
-						new ProgressBar({},"progress-bar");
+						//new ProgressBar({},"progress-bar");
 					});
 				});
 /*										define("my-module", ["dojo/store/Memory", "rql/js-array"],
 function(Memory, jsArray){
   test_store
-  test_store.queryEngine = jsArray.query;
   test_store.query("col5<20&sort(col5)").forEach(function(product){
+  test_store.queryEngine = jsArray.query;
     console.log(product);
   });
 });*/
