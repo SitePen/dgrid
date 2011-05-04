@@ -16,18 +16,26 @@ return function(table, options){
 				case "single":
 					for(var i in selection){
 						if(selection.hasOwnProperty(i)){
-							selection.set(i, false);
+							set(this, i, false);
 						}
-					}
-					selection.set(id, true);
+					}					
+					set(this, id, true);
 					break;
 				case "extended":
-					selection.set(id, !selection[id]);
+					set(this, id, !selection[id]);
 				 	break;
 			}
 		}
 	});
 	var selection = new Stateful();
+	function set(target, id, value){
+		if(listen.dispatch(target, value ? "select" : "deselect", {
+			cancelable: true,
+			bubbles: true
+		})){
+			selection.set(id, value);
+		}
+	}
 	selection.watch(function(id, oldValue, value){
 		dojo[value ? "addClass" : "removeClass"](table.getRowNode(id), "dojoxGridxRowSelected");
 	});
