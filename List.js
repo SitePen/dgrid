@@ -1,4 +1,4 @@
-define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/aspect", "./TextEdit", "dojo/has!touch?./TouchScroll", "cssx/css!./css/gridx.css"], function(dojo, declare, listen, aspect, TextEdit, TouchScroll){
+define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/aspect", "./TextEdit", "dojo/has", "dojo/has!touch?./TouchScroll", "cssx/css!./css/d-list.css"], function(dojo, declare, listen, aspect, TextEdit, has, TouchScroll){
 	// allow for custom CSS class definitions 
 	// TODO: figure out what to depend for this
 	var byId = function(id){
@@ -22,6 +22,7 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/aspect", "
 		// summary:
 		//		The set of observers for the data
 		this.observers = [];
+		this._listeners = [];
 		this._rowIdToObject = {};
 	clearTop = function(){
 		var scrollNode = self.bodyNode;
@@ -72,21 +73,34 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/aspect", "
 			this.refresh();
 		},
 		refresh: function(){
-			this.headerNode = create("div",{
-				className: "dojoxGridxHeader"
+			var headerNode = this.headerNode = create("div",{
+				className: "dojoxGridxHeader dojoxGridxHeaderRow"
 			},this.domNode);
-			this.bodyNode = create("div",{
+			var bodyNode = this.bodyNode = create("div",{
 				className: "dojoxGridxScroller"
 			},this.domNode);
+			listen(bodyNode, "scroll", function(event){
+				// keep the header aligned with the body
+				headerNode.scrollLeft = bodyNode.scrollLeft;
+			});
 			this.renderHeader();
-			this.bodyNode.style.top = this.headerNode.offsetHeight + "px";
+			bodyNode.style.top = headerNode.offsetHeight + "px";
 			this.refreshContent();
 			aspect.after(this, "scrollTo", this.onscroll);
 			this.postCreate && this.postCreate();
 		},
-		on: function(eventType, listener){ 
+		on: function(eventType, listener){
 			// delegate events to the domNode
-			return listen(this.domNode, eventType, listener);
+			var signal = listen(this.domNode, eventType, listener);
+			if(has("dom-addeventlistener")){
+				this._listeners.push(signal);
+			}
+		},
+		destroy: function(){
+			// cleanup listeners
+			for(var i = 0; i < this._listeners.length; i++){
+				this._listeners.cancel();
+			}
 		},
 		refreshContent: function(){
 			// summary:
