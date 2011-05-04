@@ -1,0 +1,100 @@
+.dojoxGridx {
+	position: relative;
+	overflow: hidden;
+	border: 1px solid #ddd;
+}
+
+.dojoxGridx .dojoxGridxHeader {
+	background-color: #eee;
+	border-right: 17px solid transparent; /* emulate scrollbar for full scrolling*/
+}
+.dojoxGridx .dojoxGridxHeader, .dojoxGridxHeaderRow, .dojoxGridxFooter {
+	overflow: hidden;
+	background-color: #eee;
+}
+.dojoxGridx table {
+	border-collapse: collapse;
+	border: none;
+	table-layout: fixed;
+	position: relative;
+	width: 1px;
+}
+.dojoxGridx .dojoxGridxHeader th {
+	border-right: 1px solid #ddd;
+	padding: 3px;
+	text-align: left;
+	overflow: hidden;
+	width: 200px;	
+}
+
+
+.dojoxGridx .dojoxGridxHeaderRow {
+	border-bottom: 1px solid #ccc;
+}
+.dojoxGridx .dojoxGridxFooter {
+}
+.dojoxGridx .dojoxGridxMain {
+	position: relative;
+}
+.dojoxGridx .dojoxGridxBody {
+	height: 100%;
+	overflow: hidden;
+	position: absolute;
+}
+.dojoxGridxScroller{
+	overflow: auto;
+	position: absolute;
+	top: 25px; /* this will be adjusted programmatically to fit below the header*/
+	bottom: 0px;
+	left: 0px;
+	right: 0px;
+}
+
+.dojoxGridxRow td {
+	border: 1px solid #ddd;
+	border-left: none;
+	border-top: none;
+	padding: 3px;
+	text-align: left;
+	overflow: hidden;
+	width: 200px;
+}
+.dojoxGridxIcon{
+	width: 16px;
+	height: 16px;
+}
+/*below is dummy style*/
+.dojoxGridxRow, .dojoxGridxHeaderRow {
+}
+
+/* Single Sort */
+.dojoxGridxSortNode {
+	text-decoration:none;
+	display:block;
+}
+.dojoxGridxArrowButtonChar {
+	display:none;
+	float:right;
+}
+.dojoxGridxArrowButtonNode {
+	background:transparent url("../../../../dijit/themes/claro/images/spriteArrows.png") no-repeat scroll left center;
+	display:block;
+	float:right;
+	height:1em;
+	margin:2px 4px 0 5px;
+	padding-left:0;
+	width:7px;
+}
+.dojoxGridxSortUp .dojoxGridxArrowButtonNode {
+	background-position:-21px 50%;
+}
+
+/* selection*/
+.dojoxGridxRowSelected td {
+	background-color: #BFD6EB;
+}
+
+.ui-icon { width: 16px; height: 16px; background-image: url(images/ui-icons_222222_256x240.png); }
+
+.ui-icon-triangle-1-e { background-position: -32px -16px; }
+.ui-icon-triangle-1-se { background-position: -48px -16px; }
