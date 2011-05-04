@@ -40,8 +40,8 @@
 				{"name":"gridx","location":"/packages/grid-2.0", "lib":"gridx"}
 				]});
 
-			require(["dojo", "d-list/OnDemandTable","d-list/Tree","d-list/Selection", "gridx/modules/ColumnResizer", "dojo/store/Observable", /*"dijit/ProgressBar",*/ "dojox/table/tests/test_data"], 
-				function(dojo, Table, Tree, Selection, ColumnResizer, Observable, ProgressBar){
+			require(["dojo", "d-list/OnDemandTable","d-list/Tree","d-list/Selection", "gridx/modules/ColumnResizer", "dojo/store/Observable", "d-list/Keyboard", /*"dijit/ProgressBar",*/ "dojox/table/tests/test_data"], 
+				function(dojo, Table, Tree, Selection, ColumnResizer, Observable, Keyboard, ProgressBar){
 					dojo.addOnLoad(function(){
 						console.log("loaded in " + (new Date().getTime() - start));
 						var layout = [
@@ -55,12 +55,13 @@
 							return test_store.query({});
 						};
 						test_store = new Observable(test_store);
-						tableWidget = new Table(ColumnResizer, {
+						tableWidget = new Table(ColumnResizer, Selection, {
 							id: "table",
 							store: test_store,
 							layout: layout
 						}, "table");
 						Selection(tableWidget);
+						Keyboard(tableWidget);
 						//dojo.byId("tableContainer").appendChild(table.domNode);
 						//table.startup();
 						//new ProgressBar({},"progress-bar");

@@ -11,7 +11,9 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "./TextEdit", ".
 				var column = this.layout[i];
 				var td = create("td",{
 					className: "dojoxGridxCell",
-					colid: i
+					colid: i,
+					role: "gridcell",
+					tabindex: this.tabIndex
 				});
 				var data = object;
 				// we support the field, get, and formatter properties like the DataGrid
@@ -56,6 +58,7 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "./TextEdit", ".
 				var th = 
 				create("th",{
 					className: "dojoxGridxHeaderCell ui-widget-header",
+					role:"columnheader",
 					colid: i
 				});
 				var field = column.field;
@@ -81,6 +84,13 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "./TextEdit", ".
 					})(column.field);
 				}
 			}
+		},
+		setColumnWidth: function(colId, width){
+			// TODO: Change this to a stylesheet insertion
+			dojo.query('[colid=' + colId + ']', this.domNode).forEach(function(cell){
+				cell.style.width = width + 'px';
+			});
+			
 		}
 	});
 });

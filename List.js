@@ -57,16 +57,18 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/aspect", "
 		createNode: create,
 		rowHeight: 0,
 		create: function(params, srcNodeRef){
-			this.domNode = srcNodeRef.nodeType ? srcNodeRef : byId(srcNodeRef);
+			var domNode = this.domNode = srcNodeRef.nodeType ? srcNodeRef : byId(srcNodeRef);
+			this.tabIndex = domNode.getAttribute("tabindex") || 1;
+			domNode.role = "grid";
 			if(params){
 				this.params = params;
 				dojo.safeMixin(this, params);
 			}
 
-			if(this.domNode.tagName == "table"){
-				
+			if(domNode.tagName == "table"){
+				// TODO: read layout from table
 			}
-			this.domNode.className += "	ui-widget-content dojoxGridx";
+			domNode.className += "	ui-widget-content dojoxGridx";
 			this.refresh();
 		},
 		refresh: function(){
@@ -128,7 +130,7 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/aspect", "
 					}
 					if(to > -1){
 						// add to new slot
-						var tr = self.createRow(object, rows[to], (options.start + to) % 2 == 1, options);
+						var tr = self.createRow(object, rows[to], (options.start + to), options);
 						rows.splice(to, 0, tr);
 					}
 				}));
@@ -137,7 +139,7 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/aspect", "
 			// TODO: if it is raw array, we can't rely on map
 			var startTime = new Date().getTime();
 			var rows = results.map(function(object){
-				return self.createRow(object, beforeNode, start++ % 2 == 1, options);
+				return self.createRow(object, beforeNode, start++, options);
 			}, console.error);
 			console.log("rendered in", new Date().getTime() - startTime);
 			return rows;
@@ -146,11 +148,11 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/aspect", "
 		renderHeader: function(){
 			// no-op in a place list 
 		},
-		createRow: function(object, beforeNode, odd, options){
+		createRow: function(object, beforeNode, i, options){
 			// summary:
 			//		Renders a single row in the table
 			var row = create("div",{
-				className: "dojoxGridxRow " + (odd ? "dojoxGridxRowOdd" : "dojoxGridxRowEven")
+				className: "dojoxGridxRow " + (i% 2 == 1 ? "dojoxGridxRowOdd" : "dojoxGridxRowEven")
 			});
 			// get the row id for easy retrieval
 			this._rowIdToObject[row.id = this.id + "-row-" + ((this.store && this.store.getIdentity) ? this.store.getIdentity(object) : this._autoId++)] = object;
