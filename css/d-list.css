@@ -2,10 +2,11 @@
 	position: relative;
 	overflow: hidden;
 	border: 1px solid #ddd;
+	height: 30em;
 }
-
 .dojoxGridx .dojoxGridxHeader {
 	background-color: #eee;
+	width: 100%; /* IE quirks needs this to work properly */
 	border-right: 17px solid transparent; /* emulate scrollbar for full scrolling*/
 }
 .dojoxGridx .dojoxGridxHeader, .dojoxGridxHeaderRow, .dojoxGridxFooter {
@@ -19,14 +20,21 @@
 	position: relative;
 	width: 1px;
 }
-.dojoxGridx .dojoxGridxHeader th {
-	border-right: 1px solid #ddd;
+.dojoxGridxRow td {
+	border-bottom: 1px solid #ddd;
+}
+
+.dojoxGridx .dojoxGridxCell {
 	padding: 3px;
 	text-align: left;
 	overflow: hidden;
-	width: 200px;	
+	width: 200px;
+	border-right: 1px solid #ddd;
+	box-sizing: border-box;	
+	-moz-box-sizing: border-box;	
+	-ms-box-sizing: border-box;	
+	-webkit-box-sizing: border-box;	
 }
-
 
 .dojoxGridx .dojoxGridxHeaderRow {
 	border-bottom: 1px solid #ccc;
@@ -36,29 +44,17 @@
 .dojoxGridx .dojoxGridxMain {
 	position: relative;
 }
-.dojoxGridx .dojoxGridxBody {
-	height: 100%;
-	overflow: hidden;
-	position: absolute;
+.dojoxGridx .dojoxGridxContent {
+	position: relative;
 }
 .dojoxGridxScroller{
 	overflow: auto;
 	position: absolute;
 	top: 25px; /* this will be adjusted programmatically to fit below the header*/
 	bottom: 0px;
-	left: 0px;
-	right: 0px;
+	width: 100%;
 }
 
-.dojoxGridxRow td {
-	border: 1px solid #ddd;
-	border-left: none;
-	border-top: none;
-	padding: 3px;
-	text-align: left;
-	overflow: hidden;
-	width: 200px;
-}
 .dojoxGridxIcon{
 	width: 16px;
 	height: 16px;
@@ -90,7 +86,7 @@
 }
 
 /* selection*/
-.dojoxGridxRowSelected td {
+.dojoxGridxRowSelected {
 	background-color: #BFD6EB;
 }
 
