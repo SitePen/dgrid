@@ -11,13 +11,14 @@ return declare([], {
 		if(this.selectionMode != "none"){
 			listen(this.contentNode, ".dojoxGridxRow:click, .dojoxGridxRow:keydown", function(e){
 				if(e.type == "click" || e.keyCode == 32){
-					e.preventDefault();
+					if(e.keyCode == 32){
+						e.preventDefault();
+					}
 					var thisRow = table.row(e);
 					var targetElement = thisRow.element;
 					var selection = table.selection;
 					var id = thisRow.id;
 					if(mode == "single" || (!event.ctrlKey && mode == "multiple")){
-						
 						for(var i in selection){
 							if(selection.hasOwnProperty(i) && typeof selection[i] != "function"){
 								set(table, targetElement, i, false);
@@ -27,7 +28,7 @@ return declare([], {
 					}else{
 						set(table, targetElement, id, !selection[id]);
 					}
-					if(event.shiftKey){
+					if(event.shiftKey && mode != "single"){
 						var lastElement = lastRow && lastRow.element;
 						// find if it is earlier or later in the DOM
 						var traverser = (lastElement && (lastElement.compareDocumentPosition ? 
@@ -63,6 +64,16 @@ return declare([], {
 	},
 	deselect: function(id){
 		set(this, this.row(id).element, id, false);
+	},
+	renderCollection: function(){
+		var rows = this.inherited(arguments);
+		for(var i = 0; i < rows.length; i++){
+			var row = this.row(rows[i]);
+			if(this.selection[row.id]){
+				set(this, rows[i], row.id, true);
+			}
+		}
+		return rows;
 	}
 });
 function set(table, target, id, value){
