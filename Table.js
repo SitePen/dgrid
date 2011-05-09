@@ -31,7 +31,6 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "./TextEdit", ".
 				if(column.get){
 					data = column.get(data);
 				}
-				data = data && data.toString().replace(/</g, '&lt;').replace(/&/g, "&amp;");
 				if(column.formatter){
 					data = column.formatter(data);
 					td.innerHTML = data;
@@ -41,7 +40,7 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "./TextEdit", ".
 				// A column can provide a renderCell method to do its own DOM manipulation, 
 				// event handling, etc.
 				if(column.renderCell){
-					column.renderCell(data, td, options);
+					column.renderCell(data, td, options, object);
 				}
 				// add the td to the tr at the end for better performance
 				tr.appendChild(td);
