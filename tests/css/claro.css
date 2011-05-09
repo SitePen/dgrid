@@ -9,6 +9,13 @@
 /* Interaction states
 ----------------------------------*/
 .ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default { 
+
+  -webkit-transition-duration: 0.25s;
+  -moz-transition-duration: 0.25s;
+  transition-duration: 0.25s;
+  -webkit-transition-property: background-color, border-color;
+  -moz-transition-property: background-color, border-color;
+  transition-property: background-color, border-color;
 }
 .ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active {
 background-color: transparent;  
@@ -19,8 +26,8 @@ background: #e0effc -moz-linear-gradient(top,  #e9f4fd,  #e0effc);
 }
 .ui-state-default:hover {
 	
-filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#d9ecff', endColorstr='#bfe0ff');
-background: #bfe0ff -webkit-gradient(linear, left top, left bottom, from(#d9ecff), to(#bfe0ff));
-background: #bfe0ff -moz-linear-gradient(top,  #d9ecff,  #bfe0ff);
+filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ecfeff', endColorstr='#bfe0ff');
+background: #bfe0ff -webkit-gradient(linear, left top, left bottom, from(#ecfeff), to(#bfe0ff));
+background: #bfe0ff -moz-linear-gradient(top,  #ecfeff,  #bfe0ff);
 
 font-weight: normal; color: #212121; }
