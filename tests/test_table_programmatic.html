@@ -7,24 +7,26 @@
 		<meta name="viewport" content="width=570" />
 		<style type="text/css">
 			@import "../../../dojo/resources/dojo.css";
+			@import "css/claro.css";
 			.heading {
 				font-weight: bold;
 				padding-bottom: 0.25em;
 			}
 					
 			#table { 
-				border: 1px solid #333;
-				width: 550px;
-				height: 30em;
+				width: 50%;
 			}
-			#table [field=col1] {
+			#table .field-col {
 				width: 80px;
 			}
-			#table [field=col2] {
+			#table .field-col2 {
 				width: 50px;
 			}
-			#table [field=col4] {
+			#table .field-col4 {
 				width: 150px;
+			}
+			#table-none-selection { 
+				width: 400px;
 			}
 		</style>
 		<script>
@@ -40,13 +42,13 @@
 				{"name":"gridx","location":"/packages/grid-2.0", "lib":"gridx"}
 				]});
 
-			require(["dojo", "d-list/OnDemandTable","d-list/Tree","d-list/Selection", "gridx/modules/ColumnResizer", "dojo/store/Observable", "d-list/Keyboard", /*"dijit/ProgressBar",*/ "dojox/table/tests/test_data"], 
-				function(dojo, Table, Tree, Selection, ColumnResizer, Observable, Keyboard, ProgressBar){
+			require(["dojo", "d-list/OnDemandTable","d-list/Tree","d-list/CheckBox","d-list/Selection", "gridx/modules/ColumnResizer", "dojo/store/Observable", "d-list/Keyboard", /*"dijit/ProgressBar",*/ "dojox/table/tests/test_data"], 
+				function(dojo, Table, Tree, CheckBox, Selection, ColumnResizer, Observable, Keyboard, ProgressBar){
 					dojo.addOnLoad(function(){
 						console.log("loaded in " + (new Date().getTime() - start));
 						var layout = [
 							new Tree({name: 'Column 1', field: 'col1'}),
-							{name: 'Column 2', field: 'col2'},
+							new CheckBox({name: 'Column 2', field: 'col2', selector: true}),
 							{name: 'Column 3', field: 'col3', editable: true, sortable: true},
 							{name: 'Column 4', field: 'col4', sortable: true},
 							{name: 'Column 5', field: 'col5', sortable: true}
@@ -55,26 +57,19 @@
 							return test_store.query({});
 						};
 						test_store = new Observable(test_store);
-						tableWidget = new Table(ColumnResizer, Selection, {
+						tableWidget = new (dojo.declare([Table, ColumnResizer, Selection, Keyboard]))({
 							id: "table",
 							store: test_store,
 							layout: layout
 						}, "table");
-						Selection(tableWidget);
-						Keyboard(tableWidget);
-						//dojo.byId("tableContainer").appendChild(table.domNode);
-						//table.startup();
-						//new ProgressBar({},"progress-bar");
+						tableWidget2 = new (dojo.declare([Table, Selection]))({
+							id: "table-none-selection",
+							store: test_store,
+							selectionMode: "none",
+							layout: layout
+						}, "table-none-selection");
 					});
 				});
-/*										define("my-module", ["dojo/store/Memory", "rql/js-array"],
-function(Memory, jsArray){
-  test_store
-  test_store.query("col5<20&sort(col5)").forEach(function(product){
-  test_store.queryEngine = jsArray.query;
-    console.log(product);
-  });
-});*/
 				
 			//require([]);
 		</script>
@@ -82,6 +77,7 @@ function(Memory, jsArray){
 	<body class="claro">
 		<div class="heading">Table Programmatic Instantiation Test</div>
 		<div id="table"></div>
+		<div id="table-none-selection"></div>
 		<div id="progress-bar"></div>
 	</body>
 </html>

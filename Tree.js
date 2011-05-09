@@ -30,17 +30,16 @@ return declare([], {
 				// update the expando display
 				this.className = "dojoxGridxExpando ui-icon ui-icon-triangle-1-" + (expanded ? "se" : "e"); 
 				var preloadNode = this.preloadNode;
-				var row = table.getRowNode(table.getObjectId(this));
+				var row = table.row(this).element;
 				if(!preloadNode){
 					// if the children have not been created, create a preload node and do the 
 					// query for the children
 					preloadNode = this.preloadNode = document.createElement("div");
 					var query = function(options){
-						return table.store.getChildren(object, options);
+						return table.store.getChildren(data, options);
 					};
 					query.level = this.level;
 					row.parentNode.insertBefore(preloadNode, row.nextSibling);
-					var object = table.getObject(row);
 					table.renderQuery(query, preloadNode);
 				}
 				// show or hide all the children

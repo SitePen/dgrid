@@ -3,24 +3,30 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "./TextEdit", ".
 	
 	return declare([List], {
 		layout: [],
-		renderRow: function(row, object, options){
-			row = dojo.create("table", null, row);
-			//row = dojo.create("tr", null, row);
+		renderRow: function(object, options){
+			var row = dojo.create("table", {
+			});			
+			if(dojo.isIE){
+				// TODO: Actually only need to do this in IE7 and below and quirks mode, I think 
+				tr = dojo.create("tbody", null, row);
+				tr = dojo.create("tr", null, tr);
+			}else{
+				tr = row;
+			}
 			for(var i = 0, l = this.layout.length; i < l; i++){
 				// iterate through the columns
 				var column = this.layout[i];
+				var field = column.field;
 				var td = create("td",{
-					className: "dojoxGridxCell",
+					className: "dojoxGridxRowCell dojoxGridxCell" + (field ? " field-" + field : "") + " column-" + i,
 					colid: i,
 					role: "gridcell",
 					tabindex: this.tabIndex
 				});
 				var data = object;
 				// we support the field, get, and formatter properties like the DataGrid
-				var field = column.field;
 				if(field){
 					data = data[field];
-					td.setAttribute("field", field);
 				}
 				if(column.get){
 					data = column.get(data);
@@ -38,30 +44,30 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "./TextEdit", ".
 					column.renderCell(data, td, options);
 				}
 				// add the td to the tr at the end for better performance
-				row.appendChild(td);
+				tr.appendChild(td);
 			}
-			
+			return row;
 		},
 		renderHeader: function(){
 			// summary:
 			//		Setup the headers for the table
-			var tr = dojo.create("table", null, this.headerNode);
+			this.headerNode.innerHTML = "<table><tr></tr></table>";
+			var tr = this.headerNode.getElementsByTagName("tr")[0]; 
 			var ths = [];
 			var table = this;
 			for(var i = 0, l = this.layout.length; i < l; i++){
 				var column = this.layout[i];
 				column.table = this;
-				column.field = column.field || column.child && column.child.substring(1);
+				var field = column.field = column.field || column.child && column.child.substring(1);
 				if(column.editable){
 					column = TextEdit(column);
 				}
 				var th = 
 				create("th",{
-					className: "dojoxGridxHeaderCell ui-widget-header",
+					className: "dojoxGridxHeaderCell dojoxGridxCell ui-widget-header" + (field ? " field-" + field : "") + " column-" + i,
 					role:"columnheader",
 					colid: i
 				});
-				var field = column.field;
 				if(field){
 					th.setAttribute("field", field);
 				}
@@ -74,23 +80,45 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "./TextEdit", ".
 				}
 				tr.appendChild(th);
 				if(column.sortable){
-					// if it is sortable, resort on clicks
-					(function(field){
-						listen(th, "click", function(){
-							// resort
-							var descending = table.sortOrder && table.sortOrder[0].attribute == field && !table.sortOrder[0].descending; 
-							table.sort(field, descending);
-						});
-					})(column.field);
+					th.setAttribute("sortable", true);
 				}
 			}
-		},
-		setColumnWidth: function(colId, width){
-			// TODO: Change this to a stylesheet insertion
-			dojo.query('[colid=' + colId + ']', this.domNode).forEach(function(cell){
-				cell.style.width = width + 'px';
+			var lastSortedArrow;
+			// if it columns are sortable, resort on clicks
+			listen(tr, ".dojoxGridxHeaderCell:click", function(event){
+				if(this.getAttribute("sortable")){
+					var field = this.getAttribute("field");
+					// resort
+					var descending = table.sortOrder && table.sortOrder[0].attribute == field && !table.sortOrder[0].descending;
+					if(lastSortedArrow){
+						dojo.destroy(lastSortedArrow);
+					}
+					lastSortedArrow = dojo.create("div",{
+						role: 'presentation',
+						className: 'dojoxGridxArrowButtonNode'
+					}, this);
+					dojo.removeClass(this, "dojoxGridxSortUp");
+					dojo.removeClass(this, "dojoxGridxSortDown");					
+					dojo.addClass(this, descending ? "dojoxGridxSortDown" : "dojoxGridxSortUp");					
+					table.sort(field, descending);
+				}
 			});
+		},
+		_styleSheets: {},
+		setColumnWidth: function(colId, width){
+			// summary:
+			//		Changes the column width by creating a dynamic stylesheet
 			
+			// first delete the old stylesheet (so it doesn't override the new one)
+			var previousStyleSheet = this._styleSheets[colId];
+			if(previousStyleSheet){
+				dojo.destroy(previousStyleSheet);
+			}
+			// now create a stylesheet to style the column
+			this._styleSheets[colId] = cssx.createStyleNode(
+			"#" + this.domNode.id + ' th.column-' + colId + ', #' + this.domNode.id + ' td.column-' + colId + '{' +
+				 "width: " + width + 'px;' +
+			"}");
 		}
 	});
 });
