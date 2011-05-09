@@ -14,7 +14,7 @@
 			}
 					
 			#table { 
-				width: 50%;
+				width: 70%;
 			}
 			#table .field-col {
 				width: 80px;
@@ -25,8 +25,16 @@
 			#table .field-col4 {
 				width: 150px;
 			}
-			#table-none-selection { 
-				width: 400px;
+			#tree { 
+				width: 700px;
+				float: left;
+			}
+			#list{
+				width: 300px;
+				float: left;
+			}
+			.ui-widget-content{
+				margin: 10px;
 			}
 		</style>
 		<script>
@@ -41,33 +49,42 @@
 				{"name":"cssx","location":"/packages/cssx", "lib":"src/cssx", "main":"./src/cssx/cssx"},
 				{"name":"gridx","location":"/packages/grid-2.0", "lib":"gridx"}
 				]});
-
-			require(["dojo", "d-list/OnDemandTable","d-list/Tree","d-list/CheckBox","d-list/Selection", "gridx/modules/ColumnResizer", "dojo/store/Observable", "d-list/Keyboard", /*"dijit/ProgressBar",*/ "dojox/table/tests/test_data"], 
-				function(dojo, Table, Tree, CheckBox, Selection, ColumnResizer, Observable, Keyboard, ProgressBar){
+			countries = 
+			require(["dojo", "d-list/List", "d-list/OnDemandTable","d-list/Tree","d-list/CheckBox","d-list/Selection", "gridx/modules/ColumnResizer", "d-list/Keyboard", "d-list/tests/test_data"], 
+				function(dojo, List, Table, Tree, CheckBox, Selection, ColumnResizer, Keyboard, ProgressBar){
 					dojo.addOnLoad(function(){
 						console.log("loaded in " + (new Date().getTime() - start));
 						var layout = [
-							new Tree({name: 'Column 1', field: 'col1'}),
+							{name: 'Column 1', field: 'col1'},
 							new CheckBox({name: 'Column 2', field: 'col2', selector: true}),
 							{name: 'Column 3', field: 'col3', editable: true, sortable: true},
 							{name: 'Column 4', field: 'col4', sortable: true},
 							{name: 'Column 5', field: 'col5', sortable: true}
 						];
-						test_store.getChildren = function(object, options){
-							return test_store.query({});
-						};
-						test_store = new Observable(test_store);
-						tableWidget = new (dojo.declare([Table, ColumnResizer, Selection, Keyboard]))({
-							id: "table",
-							store: test_store,
+						grid = new (dojo.declare([Table, ColumnResizer, Selection, Keyboard]))({
+							store: testStore,
 							layout: layout
 						}, "table");
-						tableWidget2 = new (dojo.declare([Table, Selection]))({
-							id: "table-none-selection",
-							store: test_store,
-							selectionMode: "none",
-							layout: layout
-						}, "table-none-selection");
+						tree = new (dojo.declare([Table, Selection]))({
+							store: testCountryStore,
+							query: {type: "continent"},
+							selectionMode: "single",
+							layout: [
+								new Tree({name:'Name', field:'name'}),
+								{name:'Type', field:'type'},
+								{name:'Population', field:'population'},
+								{name:'Timezone', field:'timezone'}
+							]
+						}, "tree");
+						list = new (dojo.declare([List]))({
+							store: testCountryStore,
+							renderRow: function(data){
+								return dojo.create("div", {
+									innerHTML: data.name + " is a " + data.type
+								});
+							}
+						}, "list");
+						list.renderCollection(testCountryStore.data);
 					});
 				});
 				
@@ -75,9 +92,10 @@
 		</script>
 	</head>
 	<body class="claro">
-		<div class="heading">Table Programmatic Instantiation Test</div>
+		<h2>A basic grid (70% of page width)</h2>
 		<div id="table"></div>
-		<div id="table-none-selection"></div>
-		<div id="progress-bar"></div>
+		<h2>A grid with tree column and then a simple list (both with float:left)</h2>
+		<div id="tree"></div>
+		<div id="list"></div>
 	</body>
 </html>
