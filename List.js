@@ -63,6 +63,9 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/aspect", "
 		rowHeight: 0,
 		create: function(params, srcNodeRef){
 			var domNode = this.domNode = srcNodeRef.nodeType ? srcNodeRef : byId(srcNodeRef);
+			if(!this.id){
+				this.id = domNode.id;
+			}
 			this.tabIndex = domNode.getAttribute("tabindex") || 1;
 			domNode.role = "grid";
 			if(params){
@@ -116,16 +119,17 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/aspect", "
 			//		refreshes the contents of the table
 			if(this.contentNode){
 				// remove the content so it can be recreated
-				this.bodyNode.removeChild(this.contentNode);
+				this.contentNode.innerHTML = "";
 				// remove any listeners
 				for(var i = 0;i < this.observers.length; i++){
 					this.observers[i].cancel();
 				}
 				this.observers = [];
+			}else{
+				this.contentNode = create("div",{
+					className:"dojoxGridxContent"
+				}, this.bodyNode);
 			}
-			this.contentNode = create("div",{
-				className:"dojoxGridxContent"
-			}, this.bodyNode);
 			if(this.init){
 				this.init({
 					domNode: this.bodyNode,
@@ -139,6 +143,7 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/aspect", "
 			//		This renders an array or collection of objects as rows in the table, before the
 			//		given node. This will listen for changes in the collection if an observe method
 			//		is available (as it should be if it comes from an Observable data store).
+			options = options || {};
 			var start = options.start || 0;
 			var self = this;
 			var contentNode = this.contentNode;
