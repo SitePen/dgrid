@@ -5,7 +5,11 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/aspect", "
 		return document.getElementById(id);
 	};
 	var create = dojo.create;
-	
+	function Row(id, object, element){
+		this.id = id;
+		this.data = object;
+		this.element = element;
+	}
 	return declare(TouchScroll ? [TouchScroll] : [], { 
 		constructor: function(params, srcNodeRef){
 		var self = this;
@@ -85,6 +89,11 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/aspect", "
 			});
 			this.renderHeader();
 			bodyNode.style.top = headerNode.offsetHeight + "px";
+			if(dojo.isQuirks){
+				// in quirks mode, the "bottom" CSS property is ignored, so do this to fix it
+				// We might want to use a CSS expression or the cssx package to fix this
+				bodyNode.style.height = (this.domNode.offsetHeight - headerNode.offsetHeight) + "px"; 
+			}
 			this.refreshContent();
 			aspect.after(this, "scrollTo", this.onscroll);
 			this.postCreate && this.postCreate();
@@ -115,8 +124,8 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/aspect", "
 				this.observers = [];
 			}
 			this.contentNode = create("div",{
-			}, create("div",{
-			},this.bodyNode));
+				className:"dojoxGridxContent"
+			}, this.bodyNode);
 			if(this.init){
 				this.init({
 					domNode: this.bodyNode,
@@ -165,49 +174,46 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/aspect", "
 		createRow: function(object, beforeNode, i, options){
 			// summary:
 			//		Renders a single row in the table
-			var row = create("div",{
-				className: "dojoxGridxRow " + (i% 2 == 1 ? "dojoxGridxRowOdd" : "dojoxGridxRowEven")
-			});
+			var row = this.renderRow(object, options);
+			row.className = (row.className || "") + " ui-state-default dojoxGridxRow " + (i% 2 == 1 ? "dojoxGridxRowOdd" : "dojoxGridxRowEven");
 			// get the row id for easy retrieval
 			this._rowIdToObject[row.id = this.id + "-row-" + ((this.store && this.store.getIdentity) ? this.store.getIdentity(object) : this._autoId++)] = object;
-			this.renderRow(row, object, options);  
 			this.contentNode.insertBefore(row, beforeNode);
 			return row;
 		},
 		renderRow: function(row, value){
-			row.innerHTML = value;
+			return dojo.create("div", {
+				innerHTML: value
+			});
 		},
-		getRowNode: function(objectOrId){
+		row: function(target){
 			// summary:
-			//		Get the row node for an object or id
-			if(typeof objectOrId == "object"){
-				objectOrId = this.store.getIdentity(objectOrId);
+			//		Get the row object by id, object, node, or event
+			if(target.target && target.target.nodeType == 1){
+				// event
+				target = target.target;
 			}
-			return byId(this.id + "-row-" + objectOrId);
+			if(target.nodeType == 1){
+				var object;
+				do{
+					var rowId = target.id;
+					if(object = this._rowIdToObject[rowId]){
+						return new Row(rowId.substring(rowId.indexOf("-row-") + 5), object, target); 
+					}
+					target = target.parentNode;
+				}while(target && target != this.domNode);
+				return;
+			}
+			if(typeof target == "object"){
+				var id = this.store.getIdentity(target);
+			}else{
+				var id = target;
+				target = this._rowIdToObject[this.id + "-row-" + id];
+			}
+			return new Row(id, target, byId(this.id + "-row-" + id));
 		},
-		getObject: function(node){
-			// summary:
-			//		Get the object for a given node (can be a row or any child of it)
-			node = node.target || node;
-			var object;
-			do{
-				if((object = this._rowIdToObject[node.id])){
-					return object;
-				}
-				node = node.parentNode;
-			}while(node && node != this.domNode);
-		},
-		getObjectId: function(node){
-			// summary:
-			//		Get the object id for a given node (can be a tr or any child of it)
-			node = node.target || node;
-			do{
-				var rowId = node.id;
-				if(this._rowIdToObject[rowId]){
-					return rowId.substring(rowId.indexOf("-row-") + 5);
-				}
-				node = node.parentNode;
-			}while(node && node != this.domNode);
+		rowByIndex: function(index){
+			
 		}
 	});
 });

@@ -1,0 +1,26 @@
+
+
+.ui-widget-content { border: 1px solid #aaaaaa; background: #ffffff; color: #000000; }
+.ui-widget-header { 
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ebf1f6', endColorstr='#d2e0eb');
+	background: #d2e0eb -webkit-gradient(linear, left top, left bottom, from(#ebf1f6), to(#d2e0eb));
+	background: #d2e0eb -moz-linear-gradient(top,  #ebf1f6,  #d2e0eb);
+    font-weight: bold; }
+/* Interaction states
+----------------------------------*/
+.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default { 
+}
+.ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active {
+background-color: transparent;  
+filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#e9f4fd', endColorstr='#e0effc');
+background: #e0effc -webkit-gradient(linear, left top, left bottom, from(#e9f4fd), to(#e0effc));
+background: #e0effc -moz-linear-gradient(top,  #e9f4fd,  #e0effc);
+
+}
+.ui-state-default:hover {
+	
+filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#d9ecff', endColorstr='#bfe0ff');
+background: #bfe0ff -webkit-gradient(linear, left top, left bottom, from(#d9ecff), to(#bfe0ff));
+background: #bfe0ff -moz-linear-gradient(top,  #d9ecff,  #bfe0ff);
+
+font-weight: normal; color: #212121; }
