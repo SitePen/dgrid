@@ -20,16 +20,13 @@
 	position: relative;
 	width: 1px;
 }
-.dojoxGridxRow td {
-	border-bottom: 1px solid #ddd;
-}
-
 .dojoxGridx .dojoxGridxCell {
 	padding: 3px;
 	text-align: left;
 	overflow: hidden;
 	width: 200px;
 	border-right: 1px solid #ddd;
+	border-bottom: 1px solid #ddd;
 	box-sizing: border-box;	
 	-moz-box-sizing: border-box;	
 	-ms-box-sizing: border-box;	
@@ -46,6 +43,10 @@
 }
 .dojoxGridx .dojoxGridxContent {
 	position: relative;
+}
+.dojoxGridx .dojoxGridxExpando {
+	width: 16px;
+	height: 16px;
 }
 .dojoxGridxScroller{
 	overflow: auto;
