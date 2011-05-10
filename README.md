@@ -56,6 +56,9 @@ define(["d-list/Table"], function(Table){
 	table.renderCollection(someData);
 &lt;/script>
 </pre>
+The Table class also provides a styleColumn(colId, css) method to programmatically
+style a column.
+
 <h2>OnDemandList</h2>
 This extends List to provide on-demand lazy loading or paging of data as the user
 scrolls through the list and connects to a Dojo data store for querying of data. 
@@ -64,7 +67,13 @@ This also provides sorting delegation to the store. The OnDemandList requires a 
 property, and will call the query() method on the store to retrieve the data to be rendered.
 OnDemandList will can query() with start and count properties so as to only retrieve
 the necessary objects needed to render the visible rows. As the table is scrolled, more
-query() calls will be made to retrieve additional rows.
+query() calls will be made to retrieve additional rows. This class provides the following
+properties/methods:
+
+* renderQuery(query) - This will render the given query into the list.
+* sort(property, descending) - This will sort the list by the given property. The OnDemandList 
+performs this by calling store.query() with the sort attribute with the provided parameters.  
+* sortOrder - This holds the current sort order.
 
 <h2>OnDemandTable</h2>
 The composition of Table and OnDemandList. It is nothing more than Table.extend(OnDemandList).
@@ -83,14 +92,16 @@ define(["d-list/OnDemandTable"], function(Table){
 </pre>
 
 <h3>More List API</h3>
-The List class also has the following methods:
+The base List class (inherited by all other classes) also has the following methods:
 
 * row(value) - This will lookup the requested row and return a Row object. The single
 parameter may be an DOM event, DOM node, data object id, or data object. The Row
 object has the following properties:
+
 ** id - The data object id
 ** element - The row DOM element
 ** data - The data object
+
 * on(event, listener) - Basic event listener functionality, just delegates to the DOM element using standard dojo/listen behavior.    
 * renderCollection(array, beforeNode) - This can be called to render an array. The beforeNode parameter can be used to render at a specific place in the list.
 * renderRow(value, options) - This can be overriden to provide a custom rendering of each row
@@ -144,6 +155,7 @@ The following properties and methods are added by the Selection plugin:
 
 * selection - The object containing the ids of the selected objects.
 * selectionMode - A string indicating the mode of selection. The following values are acceptable:
+
 ** multiple - This is the default setting, and follows common ctrl and shift key practices for selection
 ** single - This only allows one row to be selected at a time
 ** extended - This is similar to multiple but normal clicks add selection without removing previous selections
