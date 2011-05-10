@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" 
+	"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+	<head>
+		<title>Test Grid Common Cases</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
+		<meta name="viewport" content="width=570" />
+		<style type="text/css">
+			@import "../../dojo/resources/dojo.css";
+			@import "../css/claro.css";
+			.heading {
+				font-weight: bold;
+				padding-bottom: 0.25em;
+			}
+					
+			#dragndrop{
+				width: 504px;
+			}
+			#dragndrop .field-description{
+				width: 300px;
+			}
+			.ui-widget-content{
+				margin: 10px;
+			}
+		</style>
+		<script>
+			var start= new Date().getTime();
+		</script>
+		<script type="text/javascript" src="../../dojo/dojo.js" 
+			data-dojo-config="async: true"></script>
+		<script type="text/javascript">
+			var grid = null;
+			require({"packages":[
+				{"name":"cssx","location":"../cssx", "lib":"src/cssx", "main":"./src/cssx/cssx"},
+				{"name":"gridx","location":"../grid-2.0", "lib":"gridx"}
+				]});
+			countries = 
+			require(["dojo", "d-list/List", "d-list/OnDemandTable","d-list/Tree","d-list/CheckBox","d-list/Selection", "gridx/modules/ColumnResizer", "gridx/modules/dnd/Row", "d-list/Keyboard", "d-list/tests/test_data"], 
+				function(dojo, List, Table, Tree, CheckBox, Selection, ColumnResizer, DndRow, Keyboard, ProgressBar){
+					dojo.addOnLoad(function(){
+						console.log("loaded in " + (new Date().getTime() - start));
+						dragndrop = new (dojo.declare([Table, Selection, DndRow, Keyboard]))({
+							store: testOrderedStore,
+							layout: [
+								{name:'Name', field:'name'},
+								{name:'Description', field:'description'}
+							]
+						}, "dragndrop");
+					});
+				});
+				
+			//require([]);
+		</script>
+	</head>
+	<body class="claro">
+		<h2>Drag n' drop</h2>
+		<div id="dragndrop"></div>
+	</body>
+</html>
