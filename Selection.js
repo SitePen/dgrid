@@ -11,9 +11,7 @@ return declare([], {
 		if(this.selectionMode != "none"){
 			listen(this.contentNode, ".dojoxGridxRow:click, .dojoxGridxRow:keydown", function(e){
 				if(e.type == "click" || e.keyCode == 32){
-					if(e.keyCode == 32){
-						e.preventDefault();
-					}
+					e.preventDefault();
 					var thisRow = table.row(e);
 					var targetElement = thisRow.element;
 					var selection = table.selection;
