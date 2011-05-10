@@ -18,7 +18,7 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "./TextEdit", ".
 				var column = this.layout[i];
 				var field = column.field;
 				var td = create("td",{
-					className: "dojoxGridxRowCell dojoxGridxCell" + (field ? " field-" + field : "") + " column-" + i,
+					className: "dojoxGridxRowCell dojoxGridxCell " + (column.className || (field ? "field-" + field : "")) + " column-" + i,
 					colid: i,
 					role: "gridcell",
 					tabindex: this.tabIndex
@@ -63,7 +63,7 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "./TextEdit", ".
 				}
 				var th = 
 				create("th",{
-					className: "dojoxGridxHeaderCell dojoxGridxCell ui-widget-header" + (field ? " field-" + field : "") + " column-" + i + (column.sortable ? " dojoxGridxSortable" : ""),
+					className: "dojoxGridxHeaderCell dojoxGridxCell ui-widget-header" + (column.className || (field ? " field-" + field : "")) + " column-" + i + (column.sortable ? " dojoxGridxSortable" : ""),
 					role:"columnheader",
 					colid: i
 				});
