@@ -23,22 +23,15 @@
 				margin: 10px;
 			}
 		</style>
-		<script>
-			var start= new Date().getTime();
-		</script>
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			var grid = null;
 			require({"packages":[
-				{"name":"cssx","location":"../cssx", "lib":"src/cssx", "main":"./src/cssx/cssx"},
 				{"name":"gridx","location":"../grid-2.0", "lib":"gridx"}
 				]});
-			countries = 
 			require(["dojo", "d-list/List", "d-list/OnDemandTable","d-list/Tree","d-list/CheckBox","d-list/Selection", "gridx/modules/ColumnResizer", "gridx/modules/dnd/Row", "d-list/Keyboard", "d-list/tests/test_data"], 
 				function(dojo, List, Table, Tree, CheckBox, Selection, ColumnResizer, DndRow, Keyboard, ProgressBar){
 					dojo.addOnLoad(function(){
-						console.log("loaded in " + (new Date().getTime() - start));
 						dragndrop = new (dojo.declare([Table, Selection, DndRow, Keyboard]))({
 							store: testOrderedStore,
 							layout: [
@@ -49,7 +42,6 @@
 					});
 				});
 				
-			//require([]);
 		</script>
 	</head>
 	<body class="claro">

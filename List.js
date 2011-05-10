@@ -28,7 +28,8 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/aspect", "
 		this.observers = [];
 		this._listeners = [];
 		this._rowIdToObject = {};
-	clearTop = function(){
+	/* TODO: Implement this to hide (detach from DOM) out-of-sight nodes to improve performance
+	 * clearTop = function(){
 		var scrollNode = self.bodyNode;
 		var transform = self.contentNode.style.webkitTransform;
 		var visibleTop = scrollNode.scrollTop + (transform ? -transform.match(/translate[\w]*\(.*?,(.*?)px/)[1] : 0);
@@ -51,7 +52,7 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/aspect", "
 			}
 		});
 		self.contentNode.insertBefore(node, last);
-	};
+	};*/
 			this.create(params, srcNodeRef);
 		},
 		minRowsPerPage: 25,
@@ -186,7 +187,7 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/aspect", "
 			this.contentNode.insertBefore(row, beforeNode);
 			return row;
 		},
-		renderRow: function(row, value){
+		renderRow: function(value, options){
 			return dojo.create("div", {
 				innerHTML: value
 			});

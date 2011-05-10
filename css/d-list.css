@@ -7,7 +7,7 @@
 .dojoxGridx .dojoxGridxHeader {
 	background-color: #eee;
 	width: 100%; /* IE quirks needs this to work properly */
-	border-right: 17px solid transparent; /* emulate scrollbar for full scrolling*/
+	border-right: 17px solid transparent; /* emulate scrollbar for full horizontal scrolling*/
 }
 .dojoxGridx .dojoxGridxSortable {
 	/*cursor: pointer; I don't know if we want to do this since overrides the resize cursor*/
