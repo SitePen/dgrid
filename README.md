@@ -155,11 +155,12 @@ The following properties and methods are added by the Selection plugin:
 
 * selection - The object containing the ids of the selected objects.
 * selectionMode - A string indicating the mode of selection. The following values are acceptable:
-
-** multiple - This is the default setting, and follows common ctrl and shift key practices for selection
-** single - This only allows one row to be selected at a time
-** extended - This is similar to multiple but normal clicks add selection without removing previous selections
-** none - Nothing can be selected by user interaction, only programmatic selection is allowed.
+<ul>
+<li>multiple - This is the default setting, and follows common ctrl and shift key practices for selection</li>
+<li>single - This only allows one row to be selected at a time</li>
+<li>extended - This is similar to multiple but normal clicks add selection without removing previous selections</li>
+<li>none - Nothing can be selected by user interaction, only programmatic selection is allowed</li>
+</ul>
 * select(id) - Programmatically select a row (by object id)
 * deselect(id) - Programmatically deselect a row (by object id)
 
