@@ -4,7 +4,10 @@ return declare([], {
 	// 		Add keyboard navigation capability to a table
 	postCreate: function(){
 		this.inherited(arguments);
-		listen(table, ".dojoxGridxRow:keydown", function(event){
+		this.on(".dojoxGridxRow:keydown", function(event){
+			if(event.target.tagName.toLowerCase() == "input"){
+				return;
+			}
 			var nextFocus, lastFocus = event.target;
 			var columnId = lastFocus.getAttribute("colid");
 			switch(event.keyCode){
