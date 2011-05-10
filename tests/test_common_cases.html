@@ -2,12 +2,12 @@
 	"http://www.w3.org/TR/html4/loose.dtd">
 <html>
 	<head>
-		<title>Test Table Programmatic Instantiation</title>
+		<title>Test Grid Common Cases</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
 		<meta name="viewport" content="width=570" />
 		<style type="text/css">
-			@import "../../../dojo/resources/dojo.css";
-			@import "css/claro.css";
+			@import "../../dojo/resources/dojo.css";
+			@import "../css/claro.css";
 			.heading {
 				font-weight: bold;
 				padding-bottom: 0.25em;
@@ -27,7 +27,14 @@
 			}
 			#tree { 
 				width: 700px;
-				float: left;
+				height: 200px;
+				float:left;
+			}
+			#tree .field-bool {
+				width: 60px;
+			}
+			#tree .field-type {
+				width: 80px;
 			}
 			#list{
 				width: 300px;
@@ -40,43 +47,43 @@
 		<script>
 			var start= new Date().getTime();
 		</script>
-		<script type="text/javascript" src="../../../dojo/dojo.js" 
+		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
 			var grid = null;
 			require({"packages":[
-				{"name":"d-list","location":"/packages/d-list", "lib":"."},
-				{"name":"cssx","location":"/packages/cssx", "lib":"src/cssx", "main":"./src/cssx/cssx"},
-				{"name":"gridx","location":"/packages/grid-2.0", "lib":"gridx"}
+				{"name":"cssx","location":"../cssx", "lib":"src/cssx", "main":"./src/cssx/cssx"},
+				{"name":"gridx","location":"../grid-2.0", "lib":"gridx"}
 				]});
 			countries = 
-			require(["dojo", "d-list/List", "d-list/OnDemandTable","d-list/Tree","d-list/CheckBox","d-list/Selection", "gridx/modules/ColumnResizer", "d-list/Keyboard", "d-list/tests/test_data"], 
-				function(dojo, List, Table, Tree, CheckBox, Selection, ColumnResizer, Keyboard, ProgressBar){
+			require(["dojo", "d-list/List", "d-list/OnDemandTable","d-list/Tree","d-list/CheckBox","d-list/Selection", "gridx/modules/ColumnResizer", "gridx/modules/dnd/Row", "d-list/Keyboard", "d-list/tests/test_data"], 
+				function(dojo, List, Table, Tree, CheckBox, Selection, ColumnResizer, DndRow, Keyboard, ProgressBar){
 					dojo.addOnLoad(function(){
 						console.log("loaded in " + (new Date().getTime() - start));
 						var layout = [
-							{name: 'Column 1', field: 'col1'},
-							new CheckBox({name: 'Column 2', field: 'col2', selector: true}),
+							{name: 'Column 1', field: 'col1', editable: true, sortable: true},
+							{name: 'Column 2', field: 'col2'},
 							{name: 'Column 3', field: 'col3', editable: true, sortable: true},
-							{name: 'Column 4', field: 'col4', sortable: true},
-							{name: 'Column 5', field: 'col5', sortable: true}
+							{name: 'Column 4', field: 'col4', editable: true, sortable: true},
+							{name: 'Column 5', field: 'col5', editable: true, sortable: true}
 						];
 						grid = new (dojo.declare([Table, ColumnResizer, Selection, Keyboard]))({
 							store: testStore,
 							layout: layout
 						}, "table");
-						tree = new (dojo.declare([Table, Selection]))({
+						tree = new (dojo.declare([Table, ColumnResizer]))({
 							store: testCountryStore,
 							query: {type: "continent"},
 							selectionMode: "single",
 							layout: [
 								new Tree({name:'Name', field:'name'}),
+								new CheckBox({name: 'A CheckBox', field: 'bool'}),
 								{name:'Type', field:'type'},
 								{name:'Population', field:'population'},
 								{name:'Timezone', field:'timezone'}
 							]
 						}, "tree");
-						list = new (dojo.declare([List]))({
+						list = new (dojo.declare([List, Selection]))({
 							store: testCountryStore,
 							renderRow: function(data){
 								return dojo.create("div", {
@@ -94,7 +101,7 @@
 	<body class="claro">
 		<h2>A basic grid (70% of page width)</h2>
 		<div id="table"></div>
-		<h2>A grid with tree column and then a simple list (both with float:left)</h2>
+		<h2>A grid with tree column and then a simple list (floated left)</h2>
 		<div id="tree"></div>
 		<div id="list"></div>
 	</body>
