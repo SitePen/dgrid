@@ -1,0 +1,19 @@
+
+
+.ui-widget-content { border: 1px solid #aaaaaa; background: #ffffff; color: #000000; }
+.ui-widget-header { 
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fff', endColorstr='#e8e8e8');
+	background: #e8e8e8 -webkit-gradient(linear, left top, left bottom, from(#fff), to(#e8e8e8));
+	background: #e8e8e8 -moz-linear-gradient(top,  #fff,  #e8e8e8);
+    font-weight: bold; }
+/* Interaction states
+----------------------------------*/
+.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default { 
+}
+.ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active {
+	background-color: #aec7e3;  
+
+}
+.ui-state-default:hover {
+	background-color: #60a1ea;
+}

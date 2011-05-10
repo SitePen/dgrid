@@ -6,28 +6,28 @@
 	background: #d2e0eb -webkit-gradient(linear, left top, left bottom, from(#ebf1f6), to(#d2e0eb));
 	background: #d2e0eb -moz-linear-gradient(top,  #ebf1f6,  #d2e0eb);
     font-weight: bold; }
+.ui-widget-header:hover {
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fff', endColorstr='#d2e0eb');
+	background: #d2e0eb -webkit-gradient(linear, left top, left bottom, from(#fff), to(#d2e0eb));
+	background: #d2e0eb -moz-linear-gradient(top,  #fff,  #d2e0eb);
+}
+
 /* Interaction states
 ----------------------------------*/
 .ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default { 
 
-  -webkit-transition-duration: 0.25s;
-  -moz-transition-duration: 0.25s;
-  transition-duration: 0.25s;
+  -webkit-transition-duration: 0.2s;
+  -moz-transition-duration: 0.2s;
+  transition-duration: 0.2s;
   -webkit-transition-property: background-color, border-color;
   -moz-transition-property: background-color, border-color;
   transition-property: background-color, border-color;
+  background: url("images/row_back.png") #fff repeat-x;
 }
 .ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active {
-background-color: transparent;  
-filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#e9f4fd', endColorstr='#e0effc');
-background: #e0effc -webkit-gradient(linear, left top, left bottom, from(#e9f4fd), to(#e0effc));
-background: #e0effc -moz-linear-gradient(top,  #e9f4fd,  #e0effc);
-
+background-color:#cee6fa;
 }
-.ui-state-default:hover {
-	
-filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ecfeff', endColorstr='#bfe0ff');
-background: #bfe0ff -webkit-gradient(linear, left top, left bottom, from(#ecfeff), to(#bfe0ff));
-background: #bfe0ff -moz-linear-gradient(top,  #ecfeff,  #bfe0ff);
 
-font-weight: normal; color: #212121; }
+.ui-state-default:hover {
+background-color:#ABD6FF
+}
