@@ -59,10 +59,10 @@ return declare([List], {
 		return preloadNode;
 	},
 	sortOrder: null,
-	sort: function(attribute, descending){
+	sort: function(property, descending){
 		// summary:
 		//		Sort the content
-		this.sortOrder = [{attribute: attribute, descending: descending}];
+		this.sortOrder = [{attribute: property, descending: descending}];
 		this.refreshContent();
 	},
 	refreshContent: function(){

@@ -104,7 +104,7 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "./TextEdit", ".
 			});
 		},
 		_styleSheets: {},
-		setColumnWidth: function(colId, width){
+		styleColumn: function(colId, css){
 			// summary:
 			//		Changes the column width by creating a dynamic stylesheet
 			
@@ -116,7 +116,7 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "./TextEdit", ".
 			// now create a stylesheet to style the column
 			this._styleSheets[colId] = cssx.createStyleNode(
 			"#" + this.domNode.id + ' th.column-' + colId + ', #' + this.domNode.id + ' td.column-' + colId + '{' +
-				 "width: " + width + 'px;' +
+				 css +
 			"}");
 		}
 	});
