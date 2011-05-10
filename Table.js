@@ -63,7 +63,7 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "./TextEdit", ".
 				}
 				var th = 
 				create("th",{
-					className: "dojoxGridxHeaderCell dojoxGridxCell ui-widget-header" + (field ? " field-" + field : "") + " column-" + i,
+					className: "dojoxGridxHeaderCell dojoxGridxCell ui-widget-header" + (field ? " field-" + field : "") + " column-" + i + (column.sortable ? " dojoxGridxSortable" : ""),
 					role:"columnheader",
 					colid: i
 				});
