@@ -98,9 +98,9 @@ The base List class (inherited by all other classes) also has the following meth
 parameter may be an DOM event, DOM node, data object id, or data object. The Row
 object has the following properties:
 <ul>
-* id - The data object id
-* element - The row DOM element
-* data - The data object
+<li>id - The data object id</li>
+<li>element - The row DOM element</li>
+<li>data - The data object</li>
 </ul>
 * on(event, listener) - Basic event listener functionality, just delegates to the DOM element using standard dojo/listen behavior.    
 * renderCollection(array, beforeNode) - This can be called to render an array. The beforeNode parameter can be used to render at a specific place in the list.
