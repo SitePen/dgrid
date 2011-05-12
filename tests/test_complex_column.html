@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Test Grid Complex Columns</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
+		<meta name="viewport" content="width=570" />
+		<style type="text/css">
+			@import "../../dojo/resources/dojo.css";
+			@import "../css/claro.css";
+			.heading {
+				font-weight: bold;
+				padding-bottom: 0.25em;
+			}
+			#table { 
+				width: 70%;
+			}
+			#table .field-col1 {
+				width: 60px;
+			}
+			#table .field-col2 {
+				width: 100px;
+			}
+			#table .field-col4 {
+				width: 500px;
+			}
+			.ui-widget-content{
+				margin: 10px;
+			}
+		</style>
+
+		<script type="text/javascript" src="../../dojo/dojo.js" 
+			data-dojo-config="async: true"></script>
+		<script type="text/javascript">
+			require({"packages":[
+				{"name":"gridx","location":"../grid-2.0", "lib":"gridx"}
+				]});
+			require(["d-list/OnDemandTable", "d-list/ColumnSet", "d-list/Tree", "d-list/Selection", "d-list/Keyboard", "d-list/tests/test_data", "domReady!"],
+				function(Table, ColumnSet, Tree, Selection, Keyboard, testStore){
+					grid = dojo.declare([Table, ColumnSet, Selection, Keyboard])({
+						store: testStore,
+						columnSets: [
+							[
+								[{name: 'Column 1', field: 'col1', editable: true, sortable: true},
+										{name: 'Column 2', field: 'col2'}],
+									[{name: 'Column 3', field: 'col3', colspan: 2, editable: true, sortable: true}]],
+							[
+								[{name: 'Column 1', field: 'col1', rowspan: 2, editable: true, sortable: true},
+									{name: 'Column 4', field: 'col4', editable: true, sortable: true}],
+									[{name: 'Column 5', field: 'col5', editable: true, sortable: true}]]]
+					}, "table");
+				});
+		</script>
+	</head>
+	<body class="claro">
+		<h2>A Grid with complex columns including locking columns and subrows</h2>
+		<div id="table"></div>
+	</body>
+</html>

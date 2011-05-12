@@ -99,7 +99,7 @@ define(["dojo/store/Memory", "dojo/store/Observable"],function(Memory, Observabl
 			query: function(query, options){
 				options.sort = [{attribute:"order"}];
 				return Memory.prototype.query.call(this, query, options);
-			},
+			}
 		}));
-
+	return testStore;
 });

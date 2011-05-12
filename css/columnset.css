@@ -1,0 +1,16 @@
+.dojoxGridxColumnSet {
+	overflow: hidden;
+	width: 100%;
+	position: relative;
+}
+.dojoxGridxColumnSetScroller {
+	position: absolute;
+	bottom: 0px;
+	overflow-x: auto;
+	overflow-y: hidden;
+	height: 17px;
+}
+.dojoxGridxColumnSetScrollerContent{
+	position: relative;
+	height: 1px;
+}

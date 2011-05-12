@@ -34,7 +34,7 @@
 					dojo.addOnLoad(function(){
 						dragndrop = new (dojo.declare([Table, Selection, DndRow, Keyboard]))({
 							store: testOrderedStore,
-							layout: [
+							columns: [
 								{name:'Name', field:'name'},
 								{name:'Description', field:'description'}
 							]

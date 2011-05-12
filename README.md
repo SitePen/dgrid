@@ -20,7 +20,7 @@ define(["d-list/List"], function(List){
 <h2>Table</h2>
 This extends List to provide tabular display of data in columns. The component will
 provide a header for each column that corresponds to columns within the scrollable
-grid of data. The columns of the table are defined by using layout property. The layout
+grid of data. The columns of the table are defined by using columns property. The columns
 property should have an array of each column definition objects. The column definition object
 may have the following properties (all our optional):
 
@@ -48,7 +48,7 @@ the convention of "field-<field-name>". For example, you could define a table an
 &lt;script>
 define(["d-list/Table"], function(Table){
 	table = new Table({
-			layout: [ // define the columns
+			columns: [ // define the columns
 				{name: 'Age', field: 'age'},
 				{name: 'Name', field: 'name'},
 				...
@@ -83,7 +83,7 @@ define(["d-list/OnDemandTable"], function(Table){
 	// attach to a DOM id
 	table = new Table({
 			store: myStore, // a Dojo object store
-			layout: [ // define the columns
+			columns: [ // define the columns
 				{name: 'Column 1', field: 'col1', editable: true, sortable: true},
 				{name: 'Column 2', field: 'col2'},
 				...
@@ -171,14 +171,14 @@ across cells and rows, providing accessibility and ease of use.
 
 <h1>Column Plugins</h1>
 The following modules are plugins designed for specific columns of cells. This plugins are
-used by creating an instance and using it was a column in the layout. For example, to 
-create a layout where the first column has a tree expander and the second column has
+used by creating an instance and using it was a column in the columns. For example, to 
+create a columns where the first column has a tree expander and the second column has
 a checkbox, we could do:
 <pre>
 define(["d-list/OnDemandTable", "d-list/Tree", "d-list/CheckBox"], function(Table, Tree, CheckBox){
 	table = new Table({
 			store: myHierarchicalStore, // a Dojo object store
-			layout: [ // define the columns
+			columns: [ // define the columns
 				// first column will have a tree expander:
 				new Tree({name:'Name', field:'name'}),
 				// second column will render with a checkbox: 

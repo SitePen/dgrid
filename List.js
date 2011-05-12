@@ -75,7 +75,7 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/aspect", "
 			}
 
 			if(domNode.tagName == "table"){
-				// TODO: read layout from table
+				// TODO: read columns from table
 			}
 			domNode.className += "	ui-widget-content dojoxGridx";
 			this.refresh();
@@ -165,12 +165,17 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/aspect", "
 				}));
 			}
 			// now render the results
-			// TODO: if it is raw array, we can't rely on map
-			var startTime = new Date().getTime();
-			var rows = results.map(function(object){
+			if(results.map){
+				var rows = results.map(mapEach, console.error);
+			}else{
+				var rows = [];
+				for(var i = 0, l = results.length; i < l; i++){
+					rows[i] = mapEach(results[i]);
+				}
+			}
+			function mapEach(object){
 				return self.createRow(object, beforeNode, start++, options);
-			}, console.error);
-			console.log("rendered in", new Date().getTime() - startTime);
+			}
 			return rows;
 		},
 		_autoId: 0,

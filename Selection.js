@@ -9,10 +9,13 @@ return declare([], {
 		var table = this;
 		this.selection = new Stateful();
 		if(this.selectionMode != "none"){
-			listen(this.contentNode, ".dojoxGridxRow:click, .dojoxGridxRow:keydown", function(e){
-				if(e.type == "click" || e.keyCode == 32){
-					e.preventDefault();
-					var thisRow = table.row(e);
+			listen(this.contentNode, "mousedown", function(event){
+				event.preventDefault();
+			});
+			listen(this.contentNode, ".dojoxGridxRow:click, .dojoxGridxRow:keydown", function(event){
+				if(event.type == "click" || event.keyCode == 32){
+					event.preventDefault();
+					var thisRow = table.row(event);
 					var targetElement = thisRow.element;
 					var selection = table.selection;
 					var id = thisRow.id;

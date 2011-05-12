@@ -149,7 +149,6 @@ return declare([List], {
 				this.contentNode.insertBefore(loadingNode, preloadNode);
 				// use the query associated with the preload node to get the next "page"
 				options.query = preloadNode.query;
-				console.log("query", options)
 				var results = preloadNode.query(options);
 				dojo.when(this.renderCollection(results, loadingNode, options),
 					function(){

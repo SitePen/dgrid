@@ -11,18 +11,22 @@
 				font-weight: bold;
 				padding-bottom: 0.25em;
 			}
-					
 			#table { 
-				width: 70%;
+				/*width: 70%;*/
+				width: 700px;
+				box-sizing: border-box;	
+				-moz-box-sizing: border-box;	
+				-ms-box-sizing: border-box;	
+				-webkit-box-sizing: border-box;	
 			}
-			#table .field-col {
-				width: 80px;
+			#table .field-col1 {
+				width: 10%;
 			}
 			#table .field-col2 {
-				width: 50px;
+				width: 10%;
 			}
 			#table .field-col4 {
-				width: 150px;
+				width: 40%;
 			}
 			#tree { 
 				width: 700px;
@@ -30,7 +34,7 @@
 				float:left;
 			}
 			#tree .field-bool {
-				width: 60px;
+				width: 20%;
 			}
 			#tree .field-type {
 				width: 80px;
@@ -52,42 +56,40 @@
 			require({"packages":[
 				{"name":"gridx","location":"../grid-2.0", "lib":"gridx"}
 				]});
-			require(["dojo", "d-list/List", "d-list/OnDemandTable","d-list/Tree","d-list/CheckBox","d-list/Selection", "gridx/modules/ColumnResizer", "gridx/modules/dnd/Row", "d-list/Keyboard", "d-list/tests/test_data"], 
-				function(dojo, List, Table, Tree, CheckBox, Selection, ColumnResizer, DndRow, Keyboard, ProgressBar){
-					dojo.addOnLoad(function(){
-						console.log("loaded in " + (new Date().getTime() - start));
-						var layout = [
-							{name: 'Column 1', field: 'col1', editable: true, sortable: true},
-							{name: 'Column 2', field: 'col2'},
-							{name: 'Column 3', field: 'col3', editable: true, sortable: true},
-							{name: 'Column 4', field: 'col4', editable: true, sortable: true},
-							{name: 'Column 5', field: 'col5', editable: true, sortable: true}
-						];
-						grid = dojo.declare([Table, ColumnResizer, Selection, Keyboard])({
-							store: testStore,
-							layout: layout
-						}, "table");
-						tree =dojo.declare([Table, ColumnResizer])({
-							store: testCountryStore,
-							query: {type: "continent"},
-							selectionMode: "single",
-							layout: [
-								new Tree({name:'Name', field:'name'}),
-								new CheckBox({name: 'A CheckBox', field: 'bool'}),
-								{name:'Type', field:'type'},
-								{name:'Population', field:'population'},
-								{name:'Timezone', field:'timezone'}
-							]
-						}, "tree");
-						list = dojo.declare([List, Selection])({
-							renderRow: function(data){
-								return dojo.create("div", {
-									innerHTML: data.name + " is a " + data.type
-								});
-							}
-						}, "list");
-						list.renderCollection(testCountryStore.data);
-					});
+			require(["d-list/List", "d-list/OnDemandTable","d-list/Tree","d-list/CheckBox","d-list/Selection", "gridx/modules/ColumnResizer", "gridx/modules/dnd/Row", "d-list/Keyboard", "d-list/tests/test_data", "domReady!"], 
+				function(List, Table, Tree, CheckBox, Selection, ColumnResizer, DndRow, Keyboard, testStore){
+					console.log("loaded in " + (new Date().getTime() - start) + testStore);
+					var columns = [
+						{name: 'Column 1', field: 'col1', editable: true, sortable: true},
+						{name: 'Column 2', field: 'col2'},
+						{name: 'Column 3', field: 'col3', editable: true, sortable: true},
+						{name: 'Column 4', field: 'col4', editable: true, sortable: true},
+						{name: 'Column 5', field: 'col5', editable: true, sortable: true}
+					];
+					grid = dojo.declare([Table, ColumnResizer, Selection, Keyboard])({
+						store: testStore,
+						columns: columns
+					}, "table");
+					tree =dojo.declare([Table, ColumnResizer])({
+						store: testCountryStore,
+						query: {type: "continent"},
+						selectionMode: "single",
+						columns: [
+							new Tree({name:'Name', field:'name'}),
+							new CheckBox({name: 'A CheckBox', field: 'bool'}),
+							{name:'Type', field:'type'},
+							{name:'Population', field:'population'},
+							{name:'Timezone', field:'timezone'}
+						]
+					}, "tree");
+					list = dojo.declare([List, Selection])({
+						renderRow: function(data){
+							return dojo.create("div", {
+								innerHTML: data.name + " is a " + data.type
+							});
+						}
+					}, "list");
+					list.renderCollection(testCountryStore.data);
 				});
 		</script>
 	</head>

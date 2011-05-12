@@ -7,8 +7,8 @@
 .dojoxGridx .dojoxGridxHeader {
 	background-color: #eee;
 	width: 100%; /* IE quirks needs this to work properly */
-	border-right: 17px solid transparent; /* emulate scrollbar for full horizontal scrolling*/
 }
+
 .dojoxGridx .dojoxGridxSortable {
 	/*cursor: pointer; I don't know if we want to do this since overrides the resize cursor*/
 }
@@ -21,7 +21,7 @@
 	border: none;
 	table-layout: fixed;
 	position: relative;
-	width: 1px;
+	width: 100%;
 }
 .dojoxGridx .dojoxGridxCell {
 	padding: 3px;
@@ -35,7 +35,9 @@
 	-ms-box-sizing: border-box;	
 	-webkit-box-sizing: border-box;	
 }
-
+.dojoxGridx .dojoxGridxRightCorner {
+	width:17px;
+}
 .dojoxGridx .dojoxGridxHeaderRow {
 	border-bottom: 1px solid #ccc;
 }
@@ -52,11 +54,13 @@
 	height: 16px;
 }
 .dojoxGridxScroller{
-	overflow: auto;
+	overflow-x: auto;
+	overflow-y: scroll;
 	position: absolute;
 	top: 25px; /* this will be adjusted programmatically to fit below the header*/
 	bottom: 0px;
 	width: 100%;
+	
 }
 
 .dojoxGridxIcon{

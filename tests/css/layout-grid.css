@@ -1,0 +1,42 @@
+@import "../../css/claro.css";
+h2 {
+	content: 'A basic grid constructed from CSS (70% of page width)';
+}
+#tree {
+	width: 70%;
+	height: 500px;
+	border: 1px solid blue;
+	widget: d-list/Table, d-list/Selection, d-list/Keyboard;
+	store: testCountryStore;
+	query: {type: "continent"};
+	selection-mode: single;
+	columns: {
+		.name {
+			name: Name;
+			widget: d-list/Tree;
+			sortable: true;
+			.expanded {
+				background-image: url('expanded.png');
+			};
+			.collapsed {
+				background-image: url('expanded.png');
+			};
+		};
+		.bool {
+			name: 'A Checkbox';
+			width: 80px;
+			widget: d-list/CheckBox;
+		};
+		.type {
+			name: Type;
+			width: 120px;
+		};
+		.population {
+			name: Population;
+			editable: true;
+		};
+	};
+}
+input[type=date] {
+	widget: dijit/DateTime!native
+}

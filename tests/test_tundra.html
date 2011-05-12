@@ -33,24 +33,19 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require({"packages":[
-				{"name":"gridx","location":"../grid-2.0", "lib":"gridx"}
-				]});
-			require(["dojo", "d-list/List", "d-list/OnDemandTable","d-list/Tree","d-list/CheckBox","d-list/Selection", "gridx/modules/ColumnResizer", "d-list/Keyboard", "d-list/tests/test_data"], 
-				function(dojo, List, Table, Tree, CheckBox, Selection, ColumnResizer, Keyboard, ProgressBar){
-					dojo.addOnLoad(function(){
-						var layout = [
-							{name: 'Column 1', field: 'col1', editable: true, sortable: true},
-							{name: 'Column 2', field: 'col2'},
-							{name: 'Column 3', field: 'col3', editable: true, sortable: true},
-							{name: 'Column 4', field: 'col4', editable: true, sortable: true},
-							{name: 'Column 5', field: 'col5', editable: true, sortable: true}
-						];
-						grid = new (dojo.declare([Table, ColumnResizer, Selection, Keyboard]))({
-							store: testStore,
-							layout: layout
-						}, "table");
-					});
+			require(["d-list/List", "d-list/OnDemandTable","d-list/Tree","d-list/CheckBox","d-list/Selection", "d-list/Keyboard", "d-list/tests/test_data", "domReady!"], 
+				function(List, Table, Tree, CheckBox, Selection, Keyboard, ProgressBar){
+					var columns = [
+						{name: 'Column 1', field: 'col1', editable: true, sortable: true},
+						{name: 'Column 2', field: 'col2'},
+						{name: 'Column 3', field: 'col3', editable: true, sortable: true},
+						{name: 'Column 4', field: 'col4', editable: true, sortable: true},
+						{name: 'Column 5', field: 'col5', editable: true, sortable: true}
+					];
+					grid = new (dojo.declare([Table, Selection, Keyboard]))({
+						store: testStore,
+						columns: columns
+					}, "table");
 				});
 				
 		</script>
