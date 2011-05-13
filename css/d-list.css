@@ -19,7 +19,7 @@
 	overflow: hidden;
 	background-color: #eee;
 }
-.dojoxGridx table {
+table.dojoxGridxRow, .dojoxGridxColumnSet table{
 	border-collapse: collapse;
 	border: none;
 	table-layout: fixed;

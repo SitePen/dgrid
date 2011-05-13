@@ -11,6 +11,9 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/query", ".
 		createRowCells: function(tag, each){
 			var row = create("table", {
 			});			
+			if(dojo.isIE < 8 || dojo.isQuirks){
+				row.style.width = "auto"; // in IE7 this is needed to instead of 100% to make it not create a horizontal scroll bar
+			}
 			var tr = create("tbody", null, row);
 			tr = create("tr", null, tr);
 			for(var i = 0, l = this.columnSets.length; i < l; i++){
@@ -21,6 +24,9 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/query", ".
 					className: "dojoxGridxColumnSet",
 					colsetid: i
 				},  create(tag, null, tr));
+				if(dojo.isIE < 8 || dojo.isQuirks){
+					td.style.width = "auto"; // in IE7 this is needed to instead of 100% to make it not create a horizontal scroll bar
+				}
 				this.columns = columnSet;
 				td.appendChild(this.inherited(arguments));
 			}
