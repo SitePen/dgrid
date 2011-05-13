@@ -6,7 +6,10 @@
 }
 .dojoxGridx .dojoxGridxHeader {
 	background-color: #eee;
-	width: 100%; /* IE quirks needs this to work properly */
+	/*width: 100%; /* IE quirks needs this to work properly */
+	position: absolute;
+	right: 17px;
+	left: 0px;
 }
 
 .dojoxGridx .dojoxGridxSortable {
@@ -21,19 +24,18 @@
 	border: none;
 	table-layout: fixed;
 	position: relative;
-	width: 100%;
+	width: 100%; /* this programmatically becomes 'auto' for IE7 (non-quirks) */ 
 }
 .dojoxGridx .dojoxGridxCell {
 	padding: 3px;
 	text-align: left;
 	overflow: hidden;
-	width: 200px;
 	border-right: 1px solid #ddd;
 	border-bottom: 1px solid #ddd;
 	box-sizing: border-box;	
 	-moz-box-sizing: border-box;	
 	-ms-box-sizing: border-box;	
-	-webkit-box-sizing: border-box;	
+	-webkit-box-sizing: border-box;
 }
 .dojoxGridx .dojoxGridxRightCorner {
 	width:17px;

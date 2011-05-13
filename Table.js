@@ -8,8 +8,8 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "./TextEdit", ".
 			//		Generates the table for each row (used by renderHeader and and renderRow)
 			var tr, row = create("table", {
 			});			
-			if(dojo.isIE){
-				// TODO: Actually only need to do this in IE7 and below and quirks mode, I think 
+			if(dojo.isIE < 8 || dojo.isQuirks){
+				row.style.width = "auto"; // in IE7 this is needed to instead of 100% to make it not create a horizontal scroll bar
 				var tbody = create("tbody", null, row);
 			}else{
 				var tbody = row;
@@ -101,9 +101,9 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "./TextEdit", ".
 			});
 			row.className = "dojoxGridxRow ui-widget-header";
 			this.headerNode.appendChild(row);
-			create("th",{
+/*			create("th",{
 				className:"dojoxGridxRightCorner dojoxGridxCell"
-			}, row.getElementsByTagName("tr")[0] || row);
+			}, row.getElementsByTagName("tr")[0] || row);*/
 			var lastSortedArrow;
 			// if it columns are sortable, resort on clicks
 			listen(row, ".dojoxGridxCell:click", function(event){

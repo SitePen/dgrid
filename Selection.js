@@ -78,7 +78,7 @@ return declare([], {
 	}
 });
 function set(table, target, id, value){
-	if(listen.dispatch(target, value ? "select" : "deselect", {
+	if(listen.emit(target, value ? "select" : "deselect", {
 		cancelable: true,
 		bubbles: true,
 		id: id
