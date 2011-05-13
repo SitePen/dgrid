@@ -1,7 +1,7 @@
 define(["dojo/_base/declare", "dojo/listen", "dojo/query"], function(declare, listen, query){
 return declare([], {
 	// summary:
-	// 		Add keyboard navigation capability to a table
+	// 		Add keyboard navigation capability to a grid
 	postCreate: function(){
 		this.inherited(arguments);
 		this.on(".dojoxGridxRow:keydown", function(event){

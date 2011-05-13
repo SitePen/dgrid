@@ -11,16 +11,16 @@
 				font-weight: bold;
 				padding-bottom: 0.25em;
 			}
-			#table { 
+			#grid { 
 				width: 70%;
 			}
-			#table .field-col1 {
+			#grid .field-col1 {
 				width: 100px;
 			}
-			#table .field-col2 {
+			#grid .field-col2 {
 				width: 30%;
 			}
-			#table .field-col4 {
+			#grid .field-col4 {
 				width: 180px;
 			}
 			#tree {
@@ -51,8 +51,8 @@
 			require({"packages":[
 				{"name":"gridx","location":"../grid-2.0", "lib":"gridx"}
 				]});
-			require(["d-list/List", "d-list/OnDemandTable","d-list/Tree","d-list/CheckBox","d-list/Selection", "gridx/modules/ColumnResizer", "gridx/modules/dnd/Row", "d-list/Keyboard", "d-list/tests/test_data", "domReady!"], 
-				function(List, Table, Tree, CheckBox, Selection, ColumnResizer, DndRow, Keyboard, testStore){
+			require(["d-list/List", "d-list/OnDemandGrid","d-list/Tree","d-list/CheckBox","d-list/Selection", "gridx/modules/ColumnResizer", "gridx/modules/dnd/Row", "d-list/Keyboard", "d-list/tests/test_data", "domReady!"], 
+				function(List, Grid, Tree, CheckBox, Selection, ColumnResizer, DndRow, Keyboard, testStore){
 					console.log("loaded in " + (new Date().getTime() - start) + testStore);
 					var columns = [
 						{name: 'Column 1', field: 'col1', editable: true, sortable: true},
@@ -61,11 +61,11 @@
 						{name: 'Column 4', field: 'col4', editable: true, sortable: true},
 						{name: 'Column 5', field: 'col5', editable: true, sortable: true}
 					];
-					grid = dojo.declare([Table, ColumnResizer, Selection, Keyboard])({
+					grid = dojo.declare([Grid, ColumnResizer, Selection, Keyboard])({
 						store: testStore,
 						columns: columns
-					}, "table");
-					tree =dojo.declare([Table, ColumnResizer])({
+					}, "grid");
+					tree =dojo.declare([Grid, ColumnResizer])({
 						store: testCountryStore,
 						query: {type: "continent"},
 						selectionMode: "single",
@@ -90,7 +90,7 @@
 	</head>
 	<body class="claro">
 		<h2>A basic grid (70% of page width)</h2>
-		<div id="table"></div>
+		<div id="grid"></div>
 		<h2>A grid with tree column and then a simple list (floated left)</h2>
 		<div id="tree"></div>
 		<div id="list"></div>

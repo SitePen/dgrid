@@ -1,7 +1,7 @@
 {
   "name": "d-list",
   "author": "Kris Zyp",
-  "description": "A lightweight, mobile-ready, data-driven, modular widget designed for lists and tables",
+  "description": "A lightweight, mobile-ready, data-driven, modular widget designed for lists and grids",
   "licenses": [
      {
          "type": "AFLv2.1",
@@ -22,7 +22,7 @@
   "directories": {
     "lib": "."
   },
-  "main": "./OnDemandTable",
+  "main": "./OnDemandGrid",
   "mappings":{
     "dojo": "http://github.com/kriszyp/dojo/zipball/1.7-bootstrap-has-modularize"
   },

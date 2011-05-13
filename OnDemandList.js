@@ -19,7 +19,7 @@ return declare([List], {
 		preloadNode = preloadNode || this.createNode("div", {
 			className: "preload"
 		}, this.contentNode);
-		// this preload node is used to represent the area of the table that hasn't been 
+		// this preload node is used to represent the area of the grid that hasn't been 
 		// downloaded yet
 		preloadNode.preload = true;
 		preloadNode.query = query;

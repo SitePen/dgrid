@@ -4,20 +4,20 @@ return function(column){
 	// summary:
 	// 		Add a checkbox column
 	column.renderCell = function(data, cell){
-		var table = column.table;
-		if(!table._hasCheckBoxListener){
-			table._hasCheckBoxListener = true;
-			table.on(".dojoxGridxCheckBox:change", function(event){
+		var grid = column.grid;
+		if(!grid._hasCheckBoxListener){
+			grid._hasCheckBoxListener = true;
+			grid.on(".dojoxGridxCheckBox:change", function(event){
 				var checked = this.checked;
-				var id = table.row(event).id;
+				var id = grid.row(event).id;
 				if(column.field){
-					dojo.when(table.store.get(id), function(object){ 
+					dojo.when(grid.store.get(id), function(object){ 
 						object[column.field] = checked;
-						table.store.put(object);
+						grid.store.put(object);
 					});
 				}
 				if(column.selector){
-					table.selection.set(id, checked);
+					grid.selection.set(id, checked);
 				}
 			});
 		}

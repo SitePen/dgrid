@@ -1,12 +1,12 @@
 define(["dojo/_base/declare", "dojo/Stateful", "dojo/listen"], function(declare, Stateful, listen){
 return declare([], {
 	// summary:
-	// 		Add selection capabilities to a table. The grid will have a selection property and
+	// 		Add selection capabilities to a grid. The grid will have a selection property and
 	//		fire "select" and "deselect" events.
 	postCreate: function(){
 		this.inherited(arguments);
 		var lastRow, mode = (this.selectionMode) || "multiple";
-		var table = this;
+		var grid = this;
 		this.selection = new Stateful();
 		if(this.selectionMode != "none"){
 			listen(this.contentNode, "mousedown", function(event){
@@ -15,19 +15,19 @@ return declare([], {
 			listen(this.contentNode, ".dojoxGridxRow:click, .dojoxGridxRow:keydown", function(event){
 				if(event.type == "click" || event.keyCode == 32){
 					event.preventDefault();
-					var thisRow = table.row(event);
+					var thisRow = grid.row(event);
 					var targetElement = thisRow.element;
-					var selection = table.selection;
+					var selection = grid.selection;
 					var id = thisRow.id;
 					if(mode == "single" || (!event.ctrlKey && mode == "multiple")){
 						for(var i in selection){
 							if(selection.hasOwnProperty(i) && typeof selection[i] != "function"){
-								set(table, targetElement, i, false);
+								set(grid, targetElement, i, false);
 							}
 						}
-						set(table, targetElement, id, true);
+						set(grid, targetElement, id, true);
 					}else{
-						set(table, targetElement, id, !selection[id]);
+						set(grid, targetElement, id, !selection[id]);
 					}
 					if(event.shiftKey && mode != "single"){
 						var lastElement = lastRow && lastRow.element;
@@ -38,8 +38,8 @@ return declare([], {
 						var nextNode;
 						while(nextNode = thisRow.element[traverser]){
 							// loop through and set everything
-							thisRow = table.row(nextNode);
-							set(table, thisRow.element, thisRow.id, true);
+							thisRow = grid.row(nextNode);
+							set(grid, thisRow.element, thisRow.id, true);
 							if(nextNode == lastElement){
 								break;
 							}
@@ -51,9 +51,9 @@ return declare([], {
 				
 			});
 		}
-		table.selection.watch(function(id, oldValue, value){
-			dojo[value ? "addClass" : "removeClass"](table.row(id).element, "dojoxGridxRowSelected");
-			dojo[value ? "addClass" : "removeClass"](table.row(id).element, "ui-state-active");
+		grid.selection.watch(function(id, oldValue, value){
+			dojo[value ? "addClass" : "removeClass"](grid.row(id).element, "dojoxGridxRowSelected");
+			dojo[value ? "addClass" : "removeClass"](grid.row(id).element, "ui-state-active");
 		});
 	},
 	// selection:
@@ -77,13 +77,13 @@ return declare([], {
 		return rows;
 	}
 });
-function set(table, target, id, value){
+function set(grid, target, id, value){
 	if(listen.emit(target, value ? "select" : "deselect", {
 		cancelable: true,
 		bubbles: true,
 		id: id
 	})){
-		table.selection.set(id, value);
+		grid.selection.set(id, value);
 	}
 }
 

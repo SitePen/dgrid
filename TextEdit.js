@@ -15,16 +15,16 @@ return function(settings){
 				value: data
 			}, td);
 			input.focus();
-			var table = settings.table;
-			var id = table.row(event).id;
+			var grid = settings.grid;
+			var id = grid.row(event).id;
 			input.onblur = input.onchange = function(){
 				if(input){
 					var thisInput = input;
 					input = null;
-					if(table.store){
-						dojo.when(table.store.get(id), function(object){ 
+					if(grid.store){
+						dojo.when(grid.store.get(id), function(object){ 
 							data = object[settings.field] = thisInput.value;
-							table.store.put(object);
+							grid.store.put(object);
 							originalRenderCell(data, td);
 						});
 					}

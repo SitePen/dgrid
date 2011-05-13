@@ -5,7 +5,7 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "./TextEdit", ".
 		columns: [],
 		createRowCells: function(tag, each){
 			// summary:
-			//		Generates the table for each row (used by renderHeader and and renderRow)
+			//		Generates the grid for each row (used by renderHeader and and renderRow)
 			var tr, row = create("table", {
 			});			
 			if(dojo.isIE < 8 || dojo.isQuirks){
@@ -77,11 +77,11 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "./TextEdit", ".
 		},
 		renderHeader: function(){
 			// summary:
-			//		Setup the headers for the table
+			//		Setup the headers for the grid
 			var grid = this;
 			var row = this.createRowCells("th", function(th, column){
 				th.setAttribute("role", "columnheader");
-				column.table = grid;
+				column.grid = grid;
 				var field = column.field = column.field;
 				if(column.editable){
 					column = TextEdit(column);
@@ -110,7 +110,7 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "./TextEdit", ".
 				if(this.getAttribute("sortable")){
 					var field = this.getAttribute("field");
 					// resort
-					var descending = table.sortOrder && table.sortOrder[0].attribute == field && !table.sortOrder[0].descending;
+					var descending = grid.sortOrder && grid.sortOrder[0].attribute == field && !grid.sortOrder[0].descending;
 					if(lastSortedArrow){
 						dojo.destroy(lastSortedArrow);
 					}

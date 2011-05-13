@@ -117,7 +117,7 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/aspect", "
 		},
 		refreshContent: function(){
 			// summary:
-			//		refreshes the contents of the table
+			//		refreshes the contents of the grid
 			if(this.contentNode){
 				// remove the content so it can be recreated
 				this.contentNode.innerHTML = "";
@@ -141,7 +141,7 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/aspect", "
 		},
 		renderCollection: function(results, beforeNode, options){
 			// summary:
-			//		This renders an array or collection of objects as rows in the table, before the
+			//		This renders an array or collection of objects as rows in the grid, before the
 			//		given node. This will listen for changes in the collection if an observe method
 			//		is available (as it should be if it comes from an Observable data store).
 			options = options || {};
@@ -184,7 +184,7 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/aspect", "
 		},
 		createRow: function(object, beforeNode, i, options){
 			// summary:
-			//		Renders a single row in the table
+			//		Renders a single row in the grid
 			var row = this.renderRow(object, options);
 			row.className = (row.className || "") + " ui-state-default dojoxGridxRow " + (i% 2 == 1 ? "dojoxGridxRowOdd" : "dojoxGridxRowEven");
 			// get the row id for easy retrieval

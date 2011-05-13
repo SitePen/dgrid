@@ -6,7 +6,7 @@ h2 {
 	width: 70%;
 	height: 500px;
 	border: 1px solid blue;
-	widget: d-list/Table, d-list/Selection, d-list/Keyboard;
+	widget: d-list/Grid, d-list/Selection, d-list/Keyboard;
 	store: testCountryStore;
 	query: {type: "continent"};
 	selection-mode: single;

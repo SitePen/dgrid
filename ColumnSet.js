@@ -1,12 +1,12 @@
-define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/query", "./Table","cssx/css!./css/columnset.css"], 
-	function(dojo, declare, listen, query, Table, cssx){
+define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/query", "./Grid","cssx/css!./css/columnset.css"], 
+	function(dojo, declare, listen, query, Grid, cssx){
 		//	summary:
 		//		This module provides column sets to isolate horizontal scroll of sets of 
 		// 		columns from each other. This mainly serves the purpose of allowing for
 		// 		column locking. 
 	var create = dojo.create;
 	
-	return declare([Table], {
+	return declare([Grid], {
 		columns: [],
 		createRowCells: function(tag, each){
 			var row = create("table", {
@@ -36,7 +36,7 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/query", ".
 		},
 		renderHeader: function(){
 			// summary:
-			//		Setup the headers for the table
+			//		Setup the headers for the grid
 			this.inherited(arguments);
 			var columnSets = this.columnSets;
 			this.bodyNode.style.bottom = "17px";

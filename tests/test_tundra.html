@@ -13,16 +13,16 @@
 				padding-bottom: 0.25em;
 			}
 					
-			#table { 
+			#grid { 
 				width: 70%;
 			}
-			#table .field-col {
+			#grid .field-col {
 				width: 80px;
 			}
-			#table .field-col2 {
+			#grid .field-col2 {
 				width: 50px;
 			}
-			#table .field-col4 {
+			#grid .field-col4 {
 				width: 150px;
 			}
 
@@ -33,8 +33,8 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["d-list/List", "d-list/OnDemandTable","d-list/Tree","d-list/CheckBox","d-list/Selection", "d-list/Keyboard", "d-list/tests/test_data", "domReady!"], 
-				function(List, Table, Tree, CheckBox, Selection, Keyboard, ProgressBar){
+			require(["d-list/List", "d-list/OnDemandGrid","d-list/Tree","d-list/CheckBox","d-list/Selection", "d-list/Keyboard", "d-list/tests/test_data", "domReady!"], 
+				function(List, Grid, Tree, CheckBox, Selection, Keyboard, ProgressBar){
 					var columns = [
 						{name: 'Column 1', field: 'col1', editable: true, sortable: true},
 						{name: 'Column 2', field: 'col2'},
@@ -42,16 +42,16 @@
 						{name: 'Column 4', field: 'col4', editable: true, sortable: true},
 						{name: 'Column 5', field: 'col5', editable: true, sortable: true}
 					];
-					grid = new (dojo.declare([Table, Selection, Keyboard]))({
+					grid = new (dojo.declare([Grid, Selection, Keyboard]))({
 						store: testStore,
 						columns: columns
-					}, "table");
+					}, "grid");
 				});
 				
 		</script>
 	</head>
 	<body class="claro">
 		<h2>A basic grid (70% of page width)</h2>
-		<div id="table"></div>
+		<div id="grid"></div>
 	</body>
 </html>
