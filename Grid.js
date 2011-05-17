@@ -7,9 +7,13 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "./TextEdit", ".
 			// summary:
 			//		Generates the grid for each row (used by renderHeader and and renderRow)
 			var tr, row = create("table", {
-			});			
+			});
+			var contentBoxSizing;
 			if(dojo.isIE < 8 || dojo.isQuirks){
-				row.style.width = "auto"; // in IE7 this is needed to instead of 100% to make it not create a horizontal scroll bar
+				if(!dojo.isQuirks){
+					contentBoxSizing = true;
+					row.style.width = "auto"; // in IE7 this is needed to instead of 100% to make it not create a horizontal scroll bar
+				}
 				var tbody = create("tbody", null, row);
 			}else{
 				var tbody = row;
@@ -31,18 +35,26 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "./TextEdit", ".
 					var column = subrow[i];
 					var field = column.field;
 					var cell = create(tag,{
-						className: "dojoxGridxCell " + (column.className || (field ? "field-" + field : "")) + " column-" + i,
+						className: "dojoxGridxCell dojoxGridxCellPadding " + (column.className || (field ? "field-" + field : "")) + " column-" + i,
 						colid: i
 					});
+					if(contentBoxSizing){
+						var innerCell = create("div", {
+							className: "dojoxGridxCellPadding"
+						}, cell);
+						dojo.removeClass(cell, "dojoxGridxCellPadding");
+					}else{
+						innerCell = cell;
+					}
 					var colspan = column.colspan;
 					if(colspan){
-						cell.setAttribute("colspan", colspan);
+						cell.setAttribute("colSpan", colspan);
 					}
 					var rowspan = column.rowspan;
 					if(rowspan){
-						cell.setAttribute("rowspan", rowspan);
+						cell.setAttribute("rowSpan", rowspan);
 					}
-					each(cell, column);
+					each(innerCell, column);
 					// add the td to the tr at the end for better performance
 					tr.appendChild(cell);
 				}
@@ -50,9 +62,10 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "./TextEdit", ".
 			return row;
 		},
 		renderRow: function(object, options){
+			var tabIndex = this.tabIndex;
 			var row = this.createRowCells("td", function(td, column){
 				td.setAttribute("role", "gridcell");
-				td.setAttribute("tabindex", this.tabIndex);				
+				td.setAttribute("tabindex", tabIndex);				
 				var data = object, field = column.field;
 				// we support the field, get, and formatter properties like the DataGrid
 				if(field){
@@ -141,5 +154,37 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "./TextEdit", ".
 				 css +
 			"}");
 		}
-	});
+	});/*
+	if(!has("dom-fixedtablespans")){
+		var space = {};
+		var fixColumns = function(subrows){
+			var fixed = [[]];
+			// put everything in a spatial grid
+			for(var y = 0; y < subrows.length;y++){
+				var columns = subrows[y];
+				var x = 0;
+				for(var i = 0; i < columns.length;i++){
+					while(fixed[y][x]){
+						x++;
+					}
+					var cell = columns[i];
+					for(var y2 = 0; y2 < (cell.row || 1); y2++){
+						for(var x2 = 0; x2 < (cell.colspan || 1); x2++){
+							fixed[y][x] = space;
+						}
+					}
+					fixed[y][x] = columns[i];
+					x = x2;
+				}
+			}
+		
+			for(var y = 0; y < fixed.length;y++){
+				var fixedRow = fixed[y];
+				var x = 0;
+				for(var i = 0; i < fixedRow.length;i++){
+					var fixedCell
+				}
+					while(fixed[y][x]){
+					}
+	}*/
 });

@@ -27,7 +27,7 @@ table.dojoxGridxRow, .dojoxGridxColumnSet table{
 	width: 100%; /* this programmatically becomes 'auto' for IE7 (non-quirks) */ 
 }
 .dojoxGridx .dojoxGridxCell {
-	padding: 3px;
+	padding: 0px;
 	text-align: left;
 	overflow: hidden;
 	border-right: 1px solid #ddd;
@@ -37,6 +37,10 @@ table.dojoxGridxRow, .dojoxGridxColumnSet table{
 	-ms-box-sizing: border-box;	
 	-webkit-box-sizing: border-box;
 }
+.dojoxGridx .dojoxGridxCellPadding {
+	padding: 3px;
+}
+
 .dojoxGridx .dojoxGridxRightCorner {
 	width:17px;
 }
@@ -62,7 +66,6 @@ table.dojoxGridxRow, .dojoxGridxColumnSet table{
 	top: 25px; /* this will be adjusted programmatically to fit below the header*/
 	bottom: 0px;
 	width: 100%;
-	
 }
 
 .dojoxGridxIcon{
