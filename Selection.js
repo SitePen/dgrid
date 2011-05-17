@@ -9,12 +9,20 @@ return declare([], {
 		var grid = this;
 		this.selection = new Stateful();
 		if(this.selectionMode != "none"){
-			listen(this.contentNode, "mousedown", function(event){
+			// this is to stop IE's web accelerator and selection
+			listen(this.contentNode, "selectstart", function(event){
 				event.preventDefault();
 			});
-			listen(this.contentNode, ".dojoxGridxRow:click, .dojoxGridxRow:keydown", function(event){
-				if(event.type == "click" || event.keyCode == 32){
+			listen(this.contentNode, ".dojoxGridxRow:mousedown, .dojoxGridxRow:keydown", function(event){
+				if(event.type == "mousedown" || event.keyCode == 32){
 					event.preventDefault();
+					var focusElement = event.target;
+					while(focusElement.getAttribute && !focusElement.getAttribute("tabIndex")){
+						focusElement = focusElement.parentNode;
+					}
+					if(focusElement.focus){
+						focusElement.focus();
+					}
 					var thisRow = grid.row(event);
 					var targetElement = thisRow.element;
 					var selection = grid.selection;
