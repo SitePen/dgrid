@@ -154,37 +154,5 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "./TextEdit", ".
 				 css +
 			"}");
 		}
-	});/*
-	if(!has("dom-fixedtablespans")){
-		var space = {};
-		var fixColumns = function(subrows){
-			var fixed = [[]];
-			// put everything in a spatial grid
-			for(var y = 0; y < subrows.length;y++){
-				var columns = subrows[y];
-				var x = 0;
-				for(var i = 0; i < columns.length;i++){
-					while(fixed[y][x]){
-						x++;
-					}
-					var cell = columns[i];
-					for(var y2 = 0; y2 < (cell.row || 1); y2++){
-						for(var x2 = 0; x2 < (cell.colspan || 1); x2++){
-							fixed[y][x] = space;
-						}
-					}
-					fixed[y][x] = columns[i];
-					x = x2;
-				}
-			}
-		
-			for(var y = 0; y < fixed.length;y++){
-				var fixedRow = fixed[y];
-				var x = 0;
-				for(var i = 0; i < fixedRow.length;i++){
-					var fixedCell
-				}
-					while(fixed[y][x]){
-					}
-	}*/
+	});
 });
