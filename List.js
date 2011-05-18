@@ -67,7 +67,7 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/aspect", "
 			if(!this.id){
 				this.id = domNode.id;
 			}
-			this.tabIndex = domNode.getAttribute("tabindex") || 1;
+			this.tabIndex = domNode.getAttribute("tabindex") || 0;
 			domNode.role = "grid";
 			if(params){
 				this.params = params;
