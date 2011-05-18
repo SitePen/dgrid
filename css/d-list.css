@@ -3,19 +3,20 @@
 	overflow: hidden;
 	border: 1px solid #ddd;
 	height: 30em;
+	display: block;
 }
-.dojoxGridx .dojoxGridxHeader {
+.dojoxGridxHeader {
 	background-color: #eee;
 	/*width: 100%; /* IE quirks needs this to work properly */
 	position: absolute;
-	right: 17px;
+	right: 17px; /*-cssx-scrollbar-width;*/
 	left: 0px;
 }
 
-.dojoxGridx .dojoxGridxSortable {
+.dojoxGridxSortable {
 	/*cursor: pointer; I don't know if we want to do this since overrides the resize cursor*/
 }
-.dojoxGridx .dojoxGridxHeader, .dojoxGridxHeaderRow, .dojoxGridxFooter {
+.dojoxGridxHeader, .dojoxGridxHeaderRow, .dojoxGridxFooter {
 	overflow: hidden;
 	background-color: #eee;
 }
@@ -26,7 +27,7 @@ table.dojoxGridxRow, .dojoxGridxColumnSet table{
 	position: relative;
 	width: 100%; /* this programmatically becomes 'auto' for IE7 (non-quirks) */ 
 }
-.dojoxGridx .dojoxGridxCell {
+.dojoxGridxCell {
 	padding: 0px;
 	text-align: left;
 	overflow: hidden;
@@ -37,25 +38,25 @@ table.dojoxGridxRow, .dojoxGridxColumnSet table{
 	-ms-box-sizing: border-box;	
 	-webkit-box-sizing: border-box;
 }
-.dojoxGridx .dojoxGridxCellPadding {
+.dojoxGridxCellPadding {
 	padding: 3px;
 }
 
-.dojoxGridx .dojoxGridxRightCorner {
+.dojoxGridxRightCorner {
 	width:17px;
 }
-.dojoxGridx .dojoxGridxHeaderRow {
+.dojoxGridxHeaderRow {
 	border-bottom: 1px solid #ccc;
 }
-.dojoxGridx .dojoxGridxFooter {
+.dojoxGridxFooter {
 }
-.dojoxGridx .dojoxGridxMain {
+.dojoxGridxMain {
 	position: relative;
 }
-.dojoxGridx .dojoxGridxContent {
+.dojoxGridxContent {
 	position: relative;
 }
-.dojoxGridx .dojoxGridxExpando {
+.dojoxGridxExpando {
 	width: 16px;
 	height: 16px;
 }
@@ -103,6 +104,9 @@ table.dojoxGridxRow, .dojoxGridxColumnSet table{
 	background-color: #BFD6EB;
 }
 
+.dojoxGridxTextInput {
+	width: 99%;
+}
 .ui-icon { width: 16px; height: 16px; background-image: url(images/ui-icons_222222_256x240.png); }
 
 .ui-icon-triangle-1-e { background-position: -32px -16px; }
