@@ -8,7 +8,7 @@
 	bottom: 0px;
 	overflow-x: auto;
 	overflow-y: hidden;
-	height: 17px;
+	height: 18px; /* must be one more than the scroll bar height for IE to listen to clicks, any more blocks clicks in the main area*/
 }
 .dojoxGridxColumnSetScrollerContent{
 	position: relative;
