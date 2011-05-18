@@ -2,41 +2,63 @@
 h2 {
 	content: 'A basic grid constructed from CSS (70% of page width)';
 }
-#tree {
+#grid {
 	width: 70%;
 	height: 500px;
 	border: 1px solid blue;
-	widget: d-list/Grid, d-list/Selection, d-list/Keyboard;
+	widget: dojo.declare([require('d-list/OnDemandGrid'), require('d-list/Selection'), require('d-list/Keyboard')]);
 	store: testCountryStore;
 	query: {type: "continent"};
 	selection-mode: single;
-	columns: {
-		.name {
-			name: Name;
-			widget: d-list/Tree;
-			sortable: true;
-			.expanded {
-				background-image: url('expanded.png');
-			};
-			.collapsed {
-				background-image: url('expanded.png');
-			};
+	/*This is how it should look with full nested generative support
+	th.name[sortable=true] {
+		content: Name;
+		widget: require('d-list/Tree');
+		.expanded {
+			background-image: url('expanded.png');
 		};
-		.bool {
-			name: 'A Checkbox';
-			width: 80px;
-			widget: d-list/CheckBox;
-		};
-		.type {
-			name: Type;
-			width: 120px;
-		};
-		.population {
-			name: Population;
-			editable: true;
+		.collapsed {
+			background-image: url('expanded.png');
 		};
 	};
+	th.bool {
+		content: 'A Checkbox';
+		width: 80px;
+		widget: require('d-list/CheckBox');
+	};
+	th.type {
+		content: Type;
+		width: 120px;
+	};
+	th.population[editable=true] {
+		content: Population;
+	};*/
 }
+#grid .name {
+	name: Name;
+	widget: require('d-list/Tree');
+}
+
+#grid .name .expanded {
+	background-image: url('expanded.png');
+}
+#grid .name .collapsed {
+	background-image: url('expanded.png');
+}
+#grid .field-timezone{
+	name: 'A Checkbox';
+	width: 80px;
+	widget: require('d-list/CheckBox');
+}
+#grid .name{
+	name: Type;
+	width: 60px;
+}
+#grid .population {
+	name: Population;
+	editable: true;
+}
+
 input[type=date] {
 	widget: dijit/DateTime!native
 }

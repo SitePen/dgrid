@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Test Grid Via CSS Declaration</title>
+		<script type="text/javascript" src="../../dojo/dojo.js" 
+			data-dojo-config="async: true"></script>
+		<script type="text/javascript">
+			require(["cssx/widget!d-list/tests/css/layout-grid", "d-list/tests/test_data"],
+				function(layout){
+					layout.apply();
+					//document.body.model = testCountryStore;
+				});
+		</script>
+	</head>
+	<body class="claro">
+		<h2>A basic grid (70% of page width)</h2>
+		<table id="grid">
+			<th sortable=true class="name">Name</th><th>timezone</th><th field="type">Type</th><th class="population" editable=true>Population</th>
+		</table>
+		<table id="grid2">
+			<tr><th sortable=true>Name</th><th colSpan="2">Bool</th></tr>
+			<tr><th colSpan="2">Type</th><th editable=true>Population</th></tr>
+		</table>
+	</body>
+</html>
