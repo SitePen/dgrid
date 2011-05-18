@@ -2,6 +2,7 @@ define(["dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/li
 return declare([List], {
 	create: function(params, srcNodeRef){
 		this.inherited(arguments);
+		this.dirty = {};
 		var self = this;
 		// check visibility on scroll events
 		listen(this.bodyNode, "scroll", function(event){
@@ -157,7 +158,31 @@ return declare([List], {
 					}, console.error);
 			}
 		}
-	}	
+	},
+	getBeforePut: true,
+	save: function(){
+		var store = this.store;
+		var puts = [];
+		for(var id in this.dirty){
+			var put = (function(dirty){
+				return function(object){
+					// copy all the dirty properties onto the original
+					for(key in dirty){
+						object[key] = dirty[key];
+					}
+					// put it
+					store.put(object);
+				};
+			})(this.dirty[id]);
+			puts.push(this.getBeforePut ?
+				// retrieve the full object from the store
+				dojo.when(store.get(id), put):
+				// just use the cached object
+				put(this.row(id).data));
+		}
+		this.dirty = {}; // clear it
+		return puts;
+	}
 });
 
 });
