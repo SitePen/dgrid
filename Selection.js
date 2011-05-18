@@ -5,7 +5,7 @@ return declare([], {
 	//		fire "select" and "deselect" events.
 	postCreate: function(){
 		this.inherited(arguments);
-		var lastRow, mode = (this.selectionMode) || "multiple";
+		var lastRow, mode = this.selectionMode;
 		var grid = this;
 		this.selection = new Stateful();
 		if(this.selectionMode != "none"){
@@ -68,6 +68,9 @@ return declare([], {
 	// 		A stateful object (get/set/watch) where the property names correspond to 
 	// 		object ids and values are true or false depending on whether an item is selected
 	selection: {},
+	// selectionMode: String
+	// 		The selection mode to use, can be "multiple", "single", or "extended".
+	selectionMode: "multiple",
 	select: function(id){
 		set(this, this.row(id).element, id, true);
 	},
