@@ -24,36 +24,38 @@ return declare([], {
 						focusElement.focus();
 					}
 					var thisRow = grid.row(event);
-					var targetElement = thisRow.element;
-					var selection = grid.selection;
-					var id = thisRow.id;
-					if(mode == "single" || (!event.ctrlKey && mode == "multiple")){
-						for(var i in selection){
-							if(selection.hasOwnProperty(i) && typeof selection[i] != "function"){
-								set(grid, targetElement, i, false);
+					if(thisRow){
+						var targetElement = thisRow.element;
+						var selection = grid.selection;
+						var id = thisRow.id;
+						if(mode == "single" || (!event.ctrlKey && mode == "multiple")){
+							for(var i in selection){
+								if(selection.hasOwnProperty(i) && typeof selection[i] != "function"){
+									set(grid, targetElement, i, false);
+								}
 							}
+							set(grid, targetElement, id, true);
+						}else{
+							set(grid, targetElement, id, !selection[id]);
 						}
-						set(grid, targetElement, id, true);
-					}else{
-						set(grid, targetElement, id, !selection[id]);
-					}
-					if(event.shiftKey && mode != "single"){
-						var lastElement = lastRow && lastRow.element;
-						// find if it is earlier or later in the DOM
-						var traverser = (lastElement && (lastElement.compareDocumentPosition ? 
-							lastElement.compareDocumentPosition(targetElement) == 2 :
-							lastElement.sourceIndex > targetElement.sourceIndex)) ? "nextSibling" : "previousSibling";
-						var nextNode;
-						while(nextNode = thisRow.element[traverser]){
-							// loop through and set everything
-							thisRow = grid.row(nextNode);
-							set(grid, thisRow.element, thisRow.id, true);
-							if(nextNode == lastElement){
-								break;
+						if(event.shiftKey && mode != "single"){
+							var lastElement = lastRow && lastRow.element;
+							// find if it is earlier or later in the DOM
+							var traverser = (lastElement && (lastElement.compareDocumentPosition ? 
+								lastElement.compareDocumentPosition(targetElement) == 2 :
+								lastElement.sourceIndex > targetElement.sourceIndex)) ? "nextSibling" : "previousSibling";
+							var nextNode;
+							while(nextNode = thisRow.element[traverser]){
+								// loop through and set everything
+								thisRow = grid.row(nextNode);
+								set(grid, thisRow.element, thisRow.id, true);
+								if(nextNode == lastElement){
+									break;
+								}
 							}
+						}else{
+							lastRow = thisRow;
 						}
-					}else{
-						lastRow = thisRow;
 					}
 				}
 				

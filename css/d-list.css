@@ -104,7 +104,7 @@ table.dojoxGridxRow, .dojoxGridxColumnSet table{
 	background-color: #BFD6EB;
 }
 
-.dojoxGridxTextInput {
+.dojoxGridxInput {
 	width: 99%;
 }
 .ui-icon { width: 16px; height: 16px; background-image: url(images/ui-icons_222222_256x240.png); }
