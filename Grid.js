@@ -1,4 +1,4 @@
-define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "./TextEdit", "./List", "cssx/cssx"], function(dojo, declare, listen, TextEdit, List, cssx){
+define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "./Editor", "./List", "cssx/cssx"], function(dojo, declare, listen, Editor, List, cssx){
 	var create = dojo.create;
 	
 	return declare([List], {
@@ -66,7 +66,7 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "./TextEdit", ".
 			var tabIndex = this.tabIndex;
 			var row = this.createRowCells("td", function(td, column){
 				td.setAttribute("role", "gridcell");
-				if(!column.editor){
+				if(!column.editor || column.editOn){
 					td.setAttribute("tabindex", tabIndex);
 				}				
 				var data = object, field = column.field;
@@ -80,12 +80,6 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "./TextEdit", ".
 				if(column.formatter){
 					data = column.formatter(data);
 					td.innerHTML = data;
-				}else if(column.editor){
-					var widget = new column.editor(column, dojo.create("div",{},td));
-					widget.set("value", data);
-					widget.watch("value", function(){
-						console.log("value changed", arguments);
-					});
 				}else if(!column.renderCell && data != null){
 					td.appendChild(document.createTextNode(data));
 				}
@@ -130,7 +124,7 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "./TextEdit", ".
 				column.grid = grid;
 				var field = column.field = column.field;
 				if(column.editable){
-					column = TextEdit(column);
+					column = Editor(column, "text", "focus");
 				}
 				if(field){
 					th.setAttribute("field", field);
