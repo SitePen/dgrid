@@ -23,6 +23,18 @@ define(["dojo/store/Memory", "dojo/store/Observable"],function(Memory, Observabl
 
 	// global var "test_store"
 	testStore = Observable(Memory({data: data}));
+
+	var typesData = [];
+	for(var i = 0; i < 20; i++){
+		typesData.push({
+			integer: Math.floor(Math.random() * 100),
+			floatNum: Math.random() * 100,
+			date: new Date(new Date().getTime() * Math.random() * 2),
+			date2: new Date(new Date().getTime() - Math.random() * 1000000000),
+			text: "A number in text " + Math.random()
+		});
+	}
+	testTypesStore = Observable(Memory({data: typesData}));
 	
 	testCountryStore = Observable(new Memory({data: [
 	        { id: 'AF', name:'Africa', type:'continent', population:'900 million', area: '30,221,532 sq km',
