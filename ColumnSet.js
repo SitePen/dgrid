@@ -35,9 +35,16 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/query", ".
 		createRow: function(){
 			var row = this.inherited(arguments);
 			var columnSets = this.columnSets;
-			query(".dojoxGridxColumnSet").forEach(function(element){
-				element.scrollLeft = columnSets[element.getAttribute('colsetid')].scrollLeft;
-			});
+			function adjustScrollLeft(){
+				query(".dojoxGridxColumnSet", row).forEach(function(element){
+					element.scrollLeft = columnSets[element.getAttribute('colsetid')].scrollLeft;
+				});
+			}
+			if(dojo.isIE < 8 || dojo.isQuirks){
+				setTimeout(adjustScrollLeft, 1);
+			}else{
+				adjustScrollLeft();
+			}
 			return row;
 		},
 		renderHeader: function(){
@@ -59,24 +66,24 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/query", ".
 					listen(columnSet.scroller, "scroll", function(){
 						var scrollLeft = this.scrollLeft;
 						columnSet.scrollLeft = scrollLeft;
-						query('.dojoxGridxColumnSet[colsetid="' + i +'"]').forEach(function(element){
+						query('.dojoxGridxColumnSet[colsetid="' + i +'"]', domNode).forEach(function(element){
 							element.scrollLeft = scrollLeft;
 						});
 					});
 				})(columnSets[i], i);
 			}
-			positionScrollers(columnSets);
+			positionScrollers(columnSets, domNode);
 			listen(window, "resize", function(){
-				positionScrollers(columnSets);
+				positionScrollers(columnSets, domNode);
 			});
 		}
 	});
-	function positionScrollers(columnSets){
+	function positionScrollers(columnSets, domNode){
 		var left = 0, scrollerWidth = 0;
 		for(var i = 0, l = columnSets.length; i < l; i++){
 			// iterate through the columnSets
 			left += scrollerWidth;
-			var columnSetElement = query('.dojoxGridxColumnSet[colsetid="' + i +'"]')[0];
+			var columnSetElement = query('.dojoxGridxColumnSet[colsetid="' + i +'"]', domNode)[0];
 			var scrollerWidth = columnSetElement.offsetWidth;
 			var contentWidth = columnSetElement.firstChild.offsetWidth;
 			var columnSet = columnSets[i];
