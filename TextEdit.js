@@ -2,16 +2,19 @@ define(["dojo/listen"], function(listen){
 
 return function(settings){
 	// summary:
-	// 		Add a checkbox column
+	// 		Add a column with text editing capability
 	var originalRenderCell = settings.renderCell || function(data, td){
-		td.appendChild(document.createTextNode(data));
+		if(data != null){
+			td.appendChild(document.createTextNode(data));
+		}
 	};
 	settings.renderCell = function(data, td){
 		originalRenderCell(data, td);
-		listen(td, "dblclick", function(event){
+		listen(td, "focus", function(event){
 			td.removeChild(td.firstChild);
 			var input = dojo.create("input",{
 				type:"text",
+				className: "dojoxGridxTextInput",
 				value: data
 			}, td);
 			input.focus();
