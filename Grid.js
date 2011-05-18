@@ -39,6 +39,7 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "./TextEdit", ".
 						colid: i
 					});
 					if(contentBoxSizing){
+						// The browser (IE7-) does not support box-sizing: border-box, so we emulate it with a padding div
 						var innerCell = create("div", {
 							className: "dojoxGridxCellPadding"
 						}, cell);
@@ -46,13 +47,13 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "./TextEdit", ".
 					}else{
 						innerCell = cell;
 					}
-					var colspan = column.colspan;
-					if(colspan){
-						cell.setAttribute("colSpan", colspan);
+					var colSpan = column.colSpan;
+					if(colSpan){
+						cell.setAttribute("colSpan", colSpan);
 					}
-					var rowspan = column.rowspan;
-					if(rowspan){
-						cell.setAttribute("rowSpan", rowspan);
+					var rowSpan = column.rowSpan;
+					if(rowSpan){
+						cell.setAttribute("rowSpan", rowSpan);
 					}
 					each(innerCell, column);
 					// add the td to the tr at the end for better performance
@@ -65,7 +66,9 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "./TextEdit", ".
 			var tabIndex = this.tabIndex;
 			var row = this.createRowCells("td", function(td, column){
 				td.setAttribute("role", "gridcell");
-				td.setAttribute("tabindex", tabIndex);				
+				if(!column.editor){
+					td.setAttribute("tabindex", tabIndex);
+				}				
 				var data = object, field = column.field;
 				// we support the field, get, and formatter properties like the DataGrid
 				if(field){
@@ -77,6 +80,12 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "./TextEdit", ".
 				if(column.formatter){
 					data = column.formatter(data);
 					td.innerHTML = data;
+				}else if(column.editor){
+					var widget = new column.editor(column, dojo.create("div",{},td));
+					widget.set("value", data);
+					widget.watch("value", function(){
+						console.log("value changed", arguments);
+					});
 				}else if(!column.renderCell && data != null){
 					td.appendChild(document.createTextNode(data));
 				}
@@ -92,6 +101,30 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "./TextEdit", ".
 			// summary:
 			//		Setup the headers for the grid
 			var grid = this;
+			var columns = this.columns;
+			if(!columns.checkedTrs){
+				columns.checkedTrs = true;
+				var trs = this.domNode.getElementsByTagName("tr");
+				for(var i = 0; i < trs.length; i++){
+					var rowColumns = [];
+					columns.push(rowColumns);
+					var tr = trs[i];
+					var ths = tr.getElementsByTagName("th");
+					for(var j = 0; j < ths.length; j++){
+						var th = ths[j];
+						rowColumns.push({
+							name: th.innerHTML,
+							field: th.getAttribute("field") || th.className || th.innerHTML,
+							className: th.className,
+							editable: th.getAttribute("editable"),
+							sortable: th.getAttribute("sortable"),
+						});
+					}
+				}
+				if(tr){
+					this.domNode.removeChild(tr.parentNode);
+				}
+			}
 			var row = this.createRowCells("th", function(th, column){
 				th.setAttribute("role", "columnheader");
 				column.grid = grid;
@@ -114,9 +147,6 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "./TextEdit", ".
 			});
 			row.className = "dojoxGridxRow ui-widget-header";
 			this.headerNode.appendChild(row);
-/*			create("th",{
-				className:"dojoxGridxRightCorner dojoxGridxCell"
-			}, row.getElementsByTagName("tr")[0] || row);*/
 			var lastSortedArrow;
 			// if it columns are sortable, resort on clicks
 			listen(row, ".dojoxGridxCell:click", function(event){
