@@ -17,6 +17,7 @@ return function(column, editor, editOn){
 			var input = dojo.create("input",{
 				type: editor,
 				className: "dojoxGridxInput",
+				name: column.field || "selection",
 				value: data,
 				checked: data
 			}, cell);
@@ -53,18 +54,24 @@ return function(column, editor, editOn){
 			}
 		};
 	function setProperty(cell, oldValue, value){
-		if(listen.emit(cell, "change", {oldValue: oldValue, value: value, bubbles: true, cancelable: true})){
-			var row = grid.row(cell);
-			var object = row.data;
-			var dirty = grid.dirty[row.id] || (grid.dirty[row.id] = {});
-			dirty[column.field] = object[column.field] = value;
-			if(column.autoSave){
-				grid.save();
-			}
-			return value;
+		var row = grid.row(cell);
+		if(column.field){
+			if(listen.emit(cell, "change", {oldValue: oldValue, value: value, bubbles: true, cancelable: true})){
+				var object = row.data;
+				var dirty = grid.dirty[row.id] || (grid.dirty[row.id] = {});
+				dirty[column.field] = object[column.field] = value;
+				if(column.autoSave){
+					grid.save();
+				}
+			}else{
+				// else keep the value the same
+				return oldValue;
+			}	
 		}
-		// else keep the value the same
-		return oldValue;
+		if(column.selector){
+			grid.selection.set(row.id, value);
+		}
+		return value;
 	}
 	column.renderCell = function(data, cell, options, object){
 		grid = column.grid;
