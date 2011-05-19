@@ -3,6 +3,24 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "./Editor", "./L
 	
 	return declare([List], {
 		columns: [],
+		column: function(target){
+			// summary:
+			//		Get the column object by node, or event
+			if(target.target && target.target.nodeType == 1){
+				// event
+				target = target.target;
+			}
+			if(target.nodeType == 1){
+				var object;
+				do{
+					var colId = target.getAttribute("colid");
+					if(colId){
+						return this.columns[colId];
+					}
+					target = target.parentNode;
+				}while(target && target != this.domNode);
+			}
+		},
 		createRowCells: function(tag, each){
 			// summary:
 			//		Generates the grid for each row (used by renderHeader and and renderRow)
