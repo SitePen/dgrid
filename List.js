@@ -154,13 +154,17 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/aspect", "
 					// a change in the data took place
 					if(from > -1){
 						// remove from old slot
-						var tr = rows.splice(from, 1)[0];
-						contentNode.removeChild(tr);
+						var row = rows.splice(from, 1)[0];
+						contentNode.removeChild(row);
 					}
 					if(to > -1){
 						// add to new slot
-						var tr = self.createRow(object, rows[to], (options.start + to), options);
-						rows.splice(to, 0, tr);
+						var row = self.createRow(object, rows[to], (options.start + to), options);
+						dojo.addClass(row, "ui-state-highlight");
+						setTimeout(function(){
+							dojo.removeClass(row, "ui-state-highlight");
+						}, 250);
+						rows.splice(to, 0, row);
 					}
 				}));
 			}

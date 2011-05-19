@@ -14,7 +14,7 @@
 
 /* Interaction states
 ----------------------------------*/
-.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default { 
+.ui-state-default { 
 
   -webkit-transition-duration: 0.2s;
   -moz-transition-duration: 0.2s;
@@ -24,10 +24,14 @@
   transition-property: background-color, border-color;
   background: url("images/row_back.png") #fff repeat-x;
 }
-.ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active {
+.ui-state-active {
 background-color:#cee6fa;
 }
 
 .ui-state-default:hover {
 background-color:#ABD6FF
+}
+
+.ui-state-highlight{
+background-color:#ff4;
 }
