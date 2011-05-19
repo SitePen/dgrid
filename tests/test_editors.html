@@ -36,7 +36,7 @@
 						{name: 'Non editable text', field: 'text'},
 						Editor({name: 'Another Date', field: 'date2', sortable: true}, DateTextBox, "focus"),
 						Editor({name: 'CheckBox', field: 'bool', sortable: true}, "checkbox"),
-						Editor({name: 'Radio', field: 'bool2', sortable: true}, "radio")
+						Editor({name: 'Radio', sortable: true, selector: true}, "radio")
 					];
 					grid = new (dojo.declare([Grid, Selection, Keyboard]))({
 						store: testTypesStore,
@@ -55,6 +55,6 @@
 	<body class="claro">
 		<h2>A basic grid with editors</h2>	
 		<div id="grid"></div>
-		<button id="save" onclick="grid.save()">Save</button<
+		<button id="save" onclick="grid.save()">Save</button>
 	</body>
 </html>
