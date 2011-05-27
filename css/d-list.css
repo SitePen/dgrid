@@ -1,11 +1,11 @@
-.dojoxGridx {
+.d-list {
 	position: relative;
 	overflow: hidden;
 	border: 1px solid #ddd;
 	height: 30em;
 	display: block;
 }
-.dojoxGridxHeader {
+.d-list-header {
 	background-color: #eee;
 	/*width: 100%; /* IE quirks needs this to work properly */
 	position: absolute;
@@ -13,21 +13,21 @@
 	left: 0px;
 }
 
-.dojoxGridxSortable {
+.d-list-sortable {
 	/*cursor: pointer; I don't know if we want to do this since overrides the resize cursor*/
 }
-.dojoxGridxHeader, .dojoxGridxHeaderRow, .dojoxGridxFooter {
+.d-list-header, .d-list-header-row, .d-list-footer {
 	overflow: hidden;
 	background-color: #eee;
 }
-table.dojoxGridxRow, .dojoxGridxColumnSet table{
+table.d-list-row, .d-list-column-set table{
 	border-collapse: collapse;
 	border: none;
 	table-layout: fixed;
 	position: relative;
 	width: 100%; /* this programmatically becomes 'auto' for IE7 (non-quirks) */ 
 }
-.dojoxGridxCell {
+.d-list-cell {
 	padding: 0px;
 	text-align: left;
 	overflow: hidden;
@@ -38,29 +38,29 @@ table.dojoxGridxRow, .dojoxGridxColumnSet table{
 	-ms-box-sizing: border-box;	
 	-webkit-box-sizing: border-box;
 }
-.dojoxGridxCellPadding {
+.d-list-cell-padding {
 	padding: 3px;
 }
 
-.dojoxGridxRightCorner {
+.d-list-right-corner {
 	width:17px;
 }
-.dojoxGridxHeaderRow {
+.d-list-header-row {
 	border-bottom: 1px solid #ccc;
 }
-.dojoxGridxFooter {
+.d-list-footer {
 }
-.dojoxGridxMain {
+.d-list-main {
 	position: relative;
 }
-.dojoxGridxContent {
+.d-list-content {
 	position: relative;
 }
-.dojoxGridxExpando {
+.d-list-expando {
 	width: 16px;
 	height: 16px;
 }
-.dojoxGridxScroller{
+.d-list-scroller{
 	overflow-x: auto;
 	overflow-y: scroll;
 	position: absolute;
@@ -69,24 +69,24 @@ table.dojoxGridxRow, .dojoxGridxColumnSet table{
 	width: 100%;
 }
 
-.dojoxGridxIcon{
+.d-list-icon{
 	width: 16px;
 	height: 16px;
 }
 /*below is dummy style*/
-.dojoxGridxRow, .dojoxGridxHeaderRow {
+.d-list-row, .d-list-header-row {
 }
 
 /* Single Sort */
-.dojoxGridxSortNode {
+.d-list-sort-node {
 	text-decoration:none;
 	display:block;
 }
-.dojoxGridxArrowButtonChar {
+.d-list-arrow-button-char {
 	display:none;
 	float:right;
 }
-.dojoxGridxArrowButtonNode {
+.d-list-arrow-button-node {
 	background:transparent url("images/grid_sort_down.gif") no-repeat scroll left center;
 	display:block;
 	float:right;
@@ -95,16 +95,16 @@ table.dojoxGridxRow, .dojoxGridxColumnSet table{
 	padding-left:0;
 	width:7px;
 }
-.dojoxGridxSortUp .dojoxGridxArrowButtonNode {
+.d-list-sort-up .d-list-arrow-button-node {
 	background-image: url("images/grid_sort_up.gif");
 }
 
 /* selection*/
-.dojoxGridxRowSelected {
+.d-list-row-selected {
 	background-color: #BFD6EB;
 }
 
-.dojoxGridxInput {
+.d-list-input {
 	width: 99%;
 }
 .ui-icon { width: 16px; height: 16px; background-image: url(images/ui-icons_222222_256x240.png); }

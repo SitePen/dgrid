@@ -1,10 +1,10 @@
-define(["dojo/_base/declare", "dojo/listen", "dojo/query"], function(declare, listen, query){
+define(["dojo/_base/declare", "dojo/on", "dojo/query"], function(declare, listen, query){
 return declare([], {
 	// summary:
 	// 		Add keyboard navigation capability to a grid
 	postCreate: function(){
 		this.inherited(arguments);
-		this.on(".dojoxGridxRow:keydown", function(event){
+		this.on(".d-list-row:keydown", function(event){
 			if(event.target.tagName.toLowerCase() == "input"){
 				return;
 			}

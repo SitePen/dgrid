@@ -1,21 +1,21 @@
-define(["dojo/listen"], function(listen){
+define(["dojo/on"], function(listen){
 
 return function(settings){
 	// summary:
 	// 		Add a column with text editing capability
-	var originalRenderCell = settings.renderCell || function(data, td){
-		if(data != null){
-			td.appendChild(document.createTextNode(data));
+	var originalRenderCell = settings.renderCell || function(object, value, td){
+		if(value != null){
+			td.appendChild(document.createTextNode(value));
 		}
 	};
-	settings.renderCell = function(data, td){
-		originalRenderCell(data, td);
+	settings.renderCell = function(object, value, td){
+		originalRenderCell(object, value, td);
 		listen(td, "focus", function(event){
 			td.removeChild(td.firstChild);
 			var input = dojo.create("input",{
 				type:"text",
-				className: "dojoxGridxTextInput",
-				value: data
+				className: "d-list-text-input",
+				value: value
 			}, td);
 			input.focus();
 			var grid = settings.grid;
@@ -26,9 +26,9 @@ return function(settings){
 					input = null;
 					if(grid.store){
 						dojo.when(grid.store.get(id), function(object){ 
-							data = object[settings.field] = thisInput.value;
+							value = object[settings.field] = thisInput.value;
 							grid.store.put(object);
-							originalRenderCell(data, td);
+							originalRenderCell(value, td);
 						});
 					}
 					td.removeChild(thisInput);

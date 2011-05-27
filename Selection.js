@@ -1,4 +1,4 @@
-define(["dojo/_base/declare", "dojo/Stateful", "dojo/listen"], function(declare, Stateful, listen){
+define(["dojo/_base/declare", "dojo/Stateful", "dojo/on"], function(declare, Stateful, listen){
 return declare([], {
 	// summary:
 	// 		Add selection capabilities to a grid. The grid will have a selection property and
@@ -13,7 +13,7 @@ return declare([], {
 			listen(this.contentNode, "selectstart", function(event){
 				event.preventDefault();
 			});
-			listen(this.contentNode, ".dojoxGridxRow:mousedown, .dojoxGridxRow:keydown", function(event){
+			listen(this.contentNode, ".d-list-row:mousedown, .d-list-row:keydown", function(event){
 				if(event.type == "mousedown" || event.keyCode == 32){
 					event.preventDefault();
 					var focusElement = event.target;
@@ -28,7 +28,7 @@ return declare([], {
 						var targetElement = thisRow.element;
 						var selection = grid.selection;
 						var id = thisRow.id;
-						if(mode == "single" || (!event.ctrlKey && mode == "multiple")){
+						if(mode == "single" || (!event.ctrlKey && mode == "extended")){
 							for(var i in selection){
 								if(selection.hasOwnProperty(i) && typeof selection[i] != "function"){
 									set(grid, targetElement, i, false);
@@ -62,7 +62,7 @@ return declare([], {
 			});
 		}
 		grid.selection.watch(function(id, oldValue, value){
-			dojo[value ? "addClass" : "removeClass"](grid.row(id).element, "dojoxGridxRowSelected");
+			dojo[value ? "addClass" : "removeClass"](grid.row(id).element, "d-list-row-selected");
 			dojo[value ? "addClass" : "removeClass"](grid.row(id).element, "ui-state-active");
 		});
 	},
@@ -72,7 +72,7 @@ return declare([], {
 	selection: {},
 	// selectionMode: String
 	// 		The selection mode to use, can be "multiple", "single", or "extended".
-	selectionMode: "multiple",
+	selectionMode: "extended",
 	select: function(id){
 		set(this, this.row(id).element, id, true);
 	},

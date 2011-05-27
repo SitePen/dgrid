@@ -14,13 +14,13 @@
 			#grid { 
 				width: 70%;
 			}
-			#grid .field-col1 {
+			#grid .column-col1 {
 				width: 100px;
 			}
-			#grid .field-col2 {
+			#grid .column-col2 {
 				width: 30%;
 			}
-			#grid .field-col4 {
+			#grid .column-col4 {
 				width: 180px;
 			}
 			#tree {
@@ -49,18 +49,18 @@
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
 			require({"packages":[
-				{"name":"gridx","location":"../grid-2.0", "lib":"gridx"}
+				{"name":"gridx","location":"../grid-2.0/gridx"}
 				]});
 			require(["d-list/List", "d-list/OnDemandGrid","d-list/Tree","d-list/CheckBox","d-list/Selection", "gridx/modules/ColumnResizer", "gridx/modules/dnd/Row", "d-list/Keyboard", "d-list/tests/test_data", "domReady!"], 
 				function(List, Grid, Tree, CheckBox, Selection, ColumnResizer, DndRow, Keyboard, testStore){
 					console.log("loaded in " + (new Date().getTime() - start) + testStore);
-					var columns = [
-						{name: 'Column 1', field: 'col1', editable: true, sortable: true},
-						{name: 'Column 2', field: 'col2'},
-						{name: 'Column 3', field: 'col3', editable: true, sortable: true},
-						{name: 'Column 4', field: 'col4', editable: true, sortable: true},
-						{name: 'Column 5', field: 'col5', editable: true, sortable: true}
-					];
+					var columns = { // you can declare columns as an object hash (key translates to field)
+						col1: {name: 'Column 1', editable: true, sortable: true},
+						col2: 'Column 2',
+						col3: {name: 'Column 3', editable: true, sortable: true},
+						col4: {name: 'Column 4', editable: true, sortable: true},
+						"last-col": {name: 'Column 5', field: 'col5', editable: true, sortable: true}
+					};
 					grid = dojo.declare([Grid, ColumnResizer, Selection, Keyboard])({
 						store: testStore,
 						columns: columns
@@ -77,14 +77,11 @@
 							{name:'Timezone', field:'timezone'}
 						]
 					}, "tree");
-					list = dojo.declare([List, Selection])({
-						renderRow: function(data){
-							return dojo.create("div", {
-								innerHTML: data.name + " is a " + data.type
-							});
-						}
+					list = dojo.declare([List, Selection, Keyboard])({
 					}, "list");
-					list.renderCollection(testCountryStore.data);
+					list.renderCollection(dojo.map(testCountryStore.data, function(country){
+						return country.name;
+					}));
 				});
 		</script>
 	</head>

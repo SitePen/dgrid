@@ -14,6 +14,9 @@
 			#grid { 
 				width: 70%;
 			}
+			#grid .column-set-0 { 
+				width: 50%;
+			}
 			#grid .field-col1 {
 				width: 100px;
 			}
@@ -33,7 +36,7 @@
 				]});
 			require(["d-list/OnDemandGrid", "d-list/ColumnSet", "d-list/Tree", "d-list/Selection", "d-list/Keyboard", "d-list/tests/test_data", "domReady!"],
 				function(Grid, ColumnSet, Tree, Selection, Keyboard, testStore){
-					grid = dojo.declare([Grid, ColumnSet, Selection, Keyboard])({
+					testGrid = dojo.declare([Grid, ColumnSet, Selection, Keyboard])({
 						store: testStore,
 						columnSets: [
 							[

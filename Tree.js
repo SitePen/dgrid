@@ -6,7 +6,7 @@ return declare([], {
 			this[i] = mixin[i];
 		}
 	},
-	renderCell: function(data, td, options, object){
+	renderCell: function(object, value, td, options){
 		// summary:
 		//		Renders a cell that can be expanded, creating more rows
 		var level = options.query.level + 1;
@@ -15,9 +15,9 @@ return declare([], {
 		var expando = td.appendChild(document.createElement("div"));
 		expando.level = isNaN(level) ? 0 : level;
 		if(this.field){
-			td.appendChild(document.createTextNode(data));
+			td.appendChild(document.createTextNode(value));
 		}
-		expando.className = "dojoxGridxExpando" + (!grid.store.mayHaveChildren || 
+		expando.className = "d-list-expando" + (!grid.store.mayHaveChildren || 
 			grid.store.mayHaveChildren(object) ? " ui-icon ui-icon-triangle-1-e" : "");
 		expando.setAttribute("style", "margin-left: " + (expando.level * 19) + "px; float: left");
 		var tr, query;
@@ -25,11 +25,11 @@ return declare([], {
 		if(!grid._hasTreeListener){
 			// just setup the event listener once and use event delegation for better memory use
 			grid._hasTreeListener = true;
-			this.grid.on(".dojoxGridxExpando:click", function(event){
+			this.grid.on(".d-list-expando:click", function(event){
 				// on click we toggle expanding and collapsing
 				var expanded = this.expanded = !this.expanded;
 				// update the expando display
-				this.className = "dojoxGridxExpando ui-icon ui-icon-triangle-1-" + (expanded ? "se" : "e"); 
+				this.className = "d-list-expando ui-icon ui-icon-triangle-1-" + (expanded ? "se" : "e"); 
 				var preloadNode = this.preloadNode;
 				var row = grid.row(this);
 				var rowElement = row.element;

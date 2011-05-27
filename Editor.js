@@ -1,25 +1,25 @@
-define(["dojo/listen"], function(listen){
+define(["dojo/on"], function(listen){
 
 return function(column, editor, editOn){
 	// summary:
 	// 		Add a column with text editing capability
-	var originalRenderCell = column.renderCell || function(data, td){
-		if(data != null){
-			td.appendChild(document.createTextNode(data));
+	var originalRenderCell = column.renderCell || function(object, value, td){
+		if(value != null){
+			td.appendChild(document.createTextNode(value));
 		}
 	};
 	column.editor = editor = editor || column.editor;
 	column.editOn = editOn = editOn || column.editOn;
 	var grid;
 	var renderWidget = typeof editor == "string" ?
-		function(data, cell, object, onblur){
+		function(value, cell, object, onblur){
 			// it is string editor, so we use a common <input> as the editor
 			var input = dojo.create("input",{
 				type: editor,
-				className: "dojoxGridxInput",
+				className: "d-list-input",
 				name: column.field || "selection",
-				value: data,
-				checked: data
+				value: value,
+				checked: value
 			}, cell);
 			var id = grid.row(object).id;
 			if(onblur){
@@ -29,12 +29,12 @@ return function(column, editor, editOn){
 					var thisInput = input;
 					input = null;
 					cell.removeChild(thisInput);
-					onblur(data);
+					onblur(value);
 				};
 			}
 			input.onchange = function(){
 				if(input){
-					data = setProperty(cell, data, input[editor == "checkbox" ? "checked" : "value"]);
+					value = setProperty(cell, value, input[editor == "checkbox" ? "checked" : "value"]);
 				}
 			}
 		} :
@@ -73,18 +73,18 @@ return function(column, editor, editOn){
 		}
 		return value;
 	}
-	column.renderCell = function(data, cell, options, object){
+	column.renderCell = function(object, value, cell, options){
 		grid = column.grid;
 		if(column.editOn){
 			listen(cell, column.editOn, function(){
 				cell.innerHTML = "";
-				renderWidget(data, cell, object, function(newData){
-					originalRenderCell(data = newData, cell);
+				renderWidget(value, cell, object, function(newData){
+					originalRenderCell(value = newData, cell);
 				});
 			});
-			originalRenderCell(data, cell);
+			originalRenderCell(object, value, cell, options);
 		}else{
-			renderWidget(data, cell, object);
+			renderWidget(value, cell, object);
 		}
 	}
 	

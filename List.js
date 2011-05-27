@@ -1,4 +1,4 @@
-define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/aspect", "./TextEdit", "dojo/has", "dojo/has!touch?./TouchScroll", "cssx/css!./css/d-list.css"], function(dojo, declare, listen, aspect, TextEdit, has, TouchScroll){
+define(["dojo/_base/html", "dojo/_base/declare", "dojo/on", "dojo/aspect", "./TextEdit", "dojo/has", "dojo/has!touch?./TouchScroll", "cssx/css!./css/d-list.css"], function(dojo, declare, listen, aspect, TextEdit, has, TouchScroll){
 	// allow for custom CSS class definitions 
 	// TODO: figure out what to depend for this
 	var byId = function(id){
@@ -77,15 +77,15 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/aspect", "
 			if(domNode.tagName == "table"){
 				// TODO: read columns from table
 			}
-			domNode.className += "	ui-widget-content dojoxGridx";
+			domNode.className += "	ui-widget-content d-list";
 			this.refresh();
 		},
 		refresh: function(){
 			var headerNode = this.headerNode = create("div",{
-				className: "dojoxGridxHeader dojoxGridxHeaderRow"
+				className: "d-list-header d-list-header-row"
 			},this.domNode);
 			var bodyNode = this.bodyNode = create("div",{
-				className: "dojoxGridxScroller"
+				className: "d-list-scroller"
 			},this.domNode);
 			listen(bodyNode, "scroll", function(event){
 				// keep the header aligned with the body
@@ -128,7 +128,7 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/aspect", "
 				this.observers = [];
 			}else{
 				this.contentNode = create("div",{
-					className:"dojoxGridxContent"
+					className:"d-list-content"
 				}, this.bodyNode);
 			}
 			if(this.init){
@@ -190,7 +190,7 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/aspect", "
 			// summary:
 			//		Renders a single row in the grid
 			var row = this.renderRow(object, options);
-			row.className = (row.className || "") + " ui-state-default dojoxGridxRow " + (i% 2 == 1 ? "dojoxGridxRowOdd" : "dojoxGridxRowEven");
+			row.className = (row.className || "") + " ui-state-default d-list-row " + (i% 2 == 1 ? "d-list-row-odd" : "d-list-row-even");
 			// get the row id for easy retrieval
 			this._rowIdToObject[row.id = this.id + "-row-" + ((this.store && this.store.getIdentity) ? this.store.getIdentity(object) : this._autoId++)] = object;
 			this.contentNode.insertBefore(row, beforeNode);
@@ -198,7 +198,8 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/listen", "dojo/aspect", "
 		},
 		renderRow: function(value, options){
 			return dojo.create("div", {
-				innerHTML: value
+				innerHTML: value,
+				tabIndex: this.tabIndex 
 			});
 		},
 		row: function(target){

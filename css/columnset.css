@@ -1,16 +1,19 @@
-.dojoxGridxColumnSet {
+.d-list-column-set {
 	overflow: hidden;
 	width: 100%;
 	position: relative;
 }
-.dojoxGridxColumnSetScroller {
+.d-list-column-set-cell {
+	vertical-align: bottom;
+}
+.d-list-column-set-scroller {
 	position: absolute;
 	bottom: 0px;
 	overflow-x: auto;
 	overflow-y: hidden;
 	height: 18px; /* must be one more than the scroll bar height for IE to listen to clicks, any more blocks clicks in the main area*/
 }
-.dojoxGridxColumnSetScrollerContent{
+.d-list-column-set-scroller-content {
 	position: relative;
 	height: 1px;
 }

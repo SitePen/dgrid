@@ -102,7 +102,7 @@ object has the following properties:
 <li>element - The row DOM element</li>
 <li>data - The data object</li>
 </ul>
-* on(event, listener) - Basic event listener functionality, just delegates to the DOM element using standard dojo/listen behavior.    
+* on(event, listener) - Basic event listener functionality, just delegates to the DOM element using standard dojo/on behavior.    
 * renderCollection(array, beforeNode) - This can be called to render an array. The beforeNode parameter can be used to render at a specific place in the list.
 * renderRow(value, options) - This can be overriden to provide a custom rendering of each row
 

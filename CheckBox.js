@@ -1,13 +1,13 @@
-define(["dojo/listen", "dojo/_base/html"], function(listen, dojo){
+define(["dojo/on", "dojo/_base/html"], function(listen, dojo){
 
 return function(column){
 	// summary:
 	// 		Add a checkbox column
-	column.renderCell = function(data, cell){
+	column.renderCell = function(object, value, cell){
 		var grid = column.grid;
 		if(!grid._hasCheckBoxListener){
 			grid._hasCheckBoxListener = true;
-			grid.on(".dojoxGridxCheckBox:change", function(event){
+			grid.on(".d-list-checkbox:change", function(event){
 				var checked = this.checked;
 				var id = grid.row(event).id;
 				if(column.field){
@@ -23,8 +23,8 @@ return function(column){
 		}
 		dojo.create("input",{
 			type:"checkbox",
-			className: "dojoxGridxCheckBox",
-			checked: data
+			className: "d-list-checkbox",
+			checked: value
 		}, cell);
 	};
 	return column;

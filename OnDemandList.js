@@ -1,4 +1,4 @@
-define(["dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/listen", "./List"], function(declare, dojo, Deferred, listen, List){
+define(["dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/on", "./List"], function(declare, dojo, Deferred, listen, List){
 return declare([List], {
 	create: function(params, srcNodeRef){
 		this.inherited(arguments);
