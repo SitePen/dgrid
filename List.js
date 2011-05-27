@@ -62,6 +62,9 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/on", "dojo/aspect", "./Te
 		query: {},
 		createNode: create,
 		rowHeight: 0,
+		getCSSClass: function(shortName){
+			return "d-list-" + shortName;
+		},
 		create: function(params, srcNodeRef){
 			var domNode = this.domNode = srcNodeRef.nodeType ? srcNodeRef : byId(srcNodeRef);
 			if(!this.id){
