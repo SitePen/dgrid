@@ -1,4 +1,4 @@
-define(["dojo/on"], function(listen){
+define(["dojo/on", "cssx/create"], function(listen, create){
 
 return function(settings){
 	// summary:
@@ -12,11 +12,9 @@ return function(settings){
 		originalRenderCell(object, value, td);
 		listen(td, "focus", function(event){
 			td.removeChild(td.firstChild);
-			var input = dojo.create("input",{
-				type:"text",
-				className: "d-list-text-input",
+			var input = create(td, "input[type=text].d-list-text-input",{
 				value: value
-			}, td);
+			});
 			input.focus();
 			var grid = settings.grid;
 			var id = grid.row(event).id;

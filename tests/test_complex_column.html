@@ -34,7 +34,7 @@
 			require({"packages":[
 				{"name":"gridx","location":"../grid-2.0", "lib":"gridx"}
 				]});
-			require(["d-list/OnDemandGrid", "d-list/ColumnSet", "d-list/Tree", "d-list/Selection", "d-list/Keyboard", "d-list/tests/test_data", "domReady!"],
+			require(["d-list/OnDemandGrid", "d-list/ColumnSet", "d-list/Tree", "d-list/Selection", "d-list/Keyboard", "d-list/tests/test_data", "dojo/domReady!"],
 				function(Grid, ColumnSet, Tree, Selection, Keyboard, testStore){
 					testGrid = dojo.declare([Grid, ColumnSet, Selection, Keyboard])({
 						store: testStore,

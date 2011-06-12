@@ -1,10 +1,9 @@
-define(["dojo/_base/html", "dojo/_base/declare", "dojo/on", "dojo/aspect", "./TextEdit", "dojo/has", "dojo/has!touch?./TouchScroll", "cssx/css!./css/d-list.css"], function(dojo, declare, listen, aspect, TextEdit, has, TouchScroll){
+define(["dojo/_base/html", "cssx/create", "dojo/_base/declare", "dojo/on", "dojo/aspect", "./TextEdit", "dojo/has", "dojo/has!touch?./TouchScroll", "cssx/css!./css/d-list.css"], function(dojo, create, declare, listen, aspect, TextEdit, has, TouchScroll){
 	// allow for custom CSS class definitions 
 	// TODO: figure out what to depend for this
 	var byId = function(id){
 		return document.getElementById(id);
 	};
-	var create = dojo.create;
 	function Row(id, object, element){
 		this.id = id;
 		this.data = object;
@@ -60,7 +59,6 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/on", "dojo/aspect", "./Te
 		maxEmptySpace: 10000,
 		queryOptions: {},
 		query: {},
-		createNode: create,
 		rowHeight: 0,
 		getCSSClass: function(shortName){
 			return "d-list-" + shortName;
@@ -84,15 +82,14 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/on", "dojo/aspect", "./Te
 			this.refresh();
 		},
 		refresh: function(){
-			var headerNode = this.headerNode = create("div",{
-				className: "d-list-header d-list-header-row"
-			},this.domNode);
-			var bodyNode = this.bodyNode = create("div",{
-				className: "d-list-scroller"
-			},this.domNode);
+			var domNode = this.domNode;
+			var headerNode = this.headerNode = create(domNode, "div.d-list-header.d-list-header-row");
+			var bodyNode = this.bodyNode = create(domNode, "div.d-list-scroller");
 			listen(bodyNode, "scroll", function(event){
 				// keep the header aligned with the body
 				headerNode.scrollLeft = bodyNode.scrollLeft;
+				event.stopPropagation(); // we will refire, since browsers are not consistent about propagation here
+				listen.emit(domNode, "scroll", {scrollTarget: bodyNode});
 			});
 			this.renderHeader();
 			bodyNode.style.top = headerNode.offsetHeight + "px";
@@ -102,7 +99,9 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/on", "dojo/aspect", "./Te
 				bodyNode.style.height = (this.domNode.offsetHeight - headerNode.offsetHeight) + "px"; 
 			}
 			this.refreshContent();
-			aspect.after(this, "scrollTo", this.onscroll);
+			aspect.after(this, "scrollTo", function(){
+				listen.emit(bodyNode, "scroll", {});
+			});
 			this.postCreate && this.postCreate();
 		},
 		on: function(eventType, listener){
@@ -130,9 +129,7 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/on", "dojo/aspect", "./Te
 				}
 				this.observers = [];
 			}else{
-				this.contentNode = create("div",{
-					className:"d-list-content"
-				}, this.bodyNode);
+				this.contentNode = create(this.bodyNode, "div.d-list-content");
 			}
 			if(this.init){
 				this.init({
@@ -196,11 +193,11 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/on", "dojo/aspect", "./Te
 			row.className = (row.className || "") + " ui-state-default d-list-row " + (i% 2 == 1 ? "d-list-row-odd" : "d-list-row-even");
 			// get the row id for easy retrieval
 			this._rowIdToObject[row.id = this.id + "-row-" + ((this.store && this.store.getIdentity) ? this.store.getIdentity(object) : this._autoId++)] = object;
-			this.contentNode.insertBefore(row, beforeNode);
+			this.contentNode.insertBefore(row, beforeNode || null);
 			return row;
 		},
 		renderRow: function(value, options){
-			return dojo.create("div", {
+			return create("div", {
 				innerHTML: value,
 				tabIndex: this.tabIndex 
 			});

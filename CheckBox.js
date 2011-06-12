@@ -1,4 +1,4 @@
-define(["dojo/on", "dojo/_base/html"], function(listen, dojo){
+define(["dojo/on", "dojo/_base/Deferred", "cssx/create"], function(listen, Deferred, create){
 
 return function(column){
 	// summary:
@@ -11,7 +11,7 @@ return function(column){
 				var checked = this.checked;
 				var id = grid.row(event).id;
 				if(column.field){
-					dojo.when(grid.store.get(id), function(object){ 
+					Deferred.when(grid.store.get(id), function(object){ 
 						object[column.field] = checked;
 						grid.store.put(object);
 					});
@@ -21,11 +21,9 @@ return function(column){
 				}
 			});
 		}
-		dojo.create("input",{
-			type:"checkbox",
-			className: "d-list-checkbox",
+		create(cell, "input[type=checkbox].d-list-checkbox", {
 			checked: value
-		}, cell);
+		});
 	};
 	return column;
 };

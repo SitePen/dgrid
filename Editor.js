@@ -1,4 +1,4 @@
-define(["dojo/on"], function(listen){
+define(["dojo/on", "cssx/create"], function(listen, create){
 
 return function(column, editor, editOn){
 	// summary:
@@ -14,13 +14,11 @@ return function(column, editor, editOn){
 	var renderWidget = typeof editor == "string" ?
 		function(value, cell, object, onblur){
 			// it is string editor, so we use a common <input> as the editor
-			var input = dojo.create("input",{
-				type: editor,
-				className: "d-list-input",
+			var input = create(cell, "input[type=" + editor + "].d-list-input", {
 				name: column.field || "selection",
 				value: value,
 				checked: value
-			}, cell);
+			});
 			var id = grid.row(object).id;
 			if(onblur){
 				input.focus();
@@ -79,7 +77,7 @@ return function(column, editor, editOn){
 			listen(cell, column.editOn, function(){
 				cell.innerHTML = "";
 				renderWidget(value, cell, object, function(newData){
-					originalRenderCell(value = newData, cell);
+					originalRenderCell(object, value = newData, cell);
 				});
 			});
 			originalRenderCell(object, value, cell, options);

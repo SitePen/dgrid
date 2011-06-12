@@ -1,34 +1,23 @@
-define(["dojo/_base/html", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/query", "./Grid","cssx/css!./css/columnset.css"], 
-	function(dojo, declare, listen, aspect, query, Grid, cssx){
+define(["dojo/_base/html", "cssx/create", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/query", "./Grid","cssx/css!./css/columnset.css"], 
+	function(dojo, create, declare, listen, aspect, query, Grid, cssx){
 		//	summary:
 		//		This module provides column sets to isolate horizontal scroll of sets of 
 		// 		columns from each other. This mainly serves the purpose of allowing for
 		// 		column locking. 
-	var create = dojo.create;
 	
 	return declare([Grid], {
 		columnSets: [],
 		createRowCells: function(tag, each){
-			var row = create("table", {
-			});			
+			var row = create("table");			
 			if(dojo.isIE < 8 && !dojo.isQuirks){
 				row.style.width = "auto"; // in IE7 this is needed to instead of 100% to make it not create a horizontal scroll bar
 			}
-			var tr = create("tbody", null, row);
-			tr = create("tr", null, tr);
+			var tr = create(row, "tbody tr");
 			for(var i = 0, l = this.columnSets.length; i < l; i++){
 				// iterate through the columnSets
 				var columnSet = this.columnSets[i];
-				var cell = create("div", {
-					className: "d-list-column-set",
-					colsetid: i
-				},  create(tag, {
-					className: "d-list-column-set-cell column-set-" + i
-				}, tr));
-				/*var td = create(tag, {
-					className: "d-list-column-set",
-					colsetid: i
-				},  tr);*/
+				var cell = create(tr, tag + ".d-list-column-set-cell.column-set-" + i + " div.d-list-column-set[colsetid=" + i + "]");
+				/*var td = create(tag + ".d-list-column-set[colsetid=" + i + "]"*/
 				if(dojo.isIE < 8 && !dojo.isQuirks){
 					cell.style.width = "auto"; // in IE7 this is needed to instead of 100% to make it not create a horizontal scroll bar
 				}
@@ -64,14 +53,9 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo
 			var scrollLefts = this._columnSetScrollLefts = {}; 
 			for(var i = 0, l = columnSets.length; i < l; i++){
 				(function(columnSet, i){
-					var scroller = scrollers[i] = create("div",{
-						className:"d-list-column-set-scroller",
-						colsetid: i
-					}, domNode);
-					scrollerContents[i] = create("div", {
-						className:"d-list-column-set-scroller-content"
-					}, scroller);
-					listen(scroller, "scroll", function(){
+					var scroller = scrollers[i] = create(domNode, ".d-list-column-set-scroller[colsetid=" + i +"]");
+					scrollerContents[i] = create(scroller, ".d-list-column-set-scroller-content");
+					listen(scroller, "scroll", function(event){
 						var scrollLeft = this.scrollLeft;
 						scrollLefts[i] = scrollLeft;
 						query('.d-list-column-set[colsetid="' + i +'"]', domNode).forEach(function(element){

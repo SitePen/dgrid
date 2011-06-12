@@ -1,6 +1,4 @@
-define(["dojo/_base/html", "dojo/_base/declare", "dojo/on", "./Editor", "./List", "cssx/cssx"], function(dojo, declare, listen, Editor, List, cssx){
-	var create = dojo.create;
-	
+define(["dojo/_base/html", "cssx/create", "dojo/_base/declare", "dojo/on", "./Editor", "./List", "cssx/cssx"], function(dojo, create, declare, listen, Editor, List, cssx){	
 	return declare([List], {
 		columns: [],
 		column: function(target){
@@ -32,6 +30,7 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/on", "./Editor", "./List"
 			}
 		},
 		_columnsCss: function(rule){
+			// This is an attempt at integration with CSSX, will probably change
 			rule.fullSelector = function(){
 				return this.parent.fullSelector() + " .d-list-cell";
 			};
@@ -44,15 +43,14 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/on", "./Editor", "./List"
 		createRowCells: function(tag, each){
 			// summary:
 			//		Generates the grid for each row (used by renderHeader and and renderRow)
-			var tr, row = create("table", {
-			});
+			var tr, row = create("table");
 			var contentBoxSizing;
 			if(dojo.isIE < 8 || dojo.isQuirks){
 				if(!dojo.isQuirks){
 					contentBoxSizing = true;
 					row.style.width = "auto"; // in IE7 this is needed to instead of 100% to make it not create a horizontal scroll bar
 				}
-				var tbody = create("tbody", null, row);
+				var tbody = create(row, "tbody");
 			}else{
 				var tbody = row;
 			}
@@ -63,7 +61,7 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/on", "./Editor", "./List"
 					// shortcut for modern browsers
 					tr = tbody;
 				}else{
-					tr = create("tr", null, tbody);
+					tr = create(tbody, "tr");
 				}
 				for(var i in subrow){
 					// iterate through the columns
@@ -71,15 +69,11 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/on", "./Editor", "./List"
 					if(typeof column == "string"){
 						subrow[i] = column = {name:column};
 					}
-					var cell = create(tag,{
-						className: "d-list-cell d-list-cell-padding " + (column.className || (column.field && " field-" + column.field || "") || "") + " column-" + i,
-						colid: i
-					});
+					var extraClassName = column.className || (column.field && "field-" + column.field);
+					var cell = create(tag + ".d-list-cell.d-list-cell-padding.column-" + i + "[colid=" + i + "]" + (extraClassName ? '.' + extraClassName : ''));
 					if(contentBoxSizing){
 						// The browser (IE7-) does not support box-sizing: border-box, so we emulate it with a padding div
-						var innerCell = create("div", {
-							className: "d-list-cell-padding"
-						}, cell);
+						var innerCell = create(cell, "div.d-list-cell-padding");
 						dojo.removeClass(cell, "d-list-cell-padding");
 					}else{
 						innerCell = cell;
@@ -173,17 +167,16 @@ define(["dojo/_base/html", "dojo/_base/declare", "dojo/on", "./Editor", "./List"
 			listen(row, ".d-list-cell:click", function(event){
 				if(this.getAttribute("sortable")){
 					var field = this.getAttribute("field");
-					// resort
+					// re-sort
 					var descending = grid.sortOrder && grid.sortOrder[0].attribute == field && !grid.sortOrder[0].descending;
 					if(lastSortedArrow){
 						dojo.destroy(lastSortedArrow);
 					}
-					lastSortedArrow = create("div",{
-						role: 'presentation',
-						className: 'd-list-arrow-button-node'
-					}, this);
+					lastSortedArrow = create(this, "div.d-list-arrow-button-node[role=presentation]");
+					//this.className = this.className.replace(/d-list-sort-\w+/,'');
 					dojo.removeClass(this, "d-list-sort-up");
 					dojo.removeClass(this, "d-list-sort-down");
+					this.className += descending ? "d-list-sort-down" : "d-list-sort-up";
 					dojo.addClass(this, descending ? "d-list-sort-down" : "d-list-sort-up");					
 					grid.sort(field, descending);
 				}
