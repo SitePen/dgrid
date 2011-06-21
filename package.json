@@ -17,8 +17,8 @@
     "url":"http://github.com/kriszyp/d-list"
   },
   "dependencies": {
-    "dojo": "1.7.0b1"
-    "cssx": "master",
+    "dojo": "1.7.0b1",
+    "cssx": "master"
   },
   "directories": {
     "lib": "."
