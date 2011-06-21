@@ -197,11 +197,11 @@ define(["dojo/_base/html", "cssx/create", "dojo/_base/declare", "dojo/on", "dojo
 			return row;
 		},
 		renderRow: function(value, options){
-			return create("div", {
-				innerHTML: value,
-				tabIndex: this.tabIndex 
-			});
+			var row = create("div", value);
+			row.tabIndex = this.tabIndex;
+			return row;
 		},
+		Row: Row,
 		row: function(target){
 			// summary:
 			//		Get the row object by id, object, node, or event
@@ -214,7 +214,7 @@ define(["dojo/_base/html", "cssx/create", "dojo/_base/declare", "dojo/on", "dojo
 				do{
 					var rowId = target.id;
 					if(object = this._rowIdToObject[rowId]){
-						return new Row(rowId.substring(rowId.indexOf("-row-") + 5), object, target); 
+						return new Row(rowId.substring(this.id.length + 5), object, target); 
 					}
 					target = target.parentNode;
 				}while(target && target != this.domNode);
