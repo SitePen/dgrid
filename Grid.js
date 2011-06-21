@@ -1,6 +1,19 @@
-define(["dojo/_base/html", "cssx/create", "dojo/_base/declare", "dojo/on", "./Editor", "./List", "cssx/cssx"], function(dojo, create, declare, listen, Editor, List, cssx){	
+define(["dojo/_base/html", "cssx/create", "dojo/_base/declare", "dojo/on", "./Editor", "./List", "cssx/cssx"], function(dojo, create, declare, listen, Editor, List, cssx){
+	List.prototype.Row.cell = function(id){
+		var elements = this.element.getElementsByTagName("td");
+		for(var i = 0; i < elements.length; i++){
+			if(elements[i].className.indexOf("column-" + id) > -1){
+				return elements[i];
+			}
+		}
+	}	
 	return declare([List], {
 		columns: [],
+		// summary:
+		//		This indicates that focus is at the cell level. This may be set to false to cause
+		//		focus to be at the row level, which is useful if you want only want row-level
+		//		navigation.
+		cellNavigation: true,
 		column: function(target){
 			// summary:
 			//		Get the column object by node, or event
@@ -95,10 +108,10 @@ define(["dojo/_base/html", "cssx/create", "dojo/_base/declare", "dojo/on", "./Ed
 		},
 		renderRow: function(object, options){
 			var tabIndex = this.tabIndex;
-			var row = this.createRowCells("td", function(td, column, id){
-				td.setAttribute("role", "gridcell");
-				if(!column.editor || column.editOn){
-					td.setAttribute("tabIndex", tabIndex);
+			var cellNavigation = this.cellNavigation;
+			var row = this.createRowCells("td[role=gridcell]", function(td, column, id){
+				if(cellNavigation && !column.editor || column.editOn){
+					td.tabIndex = tabIndex;
 				}				
 				var data = object;
 				// we support the field, get, and formatter properties like the DataGrid
@@ -128,6 +141,9 @@ define(["dojo/_base/html", "cssx/create", "dojo/_base/declare", "dojo/on", "./Ed
 					}
 				}
 			});
+			if(!cellNavigation){
+				row.tabIndex = tabIndex;
+			}
 			return row;
 		},
 		renderHeader: function(){
@@ -139,8 +155,7 @@ define(["dojo/_base/html", "cssx/create", "dojo/_base/declare", "dojo/on", "./Ed
 				this.checkedTrs = true;
 				createColumnsFromDom(this.domNode, columns);
 			}
-			var row = this.createRowCells("th", function(th, column, id){
-				th.setAttribute("role", "columnheader");
+			var row = this.createRowCells("th[role=columnheader]", function(th, column, id){
 				column.id = id;
 				column.grid = grid;
 				var field = column.field;
