@@ -1,4 +1,4 @@
-define(["dojo/on", "cssx/create"], function(listen, create){
+define(["dojo/on", "cssx/create"], function(on, create){
 
 return function(column, editor, editOn){
 	// summary:
@@ -10,6 +10,11 @@ return function(column, editor, editOn){
 	};
 	column.editor = editor = editor || column.editor;
 	column.editOn = editOn = editOn || column.editOn;
+	function Column(){
+		// we mask the null so it is not used by the widget
+		this.id = null;
+	}
+	Column.prototype = column;
 	var grid;
 	var renderWidget = typeof editor == "string" ?
 		function(value, cell, object, onblur){
@@ -19,16 +24,22 @@ return function(column, editor, editOn){
 				value: value,
 				checked: value
 			});
-			var id = grid.row(object).id;
 			if(onblur){
 				input.focus();
 				input.onblur = function(){
 					// delete the input now
+					input.onblur = null;
 					var thisInput = input;
 					input = null;
 					cell.removeChild(thisInput);
 					onblur(value);
 				};
+			}
+			if(input.type == "checkbox" || input.type == "radio"){
+				input.onkeydown = function(event){
+					// bubble manually
+					on.emit(this.parentNode, "keydown", event);
+				}
 			}
 			input.onchange = function(){
 				if(input){
@@ -38,7 +49,7 @@ return function(column, editor, editOn){
 		} :
 		function(data, cell, object, onblur){
 			// using a widget as the editor
-			var widget = new editor(column, cell.appendChild(document.createElement("div")));
+			var widget = new editor(new Column, cell.appendChild(document.createElement("div")));
 			widget.set("value", data);
 			widget.watch("value", function(key, oldValue, value){
 				data = setProperty(cell, data, value);
@@ -54,7 +65,7 @@ return function(column, editor, editOn){
 	function setProperty(cell, oldValue, value){
 		var row = grid.row(cell);
 		if(column.field){
-			if(listen.emit(cell, "change", {oldValue: oldValue, value: value, bubbles: true, cancelable: true})){
+			if(on.emit(cell, "change", {oldValue: oldValue, value: value, bubbles: true, cancelable: true})){
 				var object = row.data;
 				var dirty = grid.dirty[row.id] || (grid.dirty[row.id] = {});
 				dirty[column.field] = object[column.field] = value;
@@ -67,14 +78,34 @@ return function(column, editor, editOn){
 			}	
 		}
 		if(column.selector){
-			grid.selection.set(row.id, value);
+			if(editor == "radio" || column.selector == "single"){
+				grid.clearSelection();
+			}
+			if(row){
+				grid.selection.set(row.id, value);
+			}else{
+				// select all
+				grid.selectAll();
+			}
 		}
 		return value;
 	}
+	
 	column.renderCell = function(object, value, cell, options){
-		grid = column.grid;
+		if(!grid){
+			grid = column.grid;
+			if(column.selector){
+				grid.selection.watch(function(id, oldValue, newValue){
+					var row = grid.row(id);
+					var cell = row.cell(column.id);
+					cell.innerHTML = "";
+					renderCell(row.data, newValue, cell, {});
+				});
+			}
+		}
+		value = !column.selector && value;
 		if(column.editOn){
-			listen(cell, column.editOn, function(){
+			on(cell, column.editOn, function(){
 				cell.innerHTML = "";
 				renderWidget(value, cell, object, function(newData){
 					originalRenderCell(object, value = newData, cell);
@@ -85,7 +116,11 @@ return function(column, editor, editOn){
 			renderWidget(value, cell, object);
 		}
 	}
-	
+	if(!column.name){
+		column.renderHeaderCell = function(th){
+			renderWidget(null, th);
+		}
+	}
 	return column;
 };
 });
