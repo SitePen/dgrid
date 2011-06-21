@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Test Selection</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
+		<meta name="viewport" content="width=570" />
+		<style type="text/css">
+			@import "../../dojo/resources/dojo.css";
+			@import "../css/claro.css";
+			.heading {
+				font-weight: bold;
+				padding-bottom: 0.25em;
+			}
+			.d-list { 
+				width: 70%;
+			}
+			.ui-widget-content{
+				margin: 10px;
+			}
+		</style>
+		<script type="text/javascript" src="../../dojo/dojo.js" 
+			data-dojo-config="async: true"></script>
+		<script type="text/javascript">
+			require(["d-list/OnDemandGrid", "d-list/Editor","d-list/Selection", "d-list/Keyboard", "d-list/tests/test_data", "dojo/domReady!"], 
+				function(Grid, Editor, Selection, Keyboard, testStore){
+					var columns = {
+						col1: {name: 'Column 1', sortable: true},
+						col2: 'Column 2',
+						col3: {name: 'Column 3', sortable: true},
+						col4: {name: 'Editable', editable: true, sortable: true},
+					};
+					gridRowNavigation = dojo.declare([Grid, Selection, Keyboard])({
+						store: testStore,
+						cellNavigation: false,
+						columns: columns
+					}, "grid-row-navigation");
+					var columns2 = {
+						col1: {name: 'Column 1', sortable: true},
+						col2: 'Column 2',
+						col3: {name: 'Column 3', sortable: true},
+						col4: {name: 'Editable', editable: true, sortable: true},
+					};
+					gridCellNavigation = dojo.declare([Grid, Selection, Keyboard])({
+						store: testStore,
+						columns: columns2
+					}, "grid-cell-navigation");
+				});
+		</script>
+	</head>
+	<body class="claro">
+		<h2>A grid with row-level selection</h2>
+		<div id="grid-row-navigation"></div>
+		<h2>A grid with cell-level selection</h2>
+		<div id="grid-cell-navigation"></div>
+	</body>
+</html>

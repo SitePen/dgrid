@@ -42,7 +42,7 @@
 						store: testTypesStore,
 						columns: columns
 					}, "grid");
-					grid.on("change", function(event){
+					grid.on(".field-integer:change", function(event){
 						if(event.value > 100){
 							event.preventDefault();
 							alert("Values about 100 not allowed");

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Test Grid Common Cases</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
+		<meta name="viewport" content="width=570" />
+		<style type="text/css">
+			@import "../../dojo/resources/dojo.css";
+			@import "../css/claro.css";
+			.heading {
+				font-weight: bold;
+				padding-bottom: 0.25em;
+			}
+			.d-list { 
+				width: 70%;
+			}
+			.column-col1 {
+				width: 40px;
+			}
+			.ui-widget-content{
+				margin: 10px;
+			}
+		</style>
+		<script type="text/javascript" src="../../dojo/dojo.js" 
+			data-dojo-config="async: true"></script>
+		<script type="text/javascript">
+			require(["d-list/OnDemandGrid", "d-list/Editor","d-list/Selection", "d-list/Keyboard", "d-list/tests/test_data", "dojo/domReady!"], 
+				function(Grid, Editor, Selection, Keyboard, testStore){
+					var columns = { // you can declare columns as an object hash (key translates to field)
+						col1: Editor({sortable: true, selector: true}, "checkbox"),
+						col2: 'Column 2',
+						col3: {name: 'Column 3', editable: true, sortable: true}
+					};
+					grid = dojo.declare([Grid, Selection, Keyboard])({
+						store: testStore,
+						selectionMode: "none",
+						columns: columns
+					}, "grid");
+					var columnsRadio = { // you can declare columns as an object hash (key translates to field)
+						col1: Editor({name: 'Radio', sortable: true, selector: true}, "radio"),
+						col2: 'Column 2',
+						col3: {name: 'Column 3', editable: true, sortable: true}
+					};
+					gridRadio = dojo.declare([Grid, Selection, Keyboard])({
+						store: testStore,
+						selectionMode: "none",
+						columns: columnsRadio
+					}, "grid-radio");
+				});
+		</script>
+	</head>
+	<body class="claro">
+		<h2>A grid with checkbox selectors</h2>
+		<div id="grid"></div>
+		<h2>A grid with radio selectors</h2>
+		<div id="grid-radio"></div>
+	</body>
+</html>
