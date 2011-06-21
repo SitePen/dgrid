@@ -17,14 +17,12 @@
     "url":"http://github.com/kriszyp/d-list"
   },
   "dependencies": {
-    "dojo": "1.7-bootstrap-has-modularize"
+    "dojo": "1.7.0b1"
+    "cssx": "master",
   },
   "directories": {
     "lib": "."
   },
   "main": "./OnDemandGrid",
-  "mappings":{
-    "dojo": "http://github.com/kriszyp/dojo/zipball/1.7-bootstrap-has-modularize"
-  },
   "icon": "http://packages.dojofoundation.org/images/d-list.png"
 }
