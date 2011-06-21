@@ -40,8 +40,8 @@ return declare([List], {
 		var results = query(options);
 		var self = this;
 		// render the result set
-		dojo.when(this.renderCollection(results, preloadNode, options), function(trs){
-			return dojo.when(results.total || results.length, function(total){
+		Deferred.when(this.renderCollection(results, preloadNode, options), function(trs){
+			return Deferred.when(results.total || results.length, function(total){
 				// now we need to adjust the height and total count based on the first result set
 				var height = 0;
 				for(var i = 0, l = trs.length; i < l; i++){
@@ -144,7 +144,7 @@ return declare([List], {
 				// use the query associated with the preload node to get the next "page"
 				options.query = preloadNode.query;
 				var results = preloadNode.query(options);
-				dojo.when(this.renderCollection(results, loadingNode, options),
+				Deferred.when(this.renderCollection(results, loadingNode, options),
 					function(){
 						// can remove the loading node now
 						loadingNode.parentNode.removeChild(loadingNode);
@@ -169,7 +169,7 @@ return declare([List], {
 			})(this.dirty[id]);
 			puts.push(this.getBeforePut ?
 				// retrieve the full object from the store
-				dojo.when(store.get(id), put):
+				Deferred.when(store.get(id), put):
 				// just use the cached object
 				put(this.row(id).data));
 		}
