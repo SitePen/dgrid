@@ -3,6 +3,10 @@ return declare([], {
 	// summary:
 	// 		Add selection capabilities to a grid. The grid will have a selection property and
 	//		fire "select" and "deselect" events.
+	
+	// cellSelection: Boolean
+	//		Indicates whether selection should take place at the row level or the cell level.
+	cellSelection: false,
 	create: function(){
 		this.selection = new Stateful();
 		return this.inherited(arguments);
@@ -18,7 +22,7 @@ return declare([], {
 				event.preventDefault();
 			});
 			// listen for actions that should cause selections
-			listen(this.contentNode, ".d-list-row:mousedown, .d-list-row:keydown", function(event){
+			listen(this.contentNode, "mousedown,keydown", function(event){
 				if(event.type == "mousedown" || event.keyCode == 32){
 					event.preventDefault();
 					var focusElement = event.target;
@@ -28,16 +32,18 @@ return declare([], {
 					if(focusElement.focus){
 						focusElement.focus();
 					}
-					var thisRow = grid.row(event);
+					var cell = grid.cell(event);
+					var thisRow = cell && cell.row;
 					if(thisRow){
 						var targetElement = thisRow.element;
 						var selection = grid.selection;
 						var id = thisRow.id;
+						var columnId = cell && cell.column && cell.column.id;
 						if(mode == "single" || (!event.ctrlKey && mode == "extended")){
 							grid.clearSelection();
-							set(grid, targetElement, id, true);
+							set(grid, targetElement, id, columnId, true);
 						}else{
-							set(grid, targetElement, id, !selection[id]);
+							set(grid, targetElement, id, columnId, !selection[id]);
 						}
 						if(event.shiftKey && mode != "single"){
 							var lastElement = lastRow && lastRow.element;
@@ -49,7 +55,7 @@ return declare([], {
 							while(nextNode = thisRow.element[traverser]){
 								// loop through and set everything
 								thisRow = grid.row(nextNode);
-								set(grid, thisRow.element, thisRow.id, true);
+								set(grid, thisRow.element, thisRow.id, columnId, true);
 								if(nextNode == lastElement){
 									break;
 								}
@@ -63,8 +69,13 @@ return declare([], {
 			});
 		}
 		grid.selection.watch(function(id, oldValue, value){
-			dojo[value ? "addClass" : "removeClass"](grid.row(id).element, "d-list-row-selected");
-			dojo[value ? "addClass" : "removeClass"](grid.row(id).element, "ui-state-active");
+			if(typeof oldValue == "object" || typeof value == "object"){
+				for(var colId in oldValue || value){
+					updateElement(grid.cell(id, colId).element, value[colId]);
+				}
+			}else{
+				updateElement(grid.row(id).element, value);
+			}
 		});
 	},
 	// selection:
@@ -75,10 +86,10 @@ return declare([], {
 	// 		The selection mode to use, can be "multiple", "single", or "extended".
 	selectionMode: "extended",
 	select: function(rowId, colId){
-		set(this, this.row(rowId).element, id, true);
+		set(this, this.row(rowId).element, id, colId, true);
 	},
-	deselect: function(id){
-		set(this, this.row(id).element, id, false);
+	deselect: function(id, colId){
+		set(this, this.row(id).element, id, colId, false);
 	},
 	clearSelection: function(){
 		var selection = this.selection;
@@ -92,36 +103,46 @@ return declare([], {
 		this.allSelected = true;
 		for(var i in this._rowIdToObject){
 			var row = this.row(this._rowIdToObject[i]);
-			set(this, row.element, row.id, true);
+			set(this, row.element, row.id, null, true);
 		}
 	},
 	renderCollection: function(){
 		var rows = this.inherited(arguments);
 		for(var i = 0; i < rows.length; i++){
 			var row = this.row(rows[i]);
-			if(this.selection[row.id] || this.allSelected){
-				set(this, rows[i], row.id, true);
+			var selected = this.selection[row.id] || this.allSelected;
+			if(selected){
+				set(this, rows[i], row.id, selected, true);
 			}
 		}
 		return rows;
 	}
 });
+function updateElement(element, value){
+	if(element){
+		if(value){
+			element.className += " d-list-selected ui-state-active";
+		}else{
+			element.className = element.className.replace(/ d-list-selected ui-state-active/, '');
+		}
+	}
+}
 function set(grid, target, rowId, colId, value){
-	if(listen.emit(target, value ? "select" : "deselect", {
+	if(!target || listen.emit(target, value ? "select" : "deselect", {
 		cancelable: true,
 		bubbles: true,
 		id: rowId,
-		colId: colId
+		colId: this.cellSelection && colId
 	})){
 		var selection = grid.selection;
 		var row = selection[rowId];
-		if(colId){
+		if(grid.cellSelection && colId){
 			row = row || {};
 			row[colId] = value;
 		}else{
 			row = value;
 		}
-		grid.selection.set(id, row);
+		grid.selection.set(rowId, row);
 	}
 }
 
