@@ -49,9 +49,14 @@ return declare([List], {
 				} 
 				self.rowHeight = height / l;
 				total -= trs.length;
-				preloadNode.style.height = Math.min(total * self.rowHeight, self.maxEmptySpace) + "px";
 				preloadNode.count = total;
-				preloadNode.start = trs.length; 
+				preloadNode.start = trs.length;
+				if(total){
+					preloadNode.style.height = Math.min(total * self.rowHeight, self.maxEmptySpace) + "px";
+				}else{
+					// if total is 0, IE quirks mode can't handle 0px height for some reason, I don't know why, but we are setting display: none for now 
+					preloadNode.style.display = "none"; 
+				} 
 				// can remove the loading node now
 			});
 		}, console.error);
