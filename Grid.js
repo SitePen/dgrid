@@ -1,12 +1,5 @@
-define(["dojo/_base/html", "cssx/create", "dojo/_base/declare", "dojo/on", "./Editor", "./List", "cssx/cssx"], function(dojo, create, declare, listen, Editor, List, cssx){
-	List.prototype.Row.cell = function(id){
-		var elements = this.element.getElementsByTagName("td");
-		for(var i = 0; i < elements.length; i++){
-			if(elements[i].className.indexOf("column-" + id) > -1){
-				return elements[i];
-			}
-		}
-	}	
+define(["dojo/has", "cssx/create", "dojo/_base/declare", "dojo/on", "./Editor", "./List", "cssx/cssx", "dojo/_base/sniff"], function(has, create, declare, listen, Editor, List, cssx){
+	
 	return declare([List], {
 		columns: [],
 		// summary:
@@ -16,22 +9,7 @@ define(["dojo/_base/html", "cssx/create", "dojo/_base/declare", "dojo/on", "./Ed
 		cellNavigation: true,
 		column: function(target){
 			// summary:
-			//		Get the column object by node, or event
-			if(target.target && target.target.nodeType == 1){
-				// event
-				target = target.target;
-			}
-			if(target.nodeType == 1){
-				var object;
-				do{
-					var colId = target.getAttribute("colid");
-					if(colId){
-						target = colId;
-						break;
-					}
-					target = target.parentNode;
-				}while(target && target != this.domNode);
-			}
+			//		Get the column object by node, or event, or a columnId
 			if(typeof target == "string"){
 				var subrows = getSubrows(this);
 				for(var si = 0, sl = subrows.length; si < sl; si++){
@@ -40,6 +18,49 @@ define(["dojo/_base/html", "cssx/create", "dojo/_base/declare", "dojo/on", "./Ed
 						return column;
 					}
 				}
+			}else{
+				return this.cell(target).column;
+			}
+		},
+		cell: function(target, columnId){
+			// summary:
+			//		Get the cell object by node, or event, id, plus a columnId
+			if(target.target && target.target.nodeType == 1){
+				// event
+				target = target.target;
+			}
+			var element;
+			if(target.nodeType == 1){
+				var object;
+				do{
+					if(this._rowIdToObject[target.id]){
+						break;
+					}
+					var colId = target.columnId;
+					if(colId){
+						columnId = colId;
+						element = target;
+						break;
+					}
+					target = target.parentNode;
+				}while(target && target != this.domNode);
+			}
+			if(!element && columnId){
+				var row = this.row(target); 
+				var elements = row.element.getElementsByTagName("td");
+				for(var i = 0; i < elements.length; i++){
+					if(elements[i].columnId == columnId){
+						element = elements[i];
+						break;
+					}
+				}
+			}
+			if(target != null){
+				return {
+					row: row || this.row(target),
+					column: columnId && this.column(columnId),
+					element: element
+				};
 			}
 		},
 		_columnsCss: function(rule){
@@ -58,8 +79,10 @@ define(["dojo/_base/html", "cssx/create", "dojo/_base/declare", "dojo/on", "./Ed
 			//		Generates the grid for each row (used by renderHeader and and renderRow)
 			var tr, row = create("table");
 			var contentBoxSizing;
-			if(dojo.isIE < 8 || dojo.isQuirks){
-				if(!dojo.isQuirks){
+			var cellNavigation = this.cellNavigation;
+			var tabIndex = this.tabIndex;
+			if(has("ie") < 8 || has("quirks")){
+				if(!has("quirks")){
 					contentBoxSizing = true;
 					row.style.width = "auto"; // in IE7 this is needed to instead of 100% to make it not create a horizontal scroll bar
 				}
@@ -70,7 +93,7 @@ define(["dojo/_base/html", "cssx/create", "dojo/_base/declare", "dojo/on", "./Ed
 			var subrows = getSubrows(this);
 			for(var si = 0, sl = subrows.length; si < sl; si++){
 				subrow = subrows[si];
-				if(sl == 1 && !dojo.isIE){
+				if(sl == 1 && !has("ie")){
 					// shortcut for modern browsers
 					tr = tbody;
 				}else{
@@ -82,49 +105,49 @@ define(["dojo/_base/html", "cssx/create", "dojo/_base/declare", "dojo/on", "./Ed
 					if(typeof column == "string"){
 						subrow[i] = column = {name:column};
 					}
+					if(!column.field && !(subrow instanceof Array)){
+						column.field = i;
+					}
 					var extraClassName = column.className || (column.field && "field-" + column.field);
-					var cell = create(tag + ".d-list-cell.d-list-cell-padding.column-" + i + "[colid=" + i + "]" + (extraClassName ? '.' + extraClassName : ''));
+					var cell = create(tag + ".d-list-cell.d-list-cell-padding.column-" + i + (extraClassName ? '.' + extraClassName : ''));
+					cell.columnId = i;
+					if(cellNavigation && !column.editor || column.editOn){
+						cell.tabIndex = tabIndex;
+					}				
 					if(contentBoxSizing){
 						// The browser (IE7-) does not support box-sizing: border-box, so we emulate it with a padding div
 						var innerCell = create(cell, "div.d-list-cell-padding");
-						dojo.removeClass(cell, "d-list-cell-padding");
+						cell.className = cell.className.replace(/ d-list-cell-padding/, '');
 					}else{
 						innerCell = cell;
 					}
 					var colSpan = column.colSpan;
 					if(colSpan){
-						cell.setAttribute("colSpan", colSpan);
+						cell.colSpan = colSpan;
 					}
 					var rowSpan = column.rowSpan;
 					if(rowSpan){
-						cell.setAttribute("rowSpan", rowSpan);
+						cell.rowSpan = rowSpan;
 					}
 					each(innerCell, column, i);
 					// add the td to the tr at the end for better performance
 					tr.appendChild(cell);
 				}
 			}
+			if(!cellNavigation){
+				row.tabIndex = tabIndex;
+			}			
 			return row;
 		},
 		renderRow: function(object, options){
-			var tabIndex = this.tabIndex;
-			var cellNavigation = this.cellNavigation;
 			var row = this.createRowCells("td[role=gridcell]", function(td, column, id){
-				if(cellNavigation && !column.editor || column.editOn){
-					td.tabIndex = tabIndex;
-				}				
 				var data = object;
 				// we support the field, get, and formatter properties like the DataGrid
 				var renderCell = column.renderCell;
 				if(column.get){
 					data = column.get(data);
 				}else if("field" in column){
-					var field = column.field;
-					if(field){
-						data = data[field];
-					}
-				}else if(isNaN(id)){
-					data = data[id];
+					data = data[column.field];
 				}
 				if(column.formatter){
 					data = column.formatter(data);
@@ -141,9 +164,7 @@ define(["dojo/_base/html", "cssx/create", "dojo/_base/declare", "dojo/on", "./Ed
 					}
 				}
 			});
-			if(!cellNavigation){
-				row.tabIndex = tabIndex;
-			}
+
 			return row;
 		},
 		renderHeader: function(){
@@ -160,10 +181,10 @@ define(["dojo/_base/html", "cssx/create", "dojo/_base/declare", "dojo/on", "./Ed
 				column.grid = grid;
 				var field = column.field;
 				if(column.editable){
-					column = Editor(column, "text", "focus");
+					column = Editor(column, "text", "dblclick");
 				}
 				if(field){
-					th.setAttribute("field", field);
+					th.field = field;
 				}
 				// allow for custom header manipulation
 				if(column.renderHeaderCell){
@@ -172,29 +193,29 @@ define(["dojo/_base/html", "cssx/create", "dojo/_base/declare", "dojo/on", "./Ed
 					th.appendChild(document.createTextNode(column.name || column.field));
 				}
 				if(column.sortable){
-					th.setAttribute("sortable", true);
+					th.sortable = true;
 				}
 			});
 			row.className = "d-list-row ui-widget-header";
 			this.headerNode.appendChild(row);
 			var lastSortedArrow;
 			// if it columns are sortable, resort on clicks
-			listen(row, ".d-list-cell:click", function(event){
-				if(this.getAttribute("sortable")){
-					var field = this.getAttribute("field");
-					// re-sort
-					var descending = grid.sortOrder && grid.sortOrder[0].attribute == field && !grid.sortOrder[0].descending;
-					if(lastSortedArrow){
-						dojo.destroy(lastSortedArrow);
+			listen(row, "click", function(event){
+				var target = event.target;
+				do{
+					if(target.sortable){
+						var field = target.field || target.columnId;
+						// re-sort
+						var descending = grid.sortOrder && grid.sortOrder[0].attribute == field && !grid.sortOrder[0].descending;
+						if(lastSortedArrow){
+							lastSortedArrow.parentNode.removeChild(lastSortedArrow);
+						}
+						lastSortedArrow = create(target.firstChild, "-div.d-list-arrow-button-node[role=presentation]");
+						target.className = target.className.replace(/d-list-sort-\w+/,'');
+						target.className += descending ? " d-list-sort-down" : " d-list-sort-up";
+						grid.sort(field, descending);
 					}
-					lastSortedArrow = create(this, "div.d-list-arrow-button-node[role=presentation]");
-					//this.className = this.className.replace(/d-list-sort-\w+/,'');
-					dojo.removeClass(this, "d-list-sort-up");
-					dojo.removeClass(this, "d-list-sort-down");
-					this.className += descending ? "d-list-sort-down" : "d-list-sort-up";
-					dojo.addClass(this, descending ? "d-list-sort-down" : "d-list-sort-up");					
-					grid.sort(field, descending);
-				}
+				}while((target = target.parentNode) && target != grid.headerNode);
 			});
 		},
 		_styleSheets: {},
@@ -205,7 +226,7 @@ define(["dojo/_base/html", "cssx/create", "dojo/_base/declare", "dojo/on", "./Ed
 			// first delete the old stylesheet (so it doesn't override the new one)
 			var previousStyleSheet = this._styleSheets[colId];
 			if(previousStyleSheet){
-				dojo.destroy(previousStyleSheet);
+				previousStyleSheet.parentNode.removeChild(previousStyleSheet);
 			}
 			// now create a stylesheet to style the column
 			this._styleSheets[colId] = cssx.createStyleNode(
