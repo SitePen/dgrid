@@ -1,0 +1,17 @@
+.ui-widget-content { 
+	border: 1px solid #aaaaaa; background: #ffffff; color: #000000; 
+}
+.ui-widget-header { 
+	background: url(../../../dijit/themes/soria/images/titleBar.png) #e9e9e9 repeat-x top;
+}
+.ui-widget-header th:hover {
+	background: url(../../../dijit/themes/soria/images/titleBarActive.png) #e9e9e9 repeat-x top;
+}
+
+.ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active {
+	background-color: #aec7e3;  
+
+}
+.ui-state-default:hover {
+	background-color: #60a1ea;
+}
