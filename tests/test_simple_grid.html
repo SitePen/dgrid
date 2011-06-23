@@ -30,7 +30,7 @@
 			};
 			require(["d-list/Grid", "dojo/domReady!"], 
 				function(Grid){
-					grid = new Grid({
+					window.grid = new Grid({
 						columns: columns
 					}, "grid");
 					grid.renderCollection(data);
