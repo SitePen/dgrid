@@ -32,7 +32,9 @@
 						Editor({name: 'A Date', field: 'date', sortable: true}, DateTextBox),
 						Editor({name: 'Real Number', field: 'floatNum', sortable: true}, Slider),
 						Editor({name: 'Integer', field: 'integer', sortable: true}, NumberSpinner),
-						{name: 'Text', field: 'text', editable: true, sortable: true},
+						{name: 'Text editable if checkbox checked', field: 'text', editable: true, sortable: true, canEdit: function(object){
+							return object.bool;
+						}},
 						{name: 'Non editable text', field: 'text'},
 						Editor({name: 'Another Date', field: 'date2', sortable: true}, DateTextBox, "focus"),
 						Editor({name: 'CheckBox', field: 'bool', sortable: true}, "checkbox"),

@@ -29,7 +29,9 @@ return function(column, editor, editOn){
             input.value = value;
             input.lastValue = value;
             if(!grid._hasInputListener){
+            	// register one listener at the top level that receives events delegated
             	grid._hasInputListener = true;
+            	// note that we have to listen for clicks because IE doesn't fire change events properly for checkboxes, radios
             	grid.on("change,click", function(event){
             		var target = event.target;
 	                if("lastValue" in target && target.className.indexOf("d-list-input") > -1){
@@ -63,7 +65,10 @@ return function(column, editor, editOn){
             if(onblur){
                 widget.focus();
                 widget.connect(widget, "onBlur", function(){
-                    widget.destroy();
+                	setTimeout(function(){
+                		// we have to wait on this for the widget will throw errors about keydown events that happen right after blur
+                    	widget.destroy();
+                	}, 0);
                     onblur(data);
                 });
             }
