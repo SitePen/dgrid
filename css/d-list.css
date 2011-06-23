@@ -100,7 +100,7 @@ table.d-list-row, .d-list-column-set table{
 }
 
 /* selection*/
-.d-list-row-selected {
+.d-list-selected {
 	background-color: #BFD6EB;
 }
 

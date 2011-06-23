@@ -1,4 +1,4 @@
-define(["dojo/_base/declare"], function(declare){
+define(["dojo/_base/declare", "cssx/create"], function(declare, create){
 
 return declare([], {
 	constructor: function(mixin){
@@ -10,16 +10,16 @@ return declare([], {
 		// summary:
 		//		Renders a cell that can be expanded, creating more rows
 		var level = options.query.level + 1;
+		level = isNaN(level) ? 0 : level;
 		var grid = this.grid;
 		// create the expando
-		var expando = td.appendChild(document.createElement("div"));
-		expando.level = isNaN(level) ? 0 : level;
+		var expando = create(td, ".d-list-expando" + (!grid.store.mayHaveChildren || 
+			grid.store.mayHaveChildren(object) ? ".ui-icon.ui-icon-triangle-1-e" : "") +
+			"[style=margin-left: " + (level * 19) + "px; float: left]");
 		if(this.field){
-			td.appendChild(document.createTextNode(value));
-		}
-		expando.className = "d-list-expando" + (!grid.store.mayHaveChildren || 
-			grid.store.mayHaveChildren(object) ? " ui-icon ui-icon-triangle-1-e" : "");
-		expando.setAttribute("style", "margin-left: " + (expando.level * 19) + "px; float: left");
+			create(td, "span.d-list-expando-text", value);
+		}			
+		expando.level = level;
 		var tr, query;
 
 		if(!grid._hasTreeListener){
@@ -36,7 +36,7 @@ return declare([], {
 				if(!preloadNode){
 					// if the children have not been created, create a preload node and do the 
 					// query for the children
-					preloadNode = this.preloadNode = document.createElement("div");
+					preloadNode = this.preloadNode = create('div');
 					var query = function(options){
 						return grid.store.getChildren(row.data, options);
 					};
