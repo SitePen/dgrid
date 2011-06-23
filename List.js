@@ -1,4 +1,4 @@
-define(["dojo/_base/html", "cssx/create", "dojo/_base/declare", "dojo/on", "dojo/aspect", "./TextEdit", "dojo/has", "dojo/has!touch?./TouchScroll", "cssx/css!./css/d-list.css"], function(dojo, create, declare, listen, aspect, TextEdit, has, TouchScroll){
+define(["dojo/_base/kernel", "cssx/create", "dojo/_base/declare", "dojo/on", "dojo/aspect", "./TextEdit", "dojo/has", "dojo/has!touch?./TouchScroll", "cssx/css!./css/d-list.css"], function(dojo, create, declare, listen, aspect, TextEdit, has, TouchScroll){
 	// allow for custom CSS class definitions 
 	// TODO: figure out what to depend for this
 	var byId = function(id){
@@ -68,7 +68,7 @@ define(["dojo/_base/html", "cssx/create", "dojo/_base/declare", "dojo/on", "dojo
 			if(!this.id){
 				this.id = domNode.id;
 			}
-			this.tabIndex = domNode.getAttribute("tabindex") || 0;
+			this.tabIndex = domNode.tabIndex || 0;
 			domNode.role = "grid";
 			if(params){
 				this.params = params;
@@ -83,8 +83,8 @@ define(["dojo/_base/html", "cssx/create", "dojo/_base/declare", "dojo/on", "dojo
 		},
 		refresh: function(){
 			var domNode = this.domNode;
-			var headerNode = this.headerNode = create(domNode, "div.d-list-header.d-list-header-row");
-			var bodyNode = this.bodyNode = create(domNode, "div.d-list-scroller");
+			var headerNode = this.headerNode = create(domNode, ".d-list-header.d-list-header-row");
+			var bodyNode = this.bodyNode = create(domNode, ".d-list-scroller");
 			listen(bodyNode, "scroll", function(event){
 				// keep the header aligned with the body
 				headerNode.scrollLeft = bodyNode.scrollLeft;
@@ -93,7 +93,7 @@ define(["dojo/_base/html", "cssx/create", "dojo/_base/declare", "dojo/on", "dojo
 			});
 			this.renderHeader();
 			bodyNode.style.top = headerNode.offsetHeight + "px";
-			if(dojo.isQuirks){
+			if(has("quirks")){
 				// in quirks mode, the "bottom" CSS property is ignored, so do this to fix it
 				// We might want to use a CSS expression or the cssx package to fix this
 				bodyNode.style.height = (this.domNode.offsetHeight - headerNode.offsetHeight) + "px"; 
@@ -129,7 +129,7 @@ define(["dojo/_base/html", "cssx/create", "dojo/_base/declare", "dojo/on", "dojo
 				}
 				this.observers = [];
 			}else{
-				this.contentNode = create(this.bodyNode, "div.d-list-content");
+				this.contentNode = create(this.bodyNode, ".d-list-content");
 			}
 			if(this.init){
 				this.init({
@@ -147,6 +147,7 @@ define(["dojo/_base/html", "cssx/create", "dojo/_base/declare", "dojo/on", "dojo
 			options = options || {};
 			var start = options.start || 0;
 			var self = this;
+			this.lastCollection = results;
 			var contentNode = this.contentNode;
 			if(results.observe){
 				// observe the results for changes
@@ -160,9 +161,9 @@ define(["dojo/_base/html", "cssx/create", "dojo/_base/declare", "dojo/on", "dojo
 					if(to > -1){
 						// add to new slot
 						var row = self.createRow(object, rows[to], (options.start + to), options);
-						dojo.addClass(row, "ui-state-highlight");
+						row.className += " ui-state-highlight";
 						setTimeout(function(){
-							dojo.removeClass(row, "ui-state-highlight");
+							row.className = row.className.replace(/ ui-state-highlight/, '');
 						}, 250);
 						rows.splice(to, 0, row);
 					}
@@ -201,7 +202,6 @@ define(["dojo/_base/html", "cssx/create", "dojo/_base/declare", "dojo/on", "dojo
 			row.tabIndex = this.tabIndex;
 			return row;
 		},
-		Row: Row,
 		row: function(target){
 			// summary:
 			//		Get the row object by id, object, node, or event
@@ -228,8 +228,19 @@ define(["dojo/_base/html", "cssx/create", "dojo/_base/declare", "dojo/on", "dojo
 			}
 			return new Row(id, target, byId(this.id + "-row-" + id));
 		},
-		rowByIndex: function(index){
-			
+		cell: function(target){
+			// this doesn't do much in a plain list
+			return {
+				row: this.row(target)
+			};
+		},
+		sort: function(property, descending){
+			// summary:
+			//		Sort the content
+			this.refreshContent();
+			this.renderCollection(lastCollection.sort(function(a,b){
+				return a[property] > b[property] == descending ? -1 : 1;
+			}));
 		}
 	});
 });
