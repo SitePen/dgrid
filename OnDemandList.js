@@ -1,4 +1,4 @@
-define(["dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/on", "cssx/create", "./List"], function(declare, dojo, Deferred, listen, create, List){
+define(["dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/on", "xstyle/create", "./List"], function(declare, dojo, Deferred, listen, create, List){
 return declare([List], {
 	create: function(params, srcNodeRef){
 		this.inherited(arguments);

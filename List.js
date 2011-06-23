@@ -1,4 +1,4 @@
-define(["dojo/_base/kernel", "cssx/create", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/has", "dojo/has!touch?./TouchScroll", "cssx/css!./css/d-list.css"], function(dojo, create, declare, listen, aspect, has, TouchScroll){
+define(["xstyle/css!./css/d-list.css", "dojo/_base/kernel", "xstyle/create", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/has", "dojo/has!touch?./TouchScroll"], function(css, dojo, create, declare, listen, aspect, has, TouchScroll){
 	// allow for custom CSS class definitions 
 	// TODO: figure out what to depend for this
 	var byId = function(id){
@@ -60,6 +60,7 @@ define(["dojo/_base/kernel", "cssx/create", "dojo/_base/declare", "dojo/on", "do
 		queryOptions: {},
 		query: {},
 		rowHeight: 0,
+		css: css,
 		getCSSClass: function(shortName){
 			return "d-list-" + shortName;
 		},
@@ -95,7 +96,7 @@ define(["dojo/_base/kernel", "cssx/create", "dojo/_base/declare", "dojo/on", "do
 			bodyNode.style.top = headerNode.offsetHeight + "px";
 			if(has("quirks")){
 				// in quirks mode, the "bottom" CSS property is ignored, so do this to fix it
-				// We might want to use a CSS expression or the cssx package to fix this
+				// We might want to use a CSS expression or the xstyle package to fix this
 				bodyNode.style.height = (this.domNode.offsetHeight - headerNode.offsetHeight) + "px"; 
 			}
 			this.refreshContent();

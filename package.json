@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "dojo": "1.7.0b1",
-    "cssx": "master"
+    "xstyle": "master"
   },
   "directories": {
     "lib": "."

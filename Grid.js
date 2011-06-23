@@ -1,4 +1,4 @@
-define(["dojo/has", "cssx/create", "dojo/_base/declare", "dojo/on", "./Editor", "./List", "cssx/cssx", "dojo/_base/sniff"], function(has, create, declare, listen, Editor, List, cssx){
+define(["dojo/has", "xstyle/create", "dojo/_base/declare", "dojo/on", "./Editor", "./List", "dojo/_base/sniff"], function(has, create, declare, listen, Editor, List){
 	
 	return declare([List], {
 		columns: [],
@@ -64,7 +64,7 @@ define(["dojo/has", "cssx/create", "dojo/_base/declare", "dojo/on", "./Editor", 
 			}
 		},
 		_columnsCss: function(rule){
-			// This is an attempt at integration with CSSX, will probably change
+			// This is an attempt at integration with xstyle, will probably change
 			rule.fullSelector = function(){
 				return this.parent.fullSelector() + " .d-list-cell";
 			};
@@ -218,21 +218,13 @@ define(["dojo/has", "cssx/create", "dojo/_base/declare", "dojo/on", "./Editor", 
 				}while((target = target.parentNode) && target != grid.headerNode);
 			});
 		},
-		_styleSheets: {},
 		styleColumn: function(colId, css){
 			// summary:
 			//		Changes the column width by creating a dynamic stylesheet
 			
-			// first delete the old stylesheet (so it doesn't override the new one)
-			var previousStyleSheet = this._styleSheets[colId];
-			if(previousStyleSheet){
-				previousStyleSheet.parentNode.removeChild(previousStyleSheet);
-			}
+			// TODO: Should we first delete the old stylesheet (so it doesn't override the new one)?
 			// now create a stylesheet to style the column
-			this._styleSheets[colId] = cssx.createStyleNode(
-			"#" + this.domNode.id + ' th.column-' + colId + ', #' + this.domNode.id + ' td.column-' + colId + '{' +
-				 css +
-			"}");
+			this.css.addRule("#" + this.domNode.id + ' th.column-' + colId + ', #' + this.domNode.id + ' td.column-' + colId, css);
 		}
 	});
 	function getSubrows(grid){

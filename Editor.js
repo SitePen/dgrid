@@ -1,4 +1,4 @@
-define(["dojo/on", "cssx/create"], function(on, create){
+define(["dojo/on", "xstyle/create"], function(on, create){
 
 return function(column, editor, editOn){
     // summary:

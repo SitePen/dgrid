@@ -1,4 +1,4 @@
-define(["dojo/_base/declare", "cssx/create"], function(declare, create){
+define(["dojo/_base/declare", "xstyle/create"], function(declare, create){
 
 return declare([], {
 	constructor: function(mixin){
