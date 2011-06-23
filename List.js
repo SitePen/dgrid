@@ -69,7 +69,7 @@ define(["xstyle/css!./css/d-list.css", "dojo/_base/kernel", "xstyle/create", "do
 			if(!this.id){
 				this.id = domNode.id;
 			}
-			this.tabIndex = domNode.tabIndex || 0;
+			this.tabIndex = Math.max(domNode.tabIndex, 0);
 			domNode.role = "grid";
 			if(params){
 				this.params = params;
