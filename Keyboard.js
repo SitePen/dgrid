@@ -1,15 +1,16 @@
-define(["dojo/_base/declare", "dojo/on", "dojo/query"], function(declare, listen, query){
+define(["dojo/_base/declare", "dojo/on"], function(declare, listen, query){
 return declare([], {
 	// summary:
 	// 		Add keyboard navigation capability to a grid
 	postCreate: function(){
 		this.inherited(arguments);
-		this.on(".d-list-row:keydown", function(event){
+		var grid = this;
+		this.on("keydown", function(event){
 			if(event.target.tagName.toLowerCase() == "input"){
 				return;
 			}
 			var nextFocus, lastFocus = event.target;
-			var columnId = lastFocus.getAttribute("colid");
+			var columnId = lastFocus.columnId;
 			switch(event.keyCode){
 				case 37: // left arrow
 					var previous = true;
@@ -21,7 +22,7 @@ return declare([], {
 					var previous = true;
 					// fall through 
 				case 40: // down arrow
-					nextFocus = this;
+					nextFocus = grid.row(lastFocus).element;
 					break;
 				default: // not an arrow key, just go to default
 					return;
@@ -31,7 +32,7 @@ return declare([], {
 			}while(nextFocus && nextFocus.nodeType != 1);
 			if(nextFocus){
 				if(columnId){
-					nextFocus = query('[colid="' + columnId +'"]', nextFocus)[0];
+					nextFocus = grid.cell(nextFocus, columnId).element;
 				}
 				nextFocus.focus();
 			}
