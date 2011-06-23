@@ -27,21 +27,21 @@
 			require(["d-list/OnDemandGrid", "d-list/Editor","d-list/Selection", "d-list/Keyboard", "d-list/tests/test_data", "dojo/domReady!"], 
 				function(Grid, Editor, Selection, Keyboard, testStore){
 					var columns = { // you can declare columns as an object hash (key translates to field)
-						col1: Editor({sortable: true, selector: true}, "checkbox"),
+						col1: Editor({selector: true}, "checkbox"),
 						col2: 'Column 2',
 						col3: {name: 'Column 3', editable: true, sortable: true}
 					};
-					grid = dojo.declare([Grid, Selection, Keyboard])({
+					window.grid = dojo.declare([Grid, Selection, Keyboard])({
 						store: testStore,
 						selectionMode: "none",
 						columns: columns
 					}, "grid");
 					var columnsRadio = { // you can declare columns as an object hash (key translates to field)
-						col1: Editor({name: 'Radio', sortable: true, selector: true}, "radio"),
+						col1: Editor({name: 'Radio', selector: true}, "radio"),
 						col2: 'Column 2',
 						col3: {name: 'Column 3', editable: true, sortable: true}
 					};
-					gridRadio = dojo.declare([Grid, Selection, Keyboard])({
+					window.gridRadio = dojo.declare([Grid, Selection, Keyboard])({
 						store: testStore,
 						selectionMode: "none",
 						columns: columnsRadio

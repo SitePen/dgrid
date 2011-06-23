@@ -51,8 +51,8 @@
 			require({"packages":[
 				{"name":"gridx","location":"../grid-2.0/gridx"}
 				]});
-			require(["d-list/List", "d-list/OnDemandGrid","d-list/Tree","d-list/CheckBox","d-list/Selection", "gridx/modules/ColumnResizer", "gridx/modules/dnd/Row", "d-list/Keyboard", "d-list/tests/test_data", "dojo/domReady!"], 
-				function(List, Grid, Tree, CheckBox, Selection, ColumnResizer, DndRow, Keyboard, testStore){
+			require(["dojo/on", "d-list/List", "d-list/OnDemandGrid","d-list/Tree","d-list/Editor","d-list/Selection", "gridx/modules/ColumnResizer", "gridx/modules/dnd/Row", "d-list/Keyboard", "d-list/tests/test_data", "dojo/domReady!"], 
+				function(on, List, Grid, Tree, Editor, Selection, ColumnResizer, DndRow, Keyboard, testStore){
 					console.log("loaded in " + (new Date().getTime() - start) + testStore);
 					var columns = { // you can declare columns as an object hash (key translates to field)
 						col1: {name: 'Column 1', editable: true, sortable: true},
@@ -61,33 +61,37 @@
 						col4: {name: 'Column 4', editable: true, sortable: true},
 						"last-col": {name: 'Column 5', field: 'col5', editable: true, sortable: true}
 					};
-					grid = dojo.declare([Grid, ColumnResizer, Selection, Keyboard])({
+					window.grid = dojo.declare([Grid, ColumnResizer, Selection, Keyboard])({
 						store: testStore,
 						columns: columns
 					}, "grid");
-					tree =dojo.declare([Grid, ColumnResizer])({
+					window.tree =dojo.declare([Grid, ColumnResizer])({
 						store: testCountryStore,
 						query: {type: "continent"},
 						selectionMode: "single",
 						columns: [
 							new Tree({name:'Name', field:'name'}),
-							new CheckBox({name: 'A CheckBox', field: 'bool'}),
+							new Editor({name: 'A CheckBox', field: 'bool'}, "checkbox"),
 							{name:'Type', field:'type'},
 							{name:'Population', field:'population'},
 							{name:'Timezone', field:'timezone'}
 						]
 					}, "tree");
-					list = dojo.declare([List, Selection, Keyboard])({
+					window.list = dojo.declare([List, Selection, Keyboard])({
 					}, "list");
 					list.renderCollection(dojo.map(testCountryStore.data, function(country){
 						return country.name;
 					}));
+					on(document.getElementById("save"), "click", function(){
+						grid.save();
+					});
 				});
 		</script>
 	</head>
 	<body class="claro">
 		<h2>A basic grid (70% of page width)</h2>
 		<div id="grid"></div>
+		<button id="save">Save</button>
 		<h2>A grid with tree column and then a simple list (floated left)</h2>
 		<div id="tree"></div>
 		<div id="list"></div>
