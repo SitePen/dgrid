@@ -1,5 +1,5 @@
-define(["dojo/_base/html", "cssx/create", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/query", "./Grid","cssx/css!./css/columnset.css"], 
-	function(dojo, create, declare, listen, aspect, query, Grid, cssx){
+define(["dojo/has", "cssx/create", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/query", "./Grid","cssx/css!./css/columnset.css", "dojo/_base/sniff"], 
+	function(has, create, declare, listen, aspect, query, Grid, cssx){
 		//	summary:
 		//		This module provides column sets to isolate horizontal scroll of sets of 
 		// 		columns from each other. This mainly serves the purpose of allowing for
@@ -9,7 +9,7 @@ define(["dojo/_base/html", "cssx/create", "dojo/_base/declare", "dojo/on", "dojo
 		columnSets: [],
 		createRowCells: function(tag, each){
 			var row = create("table");			
-			if(dojo.isIE < 8 && !dojo.isQuirks){
+			if(has("ie") < 8 && !has("quirks")){
 				row.style.width = "auto"; // in IE7 this is needed to instead of 100% to make it not create a horizontal scroll bar
 			}
 			var tr = create(row, "tbody tr");
@@ -34,7 +34,7 @@ define(["dojo/_base/html", "cssx/create", "dojo/_base/declare", "dojo/on", "dojo
 					element.scrollLeft = scrollLefts[element.getAttribute('colsetid')];
 				});
 			}
-			if(dojo.isIE < 8 || dojo.isQuirks){
+			if(has("ie") < 8 || has("quirks")){
 				setTimeout(adjustScrollLeft, 1);
 			}else{
 				adjustScrollLeft();
