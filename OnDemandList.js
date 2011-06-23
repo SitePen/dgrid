@@ -8,8 +8,6 @@ return declare([List], {
 		listen(this.bodyNode, "scroll", function(event){
 			self.onscroll(event);			
 		});
-		//this.inherited(arguments);
-		
 	},
 	store: null,
 	renderQuery: function(query, preloadNode){
@@ -66,8 +64,8 @@ return declare([List], {
 	sort: function(property, descending){
 		// summary:
 		//		Sort the content
-		this.sortOrder = [{attribute: property, descending: descending}];
-		this.refreshContent();
+		this.lastCollection = null;
+		this.inherited(arguments);
 	},
 	refreshContent: function(){
 		this.inherited(arguments);

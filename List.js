@@ -1,4 +1,4 @@
-define(["dojo/_base/kernel", "cssx/create", "dojo/_base/declare", "dojo/on", "dojo/aspect", "./TextEdit", "dojo/has", "dojo/has!touch?./TouchScroll", "cssx/css!./css/d-list.css"], function(dojo, create, declare, listen, aspect, TextEdit, has, TouchScroll){
+define(["dojo/_base/kernel", "cssx/create", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/has", "dojo/has!touch?./TouchScroll", "cssx/css!./css/d-list.css"], function(dojo, create, declare, listen, aspect, has, TouchScroll){
 	// allow for custom CSS class definitions 
 	// TODO: figure out what to depend for this
 	var byId = function(id){
@@ -147,7 +147,9 @@ define(["dojo/_base/kernel", "cssx/create", "dojo/_base/declare", "dojo/on", "do
 			options = options || {};
 			var start = options.start || 0;
 			var self = this;
-			this.lastCollection = results;
+			if(!beforeNode){
+				this.lastCollection = results;
+			}
 			var contentNode = this.contentNode;
 			if(results.observe){
 				// observe the results for changes
@@ -237,10 +239,14 @@ define(["dojo/_base/kernel", "cssx/create", "dojo/_base/declare", "dojo/on", "do
 		sort: function(property, descending){
 			// summary:
 			//		Sort the content
+			this.sortOrder = [{attribute: property, descending: descending}];
 			this.refreshContent();
-			this.renderCollection(lastCollection.sort(function(a,b){
-				return a[property] > b[property] == descending ? -1 : 1;
-			}));
+			if(this.lastCollection){
+				this.lastCollection.sort(function(a,b){
+					return a[property] > b[property] == !descending ? -1 : 1;
+				})
+				this.renderCollection(this.lastCollection);
+			}
 		}
 	});
 });
