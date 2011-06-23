@@ -113,10 +113,12 @@ return function(column, editor, editOn){
         value = !column.selector && value;
         if(column.editOn){
             on(cell, column.editOn, function(){
-                cell.innerHTML = "";
-                renderWidget(value, cell, object, function(newData){
-                    originalRenderCell(object, value = newData, cell);
-                });
+            	if(!column.canEdit || column.canEdit(object, value)){
+	                cell.innerHTML = "";
+	                renderWidget(value, cell, object, function(newData){
+	                    originalRenderCell(object, value = newData, cell);
+	                });
+            	}
             });
             originalRenderCell(object, value, cell, options);
         }else{
