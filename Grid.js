@@ -1,5 +1,5 @@
 define(["dojo/has", "xstyle/create", "dojo/_base/declare", "dojo/on", "./Editor", "./List", "dojo/_base/sniff"], function(has, create, declare, listen, Editor, List){
-	
+	var scrollbarWidth;
 	return declare([List], {
 		columns: [],
 		// summary:
@@ -176,13 +176,16 @@ define(["dojo/has", "xstyle/create", "dojo/_base/declare", "dojo/on", "./Editor"
 				this.checkedTrs = true;
 				createColumnsFromDom(this.domNode, columns);
 			}
+			if(!scrollbarWidth){ // we haven't computed the scroll bar width yet, do so now, and add a new rule if need be
+				scrollbarWidth = grid.bodyNode.offsetWidth - grid.bodyNode.clientWidth;
+				if(scrollbarWidth != 17){
+					this.css.addRule(".d-list-header", "right: " + scrollbarWidth + "px");
+				}
+			}
 			var row = this.createRowCells("th[role=columnheader]", function(th, column, id){
 				column.id = id;
 				column.grid = grid;
 				var field = column.field;
-				if(column.editable){
-					column = Editor(column, "text", "dblclick");
-				}
 				if(field){
 					th.field = field;
 				}
@@ -210,7 +213,7 @@ define(["dojo/has", "xstyle/create", "dojo/_base/declare", "dojo/on", "./Editor"
 						if(lastSortedArrow){
 							lastSortedArrow.parentNode.removeChild(lastSortedArrow);
 						}
-						lastSortedArrow = create(target.firstChild, "-div.d-list-arrow-button-node[role=presentation]");
+						lastSortedArrow = create(target.firstChild, "-div.d-list-arrow-button-node.ui-icon[role=presentation]");
 						target.className = target.className.replace(/d-list-sort-\w+/,'');
 						target.className += descending ? " d-list-sort-down" : " d-list-sort-up";
 						grid.sort(field, descending);
