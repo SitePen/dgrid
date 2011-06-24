@@ -1,12 +1,14 @@
 define(["dojo/_base/declare", "xstyle/create"], function(declare, create){
 
-return declare([], {
-	constructor: function(mixin){
-		for(var i in mixin){
-			this[i] = mixin[i];
-		}
-	},
-	renderCell: function(object, value, td, options){
+return function(column, editor, editOn){
+    // summary:
+    //      Add a editing capability
+    var originalRenderCell = column.renderCell || function(object, value, td){
+        if(value != null){
+        	create(td, "span.d-list-expando-text", value);
+        }
+    };
+	column.renderCell = function(object, value, td, options){
 		// summary:
 		//		Renders a cell that can be expanded, creating more rows
 		var level = options.query.level + 1;
@@ -16,9 +18,7 @@ return declare([], {
 		var expando = create(td, ".d-list-expando-icon" + (!grid.store.mayHaveChildren || 
 			grid.store.mayHaveChildren(object) ? ".ui-icon.ui-icon-triangle-1-e" : "") +
 			"[style=margin-left: " + (level * 19) + "px; float: left]");
-		if(this.field){
-			create(td, "span.d-list-expando-text", value);
-		}			
+		originalRenderCell.call(this, object, value, td, options);
 		expando.level = level;
 		var tr, query;
 
@@ -60,6 +60,7 @@ return declare([], {
 				}while(rowElement && (rowElement != preloadNode));
 			});
 		};
-	}
-});
+	};
+	return column;
+};
 });
