@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Test Grid Common Cases</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
+		<meta name="viewport" content="width=570" />
+		<style type="text/css">
+			@import "../../dojo/resources/dojo.css";
+			@import "../css/skins/claro.css";
+			.heading {
+				font-weight: bold;
+				padding-bottom: 0.25em;
+			}
+			#grid { 
+				width: 70%;
+			}
+			#grid .column-col1 {
+				width: 100px;
+			}
+			#grid .column-col2 {
+				width: 30%;
+			}
+			#grid .column-col4 {
+				width: 180px;
+			}
+			.ui-widget-content{
+				margin: 10px;
+			}
+		</style>
+		<script>
+			var start= new Date().getTime();
+		</script>
+		<script type="text/javascript" src="../../dojo/dojo.js" 
+			data-dojo-config="async: true"></script>
+		<script type="text/javascript">
+			require({"packages":[
+				{"name":"gridx","location":"../grid-2.0/gridx"}
+				]});
+			require(["dojo/on", "d-list/OnDemandGrid", "gridx/modules/ColumnResizer", "d-list/tests/test_data", "dojo/domReady!"], 
+				function(on, Grid, ColumnResizer, testStore){
+					var columns = { // you can declare columns as an object hash (key translates to field)
+						col1: {name: 'Column 1', sortable: true},
+						col2: 'Column 2',
+						col3: {name: 'Column 3', sortable: true},
+						col4: {name: 'Column 4', sortable: true},
+						"last-col": {name: 'Column 5', field: 'col5', sortable: true}
+					};
+					window.grid = dojo.declare([Grid, ColumnResizer])({
+						store: testStore,
+						columns: columns
+					}, "grid");
+				});
+		</script>
+	</head>
+	<body class="claro">
+		<h2>A basic grid with column resizing</h2>
+		<div id="grid"></div>
+	</body>
+</html>

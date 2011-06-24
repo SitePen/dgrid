@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=570" />
 		<style type="text/css">
 			@import "../../dojo/resources/dojo.css";
-			@import "../css/claro.css";
+			@import "../css/skins/claro.css";
 			.heading {
 				font-weight: bold;
 				padding-bottom: 0.25em;
@@ -48,24 +48,21 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require({"packages":[
-				{"name":"gridx","location":"../grid-2.0/gridx"}
-				]});
-			require(["dojo/on", "d-list/List", "d-list/OnDemandGrid","d-list/Tree","d-list/Editor","d-list/Selection", "gridx/modules/ColumnResizer", "gridx/modules/dnd/Row", "d-list/Keyboard", "d-list/tests/test_data", "dojo/domReady!"], 
-				function(on, List, Grid, Tree, Editor, Selection, ColumnResizer, DndRow, Keyboard, testStore){
+			require(["dojo/on", "d-list/List", "d-list/OnDemandGrid","d-list/Tree","d-list/Editor","d-list/TextBox", "d-list/Selection", "d-list/Keyboard", "d-list/tests/test_data", "dojo/domReady!"], 
+				function(on, List, Grid, Tree, Editor, TextBox, Selection, Keyboard, testStore){
 					console.log("loaded in " + (new Date().getTime() - start) + testStore);
 					var columns = { // you can declare columns as an object hash (key translates to field)
-						col1: {name: 'Column 1', editable: true, sortable: true},
+						col1: TextBox({name: 'Column 1', sortable: true}),
 						col2: 'Column 2',
-						col3: {name: 'Column 3', editable: true, sortable: true},
-						col4: {name: 'Column 4', editable: true, sortable: true},
-						"last-col": {name: 'Column 5', field: 'col5', editable: true, sortable: true}
+						col3: TextBox({name: 'Column 3', sortable: true}),
+						col4: {name: 'Column 4', sortable: true},
+						"last-col": TextBox({name: 'Column 5', field: 'col5', sortable: true})
 					};
-					window.grid = dojo.declare([Grid, ColumnResizer, Selection, Keyboard])({
+					window.grid = dojo.declare([Grid, Selection, Keyboard])({
 						store: testStore,
 						columns: columns
 					}, "grid");
-					window.tree =dojo.declare([Grid, ColumnResizer])({
+					window.tree = Grid({
 						store: testCountryStore,
 						query: {type: "continent"},
 						selectionMode: "single",
