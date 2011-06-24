@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Test Grid Common Cases</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
+		<meta name="viewport" content="width=570" />
+		<style type="text/css">
+			@import "../../dojo/resources/dojo.css";
+			@import "../css/skins/claro.css";
+			.d-list {
+				width: 700px;
+			}
+			.d-list .field-bool {
+				width: 20%;
+			}
+			.d-list .field-type {
+				width: 80px;
+			}
+			.ui-widget-content{
+				margin: 10px;
+			}
+		</style>
+		<script>
+			var start= new Date().getTime();
+		</script>
+		<script type="text/javascript" src="../../dojo/dojo.js" 
+			data-dojo-config="async: true"></script>
+		<script type="text/javascript">
+			require(["dojo/on", "d-list/OnDemandGrid","d-list/Tree","d-list/Editor", "d-list/Keyboard", "d-list/Selection", "d-list/tests/test_data", "dojo/domReady!"], 
+				function(on, Grid, Tree, Editor, Keyboard, Selection, testStore){
+					window.tree = dojo.declare([Grid, Keyboard, Selection])({
+						store: testCountryStore,
+						query: {type: "continent"},
+						selectionMode: "single",
+						columns: [
+							Tree({name:'Name', field:'name'}),
+							Editor({name: 'A CheckBox', field: 'bool'}, "checkbox"),
+							Editor({name:'Type', field:'type'}, "text"),
+							Editor({name:'Population', field:'population'}, "text", "dblclick"),
+							Editor({name:'Timezone', field:'timezone'}, "text", "dblclick")
+						]
+					}, "tree");
+					on(document.getElementById("save"), "click", function(){
+						tree.save();
+					});
+					on(document.getElementById("add-country"), "click", function(){
+						testCountryStore.put({ id: 'EU', name:'Europe', type:'continent',
+	        				children:[{_reference:'DE'}, {_reference:'FR'}, {_reference:'ES'}, {_reference:'IT'}, {_reference:'US'}] });
+					});
+					on(document.getElementById("add-continent"), "click", function(){
+						testCountryStore.put({ id: 'NE', name:'My New Europe', type:'continent',
+	        				children:[{_reference:'DE'}, {_reference:'FR'}, {_reference:'ES'}, {_reference:'IT'}] });
+					});
+					on(document.getElementById("delete"), "click", function(){
+						tree.selection.forEach(function(id){
+							testCountryStore.remove(id);
+						});
+					});
+					window.tree2 =dojo.declare([Grid, Keyboard])({
+						store: testCountryStore,
+						query: {type: "continent"},
+						selectionMode: "single",
+						columns: [
+							Tree({name:'Name', field:'name'}),
+							Editor({name: 'A CheckBox', field: 'bool'}, "checkbox"),
+							Editor({name:'Type', field:'type'}, "text"),
+							Editor({name:'Population', field:'population'}, "text", "dblclick"),
+							Editor({name:'Timezone', field:'timezone'}, "text", "dblclick")
+						]
+					}, "tree2");
+				});
+		</script>
+	</head>
+	<body class="claro">
+		<h2>A couple of tree/grids, test to see if they stay in sync</h2>
+		<div id="tree"></div>
+		<button id="save">Save</button>
+		<button id="add-continent">Add Continent</button>
+		<button id="add-country">Add US To Europe</button>
+		<button id="delete">Delete Selected</button>
+		<div id="tree2"></div>
+	</body>
+</html>
