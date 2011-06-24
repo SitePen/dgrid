@@ -114,14 +114,14 @@ function(css, dojo, create, declare, listen, aspect, has, TouchScroll){
 		on: function(eventType, listener){
 			// delegate events to the domNode
 			var signal = listen(this.domNode, eventType, listener);
-			if(has("dom-addeventlistener")){
+			if(!has("dom-addeventlistener")){
 				this._listeners.push(signal);
 			}
 		},
 		destroy: function(){
 			// cleanup listeners
 			for(var i = 0; i < this._listeners.length; i++){
-				this._listeners.cancel();
+				this._listeners.remove();
 			}
 		},
 		refreshContent: function(){
