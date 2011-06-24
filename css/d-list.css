@@ -1,3 +1,4 @@
+/* This stylesheet provides the structural CSS for the d-list */
 .d-list {
 	position: relative;
 	overflow: hidden;
@@ -7,7 +8,6 @@
 }
 .d-list-header {
 	background-color: #eee;
-	/*width: 100%; /* IE quirks needs this to work properly */
 	position: absolute;
 	right: 17px; /*-cssx-scrollbar-width;*/
 	left: 0px;
@@ -24,7 +24,6 @@ table.d-list-row, .d-list-column-set table{
 	border-collapse: collapse;
 	border: none;
 	table-layout: fixed;
-	position: relative;
 	width: 100%; /* this programmatically becomes 'auto' for IE7 (non-quirks) */ 
 }
 .d-list-cell {
@@ -56,7 +55,7 @@ table.d-list-row, .d-list-column-set table{
 .d-list-content {
 	position: relative;
 }
-.d-list-expando {
+.d-list-expando-icon {
 	width: 16px;
 	height: 16px;
 }
@@ -73,9 +72,6 @@ table.d-list-row, .d-list-column-set table{
 	width: 16px;
 	height: 16px;
 }
-/*below is dummy style*/
-.d-list-row, .d-list-header-row {
-}
 
 /* Single Sort */
 .d-list-sort-node {
@@ -87,16 +83,15 @@ table.d-list-row, .d-list-column-set table{
 	float:right;
 }
 .d-list-arrow-button-node {
-	background:transparent url("images/grid_sort_down.gif") no-repeat scroll left center;
+	background-position: -64px -16px;
 	display:block;
 	float:right;
-	height:1em;
 	margin:2px 4px 0 5px;
 	padding-left:0;
 	width:7px;
 }
 .d-list-sort-up .d-list-arrow-button-node {
-	background-image: url("images/grid_sort_up.gif");
+	background-position: 0px -16px;
 }
 
 /* selection*/
@@ -107,7 +102,15 @@ table.d-list-row, .d-list-column-set table{
 .d-list-input {
 	width: 99%;
 }
-.ui-icon { width: 16px; height: 16px; background-image: url(images/ui-icons_222222_256x240.png); }
+.ui-icon { 
+	width: 16px; 
+	height: 16px; 
+	background-image: url('images/ui-icons_222222_256x240.png'); 
+}
 
-.ui-icon-triangle-1-e { background-position: -32px -16px; }
-.ui-icon-triangle-1-se { background-position: -48px -16px; }
+.ui-icon-triangle-1-e { 
+	background-position: -32px -16px; 
+}
+.ui-icon-triangle-1-se { 
+	background-position: -48px -16px; 
+}

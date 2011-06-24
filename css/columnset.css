@@ -1,7 +1,6 @@
 .d-list-column-set {
 	overflow: hidden;
 	width: 100%;
-	position: relative;
 }
 .d-list-column-set-cell {
 	vertical-align: bottom;
