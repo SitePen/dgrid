@@ -11,37 +11,79 @@ capabilities on mobile devices. The List can be used to render an array of data.
 <pre>
 define(["d-list/List"], function(List){
 	// attach to a DOM id
-	list = new List({}, "list"); 
+	var list = new List({}, "list"); 
 	// render some data
 	list.renderArray(arrayOfData);
 	... 
 </pre>
+See the <a href="doc/api.html?d-list/doc/List">API viewer for a list methods available on the List component</a>.
 
 <h2>Grid</h2>
-This extends List to provide tabular display of data in columns. The component will
+This extends List to provide tabular display of data in columns. The grid component will
 provide a header for each column that corresponds to columns within the scrollable
 grid of data. The columns of the grid are defined by using columns property. The columns
-property should have an array of each column definition objects. The column definition object
+property should have an object or array of each column definition objects. For each 
+property in the columns object the property key is used as the 
+id of the column and each value is the column definition object. If the columns value is an
+array then the property keys are the numeric index. The column definition object
 may have the following properties (all our optional):
 
-* field - This is the property from the object in the list to display in the body of the grid.
+* field - This is the property from the object in the list to display in the body of the grid. 
+This defaults to the id of the column (if no get() function is provided).
 * name - This is the label to show in the header of the grid.
+This defaults to the id of the column.
 * sortable - This indicates whether or not you can sort on this column/field.
-* editable - This indicates whether or not to allow editing of the value (defaults to using the TextEdit plugin)
 * get - This can be a function that will retrieve the value to display from the object in the list.
 * formatter - This can be a function that will convert the value to a string/HTML for rendering.
 * renderCell - This can be a function that will be called to render the value into the target &lt;td> for each cell.
+* renderHeaderCell - This can be a function that will be called to render the value into the target &lt;th> for the columns header.
 * className - A DOM/CSS class to assign to the cells in the column. 
+* id - This is the id of the column (normally this comes from the property keys in columns object or array). 
+
+For example, we could create a grid with columns like:
+<pre>
+define(["d-list/Grid"], function(List){
+	var grid = new Grid({
+		columns: {
+			first: {
+				name: "First Name",
+				sortable: true
+			},
+			last: {
+				name: "Last Name",
+				sortable: true
+			},
+			age: {
+				get: function(object){
+					return (new Date().getTime() - object.birthDate.getTime()) / 31536000000;
+				}
+			}
+		}
+	}, "grid"); // attach to a DOM id 
+	// render some data
+	grid.renderArray(arrayOfData);
+	... 
+</pre>
+The column definition may alternately simply be a string, in which case it the value of the string is interpreted as
+the name of the column. We can more succinctly write simple columns:
+<pre>
+	var grid = new Grid({
+		columns: {
+			first: "First Name",
+			last: "Last Name",
+			...
+		}
+</pre> 
 
 The d-list components are designed to be highly CSS driven for optimal performance and organization, so visual styling should be controlled
-through CSS. The grid creates classes based fields (or if you provided a className property) with
-the convention of "field-<field-name>". For example, you could define a grid and CSS like:
+through CSS. The grid creates classes based on the column ids (or if you provided a className property) with
+the convention of "column-<column-id>". For example, you could define a grid and CSS like:
 <pre>
 &lt;style>
-.field-age {
+.column-age {
 	width: 80px;
 }
-.field-name {
+.column-first {
 	font-weight: bold;
 }
 &lt;/style>
@@ -49,8 +91,8 @@ the convention of "field-<field-name>". For example, you could define a grid and
 define(["d-list/Grid"], function(Grid){
 	grid = new Grid({
 			columns: [ // define the columns
-				{name: 'Age', field: 'age'},
-				{name: 'Name', field: 'name'},
+				age: "Age",
+				first: "First Name",
 				...
 			]});
 	grid.renderArray(someData);
@@ -58,6 +100,7 @@ define(["d-list/Grid"], function(Grid){
 </pre>
 The Grid class also provides a styleColumn(colId, css) method to programmatically
 style a column.
+See the <a href="doc/api.html?d-list/doc/Grid">API viewer for a list methods available on the List component</a>.
 
 <h2>OnDemandList</h2>
 This extends List to provide on-demand lazy loading or paging of data as the user
@@ -76,7 +119,7 @@ performs this by calling store.query() with the sort attribute with the provided
 * sortOrder - This holds the current sort order.
 
 <h2>OnDemandGrid</h2>
-The composition of Grid and OnDemandList. It is nothing more than Grid.extend(OnDemandList).
+The composition of Grid and OnDemandList. It simply the composition of Grid and OnDemandList.
 For example:
 <pre>
 define(["d-list/OnDemandGrid"], function(Grid){
