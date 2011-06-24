@@ -13,7 +13,7 @@ return declare([], {
 		level = isNaN(level) ? 0 : level;
 		var grid = this.grid;
 		// create the expando
-		var expando = create(td, ".d-list-expando" + (!grid.store.mayHaveChildren || 
+		var expando = create(td, ".d-list-expando-icon" + (!grid.store.mayHaveChildren || 
 			grid.store.mayHaveChildren(object) ? ".ui-icon.ui-icon-triangle-1-e" : "") +
 			"[style=margin-left: " + (level * 19) + "px; float: left]");
 		if(this.field){
@@ -25,22 +25,28 @@ return declare([], {
 		if(!grid._hasTreeListener){
 			// just setup the event listener once and use event delegation for better memory use
 			grid._hasTreeListener = true;
-			this.grid.on(".d-list-expando:click", function(event){
+			this.grid.on("click", function(event){
+				var target = event.target;
+				while(target.className.indexOf("d-list-expando-icon") < 0){
+					if("className" in (target = target.parentNode)){
+						return;
+					}
+				}
 				// on click we toggle expanding and collapsing
-				var expanded = this.expanded = !this.expanded;
+				var expanded = target.expanded = !target.expanded;
 				// update the expando display
-				this.className = "d-list-expando ui-icon ui-icon-triangle-1-" + (expanded ? "se" : "e"); 
-				var preloadNode = this.preloadNode;
-				var row = grid.row(this);
+				target.className = "d-list-expando-icon ui-icon ui-icon-triangle-1-" + (expanded ? "se" : "e"); 
+				var preloadNode = target.preloadNode;
+				var row = grid.row(target);
 				var rowElement = row.element;
 				if(!preloadNode){
 					// if the children have not been created, create a preload node and do the 
 					// query for the children
-					preloadNode = this.preloadNode = create('div');
+					preloadNode = target.preloadNode = create('div');
 					var query = function(options){
 						return grid.store.getChildren(row.data, options);
 					};
-					query.level = this.level;
+					query.level = target.level;
 					rowElement.parentNode.insertBefore(preloadNode, rowElement.nextSibling);
 					grid.renderQuery(query, preloadNode);
 				}
