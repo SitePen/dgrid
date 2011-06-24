@@ -170,7 +170,7 @@ define(["xstyle/css!./css/d-list.css", "dojo/_base/kernel", "xstyle/create", "do
 						}, 250);
 						rows.splice(to, 0, row);
 					}
-				}));
+				}, true));
 			}
 			// now render the results
 			if(results.map){
