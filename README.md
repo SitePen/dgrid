@@ -13,7 +13,7 @@ define(["d-list/List"], function(List){
 	// attach to a DOM id
 	list = new List({}, "list"); 
 	// render some data
-	list.renderCollection(arrayOfData);
+	list.renderArray(arrayOfData);
 	... 
 </pre>
 
@@ -53,7 +53,7 @@ define(["d-list/Grid"], function(Grid){
 				{name: 'Name', field: 'name'},
 				...
 			]});
-	grid.renderCollection(someData);
+	grid.renderArray(someData);
 &lt;/script>
 </pre>
 The Grid class also provides a styleColumn(colId, css) method to programmatically
@@ -103,7 +103,7 @@ object has the following properties:
 <li>data - The data object</li>
 </ul>
 * on(event, listener) - Basic event listener functionality, just delegates to the DOM element using standard dojo/on behavior.    
-* renderCollection(array, beforeNode) - This can be called to render an array. The beforeNode parameter can be used to render at a specific place in the list.
+* renderArray(array, beforeNode) - This can be called to render an array. The beforeNode parameter can be used to render at a specific place in the list.
 * renderRow(value, options) - This can be overriden to provide a custom rendering of each row
 
 <h1>Plugins</h1>

@@ -76,7 +76,7 @@
 					}, "tree");
 					window.list = dojo.declare([List, Selection, Keyboard])({
 					}, "list");
-					list.renderCollection(dojo.map(testCountryStore.data, function(country){
+					list.renderArray(dojo.map(testCountryStore.data, function(country){
 						return country.name;
 					}));
 					on(document.getElementById("save"), "click", function(){

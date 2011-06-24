@@ -106,7 +106,7 @@ return declare([], {
 			set(this, row.element, row.id, null, true);
 		}
 	},
-	renderCollection: function(){
+	renderArray: function(){
 		var rows = this.inherited(arguments);
 		for(var i = 0; i < rows.length; i++){
 			var row = this.row(rows[i]);

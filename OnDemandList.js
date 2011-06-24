@@ -38,7 +38,7 @@ return declare([List], {
 		var results = query(options);
 		var self = this;
 		// render the result set
-		Deferred.when(this.renderCollection(results, preloadNode, options), function(trs){
+		Deferred.when(this.renderArray(results, preloadNode, options), function(trs){
 			return Deferred.when(results.total || results.length, function(total){
 				// now we need to adjust the height and total count based on the first result set
 				var height = 0;
@@ -147,7 +147,7 @@ return declare([List], {
 				// use the query associated with the preload node to get the next "page"
 				options.query = preloadNode.query;
 				var results = preloadNode.query(options);
-				Deferred.when(this.renderCollection(results, loadingNode, options),
+				Deferred.when(this.renderArray(results, loadingNode, options),
 					function(){
 						// can remove the loading node now
 						loadingNode.parentNode.removeChild(loadingNode);
