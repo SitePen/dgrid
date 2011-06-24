@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>API Viewer</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
+		<meta name="viewport" content="width=570" />
+		<style type="text/css">
+			@import "../../dojo/resources/dojo.css";
+			@import "../css/skins/claro.css";
+			.heading {
+				font-weight: bold;
+				padding-bottom: 0.25em;
+			}
+			#explorer {
+				position: absolute;
+				top: 40px;
+				bottom: 0px;
+				left: 10px;
+				right: 10px;
+				height: auto;
+			}
+			.column-docType {
+				width: 15em;
+			}
+			.column-name {
+				width: 15em;
+			}
+			.column-type {
+				width: 15em;
+			}
+			.type {
+				background-position: -0px -96px;
+			}
+			.type-modules {
+				background-position: -112px -96px; 
+			}
+			.type-parameters {
+				background-position: -16px -64px; 
+			}
+			.type-returns {
+				background-position: -48px -64px; 
+			}
+			.type-methods {
+				background-position: -32px -160px; 
+			}
+			.type-properties {
+				background-position: -96px -176px; 
+			}
+			.type, .description {
+				float: left;
+			}			
+			#details {
+				left: 25%;
+			}
+			.ui-widget-content{
+				margin: 10px;
+			}
+		</style>
+		<script type="text/javascript" src="../../dojo/dojo.js" 
+			data-dojo-config="async: true"></script>
+		<script type="text/javascript">
+			require(["d-list/doc/api", location.search.replace(/\?/,'') || "d-list/doc/index", "dojo/domReady!"], 
+				function(api, data){
+					api(data, "explorer");
+				});
+		</script>
+	</head>
+	<body class="claro">
+		<h2>API Viewer</h2>
+		<div id="explorer"></div>
+		<div id="details"></div>
+	</body>
+</html>
