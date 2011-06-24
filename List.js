@@ -60,12 +60,6 @@ function(css, dojo, create, declare, listen, aspect, has, TouchScroll){
 	};*/
 			this.create(params, srcNodeRef);
 		},
-		minRowsPerPage: 25,
-		maxRowsPerPage: 100,
-		maxEmptySpace: 10000,
-		queryOptions: {},
-		query: {},
-		rowHeight: 0,
 		css: css,
 		getCSSClass: function(shortName){
 			return "d-list-" + shortName;
@@ -169,7 +163,7 @@ function(css, dojo, create, declare, listen, aspect, has, TouchScroll){
 					}
 					if(to > -1){
 						// add to new slot
-						var row = self.createRow(object, rows[to], (options.start + to), options);
+						var row = self.insertRow(object, rows[to], (options.start + to), options);
 						row.className += " ui-state-highlight";
 						setTimeout(function(){
 							row.className = row.className.replace(/ ui-state-highlight/, '');
@@ -188,7 +182,7 @@ function(css, dojo, create, declare, listen, aspect, has, TouchScroll){
 				}
 			}
 			function mapEach(object){
-				return self.createRow(object, beforeNode, start++, options);
+				return self.insertRow(object, beforeNode, start++, options);
 			}
 			return rows;
 		},
@@ -196,7 +190,7 @@ function(css, dojo, create, declare, listen, aspect, has, TouchScroll){
 		renderHeader: function(){
 			// no-op in a place list 
 		},
-		createRow: function(object, beforeNode, i, options){
+		insertRow: function(object, beforeNode, i, options){
 			// summary:
 			//		Renders a single row in the grid
 			var row = this.renderRow(object, options);

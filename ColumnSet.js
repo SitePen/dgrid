@@ -30,7 +30,7 @@ function(css, has, create, declare, listen, aspect, query, Grid){
 			}
 			return row;
 		},
-		createRow: function(){
+		insertRow: function(){
 			var row = this.inherited(arguments);
 			var scrollLefts = this._columnSetScrollLefts;
 			function adjustScrollLeft(){
