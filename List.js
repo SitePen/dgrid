@@ -1,6 +1,12 @@
-define(["xstyle/css!./css/d-list.css", "dojo/_base/kernel", "xstyle/create", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/has", "dojo/has!touch?./TouchScroll"], function(css, dojo, create, declare, listen, aspect, has, TouchScroll){
+define(["xstyle/css!./css/d-list.css", "dojo/_base/kernel", "xstyle/create", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/has", "dojo/has!touch?./TouchScroll", "dojo/_base/sniff"], 
+function(css, dojo, create, declare, listen, aspect, has, TouchScroll){
 	// allow for custom CSS class definitions 
 	// TODO: figure out what to depend for this
+	if(has("mozilla")){
+		// firefox's focus doesn't work by default for divs prior to actually tabbing into it. This fixes that
+		// (we don't do any other browsers because we are trying to stay as close to native as possible) 
+		css.addRule(".d-list td:focus, .d-list div:focus", "outline: 1px dotted");
+	}
 	var byId = function(id){
 		return document.getElementById(id);
 	};
@@ -140,7 +146,7 @@ define(["xstyle/css!./css/d-list.css", "dojo/_base/kernel", "xstyle/create", "do
 			}
 			this.preloadNode = null;
 		},
-		renderCollection: function(results, beforeNode, options){
+		renderArray: function(results, beforeNode, options){
 			// summary:
 			//		This renders an array or collection of objects as rows in the grid, before the
 			//		given node. This will listen for changes in the collection if an observe method
@@ -246,7 +252,7 @@ define(["xstyle/css!./css/d-list.css", "dojo/_base/kernel", "xstyle/create", "do
 				this.lastCollection.sort(function(a,b){
 					return a[property] > b[property] == !descending ? -1 : 1;
 				})
-				this.renderCollection(this.lastCollection);
+				this.renderArray(this.lastCollection);
 			}
 		}
 	});
