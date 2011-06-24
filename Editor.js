@@ -2,7 +2,7 @@ define(["dojo/on", "xstyle/create"], function(on, create){
 
 return function(column, editor, editOn){
     // summary:
-    //      Add a column with text editing capability
+    //      Add a editing capability
     var originalRenderCell = column.renderCell || function(object, value, td){
         if(value != null){
             td.appendChild(document.createTextNode(value));
@@ -22,12 +22,10 @@ return function(column, editor, editOn){
             var input = create(cell, "input[type=" + editor + "].d-list-input", {
                 name: column.field || "selection",
                 tabIndex: grid.tabIndex,
-                value: value,
-                checked: value
+                value: value || "",
+                checked: value,
+                lastValue: value
             });
-            input.checked = value;
-            input.value = value;
-            input.lastValue = value;
             if(!grid._hasInputListener){
             	// register one listener at the top level that receives events delegated
             	grid._hasInputListener = true;
@@ -48,12 +46,6 @@ return function(column, editor, editOn){
                     onblur(input.lastValue);
                 });
             }
-            /*if(input.type == "checkbox" || input.type == "radio"){
-                on(input, "keydown", function(event){
-                    // bubble manually
-                    on.emit(this.parentNode, "keydown", event);
-                });
-            }*/
         } :
         function(data, cell, object, onblur){
             // using a widget as the editor
@@ -73,11 +65,13 @@ return function(column, editor, editOn){
                 });
             }
         };
-    function setProperty(cell, oldValue, value){
+    function setProperty(cellElement, oldValue, value){
     	if(oldValue != value){
-	        var row = grid.row(cell);
+    		var cell = grid.cell(cellElement);
+	        var row = cell.row;
+	        var column = cell.column;
 	        if(column.field && row){
-	            if(on.emit(cell, "datachange", {oldValue: oldValue, value: value, bubbles: true, cancelable: true})){
+	            if(on.emit(cellElement, "datachange", {oldValue: oldValue, value: value, bubbles: true, cancelable: true})){
 	                var object = row.data;
 	                var dirty = grid.dirty[row.id] || (grid.dirty[row.id] = {});
 	                dirty[column.field] = object[column.field] = value;
@@ -94,7 +88,9 @@ return function(column, editor, editOn){
 	                grid.clearSelection();
 	            }
 	            if(row){
+	            	suppressSelect = true;
 	                grid.selection.set(row.id, value);
+	                suppressSelect = false;
 	            }else{
 	                // select all
 	                grid[value ? "selectAll" : "clearSelection"]();
@@ -103,15 +99,17 @@ return function(column, editor, editOn){
     	}
         return value;
     }
-    
+    var suppressSelect;
     column.renderCell = function(object, value, cell, options){
         if(!grid){
             grid = column.grid;
             if(column.selector){
                 grid.selection.watch(function(id, oldValue, newValue){
-                    var cell = grid.cell(id, column.id);
-                    cell.element.innerHTML = "";
-                    renderWidget(newValue, cell.element, object);
+                	if(!suppressSelect){
+	                    var cell = grid.cell(id, column.id);
+	                    cell.element.innerHTML = "";
+	                    renderWidget(newValue, cell.element, object);
+                	}
                 });
             }
         }
