@@ -26,6 +26,7 @@ return function(column, editor, editOn){
                 checked: value,
                 lastValue: value
             });
+            
             if(!grid._hasInputListener){
             	// register one listener at the top level that receives events delegated
             	grid._hasInputListener = true;
@@ -33,7 +34,7 @@ return function(column, editor, editOn){
             	grid.on("change,click", function(event){
             		var target = event.target;
 	                if("lastValue" in target && target.className.indexOf("d-list-input") > -1){
-	                    target.lastValue = setProperty(target.parentNode, target.lastValue, target[target.type == "checkbox" ? "checked" : "value"]);
+	                    target.lastValue = setProperty(target.parentNode, target.lastValue, target[target.type == "checkbox" || target.type == "radio"  ? "checked" : "value"]);
 	                }
 	            });
             }
