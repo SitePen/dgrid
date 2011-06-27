@@ -1,6 +1,6 @@
 define(["dojo/_base/declare", "xstyle/create"], function(declare, create){
 
-return function(column, editor, editOn){
+return function(column){
     // summary:
     //      Add a editing capability
     var originalRenderCell = column.renderCell || function(object, value, td){
