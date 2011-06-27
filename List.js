@@ -92,7 +92,7 @@ function(css, dojo, create, declare, listen, aspect, has, TouchScroll){
 				event.stopPropagation(); // we will refire, since browsers are not consistent about propagation here
 				listen.emit(domNode, "scroll", {scrollTarget: bodyNode});
 			});
-			this.renderHeader();
+			this.renderHeader(headerNode);
 			bodyNode.style.top = headerNode.offsetHeight + "px";
 			if(has("quirks")){
 				// in quirks mode, the "bottom" CSS property is ignored, so do this to fix it
