@@ -92,6 +92,7 @@ return declare([List], {
 		set(this, this.row(id).element, id, colId, false);
 	},
 	clearSelection: function(){
+		this.allSelected = false;
 		var selection = this.selection;
 		for(var i in selection){
 			if(selection.hasOwnProperty(i) && typeof selection[i] != "function"){
