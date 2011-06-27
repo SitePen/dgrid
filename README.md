@@ -218,14 +218,14 @@ used by creating an instance and using it was a column in the columns. For examp
 create a columns where the first column has a tree expander and the second column has
 a checkbox, we could do:
 <pre>
-define(["d-list/OnDemandGrid", "d-list/Tree", "d-list/CheckBox"], function(Grid, Tree, CheckBox){
+define(["d-list/OnDemandGrid", "d-list/Tree", "d-list/Editor"], function(Grid, Tree, Editor){
 	grid = new Grid({
 			store: myHierarchicalStore, // a Dojo object store
 			columns: [ // define the columns
 				// first column will have a tree expander:
-				new Tree({name:'Name', field:'name'}),
+				Tree({name:'Name', field:'name'}),
 				// second column will render with a checkbox: 
-				new CheckBox({name: 'A CheckBox', field: 'bool'}),
+				Editor({name: 'A CheckBox', field: 'bool'}, "checkbox"),
 				// just a normal column:
 				{name:'Type', field:'type'},
 				...
@@ -239,9 +239,8 @@ getChildren(object, options) method to return the children for each object. The 
 may also (optionally) provide a mayHaveChildren(object) method that returns a 
 boolean indicating whether or not the row can be expanded.
 
-<h2>TextEdit</h2>
-Provides editing capability of text data in cells in the column. Changing a value will trigger
-a store.put(updatedObject) call.
+<h2>TextBox</h2>
+This provides editing capability of text data in cells in the column. This is simply an Editor with the text input that shows on double click. 
 
 <h2>CheckBox</h2>
 Renders boolean values with a checkbox that can be checked and unchecked to indicate
@@ -259,10 +258,33 @@ operations.
 
 <h1>Themes/Skins</h1>
 The d-list automatically loads the necessary structural CSS to work properly. However, you can
-also use one of the the included skins/themes. There is a tundra.css and claro.css theme
-files in the css directory that can be used to included to skin the d-list to a particular
+also use one of the the included skins/themes. There is a claro.css, tundra.css, soria.css, and nihilo.css theme
+files in the css/skins directory that can be used to skin the d-list to a particular
 look and feel.
 
 <h2>Grid Structure for custom CSS Styling</h2>
-TODO: Document the classes and structure. For now, looking at this in your debugger
-should get you by.
+The d-list is designed to be styled and customized through CSS. Many of these classes
+can be discovered by simply looking at elements in your debugger and see the class names
+and applied CSS rules. As mentioned above, perhaps the most important class is the column-<id>
+assigned to each cell in grids which allow for per column styling. The following class 
+names are used by the d-list and can be referenced from CSS:
+<ul>
+<li>d-list - Applied to each d-list list or grid at the top element</li>
+<li>d-list-header - Applied to the element that contains the header rendering</li>
+<li>d-list-scroller - Applied to the element that holds the scrolling contents</li>
+<li>d-list-content - Applied to the element inside of the scrolling that holds all the data contents</li>
+<li>d-list-row - Applied to each row element</li>
+<li>d-list-row-even - Applied to each even row element</li>
+<li>d-list-row-odd - Applied to each even row element. Applying a different color to the odd (vs even) rows can be use help the rows visually stand out.</li>
+<li>d-list-selected - Applied to selected rows or cells</li>
+<li>d-list-cell - Applied to each cell element</li>
+<li>d-list-cell-padding - This is applied to each cell element or to an inner element within the cell in older versions of non-quirks mode IE to properly apply padding to keep the padding within the box measurements (box-sizing is preferred by the grid).</li>
+</ul>
+The following generic class names are also available for generic skinning (follows the jQuery themeroller convention):
+<ul>
+<li>ui-widget-content - Applied to each d-list list or grid at the top element</li>
+<li>ui-widget-header - Applied to the element that contains the header rendering</li>
+<li>ui-state-default - Applied to each row element</li>
+<li>ui-state-active - Applied to selected rows or cells</li>
+</ul>
+ 
