@@ -1,12 +1,12 @@
-define(["dojo/_base/declare", "dojo/on"], function(declare, listen, query){
+define(["dojo/_base/declare", "dojo/on", "./List"], function(declare, listen, List){
 var delegatingInputTypes = {
 	checkbox: 1,
 	radio: 1,
 	button: 1
 };
-return declare([], {
+return declare([List], {
 	// summary:
-	// 		Add keyboard navigation capability to a grid
+	// 		Add keyboard navigation capability to a grid/list
 	pageSkip: 10,
 	postCreate: function(){
 		this.inherited(arguments);

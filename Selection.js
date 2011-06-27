@@ -1,5 +1,5 @@
-define(["dojo/_base/declare", "dojo/Stateful", "dojo/on"], function(declare, Stateful, listen){
-return declare([], {
+define(["dojo/_base/declare", "dojo/Stateful", "dojo/on", "./List"], function(declare, Stateful, listen, List){
+return declare([List], {
 	// summary:
 	// 		Add selection capabilities to a grid. The grid will have a selection property and
 	//		fire "select" and "deselect" events.
