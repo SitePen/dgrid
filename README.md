@@ -1,8 +1,15 @@
 This project provides widgets for lists of data, including simple sets of scrolling rows,
 grids of data, on-demand lazy-loaded data, and various plugins for additional functionality. 
 This project also provides touch scrolling
-for mobile devices with native style momentum, bouncing, and scrollbars. The 
-components are broken down into the following top level widget modules:
+for mobile devices with native style momentum, bouncing, and scrollbars. To use this package,
+install with <a href="https://github.com/kriszyp/cpm">CPM</a>:
+<pre>
+cpm install d-list
+</pre>
+Or download it along with it's dependencies, which are <a href="https://github.com/kriszyp/xstyle">xstyle</a>
+and <a href="http://dojotoolkit.org">dojo</a>. 
+
+The components are broken down into the following top level widget modules:
 
 <h2>List</h2>
 This provides the basic facilities for taking an array of objects and rendering as rows
@@ -100,7 +107,7 @@ define(["d-list/Grid"], function(Grid){
 </pre>
 The Grid class also provides a styleColumn(colId, css) method to programmatically
 style a column.
-See the <a href="doc/api.html?d-list/doc/Grid">API viewer for a list methods available on the List component</a>.
+See the <a href="doc/api.html?d-list/doc/Grid">API viewer for a list methods available on the List component</a> (make sure to download the project to view this link, it is not available from github).
 
 <h2>OnDemandList</h2>
 This extends List to provide on-demand lazy loading or paging of data as the user
