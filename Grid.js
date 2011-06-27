@@ -167,7 +167,7 @@ define(["dojo/has", "xstyle/create", "dojo/_base/declare", "dojo/on", "./Editor"
 
 			return row;
 		},
-		renderHeader: function(){
+		renderHeader: function(headerNode){
 			// summary:
 			//		Setup the headers for the grid
 			var grid = this;
@@ -200,7 +200,7 @@ define(["dojo/has", "xstyle/create", "dojo/_base/declare", "dojo/on", "./Editor"
 				}
 			});
 			row.className = "d-list-row ui-widget-header";
-			this.headerNode.appendChild(row);
+			headerNode.appendChild(row);
 			var lastSortedArrow;
 			// if it columns are sortable, resort on clicks
 			listen(row, "click", function(event){
@@ -218,7 +218,7 @@ define(["dojo/has", "xstyle/create", "dojo/_base/declare", "dojo/on", "./Editor"
 						target.className += descending ? " d-list-sort-down" : " d-list-sort-up";
 						grid.sort(field, descending);
 					}
-				}while((target = target.parentNode) && target != grid.headerNode);
+				}while((target = target.parentNode) && target != headerNode);
 			});
 		},
 		styleColumn: function(colId, css){
