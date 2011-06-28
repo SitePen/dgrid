@@ -78,6 +78,15 @@ return function(column, editor, editOn){
 	        var row = cell.row;
 	        var column = cell.column;
 	        if(column.field && row){
+	        	// first try to keep the type the same if possible
+				if(typeof oldValue == 'number'){
+					value = isNaN(value) ? value : parseFloat(value);
+				}else if(typeof oldValue == 'boolean'){
+					value = value == 'true' ? true : value == 'false' ? false : value;
+				}else if(oldValue instanceof Date){
+					var asDate = new Date(value);
+					value = isNaN(asDate.getTime()) ? value : asDate;
+				}
 	            if(on.emit(cellElement, "datachange", {oldValue: oldValue, value: value, bubbles: true, cancelable: true})){
 	                var object = row.data;
 	                var dirty = grid.dirty[row.id] || (grid.dirty[row.id] = {});
