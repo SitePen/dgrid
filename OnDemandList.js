@@ -44,7 +44,7 @@ return declare([List], {
 		var results = query(options);
 		var self = this;
 		// render the result set
-		Deferred.when(this.renderArray(results, preloadNode, options), function(trs){
+		return Deferred.when(this.renderArray(results, preloadNode, options), function(trs){
 			return Deferred.when(results.total || results.length, function(total){
 				// now we need to adjust the height and total count based on the first result set
 				var height = 0;
@@ -62,9 +62,9 @@ return declare([List], {
 					preloadNode.style.display = "none"; 
 				} 
 				// can remove the loading node now
+				return trs;
 			});
 		}, console.error);
-		return preloadNode;
 	},
 	sortOrder: null,
 	sort: function(property, descending){

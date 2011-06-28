@@ -15,6 +15,40 @@ function(css, dojo, create, declare, listen, aspect, has, TouchScroll){
 		this.data = object;
 		this.element = element;
 	}
+	Row.prototype = {
+		remove: function(){
+			var rowElement = this.element;
+			var contentNode = rowElement.parentNode;
+			contentNode.removeChild(rowElement);
+			var connected = rowElement.connected;
+			if(connected){
+				// if it has a connected node, remove that as well
+				contentNode.removeChild(connected);
+			}
+		}
+	};
+	function move(item, steps){
+		var nextSibling, current, element = current = item.element;
+		steps = steps || 1;
+		do{
+			// move in the correct direction
+			if(nextSibling = current[steps < 0 ? 'previousSibling' : 'nextSibling']){
+				current = nextSibling;
+				if(current.rowContainer){
+					current = current[steps < 0 ? 'lastChild' : 'firstChild'];
+				}
+				var className = current && current.className;
+				if(className && className.match(/d-list-(cell|row)/)){
+					// it's an element, counts as a real move
+					element = current;
+					steps += steps < 0 ? 1 : -1;
+				}
+			}else if(!(nextSibling = (current = current.parentNode).rowContainer)){ // intentional assignment
+				steps = 0;
+			}
+		}while(nextSibling && steps);
+		return element;		
+	}
 	return declare(TouchScroll ? [TouchScroll] : [], { 
 		constructor: function(params, srcNodeRef){
 		var self = this;
@@ -121,6 +155,7 @@ function(css, dojo, create, declare, listen, aspect, has, TouchScroll){
 		refreshContent: function(){
 			// summary:
 			//		refreshes the contents of the grid
+			this._rowIdToObject = {};
 			if(this.contentNode){
 				// remove the content so it can be recreated
 				this.contentNode.innerHTML = "";
@@ -158,8 +193,7 @@ function(css, dojo, create, declare, listen, aspect, has, TouchScroll){
 					// a change in the data took place
 					if(from > -1){
 						// remove from old slot
-						var row = rows.splice(from, 1)[0];
-						contentNode.removeChild(row);
+						self.row(rows.splice(from, 1)[0]).remove();
 					}
 					if(to > -1){
 						// add to new slot
@@ -197,7 +231,7 @@ function(css, dojo, create, declare, listen, aspect, has, TouchScroll){
 			row.className = (row.className || "") + " ui-state-default d-list-row " + (i% 2 == 1 ? "d-list-row-odd" : "d-list-row-even");
 			// get the row id for easy retrieval
 			this._rowIdToObject[row.id = this.id + "-row-" + ((this.store && this.store.getIdentity) ? this.store.getIdentity(object) : this._autoId++)] = object;
-			this.contentNode.insertBefore(row, beforeNode || null);
+			(beforeNode ? beforeNode.parentNode : this.contentNode).insertBefore(row, beforeNode || null);
 			return row;
 		},
 		renderRow: function(value, options){
@@ -237,6 +271,13 @@ function(css, dojo, create, declare, listen, aspect, has, TouchScroll){
 				row: this.row(target)
 			};
 		},
+		_move: move,
+		up: function(row, steps){
+			return this.row(move(row, -(steps || 1)));
+		},
+		down: function(row, steps){
+			return this.row(move(row, steps || 1));
+		},		
 		sort: function(property, descending){
 			// summary:
 			//		Sort the content

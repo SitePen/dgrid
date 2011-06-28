@@ -139,6 +139,12 @@ define(["dojo/has", "xstyle/create", "dojo/_base/declare", "dojo/on", "./Editor"
 			}			
 			return row;
 		},
+		left: function(cell, steps){
+			return this.cell(this._move(cell, -(steps || 1)));
+		},
+		right: function(cell, steps){
+			return this.cell(this._move(cell, steps || 1));
+		},
 		renderRow: function(object, options){
 			var row = this.createRowCells("td[role=gridcell]", function(td, column, id){
 				var data = object;

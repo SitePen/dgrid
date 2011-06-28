@@ -31,16 +31,19 @@ return declare([List], {
 			if(!move){
 				return;
 			}
-			var nextSibling, columnId, cell = grid.cell(nextFocus).element;
+			var nextSibling, columnId, cell = grid.cell(nextFocus);
+			var orientation;
 			if(keyCode == 37 || keyCode == 39){
 				// horizontal movement (left and right keys)
-				nextFocus = cell;
+				orientation = 'right';
 			}else{
 				// other keys are vertical
-				columnId = cell && cell.columnId;
-				nextFocus = grid.row(nextFocus).element;				
+				orientation = 'down'
+				columnId = cell && cell.column && cell.column.id;
+				cell = grid.row(nextFocus);				
 			}
-			do{
+			var nextFocus = grid[orientation](cell, move).element;
+/*			do{
 				// move in the correct direction
 				if((nextSibling = nextFocus[move < 0 ? 'previousSibling' : 'nextSibling']) && !nextSibling.preload){
 					nextFocus = nextSibling; 
@@ -51,7 +54,7 @@ return declare([List], {
 				}else{
 					move = 0;
 				}
-			}while(nextSibling && move);
+			}while(nextSibling && move);*/
 			if(nextFocus){
 				if(columnId){
 					nextFocus = grid.cell(nextFocus, columnId).element;
