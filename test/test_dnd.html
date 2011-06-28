@@ -29,7 +29,7 @@
 			require({"packages":[
 				{"name":"gridx","location":"../grid-2.0/gridx"}
 				]});
-			require(["dojo", "d-list/List", "d-list/OnDemandGrid","d-list/Tree","d-list/CheckBox","d-list/Selection", "gridx/modules/ColumnResizer", "gridx/modules/dnd/Row", "d-list/Keyboard", "d-list/test/test_data"], 
+			require(["dojo", "d-list/List", "d-list/OnDemandGrid","d-list/Tree","d-list/CheckBox","d-list/Selection", "d-list/gridx/modules/ColumnResizer", "d-list/gridx/modules/dnd/Row", "d-list/Keyboard", "d-list/test/test_data"], 
 				function(dojo, List, Grid, Tree, CheckBox, Selection, ColumnResizer, DndRow, Keyboard, ProgressBar){
 					dojo.addOnLoad(function(){
 						dragndrop = new (dojo.declare([Grid, Selection, DndRow, Keyboard]))({

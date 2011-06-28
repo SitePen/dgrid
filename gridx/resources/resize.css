@@ -1,0 +1,13 @@
+/*Column resizing plugin*/
+.dojoxGridxColumnResizing {
+	cursor: e-resize;
+}
+
+.dojoxGridxColumnResizer {
+	position: absolute;
+	height: 100%;
+	width: 2px;
+	background-color: #666;
+	z-index: 1000;
+	top: 0;
+}

@@ -26,8 +26,8 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["d-list/List", "d-list/OnDemandGrid","d-list/Tree","d-list/CheckBox","d-list/Selection", "d-list/Keyboard", "d-list/Editor", "dijit/form/DateTextBox", "dijit/form/HorizontalSlider", "dijit/form/NumberSpinner", "d-list/test/test_data", "dojo/domReady!"], 
-				function(List, Grid, Tree, CheckBox, Selection, Keyboard, Editor, DateTextBox, Slider, NumberSpinner){
+			require(["d-list/List", "d-list/OnDemandGrid","d-list/Tree","d-list/Selection", "d-list/Keyboard", "d-list/Editor", "dijit/form/DateTextBox", "dijit/form/HorizontalSlider", "dijit/form/NumberSpinner", "d-list/test/test_data", "dojo/domReady!"], 
+				function(List, Grid, Tree, Selection, Keyboard, Editor, DateTextBox, Slider, NumberSpinner){
 					var columns = [
 						Editor({name: 'A Date', field: 'date', sortable: true}, DateTextBox),
 						Editor({name: 'Real Number', field: 'floatNum', sortable: true}, Slider),
@@ -55,7 +55,8 @@
 		</script>
 	</head>
 	<body class="claro">
-		<h2>A basic grid with editors</h2>	
+		<h2>A basic grid with editors</h2>
+		(This test requires dijit to be installed)	
 		<div id="grid"></div>
 		<button id="save" onclick="grid.save()">Save</button>
 	</body>
