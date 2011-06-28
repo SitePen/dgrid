@@ -56,7 +56,8 @@ return declare([List], {
 				if(columnId){
 					nextFocus = grid.cell(nextFocus, columnId).element;
 				}
-				if(nextFocus.getAttributeNode("tabIndex").specified){
+				var tabIndexNode = nextFocus.getAttributeNode("tabIndex");
+				if(tabIndexNode && tabIndexNode.specified){
 					nextFocus.focus();
 				}else{
 					var inputs = nextFocus.getElementsByTagName("input");
