@@ -24,12 +24,16 @@
 	transition-property: background-color, border-color;
 	background: url("images/row_back.png") #fff repeat-x;
 }
+.ui-state-default:hover {
+	background-color:#e9f2fe;
+}
+
 .ui-state-active {
 	background-color:#cee6fa;
 }
 
-.ui-state-default:hover {
-	background-color:#ABD6FF
+.ui-state-active:hover {
+	background-color: #9bc6f2;
 }
 
 .ui-state-highlight{
