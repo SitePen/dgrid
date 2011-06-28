@@ -1,4 +1,12 @@
 define(["dojo/_base/declare", "dojo/Stateful", "dojo/on", "./List"], function(declare, Stateful, listen, List){
+// patch Stateful until Dojo 1.8
+Stateful.prototype.forEach = function(callback, thisObject){
+	for(var i in this){
+		if(this.hasOwnProperty(i) && typeof this[i] != "function"){
+			callback.call(thisObject, this[i], i);
+		}
+	}
+};
 return declare([List], {
 	// summary:
 	// 		Add selection capabilities to a grid. The grid will have a selection property and
@@ -89,16 +97,13 @@ return declare([List], {
 		set(this, this.row(rowId).element, id, colId, true);
 	},
 	deselect: function(id, colId){
-		set(this, this.row(id).element, id, colId, false);
+		set(this, this.row(id).element, id, colId);
 	},
 	clearSelection: function(){
 		this.allSelected = false;
-		var selection = this.selection;
-		for(var i in selection){
-			if(selection.hasOwnProperty(i) && typeof selection[i] != "function"){
-				this.deselect(i);
-			}
-		}		
+		this.selection.forEach(function(selected, id){
+			this.deselect(id);
+		}, this);		
 	},
 	selectAll: function(){
 		this.allSelected = true;
@@ -144,6 +149,9 @@ function set(grid, target, rowId, colId, value){
 			row = value;
 		}
 		grid.selection.set(rowId, row);
+		if(!row){
+			delete grid.selection[rowId];
+		}
 	}
 }
 
