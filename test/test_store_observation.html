@@ -52,7 +52,7 @@
 	        				children:[{_reference:'DE'}, {_reference:'FR'}, {_reference:'ES'}, {_reference:'IT'}] });
 					});
 					on(document.getElementById("delete"), "click", function(){
-						tree.selection.forEach(function(id){
+						tree.selection.forEach(function(selected, id){
 							testCountryStore.remove(id);
 						});
 					});

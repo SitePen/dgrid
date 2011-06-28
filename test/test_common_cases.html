@@ -62,7 +62,7 @@
 						store: testStore,
 						columns: columns
 					}, "grid");
-					window.tree = Grid({
+					window.tree = dojo.declare([Grid, Selection, Keyboard])({
 						store: testCountryStore,
 						query: {type: "continent"},
 						selectionMode: "single",
