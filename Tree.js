@@ -1,4 +1,4 @@
-define(["dojo/_base/declare", "xstyle/create"], function(declare, create){
+define(["dojo/_base/declare", "xstyle/create", "dojo/_base/Deferred"], function(declare, create, Deferred){
 
 return function(column){
     // summary:
@@ -40,24 +40,25 @@ return function(column){
 				var row = grid.row(target);
 				var rowElement = row.element;
 				if(!preloadNode){
-					// if the children have not been created, create a preload node and do the 
+					// if the children have not been created, create a container, a preload node and do the 
 					// query for the children
-					preloadNode = target.preloadNode = create('div');
+					var container = rowElement.connected = create('.d-list-tree-container');
+					preloadNode = target.preloadNode = create(container, 'div');
+					//preloadNode.nextRow = grid.down(row).element;
 					var query = function(options){
 						return grid.store.getChildren(row.data, options);
 					};
 					query.level = target.level;
-					rowElement.parentNode.insertBefore(preloadNode, rowElement.nextSibling);
-					grid.renderQuery(query, preloadNode);
+					rowElement.parentNode.insertBefore(container, rowElement.nextSibling);
+					grid.renderQuery ? 
+						grid.renderQuery(query, preloadNode) :
+						grid.renderArray(query({}), preloadNode);
 				}
 				// show or hide all the children
 				var styleDisplay = expanded ? "" : "none";
-				do{
-					rowElement = rowElement.nextSibling;
-					if(rowElement){
-						rowElement.style.display = styleDisplay;
-					} 
-				}while(rowElement && (rowElement != preloadNode));
+				container = rowElement.connected;
+				container.rowContainer = expanded;
+				container.style.display = styleDisplay;// TODO: maybe use a CSS class here
 			});
 		};
 	};
