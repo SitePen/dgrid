@@ -1,4 +1,4 @@
-define(["dojo/on", "xstyle/create"], function(on, create){
+define(["dojo/on", "dojo/has", "xstyle/create", "dojo/_base/sniff"], function(on, has, create){
 
 return function(column, editor, editOn){
     // summary:
@@ -16,6 +16,12 @@ return function(column, editor, editOn){
     }
     Column.prototype = column;
     var grid;
+    function onchange(event){
+		var target = event.target;
+        if("lastValue" in target && target.className.indexOf("d-list-input") > -1){
+            target.lastValue = setProperty(target.parentNode, target.lastValue, target[target.type == "checkbox" || target.type == "radio"  ? "checked" : "value"]);
+        }
+    }
     var renderWidget = typeof editor == "string" ?
         function(value, cell, object, onblur){
             // it is string editor, so we use a common <input> as the editor
@@ -31,12 +37,12 @@ return function(column, editor, editOn){
             	// register one listener at the top level that receives events delegated
             	grid._hasInputListener = true;
             	// note that we have to listen for clicks because IE doesn't fire change events properly for checkboxes, radios
-            	grid.on("change,click", function(event){
-            		var target = event.target;
-	                if("lastValue" in target && target.className.indexOf("d-list-input") > -1){
-	                    target.lastValue = setProperty(target.parentNode, target.lastValue, target[target.type == "checkbox" || target.type == "radio"  ? "checked" : "value"]);
-	                }
-	            });
+            	grid.on("change", onchange);
+            }
+            if(has("ie")){
+            	// IE doesn't fire change events for all the right things, and it doesn't bubble, double fail.
+            	on(input, "change", onchange);
+            	on(input, "click", onchange);
             }
             if(onblur){
                 input.focus();
