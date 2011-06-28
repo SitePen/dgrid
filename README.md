@@ -285,7 +285,8 @@ names are used by the d-list and can be referenced from CSS:
 <li>d-list-row-odd - Applied to each even row element. Applying a different color to the odd (vs even) rows can be use help the rows visually stand out.</li>
 <li>d-list-selected - Applied to selected rows or cells</li>
 <li>d-list-cell - Applied to each cell element</li>
-<li>d-list-cell-padding - This is applied to each cell element or to an inner element within the cell in older versions of non-quirks mode IE to properly apply padding to keep the padding within the box measurements (box-sizing is preferred by the grid).</li>
+<li>d-list-cell-padding - Applied to each cell element or to an inner element within the cell in older versions of non-quirks mode IE to properly apply padding to keep the padding within the box measurements (box-sizing is preferred by the grid).</li>
+<li>d-list-expando-icon - Applied to the expando icon on tree nodes</li>
 </ul>
 The following generic class names are also available for generic skinning (follows the jQuery themeroller convention):
 <ul>
@@ -293,5 +294,6 @@ The following generic class names are also available for generic skinning (follo
 <li>ui-widget-header - Applied to the element that contains the header rendering</li>
 <li>ui-state-default - Applied to each row element</li>
 <li>ui-state-active - Applied to selected rows or cells</li>
+<li>ui-state-highlight - Applied to a row for a short time when the contents are change (or it is newly created)</li>
 </ul>
  
