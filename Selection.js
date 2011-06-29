@@ -127,9 +127,9 @@ return declare([List], {
 function updateElement(element, value){
 	if(element){
 		if(value){
-			element.className += " d-list-selected ui-state-active";
+			element.className += " dgrid-selected ui-state-active";
 		}else{
-			element.className = element.className.replace(/ d-list-selected ui-state-active/, '');
+			element.className = element.className.replace(/ dgrid-selected ui-state-active/, '');
 		}
 	}
 }

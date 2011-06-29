@@ -1,32 +1,32 @@
-/* This stylesheet provides the structural CSS for the d-list */
-.d-list {
+/* This stylesheet provides the structural CSS for the dgrid */
+.dgrid {
 	position: relative;
 	overflow: hidden;
 	border: 1px solid #ddd;
 	height: 30em;
 	display: block;
 }
-.d-list-header {
+.dgrid-header {
 	background-color: #eee;
 	position: absolute;
 	right: 17px; /*-cssx-scrollbar-width;*/
 	left: 0px;
 }
 
-.d-list-sortable {
+.dgrid-sortable {
 	/*cursor: pointer; I don't know if we want to do this since overrides the resize cursor*/
 }
-.d-list-header, .d-list-header-row, .d-list-footer {
+.dgrid-header, .dgrid-header-row, .dgrid-footer {
 	overflow: hidden;
 	background-color: #eee;
 }
-table.d-list-row, .d-list-column-set table{
+table.dgrid-row, .dgrid-column-set table{
 	border-collapse: collapse;
 	border: none;
 	table-layout: fixed;
 	width: 100%; /* this programmatically becomes 'auto' for IE7 (non-quirks) */ 
 }
-.d-list-cell {
+.dgrid-cell {
 	padding: 0px;
 	text-align: left;
 	overflow: hidden;
@@ -37,29 +37,29 @@ table.d-list-row, .d-list-column-set table{
 	-ms-box-sizing: border-box;	
 	-webkit-box-sizing: border-box;
 }
-.d-list-cell-padding {
+.dgrid-cell-padding {
 	padding: 3px;
 }
 
-.d-list-right-corner {
+.dgrid-right-corner {
 	width:17px;
 }
-.d-list-header-row {
+.dgrid-header-row {
 	border-bottom: 1px solid #ccc;
 }
-.d-list-footer {
+.dgrid-footer {
 }
-.d-list-main {
+.dgrid-main {
 	position: relative;
 }
-.d-list-content {
+.dgrid-content {
 	position: relative;
 }
-.d-list-expando-icon {
+.dgrid-expando-icon {
 	width: 16px;
 	height: 16px;
 }
-.d-list-scroller{
+.dgrid-scroller{
 	overflow-x: auto;
 	overflow-y: scroll;
 	position: absolute;
@@ -68,21 +68,21 @@ table.d-list-row, .d-list-column-set table{
 	width: 100%;
 }
 
-.d-list-icon{
+.dgrid-icon{
 	width: 16px;
 	height: 16px;
 }
 
 /* Single Sort */
-.d-list-sort-node {
+.dgrid-sort-node {
 	text-decoration:none;
 	display:block;
 }
-.d-list-arrow-button-char {
+.dgrid-arrow-button-char {
 	display:none;
 	float:right;
 }
-.d-list-arrow-button-node {
+.dgrid-arrow-button-node {
 	background-position: -64px -16px;
 	display:block;
 	float:right;
@@ -90,16 +90,16 @@ table.d-list-row, .d-list-column-set table{
 	padding-left:0;
 	width:7px;
 }
-.d-list-sort-up .d-list-arrow-button-node {
+.dgrid-sort-up .dgrid-arrow-button-node {
 	background-position: 0px -16px;
 }
 
 /* selection*/
-.d-list-selected {
+.dgrid-selected {
 	background-color: #BFD6EB;
 }
 
-.d-list-input {
+.dgrid-input {
 	width: 99%;
 }
 .ui-icon { 

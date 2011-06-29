@@ -66,7 +66,7 @@ define(["dojo/has", "xstyle/create", "dojo/_base/declare", "dojo/on", "./Editor"
 		_columnsCss: function(rule){
 			// This is an attempt at integration with xstyle, will probably change
 			rule.fullSelector = function(){
-				return this.parent.fullSelector() + " .d-list-cell";
+				return this.parent.fullSelector() + " .dgrid-cell";
 			};
 			for(var i = 0;i < rule.children.length;i++){
 				var child = rule.children[i];
@@ -109,15 +109,15 @@ define(["dojo/has", "xstyle/create", "dojo/_base/declare", "dojo/on", "./Editor"
 						column.field = i;
 					}
 					var extraClassName = column.className || (column.field && "field-" + column.field);
-					var cell = create(tag + ".d-list-cell.d-list-cell-padding.column-" + i + (extraClassName ? '.' + extraClassName : ''));
+					var cell = create(tag + ".dgrid-cell.dgrid-cell-padding.column-" + i + (extraClassName ? '.' + extraClassName : ''));
 					cell.columnId = i;
 					if(cellNavigation && !column.editor || column.editOn){
 						cell.tabIndex = tabIndex;
 					}				
 					if(contentBoxSizing){
 						// The browser (IE7-) does not support box-sizing: border-box, so we emulate it with a padding div
-						var innerCell = create(cell, "div.d-list-cell-padding");
-						cell.className = cell.className.replace(/ d-list-cell-padding/, '');
+						var innerCell = create(cell, "div.dgrid-cell-padding");
+						cell.className = cell.className.replace(/ dgrid-cell-padding/, '');
 					}else{
 						innerCell = cell;
 					}
@@ -185,7 +185,7 @@ define(["dojo/has", "xstyle/create", "dojo/_base/declare", "dojo/on", "./Editor"
 			if(!scrollbarWidth){ // we haven't computed the scroll bar width yet, do so now, and add a new rule if need be
 				scrollbarWidth = grid.bodyNode.offsetWidth - grid.bodyNode.clientWidth;
 				if(scrollbarWidth != 17){
-					this.css.addRule(".d-list-header", "right: " + scrollbarWidth + "px");
+					this.css.addRule(".dgrid-header", "right: " + scrollbarWidth + "px");
 				}
 			}
 			var row = this.createRowCells("th[role=columnheader]", function(th, column, id){
@@ -205,7 +205,7 @@ define(["dojo/has", "xstyle/create", "dojo/_base/declare", "dojo/on", "./Editor"
 					th.sortable = true;
 				}
 			});
-			row.className = "d-list-row ui-widget-header";
+			row.className = "dgrid-row ui-widget-header";
 			headerNode.appendChild(row);
 			var lastSortedArrow;
 			// if it columns are sortable, resort on clicks
@@ -219,9 +219,9 @@ define(["dojo/has", "xstyle/create", "dojo/_base/declare", "dojo/on", "./Editor"
 						if(lastSortedArrow){
 							lastSortedArrow.parentNode.removeChild(lastSortedArrow);
 						}
-						lastSortedArrow = create(target.firstChild, "-div.d-list-arrow-button-node.ui-icon[role=presentation]");
-						target.className = target.className.replace(/d-list-sort-\w+/,'');
-						target.className += descending ? " d-list-sort-down" : " d-list-sort-up";
+						lastSortedArrow = create(target.firstChild, "-div.dgrid-arrow-button-node.ui-icon[role=presentation]");
+						target.className = target.className.replace(/dgrid-sort-\w+/,'');
+						target.className += descending ? " dgrid-sort-down" : " dgrid-sort-up";
 						grid.sort(field, descending);
 					}
 				}while((target = target.parentNode) && target != headerNode);

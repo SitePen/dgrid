@@ -1,5 +1,5 @@
 {
-  "name": "d-list",
+  "name": "dgrid",
   "author": "Kris Zyp",
   "description": "A lightweight, mobile-ready, data-driven, modular widget designed for lists and grids",
   "licenses": [
@@ -14,7 +14,7 @@
   ],
   "repository": {
     "type":"git",
-    "url":"http://github.com/kriszyp/d-list"
+    "url":"http://github.com/kriszyp/dgrid"
   },
   "dependencies": {
     "dojo": "1.7.0b3",
@@ -24,5 +24,5 @@
     "lib": "."
   },
   "main": "./OnDemandGrid",
-  "icon": "http://packages.dojofoundation.org/images/d-list.png"
+  "icon": "http://packages.dojofoundation.org/images/dgrid.png"
 }

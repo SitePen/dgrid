@@ -11,7 +11,7 @@
 				font-weight: bold;
 				padding-bottom: 0.25em;
 			}
-			.d-list { 
+			.dgrid { 
 				width: 70%;
 			}
 			.column-col1 {
@@ -24,7 +24,7 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["d-list/OnDemandGrid", "d-list/Editor","d-list/Selection", "d-list/Keyboard", "d-list/test/test_data", "dojo/domReady!"], 
+			require(["dgrid/OnDemandGrid", "dgrid/Editor","dgrid/Selection", "dgrid/Keyboard", "dgrid/test/test_data", "dojo/domReady!"], 
 				function(Grid, Editor, Selection, Keyboard, testStore){
 					var columns = { // you can declare columns as an object hash (key translates to field)
 						col1: Editor({selector: true}, "checkbox"),

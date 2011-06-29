@@ -5,7 +5,7 @@ return function(column){
     //      Add a editing capability
     var originalRenderCell = column.renderCell || function(object, value, td){
         if(value != null){
-        	create(td, "span.d-list-expando-text", value);
+        	create(td, "span.dgrid-expando-text", value);
         }
     };
 	column.renderCell = function(object, value, td, options){
@@ -15,7 +15,7 @@ return function(column){
 		level = isNaN(level) ? 0 : level;
 		var grid = this.grid;
 		// create the expando
-		var expando = create(td, ".d-list-expando-icon" + (!grid.store.mayHaveChildren || 
+		var expando = create(td, ".dgrid-expando-icon" + (!grid.store.mayHaveChildren || 
 			grid.store.mayHaveChildren(object) ? ".ui-icon.ui-icon-triangle-1-e" : "") +
 			"[style=margin-left: " + (level * 19) + "px; float: left]");
 		originalRenderCell.call(this, object, value, td, options);
@@ -27,7 +27,7 @@ return function(column){
 			grid._hasTreeListener = true;
 			this.grid.on("click", function(event){
 				var target = event.target;
-				while(target.className.indexOf("d-list-expando-icon") < 0){
+				while(target.className.indexOf("dgrid-expando-icon") < 0){
 					if("className" in (target = target.parentNode)){
 						return;
 					}
@@ -35,14 +35,14 @@ return function(column){
 				// on click we toggle expanding and collapsing
 				var expanded = target.expanded = !target.expanded;
 				// update the expando display
-				target.className = "d-list-expando-icon ui-icon ui-icon-triangle-1-" + (expanded ? "se" : "e"); 
+				target.className = "dgrid-expando-icon ui-icon ui-icon-triangle-1-" + (expanded ? "se" : "e"); 
 				var preloadNode = target.preloadNode;
 				var row = grid.row(target);
 				var rowElement = row.element;
 				if(!preloadNode){
 					// if the children have not been created, create a container, a preload node and do the 
 					// query for the children
-					var container = rowElement.connected = create('.d-list-tree-container');
+					var container = rowElement.connected = create('.dgrid-tree-container');
 					preloadNode = target.preloadNode = create(container, 'div');
 					//preloadNode.nextRow = grid.down(row).element;
 					var query = function(options){

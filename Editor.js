@@ -18,14 +18,14 @@ return function(column, editor, editOn){
     var grid;
     function onchange(event){
 		var target = event.target;
-        if("lastValue" in target && target.className.indexOf("d-list-input") > -1){
+        if("lastValue" in target && target.className.indexOf("dgrid-input") > -1){
             target.lastValue = setProperty(target.parentNode, target.lastValue, target[target.type == "checkbox" || target.type == "radio"  ? "checked" : "value"]);
         }
     }
     var renderWidget = typeof editor == "string" ?
         function(value, cell, object, onblur){
             // it is string editor, so we use a common <input> as the editor
-            var input = create(cell, "input[type=" + editor + "].d-list-input", {
+            var input = create(cell, "input[type=" + editor + "].dgrid-input", {
                 name: column.field || "selection",
                 tabIndex: grid.tabIndex,
                 value: value || "",

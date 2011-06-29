@@ -4,7 +4,7 @@ This project also provides touch scrolling
 for mobile devices with native style momentum, bouncing, and scrollbars. To use this package,
 install with <a href="https://github.com/kriszyp/cpm">CPM</a>:
 <pre>
-cpm install d-list
+cpm install dgrid
 </pre>
 Or download it along with it's dependencies, which are <a href="https://github.com/kriszyp/xstyle">xstyle</a>
 and <a href="http://dojotoolkit.org">dojo</a>. 
@@ -16,14 +16,14 @@ This provides the basic facilities for taking an array of objects and rendering 
 of HTML in a scrollable area. This will automatically include touch scrolling (via TouchScroll module)
 capabilities on mobile devices. The List can be used to render an array of data. For example:
 <pre>
-define(["d-list/List"], function(List){
+define(["dgrid/List"], function(List){
 	// attach to a DOM id
 	var list = new List({}, "list"); 
 	// render some data
 	list.renderArray(arrayOfData);
 	... 
 </pre>
-See the <a href="doc/api.html?d-list/doc/List">API viewer for a list methods available on the List component</a>.
+See the <a href="doc/api.html?dgrid/doc/List">API viewer for a list methods available on the List component</a>.
 
 <h2>Grid</h2>
 This extends List to provide tabular display of data in columns. The grid component will
@@ -49,7 +49,7 @@ This defaults to the id of the column.
 
 For example, we could create a grid with columns like:
 <pre>
-define(["d-list/Grid"], function(List){
+define(["dgrid/Grid"], function(List){
 	var grid = new Grid({
 		columns: {
 			first: {
@@ -82,7 +82,7 @@ the name of the column. We can more succinctly write simple columns:
 		}
 </pre> 
 
-The d-list components are designed to be highly CSS driven for optimal performance and organization, so visual styling should be controlled
+The dgrid components are designed to be highly CSS driven for optimal performance and organization, so visual styling should be controlled
 through CSS. The grid creates classes based on the column ids (or if you provided a className property) with
 the convention of "column-<column-id>". For example, you could define a grid and CSS like:
 <pre>
@@ -95,7 +95,7 @@ the convention of "column-<column-id>". For example, you could define a grid and
 }
 &lt;/style>
 &lt;script>
-define(["d-list/Grid"], function(Grid){
+define(["dgrid/Grid"], function(Grid){
 	grid = new Grid({
 			columns: [ // define the columns
 				age: "Age",
@@ -107,7 +107,7 @@ define(["d-list/Grid"], function(Grid){
 </pre>
 The Grid class also provides a styleColumn(colId, css) method to programmatically
 style a column.
-See the <a href="doc/api.html?d-list/doc/Grid">API viewer for a list methods available on the List component</a> (make sure to download the project to view this link, it is not available from github).
+See the <a href="doc/api.html?dgrid/doc/Grid">API viewer for a list methods available on the List component</a> (make sure to download the project to view this link, it is not available from github).
 
 <h2>OnDemandList</h2>
 This extends List to provide on-demand lazy loading or paging of data as the user
@@ -129,7 +129,7 @@ performs this by calling store.query() with the sort attribute with the provided
 The composition of Grid and OnDemandList. It simply the composition of Grid and OnDemandList.
 For example:
 <pre>
-define(["d-list/OnDemandGrid"], function(Grid){
+define(["dgrid/OnDemandGrid"], function(Grid){
 	// attach to a DOM id
 	grid = new Grid({
 			store: myStore, // a Dojo object store
@@ -161,7 +161,7 @@ The following modules can be used as plugins to add extra functionality to a Gri
 these, simply add the module as a mixin. For example, to create a grid based on 
 OnDemandGrid with the selection and keyboard handling plugins, we could do:
 <pre>
-define(["dojo", "d-list/OnDemandGrid", "d-list/Selection", "d-list/Keyboard"], function(dojo, Grid, Selection, Keyboard){
+define(["dojo", "dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Keyboard"], function(dojo, Grid, Selection, Keyboard){
 	// create a grid based on plugins
 	MyGrid = dojo.declare([Grid, Selection, Keyboard]);
 	// instantiate it
@@ -225,7 +225,7 @@ used by creating an instance and using it was a column in the columns. For examp
 create a columns where the first column has a tree expander and the second column has
 a checkbox, we could do:
 <pre>
-define(["d-list/OnDemandGrid", "d-list/Tree", "d-list/Editor"], function(Grid, Tree, Editor){
+define(["dgrid/OnDemandGrid", "dgrid/Tree", "dgrid/Editor"], function(Grid, Tree, Editor){
 	grid = new Grid({
 			store: myHierarchicalStore, // a Dojo object store
 			columns: [ // define the columns
@@ -264,33 +264,33 @@ support the options.before parameter on put() calls to properly respond to drag 
 operations.
 
 <h1>Themes/Skins</h1>
-The d-list automatically loads the necessary structural CSS to work properly. However, you can
+The dgrid automatically loads the necessary structural CSS to work properly. However, you can
 also use one of the the included skins/themes. There is a claro.css, tundra.css, soria.css, and nihilo.css theme
-files in the css/skins directory that can be used to skin the d-list to a particular
+files in the css/skins directory that can be used to skin the dgrid to a particular
 look and feel.
 
 <h2>Grid Structure for custom CSS Styling</h2>
-The d-list is designed to be styled and customized through CSS. Many of these classes
+The dgrid is designed to be styled and customized through CSS. Many of these classes
 can be discovered by simply looking at elements in your debugger and see the class names
 and applied CSS rules. As mentioned above, perhaps the most important class is the column-<id>
 assigned to each cell in grids which allow for per column styling. The following class 
-names are used by the d-list and can be referenced from CSS:
+names are used by the dgrid and can be referenced from CSS:
 <ul>
-<li>d-list - Applied to each d-list list or grid at the top element</li>
-<li>d-list-header - Applied to the element that contains the header rendering</li>
-<li>d-list-scroller - Applied to the element that holds the scrolling contents</li>
-<li>d-list-content - Applied to the element inside of the scrolling that holds all the data contents</li>
-<li>d-list-row - Applied to each row element</li>
-<li>d-list-row-even - Applied to each even row element</li>
-<li>d-list-row-odd - Applied to each even row element. Applying a different color to the odd (vs even) rows can be use help the rows visually stand out.</li>
-<li>d-list-selected - Applied to selected rows or cells</li>
-<li>d-list-cell - Applied to each cell element</li>
-<li>d-list-cell-padding - Applied to each cell element or to an inner element within the cell in older versions of non-quirks mode IE to properly apply padding to keep the padding within the box measurements (box-sizing is preferred by the grid).</li>
-<li>d-list-expando-icon - Applied to the expando icon on tree nodes</li>
+<li>dgrid - Applied to each dgrid list or grid at the top element</li>
+<li>dgrid-header - Applied to the element that contains the header rendering</li>
+<li>dgrid-scroller - Applied to the element that holds the scrolling contents</li>
+<li>dgrid-content - Applied to the element inside of the scrolling that holds all the data contents</li>
+<li>dgrid-row - Applied to each row element</li>
+<li>dgrid-row-even - Applied to each even row element</li>
+<li>dgrid-row-odd - Applied to each even row element. Applying a different color to the odd (vs even) rows can be use help the rows visually stand out.</li>
+<li>dgrid-selected - Applied to selected rows or cells</li>
+<li>dgrid-cell - Applied to each cell element</li>
+<li>dgrid-cell-padding - Applied to each cell element or to an inner element within the cell in older versions of non-quirks mode IE to properly apply padding to keep the padding within the box measurements (box-sizing is preferred by the grid).</li>
+<li>dgrid-expando-icon - Applied to the expando icon on tree nodes</li>
 </ul>
 The following generic class names are also available for generic skinning (follows the jQuery themeroller convention):
 <ul>
-<li>ui-widget-content - Applied to each d-list list or grid at the top element</li>
+<li>ui-widget-content - Applied to each dgrid list or grid at the top element</li>
 <li>ui-widget-header - Applied to the element that contains the header rendering</li>
 <li>ui-state-default - Applied to each row element</li>
 <li>ui-state-active - Applied to selected rows or cells</li>

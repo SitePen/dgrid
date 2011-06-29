@@ -1,11 +1,11 @@
-define(["xstyle/css!./css/d-list.css", "dojo/_base/kernel", "xstyle/create", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/has", "dojo/has!touch?./TouchScroll", "dojo/_base/sniff"], 
+define(["xstyle/css!./css/dgrid.css", "dojo/_base/kernel", "xstyle/create", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/has", "dojo/has!touch?./TouchScroll", "dojo/_base/sniff"], 
 function(css, dojo, create, declare, listen, aspect, has, TouchScroll){
 	// allow for custom CSS class definitions 
 	// TODO: figure out what to depend for this
 	if(has("mozilla")){
 		// firefox's focus doesn't work by default for divs prior to actually tabbing into it. This fixes that
 		// (we don't do any other browsers because we are trying to stay as close to native as possible) 
-		css.addRule(".d-list td:focus, .d-list div:focus", "outline: 1px dotted");
+		css.addRule(".dgrid td:focus, .dgrid div:focus", "outline: 1px dotted");
 	}
 	var byId = function(id){
 		return document.getElementById(id);
@@ -38,7 +38,7 @@ function(css, dojo, create, declare, listen, aspect, has, TouchScroll){
 					current = current[steps < 0 ? 'lastChild' : 'firstChild'];
 				}
 				var className = current && current.className;
-				if(className && className.match(/d-list-(cell|row)/)){
+				if(className && className.match(/dgrid-(cell|row)/)){
 					// it's an element, counts as a real move
 					element = current;
 					steps += steps < 0 ? 1 : -1;
@@ -96,7 +96,7 @@ function(css, dojo, create, declare, listen, aspect, has, TouchScroll){
 		},
 		css: css,
 		getCSSClass: function(shortName){
-			return "d-list-" + shortName;
+			return "dgrid-" + shortName;
 		},
 		create: function(params, srcNodeRef){
 			var domNode = this.domNode = srcNodeRef.nodeType ? srcNodeRef : byId(srcNodeRef);
@@ -113,13 +113,13 @@ function(css, dojo, create, declare, listen, aspect, has, TouchScroll){
 			if(domNode.tagName == "table"){
 				// TODO: read columns from table
 			}
-			domNode.className += "	ui-widget-content d-list";
+			domNode.className += "	ui-widget-content dgrid";
 			this.refresh();
 		},
 		refresh: function(){
 			var domNode = this.domNode;
-			var headerNode = this.headerNode = create(domNode, ".d-list-header.d-list-header-row");
-			var bodyNode = this.bodyNode = create(domNode, ".d-list-scroller");
+			var headerNode = this.headerNode = create(domNode, ".dgrid-header.dgrid-header-row");
+			var bodyNode = this.bodyNode = create(domNode, ".dgrid-scroller");
 			listen(bodyNode, "scroll", function(event){
 				// keep the header aligned with the body
 				headerNode.scrollLeft = bodyNode.scrollLeft;
@@ -165,7 +165,7 @@ function(css, dojo, create, declare, listen, aspect, has, TouchScroll){
 				}
 				this.observers = [];
 			}else{
-				this.contentNode = create(this.bodyNode, ".d-list-content");
+				this.contentNode = create(this.bodyNode, ".dgrid-content");
 			}
 			if(this.init){
 				this.init({
@@ -228,7 +228,7 @@ function(css, dojo, create, declare, listen, aspect, has, TouchScroll){
 			// summary:
 			//		Renders a single row in the grid
 			var row = this.renderRow(object, options);
-			row.className = (row.className || "") + " ui-state-default d-list-row " + (i% 2 == 1 ? "d-list-row-odd" : "d-list-row-even");
+			row.className = (row.className || "") + " ui-state-default dgrid-row " + (i% 2 == 1 ? "dgrid-row-odd" : "dgrid-row-even");
 			// get the row id for easy retrieval
 			this._rowIdToObject[row.id = this.id + "-row-" + ((this.store && this.store.getIdentity) ? this.store.getIdentity(object) : this._autoId++)] = object;
 			(beforeNode ? beforeNode.parentNode : this.contentNode).insertBefore(row, beforeNode || null);

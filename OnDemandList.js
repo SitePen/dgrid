@@ -148,7 +148,7 @@ return declare([List], {
 					preloadNode.style.height = Math.min(preloadNode.count * this.rowHeight, this.maxEmptySpace);
 				}
 				// create a loading node as a placeholder while the data is loaded 
-				var loadingNode = create("tr.d-list-loading[style=height:" + count * this.rowHeight + "px]");
+				var loadingNode = create("tr.dgrid-loading[style=height:" + count * this.rowHeight + "px]");
 				this.contentNode.insertBefore(loadingNode, preloadNode);
 				// use the query associated with the preload node to get the next "page"
 				options.query = preloadNode.query;

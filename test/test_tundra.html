@@ -21,14 +21,14 @@
 				margin: 10px;
 			}
 			/* this is not part of theme, but you can add odd-even coloring this way*/
-			.d-list-row-odd {
+			.dgrid-row-odd {
 				background: #F2F5F9;
 			}
 		</style>
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["d-list/List", "d-list/OnDemandGrid","d-list/Tree","d-list/Selection", "d-list/Keyboard", "d-list/test/test_data", "dojo/domReady!"], 
+			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Tree","dgrid/Selection", "dgrid/Keyboard", "dgrid/test/test_data", "dojo/domReady!"], 
 				function(List, Grid, Tree, Selection, Keyboard, ProgressBar){
 					var columns = [
 						{name: 'Column 1', field: 'col1', editable: true, sortable: true},
