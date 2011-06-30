@@ -66,13 +66,13 @@
 						store: testCountryStore,
 						query: {type: "continent"},
 						selectionMode: "single",
-						columns: [
-							new Tree({name:'Name', field:'name'}),
-							new Editor({name: 'A CheckBox', field: 'bool'}, "checkbox"),
-							{name:'Type', field:'type'},
-							{name:'Population', field:'population'},
-							{name:'Timezone', field:'timezone'}
-						]
+						columns: {
+							name: new Tree({name:'Name'}),
+							bool: new Editor({name: 'A CheckBox'}, "checkbox"),
+							type: 'Type',
+							population: 'Population',
+							timezone: 'Timezone'
+						}
 					}, "tree");
 					window.list = dojo.declare([List, Selection, Keyboard])({
 					}, "list");
