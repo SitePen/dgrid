@@ -39,7 +39,11 @@ function(create){
 					row: row,
 					column: {description:"The column definition object"},
 					element:{description:"The DOM element for this cell"}
-				}))
+				})),
+				domNode: Object("This is the top level element for the list widget"),
+				headerNode: Object("This is the element that contains the header"),
+				bodyNode: Object("This is the outer scrollbox element that contains the data"),
+				contentNode: Object("This is the element that contains the data inside the scrollbox")
 			};
 	return Constructor("The List module provides rendering of sets of data as rows, with scrolling capability.", {
 			options: Object("Options to be mixed into the list", list),
