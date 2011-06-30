@@ -7,7 +7,7 @@ install with <a href="https://github.com/kriszyp/cpm">CPM</a>:
 cpm install dgrid
 </pre>
 Or download it along with it's dependencies, which are <a href="https://github.com/kriszyp/xstyle">xstyle</a>
-and <a href="http://dojotoolkit.org">dojo</a>. 
+and <a href="http://dojotoolkit.org">dojo</a> (make sure to download the project to view this link, it is not available from github). 
 
 The components are broken down into the following top level widget modules:
 
