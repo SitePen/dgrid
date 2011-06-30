@@ -13,6 +13,12 @@ function(create, List){
 			cell: Object("This is the DOM element for the cell to render into"),
 			options: Object("Additional options for the rendering")
 		}),
+		get: Method("This function can provide custom retrieval of a value from the object. This useful for columns that may be an aggregate or computed value from the object for the row", {
+			object: Object("The object for the row")
+		}, Union("", "The value to be rendered")),
+		formatter: Method("This function can provide custom stringification of the value for the cell in HTML form. Normally values are HTML escaped to avoid security exploits from data that injects malicious HTML/code. However, the formatter output is not HTML escaped, allowing for custom HTML tags in a cell.", {
+			value: Object("The value to be rendered")
+		}, String("The HTML string to be displayed in the column (will be set to the innerHTML of the cell)")),
 		renderHeaderCell: Method("This function can be provided to provide custom rendering of the header cell  in this column",{
 			cell: Object("This is the DOM element for the header to render into")
 		})
