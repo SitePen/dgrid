@@ -72,12 +72,14 @@ return dojo.declare([_Base], {
 	},
 	
 	_onDropInternal: function(nodes, copy){
-		console.log("drop internal: ", nodes, copy);
+		console.log("Row drop internal: ", nodes, copy);
 		var store = this.store;
+		var idoffset = (this.id + "_dnditem_row_").length;
+		
 		dojo.when(store.get(this._target), function(target){
 			for(var i = 0; i < nodes.length; i++){
 				var node = nodes[i];
-				var id = node.id.substring(22);
+				var id = node.id.substring(idoffset);
 				dojo.when(store.get(id), function(object){
 					store.put(object, {
 						before: target
