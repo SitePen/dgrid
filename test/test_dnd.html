@@ -26,19 +26,16 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require({"packages":[
-				{"name":"gridx","location":"../grid-2.0/gridx"}
-				]});
 			require(["dojo", "dgrid/List", "dgrid/OnDemandGrid","dgrid/Tree","dgrid/Selection", "dgrid/gridx/modules/ColumnResizer", "dgrid/gridx/modules/dnd/Row", "dgrid/Keyboard", "dgrid/test/test_data"], 
 				function(dojo, List, Grid, Tree, Selection, ColumnResizer, DndRow, Keyboard, ProgressBar){
 					dojo.addOnLoad(function(){
-						dragndrop = new (dojo.declare([Grid, Selection, DndRow, Keyboard]))({
+						thegrid = new (dojo.declare([Grid, Selection, DndRow, Keyboard]))({
 							store: testOrderedStore,
 							columns: [
 								{name:'Name', field:'name'},
 								{name:'Description', field:'description'}
 							]
-						}, "dragndrop");
+						}, "grid");
 					});
 				});
 				
@@ -46,6 +43,6 @@
 	</head>
 	<body class="claro">
 		<h2>Drag n' drop</h2>
-		<div id="dragndrop"></div>
+		<div id="grid"></div>
 	</body>
 </html>

@@ -315,7 +315,7 @@ dojo.declare('dojox.grid.gridx.modules.dnd.Cell', _Base, {
 	},
 
 	_onDropInternal: function(nodes, copy){
-		console.log("drop internal", nodes, copy);
+		console.log("Cell drop internal", nodes, copy);
 		if(this._target){
 			var mover = this.grid.move.cell;
 			var oldValue = mover.copy;
