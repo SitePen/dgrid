@@ -113,12 +113,12 @@ function(css, dojo, create, declare, listen, aspect, has, TouchScroll){
 			if(domNode.tagName == "table"){
 				// TODO: read columns from table
 			}
-			domNode.className += "	ui-widget-content dgrid";
+			domNode.className += " ui-widget dgrid";
 			this.refresh();
 		},
 		refresh: function(){
 			var domNode = this.domNode;
-			var headerNode = this.headerNode = create(domNode, ".dgrid-header.dgrid-header-row");
+			var headerNode = this.headerNode = create(domNode, ".dgrid-header.dgrid-header-row.ui-widget-header");
 			var bodyNode = this.bodyNode = create(domNode, ".dgrid-scroller");
 			listen(bodyNode, "scroll", function(event){
 				// keep the header aligned with the body
@@ -165,7 +165,7 @@ function(css, dojo, create, declare, listen, aspect, has, TouchScroll){
 				}
 				this.observers = [];
 			}else{
-				this.contentNode = create(this.bodyNode, ".dgrid-content");
+				this.contentNode = create(this.bodyNode, ".dgrid-content.ui-widget-content");
 			}
 			if(this.init){
 				this.init({
@@ -285,7 +285,7 @@ function(css, dojo, create, declare, listen, aspect, has, TouchScroll){
 			this.refreshContent();
 			if(this.lastCollection){
 				this.lastCollection.sort(function(a,b){
-					return a[property] > b[property] == !descending ? -1 : 1;
+					return a[property] > b[property] == !descending ? 1 : -1;
 				})
 				this.renderArray(this.lastCollection);
 			}
