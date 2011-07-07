@@ -201,11 +201,11 @@ define(["dojo/has", "xstyle/create", "dojo/_base/declare", "dojo/on", "./Editor"
 				}else if(column.name || column.field){
 					th.appendChild(document.createTextNode(column.name || column.field));
 				}
-				if(column.sortable){
+				if(column.sortable !== false){
 					th.sortable = true;
 				}
 			});
-			row.className = "dgrid-row ui-widget-header";
+			row.className = "dgrid-row";
 			headerNode.appendChild(row);
 			var lastSortedArrow;
 			// if it columns are sortable, resort on clicks
