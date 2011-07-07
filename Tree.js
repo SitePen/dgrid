@@ -26,7 +26,7 @@ return function(column){
 		if(!grid._hasTreeListener){
 			// just setup the event listener once and use event delegation for better memory use
 			grid._hasTreeListener = true;
-			this.grid.on(column.expandOn || ".dgrid-content .column-" + column.id + ":click", function(event){
+			this.grid.on(column.expandOn || ".dgrid-expando-icon:click,.dgrid-content .column-" + column.id + ":dblclick", function(event){
 				var target = this.className.indexOf("dgrid-expando-icon") > -1 ? this :
 					querySelector(".dgrid-expando-icon", this)[0];
 				if(target.mayHaveChildren){
