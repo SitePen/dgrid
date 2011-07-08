@@ -6,12 +6,14 @@
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#ffe8e8e8');
 	background: #e8e8e8 -webkit-gradient(linear, left top, left bottom, from(#fff), to(#e8e8e8));
 	background: #e8e8e8 -moz-linear-gradient(top,  #fff,  #e8e8e8);
+	background: #e8e8e8 -o-linear-gradient(top,  #fff,  #e8e8e8);
 	font-weight: bold; 
 }
 .ui-widget-header th:hover {
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#ffeeeeee');
 	background: #d2e0eb -webkit-gradient(linear, left top, left bottom, from(#fff), to(#eee));
 	background: #d2e0eb -moz-linear-gradient(top,  #fff,  #eee);
+	background: #d2e0eb -o-linear-gradient(top,  #fff,  #eee);
 }
 
 .ui-state-active {
