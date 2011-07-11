@@ -106,7 +106,8 @@ table.dgrid-row, .dgrid-column-set table{
 }
 
 .dgrid-cell-focus {
-	border-color: #bbb;
+	border-color: #aaa;
+	outline: 1px dotted;
 }
 
 /* selection*/

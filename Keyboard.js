@@ -13,7 +13,9 @@ return declare([List], {
 		var grid = this;
 		var cellFocusedElement;
 		function focusOnCell(element, event){
-			event.bubbles = true;
+			if(!event.bubbles){
+				event.bubbles = true;
+			}			
 			if(cellFocusedElement){
 				cellFocusedElement.className = cellFocusedElement.className.replace(/\s*dgrid-cell-focus/, '');
 				event.cell = cellFocusedElement;

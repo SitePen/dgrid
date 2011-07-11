@@ -83,6 +83,19 @@ return declare([List], {
 		if(!row.element){
 			row = this.row(row);
 		}
+		var selection = this.selection;
+		var previousValue = selection[row.id];
+		if(value != previousValue &&
+			(!row.element || listen.emit(row.element, value ? "select" : "deselect", {
+			cancelable: true,
+			bubbles: true,
+			row: row
+		}))){
+			selection.set(row.id, value);
+			if(!value){
+				delete this.selection[row.id];
+			}
+		}
 		if(toRow){
 			if(!toRow.element){
 				toRow = this.row(toRow);
@@ -101,20 +114,6 @@ return declare([List], {
 				if(nextNode == toElement){
 					break;
 				}
-			}
-			return;
-		}
-		var selection = this.selection;
-		var previousValue = selection[row.id];
-		if(value != previousValue &&
-			(!row.element || listen.emit(row.element, value ? "select" : "deselect", {
-			cancelable: true,
-			bubbles: true,
-			row: row
-		}))){
-			selection.set(row.id, value);
-			if(!value){
-				delete this.selection[row.id];
 			}
 		}
 	},
