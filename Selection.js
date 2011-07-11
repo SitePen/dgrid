@@ -96,7 +96,7 @@ return declare([List], {
 			var nextNode;
 			while(nextNode = row.element[traverser]){
 				// loop through and set everything
-				row = grid.row(nextNode);
+				row = this.row(nextNode);
 				this.select(row);
 				if(nextNode == toElement){
 					break;
@@ -114,7 +114,7 @@ return declare([List], {
 		}))){
 			selection.set(row.id, value);
 			if(!value){
-				delete grid.selection[row.id];
+				delete this.selection[row.id];
 			}
 		}
 	},

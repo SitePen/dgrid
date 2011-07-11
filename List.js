@@ -121,7 +121,7 @@ function(css, dojo, create, declare, listen, aspect, has, TouchScroll){
 					var target = event.target;
 					if(!target.type && !hasTabIndex(target)){
 						// IE changes focus when it is not supposed to
-						grid.domNode.focus();
+						domNode.focus();
 					}
 				});
 			}
