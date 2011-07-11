@@ -29,16 +29,16 @@
 			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Tree","dgrid/Selection", "dgrid/Keyboard", "dgrid/Editor", "dijit/form/DateTextBox", "dijit/form/HorizontalSlider", "dijit/form/NumberSpinner", "dgrid/test/test_data", "dojo/domReady!"], 
 				function(List, Grid, Tree, Selection, Keyboard, Editor, DateTextBox, Slider, NumberSpinner){
 					var columns = [
-						Editor({name: 'A Date', field: 'date', sortable: true}, DateTextBox),
-						Editor({name: 'Real Number', field: 'floatNum', sortable: true}, Slider),
-						Editor({name: 'Integer', field: 'integer', sortable: true}, NumberSpinner),
-						Editor({name: 'Text editable if checkbox checked', field: 'text', sortable: true, canEdit: function(object){
+						Editor({name: 'A Date', field: 'date'}, DateTextBox),
+						Editor({name: 'Real Number', field: 'floatNum'}, Slider),
+						Editor({name: 'Integer', field: 'integer'}, NumberSpinner),
+						Editor({name: 'Text editable if checkbox checked', field: 'text', canEdit: function(object){
 							return object.bool;
 						}}, "text", "dblclick"),
-						{name: 'Non editable text', field: 'text'},
-						Editor({name: 'Another Date', field: 'date2', sortable: true}, DateTextBox, "focus"),
-						Editor({name: 'CheckBox', field: 'bool', sortable: true}, "checkbox"),
-						Editor({name: 'Radio', sortable: true, selector: true}, "radio")
+						{name: 'Non editable text', field: 'text', sortable: false},
+						Editor({name: 'Another Date', field: 'date2'}, DateTextBox, "focus"),
+						Editor({name: 'CheckBox', field: 'bool'}, "checkbox"),
+						Editor({name: 'Radio', selector: true}, "radio")
 					];
 					grid = new (dojo.declare([Grid, Selection, Keyboard]))({
 						store: testTypesStore,

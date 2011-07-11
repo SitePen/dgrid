@@ -52,11 +52,11 @@
 				function(on, List, Grid, Tree, Editor, TextBox, Selection, Keyboard, testStore){
 					console.log("loaded in " + (new Date().getTime() - start) + testStore);
 					var columns = { // you can declare columns as an object hash (key translates to field)
-						col1: TextBox({name: 'Column 1', sortable: true}),
-						col2: 'Column 2',
-						col3: TextBox({name: 'Column 3', sortable: true}),
-						col4: {name: 'Column 4', sortable: true},
-						"last-col": TextBox({name: 'Column 5', field: 'col5', sortable: true})
+						col1: TextBox({name: 'Column 1'}),
+						col2: {name: 'Column 2', sortable: false},
+						col3: TextBox({name: 'Column 3'}),
+						col4: 'Column 4',
+						"last-col": TextBox({name: 'Column 5', field: 'col5'})
 					};
 					window.grid = dojo.declare([Grid, Selection, Keyboard])({
 						store: testStore,
@@ -67,9 +67,9 @@
 						query: {type: "continent"},
 						selectionMode: "single",
 						columns: {
-							name: new Tree({name:'Name'}),
-							bool: new Editor({name: 'A CheckBox'}, "checkbox"),
-							type: 'Type',
+							name: new Tree({name:'Name', sortable: false}),
+							bool: new Editor({name: 'A CheckBox', sortable: false}, "checkbox"),
+							type: {name: 'Type', sortable: false},
 							population: 'Population',
 							timezone: 'Timezone'
 						}

@@ -24,9 +24,9 @@
 				{order: 9, name:"eat", description:"Eat and enjoy!"}
 			];
 			var columns = {
-				order: {sortable: true},
-				name: {sortable: false},
-				description: "what to do"
+				order: "step", // give column a custom name
+				name: {},
+				description: {name: "what to do", sortable: false}
 			};
 			require(["dgrid/Grid", "dojo/domReady!"], 
 				function(Grid){

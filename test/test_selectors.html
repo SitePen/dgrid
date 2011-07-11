@@ -27,9 +27,9 @@
 			require(["dgrid/OnDemandGrid", "dgrid/Editor","dgrid/Selection", "dgrid/Keyboard", "dgrid/test/test_data", "dojo/domReady!"], 
 				function(Grid, Editor, Selection, Keyboard, testStore){
 					var columns = { // you can declare columns as an object hash (key translates to field)
-						col1: Editor({selector: true}, "checkbox"),
-						col2: 'Column 2',
-						col3: {name: 'Column 3', editable: true, sortable: true}
+						col1: Editor({selector: true, sortable: false}, "checkbox"),
+						col2: {name: 'Column 2', sortable: false},
+						col3: {name: 'Column 3', editable: true}
 					};
 					window.grid = dojo.declare([Grid, Selection, Keyboard])({
 						store: testStore,
@@ -37,9 +37,9 @@
 						columns: columns
 					}, "grid");
 					var columnsRadio = { // you can declare columns as an object hash (key translates to field)
-						col1: Editor({name: 'Radio', selector: true}, "radio"),
-						col2: 'Column 2',
-						col3: {name: 'Column 3', editable: true, sortable: true}
+						col1: Editor({name: 'Radio', selector: true, sortable: false}, "radio"),
+						col2: {name: 'Column 2', sortable: false},
+						col3: {name: 'Column 3', editable: true}
 					};
 					window.gridRadio = dojo.declare([Grid, Selection, Keyboard])({
 						store: testStore,

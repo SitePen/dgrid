@@ -29,6 +29,8 @@
 			require(["dojo", "dgrid/List", "dgrid/OnDemandGrid","dgrid/Tree","dgrid/Selection", "dgrid/gridx/modules/ColumnResizer", "dgrid/gridx/modules/dnd/Row", "dgrid/Keyboard", "dgrid/test/test_data"], 
 				function(dojo, List, Grid, Tree, Selection, ColumnResizer, DndRow, Keyboard, ProgressBar){
 					dojo.addOnLoad(function(){
+						// Note: testOrderedStore hard-wires sorting anyway,
+						// so leaving sort disabled on columns in this grid.
 						thegrid = new (dojo.declare([Grid, Selection, DndRow, Keyboard]))({
 							store: testOrderedStore,
 							columns: [

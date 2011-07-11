@@ -24,10 +24,10 @@
 			require(["dgrid/OnDemandGrid", "dgrid/Editor","dgrid/Selection", "dgrid/Keyboard", "dgrid/test/test_data", "dojo/domReady!"], 
 				function(Grid, Editor, Selection, Keyboard, testStore){
 					var columns = {
-						col1: {name: 'Column 1', sortable: true},
-						col2: 'Column 2',
-						col3: {name: 'Column 3', sortable: true},
-						col4: {name: 'Editable', editable: true, sortable: true}
+						col1: 'Column 1',
+						col2: {name: 'Column 2', sortable: false},
+						col3: 'Column 3',
+						col4: {name: 'Editable', editable: true}
 					};
 					gridRowNavigation = dojo.declare([Grid, Selection, Keyboard])({
 						store: testStore,
@@ -35,10 +35,10 @@
 						columns: columns
 					}, "grid-row-navigation");
 					var columns2 = {
-						col1: {name: 'Column 1', sortable: true},
-						col2: 'Column 2',
-						col3: {name: 'Column 3', sortable: true},
-						col4: {name: 'Editable', editable: true, sortable: true}
+						col1: 'Column 1',
+						col2: {name: 'Column 2', sortable: false},
+						col3: 'Column 3',
+						col4: {name: 'Editable', editable: true}
 					};
 					gridCellNavigation = dojo.declare([Grid, Selection, Keyboard])({
 						store: testStore,

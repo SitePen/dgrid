@@ -7,20 +7,24 @@
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ebf1f6', endColorstr='#d2e0eb');
 	background: #d2e0eb -webkit-gradient(linear, left top, left bottom, from(#ebf1f6), to(#d2e0eb));
 	background: #d2e0eb -moz-linear-gradient(top,	#ebf1f6,	#d2e0eb);
+	background: #d2e0eb -o-linear-gradient(top,	#ebf1f6,	#d2e0eb);
 	font-weight: bold; 
 }
 .ui-widget-header th:hover {
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#d2e0eb');
 	background: #d2e0eb -webkit-gradient(linear, left top, left bottom, from(#fff), to(#d2e0eb));
 	background: #d2e0eb -moz-linear-gradient(top,	#fff,	#d2e0eb);
+	background: #d2e0eb -o-linear-gradient(top,	#fff,	#d2e0eb);
 }
 
 .ui-state-default { 
 	-webkit-transition-duration: 0.2s;
 	-moz-transition-duration: 0.2s;
+	-o-transition-duration: 0.2s;
 	transition-duration: 0.2s;
 	-webkit-transition-property: background-color, border-color;
 	-moz-transition-property: background-color, border-color;
+	-o-transition-property: background-color, border-color;
 	transition-property: background-color, border-color;
 	background: url("images/row_back.png") #fff repeat-x;
 }
