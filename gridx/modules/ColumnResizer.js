@@ -45,7 +45,7 @@ return declare([], {
 			if(!grid._readyToResize){return;}
 			dojo.setSelectable(grid.domNode, false);
 			grid._resizing = true;
-			grid._startX = e.pageX;
+			grid._startX = e.clientX;
 			grid._gridX = dojo.position(grid.bodyNode).x;
 			
 			// show resizer inlined
@@ -71,7 +71,7 @@ return declare([], {
 			dojo.removeClass(dojo.body(), 'dojoxGridxColumnResizing');
 			dojo.setSelectable(grid.domNode, true);
 			
-			var cell = grid._targetCell, delta = e.pageX - grid._startX;
+			var cell = grid._targetCell, delta = e.clientX - grid._startX;
 			var w = cell.offsetWidth + delta;
 			if(w < grid.minWidth){w = grid.minWidth;}
 			grid.setColumnWidth(cell.columnId, w);
@@ -80,9 +80,9 @@ return declare([], {
 	},
 	
 	_updateResizerPosition: function(e){
-		var delta = e.pageX - this._startX, cell = this._targetCell;
-		var left = e.pageX - this._gridX;
-
+		var delta = e.clientX - this._startX, cell = this._targetCell;
+		var left = e.clientX - this._gridX;
+		
 		if(cell.offsetWidth + delta < this.minWidth){
 			left = this._startX - this._gridX - (cell.offsetWidth - this.minWidth); 
 		}
