@@ -66,6 +66,19 @@ table.dgrid-row, .dgrid-column-set table{
 	width: 100%;
 }
 
+.ui-icon {
+	width: 16px;
+	height: 16px;
+	background-image: url('images/ui-icons_222222_256x240.png');
+}
+
+.ui-icon-triangle-1-e {
+	background-position: -32px -16px;
+}
+.ui-icon-triangle-1-se {
+	background-position: -48px -16px;
+}
+
 .dgrid-icon{
 	width: 16px;
 	height: 16px;
@@ -84,8 +97,9 @@ table.dgrid-row, .dgrid-column-set table{
 	background-position: -64px -16px;
 	display: block;
 	float: right;
-	margin: 2px 4px 0 5px;
+	margin: 0 4px 0 5px;
 	padding-left: 0;
+	height: 12px;
 }
 .dgrid-sort-up .dgrid-arrow-button-node {
 	background-position: 0px -16px;
@@ -103,16 +117,4 @@ table.dgrid-row, .dgrid-column-set table{
 
 .dgrid-input {
 	width: 99%;
-}
-.ui-icon {
-	width: 16px;
-	height: 16px;
-	background-image: url('images/ui-icons_222222_256x240.png');
-}
-
-.ui-icon-triangle-1-e {
-	background-position: -32px -16px;
-}
-.ui-icon-triangle-1-se {
-	background-position: -48px -16px;
 }
