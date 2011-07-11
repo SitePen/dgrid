@@ -24,7 +24,7 @@ table.dgrid-row, .dgrid-column-set table{
 	border-collapse: collapse;
 	border: none;
 	table-layout: fixed;
-	width: 100%; /* this programmatically becomes 'auto' for IE7 (non-quirks) */ 
+	width: 100%; /* this programmatically becomes 'auto' for IE7 (non-quirks) */
 }
 .dgrid-cell {
 	padding: 0px;
@@ -32,9 +32,9 @@ table.dgrid-row, .dgrid-column-set table{
 	overflow: hidden;
 	border-right: 1px solid #ddd;
 	border-bottom: 1px solid #ddd;
-	box-sizing: border-box;	
-	-moz-box-sizing: border-box;	
-	-ms-box-sizing: border-box;	
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-ms-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 }
 .dgrid-cell-padding {
@@ -42,7 +42,7 @@ table.dgrid-row, .dgrid-column-set table{
 }
 
 .dgrid-right-corner {
-	width:17px;
+	width: 17px;
 }
 .dgrid-header-row {
 	border-bottom: 1px solid #ccc;
@@ -56,8 +56,6 @@ table.dgrid-row, .dgrid-column-set table{
 	position: relative;
 }
 .dgrid-expando-icon {
-	width: 16px;
-	height: 16px;
 }
 .dgrid-scroller{
 	overflow-x: auto;
@@ -75,20 +73,19 @@ table.dgrid-row, .dgrid-column-set table{
 
 /* Single Sort */
 .dgrid-sort-node {
-	text-decoration:none;
-	display:block;
+	text-decoration: none;
+	display: block;
 }
 .dgrid-arrow-button-char {
-	display:none;
-	float:right;
+	display: none;
+	float: right;
 }
 .dgrid-arrow-button-node {
 	background-position: -64px -16px;
-	display:block;
-	float:right;
-	margin:2px 4px 0 5px;
-	padding-left:0;
-	width:7px;
+	display: block;
+	float: right;
+	margin: 2px 4px 0 5px;
+	padding-left: 0;
 }
 .dgrid-sort-up .dgrid-arrow-button-node {
 	background-position: 0px -16px;
@@ -102,15 +99,15 @@ table.dgrid-row, .dgrid-column-set table{
 .dgrid-input {
 	width: 99%;
 }
-.ui-icon { 
-	width: 16px; 
-	height: 16px; 
-	background-image: url('images/ui-icons_222222_256x240.png'); 
+.ui-icon {
+	width: 16px;
+	height: 16px;
+	background-image: url('images/ui-icons_222222_256x240.png');
 }
 
-.ui-icon-triangle-1-e { 
-	background-position: -32px -16px; 
+.ui-icon-triangle-1-e {
+	background-position: -32px -16px;
 }
-.ui-icon-triangle-1-se { 
-	background-position: -48px -16px; 
+.ui-icon-triangle-1-se {
+	background-position: -48px -16px;
 }
