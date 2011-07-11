@@ -80,7 +80,6 @@ define(["dojo/has", "xstyle/create", "dojo/_base/declare", "dojo/on", "./Editor"
 			var tr, row = create("table");
 			var contentBoxSizing;
 			var cellNavigation = this.cellNavigation;
-			var tabIndex = this.tabIndex;
 			if(has("ie") < 8 || has("quirks")){
 				if(!has("quirks")){
 					contentBoxSizing = true;
@@ -112,7 +111,7 @@ define(["dojo/has", "xstyle/create", "dojo/_base/declare", "dojo/on", "./Editor"
 					var cell = create(tag + ".dgrid-cell.dgrid-cell-padding.column-" + i + (extraClassName ? '.' + extraClassName : ''));
 					cell.columnId = i;
 					if(cellNavigation && !column.editor || column.editOn){
-						cell.tabIndex = tabIndex;
+//						cell.tabIndex = tabIndex;
 					}				
 					if(contentBoxSizing){
 						// The browser (IE7-) does not support box-sizing: border-box, so we emulate it with a padding div
@@ -134,9 +133,6 @@ define(["dojo/has", "xstyle/create", "dojo/_base/declare", "dojo/on", "./Editor"
 					tr.appendChild(cell);
 				}
 			}
-			if(!cellNavigation){
-				row.tabIndex = tabIndex;
-			}			
 			return row;
 		},
 		left: function(cell, steps){
@@ -178,10 +174,6 @@ define(["dojo/has", "xstyle/create", "dojo/_base/declare", "dojo/on", "./Editor"
 			//		Setup the headers for the grid
 			var grid = this;
 			var columns = this.columns;
-			if(!this.checkedTrs){
-				this.checkedTrs = true;
-				createColumnsFromDom(this.domNode, columns);
-			}
 			if(!scrollbarWidth){ // we haven't computed the scroll bar width yet, do so now, and add a new rule if need be
 				scrollbarWidth = grid.bodyNode.offsetWidth - grid.bodyNode.clientWidth;
 				if(scrollbarWidth != 17){
@@ -233,7 +225,7 @@ define(["dojo/has", "xstyle/create", "dojo/_base/declare", "dojo/on", "./Editor"
 			
 			// TODO: Should we first delete the old stylesheet (so it doesn't override the new one)?
 			// now create a stylesheet to style the column
-			this.css.addRule("#" + this.domNode.id + ' th.column-' + colId + ', #' + this.domNode.id + ' td.column-' + colId, css);
+			this.css.addRule("#" + this.domNode.id + ' .column-' + colId, css);
 		}
 	});
 	function getSubrows(grid){
@@ -242,30 +234,5 @@ define(["dojo/has", "xstyle/create", "dojo/_base/declare", "dojo/on", "./Editor"
 			return [columns];
 		}
 		return columns;
-	}
-	function createColumnsFromDom(domNode, columns){
-		// summary:
-		//		generate columns from DOM. Should this be in here, or a separate module?
-		var trs = domNode.getElementsByTagName("tr");
-		for(var i = 0; i < trs.length; i++){
-			var rowColumns = [];
-			columns.push(rowColumns);
-			var tr = trs[i];
-			var ths = tr.getElementsByTagName("th");
-			for(var j = 0; j < ths.length; j++){
-				var th = ths[j];
-				rowColumns.push({
-					name: th.innerHTML,
-					field: th.getAttribute("field") || th.className || th.innerHTML,
-					className: th.className,
-					editable: th.getAttribute("editable"),
-					sortable: th.getAttribute("sortable")
-				});
-			}
-		}
-		if(tr){
-			domNode.removeChild(tr.parentNode);
-		}
-		
 	}
 });
