@@ -29,9 +29,9 @@ return declare([List], {
 			// listen for actions that should cause selections
 			listen(this.contentNode, "mousedown,cellfocusin", function(event){
 				if(event.type == "mousedown" || !event.ctrlKey || event.keyCode == 32){
-					if(event.keyCode == 32){
-						event.preventDefault();
-					}
+//					if(event.type == "mousedown"){
+	//					event.preventDefault();
+		//			}
 /*					var focusElement = event.target;
 					while(focusElement.getAttribute && !focusElement.getAttribute("tabIndex")){
 						focusElement = focusElement.parentNode;

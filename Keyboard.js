@@ -31,11 +31,11 @@ return declare([List], {
 		});
 		this.on("keydown", function(event){
 			var focusedElement = event.target;
-			if(focusedElement.type && !delegatingInputTypes[focusedElement.type]){
+			var keyCode = event.keyCode;
+			if(focusedElement.type && (!delegatingInputTypes[focusedElement.type] || keyCode == 32)){
 				// text boxes and other inputs that can use direction keys should be ignored and not affect cell/row navigation
 				return;
 			}
-			var keyCode = event.keyCode;
 			var move = {
 				32: 0, // space bar
 				33: -grid.pageSkip, // page up
