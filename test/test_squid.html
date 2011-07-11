@@ -25,11 +25,11 @@
 			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Tree","dgrid/Selection", "dgrid/Keyboard", "dgrid/test/test_data", "dojo/domReady!"], 
 				function(List, Grid, Tree, Selection, Keyboard, ProgressBar){
 					var columns = [
-						{name: 'Column 1', field: 'col1', editable: true},
+						{name: 'Column 1', field: 'col1'},
 						{name: 'Column 2', field: 'col2', sortable: false},
-						{name: 'Column 3', field: 'col3', editable: true},
-						{name: 'Column 4', field: 'col4', editable: true},
-						{name: 'Column 5', field: 'col5', editable: true}
+						{name: 'Column 3', field: 'col3'},
+						{name: 'Column 4', field: 'col4'},
+						{name: 'Column 5', field: 'col5'}
 					];
 					grid = new (dojo.declare([Grid, Selection, Keyboard]))({
 						store: testStore,
