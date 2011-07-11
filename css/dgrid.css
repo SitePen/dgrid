@@ -91,6 +91,10 @@ table.dgrid-row, .dgrid-column-set table{
 	background-position: 0px -16px;
 }
 
+.dgrid-cell-focus {
+	border-color: #bbb;
+}
+
 /* selection*/
 .dgrid-selected {
 	background-color: #BFD6EB;

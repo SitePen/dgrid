@@ -1,5 +1,5 @@
 define(["dojo/_base/declare", "dojo/Stateful", "dojo/on", "./List"], function(declare, Stateful, listen, List){
-// patch Stateful until Dojo 1.8
+// patch Stateful until Dojo 1.8 so we can do selection.forEach 
 Stateful.prototype.forEach = function(callback, thisObject){
 	for(var i in this){
 		if(this.hasOwnProperty(i) && typeof this[i] != "function"){
@@ -12,9 +12,6 @@ return declare([List], {
 	// 		Add selection capabilities to a grid. The grid will have a selection property and
 	//		fire "select" and "deselect" events.
 	
-	// cellSelection: Boolean
-	//		Indicates whether selection should take place at the row level or the cell level.
-	cellSelection: false,
 	create: function(){
 		this.selection = new Stateful();
 		return this.inherited(arguments);
@@ -30,46 +27,31 @@ return declare([List], {
 				event.preventDefault();
 			});
 			// listen for actions that should cause selections
-			listen(this.contentNode, "mousedown,keydown", function(event){
-				if(event.type == "mousedown" || event.keyCode == 32){
-					event.preventDefault();
-					var focusElement = event.target;
+			listen(this.contentNode, "mousedown,cellfocusin", function(event){
+				if(event.type == "mousedown" || !event.ctrlKey || event.keyCode == 32){
+					if(event.keyCode == 32){
+						event.preventDefault();
+					}
+/*					var focusElement = event.target;
 					while(focusElement.getAttribute && !focusElement.getAttribute("tabIndex")){
 						focusElement = focusElement.parentNode;
 					}
 					if(focusElement.focus){
 						focusElement.focus();
-					}
-					var cell = grid.cell(event);
-					var thisRow = cell && cell.row;
-					if(thisRow){
-						var targetElement = thisRow.element;
+					}*/
+					var row = grid.row(event);
+					if(row){
 						var selection = grid.selection;
-						var id = thisRow.id;
-						var columnId = cell && cell.column && cell.column.id;
 						if(mode == "single" || (!event.ctrlKey && mode == "extended")){
 							grid.clearSelection();
-							set(grid, targetElement, id, columnId, true);
+							grid.select(row);
 						}else{
-							set(grid, targetElement, id, columnId, !selection[id]);
+							grid.select(row, null, !selection[row.id]);
 						}
 						if(event.shiftKey && mode != "single"){
-							var lastElement = lastRow && lastRow.element;
-							// find if it is earlier or later in the DOM
-							var traverser = (lastElement && (lastElement.compareDocumentPosition ? 
-								lastElement.compareDocumentPosition(targetElement) == 2 :
-								lastElement.sourceIndex > targetElement.sourceIndex)) ? "nextSibling" : "previousSibling";
-							var nextNode;
-							while(nextNode = thisRow.element[traverser]){
-								// loop through and set everything
-								thisRow = grid.row(nextNode);
-								set(grid, thisRow.element, thisRow.id, columnId, true);
-								if(nextNode == lastElement){
-									break;
-								}
-							}
+							grid.select(lastRow, row);
 						}else{
-							lastRow = thisRow;
+							lastRow = row;
 						}
 					}
 				}
@@ -77,6 +59,7 @@ return declare([List], {
 			});
 		}
 		grid.selection.watch(function(id, oldValue, value){
+			grid.select(id, null, value);
 			if(typeof oldValue == "object" || typeof value == "object"){
 				for(var colId in oldValue || value){
 					updateElement(grid.cell(id, colId).element, value[colId]);
@@ -93,11 +76,50 @@ return declare([List], {
 	// selectionMode: String
 	// 		The selection mode to use, can be "multiple", "single", or "extended".
 	selectionMode: "extended",
-	select: function(rowId, colId){
-		set(this, this.row(rowId).element, id, colId, true);
+	select: function(row, toRow, value){
+		if(value === undefined){
+			value = true;
+		} 
+		if(!row.element){
+			row = this.row(row);
+		}
+		if(toRow){
+			if(!toRow.element){
+				toRow = this.row(toRow);
+			}
+			var toElement = toRow.element;
+			var fromElement = row.element;
+			// find if it is earlier or later in the DOM
+			var traverser = (toElement && (toElement.compareDocumentPosition ? 
+				toElement.compareDocumentPosition(fromElement) == 2 :
+				toElement.sourceIndex > fromElement.sourceIndex)) ? "nextSibling" : "previousSibling";
+			var nextNode;
+			while(nextNode = row.element[traverser]){
+				// loop through and set everything
+				row = grid.row(nextNode);
+				this.select(row);
+				if(nextNode == toElement){
+					break;
+				}
+			}
+			return;
+		}
+		var selection = this.selection;
+		var previousValue = selection[row.id];
+		if(value != previousValue &&
+			(!row.element || listen.emit(row.element, value ? "select" : "deselect", {
+			cancelable: true,
+			bubbles: true,
+			row: row
+		}))){
+			selection.set(row.id, value);
+			if(!value){
+				delete grid.selection[row.id];
+			}
+		}
 	},
-	deselect: function(id, colId){
-		set(this, this.row(id).element, id, colId);
+	deselect: function(row, toRow){
+		this.select(row, toRow, false);
 	},
 	clearSelection: function(){
 		this.allSelected = false;
@@ -109,7 +131,7 @@ return declare([List], {
 		this.allSelected = true;
 		for(var i in this._rowIdToObject){
 			var row = this.row(this._rowIdToObject[i]);
-			set(this, row.element, row.id, null, true);
+			set(this, row.element, row.id, colId, true);
 		}
 	},
 	renderArray: function(){
@@ -118,7 +140,7 @@ return declare([List], {
 			var row = this.row(rows[i]);
 			var selected = this.selection[row.id] || this.allSelected;
 			if(selected){
-				set(this, rows[i], row.id, selected, true);
+				this.select(row);
 			}
 		}
 		return rows;
@@ -134,25 +156,6 @@ function updateElement(element, value){
 	}
 }
 function set(grid, target, rowId, colId, value){
-	if(!target || listen.emit(target, value ? "select" : "deselect", {
-		cancelable: true,
-		bubbles: true,
-		id: rowId,
-		colId: this.cellSelection && colId
-	})){
-		var selection = grid.selection;
-		var row = selection[rowId];
-		if(grid.cellSelection && colId){
-			row = row || {};
-			row[colId] = value;
-		}else{
-			row = value;
-		}
-		grid.selection.set(rowId, row);
-		if(!row){
-			delete grid.selection[rowId];
-		}
-	}
 }
 
 });

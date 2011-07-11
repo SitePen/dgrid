@@ -11,14 +11,31 @@ return declare([List], {
 	postCreate: function(){
 		this.inherited(arguments);
 		var grid = this;
+		var cellFocusedElement;
+		function focusOnCell(element, event){
+			event.bubbles = true;
+			if(cellFocusedElement){
+				cellFocusedElement.className = cellFocusedElement.className.replace(/\s*dgrid-cell-focus/, '');
+				event.cell = cellFocusedElement;
+				listen.emit(element, "cellfocusout", event);
+			}
+			cellFocusedElement = element;
+			element.className += " dgrid-cell-focus";
+			event.cell = element;
+			listen.emit(element, "cellfocusin", event);
+		}
+		this.on("mousedown", function(event){
+			focusOnCell(event.target, event);
+		});
 		this.on("keydown", function(event){
-			var nextFocus = event.target;
-			if(nextFocus.type && !delegatingInputTypes[nextFocus.type]){
+			var focusedElement = event.target;
+			if(focusedElement.type && !delegatingInputTypes[focusedElement.type]){
 				// text boxes and other inputs that can use direction keys should be ignored and not affect cell/row navigation
 				return;
 			}
 			var keyCode = event.keyCode;
 			var move = {
+				32: 0, // space bar
 				33: -grid.pageSkip, // page up
 				34: grid.pageSkip,// page down
 				37: -1, // left
@@ -28,10 +45,10 @@ return declare([List], {
 				35: 10000, //end
 				36: -10000 // home
 			}[keyCode];
-			if(!move){
+			if(isNaN(move)){
 				return;
 			}
-			var nextSibling, columnId, cell = grid.cell(nextFocus);
+			var nextSibling, columnId, cell = grid.cell(cellFocusedElement);
 			var orientation;
 			if(keyCode == 37 || keyCode == 39){
 				// horizontal movement (left and right keys)
@@ -40,9 +57,9 @@ return declare([List], {
 				// other keys are vertical
 				orientation = 'down'
 				columnId = cell && cell.column && cell.column.id;
-				cell = grid.row(nextFocus);				
+				cell = grid.row(cellFocusedElement);				
 			}
-			var nextFocus = grid[orientation](cell, move).element;
+			var nextFocus = move ? grid[orientation](cell, move).element : cell;
 /*			do{
 				// move in the correct direction
 				if((nextSibling = nextFocus[move < 0 ? 'previousSibling' : 'nextSibling']) && !nextSibling.preload){
@@ -59,19 +76,17 @@ return declare([List], {
 				if(columnId){
 					nextFocus = grid.cell(nextFocus, columnId).element;
 				}
-				var tabIndexNode = nextFocus.getAttributeNode("tabIndex");
-				if(tabIndexNode && tabIndexNode.specified){
-					nextFocus.focus();
-				}else{
-					var inputs = nextFocus.getElementsByTagName("input");
-					for(var i = 0;i < inputs.length; i++){
-						if(inputs[i].tabIndex != -1){
-							inputs[i].focus();
-							break;
-						}
+				var inputs = nextFocus.getElementsByTagName("input");
+				var inputFocused;
+				for(var i = 0;i < inputs.length; i++){
+					if(inputs[i].tabIndex != -1){
+						inputs[i].focus();
+						inputFocused = true;
+						break;
 					}
 				}
 			}
+			focusOnCell(nextFocus, event);
 			event.preventDefault();
 			
 		});

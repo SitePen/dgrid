@@ -2,11 +2,6 @@ define(["xstyle/css!./css/dgrid.css", "dojo/_base/kernel", "xstyle/create", "doj
 function(css, dojo, create, declare, listen, aspect, has, TouchScroll){
 	// allow for custom CSS class definitions 
 	// TODO: figure out what to depend for this
-	if(has("mozilla")){
-		// firefox's focus doesn't work by default for divs prior to actually tabbing into it. This fixes that
-		// (we don't do any other browsers because we are trying to stay as close to native as possible) 
-		css.addRule(".dgrid td:focus, .dgrid div:focus", "outline: 1px dotted");
-	}
 	var byId = function(id){
 		return document.getElementById(id);
 	};
@@ -48,6 +43,10 @@ function(css, dojo, create, declare, listen, aspect, has, TouchScroll){
 			}
 		}while(nextSibling && steps);
 		return element;		
+	}
+	function hasTabIndex(element){
+		var tabIndexNode = element.getAttributeNode("tabIndex");
+		return tabIndexNode && tabIndexNode.specified;
 	}
 	return declare(TouchScroll ? [TouchScroll] : [], { 
 		constructor: function(params, srcNodeRef){
@@ -103,7 +102,9 @@ function(css, dojo, create, declare, listen, aspect, has, TouchScroll){
 			if(!this.id){
 				this.id = domNode.id;
 			}
-			this.tabIndex = Math.max(domNode.tabIndex, 0);
+			if(!hasTabIndex(domNode)){
+				domNode.tabIndex = 0;
+			}
 			domNode.role = "grid";
 			if(params){
 				this.params = params;
@@ -115,6 +116,15 @@ function(css, dojo, create, declare, listen, aspect, has, TouchScroll){
 			}
 			domNode.className += " ui-widget dgrid";
 			this.refresh();
+			if(has("ie")){
+				this.on("activate", function(event){
+					var target = event.target;
+					if(!target.type && !hasTabIndex(target)){
+						// IE changes focus when it is not supposed to
+						grid.domNode.focus();
+					}
+				});
+			}
 		},
 		refresh: function(){
 			var domNode = this.domNode;
@@ -235,9 +245,7 @@ function(css, dojo, create, declare, listen, aspect, has, TouchScroll){
 			return row;
 		},
 		renderRow: function(value, options){
-			var row = create("div", value);
-			row.tabIndex = this.tabIndex;
-			return row;
+			return create("div", value);
 		},
 		row: function(target){
 			// summary:
