@@ -29,7 +29,6 @@
 			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Tree","dgrid/Selection", "dgrid/Keyboard", "dgrid/Editor", "dijit/form/DateTextBox", "dijit/form/HorizontalSlider", "dijit/form/NumberSpinner", "dgrid/test/test_data", "dojo/domReady!"], 
 				function(List, Grid, Tree, Selection, Keyboard, Editor, DateTextBox, Slider, NumberSpinner){
 					var columns = [
-					{field:"id"},
 						Editor({name: 'A Date', field: 'date'}, DateTextBox),
 						Editor({name: 'Real Number', field: 'floatNum'}, Slider),
 						Editor({name: 'Integer', field: 'integer'}, NumberSpinner),
@@ -43,7 +42,8 @@
 					];
 					grid = new (dojo.declare([Grid, Selection, Keyboard]))({
 						store: testTypesStore,
-						columns: columns
+						columns: columns,
+						selectionMode: "single"
 					}, "grid");
 					grid.on(".field-integer:change", function(event){
 						if(event.value > 100){
