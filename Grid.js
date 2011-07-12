@@ -212,6 +212,7 @@ define(["dojo/has", "xstyle/create", "dojo/_base/declare", "dojo/on", "./Editor"
 							lastSortedArrow.parentNode.removeChild(lastSortedArrow);
 						}
 						lastSortedArrow = create(target.firstChild, "-div.dgrid-arrow-button-node.ui-icon[role=presentation]");
+						lastSortedArrow.innerHTML = "&nbsp;";
 						target.className = target.className.replace(/dgrid-sort-\w+/,'');
 						target.className += descending ? " dgrid-sort-down" : " dgrid-sort-up";
 						grid.sort(field, descending);
