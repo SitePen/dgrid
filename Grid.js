@@ -80,10 +80,10 @@ define(["dojo/has", "xstyle/create", "dojo/_base/declare", "dojo/on", "./Editor"
 			var tr, row = create("table");
 			var contentBoxSizing;
 			var cellNavigation = this.cellNavigation;
-			if(has("ie") < 8 || has("quirks")){
-				if(!has("quirks")){
+			if(has("ie") < 9 || has("quirks")){
+				if(has("ie") < 8 && !has("quirks")){
 					contentBoxSizing = true;
-					row.style.width = "auto"; // in IE7 this is needed to instead of 100% to make it not create a horizontal scroll bar
+					row.style.width = "auto"; // in IE7 this is needed instead of 100% to make it not create a horizontal scroll bar
 				}
 				var tbody = create(row, "tbody");
 			}else{
