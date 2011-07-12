@@ -47,16 +47,11 @@ table.dgrid-row, .dgrid-column-set table{
 .dgrid-header-row {
 	border-bottom: 1px solid #ccc;
 }
-.dgrid-footer {
-}
-.dgrid-main {
-	position: relative;
-}
+.dgrid-main,
 .dgrid-content {
 	position: relative;
 }
-.dgrid-expando-icon {
-}
+
 .dgrid-scroller{
 	overflow-x: auto;
 	overflow-y: scroll;
