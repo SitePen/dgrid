@@ -39,26 +39,24 @@ return declare([List], {
 					if(focusElement.focus){
 						focusElement.focus();
 					}*/
-					var row = grid.row(event);
-					if(row){
-						var selection = grid.selection;
-						if(mode == "single" || (!event.ctrlKey && mode == "extended")){
-							grid.clearSelection();
-							grid.select(row);
-						}else{
-							grid.select(row, null, !selection[row.id]);
-						}
-						if(event.shiftKey && mode != "single"){
-							grid.select(lastRow, row);
-						}else{
-							lastRow = row;
-						}
+					var row = event.target;
+					var selection = grid.selection;
+					if(mode == "single" || (!event.ctrlKey && mode == "extended")){
+						grid.clearSelection();
+						grid.select(row);
+					}else{
+						grid.select(row, null, null);
+					}
+					if(event.shiftKey && mode != "single"){
+						grid.select(lastRow, row);
+					}else{
+						lastRow = row;
 					}
 				}
 				
 			});
 		}
-		grid.selection.watch(function(id, oldValue, value){
+	/*	grid.selection.watch(function(id, oldValue, value){
 			grid.select(id, null, value);
 			if(typeof oldValue == "object" || typeof value == "object"){
 				for(var colId in oldValue || value){
@@ -67,7 +65,7 @@ return declare([List], {
 			}else{
 				updateElement(grid.row(id).element, value);
 			}
-		});
+		});*/
 	},
 	// selection:
 	// 		A stateful object (get/set/watch) where the property names correspond to 
@@ -78,6 +76,7 @@ return declare([List], {
 	selectionMode: "extended",
 	select: function(row, toRow, value){
 		if(value === undefined){
+			// default to true
 			value = true;
 		} 
 		if(!row.element){
@@ -85,8 +84,13 @@ return declare([List], {
 		}
 		var selection = this.selection;
 		var previousValue = selection[row.id];
+		if(value === null){
+			// indicates a toggle
+			value = !previousValue;
+		}
+		var element = row.element;
 		if(value != previousValue &&
-			(!row.element || listen.emit(row.element, value ? "select" : "deselect", {
+			(!element || listen.emit(element, value ? "select" : "deselect", {
 			cancelable: true,
 			bubbles: true,
 			row: row
@@ -94,6 +98,13 @@ return declare([List], {
 			selection.set(row.id, value);
 			if(!value){
 				delete this.selection[row.id];
+			}
+			if(element){
+				if(value){
+					element.className += " dgrid-selected ui-state-active";
+				}else{
+					element.className = element.className.replace(/ dgrid-selected ui-state-active/, '');
+				}
 			}
 		}
 		if(toRow){
@@ -130,7 +141,7 @@ return declare([List], {
 		this.allSelected = true;
 		for(var i in this._rowIdToObject){
 			var row = this.row(this._rowIdToObject[i]);
-			set(this, row.element, row.id, colId, true);
+			this.select(row.id);
 		}
 	},
 	renderArray: function(){
@@ -145,16 +156,5 @@ return declare([List], {
 		return rows;
 	}
 });
-function updateElement(element, value){
-	if(element){
-		if(value){
-			element.className += " dgrid-selected ui-state-active";
-		}else{
-			element.className = element.className.replace(/ dgrid-selected ui-state-active/, '');
-		}
-	}
-}
-function set(grid, target, rowId, colId, value){
-}
 
 });
