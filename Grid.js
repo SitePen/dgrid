@@ -195,19 +195,24 @@ define(["dojo/has", "xstyle/create", "dojo/_base/declare", "dojo/on", "./Editor"
 			var lastSortedArrow;
 			// if it columns are sortable, resort on clicks
 			listen(row, "click", function(event){
-				var target = event.target;
+				var
+					target = event.target,
+					field, descending, parentNode;
 				do{
 					if(target.sortable){
-						var field = target.field || target.columnId;
+						field = target.field || target.columnId;
 						// re-sort
-						var descending = grid.sortOrder && grid.sortOrder[0].attribute == field && !grid.sortOrder[0].descending;
+						descending = grid.sortOrder && grid.sortOrder[0].attribute == field && !grid.sortOrder[0].descending;
 						if(lastSortedArrow){
-							lastSortedArrow.parentNode.removeChild(lastSortedArrow);
+							parentNode = lastSortedArrow.parentNode;
+							parentNode.className = parentNode.className.replace(/dgrid-sort-\w+/,'');
+							parentNode.removeChild(lastSortedArrow);
 						}
 						lastSortedArrow = create(target.firstChild, "-div.dgrid-arrow-button-node.ui-icon[role=presentation]");
 						lastSortedArrow.innerHTML = "&nbsp;";
-						target.className = target.className.replace(/dgrid-sort-\w+/,'');
-						target.className += descending ? " dgrid-sort-down" : " dgrid-sort-up";
+						target.className = (target.className +
+							(descending ? " dgrid-sort-down" : " dgrid-sort-up"))
+							.replace("  ", " ");
 						grid.sort(field, descending);
 					}
 				}while((target = target.parentNode) && target != headerNode);
