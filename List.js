@@ -1,5 +1,5 @@
-define(["xstyle/css!./css/dgrid.css", "dojo/_base/kernel", "xstyle/create", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/has", "dojo/has!touch?./TouchScroll", "dojo/_base/sniff"], 
-function(css, dojo, create, declare, listen, aspect, has, TouchScroll){
+define(["xstyle/css!./css/dgrid.css", "dojo/_base/kernel", "xstyle/put", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/has", "dojo/has!touch?./TouchScroll", "dojo/_base/sniff"], 
+function(css, dojo, put, declare, listen, aspect, has, TouchScroll){
 	// allow for custom CSS class definitions 
 	// TODO: figure out what to depend for this
 	if(has("mozilla") || has("opera")){
@@ -138,8 +138,8 @@ function(css, dojo, create, declare, listen, aspect, has, TouchScroll){
 		},
 		refresh: function(){
 			var domNode = this.domNode;
-			var headerNode = this.headerNode = create(domNode, ".dgrid-header.dgrid-header-row.ui-widget-header");
-			var bodyNode = this.bodyNode = create(domNode, ".dgrid-scroller");
+			var headerNode = this.headerNode = put(domNode, "div.dgrid-header.dgrid-header-row.ui-widget-header");
+			var bodyNode = this.bodyNode = put(domNode, "div.dgrid-scroller");
 			listen(bodyNode, "scroll", function(event){
 				// keep the header aligned with the body
 				headerNode.scrollLeft = bodyNode.scrollLeft;
@@ -196,7 +196,7 @@ function(css, dojo, create, declare, listen, aspect, has, TouchScroll){
 				}
 				this.observers = [];
 			}else{
-				this.contentNode = create(this.bodyNode, ".dgrid-content.ui-widget-content");
+				this.contentNode = put(this.bodyNode, "div.dgrid-content.ui-widget-content");
 			}
 			if(this.init){
 				this.init({
@@ -266,7 +266,7 @@ function(css, dojo, create, declare, listen, aspect, has, TouchScroll){
 			return row;
 		},
 		renderRow: function(value, options){
-			return create("div", value);
+			return put("div", value);
 		},
 		row: function(target){
 			// summary:

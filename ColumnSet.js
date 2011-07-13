@@ -1,5 +1,5 @@
-define(["xstyle/css!./css/columnset.css", "dojo/has", "xstyle/create", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/query", "./Grid", "dojo/_base/sniff"], 
-function(css, has, create, declare, listen, aspect, query, Grid){
+define(["xstyle/css!./css/columnset.css", "dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/query", "./Grid", "dojo/_base/sniff"], 
+function(css, has, put, declare, listen, aspect, query, Grid){
 		//	summary:
 		//		This module provides column sets to isolate horizontal scroll of sets of 
 		// 		columns from each other. This mainly serves the purpose of allowing for
@@ -12,16 +12,16 @@ function(css, has, create, declare, listen, aspect, query, Grid){
 	return declare([Grid], {
 		columnSets: [],
 		createRowCells: function(tag, each){
-			var row = create("table");			
+			var row = put("table");			
 			if(has("ie") < 8 && !has("quirks")){
 				row.style.width = "auto"; // in IE7 this is needed to instead of 100% to make it not create a horizontal scroll bar
 			}
-			var tr = create(row, "tbody tr");
+			var tr = put(row, "tbody tr");
 			for(var i = 0, l = this.columnSets.length; i < l; i++){
 				// iterate through the columnSets
 				var columnSet = this.columnSets[i];
-				var cell = create(tr, tag + ".dgrid-column-set-cell.column-set-" + i + " div.dgrid-column-set[colsetid=" + i + "]");
-				/*var td = create(tag + ".dgrid-column-set[colsetid=" + i + "]"*/
+				var cell = put(tr, tag + ".dgrid-column-set-cell.column-set-" + i + " div.dgrid-column-set[colsetid=" + i + "]");
+				/*var td = put(tag + ".dgrid-column-set[colsetid=" + i + "]"*/
 				if(dojo.isIE < 8 && !dojo.isQuirks){
 					cell.style.width = "auto"; // in IE7 this is needed to instead of 100% to make it not create a horizontal scroll bar
 				}
@@ -47,8 +47,8 @@ function(css, has, create, declare, listen, aspect, query, Grid){
 			var scrollLefts = this._columnSetScrollLefts = {}; 
 			for(var i = 0, l = columnSets.length; i < l; i++){
 				(function(columnSet, i){
-					var scroller = scrollers[i] = create(domNode, ".dgrid-column-set-scroller[colsetid=" + i +"]");
-					scrollerContents[i] = create(scroller, ".dgrid-column-set-scroller-content");
+					var scroller = scrollers[i] = put(domNode, "div.dgrid-column-set-scroller[colsetid=" + i +"]");
+					scrollerContents[i] = put(scroller, "div.dgrid-column-set-scroller-content");
 					listen(scroller, "scroll", function(event){
 						var scrollLeft = this.scrollLeft;
 						scrollLefts[i] = scrollLeft;

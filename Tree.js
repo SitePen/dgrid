@@ -1,11 +1,11 @@
-define(["dojo/_base/declare", "xstyle/create", "dojo/_base/Deferred", "dojo/query"], function(declare, create, Deferred, querySelector){// TODO: eliminate the dojo/query dep by supporting simple event delegation in the List module
+define(["dojo/_base/declare", "xstyle/put", "dojo/_base/Deferred", "dojo/query"], function(declare, put, Deferred, querySelector){// TODO: eliminate the dojo/query dep by supporting simple event delegation in the List module
 
 return function(column){
     // summary:
     //      Add a editing capability
     var originalRenderCell = column.renderCell || function(object, value, td){
         if(value != null){
-        	create(td, "span.dgrid-expando-text", value);
+        	put(td, "span.dgrid-expando-text", value);
         }
     };
 	column.renderCell = function(object, value, td, options){
@@ -16,7 +16,7 @@ return function(column){
 		var grid = this.grid;
 		var mayHaveChildren = !grid.store.mayHaveChildren || grid.store.mayHaveChildren(object);
 		// create the expando
-		var expando = create(td, ".dgrid-expando-icon" + (mayHaveChildren ? ".ui-icon.ui-icon-triangle-1-e" : "") +
+		var expando = put(td, "div.dgrid-expando-icon" + (mayHaveChildren ? ".ui-icon.ui-icon-triangle-1-e" : "") +
 			"[style=margin-left: " + (level * 19) + "px; float: left]");
 		originalRenderCell.call(this, object, value, td, options);
 		expando.level = level;
@@ -40,8 +40,8 @@ return function(column){
 					if(!preloadNode){
 						// if the children have not been created, create a container, a preload node and do the 
 						// query for the children
-						var container = rowElement.connected = create('.dgrid-tree-container');
-						preloadNode = target.preloadNode = create(container, 'div');
+						var container = rowElement.connected = put('div.dgrid-tree-container');
+						preloadNode = target.preloadNode = put(container, 'div');
 						//preloadNode.nextRow = grid.down(row).element;
 						var query = function(options){
 							return grid.store.getChildren(row.data, options);
