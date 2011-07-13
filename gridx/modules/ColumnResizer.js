@@ -3,87 +3,123 @@ define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/on", "dojo/query", "doj
 return declare([], {
 	resizeNode: null,
 	minWidth: 40,	//minimum column width in px
-	detectWidth: 5,
-	column: function(){
-		var column = this.inherited(arguments);
-		var grid = this;
-		var setWidth = column.setWidth;
-		column.setWidth = function(width){
-			// call original
-			setWidth && setWidth.call(column, width);
-			// call our handler
-			grid.setColumnWidth(column.id, width);
-		};
-		return column;
-	},
+	detectWidth: 5, //distance from cell edge that the resize mouse cursor changes
+	gridWidth: null, //place holder for the grid width property
 	setColumnWidth: function(colId, width){
+	// Summary:
+	//      calls grid's styleColumn function to add a style for the column
+	// colId: String
+	//      column id
+	// width: Integer
+	//      new width of the column
+		
 		this.styleColumn(colId, "width: " + width + 'px;');
 	},
 	postCreate: function(){
 		this.inherited(arguments);
+		console.log("this: ", this);
 		var grid = this,
 			body = document.body;
+		grid.gridWidth = grid.headerNode.clientWidth;
+
 		listen(grid.headerNode, "mousemove", function(e){
-			if(grid._resizing || !grid._getCell(e)){
-				return;
-			}
-			if(grid._isInResizeRange(e)){
-				grid._readyToResize = true;
-				dojo.addClass(dojo.body(), 'dojoxGridxColumnResizing');
-			}else{
-				grid._readyToResize = false;
-				dojo.removeClass(dojo.body(), 'dojoxGridxColumnResizing');
-			}
+			//listens for the mouse to move over the header node
+			if(grid._resizing || !grid._getCell(e)){return;}
+			grid._mouseMove(e);
 		});
 		listen(grid, '.' + this.getCSSClass("header") + ":mouseout", function(e){ // should this be the mouse.leave event?
+			//listens for the mouse to leave the headerNode (even though it doesn't do anything special if it does...)
 			if(grid._resizing){return;}
 			grid._readyToResize = false;
 			dojo.removeClass(dojo.body(), 'dojoxGridxColumnResizing');
 		});
 		listen(grid, '.' + this.getCSSClass("header") + ":mousedown", function(e){
-			//begin resize
+			// if ready to resize, allow resize
 			if(!grid._readyToResize){return;}
-			dojo.setSelectable(grid.domNode, false);
-			grid._resizing = true;
-			grid._startX = e.clientX;
-			grid._gridX = dojo.position(grid.bodyNode).x;
-
-			// show resizer inlined
-			if(!grid._resizer){
-				grid._resizer = dojo.create('div', {
-					className: 'dojoxGridxColumnResizer'},
-					grid.domNode, 'last');
-		    	listen(grid._resizer, 'mouseup', mouseup);
-			}
-			grid._resizer.style.display = 'block';
-			grid._updateResizerPosition(e);
+				grid._mouseDown(e);
 		});
 		listen(body, "mousemove", function(e){
+			// while resizing, update the position of the resizer bar
 			if(!grid._resizing){return;}
 			grid._updateResizerPosition(e);
 		});
-		listen(body, "mouseup", mouseup);
-		function mouseup(e){
-			//end resize
-			if(!grid._resizing){return;}
-			grid._resizing = false;
-			grid._readyToResize = false;
-			dojo.removeClass(dojo.body(), 'dojoxGridxColumnResizing');
-			dojo.setSelectable(grid.domNode, true);
+		listen(body, "mouseup", function(e){
+			// if resizing and mouse button is release, fire mouseUp()
+			if(!this._resizing){return;}
+				grid._mouseUp(e);
+		});
+	},//end postCreate
 
-			var cell = grid._targetCell, delta = e.clientX - grid._startX;
-			var w = cell.offsetWidth + delta;
-			if(w < grid.minWidth){
-				w = grid.minWidth;
-				//console.log("w = mindWidth");
-			}
-			grid.setColumnWidth(cell.columnId, w);
-			grid._hideResizer();
+	_mouseMove: function(e){
+	// Summary:
+	//      called when mouse moves over the header node
+	// e: Object
+	//      mouse move object
+
+		if(this._isInResizeRange(e)){
+			this._readyToResize = true;
+			dojo.addClass(dojo.body(), 'dojoxGridxColumnResizing');
+		}else{
+			this._readyToResize = false;
+			dojo.removeClass(dojo.body(), 'dojoxGridxColumnResizing');
 		}
 	},
 
-	_updateResizerPosition: function(e){
+	_mouseDown: function(e){
+	// Summary:
+	//      called when mouse button is pressed on the header
+	// e: Object
+	//      mousedown event object
+		
+		dojo.setSelectable(this.domNode, false);
+		var grid = this;
+		grid._resizing = true;
+		grid._startX = e.clientX;
+		grid._gridX = dojo.position(grid.bodyNode).x;
 
+		// show resizer inlined
+		if(!grid._resizer){
+			grid._resizer = dojo.create('div', {
+				className: 'dojoxGridxColumnResizer'},
+				grid.domNode, 'last');
+			listen(grid._resizer, 'mouseup', function(e){
+				grid._mouseUp(e);
+			});
+		}
+		grid._resizer.style.display = 'block';
+		grid._updateResizerPosition(e);
+	},
+	_mouseUp: function(e) {
+	// Summary:
+	//      called when mouse button is released
+	// e: Object
+	//      mouseup event object
+
+		console.log("mouseup");
+
+		this._resizing = false;
+		this._readyToResize = false;
+		dojo.removeClass(dojo.body(), 'dojoxGridxColumnResizing');
+		dojo.setSelectable(this.domNode, true);
+
+		var cell = this._targetCell, delta = e.clientX - this._startX;
+		var w = cell.offsetWidth + delta; //w is the new width after resize
+		console.log("w: ", w);
+		console.log("cell: ", this._targetCell);
+		if(w < this.minWidth){
+			w = this.minWidth;
+			console.log("w = midWidth ", w);
+		}
+		this.setColumnWidth(cell.columnId, w);
+		this._hideResizer();
+	},
+	_updateResizerPosition: function(e){
+	// Summary:
+	//      updates position of resizer bar as mouse moves
+	// e: Object
+	//      mousemove event object
+
+		console.log("updateResizerPosition");
 		var delta = e.clientX - this._startX, cell = this._targetCell;
 		var left = e.clientX - this._gridX;
 		if(cell.offsetWidth + delta < this.minWidth){ 
@@ -92,19 +128,29 @@ return declare([], {
 		this._resizer.style.left = left  + 'px';
 	},
 	_hideResizer: function(){
+	// Summary:
+	//      sets resizer bar display to none
+
 		this._resizer.style.display = 'none';
 	},
 	
 	_isInResizeRange: function(e){
+	// Summary:
+	//      checks if mouse is within 5px of the edge of the header cell
+	// e: Object
+	//      mousemove event object
+
 		var cell = this._getCell(e);
 		var x = this._getCellX(e);
 		if(x < this.detectWidth){
 			this._targetCell = cell.previousSibling;
 			if(!this._targetCell){
-				return false;	//the first cell is not able to be resize
+				return false;	//left side of first cell is not able to resize
 			}
 			return true;
 		}else if(x > cell.offsetWidth - this.detectWidth && x <= cell.offsetWidth){
+			
+
 			this._targetCell = cell;
 			return true;
 		}
@@ -112,6 +158,10 @@ return declare([], {
 	},
 	
 	_getCellX: function(e){
+	// Summary:
+	//      tries to determine the location of the mouse relative to the cell
+	// e: Object
+	//      mousemove event object
 		var cell = this._getCell(e);
 		if(!cell){
 			return 100000;
@@ -122,6 +172,10 @@ return declare([], {
 	},
 	
 	_getCell: function(e){
+	// Summary:
+	//      get the target of the mouse move event
+	// e: Object
+	//      mousemove event object
 		var node = e.target;
 		while(node && node.tagName && node.tagName.toLowerCase() !== 'th'){
 			node = node.parentNode;

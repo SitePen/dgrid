@@ -229,6 +229,7 @@ define(["dojo/has", "xstyle/create", "dojo/_base/declare", "dojo/on", "./Editor"
 			
 			// TODO: Should we first delete the old stylesheet (so it doesn't override the new one)?
 			// now create a stylesheet to style the column
+			console.log("in styleColumn: ", colId);
 			this.css.addRule("#" + this.domNode.id + ' .column-' + colId, css);
 		}
 	});
