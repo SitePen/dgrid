@@ -26,26 +26,13 @@ return function(column, editor, editOn){
 		function(value, cell, object, onblur){
 			var input;
 			// it is string editor, so we use a common <input> as the editor
-			if(has("ie") < 8){
-				// IE < 8 has a bug involving radio inputs whose types are set after
-				// they are created, where you can never set them as selected via
-				// normal browser interaction.
-				// Stooping to using nonstandard createElement to work around it.
-				input = document.createElement('<input type="' + editor + '" name="' +
-					(column.field || "selection") + '" class="dgrid-input" tabIndex="' +
-					grid.tabIndex + '" value="' + (value || "") + '">');
-				input.checked = value;
-				input.lastValue = value;
-				cell.appendChild(input);
-			}else{
-				input = put(cell, "input[type=" + editor + "].dgrid-input", {
-					name: column.field || "selection",
-					tabIndex: grid.tabIndex,
-					value: value || "",
-					checked: value,
-					lastValue: value
-				});
-			}
+			input = put(cell, "input[type=" + editor + "].dgrid-input", {
+				name: column.field || "selection",
+				tabIndex: grid.tabIndex,
+				value: value || "",
+				checked: value,
+				lastValue: value
+			});
 			
 			if(!grid._hasInputListener){
 				// register one listener at the top level that receives events delegated
