@@ -32,17 +32,7 @@ function(css, has, create, declare, listen, aspect, query, Grid){
 		},
 		insertRow: function(){
 			var row = this.inherited(arguments);
-			var scrollLefts = this._columnSetScrollLefts;
-			function adjustScrollLeft(){
-				query(".dgrid-column-set", row).forEach(function(element){
-					element.scrollLeft = scrollLefts[element.getAttribute('colsetid')];
-				});
-			}
-			if(has("ie") < 8 || has("quirks")){
-				setTimeout(adjustScrollLeft, 1);
-			}else{
-				adjustScrollLeft();
-			}
+			adjustScrollLeft(this, row);
 			return row;
 		},
 		renderHeader: function(){
@@ -73,7 +63,10 @@ function(css, has, create, declare, listen, aspect, query, Grid){
 			function reposition(){
 				positionScrollers(grid, domNode);
 			}
-			listen(window, "resize", reposition); 
+			listen(window, "resize", reposition);
+			listen(domNode, "cellfocusin", function(event){
+				adjustScrollLeft(grid, grid.row(event).element);
+			});
 			aspect.after(this, "styleColumn", reposition);		
 		}
 	});
@@ -94,4 +87,18 @@ function(css, has, create, declare, listen, aspect, query, Grid){
 			scrollers[i].style.left = left + "px";
 		}	
 	}
+	function adjustScrollLeft(grid, row){
+		var scrollLefts = grid._columnSetScrollLefts;
+		function doAdjustScrollLeft(){
+			query(".dgrid-column-set", row).forEach(function(element){
+				element.scrollLeft = scrollLefts[element.getAttribute('colsetid')];
+			});
+		}
+		if(has("ie") < 8 || has("quirks")){
+			setTimeout(doAdjustScrollLeft, 1);
+		}else{
+			doAdjustScrollLeft();
+		}
+	}
+	
 });

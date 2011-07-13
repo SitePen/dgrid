@@ -2,6 +2,12 @@ define(["xstyle/css!./css/dgrid.css", "dojo/_base/kernel", "xstyle/create", "doj
 function(css, dojo, create, declare, listen, aspect, has, TouchScroll){
 	// allow for custom CSS class definitions 
 	// TODO: figure out what to depend for this
+	if(has("mozilla") || has("opera")){
+		// firefox's focus doesn't work by default for divs prior to actually tabbing into it. This fixes that
+		// (we don't do any other browsers because we are trying to stay as close to native as possible) 
+		css.addRule(".dgrid *:focus", "outline: 1px dotted");
+	}
+	var scrollbarWidth;
 	var byId = function(id){
 		return document.getElementById(id);
 	};
@@ -116,11 +122,15 @@ function(css, dojo, create, declare, listen, aspect, has, TouchScroll){
 			}
 			domNode.className += " ui-widget dgrid";
 			this.refresh();
+			var grid = this;
+			listen(window, "resize", function(){
+				grid.resize();
+			});
 			if(has("ie")){
 				this.on("activate", function(event){
 					var target = event.target;
 					if(!target.type && !hasTabIndex(target)){
-						// IE changes focus when it is not supposed to
+						// IE changes/loses focus when inner table cells even when it is not supposed to
 						domNode.focus();
 					}
 				});
@@ -137,17 +147,28 @@ function(css, dojo, create, declare, listen, aspect, has, TouchScroll){
 				listen.emit(domNode, "scroll", {scrollTarget: bodyNode});
 			});
 			this.renderHeader(headerNode);
+			this.resize();
+			this.refreshContent();
+			aspect.after(this, "scrollTo", function(){
+				listen.emit(bodyNode, "scroll", {});
+			});
+			this.postCreate && this.postCreate();
+		},
+		resize: function(){
+			var bodyNode = this.bodyNode;
+			var headerNode = this.headerNode;
 			bodyNode.style.top = headerNode.offsetHeight + "px";
 			if(has("quirks")){
 				// in quirks mode, the "bottom" CSS property is ignored, so do this to fix it
 				// We might want to use a CSS expression or the xstyle package to fix this
 				bodyNode.style.height = (this.domNode.offsetHeight - headerNode.offsetHeight) + "px"; 
 			}
-			this.refreshContent();
-			aspect.after(this, "scrollTo", function(){
-				listen.emit(bodyNode, "scroll", {});
-			});
-			this.postCreate && this.postCreate();
+			if(!scrollbarWidth){ // we haven't computed the scroll bar width yet, do so now, and add a new rule if need be
+				scrollbarWidth = bodyNode.offsetWidth - bodyNode.clientWidth;
+				if(scrollbarWidth != 17){
+					css.addRule(".dgrid-header", "right: " + scrollbarWidth + "px");
+				}
+			}
 		},
 		on: function(eventType, listener){
 			// delegate events to the domNode

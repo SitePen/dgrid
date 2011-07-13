@@ -1,7 +1,6 @@
 define(["dojo/has", "xstyle/create", "dojo/_base/declare", "dojo/on", "./Editor", "./List", "dojo/_base/sniff"], function(has, create, declare, listen, Editor, List){
-	var scrollbarWidth;
 	return declare([List], {
-		columns: [],
+		columns: {},
 		// summary:
 		//		This indicates that focus is at the cell level. This may be set to false to cause
 		//		focus to be at the row level, which is useful if you want only want row-level
@@ -174,12 +173,6 @@ define(["dojo/has", "xstyle/create", "dojo/_base/declare", "dojo/on", "./Editor"
 			//		Setup the headers for the grid
 			var grid = this;
 			var columns = this.columns;
-			if(!scrollbarWidth){ // we haven't computed the scroll bar width yet, do so now, and add a new rule if need be
-				scrollbarWidth = grid.bodyNode.offsetWidth - grid.bodyNode.clientWidth;
-				if(scrollbarWidth != 17){
-					this.css.addRule(".dgrid-header", "right: " + scrollbarWidth + "px");
-				}
-			}
 			var row = this.createRowCells("th[role=columnheader]", function(th, column, id){
 				column.id = id;
 				column.grid = grid;
@@ -202,22 +195,24 @@ define(["dojo/has", "xstyle/create", "dojo/_base/declare", "dojo/on", "./Editor"
 			var lastSortedArrow;
 			// if it columns are sortable, resort on clicks
 			listen(row, "click", function(event){
-				var target = event.target;
+				var
+					target = event.target,
+					field, descending, parentNode;
 				do{
 					if(target.sortable){
-						var field = target.field || target.columnId;
+						field = target.field || target.columnId;
 						// re-sort
-						var descending = grid.sortOrder && grid.sortOrder[0].attribute == field && !grid.sortOrder[0].descending;
+						descending = grid.sortOrder && grid.sortOrder[0].attribute == field && !grid.sortOrder[0].descending;
 						if(lastSortedArrow){
-							lastSortedArrow.parentNode.className = lastSortedArrow.parentNode.className.replace(/dgrid-sort-\w+/,'');
-							lastSortedArrow.parentNode.removeChild(lastSortedArrow);
+							parentNode = lastSortedArrow.parentNode;
+							parentNode.className = parentNode.className.replace(/dgrid-sort-\w+/,'');
+							parentNode.removeChild(lastSortedArrow);
 						}
 						lastSortedArrow = create(target.firstChild, "-div.dgrid-arrow-button-node.ui-icon[role=presentation]");
 						lastSortedArrow.innerHTML = "&nbsp;";
 						target.className = (target.className +
 							(descending ? " dgrid-sort-down" : " dgrid-sort-up"))
 							.replace("  ", " ");
-
 						grid.sort(field, descending);
 					}
 				}while((target = target.parentNode) && target != headerNode);

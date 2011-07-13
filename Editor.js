@@ -24,14 +24,28 @@ return function(column, editor, editOn){
 	}
 	var renderWidget = typeof editor == "string" ?
 		function(value, cell, object, onblur){
+			var input;
 			// it is string editor, so we use a common <input> as the editor
-			var input = create(cell, "input[type=" + editor + "].dgrid-input", {
-				name: column.field || "selection",
-				tabIndex: grid.tabIndex,
-				value: value || "",
-				checked: value,
-				lastValue: value
-			});
+			if(has("ie") < 8){
+				// IE < 8 has a bug involving radio inputs whose types are set after
+				// they are created, where you can never set them as selected via
+				// normal browser interaction.
+				// Stooping to using nonstandard createElement to work around it.
+				input = document.createElement('<input type="' + editor + '" name="' +
+					(column.field || "selection") + '" class="dgrid-input" tabIndex="' +
+					grid.tabIndex + '" value="' + (value || "") + '">');
+				input.checked = value;
+				input.lastValue = value;
+				cell.appendChild(input);
+			}else{
+				input = create(cell, "input[type=" + editor + "].dgrid-input", {
+					name: column.field || "selection",
+					tabIndex: grid.tabIndex,
+					value: value || "",
+					checked: value,
+					lastValue: value
+				});
+			}
 			
 			if(!grid._hasInputListener){
 				// register one listener at the top level that receives events delegated
@@ -105,7 +119,7 @@ return function(column, editor, editOn){
 				}
 				if(row){
 					suppressSelect = true;
-					grid.selection.set(row.id, value);
+					grid.select(row.id, null, value);
 					suppressSelect = false;
 				}else{
 					// select all
@@ -120,11 +134,11 @@ return function(column, editor, editOn){
 		if(!grid){
 			grid = column.grid;
 			if(column.selector){
-				grid.selection.watch(function(id, oldValue, newValue){
+				grid.on("select,deselect", function(event){
 					if(!suppressSelect){
-						var cell = grid.cell(id, column.id);
+						var cell = grid.cell(event.row.id, column.id);
 						cell.element.innerHTML = "";
-						renderWidget(newValue, cell.element, object);
+						renderWidget(event.type == "select", cell.element, object);
 					}
 				});
 			}
