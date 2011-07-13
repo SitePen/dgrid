@@ -1,4 +1,4 @@
-define(["dojo", "dojo/on", "xstyle/create", "dgrid/OnDemandGrid","dgrid/Tree", "dgrid/Selection", "dgrid/Keyboard", "dojo/store/Memory"], 
+define(["dojo", "dojo/on", "xstyle/put", "dgrid/OnDemandGrid","dgrid/Tree", "dgrid/Selection", "dgrid/Keyboard", "dojo/store/Memory"], 
 function(dojo, on, create, Grid, Tree, Selection, Keyboard, Memory){
 	return function(data, explorerElement){
 		function getChildren(object){
