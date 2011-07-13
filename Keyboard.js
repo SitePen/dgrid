@@ -1,4 +1,4 @@
-define(["dojo/_base/declare", "dojo/on", "./List", "dojo/_base/sniff"], function(declare, listen, List, has){
+define(["dojo/_base/declare", "dojo/on", "./List", "dojo/_base/sniff", "xstyle/put"], function(declare, listen, List, has, put){
 var delegatingInputTypes = {
 	checkbox: 1,
 	radio: 1,
@@ -30,6 +30,13 @@ return declare([List], {
 				if(!dontFocus){
 					element.tabIndex = 0;
 					element.focus();
+					if(has("ie") < 8){
+						var outlineElementStyle = put(element, "div.dgrid-ie-outline").style;
+						outlineElementStyle.left = element.offsetLeft - 1;
+						outlineElementStyle.top = element.offsetTop - 1;
+						outlineElementStyle.width = element.offsetWidth;
+						outlineElementStyle.Height = element.offsetHeight;
+					}
 				}
 				element.className += " dgrid-cell-focus";
 				listen.emit(element, "cellfocusin", event);
