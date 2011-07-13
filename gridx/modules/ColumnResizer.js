@@ -18,7 +18,7 @@ return declare([], {
 	},
 	postCreate: function(){
 		this.inherited(arguments);
-		console.log("this: ", this);
+		//console.log("this: ", this);
 		var grid = this,
 			body = document.body;
 		grid.gridWidth = grid.headerNode.clientWidth;
@@ -75,8 +75,8 @@ return declare([], {
 		dojo.setSelectable(this.domNode, false);
 		var grid = this;
 		grid._resizing = true;
-		grid._startX = e.clientX;
-		grid._gridX = dojo.position(grid.bodyNode).x;
+		grid._startX = e.clientX; //position of the target  
+		grid._gridX = dojo.position(grid.bodyNode).x;//position of the grid in the body
 
 		// show resizer inlined
 		if(!grid._resizer){
@@ -96,20 +96,17 @@ return declare([], {
 	// e: Object
 	//      mouseup event object
 
-		console.log("mouseup");
-
 		this._resizing = false;
 		this._readyToResize = false;
 		dojo.removeClass(dojo.body(), 'dojoxGridxColumnResizing');
 		dojo.setSelectable(this.domNode, true);
 
-		var cell = this._targetCell, delta = e.clientX - this._startX;
-		var w = cell.offsetWidth + delta; //w is the new width after resize
-		console.log("w: ", w);
-		console.log("cell: ", this._targetCell);
+		var cell = this._targetCell,
+			delta = e.clientX - this._startX, //final change in position of resizer
+			w = cell.offsetWidth + delta; //w is the new width after resize
+
 		if(w < this.minWidth){
 			w = this.minWidth;
-			console.log("w = midWidth ", w);
 		}
 		this.setColumnWidth(cell.columnId, w);
 		this._hideResizer();
@@ -120,9 +117,10 @@ return declare([], {
 	// e: Object
 	//      mousemove event object
 
-		console.log("updateResizerPosition");
-		var delta = e.clientX - this._startX, cell = this._targetCell;
-		var left = e.clientX - this._gridX;
+		var delta = e.clientX - this._startX, //change from where user clicked to where they drag
+			cell = this._targetCell,
+			left = e.clientX - this._gridX;
+		console.log("cell: ", cell);
 		if(cell.offsetWidth + delta < this.minWidth){ 
 			left = this._startX - this._gridX - (cell.offsetWidth - this.minWidth); 
 		}
@@ -142,17 +140,17 @@ return declare([], {
 	//      mousemove event object
 
 		var cell = this._getCell(e);
-		var x = this._getCellX(e);
+		this._targetCell = cell;
+		//var x = this._getCellX(e); //something is messed up in huurrr.
+		var x = e.layerX; //this does not work in Opera currently.
+
 		if(x < this.detectWidth){
-			this._targetCell = cell.previousSibling;
-			if(!this._targetCell){
+			if(!this._targetCell.previousSibling){
 				return false;	//left side of first cell is not able to resize
 			}
 			return true;
 		}else if(x > cell.offsetWidth - this.detectWidth && x <= cell.offsetWidth){
-			
 
-			this._targetCell = cell;
 			return true;
 		}
 		return false;
@@ -163,11 +161,12 @@ return declare([], {
 	//      tries to determine the location of the mouse relative to the cell
 	// e: Object
 	//      mousemove event object
-		var cell = this._getCell(e);
+
+		var cell = this._targetCell;
+		var x = e.layerX;
 		if(!cell){
 			return 100000;
 		}
-		var x = e.layerX - cell.offsetLeft;
 		if(x < 0){x = e.layerX;} //chrome take layerX as cell x.
 		return x;
 	},

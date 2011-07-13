@@ -24,22 +24,18 @@ table.dgrid-row, .dgrid-column-set table{
 	border-collapse: collapse;
 	border: none;
 	table-layout: fixed;
-	empty-cells: show;
 	width: 100%; /* this programmatically becomes 'auto' for IE7 (non-quirks) */
 }
 .dgrid-cell {
 	padding: 0px;
 	text-align: left;
 	overflow: hidden;
-	border: 1px solid #ddd;
-	border-top: 1px solid transparent;
+	border-right: 1px solid #ddd;
+	border-bottom: 1px solid #ddd;
 	box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	-ms-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
-}
-.dgrid-cell-focus {
-	border-color: #bbb;
 }
 .dgrid-cell-padding {
 	padding: 3px;
@@ -51,11 +47,16 @@ table.dgrid-row, .dgrid-column-set table{
 .dgrid-header-row {
 	border-bottom: 1px solid #ccc;
 }
-.dgrid-main,
+.dgrid-footer {
+}
+.dgrid-main {
+	position: relative;
+}
 .dgrid-content {
 	position: relative;
 }
-
+.dgrid-expando-icon {
+}
 .dgrid-scroller{
 	overflow-x: auto;
 	overflow-y: scroll;
@@ -102,6 +103,20 @@ table.dgrid-row, .dgrid-column-set table{
 }
 .dgrid-sort-up .dgrid-arrow-button-node {
 	background-position: 0px -16px;
+
+}
+
+.dgrid-sort-up {
+	padding-top: 0px;
+}
+
+.dgrid-sort-down {
+	padding-top: 0px;
+}
+
+.dgrid-cell-focus {
+	border-color: #aaa;
+	outline: 1px dotted;
 }
 
 /* selection*/
