@@ -105,7 +105,7 @@ return function(column, editor, editOn){
 				}
 				if(row){
 					suppressSelect = true;
-					grid.selection.set(row.id, value);
+					grid.select(row.id, null, value);
 					suppressSelect = false;
 				}else{
 					// select all
@@ -120,11 +120,11 @@ return function(column, editor, editOn){
 		if(!grid){
 			grid = column.grid;
 			if(column.selector){
-				grid.selection.watch(function(id, oldValue, newValue){
+				grid.on("select,deselect", function(event){
 					if(!suppressSelect){
-						var cell = grid.cell(id, column.id);
+						var cell = grid.cell(event.row.id, column.id);
 						cell.element.innerHTML = "";
-						renderWidget(newValue, cell.element, object);
+						renderWidget(event.type == "select", cell.element, object);
 					}
 				});
 			}
