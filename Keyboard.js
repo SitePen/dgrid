@@ -28,15 +28,14 @@ return declare([List], {
 				cellFocusedElement = element;
 				event.cell = element;
 				if(!dontFocus){
+					if(has("ie") < 8){
+						// setting the position to relative (can't be done a priori with CSS or 
+						// screws up the entire table), magically makes the outline work 
+						// properly for focusing later on with old IE
+						element.style.position = "relative";
+					}
 					element.tabIndex = 0;
 					element.focus();
-					if(has("ie") < 8){
-						var outlineElementStyle = put(element, "div.dgrid-ie-outline").style;
-						outlineElementStyle.left = element.offsetLeft - 1;
-						outlineElementStyle.top = element.offsetTop - 1;
-						outlineElementStyle.width = element.offsetWidth;
-						outlineElementStyle.Height = element.offsetHeight;
-					}
 				}
 				element.className += " dgrid-cell-focus";
 				listen.emit(element, "cellfocusin", event);

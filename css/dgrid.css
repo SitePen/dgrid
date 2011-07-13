@@ -38,10 +38,6 @@ table.dgrid-row, .dgrid-column-set table{
 	-ms-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 }
-.dgrid-ie-outline{
-	position: absolute;
-	border: 1px dotted #aaa;
-}
 .dgrid-cell-padding {
 	padding: 3px;
 }
