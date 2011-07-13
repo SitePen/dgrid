@@ -120,7 +120,7 @@ return declare([], {
 		var delta = e.clientX - this._startX, //change from where user clicked to where they drag
 			cell = this._targetCell,
 			left = e.clientX - this._gridX;
-		console.log("cell: ", cell);
+		
 		if(cell.offsetWidth + delta < this.minWidth){ 
 			left = this._startX - this._gridX - (cell.offsetWidth - this.minWidth); 
 		}
