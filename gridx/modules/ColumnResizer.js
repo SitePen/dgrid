@@ -2,7 +2,7 @@ define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/on", "dojo/query", "doj
 	
 return declare([], {
 	resizeNode: null,
-	minColumnWidth: 20,	//in px
+	minWidth: 40,	//minimum column width in px
 	detectWidth: 5,
 	column: function(){
 		var column = this.inherited(arguments);
@@ -39,7 +39,7 @@ return declare([], {
 		listen(grid, '.' + this.getCSSClass("header") + ":mouseout", function(e){ // should this be the mouse.leave event?
 			if(grid._resizing){return;}
 			grid._readyToResize = false;
-			dojo.removeClass(dojo.body(), 'dojoxGridxColumnResizing');			
+			dojo.removeClass(dojo.body(), 'dojoxGridxColumnResizing');
 		});
 		listen(grid, '.' + this.getCSSClass("header") + ":mousedown", function(e){
 			//begin resize
@@ -48,11 +48,11 @@ return declare([], {
 			grid._resizing = true;
 			grid._startX = e.clientX;
 			grid._gridX = dojo.position(grid.bodyNode).x;
-			
+
 			// show resizer inlined
 			if(!grid._resizer){
 				grid._resizer = dojo.create('div', {
-					className: 'dojoxGridxColumnResizer'}, 
+					className: 'dojoxGridxColumnResizer'},
 					grid.domNode, 'last');
 		    	listen(grid._resizer, 'mouseup', mouseup);
 			}
@@ -71,20 +71,23 @@ return declare([], {
 			grid._readyToResize = false;
 			dojo.removeClass(dojo.body(), 'dojoxGridxColumnResizing');
 			dojo.setSelectable(grid.domNode, true);
-			
+
 			var cell = grid._targetCell, delta = e.clientX - grid._startX;
 			var w = cell.offsetWidth + delta;
-			if(w < grid.minWidth){w = grid.minWidth;}
+			if(w < grid.minWidth){
+				w = grid.minWidth;
+				//console.log("w = mindWidth");
+			}
 			grid.setColumnWidth(cell.columnId, w);
 			grid._hideResizer();
 		}
 	},
-	
+
 	_updateResizerPosition: function(e){
+
 		var delta = e.clientX - this._startX, cell = this._targetCell;
 		var left = e.clientX - this._gridX;
-		
-		if(cell.offsetWidth + delta < this.minWidth){
+		if(cell.offsetWidth + delta < this.minWidth){ 
 			left = this._startX - this._gridX - (cell.offsetWidth - this.minWidth); 
 		}
 		this._resizer.style.left = left  + 'px';
