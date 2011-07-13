@@ -1,4 +1,4 @@
-define(["dojo/_base/declare", "dojo/on", "./List"], function(declare, listen, List){
+define(["dojo/_base/declare", "dojo/on", "./List", "dojo/_base/sniff"], function(declare, listen, List, has){
 var delegatingInputTypes = {
 	checkbox: 1,
 	radio: 1,
@@ -12,21 +12,30 @@ return declare([List], {
 		this.inherited(arguments);
 		var grid = this;
 		var cellFocusedElement;
-		function focusOnCell(element, event){
-			if(!event.bubbles){
-				event.bubbles = true;
-			}			
-			if(cellFocusedElement){
-				cellFocusedElement.className = cellFocusedElement.className.replace(/\s*dgrid-cell-focus/, '');
-				event.cell = cellFocusedElement;
-				listen.emit(element, "cellfocusout", event);
+		function focusOnCell(element, event, dontFocus){
+			var cell = grid[grid.cellNavigation ? "cell" : "row"](element);
+			if(cell){
+				element = cell.element;
+				if(!event.bubbles){
+					event.bubbles = true;
+				}			
+				if(cellFocusedElement){
+					cellFocusedElement.className = cellFocusedElement.className.replace(/\s*dgrid-cell-focus/, '');
+					cellFocusedElement.removeAttribute("tabIndex");
+					event.cell = cellFocusedElement;
+					listen.emit(element, "cellfocusout", event);
+				}
+				cellFocusedElement = element;
+				event.cell = element;
+				if(!dontFocus){
+					element.tabIndex = 0;
+					element.focus();
+				}
+				element.className += " dgrid-cell-focus";
+				listen.emit(element, "cellfocusin", event);
 			}
-			cellFocusedElement = element;
-			element.className += " dgrid-cell-focus";
-			event.cell = element;
-			listen.emit(element, "cellfocusin", event);
 		}
-		this.on("mousedown", function(event){
+		listen(this.contentNode, "mousedown", function(event){
 			focusOnCell(event.target, event);
 		});
 		this.on("keydown", function(event){
@@ -53,6 +62,9 @@ return declare([List], {
 			var nextSibling, columnId, cell = grid.cell(cellFocusedElement);
 			var orientation;
 			if(keyCode == 37 || keyCode == 39){
+				if(!grid.cellNavigation){
+					return;
+				}
 				// horizontal movement (left and right keys)
 				orientation = 'right';
 			}else{
@@ -61,7 +73,7 @@ return declare([List], {
 				columnId = cell && cell.column && cell.column.id;
 				cell = grid.row(cellFocusedElement);				
 			}
-			var nextFocus = move ? grid[orientation](cell, move).element : cell;
+			var nextFocus = move ? grid[orientation](cell, move).element : cell.element;
 /*			do{
 				// move in the correct direction
 				if((nextSibling = nextFocus[move < 0 ? 'previousSibling' : 'nextSibling']) && !nextSibling.preload){
@@ -78,19 +90,21 @@ return declare([List], {
 				if(columnId){
 					nextFocus = grid.cell(nextFocus, columnId).element;
 				}
-				var inputs = nextFocus.getElementsByTagName("input");
-				var inputFocused;
-				for(var i = 0;i < inputs.length; i++){
-					if(inputs[i].tabIndex != -1){
-						inputs[i].focus();
-						inputFocused = true;
-						break;
+				if(grid.cellNavigation){
+					var inputs = nextFocus.getElementsByTagName("input");
+					var inputFocused;
+					for(var i = 0;i < inputs.length; i++){
+						if(inputs[i].tabIndex != -1){
+							inputs[i].focus();
+							inputFocused = true;
+							break;
+						}
 					}
 				}
+				focusOnCell(nextFocus, event, inputFocused);
 			}
-			focusOnCell(nextFocus, event);
-			event.preventDefault();
 			
+			event.preventDefault();
 		});
 	}
 });
