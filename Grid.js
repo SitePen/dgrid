@@ -1,7 +1,6 @@
 define(["dojo/has", "xstyle/create", "dojo/_base/declare", "dojo/on", "./Editor", "./List", "dojo/_base/sniff"], function(has, create, declare, listen, Editor, List){
-	var scrollbarWidth;
 	return declare([List], {
-		columns: [],
+		columns: {},
 		// summary:
 		//		This indicates that focus is at the cell level. This may be set to false to cause
 		//		focus to be at the row level, which is useful if you want only want row-level
@@ -174,12 +173,6 @@ define(["dojo/has", "xstyle/create", "dojo/_base/declare", "dojo/on", "./Editor"
 			//		Setup the headers for the grid
 			var grid = this;
 			var columns = this.columns;
-			if(!scrollbarWidth){ // we haven't computed the scroll bar width yet, do so now, and add a new rule if need be
-				scrollbarWidth = grid.bodyNode.offsetWidth - grid.bodyNode.clientWidth;
-				if(scrollbarWidth != 17){
-					this.css.addRule(".dgrid-header", "right: " + scrollbarWidth + "px");
-				}
-			}
 			var row = this.createRowCells("th[role=columnheader]", function(th, column, id){
 				column.id = id;
 				column.grid = grid;
