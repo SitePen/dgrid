@@ -161,7 +161,7 @@ function(css, dojo, put, declare, listen, aspect, has, TouchScroll){
 			if(has("quirks")){
 				// in quirks mode, the "bottom" CSS property is ignored, so do this to fix it
 				// We might want to use a CSS expression or the xstyle package to fix this
-				bodyNode.style.height = (this.domNode.offsetHeight - headerNode.offsetHeight) + "px"; 
+				bodyNode.style.height = (this.domNode.offsetHeight - headerNode.offsetHeight) + "px";
 			}
 			if(!scrollbarWidth){ // we haven't computed the scroll bar width yet, do so now, and add a new rule if need be
 				scrollbarWidth = bodyNode.offsetWidth - bodyNode.clientWidth;
