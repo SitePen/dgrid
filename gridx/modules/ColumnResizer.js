@@ -18,6 +18,7 @@ return declare([], {
 	},
 	setColumnWidth: function(colId, width){
 		this.styleColumn(colId, "width: " + width + 'px;');
+		this.resize();
 	},
 	postCreate: function(){
 		this.inherited(arguments);
