@@ -44,8 +44,8 @@ function(dojo, on, create, Grid, Tree, Selection, Keyboard, Memory){
 				docType: new Tree({
 					name:'Part', 
 					renderCell: function(object, value, td){
-						create(td, ".ui-icon.type.type-" + object.docType + "[title=" + object.docType + "]");
-						create(td, ".description", (object.name || "") + (object.type ? ':' + object.type : '') +
+						put(td, "div.ui-icon.type.type-" + object.docType + "[title=" + object.docType + "]");
+						put(td, "div.description", (object.name || "") + (object.type ? ':' + object.type : '') +
 							(object["extends"] ? ' extends ' + (object["extends"].name || object["extends"]) : "") +
 							(object.description ? ' - ' + object.description : "") + 
 							(object["default"] !== undefined ? ' (Defaults to ' + object["default"] + ')' : ""));
@@ -55,8 +55,8 @@ function(dojo, on, create, Grid, Tree, Selection, Keyboard, Memory){
 		}, explorerElement);
 		on(explorer, "select", function(component){
 			var details = dojo.byId("details");
-			create(details, "div", component.description);
-			create(details, "div", component.description);
+			put(details, "div", component.description);
+			put(details, "div", component.description);
 			
 		});
 	};
