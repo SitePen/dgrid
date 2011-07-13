@@ -1,4 +1,4 @@
-define(["dojo/has", "xstyle/create", "dojo/_base/declare", "dojo/on", "./Editor", "./List", "dojo/_base/sniff"], function(has, create, declare, listen, Editor, List){
+define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "./List", "dojo/_base/sniff"], function(has, put, declare, listen, Editor, List){
 	return declare([List], {
 		columns: {},
 		// summary:
@@ -76,7 +76,7 @@ define(["dojo/has", "xstyle/create", "dojo/_base/declare", "dojo/on", "./Editor"
 		createRowCells: function(tag, each){
 			// summary:
 			//		Generates the grid for each row (used by renderHeader and and renderRow)
-			var tr, row = create("table");
+			var tr, row = put("table");
 			var contentBoxSizing;
 			var cellNavigation = this.cellNavigation;
 			if(has("ie") < 9 || has("quirks")){
@@ -84,7 +84,7 @@ define(["dojo/has", "xstyle/create", "dojo/_base/declare", "dojo/on", "./Editor"
 					contentBoxSizing = true;
 					row.style.width = "auto"; // in IE7 this is needed instead of 100% to make it not create a horizontal scroll bar
 				}
-				var tbody = create(row, "tbody");
+				var tbody = put(row, "tbody");
 			}else{
 				var tbody = row;
 			}
@@ -95,7 +95,7 @@ define(["dojo/has", "xstyle/create", "dojo/_base/declare", "dojo/on", "./Editor"
 					// shortcut for modern browsers
 					tr = tbody;
 				}else{
-					tr = create(tbody, "tr");
+					tr = put(tbody, "tr");
 				}
 				for(var i in subrow){
 					// iterate through the columns
@@ -107,15 +107,14 @@ define(["dojo/has", "xstyle/create", "dojo/_base/declare", "dojo/on", "./Editor"
 						column.field = i;
 					}
 					var extraClassName = column.className || (column.field && "field-" + column.field);
-					var cell = create(tag + ".dgrid-cell.dgrid-cell-padding.column-" + i + (extraClassName ? '.' + extraClassName : ''));
+					var cell = put(tag + ".dgrid-cell.dgrid-cell-padding.column-" + i + (extraClassName ? '.' + extraClassName : ''));
 					cell.columnId = i;
 					if(cellNavigation && !column.editor || column.editOn){
 //						cell.tabIndex = tabIndex;
 					}				
 					if(contentBoxSizing){
 						// The browser (IE7-) does not support box-sizing: border-box, so we emulate it with a padding div
-						var innerCell = create(cell, "div.dgrid-cell-padding");
-						cell.className = cell.className.replace(/ dgrid-cell-padding/, '');
+						var innerCell = put(cell, "!dgrid-cell-padding div.dgrid-cell-padding");// remove the dgrid-cell-padding, and create a child with that class
 					}else{
 						innerCell = cell;
 					}
@@ -204,15 +203,12 @@ define(["dojo/has", "xstyle/create", "dojo/_base/declare", "dojo/on", "./Editor"
 						// re-sort
 						descending = grid.sortOrder && grid.sortOrder[0].attribute == field && !grid.sortOrder[0].descending;
 						if(lastSortedArrow){
-							parentNode = lastSortedArrow.parentNode;
-							parentNode.className = parentNode.className.replace(/dgrid-sort-\w+/,'');
-							parentNode.removeChild(lastSortedArrow);
+							put(lastSortedArrow, "<!dgrid-sort-up!dgrid-sort-down"); // remove the sort classes from parent node
+							put(lastSortedArrow, "!"); // destroy the lastSortedArrow node
 						}
-						lastSortedArrow = create(target.firstChild, "-div.dgrid-arrow-button-node.ui-icon[role=presentation]");
+						lastSortedArrow = put(target.firstChild, "-div.dgrid-arrow-button-node.ui-icon[role=presentation]");
 						lastSortedArrow.innerHTML = "&nbsp;";
-						target.className = (target.className +
-							(descending ? " dgrid-sort-down" : " dgrid-sort-up"))
-							.replace("  ", " ");
+						put(target, descending ? ".dgrid-sort-down" : ".dgrid-sort-up")
 						grid.sort(field, descending);
 					}
 				}while((target = target.parentNode) && target != headerNode);

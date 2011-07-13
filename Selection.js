@@ -1,4 +1,4 @@
-define(["dojo/_base/declare", "dojo/Stateful", "dojo/on", "./List"], function(declare, Stateful, listen, List){
+define(["dojo/_base/declare", "dojo/Stateful", "dojo/on", "./List", "xstyle/put"], function(declare, Stateful, listen, List, put){
 // patch Stateful until Dojo 1.8 so we can do selection.forEach 
 Stateful.prototype.forEach = function(callback, thisObject){
 	for(var i in this){
@@ -101,9 +101,9 @@ return declare([List], {
 			}
 			if(element){
 				if(value){
-					element.className += " dgrid-selected ui-state-active";
+					put(element, ".dgrid-selected.ui-state-active");
 				}else{
-					element.className = element.className.replace(/ dgrid-selected ui-state-active/, '');
+					put(element, "!dgrid-selected!ui-state-active");
 				}
 			}
 		}

@@ -1,4 +1,4 @@
-define(["dojo/on", "dojo/has", "xstyle/create", "dojo/_base/sniff"], function(on, has, create){
+define(["dojo/on", "dojo/has", "xstyle/put", "dojo/_base/sniff"], function(on, has, put){
 
 return function(column, editor, editOn){
 	// summary:
@@ -38,7 +38,7 @@ return function(column, editor, editOn){
 				input.lastValue = value;
 				cell.appendChild(input);
 			}else{
-				input = create(cell, "input[type=" + editor + "].dgrid-input", {
+				input = put(cell, "input[type=" + editor + "].dgrid-input", {
 					name: column.field || "selection",
 					tabIndex: grid.tabIndex,
 					value: value || "",

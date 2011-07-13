@@ -1,4 +1,4 @@
-define(["dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/on", "xstyle/create", "./List"], function(declare, dojo, Deferred, listen, create, List){
+define(["dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/on", "xstyle/put", "./List"], function(declare, dojo, Deferred, listen, put, List){
 return declare([List], {
 	create: function(params, srcNodeRef){
 		this.inherited(arguments);
@@ -21,7 +21,7 @@ return declare([List], {
 		//		Creates a preload node for rendering a query into, and executes the query
 		//		for the first page of data. Subsequent data will be downloaded as it comes
 		//		into view.
-		preloadNode = preloadNode || create(this.contentNode, ".preload");
+		preloadNode = preloadNode || put(this.contentNode, "div.preload");
 		// this preload node is used to represent the area of the grid that hasn't been 
 		// downloaded yet
 		preloadNode.preload = true;
@@ -148,7 +148,7 @@ return declare([List], {
 					preloadNode.style.height = Math.min(preloadNode.count * this.rowHeight, this.maxEmptySpace);
 				}
 				// create a loading node as a placeholder while the data is loaded 
-				var loadingNode = create("tr.dgrid-loading[style=height:" + count * this.rowHeight + "px]");
+				var loadingNode = put("tr.dgrid-loading[style=height:" + count * this.rowHeight + "px]");
 				this.contentNode.insertBefore(loadingNode, preloadNode);
 				// use the query associated with the preload node to get the next "page"
 				options.query = preloadNode.query;
