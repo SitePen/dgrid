@@ -122,6 +122,10 @@ function(css, dojo, create, declare, listen, aspect, has, TouchScroll){
 			}
 			domNode.className += " ui-widget dgrid";
 			this.refresh();
+			var grid = this;
+			listen(window, "resize", function(){
+				grid.resize();
+			});
 			if(has("ie")){
 				this.on("activate", function(event){
 					var target = event.target;
