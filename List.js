@@ -2,6 +2,7 @@ define(["xstyle/css!./css/dgrid.css", "dojo/_base/kernel", "xstyle/put", "dojo/_
 function(css, dojo, put, declare, listen, aspect, has, TouchScroll){
 	// allow for custom CSS class definitions 
 	// TODO: figure out what to depend for this
+	
 	if(has("mozilla") || has("opera")){
 		// firefox's focus doesn't work by default for divs prior to actually tabbing into it. This fixes that
 		// (we don't do any other browsers because we are trying to stay as close to native as possible) 
@@ -126,15 +127,6 @@ function(css, dojo, put, declare, listen, aspect, has, TouchScroll){
 			listen(window, "resize", function(){
 				grid.resize();
 			});
-			if(has("ie")){
-				this.on("activate", function(event){
-					var target = event.target;
-					if(!target.type && !hasTabIndex(target)){
-						// IE changes/loses focus when inner table cells even when it is not supposed to
-						domNode.focus();
-					}
-				});
-			}
 		},
 		refresh: function(){
 			var domNode = this.domNode;
