@@ -1,12 +1,12 @@
 define(["xstyle/css!./css/columnset.css", "dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/query", "./Grid", "dojo/_base/sniff"], 
-function(css, has, put, declare, listen, aspect, query, Grid){
+function(styleSheet, has, put, declare, listen, aspect, query, Grid){
 		//	summary:
 		//		This module provides column sets to isolate horizontal scroll of sets of 
 		// 		columns from each other. This mainly serves the purpose of allowing for
 		// 		column locking. 
 	if(has("ie") < 8 || has("quirks")){
 		// need position: relative in old IE to work properly
-		css.addRule("table.dgrid-row", "position: relative");
+		styleSheet.addRule("table.dgrid-row", "position: relative");
 	}
 	
 	return declare([Grid], {

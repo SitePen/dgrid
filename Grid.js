@@ -222,7 +222,14 @@ define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "
 			
 			// TODO: Should we first delete the old stylesheet (so it doesn't override the new one)?
 			// now create a stylesheet to style the column
-			this.css.addRule("#" + this.domNode.id + ' .column-' + colId, css);
+			var styleSheet = this.styleSheet; 
+			var index = (styleSheet.cssRules || styleSheet.rules).length;
+			styleSheet.addRule("#" + this.domNode.id + ' .column-' + colId, css);
+			return {
+				remove: function(){
+					styleSheet.deleteRule(index);
+				}
+			}
 		}
 	});
 	function getSubrows(grid){

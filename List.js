@@ -1,12 +1,12 @@
 define(["xstyle/css!./css/dgrid.css", "dojo/_base/kernel", "xstyle/put", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/has", "dojo/has!touch?./TouchScroll", "dojo/_base/sniff"], 
-function(css, dojo, put, declare, listen, aspect, has, TouchScroll){
+function(styleSheet, dojo, put, declare, listen, aspect, has, TouchScroll){
 	// allow for custom CSS class definitions 
 	// TODO: figure out what to depend for this
 	
 	if(has("mozilla") || has("opera")){
 		// firefox's focus doesn't work by default for divs prior to actually tabbing into it. This fixes that
 		// (we don't do any other browsers because we are trying to stay as close to native as possible) 
-		css.addRule(".dgrid *:focus", "outline: 1px dotted");
+		styleSheet.addRule(".dgrid *:focus", "outline: 1px dotted");
 	}
 	var scrollbarWidth;
 	var byId = function(id){
@@ -100,7 +100,7 @@ function(css, dojo, put, declare, listen, aspect, has, TouchScroll){
 	};*/
 			this.create(params, srcNodeRef);
 		},
-		css: css,
+		styleSheet: styleSheet,
 		getCSSClass: function(shortName){
 			return "dgrid-" + shortName;
 		},
@@ -158,7 +158,7 @@ function(css, dojo, put, declare, listen, aspect, has, TouchScroll){
 			if(!scrollbarWidth){ // we haven't computed the scroll bar width yet, do so now, and add a new rule if need be
 				scrollbarWidth = bodyNode.offsetWidth - bodyNode.clientWidth;
 				if(scrollbarWidth != 17){
-					css.addRule(".dgrid-header", "right: " + scrollbarWidth + "px");
+					styleSheet.addRule(".dgrid-header", "right: " + scrollbarWidth + "px");
 				}
 			}
 		},
