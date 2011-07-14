@@ -46,12 +46,11 @@
 						tree.save();
 					});
 					on(document.getElementById("add-country"), "click", function(){
-						testCountryStore.put({ id: 'EU', name:'Europe', type:'continent',
-	        				children:[{_reference:'DE'}, {_reference:'FR'}, {_reference:'ES'}, {_reference:'IT'}, {_reference:'US'}] });
+						testCountryStore.put({ id: 'GR', name:'Greece', type:'country', parent: 'EU'});
 					});
 					on(document.getElementById("add-continent"), "click", function(){
-						testCountryStore.put({ id: 'NE', name:'My New Europe', type:'continent',
-	        				children:[{_reference:'DE'}, {_reference:'FR'}, {_reference:'ES'}, {_reference:'IT'}] });
+						testCountryStore.put({ id: 'NE', name:'My New Europe', type:'continent'});
+	        			testCountryStore.put({ id: 'NI', name:'My New Italy', type:'country', parent: 'NE'});
 					});
 					on(document.getElementById("delete"), "click", function(){
 						tree.selection.forEach(function(selected, id){
@@ -72,7 +71,7 @@
 		<div id="tree"></div>
 		<button id="save">Save</button>
 		<button id="add-continent">Add Continent</button>
-		<button id="add-country">Add US To Europe</button>
+		<button id="add-country">Add Greece To Europe</button>
 		<button id="delete">Delete Selected</button>
 		<div id="tree2"></div>
 	</body>
