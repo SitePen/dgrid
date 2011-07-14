@@ -220,7 +220,7 @@ function(css, dojo, put, declare, listen, aspect, has, TouchScroll){
 					}
 					if(to > -1){
 						// add to new slot
-						var row = self.insertRow(object, rows[to], (options.start + to), options);
+						var row = self.insertRow(object, rows[to] || beforeNode, (options.start + to), options);
 						row.className += " ui-state-highlight";
 						setTimeout(function(){
 							row.className = row.className.replace(/ ui-state-highlight/, '');
