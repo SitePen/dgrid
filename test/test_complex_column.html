@@ -36,7 +36,7 @@
 				]});
 			require(["dgrid/OnDemandGrid", "dgrid/ColumnSet", "dgrid/Tree", "dgrid/Selection", "dgrid/Keyboard", "dgrid/test/test_data", "dojo/domReady!"],
 				function(Grid, ColumnSet, Tree, Selection, Keyboard, testStore){
-					testGrid = dojo.declare([Grid, ColumnSet, Selection, Keyboard])({
+					window.grid = dojo.declare([Grid, ColumnSet, Selection, Keyboard])({
 						store: testStore,
 						columnSets: [
 							[
