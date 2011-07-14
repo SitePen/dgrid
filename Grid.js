@@ -208,7 +208,8 @@ define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "
 						}
 						lastSortedArrow = put(target.firstChild, "-div.dgrid-arrow-button-node.ui-icon[role=presentation]");
 						lastSortedArrow.innerHTML = "&nbsp;";
-						put(target, descending ? ".dgrid-sort-down" : ".dgrid-sort-up")
+						put(target, descending ? ".dgrid-sort-down" : ".dgrid-sort-up");
+						grid.resize();
 						grid.sort(field, descending);
 					}
 				}while((target = target.parentNode) && target != headerNode);
