@@ -26,14 +26,13 @@ return function(column, editor, editOn){
 		function(value, cell, object, onblur){
 			var input;
 			// it is string editor, so we use a common <input> as the editor
-			input = put(cell, "input[type=" + editor + "].dgrid-input", {
+			input = cell.input || (cell.input = put(cell, "input[type=" + editor + "].dgrid-input", {
 				name: column.field || "selection",
-				tabIndex: grid.tabIndex,
-				value: value || "",
-				checked: value,
-				lastValue: value
-			});
-			
+				tabIndex: grid.tabIndex
+			}));
+			input.value = value || "";
+			input.checked = value;
+			input.lastValue = value;
 			if(!grid._hasInputListener){
 				// register one listener at the top level that receives events delegated
 				grid._hasInputListener = true;
@@ -124,7 +123,6 @@ return function(column, editor, editOn){
 				grid.on("select,deselect", function(event){
 					if(!suppressSelect){
 						var cell = grid.cell(event.row.id, column.id);
-						cell.element.innerHTML = "";
 						renderWidget(event.type == "select", cell.element, object);
 					}
 				});
