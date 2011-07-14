@@ -122,8 +122,8 @@ return function(column, editor, editOn){
 			if(column.selector){
 				grid.on("select,deselect", function(event){
 					if(!suppressSelect){
-						var cell = grid.cell(event.row.id, column.id);
-						renderWidget(event.type == "select", cell.element, object);
+						var cell = grid.cell(event.row.id, column.id).element;
+						renderWidget(event.type == "select", cell.contents || cell, object);
 					}
 				});
 			}
