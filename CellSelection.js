@@ -34,7 +34,7 @@ return declare([Selection], {
 			})){
 				previousRow = previousRow || {};
 				previousRow[cell.column.id] = value;
-				this.selection.set(rowId, previousRow);
+				this.selection[rowId] = previousRow;
 				/*if(!row){ // TODO: could check for empty objects to see if it could be deleted
 					delete this.selection[rowId];
 				}*/
