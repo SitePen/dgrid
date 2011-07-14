@@ -10,7 +10,7 @@
 	font-weight: bold; 
 }
 .ui-widget-header th:hover {
-	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#ffeeeeee');
+	background: #f8f8f8;
 	background: #d2e0eb -webkit-gradient(linear, left top, left bottom, from(#fff), to(#eee));
 	background: #d2e0eb -moz-linear-gradient(top,  #fff,  #eee);
 	background: #d2e0eb -o-linear-gradient(top,  #fff,  #eee);
