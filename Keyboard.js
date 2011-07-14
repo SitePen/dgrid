@@ -21,6 +21,9 @@ return declare([List], {
 				}			
 				if(cellFocusedElement){
 					put(cellFocusedElement, "!dgrid-cell-focus[!tabIndex]"); // remove the class name and the tabIndex attribute
+					if(has("ie") < 8){
+						cellFocusedElement.style.position = "";
+					}
 					event.cell = cellFocusedElement;
 					listen.emit(element, "cellfocusout", event);
 				}
