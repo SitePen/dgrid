@@ -53,9 +53,9 @@
 	        			testCountryStore.put({ id: 'NI', name:'My New Italy', type:'country', parent: 'NE'});
 					});
 					on(document.getElementById("delete"), "click", function(){
-						tree.selection.forEach(function(selected, id){
+						for(var id in tree.selection){
 							testCountryStore.remove(id);
-						});
+						}
 					});
 					window.tree2 =dojo.declare([Grid, Keyboard])({
 						store: testCountryStore,
