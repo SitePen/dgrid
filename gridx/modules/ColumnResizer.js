@@ -3,7 +3,7 @@ define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/on", "dojo/query", "doj
 return declare([], {
 	resizeNode: null,
 	minWidth: 40,	//minimum column width in px
-	detectWidth: 5, //distance from cell edge that the resize mouse cursor changes
+	detectWidth: 8, //distance from cell edge that the resize mouse cursor changes
 	gridWidth: null, //place holder for the grid width property
 	setColumnWidth: function(colId, width){
 	// Summary:
@@ -18,7 +18,7 @@ return declare([], {
 	},
 	postCreate: function(){
 		this.inherited(arguments);
-		//console.log("this: ", this);
+		
 		var grid = this,
 			body = document.body;
 		grid.gridWidth = grid.headerNode.clientWidth;
@@ -142,15 +142,8 @@ return declare([], {
 		var cell = this._getCell(e);
 		this._targetCell = cell;
 		//var x = this._getCellX(e); //something is messed up in huurrr.
-		var x = e.layerX; //this does not work in Opera currently.
-
-		if(x < this.detectWidth){
-			if(!this._targetCell.previousSibling){
-				return false;	//left side of first cell is not able to resize
-			}
-			return true;
-		}else if(x > cell.offsetWidth - this.detectWidth && x <= cell.offsetWidth){
-
+		var x = e.offsetX || e.layerX; //this does not work in Opera currently.
+		if(x > cell.offsetWidth - this.detectWidth && x <= cell.offsetWidth){
 			return true;
 		}
 		return false;
