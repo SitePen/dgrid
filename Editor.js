@@ -49,7 +49,7 @@ return function(column, editor, editOn){
 				var signal = on(input, "blur", function(){
 					// delete the input now
 					signal.remove();
-					cell.removeChild(input);
+					put(input, "!");
 					cell.input = null;
 					onblur(input.lastValue);
 				});
@@ -129,7 +129,10 @@ return function(column, editor, editOn){
 				});
 			}
 		}
-		value = !column.selector && value;
+		if(column.selector){
+			var row = object && grid.row(object);
+			value = row && grid.selection[row.id];
+		}
 		if(column.editOn){
 			on(cell.getAttribute("role") ? cell : cell.parentNode, // if we are dealing with IE7, the cell element is the padding cell, need to go to parent 
 					column.editOn, function(){

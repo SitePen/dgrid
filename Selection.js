@@ -22,7 +22,6 @@ return declare([List], {
 			listen(this.contentNode, "mousedown,cellfocusin", function(event){
 				if(event.type == "mousedown" || !event.ctrlKey || event.keyCode == 32){
 					var row = event.target;
-					var selection = grid.selection;
 					if(mode == "single" && lastRow && event.ctrlKey){
 						grid.deselect(lastRow);
 						if(lastRow == row){
@@ -76,15 +75,15 @@ return declare([List], {
 			row: row
 		}))){
 			selection[row.id] = value;
-			if(!value){
+			if(!value && !this.allSelected){
 				delete this.selection[row.id];
 			}
-			if(element){
-				if(value){
-					put(element, ".dgrid-selected.ui-state-active");
-				}else{
-					put(element, "!dgrid-selected!ui-state-active");
-				}
+		}
+		if(element){
+			if(value){
+				put(element, ".dgrid-selected.ui-state-active");
+			}else{
+				put(element, "!dgrid-selected!ui-state-active");
 			}
 		}
 		if(toRow){
@@ -119,6 +118,7 @@ return declare([List], {
 	},
 	selectAll: function(){
 		this.allSelected = true;
+		this.selection = {}; // we do this to clear out pages from previous sorts
 		for(var i in this._rowIdToObject){
 			var row = this.row(this._rowIdToObject[i]);
 			this.select(row.id);
@@ -126,11 +126,12 @@ return declare([List], {
 	},
 	renderArray: function(){
 		var rows = this.inherited(arguments);
+		var selection = this.selection;
 		for(var i = 0; i < rows.length; i++){
 			var row = this.row(rows[i]);
-			var selected = this.selection[row.id] || this.allSelected;
+			var selected = row.id in selection ? selection[row.id] : this.allSelected;
 			if(selected){
-				this.select(row);
+				this.select(row, null, selected);
 			}
 		}
 		return rows;

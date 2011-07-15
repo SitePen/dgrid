@@ -8,8 +8,14 @@ return declare([Selection], {
 			// default to true
 			value = true;
 		}
-		if(!cell.element){
+		if(typeof cell != "object" || !("element" in cell)){
 			cell = this.cell(cell);
+		}else if(!cell.row){
+			// it is row, with the value being a hash
+			for(var id in value){
+				this.select(this.cell(cell.id, id), null, value[id]);
+			}
+			return;
 		}
 		var selection = this.selection;
 		var rowId = cell.row.id;
@@ -25,8 +31,8 @@ return declare([Selection], {
 			// indicates a toggle
 			value = !previous;
 		}
+		var element = cell.element;
 		if(previous != value){
-			var element = cell.element;
 			if(!element || listen.emit(element, value ? "select" : "deselect", {
 				cancelable: true,
 				bubbles: true,
@@ -38,13 +44,13 @@ return declare([Selection], {
 				/*if(!row){ // TODO: could check for empty objects to see if it could be deleted
 					delete this.selection[rowId];
 				}*/
-				if(element){
-					if(value){
-						element.className += " dgrid-selected ui-state-active";
-					}else{
-						element.className = element.className.replace(/ dgrid-selected ui-state-active/, '');
-					}
-				}
+			}
+		}
+		if(element){
+			if(value){
+				element.className += " dgrid-selected ui-state-active";
+			}else{
+				element.className = element.className.replace(/ dgrid-selected ui-state-active/, '');
 			}
 		}
 		if(toCell){
@@ -58,6 +64,7 @@ return declare([Selection], {
 			var traverser = (toElement && (toElement.compareDocumentPosition ? 
 				toElement.compareDocumentPosition(fromElement) == 2 :
 				toElement.sourceIndex > fromElement.sourceIndex)) ? "nextSibling" : "previousSibling";
+			// now we determine which columns are in the range 
 			var idFrom = cell.column.id, idTo = toCell.column.id, started, columnIds = [];
 			for(var id in this.columns){
 				if(started){
@@ -73,10 +80,12 @@ return declare([Selection], {
 					started = true;
 				}
 			}
+			// now we iterate over rows
 			var row = cell.row, nextNode = row.element;
 			toElement = toCell.row.element;
 			do{
-				// loop through and set everything
+				// looping through each row..
+				// and now loop through each column to be selected
 				for(var i = 0; i < columnIds.length; i++){
 					cell = this.cell(nextNode, columnIds[i]);
 					this.select(cell);
