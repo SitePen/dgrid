@@ -82,15 +82,7 @@ table.dgrid-row, .dgrid-column-set table{
 }
 
 /* Single Sort */
-.dgrid-sort-node {
-	text-decoration: none;
-	display: block;
-}
-.dgrid-arrow-button-char {
-	display: none;
-	float: right;
-}
-.dgrid-arrow-button-node {
+.dgrid-sort-arrow {
 	background-position: -64px -16px;
 	display: block;
 	float: right;
@@ -98,7 +90,7 @@ table.dgrid-row, .dgrid-column-set table{
 	padding-left: 0;
 	height: 12px;
 }
-.dgrid-sort-up .dgrid-arrow-button-node {
+.dgrid-sort-up .dgrid-sort-arrow {
 	background-position: 0px -16px;
 }
 

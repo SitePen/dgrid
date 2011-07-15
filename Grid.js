@@ -210,7 +210,7 @@ define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "
 							put(lastSortedArrow, "<!dgrid-sort-up!dgrid-sort-down"); // remove the sort classes from parent node
 							put(lastSortedArrow, "!"); // destroy the lastSortedArrow node
 						}
-						lastSortedArrow = put(target.firstChild, "-div.dgrid-arrow-button-node.ui-icon[role=presentation]");
+						lastSortedArrow = put(target.firstChild, "-div.dgrid-sort-arrow.ui-icon[role=presentation]");
 						lastSortedArrow.innerHTML = "&nbsp;";
 						put(target, descending ? ".dgrid-sort-down" : ".dgrid-sort-up");
 						grid.resize();
