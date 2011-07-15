@@ -1,4 +1,4 @@
-define(["dojo/_base/declare", "./Selection", "dojo/on"], function(declare, Selection, listen){
+define(["dojo/_base/declare", "./Selection", "dojo/on", "xstyle/put"], function(declare, Selection, listen, put){
 return declare([Selection], {
 	// summary:
 	// 		Add cell level selection capabilities to a grid. The grid will have a selection property and
@@ -48,9 +48,9 @@ return declare([Selection], {
 		}
 		if(element){
 			if(value){
-				element.className += " dgrid-selected ui-state-active";
+				put(element, ".dgrid-selected.ui-state-active");
 			}else{
-				element.className = element.className.replace(/ dgrid-selected ui-state-active/, '');
+				put(element, "!dgrid-selected!ui-state-active");
 			}
 		}
 		if(toCell){
