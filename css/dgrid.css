@@ -37,6 +37,7 @@ table.dgrid-row, .dgrid-column-set table{
 	-moz-box-sizing: border-box;
 	-ms-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
+	position: relative;
 }
 .dgrid-ie-outline{
 	position: absolute;
