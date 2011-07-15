@@ -209,7 +209,6 @@ function(styleSheet, dojo, put, declare, listen, aspect, has, TouchScroll){
 			if(!beforeNode){
 				this.lastCollection = results;
 			}
-			var contentNode = this.contentNode;
 			if(results.observe){
 				// observe the results for changes
 				this.observers.push(results.observe(function(object, from, to){
@@ -220,7 +219,8 @@ function(styleSheet, dojo, put, declare, listen, aspect, has, TouchScroll){
 					}
 					if(to > -1){
 						// add to new slot
-						var row = self.insertRow(object, rows[to] || beforeNode, (options.start + to), options);
+						var before = rows[to] || beforeNode;
+						var row = self.insertRow(object, before.parentNode, before, (options.start + to), options);
 						row.className += " ui-state-highlight";
 						setTimeout(function(){
 							row.className = row.className.replace(/ ui-state-highlight/, '');
@@ -229,6 +229,7 @@ function(styleSheet, dojo, put, declare, listen, aspect, has, TouchScroll){
 					}
 				}, true));
 			}
+			var rowsFragment = document.createDocumentFragment();
 			// now render the results
 			if(results.map){
 				var rows = results.map(mapEach, console.error);
@@ -239,26 +240,27 @@ function(styleSheet, dojo, put, declare, listen, aspect, has, TouchScroll){
 				}
 			}
 			function mapEach(object){
-				return self.insertRow(object, beforeNode, start++, options);
+				return self.insertRow(object, rowsFragment, null, start++, options);
 			}
+			(beforeNode && beforeNode.parentNode || this.contentNode).insertBefore(rowsFragment, beforeNode || null);
 			return rows;
 		},
 		_autoId: 0,
 		renderHeader: function(){
 			// no-op in a place list 
 		},
-		insertRow: function(object, beforeNode, i, options){
+		insertRow: function(object, parentFragment, beforeNode, i, options){
 			// summary:
 			//		Renders a single row in the grid
 			var row = this.renderRow(object, options);
 			row.className = (row.className || "") + " ui-state-default dgrid-row " + (i% 2 == 1 ? "dgrid-row-odd" : "dgrid-row-even");
 			// get the row id for easy retrieval
 			this._rowIdToObject[row.id = this.id + "-row-" + ((this.store && this.store.getIdentity) ? this.store.getIdentity(object) : this._autoId++)] = object;
-			(beforeNode ? beforeNode.parentNode : this.contentNode).insertBefore(row, beforeNode || null);
+			parentFragment.insertBefore(row, beforeNode);
 			return row;
 		},
 		renderRow: function(value, options){
-			return put("div", value);
+			return put("div $", value);
 		},
 		row: function(target){
 			// summary:

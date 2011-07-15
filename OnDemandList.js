@@ -15,7 +15,7 @@ return declare([List], {
 	minRowsPerPage: 25,
 	maxRowsPerPage: 100,
 	maxEmptySpace: 10000,
-	rowHeight: 0,
+	rowHeight: 22,
 	renderQuery: function(query, preloadNode){
 		// summary:
 		//		Creates a preload node for rendering a query into, and executes the query

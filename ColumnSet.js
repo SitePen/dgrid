@@ -30,10 +30,12 @@ function(styleSheet, has, put, declare, listen, aspect, query, Grid){
 			}
 			return row;
 		},
-		insertRow: function(){
-			var row = this.inherited(arguments);
-			adjustScrollLeft(this, row);
-			return row;
+		renderArray: function(){
+			var rows = this.inherited(arguments);
+			for(var i = 0; i < rows.length; i++){
+				adjustScrollLeft(this, rows[i]);
+			}
+			return rows;
 		},
 		renderHeader: function(){
 			// summary:
