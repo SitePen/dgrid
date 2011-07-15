@@ -1,19 +1,11 @@
-define(["dojo/_base/declare", "dojo/Stateful", "dojo/on", "./List", "xstyle/put"], function(declare, Stateful, listen, List, put){
-// patch Stateful until Dojo 1.8 so we can do selection.forEach 
-Stateful.prototype.forEach = function(callback, thisObject){
-	for(var i in this){
-		if(this.hasOwnProperty(i) && typeof this[i] != "function"){
-			callback.call(thisObject, this[i], i);
-		}
-	}
-};
+define(["dojo/_base/declare", "dojo/on", "./List", "xstyle/put"], function(declare, listen, List, put){
 return declare([List], {
 	// summary:
 	// 		Add selection capabilities to a grid. The grid will have a selection property and
 	//		fire "select" and "deselect" events.
 	
 	create: function(){
-		this.selection = new Stateful();
+		this.selection = {};
 		return this.inherited(arguments);
 	},
 	postCreate: function(){
@@ -29,20 +21,18 @@ return declare([List], {
 			// listen for actions that should cause selections
 			listen(this.contentNode, "mousedown,cellfocusin", function(event){
 				if(event.type == "mousedown" || !event.ctrlKey || event.keyCode == 32){
-//					if(event.type == "mousedown"){
-	//					event.preventDefault();
-		//			}
-/*					var focusElement = event.target;
-					while(focusElement.getAttribute && !focusElement.getAttribute("tabIndex")){
-						focusElement = focusElement.parentNode;
-					}
-					if(focusElement.focus){
-						focusElement.focus();
-					}*/
 					var row = event.target;
 					var selection = grid.selection;
-					if(mode == "single" || (!event.ctrlKey && mode == "extended")){
-						grid.clearSelection();
+					if(mode == "single" && lastRow && event.ctrlKey){
+						grid.deselect(lastRow);
+						if(lastRow == row){
+							return;
+						}
+					}
+					if(!event.ctrlKey){
+						if(mode != "multiple"){
+							grid.clearSelection();
+						}
 						grid.select(row);
 					}else{
 						grid.select(row, null, null);
@@ -56,19 +46,9 @@ return declare([List], {
 				
 			});
 		}
-	/*	grid.selection.watch(function(id, oldValue, value){
-			grid.select(id, null, value);
-			if(typeof oldValue == "object" || typeof value == "object"){
-				for(var colId in oldValue || value){
-					updateElement(grid.cell(id, colId).element, value[colId]);
-				}
-			}else{
-				updateElement(grid.row(id).element, value);
-			}
-		});*/
 	},
 	// selection:
-	// 		A stateful object (get/set/watch) where the property names correspond to 
+	// 		An object where the property names correspond to 
 	// 		object ids and values are true or false depending on whether an item is selected
 	selection: {},
 	// selectionMode: String
@@ -95,7 +75,7 @@ return declare([List], {
 			bubbles: true,
 			row: row
 		}))){
-			selection.set(row.id, value);
+			selection[row.id] = value;
 			if(!value){
 				delete this.selection[row.id];
 			}
@@ -133,9 +113,9 @@ return declare([List], {
 	},
 	clearSelection: function(){
 		this.allSelected = false;
-		this.selection.forEach(function(selected, id){
+		for(var id in this.selection){
 			this.deselect(id);
-		}, this);		
+		}
 	},
 	selectAll: function(){
 		this.allSelected = true;

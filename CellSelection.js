@@ -34,7 +34,7 @@ return declare([Selection], {
 			})){
 				previousRow = previousRow || {};
 				previousRow[cell.column.id] = value;
-				this.selection.set(rowId, previousRow);
+				this.selection[rowId] = previousRow;
 				/*if(!row){ // TODO: could check for empty objects to see if it could be deleted
 					delete this.selection[rowId];
 				}*/
@@ -48,24 +48,43 @@ return declare([Selection], {
 			}
 		}
 		if(toCell){
-			if(!toRow.element){
-				toRow = this.row(toRow);
+			// a range
+			if(!toCell.element){
+				toCell = this.cell(toCell);
 			}
-			var toElement = toRow.element;
-			var fromElement = row.element;
+			var toElement = toCell.element;
+			var fromElement = cell.element;
 			// find if it is earlier or later in the DOM
 			var traverser = (toElement && (toElement.compareDocumentPosition ? 
 				toElement.compareDocumentPosition(fromElement) == 2 :
 				toElement.sourceIndex > fromElement.sourceIndex)) ? "nextSibling" : "previousSibling";
-			var nextNode;
-			while(nextNode = row.element[traverser]){
+			var idFrom = cell.column.id, idTo = toCell.column.id, started, columnIds = [];
+			for(var id in this.columns){
+				if(started){
+					columnIds.push(id);				
+				}
+				if(id == idFrom && (idFrom = columnIds) || // once found, we mark it off so we don't hit it again
+					id == idTo && (idTo = columnIds)){
+					columnIds.push(id);
+					if(started || // last id, we are done 
+						(idFrom == columnIds && id == idTo)){ // the ids are the same, we are done
+						break;
+					}
+					started = true;
+				}
+			}
+			var row = cell.row, nextNode = row.element;
+			toElement = toCell.row.element;
+			do{
 				// loop through and set everything
-				row = this.row(nextNode);
-				this.select(row);
+				for(var i = 0; i < columnIds.length; i++){
+					cell = this.cell(nextNode, columnIds[i]);
+					this.select(cell);
+				}
 				if(nextNode == toElement){
 					break;
 				}
-			}
+			}while(nextNode = cell.row.element[traverser]);
 		}
 	}
 });

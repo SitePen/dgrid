@@ -37,7 +37,7 @@
 						{name: 'Column 4', field: 'col4'},
 						{name: 'Column 5', field: 'col5'}
 					];
-					grid = new (dojo.declare([Grid, Selection, Keyboard]))({
+					window.grid = new (dojo.declare([Grid, Selection, Keyboard]))({
 						store: testStore,
 						columns: columns
 					}, "grid");

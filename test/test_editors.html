@@ -40,7 +40,7 @@
 						Editor({name: 'CheckBox', field: 'bool'}, "checkbox"),
 						Editor({name: 'Radio', selector: true}, "radio")
 					];
-					grid = new (dojo.declare([Grid, Selection, Keyboard]))({
+					window.grid = new (dojo.declare([Grid, Selection, Keyboard]))({
 						store: testTypesStore,
 						columns: columns,
 						selectionMode: "single"

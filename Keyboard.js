@@ -20,25 +20,26 @@ return declare([List], {
 					event.bubbles = true;
 				}			
 				if(cellFocusedElement){
-					cellFocusedElement.className = cellFocusedElement.className.replace(/\s*dgrid-cell-focus/, '');
-					cellFocusedElement.removeAttribute("tabIndex");
+					put(cellFocusedElement, "!dgrid-cell-focus[!tabIndex]"); // remove the class name and the tabIndex attribute
+					if(has("ie") < 8){
+						cellFocusedElement.style.position = "";
+					}
 					event.cell = cellFocusedElement;
 					listen.emit(element, "cellfocusout", event);
 				}
 				cellFocusedElement = element;
 				event.cell = element;
 				if(!dontFocus){
+					if(has("ie") < 8){
+						// setting the position to relative (can't be done a priori with CSS or 
+						// screws up the entire table), magically makes the outline work 
+						// properly for focusing later on with old IE
+						element.style.position = "relative";
+					}
 					element.tabIndex = 0;
 					element.focus();
-					if(has("ie") < 8){
-						var outlineElementStyle = put(element, "div.dgrid-ie-outline").style;
-						outlineElementStyle.left = element.offsetLeft - 1;
-						outlineElementStyle.top = element.offsetTop - 1;
-						outlineElementStyle.width = element.offsetWidth;
-						outlineElementStyle.Height = element.offsetHeight;
-					}
 				}
-				element.className += " dgrid-cell-focus";
+				put(element, ".dgrid-cell-focus");
 				listen.emit(element, "cellfocusin", event);
 			}
 		}
@@ -81,18 +82,6 @@ return declare([List], {
 				cell = grid.row(cellFocusedElement);				
 			}
 			var nextFocus = move ? grid[orientation](cell, move).element : cell.element;
-/*			do{
-				// move in the correct direction
-				if((nextSibling = nextFocus[move < 0 ? 'previousSibling' : 'nextSibling']) && !nextSibling.preload){
-					nextFocus = nextSibling; 
-					if(nextFocus.nodeType == 1){
-						// it's an element, counts as a real move
-						move += move < 0 ? 1 : -1;
-					}
-				}else{
-					move = 0;
-				}
-			}while(nextSibling && move);*/
 			if(nextFocus){
 				if(columnId){
 					nextFocus = grid.cell(nextFocus, columnId).element;

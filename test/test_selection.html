@@ -38,19 +38,40 @@
 						col1: 'Column 1',
 						col2: {name: 'Column 2', sortable: false},
 						col3: 'Column 3',
-						col4: Editor({name: 'Editable'}, "text")
+						col4: 'Column 4'
 					};
 					gridCellNavigation = dojo.declare([Grid, CellSelection, Keyboard])({
 						store: testStore,
 						columns: columns2
 					}, "grid-cell-navigation");
+					gridCellNavigationSingle = dojo.declare([Grid, CellSelection, Keyboard])({
+						store: testStore,
+						columns: columns2,
+						selectionMode: "single"
+					}, "grid-cell-navigation-single");
+					gridCellNavigationMultiple = dojo.declare([Grid, CellSelection, Keyboard])({
+						store: testStore,
+						columns: columns2,
+						selectionMode: "multiple"
+					}, "grid-cell-navigation-multiple");
+					gridCellNavigationNone = dojo.declare([Grid, CellSelection, Keyboard])({
+						store: testStore,
+						columns: columns2,
+						selectionMode: "none"
+					}, "grid-cell-navigation-none");
 				});
 		</script>
 	</head>
 	<body class="claro">
 		<h2>A grid with row-level selection (and row-level navigation)</h2>
 		<div id="grid-row-navigation"></div>
-		<h2>A grid with cell-level selection</h2>
+		<h2>A grid with cell-level selection (default selection mode of "extended")</h2>
 		<div id="grid-cell-navigation"></div>
+		<h2>A grid with cell-level selection and selection mode of "single"</h2>
+		<div id="grid-cell-navigation-single"></div>
+		<h2>A grid with cell-level selection and selection mode of "multiple"</h2>
+		<div id="grid-cell-navigation-multiple"></div>
+		<h2>A grid with cell-level selection and selection mode of "none"</h2>
+		<div id="grid-cell-navigation-none"></div>
 	</body>
 </html>
