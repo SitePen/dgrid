@@ -23,8 +23,16 @@ return declare([List], {
 				if(event.type == "mousedown" || !event.ctrlKey || event.keyCode == 32){
 					var row = event.target;
 					var selection = grid.selection;
-					if(mode == "single" || (!event.ctrlKey && mode == "extended")){
-						grid.clearSelection();
+					if(mode == "single" && lastRow && event.ctrlKey){
+						grid.deselect(lastRow);
+						if(lastRow == row){
+							return;
+						}
+					}
+					if(!event.ctrlKey){
+						if(mode != "multiple"){
+							grid.clearSelection();
+						}
 						grid.select(row);
 					}else{
 						grid.select(row, null, null);
