@@ -45,12 +45,15 @@ define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "
 				}while(target && target != this.domNode);
 			}
 			if(!element && columnId){
-				var row = this.row(target); 
-				var elements = row.element.getElementsByTagName("td");
-				for(var i = 0; i < elements.length; i++){
-					if(elements[i].columnId == columnId){
-						element = elements[i];
-						break;
+				var row = this.row(target),
+					rowElement = row.element;
+				if(rowElement){ 
+					var elements = rowElement.getElementsByTagName("td");
+					for(var i = 0; i < elements.length; i++){
+						if(elements[i].columnId == columnId){
+							element = elements[i];
+							break;
+						}
 					}
 				}
 			}
