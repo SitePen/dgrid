@@ -10,7 +10,7 @@
 	background: #d2e0eb -o-linear-gradient(top,	#ebf1f6,	#d2e0eb);
 	font-weight: bold; 
 }
-.ui-widget-header th:hover {
+.ui-widget-header .dgrid-cell:hover {
 	background: #dee;
 	background: #d2e0eb -webkit-gradient(linear, left top, left bottom, from(#fff), to(#d2e0eb));
 	background: #d2e0eb -moz-linear-gradient(top,	#fff,	#d2e0eb);

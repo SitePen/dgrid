@@ -5,7 +5,7 @@ return function(column){
     //      Add a editing capability
     var originalRenderCell = column.renderCell || function(object, value, td){
         if(value != null){
-        	put(td, "span.dgrid-expando-text", value);
+        	put(td, "span.dgrid-expando-text $", value);
         }
     };
 	column.renderCell = function(object, value, td, options){
@@ -40,14 +40,13 @@ return function(column){
 					if(!preloadNode){
 						// if the children have not been created, create a container, a preload node and do the 
 						// query for the children
-						var container = rowElement.connected = put('div.dgrid-tree-container');
+						var container = rowElement.connected = put('div.dgrid-tree-container');//put(rowElement, '+...
 						preloadNode = target.preloadNode = put(container, 'div');
 						//preloadNode.nextRow = grid.down(row).element;
 						var query = function(options){
 							return grid.store.getChildren(row.data, options);
 						};
 						query.level = target.level;
-						rowElement.parentNode.insertBefore(container, rowElement.nextSibling);
 						grid.renderQuery ? 
 							grid.renderQuery(query, preloadNode) :
 							grid.renderArray(query({}), preloadNode);
@@ -55,8 +54,14 @@ return function(column){
 					// show or hide all the children
 					var styleDisplay = expanded ? "" : "none";
 					container = rowElement.connected;
-					container.rowContainer = expanded;
-					container.style.display = styleDisplay;// TODO: maybe use a CSS class here
+					// TODO: see if want to use a CSS class and a transition (must coordinate with keynav so hidden elements aren't included in nav) 
+					if(expanded){
+						put(rowElement, '+', container);
+					}else{
+						container.parentNode.removeChild(container);
+					}
+/*					put(container, (expanded ? "!" : ".") + "dgrid-tree-container-contracted");
+					container.style.display = styleDisplay;// TODO: maybe use a CSS class here*/
 				}
 			});
 		};

@@ -45,12 +45,15 @@ define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "
 				}while(target && target != this.domNode);
 			}
 			if(!element && columnId){
-				var row = this.row(target); 
-				var elements = row.element.getElementsByTagName("td");
-				for(var i = 0; i < elements.length; i++){
-					if(elements[i].columnId == columnId){
-						element = elements[i];
-						break;
+				var row = this.row(target),
+					rowElement = row.element;
+				if(rowElement){ 
+					var elements = rowElement.getElementsByTagName("td");
+					for(var i = 0; i < elements.length; i++){
+						if(elements[i].columnId == columnId){
+							element = elements[i];
+							break;
+						}
 					}
 				}
 			}
@@ -96,7 +99,7 @@ define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "
 					tr = tbody;
 				}else{
 					tr = put(tbody, "tr");
-				}
+				}				
 				for(var i in subrow){
 					// iterate through the columns
 					var column = subrow[i];
@@ -135,10 +138,10 @@ define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "
 			return row;
 		},
 		left: function(cell, steps){
-			return this.cell(this._move(cell, -(steps || 1)));
+			return this.cell(this._move(cell, -(steps || 1), "dgrid-cell"));
 		},
 		right: function(cell, steps){
-			return this.cell(this._move(cell, steps || 1));
+			return this.cell(this._move(cell, steps || 1, "dgrid-cell"));
 		},
 		renderRow: function(object, options){
 			var row = this.createRowCells("td[role=gridcell]", function(td, column, id){
@@ -207,7 +210,7 @@ define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "
 							put(lastSortedArrow, "<!dgrid-sort-up!dgrid-sort-down"); // remove the sort classes from parent node
 							put(lastSortedArrow, "!"); // destroy the lastSortedArrow node
 						}
-						lastSortedArrow = put(target.firstChild, "-div.dgrid-arrow-button-node.ui-icon[role=presentation]");
+						lastSortedArrow = put(target.firstChild, "-div.dgrid-sort-arrow.ui-icon[role=presentation]");
 						lastSortedArrow.innerHTML = "&nbsp;";
 						put(target, descending ? ".dgrid-sort-down" : ".dgrid-sort-up");
 						grid.resize();
