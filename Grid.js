@@ -99,7 +99,7 @@ define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "
 					tr = tbody;
 				}else{
 					tr = put(tbody, "tr");
-				}
+				}				
 				for(var i in subrow){
 					// iterate through the columns
 					var column = subrow[i];
@@ -138,10 +138,10 @@ define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "
 			return row;
 		},
 		left: function(cell, steps){
-			return this.cell(this._move(cell, -(steps || 1)));
+			return this.cell(this._move(cell, -(steps || 1), "dgrid-cell"));
 		},
 		right: function(cell, steps){
-			return this.cell(this._move(cell, steps || 1));
+			return this.cell(this._move(cell, steps || 1, "dgrid-cell"));
 		},
 		renderRow: function(object, options){
 			var row = this.createRowCells("td[role=gridcell]", function(td, column, id){

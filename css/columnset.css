@@ -1,6 +1,7 @@
 .dgrid-column-set {
 	overflow: hidden;
 	width: 100%;
+	position: relative; /* This is needed because we setting position: relative on cells in the grid for focus in IE7*/
 }
 .dgrid-column-set-cell {
 	vertical-align: bottom;

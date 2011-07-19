@@ -29,26 +29,28 @@ function(styleSheet, dojo, put, declare, listen, aspect, has, TouchScroll){
 			}
 		}
 	};
-	function move(item, steps){
+	function move(item, steps, targetClass){
 		var nextSibling, current, element = current = item.element;
 		steps = steps || 1;
 		do{
 			// move in the correct direction
 			if(nextSibling = current[steps < 0 ? 'previousSibling' : 'nextSibling']){
-				current = nextSibling;
-				if(current.rowContainer){
-					current = current[steps < 0 ? 'lastChild' : 'firstChild'];
-				}
-				var className = current && current.className;
-				if(className && className.match(/dgrid-(cell|row)/)){
-					// it's an element, counts as a real move
-					element = current;
-					steps += steps < 0 ? 1 : -1;
-				}
-			}else if(!(nextSibling = (current = current.parentNode).rowContainer)){ // intentional assignment
-				steps = 0;
+				do{
+					current = nextSibling;
+					var className = current && current.className;
+					if(className && className.indexOf(targetClass) > -1){
+						// it's an element with the correct class name, counts as a real move
+						element = current;
+						steps += steps < 0 ? 1 : -1;
+						break;
+					}
+					// if the next sibling isn't a match, drill down to search
+				}while(nextSibling = current[steps < 0 ? 'lastChild' : 'firstChild']);
+			}else if((current = current.parentNode) == this.domNode){ // intentional assignment
+				// we stepped all the way out of the grid, given up now
+				break;
 			}
-		}while(nextSibling && steps);
+		}while(steps);
 		return element;		
 	}
 	function hasTabIndex(element){
@@ -296,11 +298,11 @@ function(styleSheet, dojo, put, declare, listen, aspect, has, TouchScroll){
 		},
 		_move: move,
 		up: function(row, steps){
-			return this.row(move(row, -(steps || 1)));
+			return this.row(move(row, -(steps || 1), "dgrid-row"));
 		},
 		down: function(row, steps){
-			return this.row(move(row, steps || 1));
-		},		
+			return this.row(move(row, steps || 1, "dgrid-row"));
+		},
 		sort: function(property, descending){
 			// summary:
 			//		Sort the content
