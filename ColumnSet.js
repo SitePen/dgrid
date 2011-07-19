@@ -8,7 +8,6 @@ function(styleSheet, has, put, declare, listen, aspect, query, Grid){
 		// need position: relative in old IE to work properly
 		styleSheet.addRule("table.dgrid-row", "position: relative");
 	}
-	
 	return declare([Grid], {
 		columnSets: [],
 		createRowCells: function(tag, each){
@@ -47,17 +46,22 @@ function(styleSheet, has, put, declare, listen, aspect, query, Grid){
 			var scrollers = this._columnSetScrollers = {};
 			var scrollerContents = this._columnSetScrollerContents = {};
 			var scrollLefts = this._columnSetScrollLefts = {}; 
+			function onScroll(){
+				var scrollLeft = this.scrollLeft;
+				var colSetId = this.getAttribute("colsetid");
+				if(scrollLefts[colSetId] != scrollLeft){
+					scrollLefts[colSetId] = scrollLeft;
+					query('.dgrid-column-set[colsetid="' + colSetId +'"],.dgrid-column-set-scroller[colsetid="' + colSetId + '"]', domNode).
+						forEach(function(element){
+							element.scrollLeft = scrollLeft;
+						});
+				}
+			}
 			for(var i = 0, l = columnSets.length; i < l; i++){
 				(function(columnSet, i){
 					var scroller = scrollers[i] = put(domNode, "div.dgrid-column-set-scroller[colsetid=" + i +"]");
 					scrollerContents[i] = put(scroller, "div.dgrid-column-set-scroller-content");
-					listen(scroller, "scroll", function(event){
-						var scrollLeft = this.scrollLeft;
-						scrollLefts[i] = scrollLeft;
-						query('.dgrid-column-set[colsetid="' + i +'"]', domNode).forEach(function(element){
-							element.scrollLeft = scrollLeft;
-						});
-					});
+					listen(scroller, "scroll", onScroll);
 				})(columnSets[i], i);
 			}
 			var grid = this;
@@ -66,9 +70,7 @@ function(styleSheet, has, put, declare, listen, aspect, query, Grid){
 				positionScrollers(grid, domNode);
 			}
 			listen(window, "resize", reposition);
-			listen(domNode, "cellfocusin", function(event){
-				adjustScrollLeft(grid, grid.row(event).element);
-			});
+			listen(domNode, ".dgrid-column-set:cellfocusin", onScroll);
 			aspect.after(this, "styleColumn", reposition);		
 		}
 	});
