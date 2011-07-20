@@ -29,9 +29,9 @@ return declare([], {
 			grid._mouseMove(e);
 		});
 		listen(grid, '.' + this.getCSSClass("header") + ":mouseout", function(e){ // should this be the mouse.leave event?
-			//listens for the mouse to leave the headerNode (even though it doesn't do anything special if it does...)
 			if(grid._resizing){return;}
 			grid._readyToResize = false;
+
 			dojo.removeClass(dojo.body(), 'dojoxGridxColumnResizing');
 		});
 		listen(grid, '.' + this.getCSSClass("header") + ":mousedown", function(e){
@@ -60,6 +60,7 @@ return declare([], {
 		if(this._isInResizeRange(e)){
 			this._readyToResize = true;
 			dojo.addClass(dojo.body(), 'dojoxGridxColumnResizing');
+			console.log("line 63");
 		}else{
 			this._readyToResize = false;
 			dojo.removeClass(dojo.body(), 'dojoxGridxColumnResizing');
@@ -75,8 +76,8 @@ return declare([], {
 		dojo.setSelectable(this.domNode, false);
 		var grid = this;
 		grid._resizing = true;
-		grid._startX = e.clientX; //position of the target  
-		grid._gridX = dojo.position(grid.bodyNode).x;//position of the grid in the body
+		grid._startX = grid._getMouseLocation(e); //position of the target
+		grid._gridX = dojo.position(grid.bodyNode).x;//position of the grid in the body *not sure why we need this?*
 
 		// show resizer inlined
 		if(!grid._resizer){
@@ -98,17 +99,18 @@ return declare([], {
 
 		this._resizing = false;
 		this._readyToResize = false;
-		dojo.removeClass(dojo.body(), 'dojoxGridxColumnResizing');
+		console.log("why you not work opera?");
+		dojo.removeClass(dojo.body(), 'dojoxGridxColumnResizing');//not working in opera
 		dojo.setSelectable(this.domNode, true);
 
 		var cell = this._targetCell,
-			delta = e.clientX - this._startX, //final change in position of resizer
-			w = cell.offsetWidth + delta; //w is the new width after resize
+			delta = this._getMouseLocation(e) - this._startX, //final change in position of resizer
+			newWidth = cell.offsetWidth + delta; //the new width after resize
 
-		if(w < this.minWidth){
-			w = this.minWidth;
+		if(newWidth < this.minWidth){
+			newWidth = this.minWidth;
 		}
-		this.setColumnWidth(cell.columnId, w);
+		this.setColumnWidth(cell.columnId, newWidth);
 		this._hideResizer();
 	},
 	_updateResizerPosition: function(e){
@@ -117,9 +119,10 @@ return declare([], {
 	// e: Object
 	//      mousemove event object
 
-		var delta = e.clientX - this._startX, //change from where user clicked to where they drag
+		var mousePos = this._getMouseLocation(e),
+			delta = mousePos - this._startX, //change from where user clicked to where they drag
 			cell = this._targetCell,
-			left = e.clientX - this._gridX;
+			left = mousePos - this._gridX;
 		
 		if(cell.offsetWidth + delta < this.minWidth){ 
 			left = this._startX - this._gridX - (cell.offsetWidth - this.minWidth); 
@@ -141,27 +144,26 @@ return declare([], {
 
 		var cell = this._getCell(e);
 		this._targetCell = cell;
-		//var x = this._getCellX(e); //something is messed up in huurrr.
-		var x = e.offsetX || e.layerX; //this does not work in Opera currently.
-		if(x > cell.offsetWidth - this.detectWidth && x <= cell.offsetWidth){
+		var mouseX = this._getMouseLocation(e);
+		var cellPos = dojo.position(cell, true).x;
+		var zoneStart = cellPos + cell.offsetWidth - this.detectWidth;
+		var zoneEnd = cellPos + cell.offsetWidth;
+		if(mouseX > zoneStart && mouseX <= zoneEnd){
 			return true;
 		}
 		return false;
 	},
-	
-	_getCellX: function(e){
-	// Summary:
-	//      tries to determine the location of the mouse relative to the cell
-	// e: Object
-	//      mousemove event object
 
-		var cell = this._targetCell;
-		var x = e.layerX;
-		if(!cell){
-			return 100000;
+	_getMouseLocation: function(e){
+		var posX = 0;
+		if (e.pageX){
+			posX = e.pageX;
 		}
-		if(x < 0){x = e.layerX;} //chrome take layerX as cell x.
-		return x;
+		else if (e.clientX){
+			posX = e.clientX + document.body.scrollLeft
+				+ document.documentElement.scrollLeft;
+		}
+		return posX;
 	},
 	
 	_getCell: function(e){
@@ -169,10 +171,11 @@ return declare([], {
 	//      get the target of the mouse move event
 	// e: Object
 	//      mousemove event object
-		var node = e.target;
-		while(node && node.tagName && node.tagName.toLowerCase() !== 'th'){
+		var node;
+		if (e.target) node = e.target;
+		else if (e.srcElement) node = e.srcElement;
+		if (node.nodeType == 3) // defeat Safari bug
 			node = node.parentNode;
-		}
 		return node;
 	}
 	

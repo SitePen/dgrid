@@ -1,6 +1,6 @@
 /*Column resizing plugin*/
 .dojoxGridxColumnResizing {
-	cursor: e-resize;
+	cursor: col-resize;
 }
 
 .dojoxGridxColumnResizer {
