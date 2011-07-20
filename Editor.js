@@ -133,7 +133,7 @@ return function(column, editor, editOn){
 			var row = object && grid.row(object);
 			value = row && grid.selection[row.id];
 		}
-		if(column.editOn){
+		if(column.editOn){ // TODO: Make this use event delegation, particularly now that we can do event delegation with focus events
 			on(cell.getAttribute("role") ? cell : cell.parentNode, // if we are dealing with IE7, the cell element is the padding cell, need to go to parent 
 					column.editOn, function(){
 				if(!column.canEdit || column.canEdit(object, value)){

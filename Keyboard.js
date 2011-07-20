@@ -17,13 +17,14 @@ return declare([List], {
 			if(cell){
 				element = cell.element;
 				if(element){
+					event.bubbles = true;
 					if(cellFocusedElement){
 						put(cellFocusedElement, "!dgrid-focus[!tabIndex]"); // remove the class name and the tabIndex attribute
 						if(has("ie") < 8){
 							cellFocusedElement.style.position = "";
 						}
 						event.cell = cellFocusedElement;
-						listen.emit(element, "cellfocusout", {bubbles: true});
+						listen.emit(element, "cellfocusout", event);
 					}
 					cellFocusedElement = element;
 					event.cell = element;
@@ -38,7 +39,7 @@ return declare([List], {
 						element.focus();
 					}
 					put(element, ".dgrid-focus");
-					listen.emit(element, "cellfocusin", {bubbles: true});
+					listen.emit(element, "cellfocusin", event);
 				}
 			}
 		}

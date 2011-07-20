@@ -1,6 +1,6 @@
 define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "./List", "dojo/_base/sniff"], function(has, put, declare, listen, Editor, List){
 	return declare([List], {
-		columns: {},
+		columns: null,
 		// summary:
 		//		This indicates that focus is at the cell level. This may be set to false to cause
 		//		focus to be at the row level, which is useful if you want only want row-level
@@ -10,13 +10,7 @@ define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "
 			// summary:
 			//		Get the column object by node, or event, or a columnId
 			if(typeof target == "string"){
-				var subrows = getSubrows(this);
-				for(var si = 0, sl = subrows.length; si < sl; si++){
-					var column = subrows[si][target];
-					if(column) {
-						return column;
-					}
-				}
+				return this.columns[target];
 			}else{
 				return this.cell(target).column;
 			}
@@ -91,30 +85,25 @@ define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "
 			}else{
 				var tbody = row;
 			}
-			var subrows = getSubrows(this);
-			for(var si = 0, sl = subrows.length; si < sl; si++){
-				subrow = subrows[si];
+			var subRows = this.subRows || [this.columns];
+			for(var si = 0, sl = subRows.length; si < sl; si++){
+				var subRow = subRows[si];
 				if(sl == 1 && !has("ie")){
 					// shortcut for modern browsers
 					tr = tbody;
 				}else{
 					tr = put(tbody, "tr");
 				}				
-				for(var i in subrow){
+				for(var i in subRow){
 					// iterate through the columns
-					var column = subrow[i];
-					if(typeof column == "string"){
-						subrow[i] = column = {name:column};
-					}
-					if(!column.field && !(subrow instanceof Array)){
-						column.field = i;
+					var column = subRow[i];
+					var id = column.id;
+					if(!column.field && !(subRow instanceof Array)){
+						column.field = id;
 					}
 					var extraClassName = column.className || (column.field && "field-" + column.field);
-					var cell = put(tag + ".dgrid-cell.dgrid-cell-padding.column-" + i + (extraClassName ? '.' + extraClassName : ''));
-					cell.columnId = i;
-					if(cellNavigation && !column.editor || column.editOn){
-//						cell.tabIndex = tabIndex;
-					}				
+					var cell = put(tag + ".dgrid-cell.dgrid-cell-padding.column-" + id + (extraClassName ? '.' + extraClassName : ''));
+					cell.columnId = id;
 					if(contentBoxSizing){
 						// The browser (IE7-) does not support box-sizing: border-box, so we emulate it with a padding div
 						var innerCell = put(cell, "!dgrid-cell-padding div.dgrid-cell-padding");// remove the dgrid-cell-padding, and create a child with that class
@@ -130,7 +119,7 @@ define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "
 					if(rowSpan){
 						cell.rowSpan = rowSpan;
 					}
-					each(innerCell, column, i);
+					each(innerCell, column);
 					// add the td to the tr at the end for better performance
 					tr.appendChild(cell);
 				}
@@ -144,7 +133,7 @@ define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "
 			return this.cell(this._move(cell, steps || 1, "dgrid-cell"));
 		},
 		renderRow: function(object, options){
-			var row = this.createRowCells("td[role=gridcell]", function(td, column, id){
+			var row = this.createRowCells("td[role=gridcell]", function(td, column){
 				var data = object;
 				// we support the field, get, and formatter properties like the DataGrid
 				var renderCell = column.renderCell;
@@ -176,8 +165,7 @@ define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "
 			//		Setup the headers for the grid
 			var grid = this;
 			var columns = this.columns;
-			var row = this.createRowCells("th[role=columnheader]", function(th, column, id){
-				column.id = id;
+			var row = this.createRowCells("th[role=columnheader]", function(th, column){
 				column.grid = grid;
 				var field = column.field;
 				if(field){
@@ -233,13 +221,30 @@ define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "
 					styleSheet.deleteRule(index);
 				}
 			}
+		},
+		_configColumns: function(prefix, subRow){
+			for(var columnId in subRow){
+				var column = subRow[columnId];
+				if(typeof column == "string"){
+					subRow[columnId] = column = {name:column};
+				}
+				var id = column.id = column.id || (isNaN(columnId) ? columnId : (prefix + columnId));
+				if(prefix){
+					this.columns[id] = column;
+				} 
+			}
+		},
+		configStructure: function(){
+			var subRows = this.subRows;
+			if(subRows){
+				// we have subRows, but no columns yet, need to create the columns
+				this.columns = {};
+				for(var i = 0; i < subRows.length; i++){
+					this._configColumns(i + '-', subRows[i]);
+				}
+			}else{
+				this._configColumns("", this.columns);
+			}
 		}
 	});
-	function getSubrows(grid){
-		var columns = grid.columns;
-		if(!(columns instanceof Array) || (typeof columns[0].field == "string" || typeof columns[0].renderCell == "function")){
-			return [columns];
-		}
-		return columns;
-	}
 });

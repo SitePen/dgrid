@@ -24,7 +24,7 @@ function(styleSheet, has, put, declare, listen, aspect, query, Grid){
 				if(dojo.isIE < 8 && !dojo.isQuirks){
 					cell.style.width = "auto"; // in IE7 this is needed to instead of 100% to make it not create a horizontal scroll bar
 				}
-				this.columns = columnSet;
+				this.subRows = columnSet;
 				cell.appendChild(this.inherited(arguments));
 			}
 			return row;
@@ -72,6 +72,16 @@ function(styleSheet, has, put, declare, listen, aspect, query, Grid){
 			listen(window, "resize", reposition);
 			listen(domNode, ".dgrid-column-set:cellfocusin", onScroll);
 			aspect.after(this, "styleColumn", reposition);		
+		},
+		configStructure: function(){
+			this.columns = {};
+			for(var i = 0, l = this.columnSets.length; i < l; i++){
+				// iterate through the columnSets
+				var columnSet = this.columnSets[i];
+				for(var j = 0; j < columnSet.length; j++){
+					this._configColumns(i + '-' + j + '-', columnSet[j]);
+				}
+			}
 		}
 	});
 	function positionScrollers(grid, domNode){

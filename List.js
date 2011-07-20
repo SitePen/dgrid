@@ -120,9 +120,6 @@ function(styleSheet, dojo, put, declare, listen, aspect, has, TouchScroll){
 				dojo.safeMixin(this, params);
 			}
 
-			if(domNode.tagName == "table"){
-				// TODO: read columns from table
-			}
 			domNode.className += " ui-widget dgrid";
 			this.refresh();
 			var grid = this;
@@ -140,6 +137,7 @@ function(styleSheet, dojo, put, declare, listen, aspect, has, TouchScroll){
 				event.stopPropagation(); // we will refire, since browsers are not consistent about propagation here
 				listen.emit(domNode, "scroll", {scrollTarget: bodyNode});
 			});
+			this.configStructure();
 			this.renderHeader(headerNode);
 			this.resize();
 			this.refreshContent();
@@ -147,6 +145,9 @@ function(styleSheet, dojo, put, declare, listen, aspect, has, TouchScroll){
 				listen.emit(bodyNode, "scroll", {});
 			});
 			this.postCreate && this.postCreate();
+		},
+		configStructure: function(){
+			// does nothing in list, this is more of a hook for the grid
 		},
 		resize: function(){
 			var bodyNode = this.bodyNode;
