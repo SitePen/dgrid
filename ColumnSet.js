@@ -8,6 +8,10 @@ function(styleSheet, has, put, declare, listen, aspect, query, Grid){
 		// need position: relative in old IE to work properly
 		styleSheet.addRule("table.dgrid-row", "position: relative");
 	}
+	if(has("mozilla") || has("safari")){
+		// firefox and opera's outline gets cropped by the overflow: hidden 
+		styleSheet.addRule(".dgrid-column-set *:focus", "border: 1px dotted black; outline: 1px dotted black");
+	}
 	return declare([Grid], {
 		columnSets: [],
 		createRowCells: function(tag, each){

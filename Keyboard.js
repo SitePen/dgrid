@@ -17,11 +17,19 @@ return declare([List], {
 			if(cell){
 				element = cell.element;
 				if(element){
-					event.bubbles = true;
+					if(!event.bubbles){
+						// IE doesn't always have a bubbles property already true, Opera will throw an error if you try to set it to true if it is already true
+						event.bubbles = true;
+					}
 					if(cellFocusedElement){
 						put(cellFocusedElement, "!dgrid-focus[!tabIndex]"); // remove the class name and the tabIndex attribute
 						if(has("ie") < 8){
 							cellFocusedElement.style.position = "";
+						}
+						if(has("safari") && cellFocusedElement.tagName == "TABLE"){
+							var focusElement = cellFocusedElement.parentNode;
+							put(focusElement, "+", cellFocusedElement); // move the elemetn out
+							put(focusElement, "!"); // delete it
 						}
 						event.cell = cellFocusedElement;
 						listen.emit(element, "cellfocusout", event);
@@ -35,11 +43,16 @@ return declare([List], {
 							// properly for focusing later on with old IE
 							element.style.position = "relative";
 						}
+						if(has("safari") && element.tagName == "TABLE"){
+							// safari has a bug with outline not working on tables (how to detect for that?), so we wrap it with a div
+							element = put(cellFocusedElement = element, "+div");
+							put(element, '>', cellFocusedElement);
+						}
 						element.tabIndex = 0;
 						element.focus();
 					}
 					put(element, ".dgrid-focus");
-					listen.emit(element, "cellfocusin", event);
+					listen.emit(cellFocusedElement, "cellfocusin", event);
 				}
 			}
 		}
@@ -82,7 +95,10 @@ return declare([List], {
 					columnId = cell && cell.column && cell.column.id;
 					cell = grid.row(cellFocusedElement);				
 				}
-				var nextFocus = move ? grid[orientation](cell, move).element : cell.element;
+				if(move){
+					cell = grid[orientation](cell, move);
+				}
+				var nextFocus = cell && cell.element;
 				if(nextFocus){
 					if(columnId){
 						nextFocus = grid.cell(nextFocus, columnId).element;

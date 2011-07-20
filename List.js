@@ -121,6 +121,10 @@ function(styleSheet, dojo, put, declare, listen, aspect, has, TouchScroll){
 			}
 
 			domNode.className += " ui-widget dgrid";
+			// this is to stop IE 8's web accelerator and selection
+			listen(domNode, "selectstart", function(event){
+				event.preventDefault();
+			});
 			this.refresh();
 			var grid = this;
 			listen(window, "resize", function(){

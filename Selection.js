@@ -11,13 +11,8 @@ return declare([List], {
 	postCreate: function(){
 		this.inherited(arguments);
 		var lastRow, mode = this.selectionMode;
-		var grid = this;
-		
+		var grid = this;		
 		if(this.selectionMode != "none"){
-			// this is to stop IE's web accelerator and selection
-			listen(this.contentNode, "selectstart", function(event){
-				event.preventDefault();
-			});
 			// listen for actions that should cause selections
 			listen(this.contentNode, "mousedown,cellfocusin", function(event){
 				if(event.type == "mousedown" || !event.ctrlKey || event.keyCode == 32){
@@ -40,6 +35,10 @@ return declare([List], {
 						grid.select(lastRow, row);
 					}else{
 						lastRow = row;
+					}
+					if(event.type == "mousedown" && (event.shiftKey || event.ctrlKey)){
+						// prevent selection in firefox
+						event.preventDefault();
 					}
 				}
 				
