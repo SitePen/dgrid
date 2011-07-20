@@ -60,7 +60,6 @@ return declare([], {
 		if(this._isInResizeRange(e)){
 			this._readyToResize = true;
 			dojo.addClass(dojo.body(), 'dojoxGridxColumnResizing');
-			console.log("line 63");
 		}else{
 			this._readyToResize = false;
 			dojo.removeClass(dojo.body(), 'dojoxGridxColumnResizing');
@@ -99,7 +98,6 @@ return declare([], {
 
 		this._resizing = false;
 		this._readyToResize = false;
-		console.log("why you not work opera?");
 		dojo.removeClass(dojo.body(), 'dojoxGridxColumnResizing');//not working in opera
 		dojo.setSelectable(this.domNode, true);
 
