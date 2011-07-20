@@ -85,7 +85,10 @@ return declare([List], {
 					columnId = cell && cell.column && cell.column.id;
 					cell = grid.row(cellFocusedElement);				
 				}
-				var nextFocus = move ? grid[orientation](cell, move).element : cell.element;
+				if(move){
+					cell = grid[orientation](cell, move);
+				}
+				var nextFocus = cell && cell.element;
 				if(nextFocus){
 					if(columnId){
 						nextFocus = grid.cell(nextFocus, columnId).element;
