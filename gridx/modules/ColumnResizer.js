@@ -32,7 +32,7 @@ return declare([], {
 			if(grid._resizing){return;}
 			grid._readyToResize = false;
 
-			dojo.removeClass(dojo.body(), 'dojoxGridxColumnResizing');
+			dojo.removeClass(grid.domNode, 'dojoxGridxColumnResizing');
 		});
 		listen(grid, '.' + this.getCSSClass("header") + ":mousedown", function(e){
 			// if ready to resize, allow resize
@@ -59,10 +59,10 @@ return declare([], {
 
 		if(this._isInResizeRange(e)){
 			this._readyToResize = true;
-			dojo.addClass(dojo.body(), 'dojoxGridxColumnResizing');
+			dojo.addClass(this.domNode, 'dojoxGridxColumnResizing');
 		}else{
 			this._readyToResize = false;
-			dojo.removeClass(dojo.body(), 'dojoxGridxColumnResizing');
+			dojo.removeClass(this.domNode, 'dojoxGridxColumnResizing');
 		}
 	},
 
@@ -72,7 +72,11 @@ return declare([], {
 	// e: Object
 	//      mousedown event object
 		
+		// preventDefault actually seems to be enough to prevent browser selection
+		// in all but IE < 9.  setSelectable works for those.
+		e.preventDefault();
 		dojo.setSelectable(this.domNode, false);
+		
 		var grid = this;
 		grid._resizing = true;
 		grid._startX = grid._getMouseLocation(e); //position of the target
@@ -98,7 +102,7 @@ return declare([], {
 
 		this._resizing = false;
 		this._readyToResize = false;
-		dojo.removeClass(dojo.body(), 'dojoxGridxColumnResizing');//not working in opera
+		dojo.removeClass(this.domNode, 'dojoxGridxColumnResizing');//not working in opera
 		dojo.setSelectable(this.domNode, true);
 
 		var cell = this._targetCell,
