@@ -26,9 +26,10 @@ return declare([List], {
 						if(has("ie") < 8){
 							cellFocusedElement.style.position = "";
 						}
-						if(has("safari") && cellFocusedElement.firstChild.tagName == "TABLE"){
-							put(cellFocusedElement, "+", cellFocusedElement.firstChild); // move the elemetn out
-							put(cellFocusedElement, "!"); // delete it
+						if(has("safari") && cellFocusedElement.tagName == "TABLE"){
+							var focusElement = cellFocusedElement.parentNode;
+							put(focusElement, "+", cellFocusedElement); // move the elemetn out
+							put(focusElement, "!"); // delete it
 						}
 						event.cell = cellFocusedElement;
 						listen.emit(element, "cellfocusout", event);
