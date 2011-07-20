@@ -18,6 +18,7 @@ return function(column){
 		// create the expando
 		var expando = put(td, "div.dgrid-expando-icon" + (mayHaveChildren ? ".ui-icon.ui-icon-triangle-1-e" : "") +
 			"[style=margin-left: " + (level * 19) + "px; float: left]");
+		expando.innerHTML = "&nbsp;"; // for opera to space things properly
 		originalRenderCell.call(this, object, value, td, options);
 		expando.level = level;
 		expando.mayHaveChildren = mayHaveChildren;
