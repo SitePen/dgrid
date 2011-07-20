@@ -17,7 +17,10 @@ return declare([List], {
 			if(cell){
 				element = cell.element;
 				if(element){
-					event.bubbles = true;
+					if(!event.bubbles){
+						// IE doesn't always have a bubbles property already true, Opera will throw an error if you try to set it to true if it is already true
+						event.bubbles = true;
+					}
 					if(cellFocusedElement){
 						put(cellFocusedElement, "!dgrid-focus[!tabIndex]"); // remove the class name and the tabIndex attribute
 						if(has("ie") < 8){
