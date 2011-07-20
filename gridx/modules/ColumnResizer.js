@@ -5,6 +5,7 @@ return declare([], {
 	minWidth: 40,	//minimum column width in px
 	detectWidth: 8, //distance from cell edge that the resize mouse cursor changes
 	gridWidth: null, //place holder for the grid width property
+	_resizedColumns: false, //flag that indicates if resizer has converted column widths to px
 	setColumnWidth: function(colId, width){
 	// Summary:
 	//      calls grid's styleColumn function to add a style for the column
@@ -13,7 +14,7 @@ return declare([], {
 	// width: Integer
 	//      new width of the column
 		
-		this.styleColumn(colId, "width: " + width + 'px;');
+		var x = this.styleColumn(colId, "width: " + width + 'px;');
 		this.resize();
 	},
 	postCreate: function(){
@@ -22,7 +23,7 @@ return declare([], {
 		var grid = this,
 			body = document.body;
 		grid.gridWidth = grid.headerNode.clientWidth;
-
+		console.log("gridwidth: ", grid.gridWidth);
 		listen(grid.headerNode, "mousemove", function(e){
 			//listens for the mouse to move over the header node
 			if(grid._resizing || !grid._getCell(e)){return;}
@@ -102,6 +103,17 @@ return declare([], {
 
 		this._resizing = false;
 		this._readyToResize = false;
+
+		//This is used to set all the column widths to a static size
+		if(!this._resizedColumns)
+		{
+			for (id in this.columns){
+				var col = this.columns[id];
+				var width = dojo.query(".field-"+col.field)[0].offsetWidth;
+				this.setColumnWidth(id, width);
+			}
+			this._resizedColumns = true;
+		}
 		dojo.removeClass(this.domNode, 'dojoxGridxColumnResizing');//not working in opera
 		dojo.setSelectable(this.domNode, true);
 
