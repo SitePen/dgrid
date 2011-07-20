@@ -26,6 +26,10 @@ return declare([List], {
 						if(has("ie") < 8){
 							cellFocusedElement.style.position = "";
 						}
+						if(has("safari") && cellFocusedElement.firstChild.tagName == "TABLE"){
+							put(cellFocusedElement, "+", cellFocusedElement.firstChild); // move the elemetn out
+							put(cellFocusedElement, "!"); // delete it
+						}
 						event.cell = cellFocusedElement;
 						listen.emit(element, "cellfocusout", event);
 					}
@@ -38,11 +42,16 @@ return declare([List], {
 							// properly for focusing later on with old IE
 							element.style.position = "relative";
 						}
+						if(has("safari") && element.tagName == "TABLE"){
+							// safari has a bug with outline not working on tables (how to detect for that?), so we wrap it with a div
+							element = put(cellFocusedElement = element, "+div");
+							put(element, '>', cellFocusedElement);
+						}
 						element.tabIndex = 0;
 						element.focus();
 					}
 					put(element, ".dgrid-focus");
-					listen.emit(element, "cellfocusin", event);
+					listen.emit(cellFocusedElement, "cellfocusin", event);
 				}
 			}
 		}
