@@ -94,13 +94,10 @@ return declare([List], {
 			// find if it is earlier or later in the DOM
 			var traverser = (toElement && (toElement.compareDocumentPosition ? 
 				toElement.compareDocumentPosition(fromElement) == 2 :
-				toElement.sourceIndex > fromElement.sourceIndex)) ? "nextSibling" : "previousSibling";
-			var nextNode;
-			while(nextNode = row.element[traverser]){
-				// loop through and set everything
-				row = this.row(nextNode);
+				toElement.sourceIndex > fromElement.sourceIndex)) ? "down" : "up";
+			while(row = this[traverser](row)){
 				this.select(row);
-				if(nextNode == toElement){
+				if(row.element == toElement){
 					break;
 				}
 			}
