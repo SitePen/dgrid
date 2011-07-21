@@ -6,7 +6,7 @@ return declare([], {
 	detectWidth: 8, //distance from cell edge that the resize mouse cursor changes
 	gridWidth: null, //place holder for the grid width property
 	_resizedColumns: false, //flag that indicates if resizer has converted column widths to px
-	setColumnWidth: function(colId, width){
+	resizeColumnWidth: function(colId, width){
 	// Summary:
 	//      calls grid's styleColumn function to add a style for the column
 	// colId: String
@@ -22,12 +22,13 @@ return declare([], {
 		
 		var grid = this,
 			body = document.body;
-		grid.gridWidth = grid.headerNode.clientWidth;
-		console.log("gridwidth: ", grid.gridWidth);
+		grid.gridWidth = grid.headerNode.clientWidth - 1; //for some reason, total column width needs to be 1 less than this
+
+		//console.log("gridwidth: ", grid.gridWidth);
 		listen(grid.headerNode, "mousemove", function(e){
 			//listens for the mouse to move over the header node
-			if(grid._resizing || !grid._getCell(e)){return;}
-			grid._mouseMove(e);
+			if(grid._resizing || !grid._getResizeCell(e)){return;}
+			grid._resizeMouseMove(e);
 		});
 		listen(grid, '.' + this.getCSSClass("header") + ":mouseout", function(e){ // should this be the mouse.leave event?
 			if(grid._resizing){return;}
@@ -38,7 +39,7 @@ return declare([], {
 		listen(grid, '.' + this.getCSSClass("header") + ":mousedown", function(e){
 			// if ready to resize, allow resize
 			if(!grid._readyToResize){return;}
-				grid._mouseDown(e);
+				grid._resizeMouseDown(e);
 		});
 		listen(body, "mousemove", function(e){
 			// while resizing, update the position of the resizer bar
@@ -48,11 +49,11 @@ return declare([], {
 		listen(body, "mouseup", function(e){
 			// if resizing and mouse button is release, fire mouseUp()
 			if(!this._resizing){return;}
-				grid._mouseUp(e);
+				grid._resizeMouseUp(e);
 		});
 	},//end postCreate
 
-	_mouseMove: function(e){
+	_resizeMouseMove: function(e){
 	// Summary:
 	//      called when mouse moves over the header node
 	// e: Object
@@ -67,7 +68,7 @@ return declare([], {
 		}
 	},
 
-	_mouseDown: function(e){
+	_resizeMouseDown: function(e){
 	// Summary:
 	//      called when mouse button is pressed on the header
 	// e: Object
@@ -80,7 +81,7 @@ return declare([], {
 		
 		var grid = this;
 		grid._resizing = true;
-		grid._startX = grid._getMouseLocation(e); //position of the target
+		grid._startX = grid._getResizeMouseLocation(e); //position of the target
 		grid._gridX = dojo.position(grid.bodyNode).x;//position of the grid in the body *not sure why we need this?*
 
 		// show resizer inlined
@@ -89,13 +90,13 @@ return declare([], {
 				className: 'dojoxGridxColumnResizer'},
 				grid.domNode, 'last');
 			listen(grid._resizer, 'mouseup', function(e){
-				grid._mouseUp(e);
+				grid._resizeMouseUp(e);
 			});
 		}
 		grid._resizer.style.display = 'block';
 		grid._updateResizerPosition(e);
 	},
-	_mouseUp: function(e) {
+	_resizeMouseUp: function(e) {
 	// Summary:
 	//      called when mouse button is released
 	// e: Object
@@ -109,8 +110,8 @@ return declare([], {
 		{
 			for (id in this.columns){
 				var col = this.columns[id];
-				var width = dojo.query(".field-"+col.field)[0].offsetWidth;
-				this.setColumnWidth(id, width);
+				var width = dojo.query(".column-"+id)[0].offsetWidth;
+				this.resizeColumnWidth(id, width);
 			}
 			this._resizedColumns = true;
 		}
@@ -118,13 +119,31 @@ return declare([], {
 		dojo.setSelectable(this.domNode, true);
 
 		var cell = this._targetCell,
-			delta = this._getMouseLocation(e) - this._startX, //final change in position of resizer
-			newWidth = cell.offsetWidth + delta; //the new width after resize
-
+			delta = this._getResizeMouseLocation(e) - this._startX, //final change in position of resizer
+			newWidth = cell.offsetWidth + delta, //the new width after resize
+			obj = this._getResizedColumnWidths(),//get current total column widths before resize
+			totalWidth = obj.totalWidth,
+			lastCol = obj.lastColId;
+		var lastColWidth = dojo.query(".column-"+lastCol)[0].offsetWidth;
+		console.log("lastColWidth: ", lastColWidth);
+		if(cell.columnId != lastCol) {
+			console.log("delta: ", delta);
+			if(totalWidth + delta < this.gridWidth) {
+				console.log("going auto", totalWidth+delta, this.gridWidth);
+				//need to set last column's width to auto
+				this.styleColumn(lastCol, "width: auto;");
+			}else if(lastColWidth-delta <= this.minWidth) {
+				console.log("going px", lastColWidth, this.minWidth);
+				//change last col width back to px, unless it is the last column itself being resized...
+				this.resizeColumnWidth(lastCol, this.minWidth);
+				//this.styleColumn(lastCol, "width: " + lastWidth + "px;");
+			}
+		}
 		if(newWidth < this.minWidth){
+			//enforce minimum widths
 			newWidth = this.minWidth;
 		}
-		this.setColumnWidth(cell.columnId, newWidth);
+		this.resizeColumnWidth(cell.columnId, newWidth);
 		this._hideResizer();
 	},
 	_updateResizerPosition: function(e){
@@ -133,7 +152,7 @@ return declare([], {
 	// e: Object
 	//      mousemove event object
 
-		var mousePos = this._getMouseLocation(e),
+		var mousePos = this._getResizeMouseLocation(e),
 			delta = mousePos - this._startX, //change from where user clicked to where they drag
 			cell = this._targetCell,
 			left = mousePos - this._gridX;
@@ -156,9 +175,9 @@ return declare([], {
 	// e: Object
 	//      mousemove event object
 
-		var cell = this._getCell(e);
+		var cell = this._getResizeCell(e);
 		this._targetCell = cell;
-		var mouseX = this._getMouseLocation(e);
+		var mouseX = this._getResizeMouseLocation(e);
 		var cellPos = dojo.position(cell, true).x;
 		var zoneStart = cellPos + cell.offsetWidth - this.detectWidth;
 		var zoneEnd = cellPos + cell.offsetWidth;
@@ -168,7 +187,7 @@ return declare([], {
 		return false;
 	},
 
-	_getMouseLocation: function(e){
+	_getResizeMouseLocation: function(e){
 		var posX = 0;
 		if (e.pageX){
 			posX = e.pageX;
@@ -180,7 +199,7 @@ return declare([], {
 		return posX;
 	},
 	
-	_getCell: function(e){
+	_getResizeCell: function(e){
 	// Summary:
 	//      get the target of the mouse move event
 	// e: Object
@@ -191,7 +210,19 @@ return declare([], {
 		if (node.nodeType == 3) // defeat Safari bug
 			node = node.parentNode;
 		return node;
+	},
+
+	_getResizedColumnWidths: function (){
+		var totalWidth = 0;
+		var lastColId = null;
+		for (id in this.columns){
+				var col = this.columns[id];
+				var width = dojo.query(".column-"+id)[0].offsetWidth;
+				totalWidth += width;
+				lastColId = id;
+			}
+		//console.log("totalWidth: ", totalWidth);
+		return {totalWidth: totalWidth, lastColId: lastColId};
 	}
-	
 });
 });
