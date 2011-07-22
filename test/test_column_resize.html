@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<title>Test Grid Column Resize</title>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<meta name="viewport" content="width=570" />
 		<style type="text/css">
 			@import "../../dojo/resources/dojo.css";
@@ -12,9 +12,23 @@
 				padding-bottom: 0.25em;
 			}
 			#grid { 
-				width: 70%;
+				width: 766px;<!-- needs to be 16px more than total column width -->
 			}
-			
+			#grid .column-col1 {
+				width: 100px;
+			}
+			#grid .column-col2 {
+				width: 100px;
+			}
+			#grid .column-col3 {
+				width: auto;
+			}
+			#grid .column-col4 {
+				width: 100px;
+			}
+			#grid .column-last-col {
+				width: 150px;
+			}
 			.ui-widget{
 				margin: 10px;
 			}
