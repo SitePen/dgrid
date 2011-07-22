@@ -13,7 +13,6 @@ return declare([], {
 	//      column id
 	// width: Integer
 	//      new width of the column
-		
 		var x = this.styleColumn(colId, "width: " + width + 'px;');
 		this.resize();
 	},
@@ -24,7 +23,6 @@ return declare([], {
 			body = document.body;
 		grid.gridWidth = grid.headerNode.clientWidth - 1; //for some reason, total column width needs to be 1 less than this
 
-		//console.log("gridwidth: ", grid.gridWidth);
 		listen(grid.headerNode, "mousemove", function(e){
 			//listens for the mouse to move over the header node
 			if(grid._resizing || !grid._getResizeCell(e)){return;}
@@ -46,11 +44,7 @@ return declare([], {
 			if(!grid._resizing){return;}
 			grid._updateResizerPosition(e);
 		});
-		listen(body, "mouseup", function(e){
-			// if resizing and mouse button is release, fire mouseUp()
-			if(!this._resizing){return;}
-				grid._resizeMouseUp(e);
-		});
+
 	},//end postCreate
 
 	_resizeMouseMove: function(e){
@@ -89,7 +83,8 @@ return declare([], {
 			grid._resizer = dojo.create('div', {
 				className: 'dojoxGridxColumnResizer'},
 				grid.domNode, 'last');
-			listen(grid._resizer, 'mouseup', function(e){
+			var mouseUpListen = listen(document.body, 'mouseup', function(e){
+				if(!grid._resizing){return;}
 				grid._resizeMouseUp(e);
 			});
 		}
@@ -123,26 +118,24 @@ return declare([], {
 			newWidth = cell.offsetWidth + delta, //the new width after resize
 			obj = this._getResizedColumnWidths(),//get current total column widths before resize
 			totalWidth = obj.totalWidth,
-			lastCol = obj.lastColId;
-		var lastColWidth = dojo.query(".column-"+lastCol)[0].offsetWidth;
-		console.log("lastColWidth: ", lastColWidth);
+			lastCol = obj.lastColId,
+			lastColWidth = dojo.query(".column-"+lastCol)[0].offsetWidth;
+
 		if(cell.columnId != lastCol) {
-			console.log("delta: ", delta);
+
 			if(totalWidth + delta < this.gridWidth) {
-				console.log("going auto", totalWidth+delta, this.gridWidth);
 				//need to set last column's width to auto
 				this.styleColumn(lastCol, "width: auto;");
 			}else if(lastColWidth-delta <= this.minWidth) {
-				console.log("going px", lastColWidth, this.minWidth);
 				//change last col width back to px, unless it is the last column itself being resized...
 				this.resizeColumnWidth(lastCol, this.minWidth);
-				//this.styleColumn(lastCol, "width: " + lastWidth + "px;");
 			}
 		}
 		if(newWidth < this.minWidth){
 			//enforce minimum widths
 			newWidth = this.minWidth;
 		}
+
 		this.resizeColumnWidth(cell.columnId, newWidth);
 		this._hideResizer();
 	},
@@ -207,7 +200,7 @@ return declare([], {
 		var node;
 		if (e.target) node = e.target;
 		else if (e.srcElement) node = e.srcElement;
-		if (node.nodeType == 3) // defeat Safari bug
+		if (node.nodeType == 3 || !node.columnId) // defeat Safari bug first and IE oddity 2nd
 			node = node.parentNode;
 		return node;
 	},
@@ -221,7 +214,6 @@ return declare([], {
 				totalWidth += width;
 				lastColId = id;
 			}
-		//console.log("totalWidth: ", totalWidth);
 		return {totalWidth: totalWidth, lastColId: lastColId};
 	}
 });
