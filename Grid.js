@@ -1,4 +1,6 @@
 define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "./List", "dojo/_base/sniff"], function(has, put, declare, listen, Editor, List){
+	var contentBoxSizing = has("ie") < 8 && !has("quirks");
+
 	return declare([List], {
 		columns: null,
 		// summary:
@@ -73,14 +75,10 @@ define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "
 		createRowCells: function(tag, each){
 			// summary:
 			//		Generates the grid for each row (used by renderHeader and and renderRow)
-			var tr, row = put("table");
-			var contentBoxSizing;
-			var cellNavigation = this.cellNavigation;
+			var tr, row = put("table.dgrid-row-table[role=presentation]"),
+				cellNavigation = this.cellNavigation;
 			if(has("ie") < 9 || has("quirks")){
-				if(has("ie") < 8 && !has("quirks")){
-					contentBoxSizing = true;
-					row.style.width = "auto"; // in IE7 this is needed instead of 100% to make it not create a horizontal scroll bar
-				}
+				// this is the only browser that needs a tbody
 				var tbody = put(row, "tbody");
 			}else{
 				var tbody = row;
@@ -133,7 +131,7 @@ define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "
 			return this.cell(this._move(cell, steps || 1, "dgrid-cell"));
 		},
 		renderRow: function(object, options){
-			var row = this.createRowCells("td[role=gridcell]", function(td, column){
+			var row = this.createRowCells("td", function(td, column){
 				var data = object;
 				// we support the field, get, and formatter properties like the DataGrid
 				var renderCell = column.renderCell;
@@ -157,8 +155,10 @@ define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "
 					}
 				}
 			});
-
-			return row;
+			// row gets a wrapper div for a couple reasons:
+			//	1. So that one can set a fixed height on rows (heights can't be set on <table>'s AFAICT)
+			// 2. So that outline style can be set on a row when it is focused, and Safari's outline style is broken on <table>
+			return put("div[role=gridcell]>", row);
 		},
 		renderHeader: function(headerNode){
 			// summary:
@@ -181,7 +181,9 @@ define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "
 					th.sortable = true;
 				}
 			});
-			row.className = "dgrid-row";
+			
+			//put(headerNode, "div.dgrid-header-columns>", row, ".dgrid-row<+div.dgrid-header-scroll.ui-widget-header");
+			//row = put("div.dgrid-row[role=columnheader]>", row);
 			headerNode.appendChild(row);
 			var lastSortedArrow;
 			// if it columns are sortable, resort on clicks

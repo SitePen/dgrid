@@ -1,12 +1,34 @@
 define(["xstyle/css!./css/dgrid.css", "dojo/_base/kernel", "xstyle/put", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/has", "dojo/has!touch?./TouchScroll", "dojo/_base/sniff"], 
 function(styleSheet, dojo, put, declare, listen, aspect, has, TouchScroll){
-	// allow for custom CSS class definitions 
-	// TODO: figure out what to depend for this
-	
+	// Add user agent/feature CSS classes 
+/*	if(!has.addClasses){
+		has.addClasses = function(){
+			var args = arguments;
+			for(var i = 0; i < args.length; i++){
+				var arg = args[i],
+					versionPrecision = typeof arg == "number" && arg,
+					test = versionPrecision ? args[i-1] : arg,
+					hasResult = has(test); 
+				if(hasResult){
+					put(document.documentElement, '.has-' + test + (versionPrecision ?
+						'-' + Math.round(hasResult / versionPrecision) * versionPrecision : ''));
+				}
+			}
+		}
+	}
+	has.addClasses("mozilla", "opera", "ie", 1, "quirks", "safari");*/
 	if(has("mozilla") || has("opera")){
 		// firefox's focus doesn't work by default for divs prior to actually tabbing into it. This fixes that
 		// (we don't do any other browsers because we are trying to stay as close to native as possible) 
 		styleSheet.addRule(".dgrid *:focus", "outline: 1px dotted");
+	}
+	if(has("ie") < 8 && !has("quirks")){
+		// in IE7 this is needed instead of 100% to make it not create a horizontal scroll bar
+		styleSheet.addRule(".dgrid-row-table", "width: auto");
+	}
+	if(has("quirks") || has("ie") < 7){
+		// similar story, height looks too high
+		styleSheet.addRule(".dgrid-row-table", "height: auto"); 
 	}
 	var scrollbarWidth;
 	var byId = function(id){
@@ -121,10 +143,6 @@ function(styleSheet, dojo, put, declare, listen, aspect, has, TouchScroll){
 			}
 
 			domNode.className += " ui-widget dgrid";
-			// this is to stop IE 8's web accelerator and selection
-			listen(domNode, "selectstart", function(event){
-				event.preventDefault();
-			});
 			this.refresh();
 			var grid = this;
 			listen(window, "resize", function(){
@@ -135,6 +153,7 @@ function(styleSheet, dojo, put, declare, listen, aspect, has, TouchScroll){
 			var domNode = this.domNode;
 			var headerNode = this.headerNode = put(domNode, "div.dgrid-header.dgrid-header-row.ui-widget-header");
 			var bodyNode = this.bodyNode = put(domNode, "div.dgrid-scroller");
+			this.headerScrollNode = put(domNode, "div.dgrid-header-scroll.ui-widget-header");
 			listen(bodyNode, "scroll", function(event){
 				// keep the header aligned with the body
 				headerNode.scrollLeft = bodyNode.scrollLeft;
@@ -151,13 +170,13 @@ function(styleSheet, dojo, put, declare, listen, aspect, has, TouchScroll){
 			this.postCreate && this.postCreate();
 		},
 		configStructure: function(){
-			// does nothing in list, this is more of a hook for the grid
+			// does nothing in List, this is more of a hook for the Grid
 		},
 		resize: function(){
 			var bodyNode = this.bodyNode;
 			var headerNode = this.headerNode;
-			bodyNode.style.top = headerNode.offsetHeight + "px";
-			if(has("quirks")){
+			this.headerScrollNode.style.height = bodyNode.style.top = headerNode.offsetHeight + "px";
+			if(has("quirks") || has("ie") < 7){
 				// in quirks mode, the "bottom" CSS property is ignored, so do this to fix it
 				// We might want to use a CSS expression or the xstyle package to fix this
 				bodyNode.style.height = (this.domNode.offsetHeight - headerNode.offsetHeight) + "px";
@@ -166,6 +185,7 @@ function(styleSheet, dojo, put, declare, listen, aspect, has, TouchScroll){
 				scrollbarWidth = bodyNode.offsetWidth - bodyNode.clientWidth;
 				if(scrollbarWidth != 17){
 					styleSheet.addRule(".dgrid-header", "right: " + scrollbarWidth + "px");
+					styleSheet.addRule(".dgrid-header-scroll", "width: " + scrollbarWidth + "px");
 				}
 			}
 		},
@@ -256,18 +276,18 @@ function(styleSheet, dojo, put, declare, listen, aspect, has, TouchScroll){
 		renderHeader: function(){
 			// no-op in a place list 
 		},
-		insertRow: function(object, parentFragment, beforeNode, i, options){
+		insertRow: function(object, parent, beforeNode, i, options){
 			// summary:
 			//		Renders a single row in the grid
 			var row = this.renderRow(object, options);
 			row.className = (row.className || "") + " ui-state-default dgrid-row " + (i% 2 == 1 ? "dgrid-row-odd" : "dgrid-row-even");
 			// get the row id for easy retrieval
 			this._rowIdToObject[row.id = this.id + "-row-" + ((this.store && this.store.getIdentity) ? this.store.getIdentity(object) : this._autoId++)] = object;
-			parentFragment.insertBefore(row, beforeNode);
+			parent.insertBefore(row, beforeNode);
 			return row;
 		},
 		renderRow: function(value, options){
-			return put("div $", value);
+			return put("div", value);
 		},
 		row: function(target){
 			// summary:

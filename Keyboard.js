@@ -26,11 +26,6 @@ return declare([List], {
 						if(has("ie") < 8){
 							cellFocusedElement.style.position = "";
 						}
-						if(has("safari") && cellFocusedElement.tagName == "TABLE"){
-							var focusElement = cellFocusedElement.parentNode;
-							put(focusElement, "+", cellFocusedElement); // move the elemetn out
-							put(focusElement, "!"); // delete it
-						}
 						event.cell = cellFocusedElement;
 						listen.emit(element, "cellfocusout", event);
 					}
@@ -42,11 +37,6 @@ return declare([List], {
 							// screws up the entire table), magically makes the outline work 
 							// properly for focusing later on with old IE
 							element.style.position = "relative";
-						}
-						if(has("safari") && element.tagName == "TABLE"){
-							// safari has a bug with outline not working on tables (how to detect for that?), so we wrap it with a div
-							element = put(cellFocusedElement = element, "+div");
-							put(element, '>', cellFocusedElement);
 						}
 						element.tabIndex = 0;
 						element.focus();

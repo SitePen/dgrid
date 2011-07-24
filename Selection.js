@@ -13,8 +13,12 @@ return declare([List], {
 		var lastRow, mode = this.selectionMode;
 		var grid = this;		
 		if(this.selectionMode != "none"){
+			// this is to stop IE 8's web accelerator and selection
+			listen(grid.domNode, "selectstart", function(event){
+				event.preventDefault();
+			});
 			// listen for actions that should cause selections
-			listen(this.contentNode, "mousedown,cellfocusin", function(event){
+			listen(grid.contentNode, "mousedown,cellfocusin", function(event){
 				if(event.type == "mousedown" || !event.ctrlKey || event.keyCode == 32){
 					var row = event.target;
 					if(mode == "single" && lastRow && event.ctrlKey){
