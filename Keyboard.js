@@ -12,6 +12,11 @@ return declare([List], {
 		this.inherited(arguments);
 		var grid = this;
 		var cellFocusedElement;
+		function handledEvent(event){
+			// text boxes and other inputs that can use direction keys should be ignored and not affect cell/row navigation
+			var target = event.target;
+			return target.type && (!delegatingInputTypes[target.type] || event.keyCode == 32);
+		}
 		function focusOnCell(element, event, dontFocus){
 			var cell = grid[grid.cellNavigation ? "cell" : "row"](element);
 			if(cell){
@@ -47,13 +52,15 @@ return declare([List], {
 			}
 		}
 		listen(this.contentNode, "mousedown", function(event){
-			focusOnCell(event.target, event);
+			if(!handledEvent(event)){
+				focusOnCell(event.target, event);
+			}
 		});
 		this.on("keydown", function(event){
 			if(cellFocusedElement){
 				var focusedElement = event.target;
 				var keyCode = event.keyCode;
-				if(focusedElement.type && (!delegatingInputTypes[focusedElement.type] || keyCode == 32)){
+				if(handledEvent(event)){
 					// text boxes and other inputs that can use direction keys should be ignored and not affect cell/row navigation
 					return;
 				}
