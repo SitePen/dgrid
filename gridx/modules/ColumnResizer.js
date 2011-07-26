@@ -51,7 +51,7 @@ return declare([], {
 	// Summary:
 	//      called when mouse moves over the header node
 	// e: Object
-	//      mouse move object
+	//      mousemove event object
 
 		if(this._isInResizeRange(e)){
 			this._readyToResize = true;
