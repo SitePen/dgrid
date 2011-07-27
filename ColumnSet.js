@@ -9,11 +9,11 @@ function(styleSheet, has, put, declare, listen, aspect, query, Grid){
 		styleSheet.addRule(".dgrid-row-table", "position: relative");
 	}
 	if(has("mozilla") || has("safari")){
-		// firefox and opera's outline gets cropped by the overflow: hidden 
+		// firefox and opera's outline gets cropped by the overflow: hidden, so we add a border
 		styleSheet.addRule(".dgrid-column-set *:focus", "border: 1px dotted black; outline: 1px dotted black");
 	}
 	if(has("ie") == 7 && !has("quirks")){
-		// in IE7 this is needed to instead of 100% to make it not create a horizontal scroll bar
+		// in IE7 (strangely not IE6 or IE8+) this is needed instead of 100% to make it not create a horizontal scroll bar
 		styleSheet.addRule(".dgrid-column-set", "width: auto");
 	}
 	return declare([Grid], {
@@ -81,7 +81,7 @@ function(styleSheet, has, put, declare, listen, aspect, query, Grid){
 				// iterate through the columnSets
 				var columnSet = this.columnSets[i];
 				for(var j = 0; j < columnSet.length; j++){
-					this._configColumns(i + '-' + j + '-', columnSet[j]);
+					columnSet[j] = this._configColumns(i + '-' + j + '-', columnSet[j]);
 				}
 			}
 		}

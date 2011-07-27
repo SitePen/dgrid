@@ -292,11 +292,11 @@ function(styleSheet, dojo, put, declare, listen, aspect, has, TouchScroll){
 		row: function(target){
 			// summary:
 			//		Get the row object by id, object, node, or event
-			if(target.target && target.target.nodeType == 1){
+			if(target.target && target.target.nodeType){
 				// event
 				target = target.target;
 			}
-			if(target.nodeType == 1){
+			if(target.nodeType){
 				var object;
 				do{
 					var rowId = target.id;
