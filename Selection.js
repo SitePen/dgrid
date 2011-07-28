@@ -1,4 +1,4 @@
-define(["dojo/_base/declare", "dojo/on", "./List", "xstyle/put"], function(declare, listen, List, put){
+define(["dojo/_base/declare", "dojo/on", "./List", "xstyle/put", "dojo/has"], function(declare, listen, List, put, has){
 return declare([List], {
 	// summary:
 	// 		Add selection capabilities to a grid. The grid will have a selection property and
@@ -17,8 +17,7 @@ return declare([List], {
 			listen(grid.domNode, "selectstart", function(event){
 				event.preventDefault();
 			});
-			// listen for actions that should cause selections
-			listen(grid.contentNode, "mousedown,cellfocusin", function(event){
+			function focus(event){
 				if(event.type == "mousedown" || !event.ctrlKey || event.keyCode == 32){
 					var row = event.target;
 					if(mode == "single" && lastRow && event.ctrlKey){
@@ -46,7 +45,29 @@ return declare([List], {
 					}
 				}
 				
-			});
+			}
+			// listen for actions that should cause selections
+			if(has("touch")){
+				// first listen for touch taps if available
+				var lastTouchX, lastTouchY, lastTouchEvent, isTap;
+				listen(this.contentNode, "touchstart", function(event){
+					lastTouch = event.touches[0];
+					lastTouchX = lastTouch.pageX;
+					lastTouchY = lastTouch.pageY;
+					lastTouchEvent = event;
+					isTap = true;
+				});
+				listen(this.contentNode, "touchmove", function(event){
+					var thisTouch = event.touches[0];
+					isTap = Math.pow(lastTouchX - thisTouch.pageX, 2) + Math.pow(lastTouchY - thisTouch.pageY, 2) < 100; // 10 pixel radius sound good?
+				});
+				listen(this.contentNode, "touchend", function(event){
+					if(isTap){
+						focus(lastTouchEvent);
+					}
+				});
+			}
+			listen(grid.contentNode, "mousedown,cellfocusin", focus); 
 		}
 	},
 	// selection:
