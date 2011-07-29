@@ -21,7 +21,7 @@ return declare([List], {
 		//		Creates a preload node for rendering a query into, and executes the query
 		//		for the first page of data. Subsequent data will be downloaded as it comes
 		//		into view.
-		preloadNode = preloadNode || put(this.contentNode, "div.preload");
+		preloadNode = preloadNode || put(this.contentNode, "div.dgrid-preload");
 		// this preload node is used to represent the area of the grid that hasn't been 
 		// downloaded yet
 		preloadNode.preload = true;

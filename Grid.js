@@ -1,4 +1,6 @@
 define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "./List", "dojo/_base/sniff"], function(has, put, declare, listen, Editor, List){
+	var contentBoxSizing = has("ie") < 8 && !has("quirks");
+
 	return declare([List], {
 		columns: null,
 		// summary:
@@ -18,12 +20,12 @@ define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "
 		cell: function(target, columnId){
 			// summary:
 			//		Get the cell object by node, or event, id, plus a columnId
-			if(target.target && target.target.nodeType == 1){
+			if(target.target && target.target.nodeType){
 				// event
 				target = target.target;
 			}
 			var element;
-			if(target.nodeType == 1){
+			if(target.nodeType){
 				var object;
 				do{
 					if(this._rowIdToObject[target.id]){
@@ -73,19 +75,15 @@ define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "
 		createRowCells: function(tag, each){
 			// summary:
 			//		Generates the grid for each row (used by renderHeader and and renderRow)
-			var tr, row = put("table");
-			var contentBoxSizing;
-			var cellNavigation = this.cellNavigation;
+			var tr, row = put("table.dgrid-row-table[role=presentation]"),
+				cellNavigation = this.cellNavigation;
 			if(has("ie") < 9 || has("quirks")){
-				if(has("ie") < 8 && !has("quirks")){
-					contentBoxSizing = true;
-					row.style.width = "auto"; // in IE7 this is needed instead of 100% to make it not create a horizontal scroll bar
-				}
+				// this is the only browser that needs a tbody
 				var tbody = put(row, "tbody");
 			}else{
 				var tbody = row;
 			}
-			var subRows = this.subRows || [this.columns];
+			var subRows = this.subRows;
 			for(var si = 0, sl = subRows.length; si < sl; si++){
 				var subRow = subRows[si];
 				if(sl == 1 && !has("ie")){
@@ -94,13 +92,10 @@ define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "
 				}else{
 					tr = put(tbody, "tr");
 				}				
-				for(var i in subRow){
+				for(var i = 0, l = subRow.length; i < l; i++){
 					// iterate through the columns
 					var column = subRow[i];
 					var id = column.id;
-					if(!column.field && !(subRow instanceof Array)){
-						column.field = id;
-					}
 					var extraClassName = column.className || (column.field && "field-" + column.field);
 					var cell = put(tag + ".dgrid-cell.dgrid-cell-padding.column-" + id + (extraClassName ? '.' + extraClassName : ''));
 					cell.columnId = id;
@@ -133,7 +128,7 @@ define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "
 			return this.cell(this._move(cell, steps || 1, "dgrid-cell"));
 		},
 		renderRow: function(object, options){
-			var row = this.createRowCells("td[role=gridcell]", function(td, column){
+			var row = this.createRowCells("td", function(td, column){
 				var data = object;
 				// we support the field, get, and formatter properties like the DataGrid
 				var renderCell = column.renderCell;
@@ -157,8 +152,10 @@ define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "
 					}
 				}
 			});
-
-			return row;
+			// row gets a wrapper div for a couple reasons:
+			//	1. So that one can set a fixed height on rows (heights can't be set on <table>'s AFAICT)
+			// 2. So that outline style can be set on a row when it is focused, and Safari's outline style is broken on <table>
+			return put("div[role=gridcell]>", row);
 		},
 		renderHeader: function(headerNode){
 			// summary:
@@ -181,7 +178,9 @@ define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "
 					th.sortable = true;
 				}
 			});
-			row.className = "dgrid-row";
+			
+			//put(headerNode, "div.dgrid-header-columns>", row, ".dgrid-row<+div.dgrid-header-scroll.ui-widget-header");
+			//row = put("div.dgrid-row[role=columnheader]>", row);
 			headerNode.appendChild(row);
 			var lastSortedArrow;
 			// if it columns are sortable, resort on clicks
@@ -211,8 +210,7 @@ define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "
 			// summary:
 			//		Changes the column width by creating a dynamic stylesheet
 			
-			// TODO: Should we first delete the old stylesheet (so it doesn't override the new one)?
-			// now create a stylesheet to style the column
+			// now add a rule to style the column
 			var styleSheet = this.styleSheet; 
 			var index = (styleSheet.cssRules || styleSheet.rules).length;
 			styleSheet.addRule("#" + this.domNode.id + ' .column-' + colId, css);
@@ -222,28 +220,37 @@ define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "
 				}
 			}
 		},
-		_configColumns: function(prefix, subRow){
-			for(var columnId in subRow){
-				var column = subRow[columnId];
+		_configColumns: function(prefix, rowColumns){
+			// configure the current column
+			var subRow = [];
+			var isArray = rowColumns instanceof Array; 
+			for(var columnId in rowColumns){
+				var column = rowColumns[columnId];
 				if(typeof column == "string"){
-					subRow[columnId] = column = {name:column};
+					rowColumns[columnId] = column = {name:column};
 				}
-				var id = column.id = column.id || (isNaN(columnId) ? columnId : (prefix + columnId));
+				if(!isArray && !column.field){
+					column.field = columnId;
+				}
+				columnId = column.id = column.id || (isNaN(columnId) ? columnId : (prefix + columnId));
 				if(prefix){
-					this.columns[id] = column;
+					this.columns[columnId] = column;
 				} 
+				subRow.push(column); // make sure it can be iterated on
 			}
+			return isArray ? rowColumns : subRow;
 		},
 		configStructure: function(){
+			// configure the columns and subRows
 			var subRows = this.subRows;
 			if(subRows){
 				// we have subRows, but no columns yet, need to create the columns
 				this.columns = {};
 				for(var i = 0; i < subRows.length; i++){
-					this._configColumns(i + '-', subRows[i]);
+					subRows[i] = this._configColumns(i + '-', subRows[i]);
 				}
 			}else{
-				this._configColumns("", this.columns);
+				this.subRows = [this._configColumns("", this.columns)];
 			}
 		}
 	});

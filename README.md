@@ -288,6 +288,7 @@ names are used by the dgrid and can be referenced from CSS:
 <li>dgrid-cell-padding - Applied to each cell element or to an inner element within the cell in older versions of non-quirks mode IE to properly apply padding to keep the padding within the box measurements (box-sizing is preferred by the grid).</li>
 <li>dgrid-focus - Applied to the element (cell or row) with the focus (for keyboard based navigation)</li>
 <li>dgrid-expando-icon - Applied to the expando icon on tree nodes</li>
+<li>dgrid-header-scroll - Applied to the node in the top right corner over the top of the scrollbar</li>
 </ul>
 The following generic class names are also available for generic skinning (follows the jQuery themeroller convention):
 <ul>

@@ -41,6 +41,10 @@
 			.dgrid {
 				margin: 10px;
 			}
+			/*#grid .dgrid-row{
+				height:30px;
+				overflow: hidden;
+			}*/
 		</style>
 		<script>
 			var start= new Date().getTime();
@@ -83,14 +87,17 @@
 						grid.save();
 					});
 				});
+				function reflow(){
+					
+				}
 		</script>
 	</head>
 	<body class="claro">
 		<h2>A basic grid (70% of page width)</h2>
-		<div tabIndex="1" id="grid"></div>
+		<div id="grid"></div>
 		<button id="save">Save</button>
 		<h2>A grid with tree column and then a simple list (floated left)</h2>
-		<div tabIndex="1" id="tree"></div>
+		<div tabIndex="2" id="tree"></div>
 		<div tabIndex="1" id="list"></div>
 	</body>
 </html>

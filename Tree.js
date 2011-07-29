@@ -5,7 +5,7 @@ return function(column){
     //      Add a editing capability
     var originalRenderCell = column.renderCell || function(object, value, td){
         if(value != null){
-        	put(td, "span.dgrid-expando-text $", value);
+        	put(td, "span.dgrid-expando-text", value);
         }
     };
 	column.renderCell = function(object, value, td, options){

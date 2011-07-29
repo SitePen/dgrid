@@ -12,6 +12,11 @@ return declare([List], {
 		this.inherited(arguments);
 		var grid = this;
 		var cellFocusedElement;
+		function handledEvent(event){
+			// text boxes and other inputs that can use direction keys should be ignored and not affect cell/row navigation
+			var target = event.target;
+			return target.type && (!delegatingInputTypes[target.type] || event.keyCode == 32);
+		}
 		function focusOnCell(element, event, dontFocus){
 			var cell = grid[grid.cellNavigation ? "cell" : "row"](element);
 			if(cell){
@@ -26,11 +31,6 @@ return declare([List], {
 						if(has("ie") < 8){
 							cellFocusedElement.style.position = "";
 						}
-						if(has("safari") && cellFocusedElement.tagName == "TABLE"){
-							var focusElement = cellFocusedElement.parentNode;
-							put(focusElement, "+", cellFocusedElement); // move the elemetn out
-							put(focusElement, "!"); // delete it
-						}
 						event.cell = cellFocusedElement;
 						listen.emit(element, "cellfocusout", event);
 					}
@@ -43,11 +43,6 @@ return declare([List], {
 							// properly for focusing later on with old IE
 							element.style.position = "relative";
 						}
-						if(has("safari") && element.tagName == "TABLE"){
-							// safari has a bug with outline not working on tables (how to detect for that?), so we wrap it with a div
-							element = put(cellFocusedElement = element, "+div");
-							put(element, '>', cellFocusedElement);
-						}
 						element.tabIndex = 0;
 						element.focus();
 					}
@@ -57,13 +52,15 @@ return declare([List], {
 			}
 		}
 		listen(this.contentNode, "mousedown", function(event){
-			focusOnCell(event.target, event);
+			if(!handledEvent(event)){
+				focusOnCell(event.target, event);
+			}
 		});
 		this.on("keydown", function(event){
 			if(cellFocusedElement){
 				var focusedElement = event.target;
 				var keyCode = event.keyCode;
-				if(focusedElement.type && (!delegatingInputTypes[focusedElement.type] || keyCode == 32)){
+				if(handledEvent(event)){
 					// text boxes and other inputs that can use direction keys should be ignored and not affect cell/row navigation
 					return;
 				}
