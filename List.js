@@ -1,23 +1,25 @@
-define(["xstyle/css!./css/dgrid.css", "dojo/_base/kernel", "xstyle/put", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/has", "dojo/has!touch?./TouchScroll", "dojo/_base/sniff"], 
+define(["xstyle/css!./css/dgrid.css?dgrid-css-loaded", "dojo/_base/kernel", "xstyle/put", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/has", "dojo/has!touch?./TouchScroll", "dojo/_base/sniff"], 
 function(styleSheet, dojo, put, declare, listen, aspect, has, TouchScroll){
 	// Add user agent/feature CSS classes 
-/*	if(!has.addClasses){
+	// (this should be in has.js, I believe)
+	if(!has.addClasses){
 		has.addClasses = function(){
-			var args = arguments;
+			var test, args = arguments;
 			for(var i = 0; i < args.length; i++){
-				var arg = args[i],
-					versionPrecision = typeof arg == "number" && arg,
-					test = versionPrecision ? args[i-1] : arg,
-					hasResult = has(test); 
-				if(hasResult){
-					put(document.documentElement, '.has-' + test + (versionPrecision ?
-						'-' + Math.round(hasResult / versionPrecision) * versionPrecision : ''));
+				var test = args[i],
+					parts = test.match(/^(no-)?(.+?)((-[\d\.]+)(-[\d\.]+)?)?$/), // parse the class name
+					hasResult = has(parts[2]), // the actual has test
+					lower = -parts[4]; // lower bound if it is in the form of test-4 or test-4-6 (would be 4)
+				if((lower > 0 ? lower <= hasResult && (-parts[5] || lower) >= hasResult :  // if it has a range boundary, compare to see if we are in it
+						hasResult) == !parts[1]){ // parts[1] is the no- prefix that can negate the result
+					put(document.documentElement, '.has-' + test);
 				}
 			}
 		}
 	}
-	has.addClasses("mozilla", "opera", "ie", 1, "quirks", "safari");*/
-	if(has("mozilla") || has("opera")){
+	has.addClasses("mozilla", "opera", "ie-6", "ie-6-7", "quirks", "no-quirks");
+
+/*	if(has("mozilla") || has("opera")){
 		// firefox's focus doesn't work by default for divs prior to actually tabbing into it. This fixes that
 		// (we don't do any other browsers because we are trying to stay as close to native as possible) 
 		styleSheet.addRule(".dgrid *:focus", "outline: 1px dotted");
@@ -29,7 +31,7 @@ function(styleSheet, dojo, put, declare, listen, aspect, has, TouchScroll){
 	if(has("quirks") || has("ie") < 7){
 		// similar story, height looks too high
 		styleSheet.addRule(".dgrid-row-table", "height: auto"); 
-	}
+	}*/
 	var scrollbarWidth;
 	var byId = function(id){
 		return document.getElementById(id);

@@ -4,7 +4,8 @@ function(styleSheet, has, put, declare, listen, aspect, query, Grid){
 		//		This module provides column sets to isolate horizontal scroll of sets of 
 		// 		columns from each other. This mainly serves the purpose of allowing for
 		// 		column locking.
-	if(has("ie") < 8 || has("quirks")){
+	has.addClasses("safari", "ie-7");
+	/*if(has("ie") < 8 || has("quirks")){
 		// need position: relative in old IE to work properly
 		styleSheet.addRule(".dgrid-row-table", "position: relative");
 	}
@@ -15,7 +16,7 @@ function(styleSheet, has, put, declare, listen, aspect, query, Grid){
 	if(has("ie") == 7 && !has("quirks")){
 		// in IE7 (strangely not IE6 or IE8+) this is needed instead of 100% to make it not create a horizontal scroll bar
 		styleSheet.addRule(".dgrid-column-set", "width: auto");
-	}
+	}*/
 	return declare([Grid], {
 		columnSets: [],
 		createRowCells: function(tag, each){
