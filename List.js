@@ -1,21 +1,8 @@
-define(["xstyle/css!./css/dgrid.css?dgrid-css-loaded", "dojo/_base/kernel", "xstyle/put", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/has", "dojo/has!touch?./TouchScroll", "xstyle/has-class", "dojo/_base/sniff"], 
-function(styleSheet, dojo, put, declare, listen, aspect, has, TouchScroll, hasClass){
+define(["dojo/_base/kernel", "xstyle/put", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/has", "dojo/has!touch?./TouchScroll", "xstyle/has-class", "dojo/_base/sniff", "xstyle/css!./css/dgrid.css?dgrid-css-loaded"], 
+function(dojo, put, declare, listen, aspect, has, TouchScroll, hasClass){
 	// Add user agent/feature CSS classes 
 	hasClass("mozilla", "opera", "ie-6", "ie-6-7", "quirks", "no-quirks");
 
-/*	if(has("mozilla") || has("opera")){
-		// firefox's focus doesn't work by default for divs prior to actually tabbing into it. This fixes that
-		// (we don't do any other browsers because we are trying to stay as close to native as possible) 
-		styleSheet.addRule(".dgrid *:focus", "outline: 1px dotted");
-	}
-	if(has("ie") < 8 && !has("quirks")){
-		// in IE7 this is needed instead of 100% to make it not create a horizontal scroll bar
-		styleSheet.addRule(".dgrid-row-table", "width: auto");
-	}
-	if(has("quirks") || has("ie") < 7){
-		// similar story, height looks too high
-		styleSheet.addRule(".dgrid-row-table", "height: auto"); 
-	}*/
 	var scrollbarWidth;
 	var byId = function(id){
 		return document.getElementById(id);
@@ -110,7 +97,6 @@ function(styleSheet, dojo, put, declare, listen, aspect, has, TouchScroll, hasCl
 	};*/
 			this.create(params, srcNodeRef);
 		},
-		styleSheet: styleSheet,
 		getCSSClass: function(shortName){
 			return "dgrid-" + shortName;
 		},
@@ -170,8 +156,21 @@ function(styleSheet, dojo, put, declare, listen, aspect, has, TouchScroll, hasCl
 			if(!scrollbarWidth){ // we haven't computed the scroll bar width yet, do so now, and add a new rule if need be
 				scrollbarWidth = bodyNode.offsetWidth - bodyNode.clientWidth;
 				if(scrollbarWidth != 17){
-					styleSheet.addRule(".dgrid-header", "right: " + scrollbarWidth + "px");
-					styleSheet.addRule(".dgrid-header-scroll", "width: " + scrollbarWidth + "px");
+					this.addCssRule(".dgrid-header", "right: " + scrollbarWidth + "px");
+					this.addCssRule(".dgrid-header-scroll", "width: " + scrollbarWidth + "px");
+				}
+			}
+		},
+		addCssRule: function(selector, css){
+			var styleSheets = document.styleSheets;
+			var styleSheet = styleSheets[styleSheets.length - 1]; 
+			var index = (styleSheet.cssRules || styleSheet.rules).length;
+			styleSheet.addRule ?
+				styleSheet.addRule(selector, css) :
+				styleSheet.insertRule(selector + '{' + css + '}', index);
+			return {
+				remove: function(){
+					styleSheet.deleteRule(index);
 				}
 			}
 		},
