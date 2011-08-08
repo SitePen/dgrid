@@ -28,6 +28,9 @@
 	transition-property: background-color, border-color;
 	background: url("images/row_back.png") #fff repeat-x;
 }
+.has-ie6 .ui-state-default {
+	background-image: none !important; 
+}
 .ui-state-default:hover {
 	background-color:#e9f2fe;
 }
