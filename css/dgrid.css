@@ -121,3 +121,22 @@
 .dgrid-input {
 	width: 99%;
 }
+/* UA-specific hacks*/
+html.has-mozilla .dgrid *:focus, html.has-opera .dgrid *:focus {
+	/* firefox's focus doesn't work by default for divs prior to actually tabbing into it. This fixes that
+	(we don't do any other browsers because we are trying to stay as close to native as possible) */ 
+	outline: 1px dotted;
+}
+html.has-ie-6-7.has-no-quirks .dgrid-row-table {
+	/* in IE7 this is needed instead of 100% to make it not create a horizontal scroll bar*/
+	width: auto;
+}
+html.has-quirks .dgrid-row-table, html.has-ie-6 .dgrid-row-table {
+	/* similar story, height looks too high */
+	height: auto; 
+}
+
+/* indicator of a successful load */
+#dgrid-css-loaded {
+	display: none;
+}

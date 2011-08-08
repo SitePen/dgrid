@@ -1,23 +1,9 @@
-define(["xstyle/css!./css/dgrid.css", "dojo/_base/kernel", "xstyle/put", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/has", "dojo/has!touch?./TouchScroll", "dojo/_base/sniff"], 
-function(styleSheet, dojo, put, declare, listen, aspect, has, TouchScroll){
+define(["xstyle/css!./css/dgrid.css?dgrid-css-loaded", "dojo/_base/kernel", "xstyle/put", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/has", "dojo/has!touch?./TouchScroll", "xstyle/has-class", "dojo/_base/sniff"], 
+function(styleSheet, dojo, put, declare, listen, aspect, has, TouchScroll, hasClass){
 	// Add user agent/feature CSS classes 
-/*	if(!has.addClasses){
-		has.addClasses = function(){
-			var args = arguments;
-			for(var i = 0; i < args.length; i++){
-				var arg = args[i],
-					versionPrecision = typeof arg == "number" && arg,
-					test = versionPrecision ? args[i-1] : arg,
-					hasResult = has(test); 
-				if(hasResult){
-					put(document.documentElement, '.has-' + test + (versionPrecision ?
-						'-' + Math.round(hasResult / versionPrecision) * versionPrecision : ''));
-				}
-			}
-		}
-	}
-	has.addClasses("mozilla", "opera", "ie", 1, "quirks", "safari");*/
-	if(has("mozilla") || has("opera")){
+	hasClass("mozilla", "opera", "ie-6", "ie-6-7", "quirks", "no-quirks");
+
+/*	if(has("mozilla") || has("opera")){
 		// firefox's focus doesn't work by default for divs prior to actually tabbing into it. This fixes that
 		// (we don't do any other browsers because we are trying to stay as close to native as possible) 
 		styleSheet.addRule(".dgrid *:focus", "outline: 1px dotted");
@@ -29,7 +15,7 @@ function(styleSheet, dojo, put, declare, listen, aspect, has, TouchScroll){
 	if(has("quirks") || has("ie") < 7){
 		// similar story, height looks too high
 		styleSheet.addRule(".dgrid-row-table", "height: auto"); 
-	}
+	}*/
 	var scrollbarWidth;
 	var byId = function(id){
 		return document.getElementById(id);

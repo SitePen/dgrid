@@ -14,7 +14,7 @@ define(["dojo/store/Memory", "dojo/store/Observable"],function(Memory, Observabl
 		{ col1: "note", col2: false, col3: "read", col4: 'However the reserved characters', col5: 15.63, col6: 0, col7: true },
 		{ col1: "normal", col2: false, col3: "replied", col4: 'It is therefore necessary', col5: 24.22, col6: 5.50, col7: true },
 		{ col1: "important", col2: false, col3: "replied", col4: 'To problems of corruption by', col5: 9.12, col6: -3, col7: true },
-		{ col1: "note", col2: false, col3: "replied", col4: 'Which would simply be awkward in', col5: 12.15, col6: -4, col7: false }
+		{ col1: "note", col2: false, col3: "replied", col4: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris', col5: 12.15, col6: -4, col7: false }
 	];
 	var rows = 100;
 	for(var i=0, l=data_list.length; i<rows; i++){
@@ -79,7 +79,12 @@ define(["dojo/store/Memory", "dojo/store/Observable"],function(Memory, Observabl
 			return parent.type != "city";
 		}
 		}));
-
+	
+	// this var is a naive attempt at making testOrderedStore's "before" support
+	// a bit less naive for testing purposes...
+	var orderMod = 0.99;
+	
+	// global var testOrderedStore
 	testOrderedStore = Observable(new Memory({data: [
 				{order: 1, name:"preheat", description:"Preheat your oven to 350°F"},
 				{order: 2, name:"mix dry", description:"In a medium bowl, combine flour, salt, and baking soda"},
@@ -94,7 +99,9 @@ define(["dojo/store/Memory", "dojo/store/Observable"],function(Memory, Observabl
 			idProperty: "name",
 			put: function(object, options){
 				if(options.before){
-					object.order = options.before.order - 0.5;
+					object.order = options.before.order - orderMod;
+					orderMod -= 0.01;
+					if (orderMod <= 0) orderMod = 0.99;
 				}
 				return Memory.prototype.put.call(this, object, options);
 			},
