@@ -79,7 +79,12 @@ define(["dojo/store/Memory", "dojo/store/Observable"],function(Memory, Observabl
 			return parent.type != "city";
 		}
 		}));
-
+	
+	// this var is a naive attempt at making testOrderedStore's "before" support
+	// a bit less naive for testing purposes...
+	var orderMod = 0.99;
+	
+	// global var testOrderedStore
 	testOrderedStore = Observable(new Memory({data: [
 				{order: 1, name:"preheat", description:"Preheat your oven to 350°F"},
 				{order: 2, name:"mix dry", description:"In a medium bowl, combine flour, salt, and baking soda"},
@@ -94,7 +99,9 @@ define(["dojo/store/Memory", "dojo/store/Observable"],function(Memory, Observabl
 			idProperty: "name",
 			put: function(object, options){
 				if(options.before){
-					object.order = options.before.order - 0.5;
+					object.order = options.before.order - orderMod;
+					orderMod -= 0.01;
+					if (orderMod <= 0) orderMod = 0.99;
 				}
 				return Memory.prototype.put.call(this, object, options);
 			},
