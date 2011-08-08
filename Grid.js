@@ -212,7 +212,8 @@ define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "
 			//		Changes the column width by creating a dynamic stylesheet
 			
 			// now add a rule to style the column
-			var styleSheet = this.styleSheet; 
+			var styleSheets = document.styleSheets;
+			var styleSheet = styleSheets[styleSheets.length - 1]; 
 			var index = (styleSheet.cssRules || styleSheet.rules).length;
 			styleSheet.addRule("#" + this.domNode.id + ' .column-' + colId, css);
 			return {
