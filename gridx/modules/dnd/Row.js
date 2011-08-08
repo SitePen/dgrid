@@ -73,16 +73,19 @@ return dojo.declare([_Base], {
 	
 	_onDropInternal: function(nodes, copy){
 		console.log("Row drop internal: ", nodes, copy);
-		var store = this.store;
-		var idoffset = (this.id + "_dnditem_row_").length;
+		var
+			store = this.store,
+			grid = this,
+			idoffset = (this.id + "_dnditem_row_").length;
 		
 		dojo.when(store.get(this._target), function(target){
 			for(var i = 0; i < nodes.length; i++){
 				var node = nodes[i];
 				var id = node.id.substring(idoffset);
 				dojo.when(store.get(id), function(object){
-					store.put(object, {
-						before: target
+					dojo.when(store.put(object, { before: target }), function(){
+						//This might be overkill, but prevents desync of neighboring rows
+						grid.refreshContent();
 					});
 				});
 			}
@@ -93,6 +96,7 @@ return dojo.declare([_Base], {
 		var rowIds = source.dndRow._selectedRowIds;
 		var sourceGrid = source.dndRow.grid;
 		var sourceStore = sourceGrid.store;
+		var thisGrid = this;
 		var thisStore = thisGrid.store;
 		var target = this._target;
 		var size;
@@ -102,29 +106,17 @@ return dojo.declare([_Base], {
 				var rowCache = sourceGrid.model.id(rowId);
 				var toAdd = dojo.clone(rowCache.rawData);
 				try{
-					//if(this._setIdentity){
-						//this._setIdentity(toAdd);
-					//}
-					//Add new row to this grid
-					if(thisStore.newItem){
-						var item = thisStore.newItem(toAdd);
-						thisStore.getIdentity(item);
-					}else if(thisStore.add){
-						thisStore.add(toAdd);
-					}
+					thisStore.add(toAdd);
 					
 					if(!copy && !source.dndRow.copyWhenDragOut){
 						//Remove row from source grid
-						if(sourceStore.deleteItem){
-							sourceStore.deleteItem(rowCache.item);
-						}else if(sourceStore.remove){
-							sourceStore.remove(rowId);
-						}
+						sourceStore.remove(rowId);
 					}
 				}catch(e){
 					console.error("Fatal Error: gridx.modules.dnd.Row: ", e);
 				}
 			});
+			//FIXME: this doesn't exist in dgrid
 			thisGrid.move.row.moveRange(size, rowIds.length, target);
 		});
 	},

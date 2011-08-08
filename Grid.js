@@ -176,6 +176,7 @@ define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "
 				}
 				if(column.sortable !== false){
 					th.sortable = true;
+					th.className += " dgrid-sortable";
 				}
 			});
 			
