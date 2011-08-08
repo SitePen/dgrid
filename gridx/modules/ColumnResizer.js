@@ -91,7 +91,7 @@ return declare([], {
 		grid._resizer.style.display = 'block';
 		grid._updateResizerPosition(e);
 	},
-	_resizeMouseUp: function(e) {
+	_resizeMouseUp: function(e){
 	// Summary:
 	//      called when mouse button is released
 	// e: Object
@@ -101,9 +101,8 @@ return declare([], {
 		this._readyToResize = false;
 
 		//This is used to set all the column widths to a static size
-		if(!this._resizedColumns)
-		{
-			for (id in this.columns){
+		if(!this._resizedColumns){
+			for(id in this.columns){
 				var col = this.columns[id];
 				var width = dojo.query(".column-"+id)[0].offsetWidth;
 				this.resizeColumnWidth(id, width);
@@ -121,8 +120,7 @@ return declare([], {
 			lastCol = obj.lastColId,
 			lastColWidth = dojo.query(".column-"+lastCol)[0].offsetWidth;
 
-		if(cell.columnId != lastCol) {
-
+		if(cell.columnId != lastCol){
 			if(totalWidth + delta < this.gridWidth) {
 				//need to set last column's width to auto
 				this.styleColumn(lastCol, "width: auto;");
@@ -182,10 +180,10 @@ return declare([], {
 
 	_getResizeMouseLocation: function(e){
 		var posX = 0;
-		if (e.pageX){
+		if(e.pageX){
 			posX = e.pageX;
 		}
-		else if (e.clientX){
+		else if(e.clientX){
 			posX = e.clientX + document.body.scrollLeft
 				+ document.documentElement.scrollLeft;
 		}
@@ -198,22 +196,26 @@ return declare([], {
 	// e: Object
 	//      mousemove event object
 		var node;
-		if (e.target) node = e.target;
-		else if (e.srcElement) node = e.srcElement;
-		if (node.nodeType == 3 || !node.columnId) // defeat Safari bug first and IE oddity 2nd
+		if(e.target){
+			node = e.target;
+		}else if(e.srcElement){
+			node = e.srcElement;
+		}
+		if(node.nodeType == 3 || !node.columnId){ // defeat Safari bug first and IE oddity 2nd
 			node = node.parentNode;
+		}
 		return node;
 	},
 
 	_getResizedColumnWidths: function (){
 		var totalWidth = 0;
 		var lastColId = null;
-		for (id in this.columns){
-				var col = this.columns[id];
-				var width = dojo.query(".column-"+id)[0].offsetWidth;
-				totalWidth += width;
-				lastColId = id;
-			}
+		for(id in this.columns){
+			var col = this.columns[id];
+			var width = dojo.query(".column-"+id)[0].offsetWidth;
+			totalWidth += width;
+			lastColId = id;
+		}
 		return {totalWidth: totalWidth, lastColId: lastColId};
 	}
 });
