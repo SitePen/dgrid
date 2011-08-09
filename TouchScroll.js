@@ -462,7 +462,7 @@ return function(){
 	var time;
 	this.scrollTo = function(/*Object*/to, /*?Boolean*/doNotMoveScrollBar){ // to: {x, y}
 	now = new Date().getTime()
-	console.log("scrollTo", now - time);
+	//console.log("scrollTo" + (now - time));
 	time = now;
 		var s = this.containerNode.style;
 		if(dojo.isWebKit){

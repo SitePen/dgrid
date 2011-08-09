@@ -85,7 +85,7 @@ return dojo.declare([_Base], {
 				dojo.when(store.get(id), function(object){
 					dojo.when(store.put(object, { before: target }), function(){
 						//This might be overkill, but prevents desync of neighboring rows
-						grid.refreshContent();
+						grid.refresh();
 					});
 				});
 			}
