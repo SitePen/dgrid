@@ -7,13 +7,18 @@
 		<meta name="viewport" content="width=570" />
 		<style type="text/css">
 			@import "../../dojo/resources/dojo.css";
-			@import "../css/skins/claro.css";
+			/* need a theme for some dnd styles (e.g. before/after indicators).
+			   Using tundra because claro has a silly dojoDndItemBefore/After bug
+			*/
+			@import "../../dijit/themes/tundra/tundra.css";
+			@import "../css/skins/tundra.css";
 			.heading {
 				font-weight: bold;
 				padding-bottom: 0.25em;
 			}
 					
-			#another-target{
+			#another-target, #another-source {
+				float: left;
 				width: 504px;
 				height: 300px;
 				border: 1px solid green;
@@ -57,15 +62,45 @@
 								anotherTargetDiv.innerHTML = "Dropped " + source.getItem(node.id).data.name;
 							});
 						};
+						
+						// Set up a dnd source with items that can drag into the grid.
+						// This is one way of doing it; there are likely several...
+						var source = new DnDSource(dojo.byId("another-source"), {
+							accept: ["row"]
+						});
+						function nameObj(args){
+							dojo.mixin(this, args);
+						}
+						nameObj.prototype = {
+							toString: function(){
+								return this.name;
+							}
+						};
+						source.insertNodes(false, [
+							{ type: ["row"], data: new nameObj({
+								order: 10,
+								name: "do a dance",
+								description: "Dance like nobody's watching."
+							})},
+							{ type: ["row"], data: new nameObj({
+								order: 11,
+								name: "genuflect",
+								description: "Take a knee."
+							})}
+						], false, null);
+						source.getObject = function(node){
+							return this.getItem(node.id).data;
+						};
 					});
 				});
 				
 		</script>
 	</head>
-	<body class="claro">
+	<body class="tundra">
 		<h2>Drag n' drop</h2>
 		<div id="grid1"></div>
 		<div id="grid2"></div>
 		<div id="another-target">Another Target</div>
+		<div id="another-source">Another Source</div>
 	</body>
 </html>
