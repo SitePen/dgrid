@@ -115,14 +115,14 @@ function(dojo, put, declare, listen, aspect, has, TouchScroll, hasClass){
 			}
 
 			domNode.className += " ui-widget dgrid";
-			this.buildRendering();
+			this.render();
 			var grid = this;
 			listen(window, "resize", function(){
 				grid.resize();
 			});
 			this.postCreate && this.postCreate();
 		},
-		buildRendering: function(){
+		render: function(){
 			var domNode = this.domNode;
 			var headerNode = this.headerNode = put(domNode, "div.dgrid-header.dgrid-header-row.ui-widget-header");
 			var bodyNode = this.bodyNode = put(domNode, "div.dgrid-scroller");
