@@ -1,0 +1,71 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html> 
+	<head> 
+		<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no"/> 
+		<meta name="apple-mobile-web-app-capable" content="yes" /> 
+		<title>test mobile grid</title>
+
+		<style type="text/css">
+					@import "../../dojo/resources/dojo.css";
+					@import "../css/skins/claro.css";
+					@import "../../dojox/mobile/themes/iphone/iphone.css";
+					@import "../css/dgrid.css"; /* this ensures that are rules come after dgrid.css */
+					.heading {
+						font-weight: bold;
+						padding-bottom: 0.25em;
+					}
+					#grid {
+						width: 70%;
+					}
+					#grid .column-set-0 {
+						width: 50%;
+					}
+					#grid .field-col1 {
+						width: 100px;
+					}
+					#grid .field-col4 {
+						width: 500px;
+					}
+					.ui-widget{
+						margin: 10px;
+					}
+					.dgrid-sort-arrow {
+						float: left;
+					}
+				</style>
+		<script type="text/javascript"  data-dojo-config="async:1" src="../../dojo/dojo.js"></script>
+		<script type="text/javascript">
+			//Require the compat if the client isn't Webkit-based
+			//dojo.requireIf(!dojo.isWebKit,"dojox.mobile.compat");
+
+			require(["dojo/on", "dgrid/OnDemandGrid", "dgrid/gridx/modules/ColumnResizer", "dgrid/test/test_data", "dojo/domReady!"],
+				function(on, Grid, ColumnResizer, testStore){
+					console.log(require("dojo/_base/config").async);
+					var columns = { // you can declare columns as an object hash (key translates to field)
+						col1: 'Column 1',
+						col2: {name: 'Column 2', sortable: false},
+						col3: 'Column 3',
+						col4: 'Column 4',
+						"last-col": {name: 'Column 5', field: 'col5'}
+					};
+					window.grid = dojo.declare([Grid, ColumnResizer])({
+						store: testStore,
+						columns: columns
+					}, "grid");
+				});
+
+		</script>
+	</head> 
+	<body>
+
+		<div id="settings" dojoType="dojox.mobile.View" selected="true">
+			<h1 dojoType="dojox.mobile.Heading">Test Mobile Grid</h1>
+				<div id="general" dojoType="dojox.mobile.View">
+					<div id="grid"></div>
+				</div>
+		</div>
+ 
+
+	</body> 
+</html> 
