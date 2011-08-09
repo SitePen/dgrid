@@ -115,13 +115,14 @@ function(dojo, put, declare, listen, aspect, has, TouchScroll, hasClass){
 			}
 
 			domNode.className += " ui-widget dgrid";
-			this.refresh();
+			this.buildRendering();
 			var grid = this;
 			listen(window, "resize", function(){
 				grid.resize();
 			});
+			this.postCreate && this.postCreate();
 		},
-		refresh: function(){
+		buildRendering: function(){
 			var domNode = this.domNode;
 			var headerNode = this.headerNode = put(domNode, "div.dgrid-header.dgrid-header-row.ui-widget-header");
 			var bodyNode = this.bodyNode = put(domNode, "div.dgrid-scroller");
@@ -135,11 +136,10 @@ function(dojo, put, declare, listen, aspect, has, TouchScroll, hasClass){
 			this.configStructure();
 			this.renderHeader(headerNode);
 			this.resize();
-			this.refreshContent();
+			this.refresh();
 			aspect.after(this, "scrollTo", function(){
 				listen.emit(bodyNode, "scroll", {});
 			});
-			this.postCreate && this.postCreate();
 		},
 		configStructure: function(){
 			// does nothing in List, this is more of a hook for the Grid
@@ -187,7 +187,7 @@ function(dojo, put, declare, listen, aspect, has, TouchScroll, hasClass){
 				this._listeners.remove();
 			}
 		},
-		refreshContent: function(){
+		refresh: function(){
 			// summary:
 			//		refreshes the contents of the grid
 			this._rowIdToObject = {};
@@ -317,7 +317,7 @@ function(dojo, put, declare, listen, aspect, has, TouchScroll, hasClass){
 			// summary:
 			//		Sort the content
 			this.sortOrder = [{attribute: property, descending: descending}];
-			this.refreshContent();
+			this.refresh();
 			if(this.lastCollection){
 				this.lastCollection.sort(function(a,b){
 					return a[property] > b[property] == !descending ? 1 : -1;
