@@ -81,21 +81,58 @@ define(["dojo/store/Memory", "dojo/store/Observable"],function(Memory, Observabl
 		}
 	}));
 	
+	function calculateOrder(store, object, before, orderField){
+		// Calculates proper value of order for an item to be placed before another
+		var afterOrder, beforeOrder = 0;
+		if (!orderField) { orderField = "order"; }
+		
+		if(before){
+			// calculate midpoint between two items' orders to fit this one
+			afterOrder = before[orderField];
+			store.query({}, {}).forEach(function(object){
+				var ord = object[orderField];
+				if(ord > beforeOrder && ord < afterOrder){
+					beforeOrder = ord;
+				}
+			});
+			return (afterOrder + beforeOrder) / 2;
+		}else{
+			// find maximum order and place this one after it
+			afterOrder = 0;
+			store.query({}, {}).forEach(function(object){
+				var ord = object[orderField];
+				if(ord > afterOrder){ afterOrder = ord; }
+			});
+			return afterOrder + 1;
+		}
+	}
 	// global function createOrderedStore
 	createOrderedStore = function(data){
 		return Observable(new Memory({data: data,
 			idProperty: "name",
 			put: function(object, options){
-				if(options.before){
-					var afterOrder = 10, beforeOrder = options.before.order;
-					testOrderedStore.query({}, {}).forEach(function(object){
-						if(object.order > beforeOrder && object.order < afterOrder){
-							afterOrder = object.order;
-						}
-					});
-					object.order = (afterOrder + beforeOrder) / 2;
-				}
+				object.order = calculateOrder(this, object, options.before);
 				return Memory.prototype.put.call(this, object, options);
+			},
+			// Memory's add does not need to be augmented since it calls put
+			copy: function(object, options){
+				// summary:
+				//		Given an item already in the store, creates a copy of it.
+				//		(i.e., shallow-clones the item sans id, then calls add)
+				var k, obj = {}, id, i = 0;
+				for (k in object){
+					if (k != this.idProperty){ // don't copy id, we want to add a new item
+						obj[k] = object[k];
+					}
+				}
+				// Generate unique ID.
+				// NOTE: this works for this example (where id's are strings);
+				// Memory should autogenerate random numeric IDs, but
+				// something seems to be falling through the cracks currently...
+				id = object[this.idProperty];
+				while(this.index[id + "(" + (++i) + ")"]){}
+				obj[this.idProperty] = id + "(" + i + ")";
+				this.add(obj, options);
 			},
 			query: function(query, options){
 				options.sort = [{attribute:"order"}];
