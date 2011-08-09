@@ -1,9 +1,4 @@
 define(["dojo/_base/declare", "dojo/_base/lang", "./List", "dojo/dnd/Source", "xstyle/put", "dojo/on", "xstyle/css!dojo/resources/dnd.css"], function(declare, lang, List, DnDSource, put, on){
-/*	var GridDnDSource = new declare(DnDSource, {
-		getAllNodes: function(){
-			return dojo.query("> .dojoDndItem", this.parent);	// NodeList
-		}	
-	});*/
 	function setupDnD(grid){
 		if(grid.dndTarget){
 			return;
@@ -33,13 +28,14 @@ define(["dojo/_base/declare", "dojo/_base/lang", "./List", "dojo/dnd/Source", "x
 		dndTargetConfig: {
 			accept: ["row"],
 			creator: function(){
+				// this is used to create the content under the avatar. Not sure what we really want here
 				return {
 					node: put("div"),
 					data: {},
 					type: []
 				};
 			}
-		}, 
+		},
 		postCreate: function(){
 			this.inherited(arguments);
 			setupDnD(this);
