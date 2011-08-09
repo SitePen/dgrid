@@ -144,7 +144,7 @@ define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "
 					td.innerHTML = data;
 				}
 				if(!column.formatter || renderCell){
-					if(column.renderCell){
+					if(renderCell){
 					// A column can provide a renderCell method to do its own DOM manipulation, 
 					// event handling, etc.
 						data = column.renderCell(object, data, td, options);
@@ -214,18 +214,7 @@ define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "
 			//		Changes the column width by creating a dynamic stylesheet
 			
 			// now add a rule to style the column
-			var styleSheets = document.styleSheets;
-			var styleSheet = styleSheets[styleSheets.length - 1]; 
-			var index = (styleSheet.cssRules || styleSheet.rules).length;
-			var columnSelector = "#" + this.domNode.id + ' .column-' + colId;
-			styleSheet.addRule ?
-				styleSheet.addRule(columnSelector, css) :
-				styleSheet.insertRule(columnSelector + '{' + css + '}', styleSheet.cssRules.length);
-			return {
-				remove: function(){
-					styleSheet.deleteRule(index);
-				}
-			}
+			return this.addCssRule("#" + this.domNode.id + ' .column-' + colId, css);
 		},
 		_configColumns: function(prefix, rowColumns){
 			// configure the current column

@@ -80,12 +80,29 @@ define(["dojo/store/Memory", "dojo/store/Observable"],function(Memory, Observabl
 		}
 		}));
 	
-	// this var is a naive attempt at making testOrderedStore's "before" support
-	// a bit less naive for testing purposes...
-	var orderMod = 0.99;
-	
 	// global var testOrderedStore
-	testOrderedStore = Observable(new Memory({data: [
+	createOrderedStore = function(data){
+		return Observable(new Memory({data: data,
+			idProperty: "name",
+			put: function(object, options){
+				if(options.before){
+					var afterOrder = 10, beforeOrder = options.before.order;
+					testOrderedStore.query({}, {}).forEach(function(object){
+						if(object.order > beforeOrder && object.order < afterOrder){
+							afterOrder = object.order;
+						}
+					});
+					object.order = (afterOrder + beforeOrder) / 2;
+				}
+				return Memory.prototype.put.call(this, object, options);
+			},
+			query: function(query, options){
+				options.sort = [{attribute:"order"}];
+				return Memory.prototype.query.call(this, query, options);
+			}
+		}));
+	};
+	testOrderedStore = createOrderedStore([
 				{order: 1, name:"preheat", description:"Preheat your oven to 350°F"},
 				{order: 2, name:"mix dry", description:"In a medium bowl, combine flour, salt, and baking soda"},
 				{order: 3, name:"mix butter", description:"In a large bowl, beat butter, then add the brown sugar and white sugar then mix"},
@@ -95,20 +112,6 @@ define(["dojo/store/Memory", "dojo/store/Observable"],function(Memory, Observabl
 				{order: 7, name:"bake", description:"Put the cookies in the oven and bake for about 10-14 minutes"},
 				{order: 8, name:"remove", description:"Using a spatula, lift cookies off onto wax paper or a cooling rack"},
 				{order: 9, name:"eat", description:"Eat and enjoy!"}
-			],
-			idProperty: "name",
-			put: function(object, options){
-				if(options.before){
-					object.order = options.before.order - orderMod;
-					orderMod -= 0.01;
-					if (orderMod <= 0) orderMod = 0.99;
-				}
-				return Memory.prototype.put.call(this, object, options);
-			},
-			query: function(query, options){
-				options.sort = [{attribute:"order"}];
-				return Memory.prototype.query.call(this, query, options);
-			}
-		}));
+			]);
 	return testStore;
 });
