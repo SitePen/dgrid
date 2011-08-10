@@ -2,12 +2,12 @@
 	"http://www.w3.org/TR/html4/loose.dtd">
 <html>
 	<head>
-		<title>Test Song Data</title>
+		<title>dGrid as iTunes</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
 		<meta name="viewport" content="width=570" />
 		<style type="text/css">
 			@import "../../dojo/resources/dojo.css";
-			@import "../css/skins/claro.css";
+			@import "../css/skins/itunes.css";
 			html, body {
 				width: 100%;
 				height: 100%;
@@ -19,22 +19,37 @@
 			}
 			#header {
 				position: relative;
-				height: 60px;
-				border-bottom: 2px solid #ddd;
+				height: 64px;
+				background-image: url(../css/skins/images/itunes/header-background.png);
+				background-repeat: repeat-x;
+			}
+			#header-content {
+				position: absolute;
+				top: 10px;
+				left: 50%;
+				width: 431px;
+				height: 45px;
+				margin-left: -215px;
+				font-size: 18px;
+				font-weight: bold;
+				text-align: center;
+				padding-top: 12px;
+				background-image: url(../css/skins/images/itunes/header.png);
+				background-repeat: no-repeat;
 			}
 			#list-container {
 				position: absolute;
-				top: 62px;
+				top: 65px;
 				left: 0;
 				right: 0;
-				height: 240px;
+				height: 120px;
 				border-bottom: 2px solid #ddd;
 			}
 			#grid-container {
 				position: absolute;
 				left: 0;
 				right: 0;
-				top: 304px;
+				top: 187px;
 				bottom: 0;
 			}
 			#genres, #artists, #albums {
@@ -44,6 +59,13 @@
 				width: 33.3%;
 				border-right: 2px solid #ddd;
 			}
+			#genres .dgrid-row,
+			#artists .dgrid-row,
+			#albums .dgrid-row {
+				padding: 0.25em;
+				cursor: default;
+			}
+
 			#artists { left: 33.3%; }
 			#albums { right: 0; }
 			#grid {
@@ -118,9 +140,11 @@
 				
 		</script>
 	</head>
-	<body class="claro">
+	<body class="itunes">
 		<div id="header">
-			header info here
+			<div id="header-content">
+				dGrid as iTunes!
+			</div>
 		</div>
 		<div id="list-container">
 			<div id="genres"></div>
