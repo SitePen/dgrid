@@ -13,11 +13,17 @@
 				padding-bottom: 0.25em;
 			}
 					
-			#dragndrop{
+			#another-target{
 				width: 504px;
+				height: 300px;
+				border: 1px solid green;
 			}
-			#dragndrop .field-description{
-				width: 300px;
+			#grid1 {
+				height: 200px;
+			}
+			#grid2 {
+				width:400px;
+				height: 150px;
 			}
 			.ui-widget{
 				margin: 10px;
@@ -26,18 +32,31 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dojo", "dgrid/List", "dgrid/OnDemandGrid","dgrid/Tree","dgrid/Selection", "dgrid/gridx/modules/ColumnResizer", "dgrid/DnD", "dgrid/Keyboard", "dgrid/test/test_data"], 
-				function(dojo, List, Grid, Tree, Selection, ColumnResizer, DndRow, Keyboard, ProgressBar){
+			require(["dojo", "dgrid/List", "dgrid/OnDemandGrid","dgrid/Tree","dgrid/Selection", "dgrid/gridx/modules/ColumnResizer", "dgrid/DnD", "dgrid/Keyboard", "dojo/dnd/Source", "dgrid/test/test_data"], 
+				function(dojo, List, Grid, Tree, Selection, ColumnResizer, DndRow, Keyboard, DnDSource){
 					dojo.addOnLoad(function(){
 						// Note: testOrderedStore hard-wires sorting anyway,
 						// so leaving sort disabled on columns in this grid.
-						thegrid = new (dojo.declare([Grid, Selection, DndRow, Keyboard]))({
+						window.grid1 = new (dojo.declare([Grid, Selection, DndRow, Keyboard]))({
 							store: testOrderedStore,
 							columns: [
 								{name:'Name', field:'name'},
 								{name:'Description', field:'description'}
 							]
-						}, "grid");
+						}, "grid1");
+						window.grid2 = new (dojo.declare([Grid, Selection, DndRow, Keyboard]))({
+							store: createOrderedStore([]),
+							columns: [
+								{name:'Name', field:'name'}
+							]
+						}, "grid2");
+						var anotherTargetDiv = dojo.byId("another-target");
+						var target = new DnDSource(anotherTargetDiv, {accept:["row"], isSource:false});
+						target.onDrop = function(source, nodes){
+							nodes.forEach(function(node){
+								anotherTargetDiv.innerHTML = "Dropped " + source.getItem(node.id).data.name;
+							});
+						};
 					});
 				});
 				
@@ -45,6 +64,8 @@
 	</head>
 	<body class="claro">
 		<h2>Drag n' drop</h2>
-		<div id="grid"></div>
+		<div id="grid1"></div>
+		<div id="grid2"></div>
+		<div id="another-target">Another Target</div>
 	</body>
 </html>

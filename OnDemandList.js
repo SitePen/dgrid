@@ -73,7 +73,7 @@ return declare([List], {
 		this.lastCollection = null;
 		this.inherited(arguments);
 	},
-	refreshContent: function(){
+	refresh: function(){
 		this.inherited(arguments);
 		if(this.store){
 			// render the query
@@ -142,6 +142,7 @@ return declare([List], {
 				if(offset > 0 && offset + count < preloadNode.count){
 					// TODO: need to do a split 
 					var second = document.clone(preloadNode);
+					
 				}else{
 					preloadNode.start += count;
 					preloadNode.count -= count;

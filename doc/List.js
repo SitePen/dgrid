@@ -20,7 +20,7 @@ function(create){
 							data:{description:"The object that was rendered for this row"},
 							element:{description:"The DOM element for this row"}
 						})),
-				refreshContent: Method("Clears the contents of the list component", {}),
+				refresh: Method("Clears the contents of the list component", {}),
 				sort: Method("Sorts the list", {
 					property: String("The property to sort on"),
 					descending: Boolean("Indicates if the sorting should be done in descending order")
