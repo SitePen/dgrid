@@ -42,25 +42,33 @@
 						break;
 				}
 				return num + ord;
-			};
+			}
+			
+			function testFormatter(item){
+				return "<h3>Step " + item.order + ": " + item.name + "</h3><p>" +
+					item.description + "</p>";
+			}
+			
+			function testGet(inRowIndex, inItem){
+				return getOrdinal(inItem.order);
+			}
+			
+			function testRenderCell(object, data, td, options){
+				return getOrdinal(object.order);
+			}
 			
 			var columnsLegacyFormatter = {
 				order: {
 					name: "Step",
 					sortable: false,
 					field: "_item",
-					formatter: function(item){
-						return "<h3>Step " + item.order + ": " + item.name + "</h3><p>" +
-							item.description + "</p>";
-					}
+					formatter: testFormatter
 				}
 			};
 			var columnsLegacyGet = {
 				order: {
 					name: "Step",
-					get: function(inRowIndex, inItem){
-						return getOrdinal(inItem.order);
-					}
+					get: testGet
 				},
 				name: {},
 				description: {name: "what to do", sortable: false}
@@ -69,14 +77,13 @@
 				order: {
 					name: "Step",
 					sortable: false,
-					renderCell: function(object, data, td, options){
-						return getOrdinal(object.order);
-					}
+					renderCell: testRenderCell
 				},
 				name: {},
 				description: {name: "what to do", sortable: false}
 			};
-			require(["dgrid/Grid", "dojo/domReady!"], function(Grid){
+			require(["dgrid/Grid", "dgrid/GridFromHtml", "dojo/domReady!"], function(Grid, GridFromHtml){
+				// fully-programmatic tests
 				window.gridLegacyFormatter = new Grid({
 					columns: columnsLegacyFormatter
 				}, "gridLegacyFormatter");
@@ -89,6 +96,11 @@
 					columns: columnsNew
 				}, "gridNew");
 				gridNew.renderArray(data);
+				
+				// GridFromHtml tests
+				window.gridFromHtmlLegacyFormatter = new GridFromHtml({},
+					"gridFromHtmlLegacyFormatter");
+				gridFromHtmlLegacyFormatter.renderArray(data);
 			});
 				
 		</script>
@@ -101,5 +113,25 @@
 		<div id="gridLegacyGet"></div>
 		<h2>Grid with single column with renderCell function (dgrid behavior; should look same as previous)</h2>
 		<div id="gridNew"></div>
+		<hr/>
+		<h2>Same 3 tests as above, but using GridFromHtml</h2>
+		<!-- GridFromHtml should look for TRs with THs anywhere.
+			Testing here with one thead, one tbody, and one implicit. -->
+		<table id="gridFromHtmlLegacyFormatter">
+			<thead>
+				<tr>
+					<!--TODO: add sortable="false"-->
+					<th field="_item" formatter="testFormatter">Step</th>
+				</tr>
+			</thead>
+		</table>
+		<table id="gridFromHtmlLegacyGet">
+			<tbody>
+				<!--TODO: mimic gridLegacyGet-->
+			</tbody>
+		</table>
+		<table id="gridFromHtmlNew">
+			<!--TODO: mimic gridNew-->
+		</table>
 	</body>
 </html>
