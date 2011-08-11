@@ -1,12 +1,25 @@
 define(["./Grid", "dojo/_base/declare", "dojo/_base/lang"], function(Grid, declare, lang){
 	// TODO: Maybe support getting the data from the <tbody> as well
 	
+	// Functions for getting various types of values from HTML attributes
 	function getObjFromAttr(node, attr){
-		// used to get e.g. formatter, get, renderCell... from th's
+		// used to for e.g. formatter, get, renderCell
 		var val = node.getAttribute(attr);
 		console.log('getObjFromAttr:', node, attr, ' => ', val);
 		return val && lang.getObject(val);
 	}
+	function getBoolFromAttr(node, attr){
+		// used for e.g. sortable
+		var val = node.getAttribute(attr);
+		return val && val !== "false";
+	}
+	function getNumFromAttr(node, attr){
+		// used for e.g. rowSpan, colSpan
+		var val = node.getAttribute(attr);
+		val = val && Number(val);
+		return isNaN(val) ? undefined : val;
+	}
+	
 	function createColumnsFromDom(domNode, columns){
 		// summary:
 		//		generate columns from DOM. Should this be in here, or a separate module?
@@ -22,13 +35,12 @@ define(["./Grid", "dojo/_base/declare", "dojo/_base/lang"], function(Grid, decla
 					name: th.innerHTML,
 					field: th.getAttribute("field") || th.className || th.innerHTML,
 					className: th.className,
-					// TODO: test editable/sortable
-					// probably need something like dojox.grid.cells._base's getBoolAttr
-					editable: th.getAttribute("editable"),
-					sortable: th.getAttribute("sortable"),
+					sortable: getBoolFromAttr(th, "sortable"),
 					get: getObjFromAttr(th, "get"),
 					formatter: getObjFromAttr(th, "formatter"),
-					renderCell: getObjFromAttr(th, "renderCell")
+					renderCell: getObjFromAttr(th, "renderCell"),
+					rowSpan: getNumFromAttr(th, "rowspan"),
+					colSpan: getNumFromAttr(th, "colspan")
 				});
 			}
 		}
@@ -39,7 +51,7 @@ define(["./Grid", "dojo/_base/declare", "dojo/_base/lang"], function(Grid, decla
 	return declare([Grid], {
 		configStructure: function(){
 			// summary:
-			//		Setup the headers for the grid
+			//		Configure subRows based on HTML originally in srcNodeRef
 			if(!this.checkedTrs){
 				this.checkedTrs = true;
 				// set this.subRows, then let createColumnsFromDom push to it
