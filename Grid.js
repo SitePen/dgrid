@@ -133,8 +133,10 @@ define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "
 				// we support the field, get, and formatter properties like the DataGrid
 				var renderCell = column.renderCell;
 				if(column.get){
-					data = column.get(data);
-				}else if("field" in column){
+					// FIXME: signature of get is (inRowIndex, inItem)
+					// Is it possible for us to produce row index here for first arg?
+					data = column.get(0, object);
+				}else if("field" in column && column.field != "_item"){
 					data = data[column.field];
 				}
 				if(column.formatter){
