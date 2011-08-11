@@ -26,6 +26,9 @@
 	overflow: hidden;
 	background-color: #eee;
 }
+.dgrid-header .dgrid-cell {
+		overflow: visible;
+}
 
 .dgrid-row-table {
 	border-collapse: collapse;
@@ -47,6 +50,7 @@
 	-moz-box-sizing: border-box;
 	-ms-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
+	position: relative;
 }
 .dgrid-cell-padding {
 	padding: 3px;

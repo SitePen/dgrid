@@ -23,7 +23,25 @@ return declare([], {
 			body = document.body;
 		grid.gridWidth = grid.headerNode.clientWidth - 1; //for some reason, total column width needs to be 1 less than this
 
-		listen(grid.headerNode, "mousemove", function(e){
+		for(id in this.columns){
+				var col = this.columns[id];
+				var colNode = dojo.query(".column-"+id)[0];//grabs header node
+				dojo.create('div',
+					{className: 'resizeDgridResizeHandleNode'},
+					colNode,
+					'last');
+		}
+
+		listen(dojo.query(".resizeDgridResizeHandleNode"), "mouseover", function(e){
+			console.log("in node");
+		});
+
+		listen(dojo.query(".resizeDgridResizeHandleNode"), "mousedown", function(e){
+			if(!grid._readyToResize){return;}
+				grid._resizeMouseDown(e);
+		});
+
+	/*	listen(grid.headerNode, "mousemove", function(e){
 			//listens for the mouse to move over the header node
 			if(grid._resizing || !grid._getResizeCell(e)){return;}
 			grid._resizeMouseMove(e);
@@ -32,7 +50,7 @@ return declare([], {
 			if(grid._resizing){return;}
 			grid._readyToResize = false;
 
-			dojo.removeClass(grid.domNode, 'dojoxGridxColumnResizing');
+			dojo.removeClass(grid.domNode, 'resizeDgridColumnResizing');
 		});
 		listen(grid, '.' + this.getCSSClass("header") + ":mousedown", function(e){
 			// if ready to resize, allow resize
@@ -44,7 +62,7 @@ return declare([], {
 			if(!grid._resizing){return;}
 			grid._updateResizerPosition(e);
 		});
-
+*/
 	},//end postCreate
 
 	_resizeMouseMove: function(e){
@@ -55,10 +73,10 @@ return declare([], {
 
 		if(this._isInResizeRange(e)){
 			this._readyToResize = true;
-			dojo.addClass(this.domNode, 'dojoxGridxColumnResizing');
+			dojo.addClass(this.domNode, 'resizeDgridColumnResizing');
 		}else{
 			this._readyToResize = false;
-			dojo.removeClass(this.domNode, 'dojoxGridxColumnResizing');
+			dojo.removeClass(this.domNode, 'resizeDgridColumnResizing');
 		}
 	},
 
@@ -81,7 +99,7 @@ return declare([], {
 		// show resizer inlined
 		if(!grid._resizer){
 			grid._resizer = dojo.create('div', {
-				className: 'dojoxGridxColumnResizer'},
+				className: 'resizeDgridColumnResizer'},
 				grid.domNode, 'last');
 			var mouseUpListen = listen(document.body, 'mouseup', function(e){
 				if(!grid._resizing){return;}
@@ -109,7 +127,7 @@ return declare([], {
 			}
 			this._resizedColumns = true;
 		}
-		dojo.removeClass(this.domNode, 'dojoxGridxColumnResizing');//not working in opera
+		dojo.removeClass(this.domNode, 'resizeDgridColumnResizing');//not working in opera
 		dojo.setSelectable(this.domNode, true);
 
 		var cell = this._targetCell,
