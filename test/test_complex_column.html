@@ -35,9 +35,6 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require({"packages":[
-				{"name":"gridx","location":"../grid-2.0", "lib":"gridx"}
-				]});
 			require(["dgrid/OnDemandGrid", "dgrid/ColumnSet", "dgrid/Tree", "dgrid/Selection", "dgrid/Keyboard", "dgrid/test/test_data", "dojo/domReady!"],
 				function(Grid, ColumnSet, Tree, Selection, Keyboard, testStore){
 					window.grid = dojo.declare([Grid, ColumnSet, Selection, Keyboard])({
