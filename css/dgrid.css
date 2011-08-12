@@ -28,6 +28,7 @@
 }
 .dgrid-header .dgrid-cell {
 		overflow: visible;
+		word-wrap: break-word;
 }
 
 .dgrid-row-table {
