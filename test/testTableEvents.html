@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html> 
+	<head> 
+		<style> 
+		th {
+			padding: 5px;
+			border: 1px solid #000;
+		}
+		</style>
+		<script type="text/javascript" src="../../dojo/dojo.js"></script>
+		<script>
+	// caution: this test page not intended for <s>children</s>IE<9
+		dojo.ready(function(){
+			
+			function byId(id){ return document.getElementById(id); }
+			function testMouse(evt){
+				var target = getTarget(evt);
+				var location = getLocation(evt);
+				console.log("mouse location: ", location);
+
+				console.log('layerX: ', evt.layerX, ' / offsetX: ', evt.offsetX);
+				console.log('pageX: ', evt.pageX, ' / clientX: ', evt.clientX);
+				console.log("target width ", target.offsetWidth);
+				console.log("evt target: ", evt.target);
+				console.log("dojo position: ", dojo.position(evt.target, true).x);
+				console.log("");
+			}
+
+			['one', 'two', 'three'].forEach(function(id){
+				byId(id).onclick = testMouse;
+			});
+			function getTarget(e) {
+				var targ;
+
+				if (e.target) targ = e.target;
+				else if (e.srcElement) targ = e.srcElement;
+				if (targ.nodeType == 3) // defeat Safari bug
+					targ = targ.parentNode;
+				return targ;
+			}
+			function getLocation(e) {
+				var posx = 0;
+
+
+				if (e.pageX) 	{
+					posx = e.pageX;
+				}
+				else if (e.clientX) 	{
+					posx = e.clientX + document.body.scrollLeft
+						+ document.documentElement.scrollLeft;
+				}
+				return posx;
+			}
+		});
+		</script> 
+	</head> 
+	<body> 
+		<table><tr> 
+			<th id="one">one</th> 
+			<th id="two">two</th> 
+			<th id="three" style="position:relative;">three</th>
+		</tr></table>
+
+
+	</body> 
+</html> 
