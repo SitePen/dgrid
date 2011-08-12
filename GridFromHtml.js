@@ -48,7 +48,6 @@ define(["./Grid", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred"
 		getObjFromAttr: function(node, attr){
 			// used to for e.g. formatter, get, renderCell
 			var val = node.getAttribute(attr);
-			//console.log('getObjFromAttr:', node, attr, ' => ', val);
 			return val && lang.getObject(val);
 		},
 		getBoolFromAttr: function(node, attr){

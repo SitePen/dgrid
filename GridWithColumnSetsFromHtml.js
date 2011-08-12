@@ -24,7 +24,6 @@ define(["./Grid", "./GridFromHtml", "./ColumnSet", "dojo/_base/declare", "dojo/_
 			// Check whether we've passed into the next colgroup within current row.
 			// (Used within th loop)
 			currcol += amount;
-			console.log('added ' + amount + ': ', currcg, currcol);
 			tmp = cgspans[currcg];
 			if(currcol >= tmp){
 				// First, push info for the set we just finished:
@@ -34,7 +33,6 @@ define(["./Grid", "./GridFromHtml", "./ColumnSet", "dojo/_base/declare", "dojo/_
 				// Now, time to move on to the next columnset for this row.
 				currcol -= tmp;
 				currcg++;
-				console.log('after wrap: ', currcg, currcol);
 				groupColumns = [];
 			}
 		}
@@ -62,10 +60,8 @@ define(["./Grid", "./GridFromHtml", "./ColumnSet", "dojo/_base/declare", "dojo/_
 			tr = trs[i];
 			ths = tr.getElementsByTagName("th"), thslen = ths.length;
 			for(j = 0; j < thslen; j++){
-				//console.log('th loop');
 				// account for space occupied by previous rowSpans
 				while(rowspans[currcg][currcol]){
-					//console.log('skipping due to rowspan:', currcg, currcol);
 					// decrement rowspan "leftover" for next iteration
 					rowspans[currcg][currcol]--;
 					// skip past this cell for now, and try again w/ updated currcg/col
