@@ -1,4 +1,4 @@
-define(["dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/on", "xstyle/put", "./List"], function(declare, dojo, Deferred, listen, put, List){
+define(["dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/on", "xstyle/put", "./List"], function(declare, lang, Deferred, listen, put, List){
 return declare([List], {
 	create: function(params, srcNodeRef){
 		this.inherited(arguments);
@@ -136,7 +136,7 @@ return declare([List], {
 				}
 				offset = Math.round(offset);
 				count = Math.round(count);
-				var options = this.queryOptions ? dojo.delegate(this.queryOptions) : {};
+				var options = this.queryOptions ? lang.delegate(this.queryOptions) : {};
 				options.start = preloadNode.start + offset;
 				options.count = count;
 				if(offset > 0 && offset + count < preloadNode.count){
