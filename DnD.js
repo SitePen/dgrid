@@ -5,6 +5,13 @@ define(["dojo/_base/declare", "dojo/_base/lang", "./List", "dojo/dnd/Source", "d
 	//   (if undefined, put at end)
 	// * should support copy
 	//   (copy should also support options.before as above)
+	
+	// TODOs:
+	// * consider sending items rather than nodes to onDropExternal/Internal
+	// * consider declaring an extension to dojo.dnd.Source rather than
+	//   clobbering on every instance we create;
+	//   it makes extending/overriding this plugin seem a bit obtuse
+	
 	function setupDnD(grid){
 		if(grid.dndTarget){
 			return;

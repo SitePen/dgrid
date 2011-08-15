@@ -140,8 +140,8 @@ define(["dojo/store/Memory", "dojo/store/Observable"],function(Memory, Observabl
 			}
 		}));
 	};
-	// global var testOrderedStore
-	testOrderedStore = createOrderedStore([
+	// global var testOrderedData
+	testOrderedData = [
 		{order: 1, name:"preheat", description:"Preheat your oven to 350°F"},
 		{order: 2, name:"mix dry", description:"In a medium bowl, combine flour, salt, and baking soda"},
 		{order: 3, name:"mix butter", description:"In a large bowl, beat butter, then add the brown sugar and white sugar then mix"},
@@ -151,6 +151,8 @@ define(["dojo/store/Memory", "dojo/store/Observable"],function(Memory, Observabl
 		{order: 7, name:"bake", description:"Put the cookies in the oven and bake for about 10-14 minutes"},
 		{order: 8, name:"remove", description:"Using a spatula, lift cookies off onto wax paper or a cooling rack"},
 		{order: 9, name:"eat", description:"Eat and enjoy!"}
-	]);
+	];
+	// global var testOrderedStore
+	testOrderedStore = createOrderedStore(testOrderedData);
 	return testStore;
 });
