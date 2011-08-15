@@ -45,14 +45,14 @@
 						window.grid1 = new (dojo.declare([Grid, Selection, DndRow, Keyboard]))({
 							store: testOrderedStore,
 							columns: [
-								{name:'Name', field:'name'},
-								{name:'Description', field:'description'}
+								{label:'Name', field:'name'},
+								{label:'Description', field:'description'}
 							]
 						}, "grid1");
 						window.grid2 = new (dojo.declare([Grid, Selection, DndRow, Keyboard]))({
 							store: createOrderedStore([]),
 							columns: [
-								{name:'Name', field:'name'}
+								{label:'Name', field:'name'}
 							]
 						}, "grid2");
 						var anotherTargetDiv = dojo.byId("another-target");
@@ -79,12 +79,12 @@
 						source.insertNodes(false, [
 							{ type: ["row"], data: new nameObj({
 								order: 10,
-								name: "do a dance",
+								label: "do a dance",
 								description: "Dance like nobody's watching."
 							})},
 							{ type: ["row"], data: new nameObj({
 								order: 11,
-								name: "genuflect",
+								label: "genuflect",
 								description: "Take a knee."
 							})}
 						], false, null);

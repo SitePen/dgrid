@@ -19,7 +19,7 @@ define(["./Grid", "dojo/_base/declare", "dojo/_base/lang"], function(Grid, decla
 			for(var j = 0; j < thslen; j++){
 				var th = ths[j];
 				rowColumns.push({
-					name: th.innerHTML,
+					label: th.innerHTML,
 					field: th.getAttribute("field") || th.className || th.innerHTML,
 					className: th.className,
 					// TODO: test editable/sortable

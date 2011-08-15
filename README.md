@@ -53,11 +53,11 @@ define(["dgrid/Grid"], function(List){
 	var grid = new Grid({
 		columns: {
 			first: {
-				name: "First Name",
+				label: "First Name",
 				sortable: true
 			},
 			last: {
-				name: "Last Name",
+				label: "Last Name",
 				sortable: true
 			},
 			age: {
@@ -134,8 +134,8 @@ define(["dgrid/OnDemandGrid"], function(Grid){
 	grid = new Grid({
 			store: myStore, // a Dojo object store
 			columns: [ // define the columns
-				{name: 'Column 1', field: 'col1', editable: true, sortable: true},
-				{name: 'Column 2', field: 'col2'},
+				{label: 'Column 1', field: 'col1', editable: true, sortable: true},
+				{label: 'Column 2', field: 'col2'},
 				...
 			]
 		}, "grid");	... 
@@ -230,11 +230,11 @@ define(["dgrid/OnDemandGrid", "dgrid/Tree", "dgrid/Editor"], function(Grid, Tree
 			store: myHierarchicalStore, // a Dojo object store
 			columns: [ // define the columns
 				// first column will have a tree expander:
-				Tree({name:'Name', field:'name'}),
+				Tree({label:'Name', field:'name'}),
 				// second column will render with a checkbox: 
-				Editor({name: 'A CheckBox', field: 'bool'}, "checkbox"),
+				Editor({label: 'A CheckBox', field: 'bool'}, "checkbox"),
 				// just a normal column:
-				{name:'Type', field:'type'},
+				{label:'Type', field:'type'},
 				...
 			]
 		}, "grid");	... 

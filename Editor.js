@@ -148,7 +148,7 @@ return function(column, editor, editOn){
 			renderWidget(value, cell, object);
 		}
 	}
-	if(!column.name){
+	if(!column.label){
 		column.renderHeaderCell = function(th){
 			column.renderCell({}, null, th);
 		}
