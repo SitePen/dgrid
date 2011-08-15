@@ -15,7 +15,7 @@
 .resizeDgridResizeHandleNode {
 	height: 100%;
 	width: 8px;
-	position: absolute;
+	position: relative;
 	right: -4px;
 	top:0;
 	cursor: col-resize;

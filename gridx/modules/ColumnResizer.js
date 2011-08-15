@@ -24,25 +24,33 @@ return declare([], {
 		for(id in this.columns){
 				var col = this.columns[id];
 				var colNode = dojo.query(".column-"+id)[0];//grabs header node
+				console.log("colnode: ", colNode);
 				dojo.create('div',
 					{className: 'resizeDgridResizeHandleNode'},
 					colNode,
 					'last');
 		}
 
+		listen(dojo.query(".resizeDgridResizeHandleNode"), "mouseover", function(e){
+				console.log('mouseover');
+		});
+
 		listen(dojo.query(".resizeDgridResizeHandleNode"), "mousedown", function(e){
 				grid._resizeMouseDown(e);
+				console.log('mousedown');
 		});
 		grid.mouseMoveListen = listen.pausable(document.body, "mousemove", function(e){
 			// while resizing, update the position of the resizer bar
 			if(!grid._resizing){return;}
 			grid._updateResizerPosition(e);
+			console.log("mousemove");
 		});
 		grid.mouseUpListen = listen.pausable(document.body, 'mouseup', function(e){
 				if(!grid._resizing){return;}
 				grid._resizeMouseUp(e);
 				grid.mouseMoveListen.pause();
 				grid.mouseUpListen.pause();
+				console.log("mouseup");
 			});
 	},//end postCreate
 
