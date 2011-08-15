@@ -11,6 +11,7 @@ define(["./List", "dojo/_base/declare", "dojo/_base/lang", "dojo/on", "dojo/_bas
 	// * consider declaring an extension to dojo.dnd.Source rather than
 	//   clobbering on every instance we create;
 	//   it makes extending/overriding this plugin seem a bit obtuse
+	//   * barring that, might at least want to use safeMixin here
 	
 	function setupDnD(grid){
 		if(grid.dndTarget){
@@ -28,6 +29,15 @@ define(["./List", "dojo/_base/declare", "dojo/_base/lang", "dojo/on", "dojo/_bas
 		}
 		// add cross-reference to grid for potential use in inter-grid drop logic
 		targetSource.grid = grid;
+		
+		// fix _legalMouseDown to only allow starting drag from an item
+		// (not from bodyNode outside contentNode)
+		targetSource._legalMouseDown = function(evt){
+			var legal = DnDSource.prototype._legalMouseDown.apply(this, arguments);
+			return legal && evt.target != grid.bodyNode;
+		};
+		
+		// DnD method overrides
 		targetSource.onDrop = function(sourceSource, nodes, copy){
 			// on drop, determine where to move/copy the objects
 			var targetRow = targetSource.targetAnchor;
@@ -71,20 +81,19 @@ define(["./List", "dojo/_base/declare", "dojo/_base/lang", "dojo/on", "dojo/_bas
 			// query), dragging to each other.
 			var sourceGrid = sourceSource.grid;
 			// TODO: bail out if sourceSource.getObject isn't defined?
-			// (also might want to implement default checkAcceptance for this)
-			nodes.forEach(function(node){
+			nodes.forEach(function(node, i){
 				Deferred.when(sourceSource.getObject(node), function(object){
 					if(!copy){
 						if(sourceGrid){
 							// Remove original in the case of inter-grid move.
+							// (Also ensure dnd source is cleaned up properly)
 							Deferred.when(sourceGrid.store.getIdentity(object), function(id){
+								!i && sourceSource.selectNone(); // deselect all, one time
+								sourceSource.delItem(node.id);
 								sourceGrid.store.remove(id);
 							});
 						}else{
-							// TODO: delItem from sourceSource?
-							// Potentially implement above as delItem on grid sources,
-							// then merge these two branches?
-							// (problem: delItem doesn't update DOM on dojo.dnd.Sources...)
+							sourceSource.deleteSelectedNodes();
 						}
 					}
 					// Copy object, if supported by store; otherwise settle for put
