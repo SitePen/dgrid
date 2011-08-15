@@ -123,11 +123,15 @@
 							var grid = this;
 							this.inherited(arguments);
 							
+							// Don't allow copy on these grids, only move back and forth
+							this.dndTarget.copyState = function(){ return false; }
 							// Re-implement onDropExternal to simply swap flag on store item
 							this.dndTarget.onDropExternal = function(source, nodes, copy, targetItem){
 								dojo.forEach(nodes, function(node){
 									dojo.when(source.getObject(node), function(object){
 										object.added = grid.addedSide;
+										// If we wanted to support copy, we would probably want
+										// to check the copy flag and call copy instead of put here.
 										grid.store.put(object, { before: targetItem });
 									});
 								});
@@ -139,10 +143,12 @@
 					var sharedStore = createOrderedStore(dojo.clone(testOrderedData));
 					
 					window.grid3 = new SharedDnDGrid({
+						dndSourceType: "row-swap",
 						store: sharedStore,
 						columns: columns
 					}, "grid3");
 					window.grid4 = new SharedDnDGrid({
+						dndSourceType: "row-swap", // same as grid3
 						addedSide: true, // flag to extension above
 						store: sharedStore,
 						columns: columns

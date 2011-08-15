@@ -119,8 +119,12 @@ define(["./List", "dojo/_base/declare", "dojo/_base/lang", "dojo/on", "dojo/_bas
 	}
 	return declare([List], {
 		dndSourceType: "row",
-		dndTargetConfig: {
-			accept: ["row"]
+		dndTargetConfig: null,
+		constructor: function(){
+			// initialize default dndTargetConfig
+			this.dndTargetConfig = {
+				accept: [this.dndSourceType]
+			}
 		},
 		postCreate: function(){
 			this.inherited(arguments);
