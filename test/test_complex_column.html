@@ -54,6 +54,9 @@
 					window.gridFromHtml = dojo.declare([Grid, GridFromHtml, Selection, Keyboard])({
 						store: testStore
 					}, "gridFromHtml");
+					window.gridFromHtml2 = dojo.declare([Grid, GridFromHtml, Selection, Keyboard])({
+						store: testStore
+					}, "gridFromHtml2");
 				});
 		</script>
 	</head>
@@ -74,6 +77,31 @@
 				<tr>
 					<th field="col3" colspan="2">Column 3</th>
 					<th field="col5">Column 5</th>
+				</tr>
+			</thead>
+		</table>
+		<h2>Another complex grid instantiated from an HTML table</h2>
+		<table id="gridFromHtml2">
+			<colgroup span="3"></colgroup>
+			<colgroup span="3"></colgroup>
+			<thead>
+				<tr>
+					<th field="col1" rowspan="3">rowspan=3</th>
+					<th field="col2" colspan="2">colspan=2</th>
+					<th field="col3" rowspan="2">rowspan=2</th>
+					<th field="col4" colspan="2">colspan=2</th>
+					<th field="col5" rowspan="2">rowspan=2</th>
+				</tr>
+				<tr>
+					<th field="col2" rowspan="2">rowspan=2</th>
+					<th field="col3">Column 3</th>
+					<th field="col4" rowspan="2">rowspan=2</th>
+					<th field="col5">Column 5</th>
+				</tr>
+				<tr>
+					<th field="col2">Column 2</th>
+					<th field="col3">Column 3</th>
+					<th field="col5" colspan="2">colspan=2</th>
 				</tr>
 			</thead>
 		</table>

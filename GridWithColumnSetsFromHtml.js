@@ -78,6 +78,13 @@ define(["./Grid", "./GridFromHtml", "./ColumnSet", "dojo/_base/declare", "dojo/_
 				// increment currcol/currcg appropriately, accounting for cell colSpan
 				incCurrcol(tmp.colSpan || 1);
 			}
+			// At the end of processing each row, there is a chance that the last
+			// column set didn't get pushed yet (specifically if there are trailing
+			// rowspans - since rowspan "debt" gets iterated at the beginning of each
+			// iteration, not the end).  In that case, push the last one now.
+			if(groupColumns.length){
+				columnsets[currcg][i] = groupColumns;
+			}
 		}
 		if(tr){
 			domNode.removeChild(tr.parentNode);
