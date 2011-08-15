@@ -108,6 +108,7 @@ define(["dojo/store/Memory", "dojo/store/Observable"],function(Memory, Observabl
 	}
 	// global function createOrderedStore
 	createOrderedStore = function(data){
+		// Instantiate a Memory store modified to support ordering.
 		return Observable(new Memory({data: data,
 			idProperty: "name",
 			put: function(object, options){
@@ -119,19 +120,20 @@ define(["dojo/store/Memory", "dojo/store/Observable"],function(Memory, Observabl
 				// summary:
 				//		Given an item already in the store, creates a copy of it.
 				//		(i.e., shallow-clones the item sans id, then calls add)
-				var k, obj = {}, id, i = 0;
+				var k, obj = {}, id, idprop = this.idProperty, i = 0;
 				for (k in object){
-					if (k != this.idProperty){ // don't copy id, we want to add a new item
-						obj[k] = object[k];
-					}
+					obj[k] = object[k];
 				}
-				// Generate unique ID.
+				// Ensure unique ID.
 				// NOTE: this works for this example (where id's are strings);
 				// Memory should autogenerate random numeric IDs, but
 				// something seems to be falling through the cracks currently...
-				id = object[this.idProperty];
-				while(this.index[id + "(" + (++i) + ")"]){}
-				obj[this.idProperty] = id + "(" + i + ")";
+				id = object[idprop];
+				if(id in this.index){
+					// rev id
+					while(this.index[id + "(" + (++i) + ")"]){}
+					obj[idprop] = id + "(" + i + ")";
+				}
 				this.add(obj, options);
 			},
 			query: function(query, options){
