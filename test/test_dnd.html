@@ -47,7 +47,6 @@
 				function(dojo, List, Grid, Tree, Selection, ColumnResizer, DndRow, Keyboard, DnDSource){
 					var
 						DnDGrid = dojo.declare([Grid, Selection, DndRow, Keyboard]),
-						sharedStore = createOrderedStore(dojo.clone(testOrderedData)),
 						columns = [
 							{name:'Name', field:'name', sortable: false},
 							{name:'Description', field:'description', sortable: false}
@@ -107,17 +106,22 @@
 					// Set up 2 more grids sharing the same store, to DnD between.
 					// Again, there are many ways to spin this, this is just one way.
 					var SharedDnDGrid = dojo.declare(DnDGrid, {
-						// addedSide: Boolean
+						// addedSide: undefined | true
 						//		Indicates whether this grid represents the "added" side, i.e.
 						//		items initially start on the other side then get moved here.
-						addedSide: false,
+						addedSide: undefined,
+						
+						// TODO: Should probably think harder about code flow necessitated,
+						// at a broader level.
+						
+						constructor: function(){
+							// Filter according to which "side" is represented
+							this.query.added = this.addedSide;
+						},
 						
 						postCreate: function(){
 							var grid = this;
 							this.inherited(arguments);
-							
-							// Filter according to which "side" is represented
-							this.query.added = this.addedSide;
 							
 							// Re-implement onDropExternal to simply swap flag on store item
 							this.dndTarget.onDropExternal = function(source, nodes, copy, targetItem){
@@ -130,6 +134,9 @@
 							};
 						}
 					});
+					
+					// set up store to use for these grids
+					var sharedStore = createOrderedStore(dojo.clone(testOrderedData));
 					
 					window.grid3 = new SharedDnDGrid({
 						store: sharedStore,

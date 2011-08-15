@@ -9,13 +9,20 @@ return declare([List], {
 			self.onscroll(event);			
 		});
 	},
-	queryOptions: {},
-	query: {},
+	queryOptions: null,
+	query: null,
 	store: null,
 	minRowsPerPage: 25,
 	maxRowsPerPage: 100,
 	maxEmptySpace: 10000,
 	rowHeight: 22,
+	
+	constructor: function(){
+		// Create empty query objects on each instance, not the prototype
+		this.query = {};
+		this.queryOptions = {};
+	},
+	
 	renderQuery: function(query, preloadNode){
 		// summary:
 		//		Creates a preload node for rendering a query into, and executes the query
