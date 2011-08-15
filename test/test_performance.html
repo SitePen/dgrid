@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" 
+	"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+	<head>
+		<title>Test Performance</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
+		<meta name="viewport" content="width=570" />
+		<style type="text/css">
+			@import "../../dojo/resources/dojo.css";
+			@import "../css/dgrid.css";
+			@import "../css/skins/tundra.css";
+			.heading {
+				font-weight: bold;
+				padding-bottom: 0.25em;
+			}
+
+			.ui-widget{
+				margin: 10px;
+			}
+			/* this is not part of theme, but you can add odd-even coloring this way*/
+			.dgrid-row-odd {
+				background: #F2F5F9;
+			}
+
+			#grid {
+				width: 65em;
+				height: 25em;
+				padding: 1px;
+			}
+		</style>
+		<script type="text/javascript" src="../../dojo/dojo.js" 
+			data-dojo-config="async: true"></script>
+		<script type="text/javascript">
+			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dgrid/test/test_data", "dojo/domReady!"], 
+				function(List, Grid, Selection, Keyboard, ProgressBar){
+					var columns = [
+						{label: 'Column 1', field: 'name'},
+						{label: 'Column 2', field: 'type'}
+					];
+					var start = new Date().getTime();
+					window.grid = new (dojo.declare([Grid, Selection, Keyboard]))({
+						store: testCountryStore,
+						columns: columns
+					}, "grid");
+					console.log(new Date().getTime() - start);
+				});
+				
+		</script>
+	</head>
+	<body class="tundra">
+		<h2>A performance test designed to go head to head with the DataGrid's test_data_grid.html</h2>
+		<div id="grid"></div>
+	</body>
+</html>
