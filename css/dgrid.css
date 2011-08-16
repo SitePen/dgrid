@@ -11,12 +11,15 @@
 	position: absolute;
 	right: 17px; /*scrollbar width; */
 	left: 0px;
+
 }
 
 .dgrid-header-row .dgrid-cell {
 	position: relative ;
 }
-
+.dgrid-header .dgrid-header-row .ui-widget-header {
+	height: 100%;
+}
 .dgrid-header-scroll {
 	position: absolute;
 	top: 0px;
