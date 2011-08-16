@@ -31,6 +31,7 @@ return declare([], {
 					construct.create('div', {style: 'position:relative; height:100%;', innerHTML: headerHTML}, colNode, 'last'),
 					'last');
 		}
+		
 
 
 		listen(query(".resizeDgridResizeHandleNode"), "mousedown", function(e){

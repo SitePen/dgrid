@@ -16,6 +16,7 @@
 
 .dgrid-header-row .dgrid-cell {
 	position: relative ;
+
 }
 .dgrid-header .dgrid-header-row .ui-widget-header {
 	height: 100%;
@@ -37,7 +38,7 @@
 .dgrid-header .dgrid-cell {
 	overflow: visible;
 	word-wrap: break-word;
-	height:100%;
+	height: 20px;
 }
 
 .dgrid-row-table {
