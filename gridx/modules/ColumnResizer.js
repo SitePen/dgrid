@@ -175,7 +175,7 @@ return declare([], {
 			node = e.srcElement;
 		}
 		if(node.nodeType == 3 || !node.columnId){ // defeat Safari bug first and IE oddity 2nd
-			node = node.parentNode;
+			node = node.parentNode.parentNode;
 		}
 		return node;
 	},

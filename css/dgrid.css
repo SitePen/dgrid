@@ -34,6 +34,7 @@
 .dgrid-header .dgrid-cell {
 	overflow: visible;
 	word-wrap: break-word;
+	height:100%;
 }
 
 .dgrid-row-table {
