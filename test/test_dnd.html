@@ -48,8 +48,8 @@
 					var
 						DnDGrid = dojo.declare([Grid, Selection, DndRow, Keyboard]),
 						columns = [
-							{name:'Name', field:'name', sortable: false},
-							{name:'Description', field:'description', sortable: false}
+							{label:'Name', field:'name', sortable: false},
+							{label:'Description', field:'description', sortable: false}
 						];
 					
 					// Note: testOrderedStore hard-wires sorting anyway,
@@ -61,7 +61,7 @@
 					window.grid2 = new DnDGrid({
 						store: createOrderedStore([]),
 						columns: [
-							{name:'Name', field:'name', sortable: false}
+							{label:'Name', field:'name', sortable: false}
 						]
 					}, "grid2");
 					
