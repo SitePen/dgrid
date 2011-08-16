@@ -15,18 +15,6 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			var data = [
-				{order: 1, name:"preheat", description:"Preheat your oven to 350F"},
-				{order: 2, name:"mix dry", description:"In a medium bowl, combine flour, salt, and baking soda"},
-				{order: 3, name:"mix butter", description:"In a large bowl, beat butter, then add the brown sugar and white sugar then mix"},
-				{order: 4, name:"mix together", description:"Slowly add the dry ingredients from the medium bowl to the wet ingredients in the large bowl, mixing until the dry ingredients are totally combined"},
-				{order: 5, name:"chocolate chips", description:"Add chocolate chips"},
-				{order: 6, name:"make balls", description:"Scoop up a golf ball size amount of dough with a spoon and drop in onto a cookie sheet"},
-				{order: 7, name:"bake", description:"Put the cookies in the oven and bake for about 10-14 minutes"},
-				{order: 8, name:"remove", description:"Using a spatula, lift cookies off onto wax paper or a cooling rack"},
-				{order: 9, name:"eat", description:"Eat and enjoy!"}
-			];
-			
 			var store; // defined later, Memory store containing data
 			
 			function getOrdinal(num){
@@ -83,7 +71,7 @@
 				name: {},
 				description: {name: "what to do", sortable: false}
 			};
-			require(["dgrid/Grid", "dgrid/OnDemandGrid", "dgrid/GridFromHtml", "dojo/store/Memory", "dojo/store/Observable", "dojo/_base/declare", "dojo/parser", "dojo/query", "dojo/domReady!"],
+			require(["dgrid/Grid", "dgrid/OnDemandGrid", "dgrid/GridFromHtml", "dojo/store/Memory", "dojo/store/Observable", "dojo/_base/declare", "dojo/parser", "dojo/query", "dgrid/test/test_data", "dojo/domReady!"],
 			function(Grid, OnDemandGrid, GridFromHtml, Memory, Observable, declare, parser, query){
 				
 				// fully-programmatic tests
@@ -91,35 +79,35 @@
 				window.gridLegacyFormatter = new Grid({
 					columns: columnsLegacyFormatter
 				}, "gridLegacyFormatter");
-				gridLegacyFormatter.renderArray(data);
+				gridLegacyFormatter.renderArray(testOrderedData);
 				
 				window.gridLegacyGet = new Grid({
 					columns: columnsLegacyGet
 				}, "gridLegacyGet");
-				gridLegacyGet.renderArray(data);
+				gridLegacyGet.renderArray(testOrderedData);
 				
 				window.gridNew = new Grid({
 					columns: columnsNew
 				}, "gridNew");
-				gridNew.renderArray(data);
+				gridNew.renderArray(testOrderedData);
 				
 				// GridFromHtml tests
 				
 				window.gridFromHtmlLegacyFormatter = new GridFromHtml({},
 					"gridFromHtmlLegacyFormatter");
-				gridFromHtmlLegacyFormatter.renderArray(data);
+				gridFromHtmlLegacyFormatter.renderArray(testOrderedData);
 				
 				window.gridFromHtmlLegacyGet = new GridFromHtml({},
 					"gridFromHtmlLegacyGet");
-				gridFromHtmlLegacyGet.renderArray(data);
+				gridFromHtmlLegacyGet.renderArray(testOrderedData);
 				
 				window.gridFromHtmlNew = new GridFromHtml({},
 					"gridFromHtmlNew");
-				gridFromHtmlNew.renderArray(data);
+				gridFromHtmlNew.renderArray(testOrderedData);
 				
 				window.gridFromHtmlTestProps = new GridFromHtml({},
 					"gridFromHtmlTestProps");
-				gridFromHtmlTestProps.renderArray(data);
+				gridFromHtmlTestProps.renderArray(testOrderedData);
 				
 				// need to expose GridFromHtml as a global for parser to find.
 				// (need a version with OnDemandGrid for store usage)
@@ -127,7 +115,7 @@
 				
 				// also, need a store, since there's currently no way to effectively
 				// invoke renderArray from HTML.
-				store = Observable(Memory({data: data}));
+				store = Observable(Memory({data: testOrderedData}));
 				parser.parse();
 				
 				function byId(id){
