@@ -23,11 +23,12 @@ return declare([], {
 
 		for(id in this.columns){
 				var col = this.columns[id];
-
 				var colNode = query(".column-"+id)[0];//grabs header node
+				var headerHTML = colNode.innerHTML;
+				colNode.innerHTML = '';
 				construct.create('div',
 					{className: 'resizeDgridResizeHandleNode'},
-					colNode,
+					construct.create('div', {style: 'position:relative; height:100%;', innerHTML: headerHTML}, colNode, 'last'),
 					'last');
 		}
 

@@ -12,6 +12,11 @@
 	right: 17px; /*scrollbar width; */
 	left: 0px;
 }
+
+.dgrid-header-row .dgrid-cell {
+	position: relative ;
+}
+
 .dgrid-header-scroll {
 	position: absolute;
 	top: 0px;
@@ -27,8 +32,8 @@
 	background-color: #eee;
 }
 .dgrid-header .dgrid-cell {
-		overflow: visible;
-		word-wrap: break-word;
+	overflow: visible;
+	word-wrap: break-word;
 }
 
 .dgrid-row-table {
