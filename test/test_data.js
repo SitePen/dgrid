@@ -21,7 +21,7 @@ define(["dojo/store/Memory", "dojo/store/Observable"],function(Memory, Observabl
 		data.items.push(dojo.mixin({ id: i }, data_list[i%l]));
 	}
 
-	// global var "test_store"
+	// global var testStore
 	testStore = Observable(Memory({data: data}));
 
 	var typesData = [];
@@ -37,8 +37,10 @@ define(["dojo/store/Memory", "dojo/store/Observable"],function(Memory, Observabl
 			bool2: Math.random() > 0.5
 		});
 	}
+	// global var testTypesStore
 	testTypesStore = Observable(Memory({data: typesData}));
 	
+	// global var testCountryStore
 	testCountryStore = Observable(new Memory({
 		data: [
 			{ id: 'AF', name:'Africa', type:'continent', population:'900 million', area: '30,221,532 sq km',
@@ -108,6 +110,7 @@ define(["dojo/store/Memory", "dojo/store/Observable"],function(Memory, Observabl
 	}
 	// global function createOrderedStore
 	createOrderedStore = function(data){
+		// Instantiate a Memory store modified to support ordering.
 		return Observable(new Memory({data: data,
 			idProperty: "name",
 			put: function(object, options){
@@ -119,19 +122,20 @@ define(["dojo/store/Memory", "dojo/store/Observable"],function(Memory, Observabl
 				// summary:
 				//		Given an item already in the store, creates a copy of it.
 				//		(i.e., shallow-clones the item sans id, then calls add)
-				var k, obj = {}, id, i = 0;
+				var k, obj = {}, id, idprop = this.idProperty, i = 0;
 				for (k in object){
-					if (k != this.idProperty){ // don't copy id, we want to add a new item
-						obj[k] = object[k];
-					}
+					obj[k] = object[k];
 				}
-				// Generate unique ID.
+				// Ensure unique ID.
 				// NOTE: this works for this example (where id's are strings);
 				// Memory should autogenerate random numeric IDs, but
 				// something seems to be falling through the cracks currently...
-				id = object[this.idProperty];
-				while(this.index[id + "(" + (++i) + ")"]){}
-				obj[this.idProperty] = id + "(" + i + ")";
+				id = object[idprop];
+				if(id in this.index){
+					// rev id
+					while(this.index[id + "(" + (++i) + ")"]){}
+					obj[idprop] = id + "(" + i + ")";
+				}
 				this.add(obj, options);
 			},
 			query: function(query, options){
@@ -140,8 +144,8 @@ define(["dojo/store/Memory", "dojo/store/Observable"],function(Memory, Observabl
 			}
 		}));
 	};
-	// global var testOrderedStore
-	testOrderedStore = createOrderedStore([
+	// global var testOrderedData
+	testOrderedData = [
 		{order: 1, name:"preheat", description:"Preheat your oven to 350°F"},
 		{order: 2, name:"mix dry", description:"In a medium bowl, combine flour, salt, and baking soda"},
 		{order: 3, name:"mix butter", description:"In a large bowl, beat butter, then add the brown sugar and white sugar then mix"},
@@ -151,6 +155,8 @@ define(["dojo/store/Memory", "dojo/store/Observable"],function(Memory, Observabl
 		{order: 7, name:"bake", description:"Put the cookies in the oven and bake for about 10-14 minutes"},
 		{order: 8, name:"remove", description:"Using a spatula, lift cookies off onto wax paper or a cooling rack"},
 		{order: 9, name:"eat", description:"Eat and enjoy!"}
-	]);
+	];
+	// global var testOrderedStore
+	testOrderedStore = createOrderedStore(testOrderedData);
 	return testStore;
 });

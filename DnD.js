@@ -1,10 +1,18 @@
-define(["dojo/_base/declare", "dojo/_base/lang", "./List", "dojo/dnd/Source", "dojo/dnd/Manager", "xstyle/put", "dojo/on", "xstyle/css!dojo/resources/dnd.css"], function(declare, lang, List, DnDSource, DnDManager, put, on){
+define(["./List", "dojo/_base/declare", "dojo/_base/lang", "dojo/on", "dojo/_base/Deferred", "dojo/dnd/Source", "dojo/dnd/Manager", "xstyle/put", "xstyle/css!dojo/resources/dnd.css"], function(List, declare, lang, on, Deferred, DnDSource, DnDManager, put){
 	// TODOC: store requirements
 	// * requires a store (sounds obvious, but not all Lists/Grids have stores...)
 	// * must support options.before in put calls
 	//   (if undefined, put at end)
 	// * should support copy
 	//   (copy should also support options.before as above)
+	
+	// TODOs:
+	// * consider sending items rather than nodes to onDropExternal/Internal
+	// * consider declaring an extension to dojo.dnd.Source rather than
+	//   clobbering on every instance we create;
+	//   it makes extending/overriding this plugin seem a bit obtuse
+	//   * barring that, might at least want to use safeMixin here
+	
 	function setupDnD(grid){
 		if(grid.dndTarget){
 			return;
@@ -21,6 +29,15 @@ define(["dojo/_base/declare", "dojo/_base/lang", "./List", "dojo/dnd/Source", "d
 		}
 		// add cross-reference to grid for potential use in inter-grid drop logic
 		targetSource.grid = grid;
+		
+		// fix _legalMouseDown to only allow starting drag from an item
+		// (not from bodyNode outside contentNode)
+		targetSource._legalMouseDown = function(evt){
+			var legal = DnDSource.prototype._legalMouseDown.apply(this, arguments);
+			return legal && evt.target != grid.bodyNode;
+		};
+		
+		// DnD method overrides
 		targetSource.onDrop = function(sourceSource, nodes, copy){
 			// on drop, determine where to move/copy the objects
 			var targetRow = targetSource.targetAnchor;
@@ -31,7 +48,7 @@ define(["dojo/_base/declare", "dojo/_base/lang", "./List", "dojo/dnd/Source", "d
 			}
 			targetRow = targetRow && grid.row(targetRow);
 			
-			dojo.when(targetRow && store.get(targetRow.id), function(target){
+			Deferred.when(targetRow && store.get(targetRow.id), function(target){
 				// Note: if dropping after the last row, or into an empty grid,
 				// target will be undefined.  Thus, it is important for store to place
 				// item last in order if options.before is undefined.
@@ -47,7 +64,7 @@ define(["dojo/_base/declare", "dojo/_base/lang", "./List", "dojo/dnd/Source", "d
 		};
 		targetSource.onDropInternal = function(nodes, copy, targetItem){
 			nodes.forEach(function(node){
-				dojo.when(targetSource.getObject(node), function(object){
+				Deferred.when(targetSource.getObject(node), function(object){
 					// For copy DnD operations, copy object, if supported by store;
 					// otherwise settle for put anyway.
 					// (put will relocate an existing item with the same id, i.e. move).
@@ -64,20 +81,19 @@ define(["dojo/_base/declare", "dojo/_base/lang", "./List", "dojo/dnd/Source", "d
 			// query), dragging to each other.
 			var sourceGrid = sourceSource.grid;
 			// TODO: bail out if sourceSource.getObject isn't defined?
-			// (also might want to implement default checkAcceptance for this)
-			nodes.forEach(function(node){
-				dojo.when(sourceSource.getObject(node), function(object){
+			nodes.forEach(function(node, i){
+				Deferred.when(sourceSource.getObject(node), function(object){
 					if(!copy){
 						if(sourceGrid){
 							// Remove original in the case of inter-grid move.
-							dojo.when(sourceGrid.store.getIdentity(object), function(id){
+							// (Also ensure dnd source is cleaned up properly)
+							Deferred.when(sourceGrid.store.getIdentity(object), function(id){
+								!i && sourceSource.selectNone(); // deselect all, one time
+								sourceSource.delItem(node.id);
 								sourceGrid.store.remove(id);
 							});
 						}else{
-							// TODO: delItem from sourceSource?
-							// Potentially implement above as delItem on grid sources,
-							// then merge these two branches?
-							// (problem: delItem doesn't update DOM on dojo.dnd.Sources...)
+							sourceSource.deleteSelectedNodes();
 						}
 					}
 					// Copy object, if supported by store; otherwise settle for put
@@ -112,8 +128,12 @@ define(["dojo/_base/declare", "dojo/_base/lang", "./List", "dojo/dnd/Source", "d
 	}
 	return declare([List], {
 		dndSourceType: "row",
-		dndTargetConfig: {
-			accept: ["row"]
+		dndTargetConfig: null,
+		constructor: function(){
+			// initialize default dndTargetConfig
+			this.dndTargetConfig = {
+				accept: [this.dndSourceType]
+			}
 		},
 		postCreate: function(){
 			this.inherited(arguments);

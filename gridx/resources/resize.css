@@ -1,13 +1,23 @@
 /*Column resizing plugin*/
-.dojoxGridxColumnResizing {
+.resizeDgridColumnResizing {
 	cursor: col-resize;
 }
 
-.dojoxGridxColumnResizer {
+.resizeDgridColumnResizer {
 	position: absolute;
 	height: 100%;
 	width: 2px;
 	background-color: #666;
 	z-index: 1000;
 	top: 0;
+}
+
+.resizeDgridResizeHandleNode {
+	height: 100%;
+	width: 8px;
+	position: absolute;
+	right: -4px;
+	top:0;
+	cursor: col-resize;
+	z-index: 999;
 }

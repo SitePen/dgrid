@@ -2,8 +2,8 @@
 	"http://www.w3.org/TR/html4/loose.dtd">
 <html>
 	<head>
-		<title>Test Grid Common Cases</title>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
+		<title>Test Grid DnD</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 		<meta name="viewport" content="width=570" />
 		<style type="text/css">
 			@import "../../dojo/resources/dojo.css";
@@ -16,7 +16,9 @@
 				font-weight: bold;
 				padding-bottom: 0.25em;
 			}
-					
+			
+			.clear { clear: both; }
+			
 			#another-target, #another-source {
 				float: left;
 				width: 504px;
@@ -30,6 +32,10 @@
 				width:400px;
 				height: 150px;
 			}
+			#grid3, #grid4 {
+				width: 40%;
+				float: left;
+			}
 			.ui-widget{
 				margin: 10px;
 			}
@@ -37,61 +43,116 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dojo", "dgrid/List", "dgrid/OnDemandGrid","dgrid/Tree","dgrid/Selection", "dgrid/gridx/modules/ColumnResizer", "dgrid/DnD", "dgrid/Keyboard", "dojo/dnd/Source", "dgrid/test/test_data"], 
+			require(["dojo", "dgrid/List", "dgrid/OnDemandGrid","dgrid/Tree","dgrid/Selection", "dgrid/gridx/modules/ColumnResizer", "dgrid/DnD", "dgrid/Keyboard", "dojo/dnd/Source", "dgrid/test/test_data", "dojo/domReady!"], 
 				function(dojo, List, Grid, Tree, Selection, ColumnResizer, DndRow, Keyboard, DnDSource){
-					dojo.addOnLoad(function(){
-						// Note: testOrderedStore hard-wires sorting anyway,
-						// so leaving sort disabled on columns in this grid.
-						window.grid1 = new (dojo.declare([Grid, Selection, DndRow, Keyboard]))({
-							store: testOrderedStore,
-							columns: [
-								{label:'Name', field:'name'},
-								{label:'Description', field:'description'}
-							]
-						}, "grid1");
-						window.grid2 = new (dojo.declare([Grid, Selection, DndRow, Keyboard]))({
-							store: createOrderedStore([]),
-							columns: [
-								{label:'Name', field:'name'}
-							]
-						}, "grid2");
-						var anotherTargetDiv = dojo.byId("another-target");
-						var target = new DnDSource(anotherTargetDiv, {accept:["row"], isSource:false});
-						target.onDrop = function(source, nodes){
-							nodes.forEach(function(node){
-								anotherTargetDiv.innerHTML = "Dropped " + source.getItem(node.id).data.name;
-							});
-						};
-						
-						// Set up a dnd source with items that can drag into the grid.
-						// This is one way of doing it; there are likely several...
-						var source = new DnDSource(dojo.byId("another-source"), {
-							accept: ["row"]
+					var
+						DnDGrid = dojo.declare([Grid, Selection, DndRow, Keyboard]),
+						columns = [
+							{name:'Name', field:'name', sortable: false},
+							{name:'Description', field:'description', sortable: false}
+						];
+					
+					// Note: testOrderedStore hard-wires sorting anyway,
+					// so leaving sort disabled on columns in this grid.
+					window.grid1 = new DnDGrid({
+						store: testOrderedStore,
+						columns: columns
+					}, "grid1");
+					window.grid2 = new DnDGrid({
+						store: createOrderedStore([]),
+						columns: [
+							{name:'Name', field:'name', sortable: false}
+						]
+					}, "grid2");
+					
+					// set up other targets
+					var anotherTargetDiv = dojo.byId("another-target");
+					var target = new DnDSource(anotherTargetDiv, {accept:["row"], isSource:false});
+					target.onDrop = function(source, nodes){
+						nodes.forEach(function(node){
+							anotherTargetDiv.innerHTML = "Dropped " + source.getItem(node.id).data.name;
 						});
-						function nameObj(args){
-							dojo.mixin(this, args);
-						}
-						nameObj.prototype = {
-							toString: function(){
-								return this.name;
-							}
-						};
-						source.insertNodes(false, [
-							{ type: ["row"], data: new nameObj({
-								order: 10,
-								label: "do a dance",
-								description: "Dance like nobody's watching."
-							})},
-							{ type: ["row"], data: new nameObj({
-								order: 11,
-								label: "genuflect",
-								description: "Take a knee."
-							})}
-						], false, null);
-						source.getObject = function(node){
-							return this.getItem(node.id).data;
-						};
+					};
+					
+					// Set up a dnd source with items that can drag into the grid.
+					// This is one way of doing it; there are likely several...
+					var source = new DnDSource(dojo.byId("another-source"), {
+						accept: ["row"]
 					});
+					function nameObj(args){
+						dojo.mixin(this, args);
+					}
+					nameObj.prototype = {
+						toString: function(){
+							return this.name;
+						}
+					};
+					source.insertNodes(false, [
+						{ type: ["row"], data: new nameObj({
+							order: 10,
+							name: "do a dance",
+							description: "Dance like nobody's watching."
+						})},
+						{ type: ["row"], data: new nameObj({
+							order: 11,
+							name: "genuflect",
+							description: "Take a knee."
+						})}
+					], false, null);
+					source.getObject = function(node){
+						return this.getItem(node.id).data;
+					};
+					
+					// Set up 2 more grids sharing the same store, to DnD between.
+					// Again, there are many ways to spin this, this is just one way.
+					var SharedDnDGrid = dojo.declare(DnDGrid, {
+						// addedSide: undefined | true
+						//		Indicates whether this grid represents the "added" side, i.e.
+						//		items initially start on the other side then get moved here.
+						addedSide: undefined,
+						
+						// TODO: Should probably think harder about code flow necessitated,
+						// at a broader level.
+						
+						constructor: function(){
+							// Filter according to which "side" is represented
+							this.query.added = this.addedSide;
+						},
+						
+						postCreate: function(){
+							var grid = this;
+							this.inherited(arguments);
+							
+							// Don't allow copy on these grids, only move back and forth
+							this.dndTarget.copyState = function(){ return false; }
+							// Re-implement onDropExternal to simply swap flag on store item
+							this.dndTarget.onDropExternal = function(source, nodes, copy, targetItem){
+								dojo.forEach(nodes, function(node){
+									dojo.when(source.getObject(node), function(object){
+										object.added = grid.addedSide;
+										// If we wanted to support copy, we would probably want
+										// to check the copy flag and call copy instead of put here.
+										grid.store.put(object, { before: targetItem });
+									});
+								});
+							};
+						}
+					});
+					
+					// set up store to use for these grids
+					var sharedStore = createOrderedStore(dojo.clone(testOrderedData));
+					
+					window.grid3 = new SharedDnDGrid({
+						dndSourceType: "row-swap",
+						store: sharedStore,
+						columns: columns
+					}, "grid3");
+					window.grid4 = new SharedDnDGrid({
+						dndSourceType: "row-swap", // same as grid3
+						addedSide: true, // flag to extension above
+						store: sharedStore,
+						columns: columns
+					}, "grid4");
 				});
 				
 		</script>
@@ -102,5 +163,10 @@
 		<div id="grid2"></div>
 		<div id="another-target">Another Target</div>
 		<div id="another-source">Another Source</div>
+		<div class="clear">
+			<h2>Example of 2 grids w/ inter-grid DnD, sharing the same store</h2>
+			<div id="grid3"></div>
+			<div id="grid4"></div>
+		</div>
 	</body>
 </html>
