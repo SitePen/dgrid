@@ -171,7 +171,6 @@ define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "
 					th.field = field;
 				}
 				// allow for custom header manipulation
-				
 				if(column.renderHeaderCell){
 					column.renderHeaderCell(th);
 				}else if(column.name || column.field){
