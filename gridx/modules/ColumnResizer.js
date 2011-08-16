@@ -1,4 +1,4 @@
-define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/on", "dojo/query", "dojo/_base/html", 'xstyle/css!../resources/resize.css'], function(dojo, declare, listen){
+define(["dojo/_base/declare", "dojo/on", "dojo/query", "dojo/dom", "dojo/dom-construct", "dojo/dom-geometry", "dojo/dom-class", "dojo/_base/html", 'xstyle/css!../resources/resize.css'], function(declare, listen, query, dom, construct, geom, cls){
 	
 return declare([], {
 	resizeNode: null,
@@ -23,19 +23,16 @@ return declare([], {
 
 		for(id in this.columns){
 				var col = this.columns[id];
-				var colNode = dojo.query(".column-"+id)[0];//grabs header node
-				console.log("colnode: ", colNode);
-				dojo.create('div',
+
+				var colNode = query(".column-"+id)[0];//grabs header node
+				construct.create('div',
 					{className: 'resizeDgridResizeHandleNode'},
 					colNode,
 					'last');
 		}
 
-		listen(dojo.query(".resizeDgridResizeHandleNode"), "mouseover", function(e){
-				console.log('mouseover');
-		});
 
-		listen(dojo.query(".resizeDgridResizeHandleNode"), "mousedown", function(e){
+		listen(query(".resizeDgridResizeHandleNode"), "mousedown", function(e){
 				grid._resizeMouseDown(e);
 				console.log('mousedown');
 		});
@@ -63,16 +60,16 @@ return declare([], {
 		// preventDefault actually seems to be enough to prevent browser selection
 		// in all but IE < 9.  setSelectable works for those.
 		e.preventDefault();
-		dojo.setSelectable(this.domNode, false);
+		dom.setSelectable(this.domNode, false);
 		var grid = this;
 		grid._resizing = true;
 		grid._startX = grid._getResizeMouseLocation(e); //position of the target
-		grid._gridX = dojo.position(grid.bodyNode).x;//position of the grid in the body *not sure why we need this?*
+		grid._gridX = geom.position(grid.bodyNode).x;//position of the grid in the body *not sure why we need this?*
 		grid._targetCell = grid._getResizeCell(e);
 		
 		// show resizer inlined
 		if(!grid._resizer){
-			grid._resizer = dojo.create('div', {
+			grid._resizer = construct.create('div', {
 				className: 'resizeDgridColumnResizer'},
 				grid.domNode, 'last');
 		}else{
@@ -96,13 +93,13 @@ return declare([], {
 		if(!this._resizedColumns){
 			for(id in this.columns){
 				var col = this.columns[id];
-				var width = dojo.query(".column-"+id)[0].offsetWidth;
+				var width = query(".column-"+id)[0].offsetWidth;
 				this.resizeColumnWidth(id, width);
 			}
 			this._resizedColumns = true;
 		}
-		dojo.removeClass(this.domNode, 'resizeDgridColumnResizing');//not working in opera
-		dojo.setSelectable(this.domNode, true);
+		cls.remove(this.domNode, 'resizeDgridColumnResizing');//not working in opera
+		dom.setSelectable(this.domNode, true);
 
 		var cell = this._targetCell,
 			delta = this._getResizeMouseLocation(e) - this._startX, //final change in position of resizer
@@ -110,7 +107,7 @@ return declare([], {
 			obj = this._getResizedColumnWidths(),//get current total column widths before resize
 			totalWidth = obj.totalWidth,
 			lastCol = obj.lastColId,
-			lastColWidth = dojo.query(".column-"+lastCol)[0].offsetWidth;
+			lastColWidth = query(".column-"+lastCol)[0].offsetWidth;
 
 		if(cell.columnId != lastCol){
 			if(totalWidth + delta < this.gridWidth) {
@@ -188,7 +185,7 @@ return declare([], {
 		var lastColId = null;
 		for(id in this.columns){
 			var col = this.columns[id];
-			var width = dojo.query(".column-"+id)[0].offsetWidth;
+			var width = query(".column-"+id)[0].offsetWidth;
 			totalWidth += width;
 			lastColId = id;
 		}

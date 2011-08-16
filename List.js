@@ -95,6 +95,15 @@ function(dojo, put, declare, listen, aspect, has, TouchScroll, hasClass){
 		});
 		self.contentNode.insertBefore(node, last);
 	};*/
+			// mix in params now, but wait until postScript to create
+			if(params){
+				this.params = params;
+				dojo.safeMixin(this, params);
+			}
+		},
+		postscript: function(params, srcNodeRef){
+			// invoke create in postScript to allow descendants to
+			// perform logic before create/postCreate happen (a la dijit/_WidgetBase)
 			this.create(params, srcNodeRef);
 		},
 		getCSSClass: function(shortName){
@@ -109,11 +118,7 @@ function(dojo, put, declare, listen, aspect, has, TouchScroll, hasClass){
 				domNode.tabIndex = 0;
 			}
 			domNode.role = "grid";
-			if(params){
-				this.params = params;
-				dojo.safeMixin(this, params);
-			}
-
+			
 			domNode.className += " ui-widget dgrid";
 			this.render();
 			var grid = this;

@@ -1,5 +1,5 @@
-define(["dojo", "dojo/on", "xstyle/put", "dgrid/OnDemandGrid","dgrid/Tree", "dgrid/Selection", "dgrid/Keyboard", "dojo/store/Memory"], 
-function(dojo, on, put, Grid, Tree, Selection, Keyboard, Memory){
+define(["dojo/dom", "dojo/_base/declare", "dojo/on", "xstyle/put", "dgrid/OnDemandGrid","dgrid/Tree", "dgrid/Selection", "dgrid/Keyboard", "dojo/store/Memory"], 
+function(dom, declare, on, put, Grid, Tree, Selection, Keyboard, Memory){
 	return function(data, explorerElement){
 		function getChildren(object){
 			var children = [];
@@ -37,7 +37,7 @@ function(dojo, on, put, Grid, Tree, Selection, Keyboard, Memory){
 			getChildren: getChildren,
 			data: getChildren(data)
 		});
-		window.explorer = dojo.declare([Grid, Selection, Keyboard])({
+		window.explorer = declare([Grid, Selection, Keyboard])({
 			selectionMode: "single",
 			store: store,
 			columns: {
@@ -54,7 +54,7 @@ function(dojo, on, put, Grid, Tree, Selection, Keyboard, Memory){
 			}
 		}, explorerElement);
 		on(explorer, "select", function(component){
-			var details = dojo.byId("details");
+			var details = dom.byId("details");
 			put(details, "div", component.description);
 			put(details, "div", component.description);
 			

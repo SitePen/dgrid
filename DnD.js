@@ -1,10 +1,17 @@
-define(["dojo/_base/declare", "dojo/_base/lang", "./List", "dojo/dnd/Source", "dojo/dnd/Manager", "xstyle/put", "dojo/on", "xstyle/css!dojo/resources/dnd.css"], function(declare, lang, List, DnDSource, DnDManager, put, on){
+define(["./List", "dojo/_base/declare", "dojo/_base/lang", "dojo/on", "dojo/_base/Deferred", "dojo/dnd/Source", "dojo/dnd/Manager", "xstyle/put", "xstyle/css!dojo/resources/dnd.css"], function(List, declare, lang, on, Deferred, DnDSource, DnDManager, put){
 	// TODOC: store requirements
 	// * requires a store (sounds obvious, but not all Lists/Grids have stores...)
 	// * must support options.before in put calls
 	//   (if undefined, put at end)
 	// * should support copy
 	//   (copy should also support options.before as above)
+	
+	// TODOs:
+	// * consider sending items rather than nodes to onDropExternal/Internal
+	// * consider declaring an extension to dojo.dnd.Source rather than
+	//   clobbering on every instance we create;
+	//   it makes extending/overriding this plugin seem a bit obtuse
+	
 	function setupDnD(grid){
 		if(grid.dndTarget){
 			return;
@@ -31,7 +38,7 @@ define(["dojo/_base/declare", "dojo/_base/lang", "./List", "dojo/dnd/Source", "d
 			}
 			targetRow = targetRow && grid.row(targetRow);
 			
-			dojo.when(targetRow && store.get(targetRow.id), function(target){
+			Deferred.when(targetRow && store.get(targetRow.id), function(target){
 				// Note: if dropping after the last row, or into an empty grid,
 				// target will be undefined.  Thus, it is important for store to place
 				// item last in order if options.before is undefined.
@@ -47,7 +54,7 @@ define(["dojo/_base/declare", "dojo/_base/lang", "./List", "dojo/dnd/Source", "d
 		};
 		targetSource.onDropInternal = function(nodes, copy, targetItem){
 			nodes.forEach(function(node){
-				dojo.when(targetSource.getObject(node), function(object){
+				Deferred.when(targetSource.getObject(node), function(object){
 					// For copy DnD operations, copy object, if supported by store;
 					// otherwise settle for put anyway.
 					// (put will relocate an existing item with the same id, i.e. move).
@@ -66,11 +73,11 @@ define(["dojo/_base/declare", "dojo/_base/lang", "./List", "dojo/dnd/Source", "d
 			// TODO: bail out if sourceSource.getObject isn't defined?
 			// (also might want to implement default checkAcceptance for this)
 			nodes.forEach(function(node){
-				dojo.when(sourceSource.getObject(node), function(object){
+				Deferred.when(sourceSource.getObject(node), function(object){
 					if(!copy){
 						if(sourceGrid){
 							// Remove original in the case of inter-grid move.
-							dojo.when(sourceGrid.store.getIdentity(object), function(id){
+							Deferred.when(sourceGrid.store.getIdentity(object), function(id){
 								sourceGrid.store.remove(id);
 							});
 						}else{
@@ -112,8 +119,12 @@ define(["dojo/_base/declare", "dojo/_base/lang", "./List", "dojo/dnd/Source", "d
 	}
 	return declare([List], {
 		dndSourceType: "row",
-		dndTargetConfig: {
-			accept: ["row"]
+		dndTargetConfig: null,
+		constructor: function(){
+			// initialize default dndTargetConfig
+			this.dndTargetConfig = {
+				accept: [this.dndSourceType]
+			}
 		},
 		postCreate: function(){
 			this.inherited(arguments);
