@@ -11,15 +11,6 @@
 	position: absolute;
 	right: 17px; /*scrollbar width; */
 	left: 0px;
-
-}
-
-.dgrid-header-row .dgrid-cell {
-	position: relative ;
-
-}
-.dgrid-header .dgrid-header-row .ui-widget-header {
-	height: 100%;
 }
 .dgrid-header-scroll {
 	position: absolute;
@@ -34,11 +25,6 @@
 .dgrid-header, .dgrid-header-row, .dgrid-footer {
 	overflow: hidden;
 	background-color: #eee;
-}
-.dgrid-header .dgrid-cell {
-	overflow: visible;
-	word-wrap: break-word;
-	height: 20px;
 }
 
 .dgrid-row-table {
@@ -61,7 +47,6 @@
 	-moz-box-sizing: border-box;
 	-ms-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
-	position: relative;
 }
 .dgrid-cell-padding {
 	padding: 3px;
