@@ -29,7 +29,7 @@ return declare([], {
 				colNode.innerHTML = '';
 				construct.create('div',
 					{className: 'resizeDgridResizeHandleNode'},
-					construct.create('div', {style: 'position:relative; height:100%;', innerHTML: headerHTML}, colNode, 'last'),
+					construct.create('div', {className: 'resizeHeaderTextNode', innerHTML: headerHTML}, colNode, 'last'),
 					'last');
 		}
 		

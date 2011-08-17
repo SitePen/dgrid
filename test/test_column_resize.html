@@ -42,8 +42,8 @@
 			require(["dojo/on", "dgrid/OnDemandGrid", "dgrid/gridx/modules/ColumnResizer", "dgrid/test/test_data", "dojo/domReady!"], 
 				function(on, Grid, ColumnResizer, testStore){
 					var columns = { // you can declare columns as an object hash (key translates to field)
-						col1: 'Column 1',
-						col2: {label: 'Column2222222222222222222222222', sortable: false},
+						col1: 'Column 1Column1Column 1 Column 1',
+						col2: {name: 'Column2222222222222222222222222'},
 						col3: 'Column3333333333333333333',
 						col4: 'Column 4',
 						"last-col": {label: 'Column 5', field: 'col5'}
