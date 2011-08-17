@@ -143,6 +143,9 @@ function(dojo, put, declare, listen, aspect, has, TouchScroll, hasClass){
 		render: function(){
 			var domNode = this.domNode;
 			var headerNode = this.headerNode = put(domNode, "div.dgrid-header.dgrid-header-row.ui-widget-header");
+			if(has("quirks") || has("ie") < 8){
+				var spacerNode = put(domNode, "div.dgrid-spacer");
+			}
 			var bodyNode = this.bodyNode = put(domNode, "div.dgrid-scroller");
 			this.headerScrollNode = put(domNode, "div.dgrid-header-scroll.ui-widget-header");
 			listen(bodyNode, "scroll", function(event){
@@ -165,7 +168,7 @@ function(dojo, put, declare, listen, aspect, has, TouchScroll, hasClass){
 		resize: function(){
 			var bodyNode = this.bodyNode;
 			var headerNode = this.headerNode;
-			this.headerScrollNode.style.height = bodyNode.style.top = headerNode.offsetHeight + "px";
+			this.headerScrollNode.style.height = bodyNode.style.marginTop = headerNode.offsetHeight + "px";
 			if(has("quirks") || has("ie") < 7){
 				// in quirks mode, the "bottom" CSS property is ignored, so do this to fix it
 				// We might want to use a CSS expression or the xstyle package to fix this

@@ -1,7 +1,7 @@
 /* This stylesheet provides the structural CSS for the dgrid */
 .dgrid {
 	position: relative;
-	overflow: hidden;
+	overflow: hidden; /* This is needed by IE to prevent crazy scrollbar flashing */
 	border: 1px solid #ddd;
 	height: 30em;
 	display: block;
@@ -11,7 +11,6 @@
 	position: absolute;
 	right: 17px; /*scrollbar width; */
 	left: 0px;
-
 }
 
 .dgrid-header-row .dgrid-cell {
@@ -35,11 +34,6 @@
 	overflow: hidden;
 	background-color: #eee;
 }
-.dgrid-header .dgrid-cell {
-	overflow: visible;
-	word-wrap: break-word;
-	height: 20px;
-}
 
 .dgrid-row-table {
 	border-collapse: collapse;
@@ -61,7 +55,6 @@
 	-moz-box-sizing: border-box;
 	-ms-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
-	position: relative;
 }
 .dgrid-cell-padding {
 	padding: 3px;
@@ -82,7 +75,8 @@
 	overflow-x: auto;
 	overflow-y: scroll;
 	position: absolute;
-	top: 25px; /* this will be adjusted programmatically to fit below the header*/
+	top: 0px;
+	margin-top: 25px; /* this will be adjusted programmatically to fit below the header*/
 	bottom: 0px;
 	width: 100%;
 }
