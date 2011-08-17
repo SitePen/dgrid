@@ -24,25 +24,32 @@ return declare([], {
 		for(id in this.columns){
 				var col = this.columns[id];
 				var colNode = query(".column-"+id)[0];//grabs header node
+				var headerHTML = colNode.innerHTML;
+				colNode.innerHTML = '';
 				construct.create('div',
 					{className: 'resizeDgridResizeHandleNode'},
-					colNode,
+					construct.create('div', {style: 'position:relative; height:100%;', innerHTML: headerHTML}, colNode, 'last'),
 					'last');
 		}
+		
+
 
 		listen(query(".resizeDgridResizeHandleNode"), "mousedown", function(e){
 				grid._resizeMouseDown(e);
+				console.log('mousedown');
 		});
 		grid.mouseMoveListen = listen.pausable(document.body, "mousemove", function(e){
 			// while resizing, update the position of the resizer bar
 			if(!grid._resizing){return;}
 			grid._updateResizerPosition(e);
+			console.log("mousemove");
 		});
 		grid.mouseUpListen = listen.pausable(document.body, 'mouseup', function(e){
 				if(!grid._resizing){return;}
 				grid._resizeMouseUp(e);
 				grid.mouseMoveListen.pause();
 				grid.mouseUpListen.pause();
+				console.log("mouseup");
 			});
 	},//end postCreate
 
@@ -169,7 +176,7 @@ return declare([], {
 			node = e.srcElement;
 		}
 		if(node.nodeType == 3 || !node.columnId){ // defeat Safari bug first and IE oddity 2nd
-			node = node.parentNode;
+			node = node.parentNode.parentNode;
 		}
 		return node;
 	},

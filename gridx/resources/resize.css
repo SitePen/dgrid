@@ -16,8 +16,28 @@
 	height: 100%;
 	width: 8px;
 	position: absolute;
-	right: -4px;
-	top:0;
+	right: -8px;
+	top:-4px;
 	cursor: col-resize;
 	z-index: 999;
+	padding-bottom: 8px;
+	background-color: #F00;
+}
+
+.dgrid-header-row .dgrid-cell {
+	position: relative ;
+
+}
+
+.dgrid-header .dgrid-header-row .ui-widget-header {
+	height: 100%;
+}
+
+.dgrid-header .dgrid-cell {
+	overflow: visible;
+	word-wrap: break-word;
+}
+
+.dgrid-cell {
+	position: relative;
 }
