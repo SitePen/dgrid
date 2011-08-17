@@ -1,5 +1,5 @@
-define(["dojo/_base/kernel", "xstyle/put", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/has", "dojo/has!touch?./TouchScroll", "xstyle/has-class", "dojo/_base/sniff", "xstyle/css!./css/dgrid.css?dgrid-css-loaded"], 
-function(dojo, put, declare, listen, aspect, has, TouchScroll, hasClass){
+define(["xstyle/put", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/has", "dojo/has!touch?./TouchScroll", "xstyle/has-class", "dojo/_base/sniff", "xstyle/css!./css/dgrid.css?dgrid-css-loaded"], 
+function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 	// Add user agent/feature CSS classes 
 	hasClass("mozilla", "opera", "ie-6", "ie-6-7", "quirks", "no-quirks");
 
@@ -66,7 +66,7 @@ function(dojo, put, declare, listen, aspect, has, TouchScroll, hasClass){
 			// mixins/plugins are being provided, we will mix then into the instance 
 			var i = 0, mixin;
 			while(typeof (mixin = arguments[i++]) == "function"){
-				dojo.safeMixin(this, mixin.prototype);
+				declare.safeMixin(this, mixin.prototype);
 			} 
 			// shift the arguments to get the params and srcNodeRef for the new instantiation
 			params = arguments[i - 1];
@@ -105,7 +105,7 @@ function(dojo, put, declare, listen, aspect, has, TouchScroll, hasClass){
 			// mix in params now, but wait until postScript to create
 			if(params){
 				this.params = params;
-				dojo.safeMixin(this, params);
+				declare.safeMixin(this, params);
 			}
 		},
 		postscript: function(params, srcNodeRef){
