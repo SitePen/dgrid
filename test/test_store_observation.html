@@ -29,11 +29,11 @@
 			require(["dojo/on", "dgrid/OnDemandGrid","dgrid/Tree","dgrid/Editor", "dgrid/Keyboard", "dgrid/Selection", "dgrid/test/test_data", "dojo/domReady!"], 
 				function(on, Grid, Tree, Editor, Keyboard, Selection, testStore){
 					var columns = [
-						Tree({name:'Name', field:'name', sortable: false}),
-						Editor({name: 'A CheckBox', field: 'bool', sortable: false}, "checkbox"),
-						Editor({name:'Type', field:'type', sortable: false}, "text"),
-						Editor({name:'Population', field:'population'}, "text", "dblclick"),
-						Editor({name:'Timezone', field:'timezone'}, "text", "dblclick")
+						Tree({label:'Name', field:'name', sortable: false}),
+						Editor({label: 'A CheckBox', field: 'bool', sortable: false}, "checkbox"),
+						Editor({label:'Type', field:'type', sortable: false}, "text"),
+						Editor({label:'Population', field:'population'}, "text", "dblclick"),
+						Editor({label:'Timezone', field:'timezone'}, "text", "dblclick")
 					];
 					
 					window.tree = dojo.declare([Grid, Keyboard, Selection])({

@@ -173,8 +173,8 @@ define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "
 				// allow for custom header manipulation
 				if(column.renderHeaderCell){
 					column.renderHeaderCell(th);
-				}else if(column.name || column.field){
-					th.appendChild(document.createTextNode(column.name || column.field));
+				}else if(column.label || column.field){
+					th.appendChild(document.createTextNode(column.label || column.field));
 				}
 				if(column.sortable !== false){
 					th.sortable = true;
@@ -223,7 +223,7 @@ define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "
 			for(var columnId in rowColumns){
 				var column = rowColumns[columnId];
 				if(typeof column == "string"){
-					rowColumns[columnId] = column = {name:column};
+					rowColumns[columnId] = column = {label:column};
 				}
 				if(!isArray && !column.field){
 					column.field = columnId;

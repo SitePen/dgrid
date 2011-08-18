@@ -42,7 +42,7 @@ function(dom, declare, on, put, Grid, Tree, Selection, Keyboard, Memory){
 			store: store,
 			columns: {
 				docType: new Tree({
-					name:'Part', 
+					label:'Part', 
 					renderCell: function(object, value, td){
 						put(td, "div.ui-icon.type.type-" + object.docType + "[title=" + object.docType + "]");
 						put(td, "div.description", (object.name || "") + (object.type ? ':' + object.type : '') +
