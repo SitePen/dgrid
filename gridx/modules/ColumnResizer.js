@@ -24,11 +24,12 @@ return declare([], {
 		for(id in this.columns){
 				var col = this.columns[id];
 				var colNode = query(".column-"+id)[0];//grabs header node
+				console.log("colNode: ", colNode);
 				var headerHTML = colNode.innerHTML;
 				colNode.innerHTML = '';
 				construct.create('div',
 					{className: 'resizeDgridResizeHandleNode'},
-					construct.create('div', {style: 'position:relative; height:100%;', innerHTML: headerHTML}, colNode, 'last'),
+					construct.create('div', {className: 'resizeHeaderTextNode', innerHTML: headerHTML}, colNode, 'last'),
 					'last');
 		}
 		
@@ -100,7 +101,6 @@ return declare([], {
 			}
 			this._resizedColumns = true;
 		}
-		cls.remove(this.domNode, 'resizeDgridColumnResizing');//not working in opera
 		dom.setSelectable(this.domNode, true);
 
 		var cell = this._targetCell,
