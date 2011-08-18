@@ -257,9 +257,8 @@ edit the value.
 The ColumnResizer plugin from https://github.com/kriszyp/grid-2.0/tree/simple-plugin/gridx/modules
 can be used to add column resizing (via dragging) functionality.
 
-<h2>grid-2.0/gridx/dnd/Row</h2>
-The dnd/Row plugin from https://github.com/kriszyp/grid-2.0/tree/simple-plugin/gridx/modules/dnd
-can be used to add row drag n' drop functionality. The store should be order-aware and 
+<h2>DnD</h2>
+The DnD can be used to add row drag n' drop functionality. The store should be order-aware and 
 support the options.before parameter on put() calls to properly respond to drag n' drop
 operations.
 
