@@ -19,8 +19,8 @@ return declare([List], {
 	
 	constructor: function(){
 		// Create empty query objects on each instance, not the prototype
-		this.query = {};
-		this.queryOptions = {};
+		this.query || (this.query = {});
+		this.queryOptions || (this.queryOptions = {});
 	},
 	
 	renderQuery: function(query, preloadNode){
