@@ -2,7 +2,7 @@
 	"http://www.w3.org/TR/html4/loose.dtd">
 <html>
 	<head>
-		<title>Test renderRow functionality</title>
+		<title>Test renderRow and legacy functionality</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
 		<meta name="viewport" content="width=570" />
 		<style type="text/css">
@@ -15,18 +15,6 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			var data = [
-				{order: 1, name:"preheat", description:"Preheat your oven to 350F"},
-				{order: 2, name:"mix dry", description:"In a medium bowl, combine flour, salt, and baking soda"},
-				{order: 3, name:"mix butter", description:"In a large bowl, beat butter, then add the brown sugar and white sugar then mix"},
-				{order: 4, name:"mix together", description:"Slowly add the dry ingredients from the medium bowl to the wet ingredients in the large bowl, mixing until the dry ingredients are totally combined"},
-				{order: 5, name:"chocolate chips", description:"Add chocolate chips"},
-				{order: 6, name:"make balls", description:"Scoop up a golf ball size amount of dough with a spoon and drop in onto a cookie sheet"},
-				{order: 7, name:"bake", description:"Put the cookies in the oven and bake for about 10-14 minutes"},
-				{order: 8, name:"remove", description:"Using a spatula, lift cookies off onto wax paper or a cooling rack"},
-				{order: 9, name:"eat", description:"Eat and enjoy!"}
-			];
-			
 			var store; // defined later, Memory store containing data
 			
 			function getOrdinal(num){
@@ -83,43 +71,43 @@
 				name: {},
 				description: {name: "what to do", sortable: false}
 			};
-			require(["dgrid/Grid", "dgrid/OnDemandGrid", "dgrid/GridFromHtml", "dojo/store/Memory", "dojo/store/Observable", "dojo/_base/declare", "dojo/parser", "dojo/domReady!"],
-			function(Grid, OnDemandGrid, GridFromHtml, Memory, Observable, declare, parser){
+			require(["dgrid/Grid", "dgrid/OnDemandGrid", "dgrid/GridFromHtml", "dojo/store/Memory", "dojo/store/Observable", "dojo/_base/declare", "dojo/parser", "dojo/query", "dgrid/test/test_data", "dojo/domReady!"],
+			function(Grid, OnDemandGrid, GridFromHtml, Memory, Observable, declare, parser, query){
 				
 				// fully-programmatic tests
 				
 				window.gridLegacyFormatter = new Grid({
 					columns: columnsLegacyFormatter
 				}, "gridLegacyFormatter");
-				gridLegacyFormatter.renderArray(data);
+				gridLegacyFormatter.renderArray(testOrderedData);
 				
 				window.gridLegacyGet = new Grid({
 					columns: columnsLegacyGet
 				}, "gridLegacyGet");
-				gridLegacyGet.renderArray(data);
+				gridLegacyGet.renderArray(testOrderedData);
 				
 				window.gridNew = new Grid({
 					columns: columnsNew
 				}, "gridNew");
-				gridNew.renderArray(data);
+				gridNew.renderArray(testOrderedData);
 				
 				// GridFromHtml tests
 				
 				window.gridFromHtmlLegacyFormatter = new GridFromHtml({},
 					"gridFromHtmlLegacyFormatter");
-				gridFromHtmlLegacyFormatter.renderArray(data);
+				gridFromHtmlLegacyFormatter.renderArray(testOrderedData);
 				
 				window.gridFromHtmlLegacyGet = new GridFromHtml({},
 					"gridFromHtmlLegacyGet");
-				gridFromHtmlLegacyGet.renderArray(data);
+				gridFromHtmlLegacyGet.renderArray(testOrderedData);
 				
 				window.gridFromHtmlNew = new GridFromHtml({},
 					"gridFromHtmlNew");
-				gridFromHtmlNew.renderArray(data);
+				gridFromHtmlNew.renderArray(testOrderedData);
 				
 				window.gridFromHtmlTestProps = new GridFromHtml({},
 					"gridFromHtmlTestProps");
-				gridFromHtmlTestProps.renderArray(data);
+				gridFromHtmlTestProps.renderArray(testOrderedData);
 				
 				// need to expose GridFromHtml as a global for parser to find.
 				// (need a version with OnDemandGrid for store usage)
@@ -127,8 +115,48 @@
 				
 				// also, need a store, since there's currently no way to effectively
 				// invoke renderArray from HTML.
-				store = Observable(Memory({data: data}));
+				store = Observable(Memory({data: testOrderedData}));
 				parser.parse();
+				
+				function byId(id){
+					return document.getElementById(id);
+				}
+				
+				// Test 4x: testing dgrid w/o srcNodeRef, or w/ srcNodeRef w/o id
+				// Purposely testing with store to see how init is handled.
+				// (works fine if you renderArray after node placement)
+				
+				// Test 4a: srcNodeRef + no id, specify id to dgrid
+				window.grid4a = new OnDemandGrid({
+					store: store,
+					columns: columnsNew,
+					id: "test4a"
+				}, query(".test4a")[0]);
+				
+				// Test 4b: srcNodeRef + no id - should end up with id=dgrid_0
+				window.grid4b = new OnDemandGrid({
+					store: store,
+					columns: columnsNew
+				}, query(".test4b")[0]);
+				
+				// Test 4c: no srcNodeRef, specify id to dgrid
+				window.grid4c = new OnDemandGrid({
+					store: store,
+					columns: columnsNew,
+					id: "test4c"
+				});
+				query(".test4c")[0].appendChild(grid4c.domNode);
+				// need to call resize to calculate header size after node is placed
+				grid4c.resize();
+				
+				// Test 4d: no srcNodeRef, no id - should end up with id=dgrid_1
+				window.grid4d = new OnDemandGrid({
+					store: store,
+					columns: columnsNew
+				});
+				query(".test4d")[0].appendChild(grid4d.domNode);
+				// need to call resize to calculate header size after node is placed
+				grid4d.resize();
 			});
 			
 		</script>
@@ -220,5 +248,16 @@
 				<th field="description" sortable="false">what to do</th>
 			</tr>
 		</table>
+		
+		<hr/>
+		
+		<h2>4a: Grid on domnode with no initial id, id specified as param (will become DOM node id)</h2>
+		<div class="test4a"></div>
+		<h2>4b: Grid on domnode with no initial id, dgrid / DOM node id autogenerated</h2>
+		<div class="test4b"></div>
+		<h2>4c: Grid with no srcNodeRef (placed inside another domNode), id specified as param (will become DOM node id)</h2>
+		<div class="test4c"></div>
+		<h2>4d: Grid with no srcNodeRef (placed inside another domNode), dgrid / DOM node id autogenerated</h2>
+		<div class="test4d"></div>
 	</body>
 </html>

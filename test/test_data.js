@@ -21,7 +21,7 @@ define(["dojo/store/Memory", "dojo/store/Observable"],function(Memory, Observabl
 		data.items.push(dojo.mixin({ id: i }, data_list[i%l]));
 	}
 
-	// global var "test_store"
+	// global var testStore
 	testStore = Observable(Memory({data: data}));
 
 	var typesData = [];
@@ -37,8 +37,10 @@ define(["dojo/store/Memory", "dojo/store/Observable"],function(Memory, Observabl
 			bool2: Math.random() > 0.5
 		});
 	}
+	// global var testTypesStore
 	testTypesStore = Observable(Memory({data: typesData}));
 	
+	// global var testCountryStore
 	testCountryStore = Observable(new Memory({
 		data: [
 			{ id: 'AF', name:'Africa', type:'continent', population:'900 million', area: '30,221,532 sq km',
