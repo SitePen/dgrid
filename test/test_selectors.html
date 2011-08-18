@@ -28,8 +28,9 @@
 				function(Grid, Editor, Selection, Keyboard, testStore){
 					var columns = { // you can declare columns as an object hash (key translates to field)
 						col1: Editor({selector: true, sortable: false}, "checkbox"),
-						col2: {name: 'Column 2', sortable: false},
-						col3: {name: 'Column 3'}
+						id: "ID",
+						col2: {label: 'Column 2', sortable: false},
+						col3: {label: 'Column 3'}
 					};
 					window.grid = dojo.declare([Grid, Selection, Keyboard])({
 						store: testStore,
@@ -37,9 +38,10 @@
 						columns: columns
 					}, "grid");
 					var columnsRadio = { // you can declare columns as an object hash (key translates to field)
-						col1: Editor({name: 'Radio', selector: true, sortable: false}, "radio"),
-						col2: {name: 'Column 2', sortable: false},
-						col3: {name: 'Column 3'}
+						col1: Editor({label: 'Radio', selector: true, sortable: false}, "radio"),
+						id: "ID",
+						col2: {label: 'Column 2', sortable: false},
+						col3: {label: 'Column 3'}
 					};
 					window.gridRadio = dojo.declare([Grid, Selection, Keyboard])({
 						store: testStore,

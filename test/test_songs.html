@@ -106,12 +106,12 @@
 					};
 
 					var columns = [
-						{name: 'Name', field: 'Name'},
-						{name: 'Duration', field: 'Time', formatter: timeFormatter},
-						{name: 'Year', field: 'Year'},
-						{name: 'Artist', field: 'Artist'},
-						{name: 'Album', field: 'Album'},
-						{name: 'Genre', field: 'Genre'}
+						{label: 'Name', field: 'Name'},
+						{label: 'Duration', field: 'Time', formatter: timeFormatter},
+						{label: 'Year', field: 'Year'},
+						{label: 'Artist', field: 'Artist'},
+						{label: 'Album', field: 'Album'},
+						{label: 'Genre', field: 'Genre'}
 					];
 					window.grid = new (dojo.declare([Grid, Selection, Keyboard]))({
 						store: songStore,

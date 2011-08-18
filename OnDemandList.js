@@ -19,8 +19,8 @@ return declare([List], {
 	
 	constructor: function(){
 		// Create empty query objects on each instance, not the prototype
-		this.query = {};
-		this.queryOptions = {};
+		this.query || (this.query = {});
+		this.queryOptions || (this.queryOptions = {});
 	},
 	
 	renderQuery: function(query, preloadNode){
@@ -135,9 +135,8 @@ return declare([List], {
 					offset = 0;
 				}
 				// TODO: do this for the bottom too
-				count = Math.max(count, this.minRowsPerPage);
-				count = Math.min(count, this.maxRowsPerPage);
-				count = Math.min(count, preloadNode.count);
+				count = Math.min(Math.max(count, this.minRowsPerPage), 
+									this.maxRowsPerPage, preloadNode.count);
 				if(count == 0){
 					return;
 				}
@@ -146,18 +145,28 @@ return declare([List], {
 				var options = this.queryOptions ? lang.delegate(this.queryOptions) : {};
 				options.start = preloadNode.start + offset;
 				options.count = count;
-				if(offset > 0 && offset + count < preloadNode.count){
-					// TODO: need to do a split 
-					var second = document.clone(preloadNode);
-					
+				if(offset > 0){
+					if(offset + count > preloadNode.count){
+						count = preloadNode.count - offset;
+					}
+					// need to do a split 
+					var newPreloadNode = preloadNode.cloneNode();
+					put(preloadNode, "+", newPreloadNode);
+					preloadNode.next = newPreloadNode;
+					newPreloadNode.previous = preloadNode;
+					newPreloadNode.start = options.start + count;
+					newPreloadNode.count = preloadNode.count - offset;
+					newPreloadNode.query = preloadNode.query;
+					preloadNode.count = offset;
+					preloadNode.style.height = offset * this.rowHeight + "px";
+					preloadNode = newPreloadNode;
 				}else{
 					preloadNode.start += count;
-					preloadNode.count -= count;
-					preloadNode.style.height = Math.min(preloadNode.count * this.rowHeight, this.maxEmptySpace);
 				}
+				preloadNode.count -= count;
+				preloadNode.style.height = Math.min(preloadNode.count * this.rowHeight, this.maxEmptySpace) + "px";
 				// create a loading node as a placeholder while the data is loaded 
-				var loadingNode = put("tr.dgrid-loading[style=height:" + count * this.rowHeight + "px]");
-				this.contentNode.insertBefore(loadingNode, preloadNode);
+				var loadingNode = put(preloadNode, "-tr.dgrid-loading[style=height:" + count * this.rowHeight + "px]");
 				// use the query associated with the preload node to get the next "page"
 				options.query = preloadNode.query;
 				var results = preloadNode.query(options);

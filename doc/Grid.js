@@ -3,7 +3,7 @@ function(create, List){
 	with(create){
 	var column = Object("Column definition", {
 		field: String("The property from the data objects to retrieve for display in this column"),
-		name: String("The label to use in the column header"),
+		label: String("The label to use in the column header"),
 		sortable: Boolean("The property from the data objects to retrieve for display in this column"),
 		className: String("The CSS classname to apply to the DOM element for the cells in this column"),
 		id: String("The column id"),
