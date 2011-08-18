@@ -24,17 +24,13 @@ return declare([], {
 		for(id in this.columns){
 				var col = this.columns[id];
 				var colNode = query(".column-"+id)[0];//grabs header node
-				console.log("colNode: ", colNode);
 				var headerHTML = colNode.innerHTML;
 				colNode.innerHTML = '';
 				construct.create('div',
-					{className: 'resizeDgridResizeHandleNode'},
+					{className: 'resizeDgridResizeHandleNode  resizeNode-'+id},
 					construct.create('div', {className: 'resizeHeaderTextNode', innerHTML: headerHTML}, colNode, 'last'),
 					'last');
 		}
-		
-
-
 		listen(query(".resizeDgridResizeHandleNode"), "mousedown", function(e){
 				grid._resizeMouseDown(e);
 				console.log('mousedown');
