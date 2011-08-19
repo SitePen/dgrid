@@ -22,11 +22,4 @@
 .resizeHeaderTextNode {
 	position:relative;
 	height:100%;
-	
-}
-
-.dgrid-cell-padding {
-	padding: 3px;
-	position:relative;
-	overflow: hidden;
 }
