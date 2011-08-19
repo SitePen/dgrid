@@ -1,4 +1,4 @@
-define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "./List", "dojo/_base/sniff"], function(has, put, declare, listen, Editor, List){
+define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Editor", "./List", "dojo/_base/sniff"], function(has, put, declare, listen, Editor, List){
 	var contentBoxSizing = has("ie") < 8 && !has("quirks");
 
 	return declare([List], {
@@ -8,6 +8,7 @@ define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "
 		//		focus to be at the row level, which is useful if you want only want row-level
 		//		navigation.
 		cellNavigation: true,
+		tabableHeader: true,
 		column: function(target){
 			// summary:
 			//		Get the column object by node, or event, or a columnId
@@ -181,32 +182,34 @@ define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "
 					th.className += " dgrid-sortable";
 				}
 			});
-			
+			this._rowIdToObject[row.id = this.id + "-header"] = this.columns;
 			//put(headerNode, "div.dgrid-header-columns>", row, ".dgrid-row<+div.dgrid-header-scroll.ui-widget-header");
 			//row = put("div.dgrid-row[role=columnheader]>", row);
 			headerNode.appendChild(row);
 			var lastSortedArrow;
 			// if it columns are sortable, resort on clicks
-			listen(row, "click", function(event){
-				var
-					target = event.target,
-					field, descending, parentNode;
-				do{
-					if(target.sortable){
-						field = target.field || target.columnId;
-						// re-sort
-						descending = grid.sortOrder && grid.sortOrder[0].attribute == field && !grid.sortOrder[0].descending;
-						if(lastSortedArrow){
-							put(lastSortedArrow, "<!dgrid-sort-up!dgrid-sort-down"); // remove the sort classes from parent node
-							put(lastSortedArrow, "!"); // destroy the lastSortedArrow node
+			listen(row, "click,keydown", function(event){
+				if(event.type == "click" || event.keyCode == 32){
+					var
+						target = event.target,
+						field, descending, parentNode;
+					do{
+						if(target.sortable){
+							field = target.field || target.columnId;
+							// re-sort
+							descending = grid.sortOrder && grid.sortOrder[0].attribute == field && !grid.sortOrder[0].descending;
+							if(lastSortedArrow){
+								put(lastSortedArrow, "<!dgrid-sort-up!dgrid-sort-down"); // remove the sort classes from parent node
+								put(lastSortedArrow, "!"); // destroy the lastSortedArrow node
+							}
+							lastSortedArrow = put(target.firstChild, "-div.dgrid-sort-arrow.ui-icon[role=presentation]");
+							lastSortedArrow.innerHTML = "&nbsp;";
+							put(target, descending ? ".dgrid-sort-down" : ".dgrid-sort-up");
+							grid.resize();
+							grid.sort(field, descending);
 						}
-						lastSortedArrow = put(target.firstChild, "-div.dgrid-sort-arrow.ui-icon[role=presentation]");
-						lastSortedArrow.innerHTML = "&nbsp;";
-						put(target, descending ? ".dgrid-sort-down" : ".dgrid-sort-up");
-						grid.resize();
-						grid.sort(field, descending);
-					}
-				}while((target = target.parentNode) && target != headerNode);
+					}while((target = target.parentNode) && target != headerNode);
+				}
 			});
 		},
 		styleColumn: function(colId, css){

@@ -1,4 +1,4 @@
-define(["xstyle/put", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/has", "dojo/has!touch?./TouchScroll", "xstyle/has-class", "dojo/_base/sniff", "xstyle/css!./css/dgrid.css?dgrid-css-loaded"], 
+define(["put-selector/put", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/has", "dojo/has!touch?./TouchScroll", "xstyle/has-class", "dojo/_base/sniff", "xstyle/css!./css/dgrid.css?dgrid-css-loaded"], 
 function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 	// Add user agent/feature CSS classes 
 	hasClass("mozilla", "opera", "ie-6", "ie-6-7", "quirks", "no-quirks");
@@ -47,10 +47,6 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			}
 		}while(steps);
 		return element;		
-	}
-	function hasTabIndex(element){
-		var tabIndexNode = element.getAttributeNode("tabIndex");
-		return tabIndexNode && tabIndexNode.specified;
 	}
 	
 	// var and function for autogenerating ID when one isn't provided
@@ -127,9 +123,6 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			if(!this.id){
 				this.id = domNode.id;
 			}
-			if(!hasTabIndex(domNode)){
-				domNode.tabIndex = 0;
-			}
 			domNode.role = "grid";
 			
 			domNode.className += " ui-widget dgrid";
@@ -140,9 +133,11 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			});
 			this.postCreate && this.postCreate();
 		},
+		tabableHeader: false,
 		render: function(){
 			var domNode = this.domNode;
-			var headerNode = this.headerNode = put(domNode, "div.dgrid-header.dgrid-header-row.ui-widget-header");
+			var headerNode = this.headerNode = put(domNode, 
+				"div.dgrid-header.dgrid-header-row.ui-widget-header");
 			if(has("quirks") || has("ie") < 8){
 				var spacerNode = put(domNode, "div.dgrid-spacer");
 			}
