@@ -28,7 +28,7 @@ return function(column, editor, editOn){
 			// it is string editor, so we use a common <input> as the editor
 			input = cell.input || (cell.input = put(cell, "input[type=" + editor + "].dgrid-input", {
 				name: column.field || "selection",
-				tabIndex: grid.tabIndex
+				tabIndex: isNaN(column.tabIndex) ? -1 : column.tabIndex
 			}));
 			input.value = value || "";
 			input.checked = value;
