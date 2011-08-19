@@ -1,4 +1,4 @@
-define(["dojo/on", "dojo/has", "xstyle/put", "dojo/_base/sniff"], function(on, has, put){
+define(["dojo/on", "dojo/has", "put-selector/put", "dojo/_base/sniff"], function(on, has, put){
 
 return function(column, editor, editOn){
 	// summary:
