@@ -50,8 +50,6 @@
 }
 .dgrid-cell-padding {
 	padding: 3px;
-	position:relative;
-	overflow: hidden;
 }
 
 .dgrid-right-corner {
