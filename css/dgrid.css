@@ -1,7 +1,7 @@
 /* This stylesheet provides the structural CSS for the dgrid */
 .dgrid {
 	position: relative;
-	overflow: hidden;
+	overflow: hidden; /* This is needed by IE to prevent crazy scrollbar flashing */
 	border: 1px solid #ddd;
 	height: 30em;
 	display: block;
@@ -67,7 +67,8 @@
 	overflow-x: auto;
 	overflow-y: scroll;
 	position: absolute;
-	top: 25px; /* this will be adjusted programmatically to fit below the header*/
+	top: 0px;
+	margin-top: 25px; /* this will be adjusted programmatically to fit below the header*/
 	bottom: 0px;
 	width: 100%;
 }
