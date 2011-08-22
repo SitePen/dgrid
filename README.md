@@ -253,8 +253,8 @@ This provides editing capability of text data in cells in the column. This is si
 Renders boolean values with a checkbox that can be checked and unchecked to indicate
 edit the value.
 
-<h2>grid-2.0/gridx/ColumnResizer</h2>
-The ColumnResizer plugin from https://github.com/kriszyp/grid-2.0/tree/simple-plugin/gridx/modules
+<h2>ColumnResizer</h2>
+The ColumnResizer plugin from https://github.com/kriszyp/grid-2.0/tree/simple-plugin/gridx/modules *need to update path
 can be used to add column resizing (via dragging) functionality.
 
 <h2>DnD</h2>

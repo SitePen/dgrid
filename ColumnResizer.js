@@ -1,4 +1,4 @@
-define(["dojo/_base/declare", "dojo/on", "dojo/query", "dojo/dom", "dojo/dom-construct", "dojo/dom-geometry", "dojo/dom-class", "dojo/_base/html", 'xstyle/css!../resources/resize.css'], function(declare, listen, query, dom, construct, geom, cls){
+define(["dojo/_base/declare", "dojo/on", "dojo/query", "dojo/dom", "dojo/dom-construct", "dojo/dom-geometry", "dojo/dom-class", "dojo/_base/html", "xstyle/css!./css/resize.css"], function(declare, listen, query, dom, construct, geom, cls){
 	
 return declare([], {
 	resizeNode: null,

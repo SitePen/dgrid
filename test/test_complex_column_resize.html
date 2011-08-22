@@ -35,7 +35,7 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dgrid/OnDemandGrid", "dgrid/GridWithColumnSetsFromHtml", "dgrid/ColumnSet", "dgrid/Tree", "dgrid/Selection", "dgrid/Keyboard", "dgrid/gridx/modules/ColumnResizer", "dgrid/test/test_data", "dojo/domReady!"],
+			require(["dgrid/OnDemandGrid", "dgrid/GridWithColumnSetsFromHtml", "dgrid/ColumnSet", "dgrid/Tree", "dgrid/Selection", "dgrid/Keyboard", "dgrid/ColumnResizer", "dgrid/test/test_data", "dojo/domReady!"],
 				function(Grid, GridFromHtml, ColumnSet, Tree, Selection, Keyboard,ColumnResizer, testStore){
 					window.grid = dojo.declare([Grid, ColumnSet, Selection, Keyboard, ColumnResizer])({
 						store: testStore,

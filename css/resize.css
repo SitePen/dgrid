@@ -10,7 +10,7 @@
 
 .resizeDgridResizeHandleNode {
 	height: 100px;
-	width: 4px;
+	width: 5px;
 	position: absolute;
 	right: -4px;
 	top:-4px;
