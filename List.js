@@ -107,7 +107,6 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 		postscript: function(params, srcNodeRef){
 			// invoke create in postScript to allow descendants to
 			// perform logic before create/postCreate happen (a la dijit/_WidgetBase)
-			console.log('postscript args:', params, srcNodeRef);
 			
 			if(srcNodeRef){
 				// normalize srcNodeRef and store on instance during create process.
