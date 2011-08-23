@@ -39,7 +39,7 @@
 			//Require the compat if the client isn't Webkit-based
 			//dojo.requireIf(!dojo.isWebKit,"dojox.mobile.compat");
 
-			require(["dojo/on", "dgrid/OnDemandGrid", "dgrid/gridx/modules/ColumnResizer", "dgrid/test/test_data", "dojo/domReady!"],
+			require(["dojo/on", "dgrid/OnDemandGrid", "dgrid/ColumnResizer", "dgrid/test/test_data", "dojo/domReady!"],
 				function(on, Grid, ColumnResizer, testStore){
 					console.log(require("dojo/_base/config").async);
 					var columns = { // you can declare columns as an object hash (key translates to field)

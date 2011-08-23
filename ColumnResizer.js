@@ -1,4 +1,4 @@
-define(["dojo/_base/declare", "dojo/on", "dojo/query", "dojo/dom", "dojo/dom-construct", "dojo/dom-geometry", "dojo/dom-class", "dojo/_base/html", 'xstyle/css!../resources/resize.css'], function(declare, listen, query, dom, construct, geom, cls){
+define(["dojo/_base/declare", "dojo/on", "dojo/query", "dojo/dom", "dojo/dom-construct", "dojo/dom-geometry", "dojo/dom-class", "dojo/_base/html", "xstyle/css!./css/resize.css"], function(declare, listen, query, dom, construct, geom, cls){
 	
 return declare([], {
 	resizeNode: null,
@@ -23,19 +23,15 @@ return declare([], {
 
 		for(id in this.columns){
 				var col = this.columns[id];
-				var colNode = query(".column-"+id)[0];//grabs header node
-				console.log("colNode: ", colNode);
+				var colNode = query("#" + grid.domNode.id + " .column-"+id)[0];//grabs header node
 				var headerHTML = colNode.innerHTML;
 				colNode.innerHTML = '';
 				construct.create('div',
-					{className: 'resizeDgridResizeHandleNode'},
+					{className: 'resizeDgridResizeHandleNode  resizeNode-'+id},
 					construct.create('div', {className: 'resizeHeaderTextNode', innerHTML: headerHTML}, colNode, 'last'),
 					'last');
 		}
-		
-
-
-		listen(query(".resizeDgridResizeHandleNode"), "mousedown", function(e){
+		listen(query("#" + grid.domNode.id + "  .resizeDgridResizeHandleNode"), "mousedown", function(e){
 				grid._resizeMouseDown(e);
 				console.log('mousedown');
 		});
@@ -96,7 +92,7 @@ return declare([], {
 		if(!this._resizedColumns){
 			for(id in this.columns){
 				var col = this.columns[id];
-				var width = query(".column-"+id)[0].offsetWidth;
+				var width = query("#" + this.domNode.id + " .column-"+id)[0].offsetWidth;
 				this.resizeColumnWidth(id, width);
 			}
 			this._resizedColumns = true;
@@ -109,7 +105,7 @@ return declare([], {
 			obj = this._getResizedColumnWidths(),//get current total column widths before resize
 			totalWidth = obj.totalWidth,
 			lastCol = obj.lastColId,
-			lastColWidth = query(".column-"+lastCol)[0].offsetWidth;
+			lastColWidth = query("#" + this.domNode.id + " .column-"+lastCol)[0].offsetWidth;
 
 		if(cell.columnId != lastCol){
 			if(totalWidth + delta < this.gridWidth) {
@@ -187,7 +183,7 @@ return declare([], {
 		var lastColId = null;
 		for(id in this.columns){
 			var col = this.columns[id];
-			var width = query(".column-"+id)[0].offsetWidth;
+			var width = query("#" + this.domNode.id + " .column-"+id)[0].offsetWidth;
 			totalWidth += width;
 			lastColId = id;
 		}

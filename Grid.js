@@ -163,16 +163,21 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 			var grid = this;
 			var columns = this.columns;
 			var row = this.createRowCells("th[role=columnheader]", function(th, column){
+				var contentNode = th;
+				if(contentBoxSizing){
+					// we're interested in the th, but we're passed the inner div
+					th = th.parentNode;
+				}
 				column.grid = grid;
 				var field = column.field;
 				if(field){
 					th.field = field;
 				}
-				// allow for custom header manipulation
+				// allow for custom header content manipulation
 				if(column.renderHeaderCell){
-					column.renderHeaderCell(th);
+					column.renderHeaderCell(contentNode);
 				}else if(column.label || column.field){
-					th.appendChild(document.createTextNode(column.label || column.field));
+					contentNode.appendChild(document.createTextNode(column.label || column.field));
 				}
 				if(column.sortable !== false){
 					th.sortable = true;

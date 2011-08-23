@@ -9,23 +9,14 @@
 }
 
 .resizeDgridResizeHandleNode {
-	height: 150px; /* this is a hack to overcome cross-browser issues*/
-	width: 8px;
+	height: 100px;
+	width: 5px;
 	position: absolute;
-	right: -8px;
+	right: -4px;
 	top:-4px;
 	cursor: col-resize;
 	z-index: 999;
 	background-color: #F00;
-}
-
-.dgrid-header .dgrid-header-row .ui-widget-header {
-	height: 100%;
-}
-
-.dgrid-header .dgrid-cell {
-	overflow: visible;
-	word-wrap: break-word;
 }
 
 .resizeHeaderTextNode {
