@@ -132,7 +132,6 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 			var row = this.createRowCells("td", function(td, column){
 				var data = object;
 				// we support the field, get, and formatter properties like the DataGrid
-				var renderCell = column.renderCell;
 				if(column.get){
 					// FIXME: signature of get is (inRowIndex, inItem)
 					// Is it possible for us to produce row index here for first arg?
@@ -141,18 +140,16 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 					data = data[column.field];
 				}
 				if(column.formatter){
-					data = column.formatter(data);
-					td.innerHTML = data;
-				}
-				if(!column.formatter || renderCell){
-					if(renderCell){
+					td.innerHTML = column.formatter(data);
+				}else if(column.renderCell){
 					// A column can provide a renderCell method to do its own DOM manipulation, 
 					// event handling, etc.
-						data = column.renderCell(object, data, td, options);
-					} 
-					if(data != null){
-						td.appendChild(document.createTextNode(data));
+					var subNode = column.renderCell(object, data, td, options);
+					if(subNode && subNode.nodeType){
+						td.appendChild(subNode);
 					}
+				}else if(data != null){
+					td.appendChild(document.createTextNode(data));
 				}
 			});
 			// row gets a wrapper div for a couple reasons:
