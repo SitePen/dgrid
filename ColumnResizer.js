@@ -33,20 +33,17 @@ return declare([], {
 		}
 		listen(query("#" + grid.domNode.id + "  .resizeDgridResizeHandleNode"), "mousedown", function(e){
 				grid._resizeMouseDown(e);
-				console.log('mousedown');
 		});
 		grid.mouseMoveListen = listen.pausable(document.body, "mousemove", function(e){
 			// while resizing, update the position of the resizer bar
 			if(!grid._resizing){return;}
 			grid._updateResizerPosition(e);
-			console.log("mousemove");
 		});
 		grid.mouseUpListen = listen.pausable(document.body, 'mouseup', function(e){
 				if(!grid._resizing){return;}
 				grid._resizeMouseUp(e);
 				grid.mouseMoveListen.pause();
 				grid.mouseUpListen.pause();
-				console.log("mouseup");
 			});
 	},//end postCreate
 
