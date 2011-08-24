@@ -23,15 +23,14 @@ return declare([], {
 
 		for(id in this.columns){
 				var col = this.columns[id];
-				var colNode = query("#" + grid.domNode.id + " .column-"+id)[0];//grabs header node
-				var headerHTML = colNode.innerHTML;
-				colNode.innerHTML = '';
+				var colNode = query("#" + grid.domNode.id + " .column-"+id+" .dgrid-header-label")[0];//grabs header node
+				console.log(colNode);
 				construct.create('div',
-					{className: 'resizeDgridResizeHandleNode  resizeNode-'+id},
-					construct.create('div', {className: 'resizeHeaderTextNode', innerHTML: headerHTML}, colNode, 'last'),
+					{className: 'resize-dgrid-resize-handle  resizeNode-'+id},
+					colNode,
 					'last');
 		}
-		listen(query("#" + grid.domNode.id + "  .resizeDgridResizeHandleNode"), "mousedown", function(e){
+		listen(query("#" + grid.domNode.id + "  .resize-dgrid-resize-handle"), "mousedown", function(e){
 				grid._resizeMouseDown(e);
 		});
 		grid.mouseMoveListen = listen.pausable(document.body, "mousemove", function(e){
@@ -66,7 +65,7 @@ return declare([], {
 		// show resizer inlined
 		if(!grid._resizer){
 			grid._resizer = construct.create('div', {
-				className: 'resizeDgridColumnResizer'},
+				className: 'resize-dgrid-column-resizer'},
 				grid.domNode, 'last');
 		}else{
 			grid.mouseMoveListen.resume();
