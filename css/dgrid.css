@@ -26,9 +26,7 @@
 	overflow: hidden;
 	background-color: #eee;
 }
-.dgrid-header-label {
-	position:relative;
-}
+
 .dgrid-row-table {
 	border-collapse: collapse;
 	border: none;
@@ -106,11 +104,10 @@
 /* Single Sort */
 .dgrid-sort-arrow {
 	background-position: -64px -16px;
-	position:absolute;
-	right:0px;
-	top:0px;
+	display: block;
+	float: right;
 	margin: 0 4px 0 5px;
-
+	padding-left: 0;
 	height: 12px;
 }
 .dgrid-sort-up .dgrid-sort-arrow {

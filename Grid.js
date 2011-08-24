@@ -179,9 +179,7 @@ define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "
 				if(column.renderHeaderCell){
 					column.renderHeaderCell(contentNode);
 				}else if(column.label || column.field){
-					var div = put(th, "div.dgrid-header-label");
-					div.appendChild(document.createTextNode(column.label || column.field));
-					contentNode.appendChild(div);
+					contentNode.appendChild(document.createTextNode(column.label || column.field));
 				}
 				if(column.sortable !== false){
 					th.sortable = true;
@@ -204,10 +202,10 @@ define(["dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "./Editor", "
 						// re-sort
 						descending = grid.sortOrder && grid.sortOrder[0].attribute == field && !grid.sortOrder[0].descending;
 						if(lastSortedArrow){
-							put(lastSortedArrow.parentNode, "<!dgrid-sort-up!dgrid-sort-down"); // remove the sort classes from parent node
+							put(lastSortedArrow, "<!dgrid-sort-up!dgrid-sort-down"); // remove the sort classes from parent node
 							put(lastSortedArrow, "!"); // destroy the lastSortedArrow node
 						}
-						lastSortedArrow = put(target.firstChild.firstChild, "+div.dgrid-sort-arrow.ui-icon[role=presentation]");
+						lastSortedArrow = put(target.firstChild, "-div.dgrid-sort-arrow.ui-icon[role=presentation]");
 						lastSortedArrow.innerHTML = "&nbsp;";
 						put(target, descending ? ".dgrid-sort-down" : ".dgrid-sort-up");
 						grid.resize();

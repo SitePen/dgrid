@@ -23,14 +23,15 @@ return declare([], {
 
 		for(id in this.columns){
 				var col = this.columns[id];
-				var colNode = query("#" + grid.domNode.id + " .column-"+id+" .dgrid-header-label")[0];//grabs header node
-				console.log(colNode);
+				var colNode = query("#" + grid.domNode.id + " .column-"+id)[0];//grabs header node
+				var headerHTML = colNode.innerHTML;
+				colNode.innerHTML = '';
 				construct.create('div',
-					{className: 'resize-dgrid-resize-handle  resizeNode-'+id},
-					colNode,
+					{className: 'resize-dgrid-handle  resizeNode-'+id},
+					construct.create('div', {className: 'resize-header-text', innerHTML: headerHTML}, colNode, 'last'),
 					'last');
 		}
-		listen(query("#" + grid.domNode.id + "  .resize-dgrid-resize-handle"), "mousedown", function(e){
+		listen(query("#" + grid.domNode.id + "  .resize-dgrid-handle"), "mousedown", function(e){
 				grid._resizeMouseDown(e);
 		});
 		grid.mouseMoveListen = listen.pausable(document.body, "mousemove", function(e){
