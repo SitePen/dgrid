@@ -10,7 +10,7 @@
 
 .resizeDgridResizeHandleNode {
 	height: 100px;
-	width: 4px;
+	width: 5px;
 	position: absolute;
 	right: -4px;
 	top:-4px;
@@ -22,5 +22,8 @@
 .resizeHeaderTextNode {
 	position:relative;
 	height:100%;
-	
 }
+
+ .dgrid-header .dgrid-cell-padding {
+	 overflow: hidden;
+ }
