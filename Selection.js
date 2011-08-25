@@ -18,7 +18,8 @@ return declare([List], {
 				event.preventDefault();
 			});
 			function focus(event){
-				if(event.type == "mousedown" || !event.ctrlKey || event.keyCode == 32){
+				if(!event._selected && (event.type == "mousedown" || !event.ctrlKey || event.keyCode == 32)){
+					event._selected = true;
 					var row = event.target;
 					if(mode == "single" && lastRow && event.ctrlKey){
 						grid.deselect(lastRow);
