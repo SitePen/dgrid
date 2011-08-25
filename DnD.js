@@ -1,4 +1,4 @@
-define(["./List", "dojo/_base/declare", "dojo/_base/lang", "dojo/on", "dojo/_base/Deferred", "dojo/dnd/Source", "dojo/dnd/Manager", "xstyle/put", "xstyle/css!dojo/resources/dnd.css"], function(List, declare, lang, on, Deferred, DnDSource, DnDManager, put){
+define(["./List", "dojo/_base/declare", "dojo/_base/lang", "dojo/on", "dojo/_base/Deferred", "dojo/dnd/Source", "dojo/dnd/Manager", "put-selector/put", "xstyle/css!dojo/resources/dnd.css"], function(List, declare, lang, on, Deferred, DnDSource, DnDManager, put){
 	// TODOC: store requirements
 	// * requires a store (sounds obvious, but not all Lists/Grids have stores...)
 	// * must support options.before in put calls

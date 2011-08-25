@@ -1,4 +1,4 @@
-define(["dojo/_base/declare", "dojo/on", "./List", "dojo/_base/sniff", "xstyle/put"], function(declare, listen, List, has, put){
+define(["dojo/_base/declare", "dojo/on", "./List", "dojo/_base/sniff", "put-selector/put"], function(declare, on, List, has, put){
 var delegatingInputTypes = {
 	checkbox: 1,
 	radio: 1,
@@ -8,56 +8,62 @@ return declare([List], {
 	// summary:
 	// 		Add keyboard navigation capability to a grid/list
 	pageSkip: 10,
+	tabIndex: 0,
 	postCreate: function(){
 		this.inherited(arguments);
 		var grid = this;
-		var cellFocusedElement;
 		function handledEvent(event){
 			// text boxes and other inputs that can use direction keys should be ignored and not affect cell/row navigation
 			var target = event.target;
 			return target.type && (!delegatingInputTypes[target.type] || event.keyCode == 32);
 		}
-		function focusOnCell(element, event, dontFocus){
-			var cell = grid[grid.cellNavigation ? "cell" : "row"](element);
-			if(cell){
-				element = cell.element;
-				if(element){
-					if(!event.bubbles){
-						// IE doesn't always have a bubbles property already true, Opera will throw an error if you try to set it to true if it is already true
-						event.bubbles = true;
-					}
-					if(cellFocusedElement){
+		function navigateArea(areaNode){
+			var cellFocusedElement = areaNode;
+			var next;
+			while((next = cellFocusedElement.firstChild) && next.tagName){
+				cellFocusedElement = next;
+			}
+			cellFocusedElement.tabIndex = grid.tabIndex; // set the tab index of the first child we encounter
+			function focusOnCell(element, event, dontFocus){
+				var cell = grid[grid.cellNavigation ? "cell" : "row"](element);
+				if(cell){
+					element = cell.element;
+					if(element){
+						if(!event.bubbles){
+							// IE doesn't always have a bubbles property already true, Opera will throw an error if you try to set it to true if it is already true
+							event.bubbles = true;
+						}
 						put(cellFocusedElement, "!dgrid-focus[!tabIndex]"); // remove the class name and the tabIndex attribute
-						if(has("ie") < 8){
-							cellFocusedElement.style.position = "";
+						if(cellFocusedElement){
+							if(has("ie") < 8){
+								cellFocusedElement.style.position = "";
+							}
+							event.cell = cellFocusedElement;
+							on.emit(element, "cellfocusout", event);
 						}
-						event.cell = cellFocusedElement;
-						listen.emit(element, "cellfocusout", event);
-					}
-					cellFocusedElement = element;
-					event.cell = element;
-					if(!dontFocus){
-						if(has("ie") < 8){
-							// setting the position to relative (can't be done a priori with CSS or 
-							// screws up the entire table), magically makes the outline work 
-							// properly for focusing later on with old IE
-							element.style.position = "relative";
+						cellFocusedElement = element;
+						event.cell = element;
+						if(!dontFocus){
+							if(has("ie") < 8){
+								// setting the position to relative (can't be done a priori with CSS or 
+								// screws up the entire table), magically makes the outline work 
+								// properly for focusing later on with old IE
+								element.style.position = "relative";
+							}
+							element.tabIndex = grid.tabIndex;
+							element.focus();
 						}
-						element.tabIndex = 0;
-						element.focus();
+						put(element, ".dgrid-focus");
+						on.emit(cellFocusedElement, "cellfocusin", event);
 					}
-					put(element, ".dgrid-focus");
-					listen.emit(cellFocusedElement, "cellfocusin", event);
 				}
 			}
-		}
-		listen(this.contentNode, "mousedown", function(event){
-			if(!handledEvent(event)){
-				focusOnCell(event.target, event);
-			}
-		});
-		this.on("keydown", function(event){
-			if(cellFocusedElement){
+			on(areaNode, "mousedown", function(event){
+				if(!handledEvent(event)){
+					focusOnCell(event.target, event);
+				}
+			});
+			on(areaNode, "keydown", function(event){
 				var focusedElement = event.target;
 				var keyCode = event.keyCode;
 				if(handledEvent(event)){
@@ -78,7 +84,7 @@ return declare([List], {
 				if(isNaN(move)){
 					return;
 				}
-				var nextSibling, columnId, cell = grid.cell(cellFocusedElement);
+				var nextSibling, columnId, cell = grid.cell(cellFocusedElement || firstDeepChild(focusedElement));
 				var orientation;
 				if(keyCode == 37 || keyCode == 39){
 					if(!grid.cellNavigation){
@@ -90,10 +96,10 @@ return declare([List], {
 					// other keys are vertical
 					orientation = 'down'
 					columnId = cell && cell.column && cell.column.id;
-					cell = grid.row(cellFocusedElement);				
+					cell = grid.row(cellFocusedElement || firstDeepChild(focusedElement));				
 				}
 				if(move){
-					cell = grid[orientation](cell, move);
+					cell = cell && grid[orientation](cell, move);
 				}
 				var nextFocus = cell && cell.element;
 				if(nextFocus){
@@ -104,8 +110,9 @@ return declare([List], {
 						var inputs = nextFocus.getElementsByTagName("input");
 						var inputFocused;
 						for(var i = 0;i < inputs.length; i++){
-							if(inputs[i].tabIndex != -1){
-								inputs[i].focus();
+							var input = inputs[i];
+							if(input.tabIndex != -1 || "lastValue" in input){
+								input.focus();
 								inputFocused = true;
 								break;
 							}
@@ -114,8 +121,12 @@ return declare([List], {
 					focusOnCell(nextFocus, event, inputFocused);
 				}
 				event.preventDefault();
-			}
-		});
+			});
+		}
+		if(grid.tabableHeader){
+			navigateArea(grid.headerNode);
+		}
+		navigateArea(grid.contentNode);
 	}
 });
 });
