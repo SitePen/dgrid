@@ -1,5 +1,5 @@
 /*Column resizing plugin*/
-.resizeDgridColumnResizer {
+.resize-dgrid-column-resizer {
 	position: absolute;
 	height: 100%;
 	width: 2px;
@@ -8,22 +8,25 @@
 	top: 0;
 }
 
-.resizeDgridResizeHandleNode {
+.resize-dgrid-handle {
 	height: 100px;
 	width: 5px;
 	position: absolute;
-	right: -4px;
+	right: -3px;
 	top:-4px;
 	cursor: col-resize;
 	z-index: 999;
 	background-color: #F00;
 }
 
-.resizeHeaderTextNode {
+.resize-header-text {
 	position:relative;
 	height:100%;
 }
 
  .dgrid-header .dgrid-cell-padding {
 	 overflow: hidden;
+	 width:100%;
+	 padding-left: 3px;
+	 padding-right: 0px;
  }

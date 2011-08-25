@@ -27,11 +27,11 @@ return declare([], {
 				var headerHTML = colNode.innerHTML;
 				colNode.innerHTML = '';
 				construct.create('div',
-					{className: 'resizeDgridResizeHandleNode  resizeNode-'+id},
-					construct.create('div', {className: 'resizeHeaderTextNode', innerHTML: headerHTML}, colNode, 'last'),
+					{className: 'resize-dgrid-handle  resizeNode-'+id},
+					construct.create('div', {className: 'resize-header-text', innerHTML: headerHTML}, colNode, 'last'),
 					'last');
 		}
-		listen(query("#" + grid.domNode.id + "  .resizeDgridResizeHandleNode"), "mousedown", function(e){
+		listen(query("#" + grid.domNode.id + "  .resize-dgrid-handle"), "mousedown", function(e){
 				grid._resizeMouseDown(e);
 		});
 		grid.mouseMoveListen = listen.pausable(document.body, "mousemove", function(e){
@@ -66,7 +66,7 @@ return declare([], {
 		// show resizer inlined
 		if(!grid._resizer){
 			grid._resizer = construct.create('div', {
-				className: 'resizeDgridColumnResizer'},
+				className: 'resize-dgrid-column-resizer'},
 				grid.domNode, 'last');
 		}else{
 			grid.mouseMoveListen.resume();
