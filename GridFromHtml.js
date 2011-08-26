@@ -42,9 +42,6 @@ define(["./Grid", "dojo/_base/declare", "dojo/_base/lang", "dojo/dom-construct",
 		},
 		
 		create: function(params, srcNodeRef){
-			srcNodeRef = srcNodeRef.nodeType ?
-				srcNodeRef : document.getElementById(srcNodeRef);
-			
 			// We need to replace srcNodeRef, presumably a table, with a div.
 			// (Otherwise we'll generate highly invalid markup, which IE doesn't like)
 			var
@@ -52,6 +49,7 @@ define(["./Grid", "dojo/_base/declare", "dojo/_base/lang", "dojo/dom-construct",
 				style = srcNodeRef.getAttribute("style");
 			
 			// Copy some commonly-used attributes...
+			div.id = srcNodeRef.id;
 			div.className = srcNodeRef.className;
 			style && div.setAttribute("style", style);
 			
@@ -95,7 +93,7 @@ define(["./Grid", "dojo/_base/declare", "dojo/_base/lang", "dojo/dom-construct",
 				getNum = GridFromHtml.utils.getNumFromAttr;
 			
 			return {
-				name: th.innerHTML,
+				label: th.innerHTML,
 				field: th.getAttribute("field") || th.className || th.innerHTML,
 				className: th.className,
 				sortable: getBool(th, "sortable"),
