@@ -23,22 +23,28 @@ return declare([List], {
 					var row = event.target;
 					console.log("in focus");
 					if(mode == "single" && lastRow && event.ctrlKey){
+						console.log("1");
 						grid.deselect(lastRow);
 						if(lastRow == row){
 							return;
 						}
 					}
 					if(!event.ctrlKey){
+						console.log("2");
 						if(mode != "multiple"){
+							console.log("3");
 							grid.clearSelection();
 						}
 						grid.select(row);
 					}else{
+						console.log("4");
 						grid.select(row, null, null);
 					}
 					if(event.shiftKey && mode != "single"){
+						console.log("5");
 						grid.select(lastRow, row);
 					}else{
+						console.log("6");
 						lastRow = row;
 					}
 					if(event.type == "mousedown" && (event.shiftKey || event.ctrlKey)){
