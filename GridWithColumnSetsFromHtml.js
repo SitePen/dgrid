@@ -98,8 +98,7 @@ define(["./Grid", "./GridFromHtml", "./ColumnSet", "dojo/_base/declare", "dojo/_
 			
 			var tmp;
 			if(!this._checkedTrs){
-				//this.subRows = getSubRowsFromDom(this.domNode, this.subRows);
-				tmp = getColumnSetsFromDom(this.domNode);
+				tmp = getColumnSetsFromDom(this.srcNodeRef);
 				if(tmp){
 					this.columnSets = tmp;
 					this._checkedTrs = true;
