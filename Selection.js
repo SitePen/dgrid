@@ -63,9 +63,11 @@ return declare([List], {
 				listen(this.contentNode, "touchmove", function(event){
 					var thisTouch = event.touches[0];
 					isTap = Math.pow(lastTouchX - thisTouch.pageX, 2) + Math.pow(lastTouchY - thisTouch.pageY, 2) < 100; // 10 pixel radius sound good?
+					console.log("touchmove istap: ", isTap);
 				});
 				listen(this.contentNode, "touchend", function(event){
 					if(isTap){
+						console.log("touchend");
 						focus(lastTouchEvent);
 					}
 				});
