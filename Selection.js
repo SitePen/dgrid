@@ -30,9 +30,8 @@ return declare([List], {
 						}
 					}
 					if(!event.ctrlKey){
-						console.log("2");
+						console.log("mode: ", mode);
 						if(mode != "multiple"){
-							console.log("3");
 							grid.clearSelection();
 						}
 						grid.select(row);
@@ -44,7 +43,7 @@ return declare([List], {
 						console.log("5");
 						grid.select(lastRow, row);
 					}else{
-						console.log("6");
+						console.log("row: ", row);
 						lastRow = row;
 					}
 					if(event.type == "mousedown" && (event.shiftKey || event.ctrlKey)){
