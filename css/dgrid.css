@@ -20,7 +20,7 @@
 }
 
 .dgrid-sortable {
-	cursor: pointer; /*I don't know if we want to do this since overrides the resize cursor*/
+	cursor: pointer;
 }
 .dgrid-header, .dgrid-header-row, .dgrid-footer {
 	overflow: hidden;
