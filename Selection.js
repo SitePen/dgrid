@@ -21,6 +21,7 @@ return declare([List], {
 				if(!event._selected && (event.type == "mousedown" || !event.ctrlKey || event.keyCode == 32)){
 					event._selected = true;
 					var row = event.target;
+					console.log("event: ", event);
 					console.log("in focus");
 					if(mode == "single" && lastRow && event.ctrlKey){
 						console.log("1");
