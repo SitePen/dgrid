@@ -120,13 +120,12 @@
 			require([
 					"dgrid/List", 
 					"dgrid/OnDemandGrid",
-					"dgrid/Tree",
 					"dgrid/Selection", 
 					"dgrid/Keyboard", 
 					"dgrid/test/song_data", 
 					"dojo/domReady!"
 				], 
-				function(List, Grid, Tree, Selection, Keyboard){
+				function(List, Grid, Selection, Keyboard){
 					//	a formatting function for the Duration column.
 					var timeFormatter = function(t){
 						var tmp = parseInt(t, 10);
@@ -172,6 +171,7 @@
 					albums.select(0);
 
 					//	start listening for selections on the lists.
+					//	TODO: A little bit smarter on the filtering, since the list interactions are all related.
 					genres.on("select", function(e){
 						//	filter the albums, artists and grid
 						var filter = e.row.data;
