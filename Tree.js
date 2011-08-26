@@ -1,4 +1,4 @@
-define(["dojo/_base/declare", "xstyle/put", "dojo/_base/Deferred", "dojo/query"], function(declare, put, Deferred, querySelector){// TODO: eliminate the dojo/query dep by supporting simple event delegation in the List module
+define(["dojo/_base/declare", "put-selector/put", "dojo/_base/Deferred", "dojo/query"], function(declare, put, Deferred, querySelector){// TODO: eliminate the dojo/query dep by supporting simple event delegation in the List module
 
 return function(column){
     // summary:

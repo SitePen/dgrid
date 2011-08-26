@@ -1,4 +1,4 @@
-define(["dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/on", "xstyle/put", "./List"], function(declare, lang, Deferred, listen, put, List){
+define(["dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/on", "put-selector/put", "./List"], function(declare, lang, Deferred, listen, put, List){
 return declare([List], {
 	create: function(params, srcNodeRef){
 		this.inherited(arguments);
@@ -28,7 +28,16 @@ return declare([List], {
 		//		Creates a preload node for rendering a query into, and executes the query
 		//		for the first page of data. Subsequent data will be downloaded as it comes
 		//		into view.
-		preloadNode = preloadNode || put(this.contentNode, "div.dgrid-preload");
+		if(!preloadNode){
+			var topPreloadNode = put(this.contentNode, "div.dgrid-preload");
+			topPreloadNode.preload = true;
+			topPreloadNode.query = query;
+			topPreloadNode.start = 0;
+			topPreloadNode.count = 0;
+			topPreloadNode.next =
+				preloadNode = put(this.contentNode, "div.dgrid-preload");
+			preloadNode.previous = topPreloadNode;
+		}
 		// this preload node is used to represent the area of the grid that hasn't been 
 		// downloaded yet
 		preloadNode.preload = true;
@@ -68,6 +77,7 @@ return declare([List], {
 					// if total is 0, IE quirks mode can't handle 0px height for some reason, I don't know why, but we are setting display: none for now 
 					preloadNode.style.display = "none"; 
 				} 
+				self.onscroll(); // recheck the scroll position in case the query didn't filll the screen
 				// can remove the loading node now
 				return trs;
 			});
@@ -112,11 +122,37 @@ return declare([List], {
 			this.preloadNode = preloadNode;
 			var preloadTop = preloadNode.offsetTop;
 			var preloadHeight;
+			function removeDistantNodes(grid, distanceOff, traversal, below){
+				if(distanceOff > 10000){
+					var row, nextRow = preloadNode[traversal];
+					var reclaimedHeight = 0;
+					var count = 0;
+					while(row = nextRow){ // intentional assignment
+						var rowHeight = row.offsetHeight;
+						if(reclaimedHeight + rowHeight + 5000 > distanceOff){
+							break;
+						}
+						count++;
+						reclaimedHeight += rowHeight;
+						var nextRow = row[traversal]; // have to do this before removing it
+						delete grid._rowIdToObject[row.id]; // clear out of the lookup
+						put(row, "!"); // remove it from the DOM
+					}
+					if(below){
+						preloadNode.start -= count;
+					}
+					preloadNode.count += count;
+					preloadNode.style.height = Math.min(preloadNode.count * this.rowHeight, this.maxEmptySpace) + "px";
+				}
+				
+			}
 			if(visibleBottom < preloadTop){
 				// the preload is below the line of site
+				removeDistantNodes(this, preloadTop - visibleBottom, 'previousSibling', true);
 				preloadNode = preloadNode.previous;
 			}else if(visibleTop > (preloadTop + (preloadHeight = preloadNode.offsetHeight))){
 				// the preload is above the line of site
+				removeDistantNodes(this, preloadTop + preloadHeight, 'nextSibling');
 				preloadNode = preloadNode.next;
 			}else{
 				// the preload node is visible, or close to visible, better show it

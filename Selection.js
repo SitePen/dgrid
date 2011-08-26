@@ -1,4 +1,4 @@
-define(["dojo/_base/declare", "dojo/on", "./List", "xstyle/put", "dojo/has"], function(declare, listen, List, put, has){
+define(["dojo/_base/declare", "dojo/on", "./List", "put-selector/put", "dojo/has"], function(declare, listen, List, put, has){
 return declare([List], {
 	// summary:
 	// 		Add selection capabilities to a grid. The grid will have a selection property and
@@ -20,6 +20,7 @@ return declare([List], {
 			function focus(event){
 				if(event.type == "mousedown" || !event.ctrlKey || event.keyCode == 32){
 					var row = event.target;
+					console.log("in focus");
 					if(mode == "single" && lastRow && event.ctrlKey){
 						grid.deselect(lastRow);
 						if(lastRow == row){
@@ -51,6 +52,7 @@ return declare([List], {
 				// first listen for touch taps if available
 				var lastTouchX, lastTouchY, lastTouchEvent, isTap;
 				listen(this.contentNode, "touchstart", function(event){
+					console.log("touchstart");
 					lastTouch = event.touches[0];
 					lastTouchX = lastTouch.pageX;
 					lastTouchY = lastTouch.pageY;

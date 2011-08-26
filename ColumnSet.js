@@ -1,4 +1,4 @@
-define(["xstyle/css!./css/columnset.css", "dojo/has", "xstyle/put", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/query", "./Grid", "xstyle/has-class", "dojo/_base/sniff"], 
+define(["xstyle/css!./css/columnset.css", "dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/query", "./Grid", "xstyle/has-class", "dojo/_base/sniff"], 
 function(styleSheet, has, put, declare, listen, aspect, query, Grid, hasClass){
 		//	summary:
 		//		This module provides column sets to isolate horizontal scroll of sets of 

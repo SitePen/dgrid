@@ -1,4 +1,4 @@
-define(["./Grid", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "require"], function(Grid, declare, lang, Deferred, require){
+define(["./Grid", "dojo/_base/declare", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/Deferred", "require"], function(Grid, declare, lang, domConstruct, Deferred, require){
 	// This module supports parsing grid structure information from an HTML table.
 	// This module does NOT support ColumnSets; see GridWithColumnSetsFromHtml
 	
@@ -36,9 +36,34 @@ define(["./Grid", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred"
 			//		Configure subRows based on HTML originally in srcNodeRef
 			if(!this._checkedTrs){
 				this._checkedTrs = true;
-				this.subRows = getSubRowsFromDom(this.domNode, this.subRows);
+				this.subRows = getSubRowsFromDom(this.srcNodeRef, this.subRows);
 			}
 			return this.inherited(arguments);
+		},
+		
+		create: function(params, srcNodeRef){
+			srcNodeRef = srcNodeRef.nodeType ?
+				srcNodeRef : document.getElementById(srcNodeRef);
+			
+			// We need to replace srcNodeRef, presumably a table, with a div.
+			// (Otherwise we'll generate highly invalid markup, which IE doesn't like)
+			var
+				div = document.createElement("div"),
+				style = srcNodeRef.getAttribute("style");
+			
+			// Copy some commonly-used attributes...
+			div.className = srcNodeRef.className;
+			style && div.setAttribute("style", style);
+			
+			// replace srcNodeRef in DOM with the div
+			srcNodeRef.parentNode.replaceChild(div, srcNodeRef);
+			
+			// call inherited with the new node
+			// (but configStructure will look at srcNodeRef)
+			this.inherited(arguments, [params, div]);
+			
+			// destroy srcNodeRef for good now that we're done with it
+			domConstruct.destroy(srcNodeRef);
 		}
 	});
 	
