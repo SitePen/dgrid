@@ -58,7 +58,6 @@
 				bottom: 0;
 				width: 33.3%;
 				height: auto;
-				border-right: 2px solid #a6a6a6;
 			}
 			#genres .dgrid-row,
 			#artists .dgrid-row,
@@ -113,6 +112,7 @@
 				for(var p in obj){
 					ret.push(p);
 				}
+				ret.sort();
 				return ret;
 			}
 
@@ -159,10 +159,9 @@
 					var g = unique(dojo.map(songStore.data, function(item){ return item.Genre; })),
 						art = unique(dojo.map(songStore.data, function(item){ return item.Artist; })),
 						alb = unique(dojo.map(songStore.data, function(item){ return item.Album; }));
-					g.sort(); art.sort(); alb.sort();
-					g.unshift("All (" + g.length + " Genres)");
-					art.unshift("All (" + art.length + " Artists)");
-					alb.unshift("All (" + alb.length + " Albums)");
+					g.unshift("All (" + g.length + " Genre" + (g.length > 1 ? "s" : "") + ")");
+					art.unshift("All (" + art.length + " Artist" + (art.length > 1 ? "s" : "") + ")");
+					alb.unshift("All (" + alb.length + " Album" + (alb.length > 1 ? "s" : "") + ")");
 					genres.renderArray(g);
 					artists.renderArray(art);
 					albums.renderArray(alb);
@@ -174,8 +173,55 @@
 
 					//	start listening for selections on the lists.
 					genres.on("select", function(e){
-						console.log(e.row);
+						//	filter the albums, artists and grid
+						var filter = e.row.data;
+						if(e.row.id == "0"){
+							//	remove filtering
+							var art = unique(dojo.map(songStore.data, function(item){ return item.Artist; })),
+								alb = unique(dojo.map(songStore.data, function(item){ return item.Album; }));
+							grid.query = {};
+						} else {
+							//	create filtering
+							var art = unique(dojo.map(dojo.filter(songStore.data, function(item){ return item.Genre == filter; }), function(item){ return item.Artist; })),
+								alb = unique(dojo.map(dojo.filter(songStore.data, function(item){ return item.Genre == filter; }), function(item){ return item.Album; }));
+							grid.query = { "Genre": filter };
+						}
+						art.unshift("All (" + art.length + " Artist" + (art.length > 1 ? "s" : "") + ")");
+						alb.unshift("All (" + alb.length + " Album" + (alb.length > 1 ? "s" : "") + ")");
+						artists.refresh();	//	clear contents
+						albums.refresh();
+						artists.renderArray(art);
+						albums.renderArray(alb);
+						grid.refresh();
 					});
+					artists.on("select", function(e){
+						//	filter the albums, grid
+						var filter = e.row.data;
+						if(e.row.id == "0"){
+							//	remove filtering
+							var alb = unique(dojo.map(songStore.data, function(item){ return item.Album; }));
+							grid.query = {};
+						} else {
+							//	create filtering
+							var alb = unique(dojo.map(dojo.filter(songStore.data, function(item){ return item.Artist == filter; }), function(item){ return item.Album; }));
+							grid.query = { "Artist": filter };
+						}
+						alb.unshift("All (" + alb.length + " Album" + (alb.length > 1 ? "s" : "") + ")");
+						albums.refresh();
+						albums.renderArray(alb);
+						grid.refresh();
+					});
+					albums.on("select", function(e){
+						//	filter the grid
+						var filter = e.row.data;
+						if(e.row.id == "0"){
+							grid.query = {};
+						} else {
+							grid.query = { "Album": filter };
+						}
+						grid.refresh();
+					});
+
 				}	//	end "main" function
 			);		//	end require
 		</script>
