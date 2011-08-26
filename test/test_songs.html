@@ -199,11 +199,11 @@
 						var filter = e.row.data;
 						if(e.row.id == "0"){
 							//	remove filtering
-							var alb = unique(dojo.map(songStore.data, function(item){ return item.Artist; }));
+							var alb = unique(dojo.map(songStore.data, function(item){ return item.Album; }));
 							grid.query = {};
 						} else {
 							//	create filtering
-							var alb = unique(dojo.map(dojo.filter(songStore.data, function(item){ return item.Artist == filter; }), function(item){ return item.Artist; }));
+							var alb = unique(dojo.map(dojo.filter(songStore.data, function(item){ return item.Artist == filter; }), function(item){ return item.Album; }));
 							grid.query = { "Artist": filter };
 						}
 						alb.unshift("All (" + alb.length + " Album" + (alb.length > 1 ? "s" : "") + ")");
