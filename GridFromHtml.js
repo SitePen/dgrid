@@ -46,10 +46,11 @@ define(["./Grid", "dojo/_base/declare", "dojo/_base/lang", "dojo/dom-construct",
 			// (Otherwise we'll generate highly invalid markup, which IE doesn't like)
 			var
 				div = document.createElement("div"),
+				id = srcNodeRef.id,
 				style = srcNodeRef.getAttribute("style");
 			
 			// Copy some commonly-used attributes...
-			div.id = srcNodeRef.id;
+			if(id){ this.id = id; } // will be propagated in List's create
 			div.className = srcNodeRef.className;
 			style && div.setAttribute("style", style);
 			
