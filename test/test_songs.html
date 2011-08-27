@@ -196,8 +196,10 @@
 					});
 					artists.on("select", function(e){
 						//	filter the albums, grid
+						//	TODO: ids are reset on re-render, which is a problem.  We expect the fake "All Artists" to be id 0 but apparently they
+						//	are being assigned new ids on pull.
 						var filter = e.row.data;
-						if(e.row.id == "0"){
+						if(filter.indexOf("Artists)") > -1){
 							//	remove filtering
 							var alb = unique(dojo.map(songStore.data, function(item){ return item.Album; }));
 							grid.query = {};
@@ -207,7 +209,9 @@
 							grid.query = { "Artist": filter };
 						}
 						alb.unshift("All (" + alb.length + " Album" + (alb.length > 1 ? "s" : "") + ")");
+						artists.refresh();	//	clear contents
 						albums.refresh();
+						artists.renderArray(art);
 						albums.renderArray(alb);
 						grid.refresh();
 					});
