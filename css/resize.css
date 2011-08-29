@@ -16,7 +16,6 @@
 	top:-4px;
 	cursor: col-resize;
 	z-index: 999;
-	background-color: #F00;
 }
 
 .dgrid-resize-header-container {
