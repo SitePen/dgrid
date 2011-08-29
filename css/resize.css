@@ -19,10 +19,16 @@
 }
 
 .dgrid-resize-header-container {
-	position:relative;
 	height:100%;
 }
 
-.dgrid-header .dgrid-cell-padding {
-	 overflow: hidden;
+html.has-no-quirks .dgrid-resize-header-container {
+	position: relative;
 }
+.dgrid-header .dgrid-cell-padding {
+	overflow: hidden;
+}
+html.has-quirks .dgrid-header .dgrid-cell-padding {
+	position:relative;
+}
+ 
