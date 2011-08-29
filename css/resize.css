@@ -16,18 +16,19 @@
 	top:-4px;
 	cursor: col-resize;
 	z-index: 999;
-	background-color: #F00;
 }
 
 .dgrid-resize-header-container {
-	position:relative;
 	height:100%;
 }
 
-.dgrid-header .dgrid-cell-padding {
-	 overflow: hidden;
-	 /*IE6 overflow fix */
-	 width:100%;
-	 padding-left: 3px;
-	 padding-right: 0px;
+html.has-no-quirks .dgrid-resize-header-container {
+	position: relative;
 }
+.dgrid-header .dgrid-cell-padding {
+	overflow: hidden;
+}
+.dgrid-header .dgrid-cell-padding {
+	position:relative;
+}
+ 
