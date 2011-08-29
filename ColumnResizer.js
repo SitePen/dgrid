@@ -1,4 +1,4 @@
-define(["dojo/_base/declare", "dojo/on", "dojo/query", "dojo/dom", "put-selector/put", "dojo/dom-geometry", "dojo/dom-class", "dojo/_base/html", "xstyle/css!./css/resize.css"], function(declare, listen, query, dom, put, geom, cls){
+define(["dojo/_base/declare", "dojo/on", "dojo/query", "dojo/dom", "put-selector/put", "xstyle/has-class", "dojo/dom-geometry", "dojo/dom-class", "dojo/_base/html", "xstyle/css!./css/resize.css"], function(declare, listen, query, dom, put, hasClass, geom, cls){
 	
 return declare([], {
 	resizeNode: null,
@@ -16,6 +16,7 @@ return declare([], {
 		this.resize();
 	},
 	postCreate: function(){
+		hasClass("no-ie-6");
 		this.inherited(arguments);
 		
 		var grid = this;

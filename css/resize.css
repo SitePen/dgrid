@@ -22,13 +22,13 @@
 	height:100%;
 }
 
-html.has-no-quirks .dgrid-resize-header-container {
+html.has-no-quirks.has-no-ie-6 .dgrid-resize-header-container {
 	position: relative;
 }
 .dgrid-header .dgrid-cell-padding {
 	overflow: hidden;
 }
-.dgrid-header .dgrid-cell-padding {
+html.has-quirks .dgrid-header .dgrid-cell-padding, html.has-ie-6 .dgrid-header .dgrid-cell {
 	position:relative;
 }
- 
+
