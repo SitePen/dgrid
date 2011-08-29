@@ -12,7 +12,7 @@
 	height: 100px;
 	width: 5px;
 	position: absolute;
-	right: 0px;
+	right: -1px;
 	top:-4px;
 	cursor: col-resize;
 	z-index: 999;
@@ -24,9 +24,9 @@
 	height:100%;
 }
 
- .dgrid-header .dgrid-cell-padding {
+.dgrid-header .dgrid-cell-padding {
 	 overflow: hidden;
-	 width:100%;
-	 padding-left: 3px;
-	 padding-right: 0px;
- }
+}
+.dgrid-header .dgrid-cell {
+	 position: relative;
+}
