@@ -199,6 +199,7 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 					do{
 						if(target.sortable){
 							field = target.field || target.columnId;
+							target = target.contents || target;
 							// re-sort
 							descending = grid.sortOrder && grid.sortOrder[0].attribute == field && !grid.sortOrder[0].descending;
 							if(lastSortedArrow){
@@ -209,7 +210,7 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 							lastSortedArrow.innerHTML = "&nbsp;";
 							put(target, descending ? ".dgrid-sort-down" : ".dgrid-sort-up");
 							grid.resize();
-							grid.sort(field, descending);
+							return grid.sort(field, descending);
 						}
 					}while((target = target.parentNode) && target != headerNode);
 				}
