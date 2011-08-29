@@ -24,8 +24,15 @@ return declare([], {
 		for(id in this.columns){
 			var col = this.columns[id];
 			var colNode = query("#" + grid.domNode.id + " .column-"+id)[0];//grabs header node
-			
-			listen(put(colNode, 'div.resize-dgrid-handle.resizeNode-'+id), "mousedown", function(e){
+
+			var headerTextNode = put('div.dgrid-resize-header-container');
+			colNode.contents = headerTextNode;
+			var childNodes = colNode.childNodes;
+			// move all the children to the header text node
+			while(childNodes.length > 0){
+				put(headerTextNode, childNodes[0]);
+			}
+			listen(put(colNode, headerTextNode, 'div.dgrid-resize-handler.resizeNode-'+id), "mousedown", function(e){
 					grid._resizeMouseDown(e);
 			});
 		}
@@ -60,7 +67,7 @@ return declare([], {
 		
 		// show resizer inlined
 		if(!grid._resizer){
-			grid._resizer = put(grid.domNode, 'div.resize-dgrid-column-resizer');
+			grid._resizer = put(grid.domNode, 'div.dgrid-column-resizer');
 		}else{
 			grid.mouseMoveListen.resume();
 			grid.mouseUpListen.resume();
@@ -162,7 +169,7 @@ return declare([], {
 			node = e.srcElement;
 		}
 		if(node.nodeType == 3 || !node.columnId){ // defeat Safari bug first and IE oddity 2nd
-			node = node.parentNode;
+			node = node.parentNode.parentNode;
 		}
 		return node;
 	},
