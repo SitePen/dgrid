@@ -1,4 +1,4 @@
-define(["dojo/_base/declare", "dojo/on", "dojo/query", "dojo/dom", "dojo/dom-construct", "dojo/dom-geometry", "dojo/dom-class", "dojo/_base/html", "xstyle/css!./css/resize.css"], function(declare, listen, query, dom, construct, geom, cls){
+define(["dojo/_base/declare", "dojo/on", "dojo/query", "dojo/dom", "put-selector/put", "dojo/dom-geometry", "dojo/dom-class", "dojo/_base/html", "xstyle/css!./css/resize.css"], function(declare, listen, query, dom, put, geom, cls){
 	
 return declare([], {
 	resizeNode: null,
@@ -22,18 +22,13 @@ return declare([], {
 		grid.gridWidth = grid.headerNode.clientWidth - 1; //for some reason, total column width needs to be 1 less than this
 
 		for(id in this.columns){
-				var col = this.columns[id];
-				var colNode = query("#" + grid.domNode.id + " .column-"+id)[0];//grabs header node
-				var headerHTML = colNode.innerHTML;
-				colNode.innerHTML = '';
-				construct.create('div',
-					{className: 'resizeDgridResizeHandleNode  resizeNode-'+id},
-					construct.create('div', {className: 'resizeHeaderTextNode', innerHTML: headerHTML}, colNode, 'last'),
-					'last');
+			var col = this.columns[id];
+			var colNode = query("#" + grid.domNode.id + " .column-"+id)[0];//grabs header node
+			
+			listen(put(colNode, 'div.resizeDgridResizeHandleNode.resizeNode-'+id), "mousedown", function(e){
+					grid._resizeMouseDown(e);
+			});
 		}
-		listen(query("#" + grid.domNode.id + "  .resizeDgridResizeHandleNode"), "mousedown", function(e){
-				grid._resizeMouseDown(e);
-		});
 		grid.mouseMoveListen = listen.pausable(document.body, "mousemove", function(e){
 			// while resizing, update the position of the resizer bar
 			if(!grid._resizing){return;}
@@ -65,9 +60,7 @@ return declare([], {
 		
 		// show resizer inlined
 		if(!grid._resizer){
-			grid._resizer = construct.create('div', {
-				className: 'resizeDgridColumnResizer'},
-				grid.domNode, 'last');
+			grid._resizer = put(grid.domNode, 'div.resizeDgridColumnResizer');
 		}else{
 			grid.mouseMoveListen.resume();
 			grid.mouseUpListen.resume();
@@ -169,7 +162,7 @@ return declare([], {
 			node = e.srcElement;
 		}
 		if(node.nodeType == 3 || !node.columnId){ // defeat Safari bug first and IE oddity 2nd
-			node = node.parentNode.parentNode;
+			node = node.parentNode;
 		}
 		return node;
 	},
