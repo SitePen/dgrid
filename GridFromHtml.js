@@ -57,6 +57,7 @@ define(["./OnDemandGrid", "dojo/_base/declare", "dojo/_base/lang", "dojo/dom-con
 			// replace srcNodeRef in DOM with the div
 			srcNodeRef.parentNode.replaceChild(div, srcNodeRef);
 			
+			(params = params || {}).srcNodeRef = srcNodeRef;
 			// call inherited with the new node
 			// (but configStructure will look at srcNodeRef)
 			this.inherited(arguments, [params, div]);

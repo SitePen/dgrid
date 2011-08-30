@@ -109,7 +109,7 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 				this.params = params;
 				declare.safeMixin(this, params);
 			}
-			this.srcNodeRef = srcNodeRef || put("div");
+			this.domNode = srcNodeRef || put("div");
 			
 			this.postMixInProperties();
 			// apply id to widget and domNode,
@@ -126,7 +126,7 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 		},
 		tabableHeader: false,
 		buildRendering: function(){
-			var domNode = this.domNode = this.srcNodeRef;
+			var domNode = this.domNode;
 			this.id = domNode.id = domNode.id || this.id || generateId();
 			put(domNode, "[role=grid].ui-widget.dgrid.dgrid-" + this.listType);
 			var headerNode = this.headerNode = put(domNode, 
