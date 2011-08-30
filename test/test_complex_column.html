@@ -35,8 +35,8 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dgrid/OnDemandGrid", "dgrid/GridWithColumnSetsFromHtml", "dgrid/ColumnSet", "dgrid/Tree", "dgrid/Selection", "dgrid/Keyboard", "dgrid/test/test_data", "dojo/domReady!"],
-				function(Grid, GridFromHtml, ColumnSet, Tree, Selection, Keyboard, testStore){
+			require(["dgrid/OnDemandGrid", "dgrid/GridWithColumnSetsFromHtml", "dgrid/ColumnSet", "dgrid/Tree", "dgrid/Selection", "dgrid/Keyboard", "dojo/parser", "dgrid/test/test_data", "dojo/domReady!"],
+				function(Grid, GridFromHtml, ColumnSet, Tree, Selection, Keyboard, parser, testStore){
 					window.grid = dojo.declare([Grid, ColumnSet, Selection, Keyboard])({
 						store: testStore,
 						columnSets: [
@@ -57,6 +57,10 @@
 					window.gridFromHtml2 = dojo.declare([Grid, GridFromHtml, Selection, Keyboard])({
 						store: testStore
 					}, "gridFromHtml2");
+					
+					// test declarative instantiation (need a global for parser)
+					window.GridFromHtml = GridFromHtml;
+					dojo.parser.parse();
 				});
 		</script>
 	</head>
@@ -82,6 +86,50 @@
 		</table>
 		<h2>Another complex grid instantiated from an HTML table</h2>
 		<table id="gridFromHtml2">
+			<colgroup span="3"></colgroup>
+			<colgroup span="4"></colgroup>
+			<thead>
+				<tr>
+					<th field="col1" rowspan="3">rowspan=3</th>
+					<th field="col2" colspan="2">colspan=2</th>
+					<th field="col3" rowspan="2">rowspan=2</th>
+					<th field="col4" colspan="2">colspan=2</th>
+					<th field="col5" rowspan="2">rowspan=2</th>
+				</tr>
+				<tr>
+					<th field="col2" rowspan="2">rowspan=2</th>
+					<th field="col3">Column 3</th>
+					<th field="col4" rowspan="2">rowspan=2</th>
+					<th field="col5">Column 5</th>
+				</tr>
+				<tr>
+					<th field="col2">Column 2</th>
+					<th field="col3">Column 3</th>
+					<th field="col5" colspan="2">colspan=2</th>
+				</tr>
+			</thead>
+		</table>
+		<hr>
+		<h2>Same as previous two tables, instantiated declaratively</h2>
+		<table id="gridFromHtmlDecl" class="grid" data-dojo-type="GridFromHtml"
+			data-dojo-props="store:testStore">
+			<colgroup span="2"></colgroup>
+			<colgroup span="2"></colgroup>
+			<thead>
+				<tr>
+					<th field="col1">Column 1</th>
+					<th field="col2" sortable="false">Column 2</th>
+					<th field="col1" rowspan="2">Column 1</th>
+					<th field="col4">Column 4</th>
+				</tr>
+				<tr>
+					<th field="col3" colspan="2">Column 3</th>
+					<th field="col5">Column 5</th>
+				</tr>
+			</thead>
+		</table>
+		<table id="gridFromHtmlDecl2" data-dojo-type="GridFromHtml"
+			data-dojo-props="store:testStore">
 			<colgroup span="3"></colgroup>
 			<colgroup span="4"></colgroup>
 			<thead>
