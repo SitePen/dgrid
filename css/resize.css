@@ -12,10 +12,11 @@
 	height: 100px;
 	width: 5px;
 	position: absolute;
-	right: 0px;
+	right: -1px;
 	top:-4px;
 	cursor: col-resize;
 	z-index: 999;
+	background-color: transparent;
 }
 
 .dgrid-resize-header-container {
@@ -30,6 +31,7 @@ html.has-ie-6 .dgrid-resize-header-container {
 } 
 .dgrid-header .dgrid-cell-padding {
 	overflow: hidden;
+	padding-right:0px;
 }
 html.has-quirks .dgrid-header .dgrid-cell-padding, html.has-ie-6 .dgrid-header .dgrid-cell {
 	position:relative;

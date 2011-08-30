@@ -24,8 +24,7 @@ return declare([], {
 		for(id in this.columns){
 			var col = this.columns[id];
 			var colNode = query("#" + grid.domNode.id + " .column-"+id)[0];//grabs header node
-			
-			
+
 			var headerTextNode = put('div.dgrid-resize-header-container');
 			colNode.contents = headerTextNode;
 			var childNodes = colNode.childNodes;
