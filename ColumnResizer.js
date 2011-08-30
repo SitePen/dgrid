@@ -1,4 +1,4 @@
-define(["dojo/_base/declare", "dojo/on", "dojo/query", "dojo/dom", "dojo/dom-construct", "dojo/dom-geometry", "dojo/dom-class", "dojo/_base/html", "xstyle/css!./css/resize.css"], function(declare, listen, query, dom, construct, geom, cls){
+define(["dojo/_base/declare", "dojo/on", "dojo/query", "dojo/dom", "put-selector/put", "xstyle/has-class", "dojo/dom-geometry", "dojo/dom-class", "dojo/_base/html", "xstyle/css!./css/resize.css"], function(declare, listen, query, dom, put, hasClass, geom, cls){
 	
 return declare([], {
 	resizeNode: null,
@@ -16,24 +16,28 @@ return declare([], {
 		this.resize();
 	},
 	postCreate: function(){
+		hasClass("no-ie-6");
 		this.inherited(arguments);
 		
 		var grid = this;
 		grid.gridWidth = grid.headerNode.clientWidth - 1; //for some reason, total column width needs to be 1 less than this
 
 		for(id in this.columns){
-				var col = this.columns[id];
-				var colNode = query("#" + grid.domNode.id + " .column-"+id)[0];//grabs header node
-				var headerHTML = colNode.innerHTML;
-				colNode.innerHTML = '';
-				construct.create('div',
-					{className: 'resizeDgridResizeHandleNode  resizeNode-'+id},
-					construct.create('div', {className: 'resizeHeaderTextNode', innerHTML: headerHTML}, colNode, 'last'),
-					'last');
+			var col = this.columns[id];
+			var colNode = query("#" + grid.domNode.id + " .column-"+id)[0];//grabs header node
+			
+			
+			var headerTextNode = put('div.dgrid-resize-header-container');
+			colNode.contents = headerTextNode;
+			var childNodes = colNode.childNodes;
+			// move all the children to the header text node
+			while(childNodes.length > 0){
+				put(headerTextNode, childNodes[0]);
+			}
+			listen(put(colNode, headerTextNode, 'div.dgrid-resize-handler.resizeNode-'+id), "mousedown", function(e){
+					grid._resizeMouseDown(e);
+			});
 		}
-		listen(query("#" + grid.domNode.id + "  .resizeDgridResizeHandleNode"), "mousedown", function(e){
-				grid._resizeMouseDown(e);
-		});
 		grid.mouseMoveListen = listen.pausable(document.body, "mousemove", function(e){
 			// while resizing, update the position of the resizer bar
 			if(!grid._resizing){return;}
@@ -65,9 +69,7 @@ return declare([], {
 		
 		// show resizer inlined
 		if(!grid._resizer){
-			grid._resizer = construct.create('div', {
-				className: 'resizeDgridColumnResizer'},
-				grid.domNode, 'last');
+			grid._resizer = put(grid.domNode, 'div.dgrid-column-resizer');
 		}else{
 			grid.mouseMoveListen.resume();
 			grid.mouseUpListen.resume();
