@@ -1,4 +1,4 @@
-define(["./Grid", "dojo/_base/declare", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/Deferred", "require"], function(Grid, declare, lang, domConstruct, Deferred, require){
+define(["./OnDemandGrid", "dojo/_base/declare", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/Deferred", "require"], function(OnDemandGrid, declare, lang, domConstruct, Deferred, require){
 	// This module supports parsing grid structure information from an HTML table.
 	// This module does NOT support ColumnSets; see GridWithColumnSetsFromHtml
 	
@@ -30,7 +30,7 @@ define(["./Grid", "dojo/_base/declare", "dojo/_base/lang", "dojo/dom-construct",
 		return columns;
 	}
 	
-	var GridFromHtml = declare([Grid], {
+	var GridFromHtml = declare([OnDemandGrid], {
 		configStructure: function(){
 			// summary:
 			//		Configure subRows based on HTML originally in srcNodeRef
