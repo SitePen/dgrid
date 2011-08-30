@@ -12,15 +12,15 @@
 	height: 100px;
 	width: 5px;
 	position: absolute;
-	right: 0px;
+	right: -1px;
 	top:-4px;
 	cursor: col-resize;
-	z-index: 998;
+	z-index: 999;
+	background-color: transparent;
 }
 
 .dgrid-resize-header-container {
 	height:100%;
-	z-index: 999;
 }
 
 html.has-no-quirks .dgrid-resize-header-container {
