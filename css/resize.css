@@ -15,18 +15,21 @@
 	right: 0px;
 	top:-4px;
 	cursor: col-resize;
-	z-index: 999;
+	z-index: 998;
 }
 
 .dgrid-resize-header-container {
 	height:100%;
+	z-index: 999;
 }
 
 html.has-no-quirks.has-no-ie-6 .dgrid-resize-header-container {
 	position: relative;
+	z-index: 999;
 }
 .dgrid-header .dgrid-cell-padding {
 	overflow: hidden;
+	padding-right:0px;
 }
 html.has-quirks .dgrid-header .dgrid-cell-padding, html.has-ie-6 .dgrid-header .dgrid-cell {
 	position:relative;
