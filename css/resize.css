@@ -1,5 +1,5 @@
 /*Column resizing plugin*/
-.resize-dgrid-column-resizer {
+.dgrid-column-resizer {
 	position: absolute;
 	height: 100%;
 	width: 2px;
@@ -8,7 +8,7 @@
 	top: 0;
 }
 
-.resize-dgrid-handle {
+.dgrid-resize-handler {
 	height: 100px;
 	width: 5px;
 	position: absolute;
@@ -16,17 +16,18 @@
 	top:-4px;
 	cursor: col-resize;
 	z-index: 999;
-	background-color: #F00;
 }
 
-.resize-header-text {
-	position:relative;
+.dgrid-resize-header-container {
 	height:100%;
 }
 
- .dgrid-header .dgrid-cell-padding {
-	 overflow: hidden;
-	 width:100%;
-	 padding-left: 3px;
-	 padding-right: 0px;
- }
+html.has-no-ie-6.has-no-quirks .dgrid-resize-header-container {
+	position: relative;
+}
+.dgrid-header .dgrid-cell-padding {
+	overflow: hidden;
+}
+html.has-quirks .dgrid-header .dgrid-cell-padding, html.has-ie-6 .dgrid-header .dgrid-cell {
+	position:relative;
+}

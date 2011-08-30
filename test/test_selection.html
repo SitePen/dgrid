@@ -34,6 +34,12 @@
 						cellNavigation: false,
 						columns: columns
 					}, "grid-row-navigation");
+					gridRowNavigation.on("select", function(event){
+						console.log("selected", event.row);
+					});
+					gridRowNavigation.on("deselect", function(event){
+						console.log("deselected", event.row);	
+					});
 					var columns2 = {
 						col1: 'Column 1',
 						col2: {label: 'Column 2', sortable: false},
