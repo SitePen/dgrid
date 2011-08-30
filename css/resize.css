@@ -33,6 +33,13 @@ html.has-ie-6 .dgrid-resize-header-container {
 	overflow: hidden;
 	padding-right:0px;
 }
+html.has-ie-6 .dgrid-header .dgrid-cell-padding {
+	margin-right: 4px; /* for IE6, keep the resizer visible */
+}
+html.has-ie-6 .dgrid-header .dgrid-sort-arrow {
+    margin-right: 0; /* for IE6, zero out the right margin due to the right margin for the container */
+}
 html.has-quirks .dgrid-header .dgrid-cell-padding, html.has-ie-6 .dgrid-header .dgrid-cell {
 	position:relative;
 }
+
