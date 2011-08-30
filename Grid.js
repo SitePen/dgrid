@@ -18,6 +18,7 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 				return this.cell(target).column;
 			}
 		},
+		listType: "grid",
 		cell: function(target, columnId){
 			// summary:
 			//		Get the cell object by node, or event, id, plus a columnId
@@ -188,7 +189,7 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 			//put(headerNode, "div.dgrid-header-columns>", row, ".dgrid-row<+div.dgrid-header-scroll.ui-widget-header");
 			//row = put("div.dgrid-row[role=columnheader]>", row);
 			headerNode.appendChild(row);
-			var lastSortedArrow, arrowParent;
+			var lastSortedArrow;
 			// if it columns are sortable, resort on clicks
 			listen(row, "click,keydown", function(event){
 				if(event.type == "click" || event.keyCode == 32){
@@ -201,17 +202,6 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 							target = target.contents || target;
 							// re-sort
 							descending = grid.sortOrder && grid.sortOrder[0].attribute == field && !grid.sortOrder[0].descending;
-							/*var sortTarget = target.firstChild;
-							if(sortTarget.firstChild){
-								sortTarget = sortTarget.firstChild;
-								arrowParent = lastSortedArrow ? lastSortedArrow.parentNode : null;
-								if(contentBoxSizing && sortTarget.firstChild){
-									sortTarget = sortTarget.firstChild;
-									arrowParent = lastSortedArrow ? arrowParent.parentNode : null;
-								}
-							}else{
-								arrowParent = lastSortedArrow;
-							}*/
 							if(lastSortedArrow){
 								put(lastSortedArrow, "<!dgrid-sort-up!dgrid-sort-down"); // remove the sort classes from parent node
 								put(lastSortedArrow, "!"); // destroy the lastSortedArrow node
