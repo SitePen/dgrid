@@ -29,7 +29,12 @@ html.has-mozilla .dgrid-column-set *:focus, html.has-safari .dgrid-column-set *:
 	border: 1px dotted black; 
 	outline: 1px dotted black;
 }
-html.has-ie-7.has-no-quirks .dgrid-column-set {
+html.has-ie-7 .dgrid-column-set {
 	/* in IE7 (strangely not IE6 or IE8+) this is needed instead of 100% to make it not create a horizontal scroll bar*/
 	width: auto;
+}
+
+html.has-quirks .dgrid-column-set {
+	/* at it works in quirks even in IE7*/
+	width: 100%;
 }
