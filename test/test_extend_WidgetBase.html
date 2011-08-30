@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Test Grid Common Cases</title>
+		<title>Test Grid Common Cases Extending _WidgetBase</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 		<meta name="viewport" content="width=570" />
 		<style type="text/css">
@@ -42,20 +42,12 @@
 			.dgrid {
 				margin: 10px;
 			}
-			/*#grid .dgrid-row{
-				height:30px;
-				overflow: hidden;
-			}*/
 		</style>
-		<script>
-			var start= new Date().getTime();
-		</script>
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
 			require(["dojo/on", "dgrid/List", "dgrid/OnDemandGrid","dgrid/Tree","dgrid/Editor","dgrid/TextBox", "dgrid/Selection", "dgrid/Keyboard", "dijit/_WidgetBase", "dgrid/test/test_data", "dojo/domReady!"], 
 				function(on, List, Grid, Tree, Editor, TextBox, Selection, Keyboard, _WidgetBase, testStore){
-					console.log("loaded in " + (new Date().getTime() - start) + testStore);
 					var columns = { // you can declare columns as an object hash (key translates to field)
 						col1: TextBox({label: 'Column 1 column 1 column 1'}),
 						col2: {label: 'Column 2', sortable: false},

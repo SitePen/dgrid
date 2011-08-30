@@ -23,7 +23,7 @@
 	z-index: 999;
 }
 
-html.has-no-quirks.has-no-ie-6 .dgrid-resize-header-container {
+html.has-no-ie-6.has-no-quirks .dgrid-resize-header-container {
 	position: relative;
 	z-index: 999;
 }
