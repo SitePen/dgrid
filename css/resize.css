@@ -10,13 +10,13 @@
 
 .dgrid-resize-handler {
 	height: 100px;
-	width: 1px;
+	width: 0;
 	position: absolute;
 	right: -1px;
 	top:-4px;
 	cursor: col-resize;
 	z-index: 999;
-	border-left: 3px solid transparent;
+	border-left: 5px solid transparent;
 }
 html.has-ie-6 .dgrid-resize-handler {
     border-color: pink;
