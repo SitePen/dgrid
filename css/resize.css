@@ -10,15 +10,18 @@
 
 .dgrid-resize-handler {
 	height: 100px;
-	width: 5px;
+	width: 1px;
 	position: absolute;
 	right: -1px;
 	top:-4px;
 	cursor: col-resize;
 	z-index: 999;
-	background-color: transparent;
+	border-left: 3px solid transparent;
 }
-
+html.has-ie-6 .dgrid-resize-handler {
+    border-color: pink;
+    filter: chroma(color=pink);
+}
 .dgrid-resize-header-container {
 	height:100%;
 }
