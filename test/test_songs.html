@@ -43,7 +43,7 @@
 				left: 0;
 				right: 0;
 				height: 120px;
-				border-bottom: 2px solid #ddd;
+				border-bottom: 1px solid #a6a6a6;
 			}
 			#grid-container {
 				position: absolute;
@@ -56,9 +56,8 @@
 				position: absolute;
 				top: 0;
 				bottom: 0;
-				height: auto;
 				width: 33.3%;
-				border-right: 2px solid #ddd;
+				height: auto;
 			}
 			#genres .dgrid-row,
 			#artists .dgrid-row,
@@ -72,6 +71,23 @@
 			#grid {
 				height: 99%;
 			}
+			#grid .dgrid-cell {
+				border: 0;
+			}
+			#grid .dgrid-header th {
+				border: 0;
+				border-right: 1px solid #a6a6a6;
+			}
+			#grid .dgrid-header th:last-child {
+				border: 0;
+			}
+			#grid div.dgrid-row-even {
+				background-color: #f2f6fa;
+			}
+			#grid div.dgrid-row-even.dgrid-selected {
+				background-color: #bfd6eb;
+			}
+
 			.ui-widget{ }
 			.dgrid-cell.field-Time, 
 			.dgrid-cell.field-Year{ 
@@ -82,22 +98,35 @@
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
 			function unique(arr){
-				//	create a unique list of items from the passed array.
+				//	create a unique list of items from the passed array.  This is quick and dirty.
+				//	first, set up a hashtable for unique objects.
 				var obj = {};
 				for(var i=0,l=arr.length; i<l; i++){
 					if(!(arr[i] in obj)){
 						obj[arr[i]] = true;
 					}
 				}
+
+				//	now push the unique objects back into an array, and return it.
 				var ret = [];
 				for(var p in obj){
 					ret.push(p);
 				}
+				ret.sort();
 				return ret;
 			}
 
-			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Tree","dgrid/Selection", "dgrid/Keyboard", "dgrid/test/song_data", "dojo/domReady!"], 
-				function(List, Grid, Tree, Selection, Keyboard, ProgressBar){
+			//	our "main" function
+			require([
+					"dgrid/List", 
+					"dgrid/OnDemandGrid",
+					"dgrid/Selection", 
+					"dgrid/Keyboard", 
+					"dgrid/test/song_data", 
+					"dojo/domReady!"
+				], 
+				function(List, Grid, Selection, Keyboard){
+					//	a formatting function for the Duration column.
 					var timeFormatter = function(t){
 						var tmp = parseInt(t, 10);
 						if(isNaN(tmp)){ return t; }
@@ -106,6 +135,7 @@
 						return "" + min + ":" + (sec + "00").substring(0, 2);
 					};
 
+					//	define the column structure on the main grid, and create it.
 					var columns = [
 						{label: 'Name', field: 'Name'},
 						{label: 'Duration', field: 'Time', formatter: timeFormatter},
@@ -119,26 +149,85 @@
 						columns: columns
 					}, "grid");
 
-					window.genres = dojo.declare([List, Selection, Keyboard])({
-					}, "genres");
-					window.artists = dojo.declare([List, Selection, Keyboard])({
-					}, "artists");
-					window.albums = dojo.declare([List, Selection, Keyboard])({
-					}, "albums");
+					//	define our three lists for the top.
+					window.genres = dojo.declare([List, Selection, Keyboard])({ }, "genres");
+					window.artists = dojo.declare([List, Selection, Keyboard])({ }, "artists");
+					window.albums = dojo.declare([List, Selection, Keyboard])({ }, "albums");
 
 					//	create the unique lists and render them
-					var g = unique(dojo.map(songStore.data, function(item){ return item.Genre; }));
-					var art = unique(dojo.map(songStore.data, function(item){ return item.Artist; }));
-					var alb = unique(dojo.map(songStore.data, function(item){ return item.Album; }));
-					g.sort(); art.sort(); alb.sort();
-					g.unshift("All (" + g.length + " Genres)");
-					art.unshift("All (" + g.length + " Artists)");
-					alb.unshift("All (" + g.length + " Albums)");
+					var g = unique(dojo.map(songStore.data, function(item){ return item.Genre; })),
+						art = unique(dojo.map(songStore.data, function(item){ return item.Artist; })),
+						alb = unique(dojo.map(songStore.data, function(item){ return item.Album; }));
+					g.unshift("All (" + g.length + " Genre" + (g.length > 1 ? "s" : "") + ")");
+					art.unshift("All (" + art.length + " Artist" + (art.length > 1 ? "s" : "") + ")");
+					alb.unshift("All (" + alb.length + " Album" + (alb.length > 1 ? "s" : "") + ")");
 					genres.renderArray(g);
 					artists.renderArray(art);
 					albums.renderArray(alb);
-				});
-				
+
+					//	set the initial selections on the lists.
+					genres.select(0);
+					artists.select(0);
+					albums.select(0);
+
+					//	start listening for selections on the lists.
+					//	TODO: A little bit smarter on the filtering, since the list interactions are all related.
+					genres.on("select", function(e){
+						//	filter the albums, artists and grid
+						var filter = e.row.data;
+						if(e.row.id == "0"){
+							//	remove filtering
+							var art = unique(dojo.map(songStore.data, function(item){ return item.Artist; })),
+								alb = unique(dojo.map(songStore.data, function(item){ return item.Album; }));
+							grid.query = {};
+						} else {
+							//	create filtering
+							var art = unique(dojo.map(dojo.filter(songStore.data, function(item){ return item.Genre == filter; }), function(item){ return item.Artist; })),
+								alb = unique(dojo.map(dojo.filter(songStore.data, function(item){ return item.Genre == filter; }), function(item){ return item.Album; }));
+							grid.query = { "Genre": filter };
+						}
+						art.unshift("All (" + art.length + " Artist" + (art.length > 1 ? "s" : "") + ")");
+						alb.unshift("All (" + alb.length + " Album" + (alb.length > 1 ? "s" : "") + ")");
+						artists.refresh();	//	clear contents
+						albums.refresh();
+						artists.renderArray(art);
+						albums.renderArray(alb);
+						grid.refresh();
+					});
+					artists.on("select", function(e){
+						//	filter the albums, grid
+						//	TODO: ids are reset on re-render, which is a problem.  We expect the fake "All Artists" to be id 0 but apparently they
+						//	are being assigned new ids on pull.
+						var filter = e.row.data;
+						if(filter.indexOf("Artists)") > -1){
+							//	remove filtering
+							var alb = unique(dojo.map(songStore.data, function(item){ return item.Album; }));
+							grid.query = {};
+						} else {
+							//	create filtering
+							var alb = unique(dojo.map(dojo.filter(songStore.data, function(item){ return item.Artist == filter; }), function(item){ return item.Album; }));
+							grid.query = { "Artist": filter };
+						}
+						alb.unshift("All (" + alb.length + " Album" + (alb.length > 1 ? "s" : "") + ")");
+						artists.refresh();	//	clear contents
+						albums.refresh();
+						artists.renderArray(art);
+						albums.renderArray(alb);
+						grid.refresh();
+					});
+					albums.on("select", function(e){
+						//	filter the grid
+						var filter = e.row.data;
+						if(e.row.id == "0"){
+							grid.query = {};
+						} else {
+							grid.query = { "Album": filter };
+						}
+						grid.refresh();
+					});
+
+				}	//	end "main" function
+			);		//	end require
 		</script>
 	</head>
 	<body class="itunes">
