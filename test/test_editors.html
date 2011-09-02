@@ -13,11 +13,17 @@
 				font-weight: bold;
 				padding-bottom: 0.25em;
 			}
-			#grid .field-date, #grid .field-date2, #grid .field-integer {
+			#grid .field-date, #grid .field-date2 {
 				width: 16em;
 			}
-			#grid .field-bool, #grid .field-bool2 {
-				width: 3em;
+			#grid .field-integer {
+				width: 6em;
+			}
+			#grid .field-bool {
+				width: 6em;
+			}
+			#grid .column-7 { /* radio */
+				width: 5em;
 			}
 			.ui-widget{
 				margin: 10px;
@@ -31,7 +37,7 @@
 					var columns = [
 						Editor({label: 'A Date', field: 'date'}, DateTextBox),
 						Editor({label: 'Real Number', field: 'floatNum'}, Slider),
-						Editor({label: 'Integer', field: 'integer'}, NumberSpinner),
+						Editor({label: 'Integer', field: 'integer', style: 'width: 5em;'}, NumberSpinner),
 						Editor({label: 'Text editable if checkbox checked', field: 'text', canEdit: function(object){
 							return object.bool;
 						}}, "text", "dblclick"),
