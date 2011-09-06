@@ -37,13 +37,16 @@
 					{ name: 'Column 8', field: 'price', width: '10%' },
 					{ name: 'Column 9', field: 'today', width: '10%' }
 			];
+
 			var store = new ObjectStore({"objectStore":testPerfStore});
+			var start = new Date().getTime();
 			var grid = new DataGrid({
 				id: "perfGrid",
 				structure: layout,
 				store: store
 			},"grid");
 			grid.startup();
+			console.log(new Date().getTime() - start);
 		});
 	</script>
 </head>
