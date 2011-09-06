@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+	"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>Test dojox.grid.DataGrid Performance</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
+	<style type="text/css">
+		@import "../../dojo/resources/dojo.css";
+		@import "../../dojox/grid/resources/Grid.css";
+		@import "../../dojox/grid/resources/tundraGrid.css";
+		body {
+			font-size: 0.9em;
+			font-family: Geneva, Arial, Helvetica, sans-serif;
+		}
+		.heading {
+			font-weight: bold;
+			padding-bottom: 0.25em;
+		}
+		#grid {
+			width: 100em;
+			height: 25em;
+			padding: 1px;
+		}
+	</style>
+	<script type="text/javascript" src="../../dojo/dojo.js"
+		data-dojo-config="async: true"></script>
+
+	<script type="text/javascript">
+	require(["dojox/grid/DataGrid", "dojo/data/ObjectStore", "dgrid/test/test_data", "dojo/domReady!"],
+		function(DataGrid, ObjectStore){
+			var layout = [
+					{ name: 'Column 0', field: 'id', width: '10%' },
+					{ name: 'Column 1', field: 'integer', width: '10%' },
+					{ name: 'Column 2', field: 'floatNum', width: '10%' },
+					{ name: 'Column 3', field: 'date', width: '10%' },
+					{ name: 'Column 4', field: 'date2', width: '10%' },
+					{ name: 'Column 5', field: 'text', width: '10%' },
+					{ name: 'Column 6', field: 'bool', width: '10%' },
+					{ name: 'Column 7', field: 'bool2', width: '10%' },
+					{ name: 'Column 8', field: 'price', width: '10%' },
+					{ name: 'Column 9', field: 'today', width: '10%' }
+			];
+			var store = new ObjectStore({"objectStore":testPerfStore});
+			var grid = new DataGrid({
+				id: "perfGrid",
+				structure: layout,
+				store: store
+			},"grid");
+			grid.startup();
+		});
+	</script>
+</head>
+<body class="tundra">
+		<h2 class="heading">A performance test designed to go head to head with the dgrid's test_performance.html</h2>
+		<div id="grid"></div>
+	</body>
+</html>
