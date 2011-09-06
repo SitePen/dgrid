@@ -19,8 +19,8 @@
 	border-left: 5px solid transparent;
 }
 html.has-ie-6 .dgrid-resize-handler {
-    border-color: pink;
-    filter: chroma(color=pink);
+	border-color: pink;
+	filter: chroma(color=pink);
 }
 .dgrid-resize-header-container {
 	height:100%;
@@ -45,4 +45,3 @@ html.has-ie-6 .dgrid-header .dgrid-sort-arrow {
 html.has-quirks .dgrid-header .dgrid-cell-padding, html.has-ie-6 .dgrid-header .dgrid-cell {
 	position:relative;
 }
-

@@ -7,13 +7,11 @@
 		<meta name="viewport" content="width=570" />
 		<style type="text/css">
 			@import "../../dojo/resources/dojo.css";
-			@import "../css/dgrid.css";
 			@import "../css/skins/tundra.css";
 			.heading {
 				font-weight: bold;
 				padding-bottom: 0.25em;
 			}
-
 			.ui-widget{
 				margin: 10px;
 			}
@@ -25,6 +23,17 @@
 			/* also not part of theme, but a contrived example of using dgrid-sortable. */
 			.dgrid-sortable {
 				font-weight: bold;
+			}
+			
+			/* add styles to size this grid appropriately */
+			#grid {
+				height: 20em;
+			}
+			#grid .column-order {
+				width: 7%;
+			}
+			#grid .column-name {
+				width: 18%;
 			}
 		</style>
 		<script type="text/javascript" src="../../dojo/dojo.js" 
