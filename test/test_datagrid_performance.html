@@ -13,10 +13,14 @@
 			font-weight: bold;
 			padding-bottom: 0.25em;
 		}
-		#grid {
-			width: 100em;
-			height: 25em;
+		.dojoxGrid {
+			width: 80em;
+			height: 59em;
+			margin: 10px;
 			padding: 1px;
+		}
+		.dojoxGrid * {
+			vertical-align: top;
 		}
 	</style>
 	<script type="text/javascript" src="../../dojo/dojo.js"
@@ -26,16 +30,16 @@
 	require(["dojox/grid/DataGrid", "dojo/data/ObjectStore", "dgrid/test/test_data", "dojo/domReady!"],
 		function(DataGrid, ObjectStore){
 			var layout = [
-					{ name: 'Column 0', field: 'id', width: '10%' },
-					{ name: 'Column 1', field: 'integer', width: '10%' },
-					{ name: 'Column 2', field: 'floatNum', width: '10%' },
-					{ name: 'Column 3', field: 'date', width: '10%' },
-					{ name: 'Column 4', field: 'date2', width: '10%' },
-					{ name: 'Column 5', field: 'text', width: '10%' },
-					{ name: 'Column 6', field: 'bool', width: '10%' },
-					{ name: 'Column 7', field: 'bool2', width: '10%' },
-					{ name: 'Column 8', field: 'price', width: '10%' },
-					{ name: 'Column 9', field: 'today', width: '10%' }
+					{ name: 'id', field: 'id', width: '10%' },
+					{ name: 'integer', field: 'integer', width: '10%' },
+					{ name: 'floatNum', field: 'floatNum', width: '10%' },
+					{ name: 'date', field: 'date', width: '10%' },
+					{ name: 'date2', field: 'date2', width: '10%' },
+					{ name: 'text', field: 'text', width: '10%' },
+					{ name: 'bool', field: 'bool', width: '10%' },
+					{ name: 'bool2', field: 'bool2', width: '10%' },
+					{ name: 'price', field: 'price', width: '10%' },
+					{ name: 'today', field: 'today', width: '10%' }
 			];
 
 			var store = new ObjectStore({"objectStore":testPerfStore});
