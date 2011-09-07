@@ -1,71 +1,81 @@
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
-<html> 
-	<head> 
-		<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no"/> 
-		<meta name="apple-mobile-web-app-capable" content="yes" /> 
-		<title>test mobile grid</title>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no"/>
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<title>Mobile dgrid test</title>
 
 		<style type="text/css">
 					@import "../../dojo/resources/dojo.css";
+					@import "../../dojox/mobile/themes/iphone/base.css";
 					@import "../css/skins/claro.css";
-					@import "../../dojox/mobile/themes/iphone/iphone.css";
 					@import "../css/dgrid.css"; /* this ensures that are rules come after dgrid.css */
-					.heading {
-						font-weight: bold;
-						padding-bottom: 0.25em;
-					}
-					#grid {
-						width: 70%;
-					}
-					#grid .column-set-0 {
-						width: 50%;
-					}
-					#grid .field-col1 {
-						width: 100px;
-					}
-					#grid .field-col4 {
-						width: 500px;
-					}
-					.ui-widget{
-						margin: 10px;
-					}
-					.dgrid-sort-arrow {
-						float: left;
-					}
+					@import "../../dojox/mobile/tests/images/i-icon-1.png";
+					
 				</style>
-		<script type="text/javascript"  data-dojo-config="async:1" src="../../dojo/dojo.js"></script>
-		<script type="text/javascript">
-			//Require the compat if the client isn't Webkit-based
-			//dojo.requireIf(!dojo.isWebKit,"dojox.mobile.compat");
 
+
+		<script language="JavaScript" type="text/javascript">
+			dojoConfig = { deps: [ "dojox/mobile", "dojox/mobile/parser", "dojox/mobile/compat" ], parseOnLoad: true, async: true }
+		</script>
+		<script type="text/javascript"  src="../../dojo/dojo.js"></script>
+		<script type="text/javascript">
 			require(["dojo/on", "dgrid/OnDemandGrid", "dgrid/ColumnResizer", "dgrid/test/test_data", "dojo/domReady!"],
 				function(on, Grid, ColumnResizer, testStore){
-					console.log(require("dojo/_base/config").async);
 					var columns = { // you can declare columns as an object hash (key translates to field)
-						col1: 'Column 1',
-						col2: {name: 'Column 2', sortable: false},
-						col3: 'Column 3',
-						col4: 'Column 4',
-						"last-col": {name: 'Column 5', field: 'col5'}
+						col1: 'Status',
+						col4: 'Expired',
+						"last-col": {label: 'Weight', field: 'col5'}
 					};
 					window.grid = dojo.declare([Grid, ColumnResizer])({
 						store: testStore,
 						columns: columns
 					}, "grid");
-				});
-
+					});
 		</script>
-	</head> 
-	<body>
+	</head>
+	<body style="visibility:hidden;">
+		<div id="view1" data-dojo-type="dojox.mobile.View" selected="true">
+			<div id="view11" data-dojo-type="dojox.mobile.View" selected="true">
+				<h1 data-dojo-type="dojox.mobile.Heading">View dgrid</h1>
+				<h2 data-dojo-type="dojox.mobile.RoundRectCategory">dgrid Mobile Test</h2>
 
-		<div id="settings" dojoType="dojox.mobile.View" selected="true">
-			<h1 dojoType="dojox.mobile.Heading">Test Mobile Grid</h1>
-				<div id="general" dojoType="dojox.mobile.View">
-					<div id="grid"></div>
+				<ul data-dojo-type="dojox.mobile.RoundRectList">
+					<li data-dojo-type="dojox.mobile.ListItem" icon="../../dojox/mobile/tests/images/i-icon-1.png" moveTo="view12" transition="slide">
+						View dgrid
+					</li>
+					<li data-dojo-type="dojox.mobile.ListItem" icon="../../dojox/mobile/tests/images/i-icon-3.png" moveTo="view2" transition="slide">
+						View 2
+					</li>
+				</ul>
+			</div>
+
+			<div id="view12" data-dojo-type="dojox.mobile.View">
+				<h1 data-dojo-type="dojox.mobile.Heading">View 1-2</h1>
+				<ul data-dojo-type="dojox.mobile.RoundRectList">
+					<li data-dojo-type="dojox.mobile.ListItem" icon="../../dojox/mobile/tests/images/i-icon-2.png" moveTo="view11" transition="slide" transitionDir="-1">
+						Home
+					</li>
+					<li data-dojo-type="dojox.mobile.ListItem" icon="../../dojox/mobile/tests/images/i-icon-3.png" moveTo="view2" transition="slide">
+						View 2
+					</li>
+				</ul>
+				<div data-dojo-type="dojox.mobile.RoundRect" shadow="true">
+					<pre style="font-size:12px">
+						<div id="grid"></div>
+                    </pre>
 				</div>
+			</div>
 		</div>
- 
 
-	</body> 
-</html> 
+		<div id="view2" data-dojo-type="dojox.mobile.View">
+			<h1 data-dojo-type="dojox.mobile.Heading">View 2</h1>
+			<ul data-dojo-type="dojox.mobile.RoundRectList">
+				<li data-dojo-type="dojox.mobile.ListItem" icon="../../dojox/mobile/tests/images/i-icon-1.png" moveTo="view1" transition="slide" transitionDir="-1">
+					Back
+				</li>
+			</ul>
+		</div>
+	</body>
+</html>
