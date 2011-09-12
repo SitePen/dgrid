@@ -129,7 +129,8 @@ define(["./List", "dojo/_base/declare", "dojo/_base/lang", "dojo/on", "dojo/_bas
 	return declare([List], {
 		dndSourceType: "row",
 		dndTargetConfig: null,
-		constructor: function(){
+		postMixInProperties: function(){
+			this.inherited(arguments);
 			// initialize default dndTargetConfig
 			this.dndTargetConfig = {
 				accept: [this.dndSourceType]
