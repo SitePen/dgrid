@@ -114,7 +114,8 @@
 						// TODO: Should probably think harder about code flow necessitated,
 						// at a broader level.
 						
-						constructor: function(){
+						postMixInProperties: function(){
+							this.inherited(arguments);
 							// Filter according to which "side" is represented
 							this.query.added = this.addedSide;
 						},
