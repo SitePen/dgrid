@@ -114,6 +114,9 @@ return declare([List], {
 		var lastScrollTop = this.lastScrollTop;
 		this.lastScrollTop = visibleTop;
 		
+		// if rowHeight is NaN, List presently has no items - nothing to preload
+		if (isNaN(this.rowHeight)){ return; }
+		
 		// there can be multiple preloadNodes (if they split, or multiple queries are created),
 		//	so we can traverse them until we find whatever is in the current viewport, making
 		//	sure we don't backtrack
