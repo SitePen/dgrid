@@ -17,7 +17,7 @@ return declare([List], {
 	maxEmptySpace: 10000,
 	// rows can be removed if they are this distance in pixels from the visible viewing area.
 	// set this to infinity if you never want rows removed
-	farOffRemoval: 10000,
+	farOffRemoval: 4000,
 	rowHeight: 22,
 	
 	constructor: function(){
