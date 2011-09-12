@@ -76,8 +76,8 @@ return declare([List], {
 				}else{
 					// if total is 0, IE quirks mode can't handle 0px height for some reason, I don't know why, but we are setting display: none for now 
 					preloadNode.style.display = "none"; 
-				} 
-				self.onscroll(); // recheck the scroll position in case the query didn't filll the screen
+				}
+				self.onscroll(); // recheck the scroll position in case the query didn't fill the screen
 				// can remove the loading node now
 				return trs;
 			});
@@ -149,12 +149,13 @@ return declare([List], {
 				}
 				
 			}
+			
 			if(visibleBottom < preloadTop){
-				// the preload is below the line of site
+				// the preload is below the line of sight
 				removeDistantNodes(this, preloadTop - visibleBottom, 'previousSibling', true);
 				preloadNode = preloadNode.previous;
 			}else if(visibleTop > (preloadTop + (preloadHeight = preloadNode.offsetHeight))){
-				// the preload is above the line of site
+				// the preload is above the line of sight
 				removeDistantNodes(this, preloadTop + preloadHeight, 'nextSibling');
 				preloadNode = preloadNode.next;
 			}else{
