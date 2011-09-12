@@ -199,7 +199,7 @@ return declare([List], {
 					}
 					// need to do a split as we have scrolled far enough that we don't want to
 					// load everything up to this point, just what is in visible range
-					var newPreloadNode = preloadNode.cloneNode();
+					var newPreloadNode = preloadNode.cloneNode(false);
 					put(preloadNode, "+", newPreloadNode);
 					preloadNode.next = newPreloadNode;
 					newPreloadNode.previous = preloadNode;
