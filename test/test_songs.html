@@ -202,16 +202,18 @@
 						if(filter.indexOf("All (") > -1){
 							//	remove filtering
 							var alb = unique(dojo.map(songStore.data, function(item){ return item.Album; }));
-							grid.query = {};
+							delete grid.query.Artist;
 						} else {
 							//	create filtering
 							var alb = unique(dojo.map(dojo.filter(songStore.data, function(item){ return item.Artist == filter; }), function(item){ return item.Album; }));
-							grid.query = { "Artist": filter };
+							grid.query.Artist = filter;
 						}
 						alb.unshift("All (" + alb.length + " Album" + (alb.length > 1 ? "s" : "") + ")");
-						artists.refresh();	//	clear contents
-						albums.refresh();
-						artists.renderArray(art);
+
+						// Reset album filter since artist selection changed
+						delete grid.query.Album;
+
+						albums.refresh(); //	clear contents
 						albums.renderArray(alb);
 						grid.refresh();
 					});
@@ -219,15 +221,15 @@
 						//	filter the grid
 						var filter = e.row.data;
 						if(filter.indexOf("All (") > -1){
-							grid.query = {};
+							delete grid.query.Album;
 						} else {
-							grid.query = { "Album": filter };
+							grid.query.Album = filter;
 						}
 						grid.refresh();
 					});
 
 				}	//	end "main" function
-			);		//	end require
+			);	//	end require
 		</script>
 	</head>
 	<body class="itunes">
