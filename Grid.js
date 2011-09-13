@@ -222,7 +222,7 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "dojo/q
 			// if we were invoked from a header cell click handler, grab
 			// stashed target node; otherwise (e.g. direct sort call) need to look up
 			var target = this._sortNode ||
-				query("#" + this.id + " .dgrid-header .field-" + property)[0];
+				query(".dgrid-header .field-" + property, this.domNode)[0];
 			
 			target = target.contents || target;
 			if(this._lastSortedArrow){
