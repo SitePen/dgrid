@@ -1,4 +1,4 @@
-define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Editor", "./List", "dojo/_base/sniff"], function(has, put, declare, listen, Editor, List){
+define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "dojo/query", "./Editor", "./List", "dojo/_base/sniff"], function(has, put, declare, listen, query, Editor, List){
 	var contentBoxSizing = has("ie") < 8 && !has("quirks");
 
 	return declare([List], {
@@ -189,32 +189,57 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 			//put(headerNode, "div.dgrid-header-columns>", row, ".dgrid-row<+div.dgrid-header-scroll.ui-widget-header");
 			//row = put("div.dgrid-row[role=columnheader]>", row);
 			headerNode.appendChild(row);
-			var lastSortedArrow;
 			// if it columns are sortable, resort on clicks
 			listen(row, "click,keydown", function(event){
+				// respond to click or space keypress
 				if(event.type == "click" || event.keyCode == 32){
 					var
 						target = event.target,
 						field, descending, parentNode;
 					do{
 						if(target.sortable){
+							// stash node subject to DOM manipulations,
+							// to be referenced then removed by sort()
+							grid._sortNode = target;
+							
 							field = target.field || target.columnId;
-							target = target.contents || target;
-							// re-sort
-							descending = grid.sortOrder && grid.sortOrder[0].attribute == field && !grid.sortOrder[0].descending;
-							if(lastSortedArrow){
-								put(lastSortedArrow, "<!dgrid-sort-up!dgrid-sort-down"); // remove the sort classes from parent node
-								put(lastSortedArrow, "!"); // destroy the lastSortedArrow node
-							}
-							lastSortedArrow = put(target.firstChild, "-div.dgrid-sort-arrow.ui-icon[role=presentation]");
-							lastSortedArrow.innerHTML = "&nbsp;";
-							put(target, descending ? ".dgrid-sort-down" : ".dgrid-sort-up");
-							grid.resize();
+							
+							// if the click is on the same column as the active sort,
+							// reverse sort direction
+							descending = grid.sortOrder && grid.sortOrder[0].attribute == field &&
+								!grid.sortOrder[0].descending;
+							
 							return grid.sort(field, descending);
 						}
 					}while((target = target.parentNode) && target != headerNode);
 				}
 			});
+		},
+		sort: function(property, descending){
+			// summary:
+			//		Extension of List.js sort to update sort arrow in UI
+			
+			// if we were invoked from a header cell click handler, grab
+			// stashed target node; otherwise (e.g. direct sort call) need to look up
+			var target = this._sortNode ||
+				query("#" + this.id + " .dgrid-header .field-" + property)[0];
+			
+			target = target.contents || target;
+			if(this._lastSortedArrow){
+				// remove the sort classes from parent node
+				put(this._lastSortedArrow, "<!dgrid-sort-up!dgrid-sort-down");
+				// destroy the lastSortedArrow node
+				put(this._lastSortedArrow, "!");
+			}
+			// place sort arrow under clicked node, and add up/down sort class
+			this._lastSortedArrow = put(target.firstChild, "-div.dgrid-sort-arrow.ui-icon[role=presentation]");
+			this._lastSortedArrow.innerHTML = "&nbsp;";
+			put(target, descending ? ".dgrid-sort-down" : ".dgrid-sort-up");
+			// call resize in case relocation of sort arrow caused any height changes
+			this.resize();
+			
+			delete this._sortNode;
+			this.inherited(arguments);
 		},
 		styleColumn: function(colId, css){
 			// summary:
