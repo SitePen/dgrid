@@ -6,7 +6,7 @@ return declare([List], {
 		var self = this;
 		// check visibility on scroll events
 		listen(this.bodyNode, "scroll", function(event){
-			self.onscroll(event);			
+			self.onscroll(event);
 		});
 	},
 	queryOptions: null,
@@ -69,8 +69,10 @@ return declare([List], {
 				var height = 0;
 				for(var i = 0, l = trs.length; i < l; i++){
 					height += trs[i].offsetHeight;
-				} 
-				self.rowHeight = height / l;
+				}
+				// only update rowHeight if we actually got results
+				if(l){ self.rowHeight = height / l; }
+				
 				total -= trs.length;
 				preloadNode.count = total;
 				preloadNode.start = trs.length;
@@ -116,9 +118,6 @@ return declare([List], {
 		var priorPreload, preloadNode = this.preloadNode;
 		var lastScrollTop = this.lastScrollTop;
 		this.lastScrollTop = visibleTop;
-		
-		// if rowHeight is NaN, List presently has no items - nothing to preload
-		if (isNaN(this.rowHeight)){ return; }
 		
 		// there can be multiple preloadNodes (if they split, or multiple queries are created),
 		//	so we can traverse them until we find whatever is in the current viewport, making
