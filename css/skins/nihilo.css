@@ -1,14 +1,14 @@
-.ui-widget-content { 
+.nihilo .ui-widget-content { 
 	border: 1px solid #aaaaaa; background: #ffffff; color: #000000; 
 }
-.ui-widget-header { 
+.nihilo .ui-widget-header { 
 	background: #fff;
 }
 
-.ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active {
+.nihilo .ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active {
 	background-color: #aec7e3;  
 
 }
-.ui-state-default:hover {
+.nihilo .ui-state-default:hover {
 	background-color: #ffe284;
 }

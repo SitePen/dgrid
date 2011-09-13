@@ -1,21 +1,21 @@
-.ui-widget { 
+.itunes .ui-widget { 
 	border: 1px solid #aaaaaa; 
 	background: #ffffff; 
 	color: #000000; 
 }
-.ui-widget-header { 
+.itunes .ui-widget-header { 
 	background-image: url(images/itunes/grid-header-bg.png);
 	background-repeat: repeat-x;
 	font-weight: bold; 
 }
-.ui-widget-header .dgrid-cell:hover,
-.ui-widget-header .dgrid-sort-up,
-.ui-widget-header .dgrid-sort-down{
+.itunes .ui-widget-header .dgrid-cell:hover,
+.itunes .ui-widget-header .dgrid-sort-up,
+.itunes .ui-widget-header .dgrid-sort-down{
 	background-image: url(images/itunes/grid-header-sorted.png);
 	background-repeat: repeat-x;
 }
 
-.ui-state-default { 
+.itunes .ui-state-default { 
 	-webkit-transition-duration: 0.2s;
 	-moz-transition-duration: 0.2s;
 	-o-transition-duration: 0.2s;
@@ -26,18 +26,18 @@
 	transition-property: background-color, border-color;
 	background: url("images/row_back.png") #fff repeat-x;
 }
-.ui-state-default:hover {
+.itunes .ui-state-default:hover {
 	background-color:#e9f2fe;
 }
 
-.ui-state-active {
+.itunes .ui-state-active {
 	background-color:#cee6fa;
 }
 
-.ui-state-active:hover {
+.itunes .ui-state-active:hover {
 	background-color: #9bc6f2;
 }
 
-.ui-state-highlight{
+.itunes .ui-state-highlight{
 	background-color:#ff6;
 }
