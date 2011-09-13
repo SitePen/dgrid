@@ -12,7 +12,7 @@ return declare([], {
 	//      column id
 	// width: Integer
 	//      new width of the column
-		var x = this.styleColumn(colId, "width: " + width + 'px;');
+		var x = this.styleColumn(colId, "width: " + width + "px;");
 		this.resize();
 	},
 	postCreate: function(){
@@ -25,14 +25,14 @@ return declare([], {
 			var col = this.columns[id];
 			var colNode = query("#" + grid.domNode.id + " .column-"+id)[0];//grabs header node
 
-			var headerTextNode = put('div.dgrid-resize-header-container');
+			var headerTextNode = put("div.dgrid-resize-header-container");
 			colNode.contents = headerTextNode;
 			var childNodes = colNode.childNodes;
 			// move all the children to the header text node
 			while(childNodes.length > 0){
 				put(headerTextNode, childNodes[0]);
 			}
-			listen(put(colNode, headerTextNode, 'div.dgrid-resize-handler.resizeNode-'+id), "mousedown", function(e){
+			listen(put(colNode, headerTextNode, "div.dgrid-resize-handler.resizeNode-"+id), "mousedown", function(e){
 					grid._resizeMouseDown(e);
 			});
 		}
@@ -41,7 +41,7 @@ return declare([], {
 			if(!grid._resizing){return;}
 			grid._updateResizerPosition(e);
 		});
-		grid.mouseUpListen = listen.pausable(document.body, 'mouseup', function(e){
+		grid.mouseUpListen = listen.pausable(document.body, "mouseup", function(e){
 				if(!grid._resizing){return;}
 				grid._resizeMouseUp(e);
 				grid.mouseMoveListen.pause();
@@ -67,13 +67,13 @@ return declare([], {
 		
 		// show resizer inlined
 		if(!grid._resizer){
-			grid._resizer = put(grid.domNode, 'div.dgrid-column-resizer');
+			grid._resizer = put(grid.domNode, "div.dgrid-column-resizer");
 		}else{
 			grid.mouseMoveListen.resume();
 			grid.mouseUpListen.resume();
 		}
 
-		grid._resizer.style.display = 'block';
+		grid._resizer.style.display = "block";
 		grid._updateResizerPosition(e);
 	},
 	_resizeMouseUp: function(e){
@@ -134,13 +134,13 @@ return declare([], {
 		if(cell.offsetWidth + delta < this.minWidth){ 
 			left = this._startX - this._gridX - (cell.offsetWidth - this.minWidth); 
 		}
-		this._resizer.style.left = left  + 'px';
+		this._resizer.style.left = left  + "px";
 	},
 
 	_hideResizer: function(){
 	// Summary:
 	//      sets resizer bar display to none
-		this._resizer.style.display = 'none';
+		this._resizer.style.display = "none";
 	},
 	_getResizeMouseLocation: function(e){
 	//Summary:

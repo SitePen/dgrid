@@ -134,7 +134,8 @@ return function(column, editor, editOn){
 			value = row && grid.selection[row.id];
 		}
 		if(column.editOn){ // TODO: Make this use event delegation, particularly now that we can do event delegation with focus events
-			on(cell.tagName == "TD" ? cell : cell.parentNode, // if we are dealing with IE7, the cell element is the padding cell, need to go to parent 
+			// if we are dealing with IE<8, the cell element is the padding cell, need to go to parent
+			on(cell.tagName == "TD" ? cell : cell.parentNode,
 					column.editOn, function(){
 				if(!column.canEdit || column.canEdit(object, value)){
 					cell.innerHTML = "";
