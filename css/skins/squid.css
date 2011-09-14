@@ -34,6 +34,10 @@
 	background-color:#444;
 }
 
+.has-ie-6 .squid .ui-state-default {
+	background-image: none;
+}
+
 .squid .ui-state-active {
 	background-color:#64390d;
 	text-shadow: 0 -1px 0 rgba(0,0,0,.3);
