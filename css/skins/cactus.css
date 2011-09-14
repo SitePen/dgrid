@@ -4,6 +4,10 @@
 	color: #000;
 }
 
+.cactus .ui-icon {
+    background-image: url("images/ui-icons_222222_256x240_white.png");
+}
+
 .cactus .dgrid-header-row {
     border-bottom: none;
 }
