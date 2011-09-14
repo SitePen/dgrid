@@ -52,6 +52,8 @@
 				top: 187px;
 				bottom: 0;
 			}
+
+			/* these are the three lists in the top region */
 			#genres, #artists, #albums {
 				position: absolute;
 				top: 0;
@@ -68,6 +70,7 @@
 
 			#artists { left: 33.3%; }
 			#albums { right: 0; }
+
 			#grid {
 				height: 99%;
 			}
@@ -98,7 +101,9 @@
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
 			function unique(arr){
-				//	create a unique list of items from the passed array.  This is quick and dirty.
+				//	create a unique list of items from the passed array
+				//	(removing duplicates).  This is quick and dirty.
+
 				//	first, set up a hashtable for unique objects.
 				var obj = {};
 				for(var i=0,l=arr.length; i<l; i++){
