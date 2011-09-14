@@ -149,10 +149,14 @@
 						columns: columns
 					}, "grid");
 
+					// define a List constructor with the features we want mixed in,
+					// for use by the three lists in the top region
+					var TunesList = dojo.declare([List, Selection, Keyboard]);
+
 					//	define our three lists for the top.
-					window.genres = dojo.declare([List, Selection, Keyboard])({ }, "genres");
-					window.artists = dojo.declare([List, Selection, Keyboard])({ }, "artists");
-					window.albums = dojo.declare([List, Selection, Keyboard])({ }, "albums");
+					window.genres = new TunesList({ selectionMode: "single" }, "genres");
+					window.artists = new TunesList({ selectionMode: "single" }, "artists");
+					window.albums = new TunesList({ selectionMode: "single" }, "albums");
 
 					//	create the unique lists and render them
 					var g = unique(dojo.map(songStore.data, function(item){ return item.Genre; })),
