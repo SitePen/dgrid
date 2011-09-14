@@ -50,10 +50,15 @@
 
 .sage .dgrid-row:hover,
 .sage .dgrid-row:hover .dgrid-cell,
-.sage .dgrid-selected,
-.sage .dgrid-selected .dgrid-cell,
-.sage .ui-state-active:hover  {
+.sage .ui-state-active:hover {
     background: #AEB876;
+    color: #FFF;
+	text-shadow: 0 -1px 0 rgba(0,0,0,.3);    
+}
+
+.sage .dgrid-selected,
+.sage .dgrid-selected .dgrid-cell {
+    background: #8F9661;
 /*	border-top: 1px solid #959E60; */
 	color: #FFF;
 	text-shadow: 0 -1px 0 rgba(0,0,0,.5);
