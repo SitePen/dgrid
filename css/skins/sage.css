@@ -1,6 +1,6 @@
 .sage .ui-widget-content {
 	border: none;
-	background: #FAFFEF;
+	background: #FFF;
 	color: #000;
 	text-shadow: 0 1px 0 rgba(255,255,255,.9);
 }
@@ -44,24 +44,27 @@
     background: #F2F7E8;
 }
 
-.sage .dgrid-row-odd .dgrid-cell {
-    border-top: 1px solid #FCFFF0;
+.sage .dgrid-row:hover {
+    background: #C5DCA6;
+    color: #333;
+    text-shadow: 0 1px 0 rgba(255,255,255,.5);
 }
 
-.sage .dgrid-row:hover,
-.sage .dgrid-row:hover .dgrid-cell,
-.sage .ui-state-active:hover {
-    background: #AEB876;
-    color: #FFF;
-	text-shadow: 0 -1px 0 rgba(0,0,0,.3);    
+.sage .ui-state-default { 
+	-webkit-transition-duration: 0.1s;
+	-moz-transition-duration: 0.1s;
+	transition-duration: 0.1s;
+	-webkit-transition-property: background-color, border-color;
+	-moz-transition-property: background-color, border-color;
+	transition-property: background-color, border-color;
 }
 
 .sage .dgrid-selected,
+.sage .dgrid-selected:hover
 .sage .dgrid-selected .dgrid-cell {
-    background: #8F9661;
+    background: #B3D18B;
+    text-shadow: 0 1px 0 rgba(255,255,255,.6);
 /*	border-top: 1px solid #959E60; */
-	color: #FFF;
-	text-shadow: 0 -1px 0 rgba(0,0,0,.5);
 }
 
 .sage .ui-state-highlight{
