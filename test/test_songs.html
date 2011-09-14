@@ -123,14 +123,16 @@
 
 			//	our "main" function
 			require([
-					"dgrid/List", 
+					"dgrid/List",
 					"dgrid/OnDemandGrid",
-					"dgrid/Selection", 
-					"dgrid/Keyboard", 
-					"dgrid/test/song_data", 
+					"dgrid/Selection",
+					"dgrid/Keyboard",
+					"dojo/_base/declare",
+					"dojo/_base/array",
+					"dgrid/test/song_data",
 					"dojo/domReady!"
 				], 
-				function(List, Grid, Selection, Keyboard){
+				function(List, Grid, Selection, Keyboard, declare, arrayUtil){
 					//	a formatting function for the Duration column.
 					var timeFormatter = function(t){
 						var tmp = parseInt(t, 10);
@@ -149,20 +151,24 @@
 						{label: 'Album', field: 'Album'},
 						{label: 'Genre', field: 'Genre'}
 					];
-					window.grid = new (dojo.declare([Grid, Selection, Keyboard]))({
+					window.grid = new (declare([Grid, Selection, Keyboard]))({
 						store: songStore,
 						columns: columns
 					}, "grid");
 
+					// define a List constructor with the features we want mixed in,
+					// for use by the three lists in the top region
+					var TunesList = declare([List, Selection, Keyboard]);
+
 					//	define our three lists for the top.
-					window.genres = dojo.declare([List, Selection, Keyboard])({ }, "genres");
-					window.artists = dojo.declare([List, Selection, Keyboard])({ }, "artists");
-					window.albums = dojo.declare([List, Selection, Keyboard])({ }, "albums");
+					window.genres = new TunesList({ selectionMode: "single" }, "genres");
+					window.artists = new TunesList({ selectionMode: "single" }, "artists");
+					window.albums = new TunesList({ selectionMode: "single" }, "albums");
 
 					//	create the unique lists and render them
-					var g = unique(dojo.map(songStore.data, function(item){ return item.Genre; })),
-						art = unique(dojo.map(songStore.data, function(item){ return item.Artist; })),
-						alb = unique(dojo.map(songStore.data, function(item){ return item.Album; }));
+					var g = unique(arrayUtil.map(songStore.data, function(item){ return item.Genre; })),
+						art = unique(arrayUtil.map(songStore.data, function(item){ return item.Artist; })),
+						alb = unique(arrayUtil.map(songStore.data, function(item){ return item.Album; }));
 					g.unshift("All (" + g.length + " Genre" + (g.length > 1 ? "s" : "") + ")");
 					art.unshift("All (" + art.length + " Artist" + (art.length > 1 ? "s" : "") + ")");
 					alb.unshift("All (" + alb.length + " Album" + (alb.length > 1 ? "s" : "") + ")");
@@ -175,20 +181,22 @@
 					artists.select(0);
 					albums.select(0);
 
+					var currentGenre; // updated on genre select
+
 					//	start listening for selections on the lists.
 					//	TODO: A little bit smarter on the filtering, since the list interactions are all related.
 					genres.on("select", function(e){
 						//	filter the albums, artists and grid
-						var filter = e.row.data;
+						var filter = currentGenre = e.row.data;
 						if(e.row.id == "0"){
 							//	remove filtering
-							var art = unique(dojo.map(songStore.data, function(item){ return item.Artist; })),
-								alb = unique(dojo.map(songStore.data, function(item){ return item.Album; }));
+							var art = unique(arrayUtil.map(songStore.data, function(item){ return item.Artist; })),
+								alb = unique(arrayUtil.map(songStore.data, function(item){ return item.Album; }));
 							grid.query = {};
 						} else {
 							//	create filtering
-							var art = unique(dojo.map(dojo.filter(songStore.data, function(item){ return item.Genre == filter; }), function(item){ return item.Artist; })),
-								alb = unique(dojo.map(dojo.filter(songStore.data, function(item){ return item.Genre == filter; }), function(item){ return item.Album; }));
+							var art = unique(arrayUtil.map(arrayUtil.filter(songStore.data, function(item){ return item.Genre == filter; }), function(item){ return item.Artist; })),
+								alb = unique(arrayUtil.map(arrayUtil.filter(songStore.data, function(item){ return item.Genre == filter; }), function(item){ return item.Album; }));
 							grid.query = { "Genre": filter };
 						}
 						art.unshift("All (" + art.length + " Artist" + (art.length > 1 ? "s" : "") + ")");
@@ -203,14 +211,19 @@
 						//	filter the albums, grid
 						//	TODO: ids are reset on re-render, which is a problem.  We expect the fake "All Artists" to be id 0 but apparently they
 						//	are being assigned new ids on pull.
-						var filter = e.row.data;
+						var filter = e.row.data, alb;
 						if(filter.indexOf("All (") > -1){
-							//	remove filtering
-							var alb = unique(dojo.map(songStore.data, function(item){ return item.Album; }));
+							if(genres.selection[0]){
+								//	remove filtering entirely
+								alb = unique(arrayUtil.map(songStore.data, function(item){ return item.Album; }));
+							} else {
+								//	filter only by genre
+								alb = unique(arrayUtil.map(arrayUtil.filter(songStore.data, function(item){ return item.Genre == currentGenre; }), function(item){ return item.Album; }));
+							}
 							delete grid.query.Artist;
 						} else {
-							//	create filtering
-							var alb = unique(dojo.map(dojo.filter(songStore.data, function(item){ return item.Artist == filter; }), function(item){ return item.Album; }));
+							//	create filter based on artist
+							alb = unique(arrayUtil.map(arrayUtil.filter(songStore.data, function(item){ return item.Artist == filter; }), function(item){ return item.Album; }));
 							grid.query.Artist = filter;
 						}
 						alb.unshift("All (" + alb.length + " Album" + (alb.length > 1 ? "s" : "") + ")");
