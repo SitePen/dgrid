@@ -50,6 +50,15 @@
     text-shadow: 0 1px 0 rgba(255,255,255,.5);
 }
 
+.sage .ui-state-default { 
+	-webkit-transition-duration: 0.1s;
+	-moz-transition-duration: 0.1s;
+	transition-duration: 0.1s;
+	-webkit-transition-property: background-color, border-color;
+	-moz-transition-property: background-color, border-color;
+	transition-property: background-color, border-color;
+}
+
 .sage .dgrid-selected,
 .sage .dgrid-selected:hover
 .sage .dgrid-selected .dgrid-cell {
