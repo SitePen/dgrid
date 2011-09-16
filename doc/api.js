@@ -42,7 +42,7 @@ function(dom, declare, on, put, Grid, Tree, Selection, Keyboard, Memory){
 			store: store,
 			columns: {
 				docType: new Tree({
-					label:'Part', 
+					label:'Component', 
 					renderCell: function(object, value, td){
 						put(td, "div.ui-icon.type.type-" + object.docType + "[title=" + object.docType + "]");
 						put(td, "div.description", (object.name || "") + (object.type ? ':' + object.type : '') +
@@ -53,11 +53,5 @@ function(dom, declare, on, put, Grid, Tree, Selection, Keyboard, Memory){
 				})
 			}
 		}, explorerElement);
-		on(explorer, "select", function(component){
-			var details = dom.byId("details");
-			put(details, "div", component.description);
-			put(details, "div", component.description);
-			
-		});
 	};
 });
