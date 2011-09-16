@@ -11,7 +11,7 @@ return function(column){
 	column.renderCell = function(object, value, td, options){
 		// summary:
 		//		Renders a cell that can be expanded, creating more rows
-		var level = options.query.level + 1;
+		var level = Number(options.query.level) + 1;
 		level = isNaN(level) ? 0 : level;
 		var grid = this.grid;
 		var mayHaveChildren = !grid.store.mayHaveChildren || grid.store.mayHaveChildren(object);
