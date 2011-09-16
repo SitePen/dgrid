@@ -306,8 +306,10 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 				return;
 			}
 			if(typeof target == "object"){
+				// assume target represents a store item
 				var id = this.store.getIdentity(target);
 			}else{
+				// assume target is a row ID
 				var id = target;
 				target = this._rowIdToObject[this.id + "-row-" + id];
 			}

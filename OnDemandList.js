@@ -248,7 +248,7 @@ return declare([List], {
 			})(this.dirty[id]);
 			puts.push(this.getBeforePut ?
 				// retrieve the full object from the store
-				Deferred.when(store.get(id), put):
+				Deferred.when(store.get(id), put) :
 				// just use the cached object
 				put(this.row(id).data));
 		}
