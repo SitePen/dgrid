@@ -1,4 +1,4 @@
-define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "dojo/query", "./Editor", "./List", "dojo/_base/sniff"], function(has, put, declare, listen, query, Editor, List){
+define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Editor", "./List", "dojo/_base/sniff"], function(has, put, declare, listen, Editor, List){
 	var contentBoxSizing = has("ie") < 8 && !has("quirks");
 
 	return declare([List], {
@@ -222,7 +222,7 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "dojo/q
 			// if we were invoked from a header cell click handler, grab
 			// stashed target node; otherwise (e.g. direct sort call) need to look up
 			var target = this._sortNode ||
-				query("#" + this.id + " .dgrid-header .field-" + property)[0];
+				document.getElementById("#" + this.id + " .dgrid-header .field-" + property)[0];
 			
 			target = target.contents || target;
 			if(this._lastSortedArrow){
