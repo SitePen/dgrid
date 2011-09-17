@@ -40,4 +40,5 @@ function(create, List){
 		});
 	};
 	Grid.column = column;
-	return Grid;});
+	return Grid;
+});

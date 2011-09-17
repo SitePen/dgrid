@@ -51,4 +51,5 @@ function(create){
 		}, list);
 		
 	
-	}});
+	}
+});
