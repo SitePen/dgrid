@@ -204,6 +204,7 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			// summary:
 			//		refreshes the contents of the grid
 			this._rowIdToObject = {};
+			this._autoId = 0;
 			if(this.contentNode){
 				// remove the content so it can be recreated
 				this.contentNode.innerHTML = "";
