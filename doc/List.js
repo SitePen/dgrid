@@ -45,4 +45,7 @@ function(create){
 			options: Object("Options to be mixed into the list", list),
 			element: Union(["string", "object"], "This is the element or element id to attach the grid to")
 		}, list);
-	}});
+		
+	
+	}
+});

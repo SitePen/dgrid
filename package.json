@@ -17,9 +17,9 @@
     "url":"http://github.com/kriszyp/dgrid"
   },
   "dependencies": {
-    "dojo": "1.7.0b4",
+    "dojo": "1.7.0b5",
     "put-selector": "0.1.2",
-    "xstyle": "master"
+    "xstyle": "0.0.1"
   },
   "directories": {
     "lib": "."
