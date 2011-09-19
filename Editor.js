@@ -2,30 +2,29 @@ define(["dojo/on", "dojo/has", "put-selector/put", "dojo/_base/sniff"], function
 
 return function(column, editor, editOn){
 	// summary:
-	//      Add a editing capability
+	//		Adds editing capability to a column's cells.
+	
 	var originalRenderCell = column.renderCell || function(object, value, td){
 		if(value != null){
 			td.appendChild(document.createTextNode(value));
 		}
 	};
+	// accept arguments as parameters to Editor function, or from column def
 	column.editor = editor = editor || column.editor;
 	column.editOn = editOn = editOn || column.editOn;
-	function Column(){
-		// we mask the null so it is not used by the widget
-		this.id = null;
-	}
-	Column.prototype = column;
+	
 	var grid;
 	function onchange(event){
 		var target = event.target;
 		if("lastValue" in target && target.className.indexOf("dgrid-input") > -1){
-			target.lastValue = setProperty(target.parentNode, target.lastValue, target[target.type == "checkbox" || target.type == "radio"  ? "checked" : "value"]);
+			target.lastValue = setProperty(target.parentNode, target.lastValue,
+				target[target.type == "checkbox" || target.type == "radio"  ? "checked" : "value"]);
 		}
 	}
 	var renderWidget = typeof editor == "string" ?
 		function(value, cell, object, onblur){
 			var input;
-			// it is string editor, so we use a common <input> as the editor
+			// when editor is a string, we use a common <input> as the editor
 			input = cell.input || (cell.input = put(cell, "input[type=" + editor + "].dgrid-input", {
 				name: column.field || "selection",
 				tabIndex: isNaN(column.tabIndex) ? -1 : column.tabIndex
@@ -36,18 +35,18 @@ return function(column, editor, editOn){
 			if(!grid._hasInputListener){
 				// register one listener at the top level that receives events delegated
 				grid._hasInputListener = true;
-				// note that we have to listen for clicks because IE doesn't fire change events properly for checkboxes, radios
 				grid.on("change", onchange);
 			}
 			if(has("ie")){
 				// IE doesn't fire change events for all the right things, and it doesn't bubble, double fail.
 				on(input, "change", onchange);
+				// listen for clicks because IE doesn't fire change events properly for checkboxes, radios
 				on(input, "click", onchange);
 			}
 			if(onblur){
 				input.focus();
 				var signal = on(input, "blur", function(){
-					// delete the input now
+					// unhook and delete the input now
 					signal.remove();
 					put(input, "!");
 					cell.input = null;
@@ -56,8 +55,9 @@ return function(column, editor, editOn){
 			}
 		} :
 		function(data, cell, object, onblur){
-			// using a widget as the editor
-			var widget = new editor(new Column, cell.appendChild(document.createElement("div")));
+			// using a widget as the editor.
+			var widget = new editor(column.widgetArgs || {},
+				cell.appendChild(document.createElement("div")));
 			widget.set("value", data);
 			widget.watch("value", function(key, oldValue, value){
 				data = setProperty(cell, data, value);
