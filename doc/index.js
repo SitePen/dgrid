@@ -12,4 +12,5 @@ function(List, Grid, OnDemandList, OnDemandGrid, Editor, Tree, Selection, Keyboa
 			Selection: Selection,
 			Keyboard: Keyboard
 		}
-	};});
+	};
+});

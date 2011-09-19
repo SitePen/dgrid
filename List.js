@@ -204,6 +204,7 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			// summary:
 			//		refreshes the contents of the grid
 			this._rowIdToObject = {};
+			this._autoId = 0;
 			if(this.contentNode){
 				// remove the content so it can be recreated
 				this.contentNode.innerHTML = "";
@@ -306,8 +307,10 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 				return;
 			}
 			if(typeof target == "object"){
+				// assume target represents a store item
 				var id = this.store.getIdentity(target);
 			}else{
+				// assume target is a row ID
 				var id = target;
 				target = this._rowIdToObject[this.id + "-row-" + id];
 			}

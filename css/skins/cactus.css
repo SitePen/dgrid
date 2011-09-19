@@ -53,13 +53,13 @@
     filter: pr-imageogid:DXImageTransform.Microsoft.gradient( startColorstr='#b9cb7f', endColorstr='#8fa05b',GradientType=0 );
     background-image: linear-gradient(top, rgba(185,203,127,1) 0%,rgba(143,160,91,1) 100%);
 	text-shadow: 0 1px 0 rgba(255,255,255,.9);
-	border-top: 1px solid #959E60;
+	border-top: 1px solid #CCD595;
 	color: #FFF;
-	text-shadow: 0 -1px 0 rgba(0,0,0,.5);
+	text-shadow: 0 -1px 0 rgba(0,0,0,.4);
 }
 
 .cactus .dgrid-row-odd .dgrid-cell {
-    border-top: 1px solid #FCFFF0;
+    border-top: 1px solid #E9EFBD;
 }
 
 .cactus .dgrid-row:hover,
