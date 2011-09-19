@@ -66,16 +66,18 @@ return declare([List], {
 		return Deferred.when(this.renderArray(results, preloadNode, options), function(trs){
 			return Deferred.when(results.total || results.length, function(total){
 				// now we need to adjust the height and total count based on the first result set
+				var trCount = trs.length;
+				total = total || trCount;
 				var height = 0;
-				for(var i = 0, l = trs.length; i < l; i++){
+				for(var i = 0; i < trCount; i++){
 					height += trs[i].offsetHeight;
 				}
 				// only update rowHeight if we actually got results
-				if(l){ self.rowHeight = height / l; }
+				if(trCount){ self.rowHeight = height / trCount; }
 				
-				total -= trs.length;
+				total -= trCount;
 				preloadNode.count = total;
-				preloadNode.start = trs.length;
+				preloadNode.start = trCount;
 				if(total){
 					preloadNode.style.height = Math.min(total * self.rowHeight, self.maxEmptySpace) + "px";
 				}else{
