@@ -24,7 +24,7 @@
 		<script type="text/javascript">
 			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dojo/store/JsonRest", "dojo/domReady!"], 
 				function(List, Grid, Selection, Keyboard, JsonRest){
-					var testStore = new JsonRest({target:"./"});
+					var testStore = new JsonRest({target:"./", idProperty: "order"});
 					var columns = [
 						{label:'Name', field:'name', sortable: false},
 						{label:'Description', field:'description', sortable: false}
