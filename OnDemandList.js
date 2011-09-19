@@ -138,6 +138,8 @@ return declare([List], {
 					var row, nextRow = preloadNode[traversal];
 					var reclaimedHeight = 0;
 					var count = 0;
+					var toDelete = [];
+					console.time("test");
 					while(row = nextRow){ // intentional assignment
 						var rowHeight = row.offsetHeight;
 						if(reclaimedHeight + rowHeight + farOffRemoval > distanceOff){
@@ -148,8 +150,12 @@ return declare([List], {
 						reclaimedHeight += rowHeight;
 						var nextRow = row[traversal]; // have to do this before removing it
 						delete grid._rowIdToObject[row.id]; // clear out of the lookup
-						put(row, "!"); // remove it from the DOM
+						toDelete.push(row);
 					}
+					for(var i = 0; i < toDelete.length; i++){
+						put(toDelete[i], "!"); // remove it from the DOM
+					}
+					console.timeEnd("test");
 					// now adjust the preloadNode based on the reclaimed space
 					if(below){
 						preloadNode.start -= count;
