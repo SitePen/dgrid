@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" 
+	"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+	<head>
+		<title>Test Tundra Theme</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
+		<meta name="viewport" content="width=570" />
+		<style type="text/css">
+			@import "../../dojo/resources/dojo.css";
+			@import "../css/dgrid.css";
+			@import "../css/skins/claro.css";
+			.heading {
+				font-weight: bold;
+				padding-bottom: 0.25em;
+			}
+			#grid {
+				width: 400px;
+			}
+			#grid.dgrid {
+				height: auto;
+			}
+			#grid.dgrid .dgrid-scroller {
+				position: relative;
+				overflow: visible;
+			}
+		</style>
+		<script type="text/javascript" src="../../dojo/dojo.js" 
+			data-dojo-config="async: true"></script>
+		<script type="text/javascript">
+			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dgrid/test/test_data", "dojo/domReady!"], 
+				function(List, Grid, Selection, Keyboard, ProgressBar){
+					var columns = [
+						{label: 'Column 1', field: 'name'},
+						{label: 'Column 2', field: 'type'}
+					];
+					window.grid = new (dojo.declare([Grid, Selection, Keyboard]))({
+						store: testCountryStore,
+						columns: columns,
+						query: {type:"continent"}
+					}, "grid");
+				});
+				
+		</script>
+	</head>
+	<body class="tundra">
+		<h2>A basic grid tundra theme</h2>
+		<div id="grid"></div>
+		<a href="https://github.com/kriszyp/dgrid">dgrid</a>
+	</body>
+</html>
