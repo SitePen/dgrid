@@ -271,10 +271,10 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 				return self.insertRow(object, rowsFragment, null, start++, options);
 			}
 			function whenDone(rows){
-				(beforeNode && beforeNode.parentNode || this.contentNode).insertBefore(rowsFragment, beforeNode || null);
+				(beforeNode && beforeNode.parentNode || self.contentNode).insertBefore(rowsFragment, beforeNode || null);
 				return rows;
 			}
-			return whenDone();
+			return whenDone(rows);
 		},
 		_autoId: 0,
 		renderHeader: function(){
