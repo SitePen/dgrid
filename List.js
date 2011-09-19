@@ -259,6 +259,9 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			// now render the results
 			if(results.map){
 				var rows = results.map(mapEach, console.error);
+				if(rows.then){
+					return rows.then(whenDone);
+				}
 			}else{
 				var rows = [];
 				for(var i = 0, l = results.length; i < l; i++){
@@ -268,8 +271,11 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			function mapEach(object){
 				return self.insertRow(object, rowsFragment, null, start++, options);
 			}
-			(beforeNode && beforeNode.parentNode || this.contentNode).insertBefore(rowsFragment, beforeNode || null);
-			return rows;
+			function whenDone(rows){
+				(beforeNode && beforeNode.parentNode || self.contentNode).insertBefore(rowsFragment, beforeNode || null);
+				return rows;
+			}
+			return whenDone(rows);
 		},
 		_autoId: 0,
 		renderHeader: function(){
