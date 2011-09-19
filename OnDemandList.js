@@ -66,16 +66,18 @@ return declare([List], {
 		return Deferred.when(this.renderArray(results, preloadNode, options), function(trs){
 			return Deferred.when(results.total || results.length, function(total){
 				// now we need to adjust the height and total count based on the first result set
+				var trCount = trs.length;
+				total = total || trCount;
 				var height = 0;
-				for(var i = 0, l = trs.length; i < l; i++){
+				for(var i = 0; i < trCount; i++){
 					height += trs[i].offsetHeight;
 				}
 				// only update rowHeight if we actually got results
-				if(l){ self.rowHeight = height / l; }
+				if(trCount){ self.rowHeight = height / trCount; }
 				
-				total -= trs.length;
+				total -= trCount;
 				preloadNode.count = total;
-				preloadNode.start = trs.length;
+				preloadNode.start = trCount;
 				if(total){
 					preloadNode.style.height = Math.min(total * self.rowHeight, self.maxEmptySpace) + "px";
 				}else{
@@ -136,6 +138,7 @@ return declare([List], {
 					var row, nextRow = preloadNode[traversal];
 					var reclaimedHeight = 0;
 					var count = 0;
+					var toDelete = [];
 					while(row = nextRow){ // intentional assignment
 						var rowHeight = row.offsetHeight;
 						if(reclaimedHeight + rowHeight + farOffRemoval > distanceOff){
@@ -146,7 +149,10 @@ return declare([List], {
 						reclaimedHeight += rowHeight;
 						var nextRow = row[traversal]; // have to do this before removing it
 						delete grid._rowIdToObject[row.id]; // clear out of the lookup
-						put(row, "!"); // remove it from the DOM
+						toDelete.push(row);
+					}
+					for(var i = 0; i < toDelete.length; i++){
+						put(toDelete[i], "!"); // remove it from the DOM
 					}
 					// now adjust the preloadNode based on the reclaimed space
 					if(below){
