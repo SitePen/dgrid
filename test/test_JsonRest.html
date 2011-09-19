@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" 
+	"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+	<head>
+		<title>Test JsonRest store</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+		<meta name="viewport" content="width=570" />
+		<style type="text/css">
+			@import "../../dojo/resources/dojo.css";
+			@import "../css/skins/claro.css";
+			h2 {
+				margin: 12px;
+			}
+			.heading {
+				font-weight: bold;
+				padding-bottom: 0.25em;
+			}
+			.ui-widget{
+				margin: 10px;
+			}
+		</style>
+		<script type="text/javascript" src="../../dojo/dojo.js" 
+			data-dojo-config="async: true"></script>
+		<script type="text/javascript">
+			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dojo/store/JsonRest", "dojo/domReady!"], 
+				function(List, Grid, Selection, Keyboard, JsonRest){
+					var testStore = new JsonRest({target:"./"});
+					var columns = [
+						{label:'Name', field:'name', sortable: false},
+						{label:'Description', field:'description', sortable: false}
+					];
+
+					window.grid = new (dojo.declare([Grid, Selection, Keyboard]))({
+						query: "rest-data.js",
+						store: testStore,
+						columns: columns
+					}, "grid");
+				});
+				
+		</script>
+	</head>
+	<body class="claro">
+		<h2>A basic grid with JsonRest store</h2>
+		<div id="grid"></div>
+	</body>
+</html>
