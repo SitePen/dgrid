@@ -12,7 +12,7 @@ function(create, List){
 			value: Union("", "This is the value to render"),
 			cell: Object("This is the DOM element for the cell to render into"),
 			options: Object("Additional options for the rendering")
-		}, Union("", "The DOM node to be rendered within the cell.")),
+		}, Union("", "The optional DOM node to be rendered within the cell.")),
 		get: Method("This function can define custom retrieval of a value from the object. This useful for columns that may be an aggregate or computed value from the object for the row", {
 			object: Object("The object for the row")
 		}, Union("", "The value to be rendered")),
@@ -21,7 +21,7 @@ function(create, List){
 		}, String("The HTML string to be displayed in the column (will be assigned to the innerHTML of the cell)")),
 		renderHeaderCell: Method("This function can be specified to provide custom rendering of the header cell  in this column",{
 			cell: Object("The DOM element for the header to render into")
-		})
+		}, Union("", "The optional DOM node to be rendered within the header cell."))
 	});
 	column.name = "Column";
 	var Grid = Constructor(List, 
