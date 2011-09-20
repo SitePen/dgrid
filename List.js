@@ -268,11 +268,15 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 					rows[i] = mapEach(results[i]);
 				}
 			}
+			var lastRow;
 			function mapEach(object){
-				return self.insertRow(object, rowsFragment, null, start++, options);
+				return lastRow = self.insertRow(object, rowsFragment, null, start++, options);
 			}
 			function whenDone(rows){
 				(beforeNode && beforeNode.parentNode || self.contentNode).insertBefore(rowsFragment, beforeNode || null);
+				if(!beforeNode){
+					put(lastRow, ".dgrid-last-row");
+				}
 				return rows;
 			}
 			return whenDone(rows);
