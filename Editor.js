@@ -122,7 +122,7 @@ return function(column, editor, editOn){
 			grid = column.grid;
 			if(column.selector){
 				grid.on("select,deselect", function(event){
-					if(!suppressSelect){
+					if(!suppressSelect && event.currentTarget === event.target){
 						var cell = grid.cell(event.row.id, column.id).element;
 						renderWidget(event.type == "select", cell.contents || cell, object);
 					}
