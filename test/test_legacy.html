@@ -11,6 +11,14 @@
 			body {
 				padding: 0 80px; /* side padding to make it easier to scroll doc */
 			}
+			
+			/* tests for renderCell / renderHeaderCell */
+			.renderedCell {
+				font-style: italic;
+			}
+			.renderedHeaderCell {
+				text-decoration: underline;
+			}
 		</style>
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
@@ -43,8 +51,16 @@
 				return getOrdinal(inItem.order);
 			}
 			
+			function testRenderHeaderCell(th){
+				var div = document.createElement("div");
+				div.className = "renderedHeaderCell";
+				div.innerHTML = "Step";
+				return div;
+			}
+			
 			function testRenderCell(object, data, td, options){
 				var div = document.createElement("div");
+				div.className = "renderedCell";
 				div.innerHTML = getOrdinal(object.order);
 				return div;
 			}
@@ -68,6 +84,7 @@
 			var columnsNew = {
 				order: {
 					label: "Step",
+					renderHeaderCell: testRenderHeaderCell,
 					renderCell: testRenderCell
 				},
 				name: {},
@@ -170,7 +187,9 @@
 		<div id="gridLegacyFormatter"></div>
 		<h2>1b: Grid with single column with get for order field (legacy grid behavior)</h2>
 		<div id="gridLegacyGet"></div>
-		<h2>1c: Grid with single column with renderCell function (dgrid behavior; should look same as previous)</h2>
+		<h2>1c: Grid with single column with renderCell function</h2>
+		<p>(dgrid behavior; should look same as previous but with underlined first header cell
+			and italicized first column values)</p>
 		<div id="gridNew"></div>
 		
 		<hr/>
@@ -198,7 +217,8 @@
 		<h2>2c: Same as 1c, using GridFromHtml</h2>
 		<table id="gridFromHtmlNew">
 			<tr>
-				<th field="order" renderCell="testRenderCell">Step</th>
+				<th field="order"
+					renderCell="testRenderCell" renderHeaderCell="testRenderHeaderCell">Step</th>
 				<th>name</th>
 				<th field="description" sortable="false">what to do</th>
 			</tr>
@@ -244,7 +264,8 @@
 		<table id="gridDeclarativeNew" data-dojo-id="gridDeclarativeNew"
 			data-dojo-type="GridFromHtml" data-dojo-props="store: store">
 			<tr>
-				<th field="order" renderCell="testRenderCell">Step</th>
+				<th field="order"
+					renderCell="testRenderCell" renderHeaderCell="testRenderHeaderCell">Step</th>
 				<th>name</th>
 				<th field="description" sortable="false">what to do</th>
 			</tr>

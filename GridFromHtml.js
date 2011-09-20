@@ -102,6 +102,7 @@ define(["./OnDemandGrid", "dojo/_base/declare", "dojo/_base/lang", "dojo/dom-con
 				get: getObj(th, "get"),
 				formatter: getObj(th, "formatter"),
 				renderCell: getObj(th, "renderCell"),
+				renderHeaderCell: getObj(th, "renderHeaderCell"),
 				rowSpan: getNum(th, "rowspan"),
 				colSpan: getNum(th, "colspan")
 			}
