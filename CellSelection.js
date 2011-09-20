@@ -3,6 +3,10 @@ return declare([Selection], {
 	// summary:
 	// 		Add cell level selection capabilities to a grid. The grid will have a selection property and
 	//		fire "select" and "deselect" events.
+	
+	// ensure we don't select when an individual cell is not identifiable
+	selectionEvent: ".dgrid-cell:mousedown,cellfocusin",
+	
 	select: function(cell, toCell, value){
 		if(value === undefined){
 			// default to true

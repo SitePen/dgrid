@@ -4,6 +4,10 @@ return declare([List], {
 	// 		Add selection capabilities to a grid. The grid will have a selection property and
 	//		fire "select" and "deselect" events.
 	
+	// selectionEvent: String
+	//		event (or events, in dojo/on format) to listen on to trigger select logic
+	selectionEvent: "mousedown,cellfocusin",
+	
 	create: function(){
 		this.selection = {};
 		return this.inherited(arguments);
@@ -72,7 +76,7 @@ return declare([List], {
 					}
 				});
 			}
-			listen(grid.contentNode, "mousedown,cellfocusin", focus); 
+			listen(grid.contentNode, this.selectionEvent, focus); 
 		}
 	},
 	// selection:
