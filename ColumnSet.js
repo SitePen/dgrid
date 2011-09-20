@@ -50,7 +50,8 @@ function(styleSheet, has, put, declare, listen, aspect, query, Grid, hasClass){
 			}
 			for(var i = 0, l = columnSets.length; i < l; i++){
 				(function(columnSet, i){
-					var scroller = scrollers[i] = put(domNode, "div.dgrid-column-set-scroller.column-set-scroller-" + i + "[colsetid=" + i +"]");
+					var scroller = scrollers[i] =
+						put(domNode, "div.dgrid-column-set-scroller.dgrid-scrollbar-height.column-set-scroller-" + i + "[colsetid=" + i +"]");
 					scrollerContents[i] = put(scroller, "div.dgrid-column-set-scroller-content");
 					listen(scroller, "scroll", onScroll);
 				})(columnSets[i], i);

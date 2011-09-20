@@ -16,7 +16,6 @@
 	position: absolute;
 	top: 0px;
 	right: 0px;
-	width: 17px;
 }
 
 .dgrid-sortable {
@@ -41,13 +40,17 @@
 	overflow: hidden;
 	vertical-align: top;
 	border: 1px solid #ddd;
-	border-bottom: none;
+	border-bottom-style: none;
 	/*border-top: 1px solid transparent;*/
 	box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	-ms-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 }
+.dgrid-last-row .dgrid-cell {
+	border-bottom-style: solid;
+}
+
 .dgrid-cell-padding {
 	padding: 3px;
 }

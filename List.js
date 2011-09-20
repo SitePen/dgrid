@@ -135,7 +135,7 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 				var spacerNode = put(domNode, "div.dgrid-spacer");
 			}
 			var bodyNode = this.bodyNode = put(domNode, "div.dgrid-scroller");
-			this.headerScrollNode = put(domNode, "div.dgrid-header-scroll.ui-widget-header");
+			this.headerScrollNode = put(domNode, "div.dgrid-header-scroll.dgrid-scrollbar-width.ui-widget-header");
 			listen(bodyNode, "scroll", function(event){
 				// keep the header aligned with the body
 				headerNode.scrollLeft = bodyNode.scrollLeft;
@@ -166,8 +166,14 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 				// We might want to use a CSS expression or the xstyle package to fix this
 				bodyNode.style.height = (this.domNode.offsetHeight - headerNode.offsetHeight) + "px";
 			}
-			if(!scrollbarWidth){ // we haven't computed the scroll bar width yet, do so now, and add a new rule if need be
-				scrollbarWidth = bodyNode.offsetWidth - bodyNode.clientWidth;
+			if(!scrollbarWidth){
+				// we haven't computed the scroll bar width yet, do so now, and add a new rule if need be
+				scrollbarWidth = 1 + bodyNode.offsetWidth - bodyNode.clientWidth;
+				
+				// add rules that can be used where scrollbar width/height is needed
+				this.addCssRule(".dgrid-scrollbar-width", "width: " + scrollbarWidth + "px");
+				this.addCssRule(".dgrid-scrollbar-height", "height: " + scrollbarWidth + "px");
+				
 				if(scrollbarWidth != 17){
 					this.addCssRule(".dgrid-header", "right: " + scrollbarWidth + "px");
 					this.addCssRule(".dgrid-header-scroll", "width: " + scrollbarWidth + "px");
@@ -268,11 +274,15 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 					rows[i] = mapEach(results[i]);
 				}
 			}
+			var lastRow;
 			function mapEach(object){
-				return self.insertRow(object, rowsFragment, null, start++, options);
+				return lastRow = self.insertRow(object, rowsFragment, null, start++, options);
 			}
 			function whenDone(rows){
 				(beforeNode && beforeNode.parentNode || self.contentNode).insertBefore(rowsFragment, beforeNode || null);
+				if(!beforeNode){
+					put(lastRow, ".dgrid-last-row");
+				}
 				return rows;
 			}
 			return whenDone(rows);

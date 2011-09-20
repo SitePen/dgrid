@@ -1,6 +1,10 @@
 define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "dojo/query", "./Editor", "./List", "dojo/_base/sniff"], function(has, put, declare, listen, query, Editor, List){
 	var contentBoxSizing = has("ie") < 8 && !has("quirks");
-
+	function appendIfNode(parent, subNode){
+		if(subNode && subNode.nodeType){
+			parent.appendChild(subNode);
+		}
+	}
 	return declare([List], {
 		columns: null,
 		// summary:
@@ -145,10 +149,7 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "dojo/q
 				}else if(column.renderCell){
 					// A column can provide a renderCell method to do its own DOM manipulation, 
 					// event handling, etc.
-					var subNode = column.renderCell(object, data, td, options);
-					if(subNode && subNode.nodeType){
-						td.appendChild(subNode);
-					}
+					appendIfNode(td, column.renderCell(object, data, td, options));
 				}else if(data != null){
 					td.appendChild(document.createTextNode(data));
 				}
@@ -176,7 +177,7 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "dojo/q
 				}
 				// allow for custom header content manipulation
 				if(column.renderHeaderCell){
-					column.renderHeaderCell(contentNode);
+					appendIfNode(contentNode, column.renderHeaderCell(contentNode));
 				}else if(column.label || column.field){
 					contentNode.appendChild(document.createTextNode(column.label || column.field));
 				}
