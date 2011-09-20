@@ -51,6 +51,7 @@ return declare([Selection], {
 			}
 		}
 		if(element){
+			// add or remove classes as appropriate
 			if(value){
 				put(element, ".dgrid-selected.ui-state-active");
 			}else{
