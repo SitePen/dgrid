@@ -36,6 +36,7 @@ return declare([List], {
 						put(cellFocusedElement, "!dgrid-focus[!tabIndex]"); // remove the class name and the tabIndex attribute
 						if(cellFocusedElement){
 							if(has("ie") < 8){
+								// clean up after workaround below (for non-input cases)
 								cellFocusedElement.style.position = "";
 							}
 							event.cell = cellFocusedElement;
@@ -112,7 +113,11 @@ return declare([List], {
 						for(var i = 0;i < inputs.length; i++){
 							var input = inputs[i];
 							if(input.tabIndex != -1 || "lastValue" in input){
+								// focusing here requires the same workaround for IE<8,
+								// though here we can get away with doing it all at once.
+								if(has("ie") < 8){ input.style.position = "relative"; }
 								input.focus();
+								if(has("ie") < 8){ input.style.position = ""; }
 								inputFocused = true;
 								break;
 							}
