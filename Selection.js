@@ -21,30 +21,24 @@ return declare([List], {
 				if(!event._selected && (event.type == "mousedown" || !event.ctrlKey || event.keyCode == 32)){
 					event._selected = true;
 					var row = event.target;
-					console.log("event: ", event);
-					console.log("in focus");
+					console.log("in focus; event: ", event, "; row: ", row);
 					if(mode == "single" && lastRow && event.ctrlKey){
-						console.log("1");
 						grid.deselect(lastRow);
 						if(lastRow == row){
 							return;
 						}
 					}
 					if(!event.ctrlKey){
-						console.log("mode: ", mode);
 						if(mode != "multiple"){
 							grid.clearSelection();
 						}
 						grid.select(row);
 					}else{
-						console.log("4");
 						grid.select(row, null, null);
 					}
 					if(event.shiftKey && mode != "single"){
-						console.log("5");
 						grid.select(lastRow, row);
 					}else{
-						console.log("row: ", row);
 						lastRow = row;
 					}
 					if(event.type == "mousedown" && (event.shiftKey || event.ctrlKey)){
