@@ -24,6 +24,11 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
+			function setSM(mode){
+				// sets selectionMode on our test grids
+				window.grid.setSelectionMode(mode);
+				window.gridRadio.setSelectionMode(mode);
+			}
 			require(["dgrid/OnDemandGrid", "dgrid/Editor","dgrid/Selection", "dgrid/Keyboard", "dgrid/test/data", "dojo/domReady!"], 
 				function(Grid, Editor, Selection, Keyboard, testStore){
 					var columns = { // you can declare columns as an object hash (key translates to field)
@@ -48,10 +53,16 @@
 						selectionMode: "none",
 						columns: columnsRadio
 					}, "grid-radio");
-				});
+				}
+			);
 		</script>
 	</head>
 	<body class="claro">
+		<div>
+			<button type="button" onclick="setSM('none');">Set selection mode to "none"</button>
+			<button type="button" onclick="setSM('extended');">
+				Set selection mode to "extended" (to test sync)</button>
+		</div>
 		<h2>A grid with checkbox selectors</h2>
 		<div id="grid"></div>
 		<h2>A grid with radio selectors</h2>

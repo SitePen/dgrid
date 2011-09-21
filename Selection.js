@@ -1,7 +1,7 @@
-define(["dojo/_base/declare", "dojo/on", "./List", "put-selector/put", "dojo/has"], function(declare, listen, List, put, has){
+define(["dojo/_base/declare", "dojo/on", "./List", "put-selector/put", "dojo/has"], function(declare, on, List, put, has){
 return declare([List], {
 	// summary:
-	// 		Add selection capabilities to a grid. The grid will have a selection property and
+	//		Add selection capabilities to a grid. The grid will have a selection property and
 	//		fire "select" and "deselect" events.
 	
 	// selectionEvent: String
@@ -14,78 +14,127 @@ return declare([List], {
 	},
 	postCreate: function(){
 		this.inherited(arguments);
-		var lastRow, mode = this.selectionMode;
-		var grid = this;		
-		if(this.selectionMode != "none"){
-			// this is to stop IE 8's web accelerator and selection
-			listen(grid.domNode, "selectstart", function(event){
-				event.preventDefault();
-			});
-			function focus(event){
-				if(!event._selected && (event.type == "mousedown" || !event.ctrlKey || event.keyCode == 32)){
-					event._selected = true;
-					var row = event.target;
-					console.log("in focus; event: ", event, "; row: ", row);
-					if(mode == "single" && lastRow && event.ctrlKey){
-						grid.deselect(lastRow);
-						if(lastRow == row){
-							return;
-						}
-					}
-					if(!event.ctrlKey){
-						if(mode != "multiple"){
-							grid.clearSelection();
-						}
-						grid.select(row);
-					}else{
-						grid.select(row, null, null);
-					}
-					if(event.shiftKey && mode != "single"){
-						grid.select(lastRow, row);
-					}else{
-						lastRow = row;
-					}
-					if(event.type == "mousedown" && (event.shiftKey || event.ctrlKey)){
-						// prevent selection in firefox
-						event.preventDefault();
-					}
-				}
-				
-			}
-			// listen for actions that should cause selections
-			if(has("touch")){
-				// first listen for touch taps if available
-				var lastTouchX, lastTouchY, lastTouchEvent, isTap;
-				listen(this.contentNode, "touchstart", function(event){
-					console.log("touchstart");
-					lastTouch = event.touches[0];
-					lastTouchX = lastTouch.pageX;
-					lastTouchY = lastTouch.pageY;
-					lastTouchEvent = event;
-					isTap = true;
-				});
-				listen(this.contentNode, "touchmove", function(event){
-					var thisTouch = event.touches[0];
-					isTap = Math.pow(lastTouchX - thisTouch.pageX, 2) + Math.pow(lastTouchY - thisTouch.pageY, 2) < 100; // 10 pixel radius sound good?
-					console.log("touchmove istap: ", isTap);
-				});
-				listen(this.contentNode, "touchend", function(event){
-					if(isTap){
-						console.log("touchend");
-						focus(lastTouchEvent);
-					}
-				});
-			}
-			listen(grid.contentNode, this.selectionEvent, focus); 
+		var mode = this.selectionMode;
+		
+		if(mode != "none"){ // forego initial event hookup if selectionMode is none
+			this.selectionMode = "none"; // force first setSelectionMode call to run
+			this.setSelectionMode(mode);
 		}
 	},
+	
 	// selection:
-	// 		An object where the property names correspond to 
-	// 		object ids and values are true or false depending on whether an item is selected
+	//		An object where the property names correspond to 
+	//		object ids and values are true or false depending on whether an item is selected
 	selection: {},
 	// selectionMode: String
-	// 		The selection mode to use, can be "multiple", "single", or "extended".
+	//		The selection mode to use, can be "multiple", "single", or "extended".
 	selectionMode: "extended",
+	
+	setSelectionMode: function(mode){
+		// summary:
+		//		Updates selectionMode, hooking up listener if necessary.
+		
+		var listeners, listenerAction, i;
+		
+		if(mode == this.selectionMode){ return; } // prevent unnecessary spinning
+		
+		if(!this._selectionListeners){
+			this._initSelectionEvents(); // first time; set up event hooks
+		}
+		listeners = this._selectionListeners;
+		
+		// If switching to none, pause listeners; if switching from none, resume.
+		// (If switching between non-none modes, don't need to change anything.)
+		listenerAction = mode == "none" ? "pause" :
+			(this.selectionMode == "none" ? "resume" : "");
+		if(listenerAction){
+			for(i = listeners.length; i--;){
+				listeners[i][listenerAction]();
+			}
+		}
+		
+		// Start selection fresh when switching mode.
+		this.clearSelection();
+		
+		this.selectionMode = mode;
+	},
+	
+	_initSelectionEvents: function(){
+		// summary:
+		//		Performs first-time hookup of event handlers containing logic
+		//		required for selection to operate.
+		
+		var
+			listeners = this._selectionListeners = [],
+			grid = this,
+			lastRow;
+		
+		// this is to stop IE 8's web accelerator and selection
+		// TODO: can we refine this? I think this also nerfs selection in text editor widgets...
+		listeners.push(on.pausable(this.domNode, "selectstart", function(event){
+			event.preventDefault();
+		}));
+		
+		function focus(event){
+			var mode = grid.selectionMode;
+			if(!event._selected && (event.type == "mousedown" || !event.ctrlKey || event.keyCode == 32)){
+				event._selected = true;
+				var row = event.target;
+				console.log("in focus; event: ", event, "; row: ", row);
+				if(mode == "single" && lastRow && event.ctrlKey){
+					grid.deselect(lastRow);
+					if(lastRow == row){
+						return; // allow deselection even within single select mode
+					}
+				}
+				if(!event.ctrlKey){
+					if(mode != "multiple"){
+						grid.clearSelection();
+					}
+					grid.select(row);
+				}else{
+					grid.select(row, null, null);
+				}
+				if(event.shiftKey && mode != "single"){
+					// select range
+					grid.select(lastRow, row);
+				}else{
+					lastRow = row;
+				}
+				if(event.type == "mousedown" && (event.shiftKey || event.ctrlKey)){
+					// prevent selection in firefox
+					event.preventDefault();
+				}
+			}
+		}
+		
+		// listen for actions that should cause selections
+		listeners.push(on.pausable(this.contentNode, this.selectionEvent, focus));
+		if(has("touch")){
+			// first listen for touch taps if available
+			var lastTouch, lastTouchX, lastTouchY, lastTouchEvent, isTap;
+			listeners.push(on.pausable(this.contentNode, "touchstart", function(event){
+				console.log("touchstart");
+				lastTouch = event.touches[0];
+				lastTouchX = lastTouch.pageX;
+				lastTouchY = lastTouch.pageY;
+				lastTouchEvent = event;
+				isTap = true;
+			}));
+			listeners.push(on.pausable(this.contentNode, "touchmove", function(event){
+				var thisTouch = event.touches[0];
+				isTap = Math.pow(lastTouchX - thisTouch.pageX, 2) + Math.pow(lastTouchY - thisTouch.pageY, 2) < 100; // 10 pixel radius sound good?
+				console.log("touchmove istap: ", isTap);
+			}));
+			listeners.push(on.pausable(this.contentNode, "touchend", function(event){
+				if(isTap){
+					console.log("touchend");
+					focus(lastTouchEvent);
+				}
+			}));
+		}
+	},
+	
 	select: function(row, toRow, value){
 		if(value === undefined){
 			// default to true
@@ -102,7 +151,7 @@ return declare([List], {
 		}
 		var element = row.element;
 		if(value != previousValue &&
-			(!element || listen.emit(element, value ? "select" : "deselect", {
+			(!element || on.emit(element, value ? "select" : "deselect", {
 			cancelable: true,
 			bubbles: true,
 			row: row

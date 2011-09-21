@@ -70,6 +70,12 @@
 	</head>
 	<body class="claro">
 		<h2>A grid with row-level selection (and row-level navigation)</h2>
+		<div>Set selectionMode:
+			<button type="button" onclick="gridRowNavigation.setSelectionMode('none');">None</button>
+			<button type="button" onclick="gridRowNavigation.setSelectionMode('single');">Single</button>
+			<button type="button" onclick="gridRowNavigation.setSelectionMode('multiple');">Multiple</button>
+			<button type="button" onclick="gridRowNavigation.setSelectionMode('extended');">Extended</button>
+		</div>
 		<div id="grid-row-navigation"></div>
 		<h2>A grid with cell-level selection (default selection mode of "extended")</h2>
 		<div id="grid-cell-navigation"></div>
@@ -78,6 +84,12 @@
 		<h2>A grid with cell-level selection and selection mode of "multiple"</h2>
 		<div id="grid-cell-navigation-multiple"></div>
 		<h2>A grid with cell-level selection and selection mode of "none"</h2>
+		<div>Set selectionMode:
+			<button type="button" onclick="gridCellNavigationNone.setSelectionMode('none');">None</button>
+			<button type="button" onclick="gridCellNavigationNone.setSelectionMode('single');">Single</button>
+			<button type="button" onclick="gridCellNavigationNone.setSelectionMode('multiple');">Multiple</button>
+			<button type="button" onclick="gridCellNavigationNone.setSelectionMode('extended');">Extended</button>
+		</div>
 		<div id="grid-cell-navigation-none"></div>
 	</body>
 </html>
