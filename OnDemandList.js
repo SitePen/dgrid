@@ -76,7 +76,7 @@ return declare([List], {
 				if(trCount){ self.rowHeight = height / trCount; }
 				
 				total -= trCount;
-				if(!total){
+				if(!total && trCount){
 					put(trs[trCount-1], ".dgrid-last-row");
 				}
 				preloadNode.count = total;

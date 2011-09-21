@@ -33,9 +33,12 @@ return declare([List], {
 							// IE doesn't always have a bubbles property already true, Opera will throw an error if you try to set it to true if it is already true
 							event.bubbles = true;
 						}
-						put(cellFocusedElement, "!dgrid-focus[!tabIndex]"); // remove the class name and the tabIndex attribute
+						// clean up previously-focused element
+						// remove the class name and the tabIndex attribute
+						put(cellFocusedElement, "!dgrid-focus[!tabIndex]");
 						if(cellFocusedElement){
 							if(has("ie") < 8){
+								// clean up after workaround below (for non-input cases)
 								cellFocusedElement.style.position = "";
 							}
 							event.cell = cellFocusedElement;
@@ -45,9 +48,9 @@ return declare([List], {
 						event.cell = element;
 						if(!dontFocus){
 							if(has("ie") < 8){
-								// setting the position to relative (can't be done a priori with CSS or 
-								// screws up the entire table), magically makes the outline work 
-								// properly for focusing later on with old IE
+								// setting the position to relative magically makes the outline
+								// work properly for focusing later on with old IE.
+								// (can't be done a priori with CSS or screws up the entire table)
 								element.style.position = "relative";
 							}
 							element.tabIndex = grid.tabIndex;
@@ -87,14 +90,14 @@ return declare([List], {
 				var nextSibling, columnId, cell = grid.cell(cellFocusedElement || firstDeepChild(focusedElement));
 				var orientation;
 				if(keyCode == 37 || keyCode == 39){
-					if(!grid.cellNavigation){
-						return;
-					}
 					// horizontal movement (left and right keys)
-					orientation = 'right';
+					if(!grid.cellNavigation){
+						return; // do nothing for row-only navigation
+					}
+					orientation = "right";
 				}else{
 					// other keys are vertical
-					orientation = 'down'
+					orientation = "down";
 					columnId = cell && cell.column && cell.column.id;
 					cell = grid.row(cellFocusedElement || firstDeepChild(focusedElement));				
 				}
@@ -112,7 +115,11 @@ return declare([List], {
 						for(var i = 0;i < inputs.length; i++){
 							var input = inputs[i];
 							if(input.tabIndex != -1 || "lastValue" in input){
+								// focusing here requires the same workaround for IE<8,
+								// though here we can get away with doing it all at once.
+								if(has("ie") < 8){ input.style.position = "relative"; }
 								input.focus();
+								if(has("ie") < 8){ input.style.position = ""; }
 								inputFocused = true;
 								break;
 							}
