@@ -127,7 +127,10 @@ return function(column, editor, editOn){
 			grid = column.grid;
 			if(column.selector){
 				grid.on("select,deselect", function(event){
-					if(!suppressSelect && event.currentTarget === event.target){
+					// Selector only cares about selection events from rows.
+					// We can't just use event delegation here, because we *don't* want
+					// to capture events bubbled from deeper (e.g. text editors).
+					if(!suppressSelect && /\bdgrid-row\b/.test(event.target.className)){
 						var cell = grid.cell(event.row.id, column.id).element;
 						renderWidget(event.type == "select", cell.contents || cell, object);
 					}
