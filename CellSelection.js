@@ -45,9 +45,17 @@ return declare([Selection], {
 				previousRow = previousRow || {};
 				previousRow[cell.column.id] = value;
 				this.selection[rowId] = previousRow;
-				/*if(!row){ // TODO: could check for empty objects to see if it could be deleted
-					delete this.selection[rowId];
-				}*/
+				
+				// Check for all-false objects to see if it can be deleted.
+				// This prevents build-up of unnecessary iterations later.
+				var hasSelected = false;
+				for(var i in previousRow){
+					if(previousRow[i] === true){
+						hasSelected = true;
+						break;
+					}
+				}
+				if(!hasSelected){ delete this.selection[rowId]; }
 			}
 		}
 		if(element){
