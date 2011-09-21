@@ -26,7 +26,7 @@ return function(column, editor, editOn){
 			var input;
 			// when editor is a string, we use a common <input> as the editor
 			input = cell.input || (cell.input = put(cell, "input[type=" + editor + "].dgrid-input", {
-				name: column.field || "selection",
+				name: column.field || this.id + "-selection",
 				tabIndex: isNaN(column.tabIndex) ? -1 : column.tabIndex
 			}));
 			input.value = value || "";
@@ -37,11 +37,15 @@ return function(column, editor, editOn){
 				grid._hasInputListener = true;
 				grid.on("change", onchange);
 			}
-			if(has("ie")){
-				// IE doesn't fire change events for all the right things, and it doesn't bubble, double fail.
-				on(input, "change", onchange);
-				// listen for clicks because IE doesn't fire change events properly for checkboxes, radios
-				on(input, "click", onchange);
+			if(has("ie") < 9){
+				// IE<9 doesn't fire change events for all the right things,
+				// and it doesn't bubble, double fail.
+				if(cell.input.type == "radio" || cell.input.type == "checkbox"){
+					// listen for clicks because IE doesn't fire change events properly for checks/radios
+					on(input, "click", onchange);
+				}else{
+					on(input, "change", onchange);
+				}
 			}
 			if(onblur){
 				input.focus();
@@ -66,8 +70,9 @@ return function(column, editor, editOn){
 				widget.focus();
 				widget.connect(widget, "onBlur", function(){
 					setTimeout(function(){
-						// we have to wait on this for the widget will throw errors about keydown events that happen right after blur
-						widget.destroy();
+						// we have to wait on this for the widget will throw errors
+						// about keydown events that happen right after blur
+						widget.destroyRecursive();
 					}, 0);
 					onblur(data);
 				});
