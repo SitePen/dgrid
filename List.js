@@ -163,8 +163,10 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			this.headerScrollNode.style.height = bodyNode.style.marginTop = headerNode.offsetHeight + "px";
 			if(has("quirks") || has("ie") < 7){
 				// in quirks mode, the "bottom" CSS property is ignored, so do this to fix it
-				// We might want to use a CSS expression or the xstyle package to fix this
-				bodyNode.style.height = (this.domNode.offsetHeight - headerNode.offsetHeight) + "px";
+				// We might want to use a CSS expression or the xstyle package to fix this.
+				// We guard against negative values in case of issues with external CSS.
+				bodyNode.style.height =
+					Math.max((this.domNode.offsetHeight - headerNode.offsetHeight), 0) + "px";
 			}
 			if(!scrollbarWidth){
 				// we haven't computed the scroll bar width yet, do so now, and add a new rule if need be

@@ -11,6 +11,7 @@
 			html, body {
 				width: 100%;
 				height: 100%;
+				overflow: hidden;
 			}
 			body {
 				font-family: "Lucida Grande", sans-serif;
@@ -45,15 +46,8 @@
 				height: 120px;
 				border-bottom: 1px solid #a6a6a6;
 			}
-			#grid-container {
-				position: absolute;
-				left: 0;
-				right: 0;
-				top: 187px;
-				bottom: 0;
-			}
 
-			/* these are the three lists in the top region */
+			/* styles for the three lists in the top region */
 			#genres, #artists, #albums {
 				position: absolute;
 				top: 0;
@@ -61,19 +55,38 @@
 				width: 33.3%;
 				height: auto;
 			}
-			#genres .dgrid-row,
-			#artists .dgrid-row,
-			#albums .dgrid-row {
+			#list-container .dgrid-row { /* all rows in all 3 lists */
 				padding: 0.25em;
 				cursor: default;
+			}
+
+			/* IE<7 doesn't support height/width: auto w/ top/bottom / left/right. */
+			.has-ie-6 #genres, .has-ie-6 #artists, .has-ie-6 #albums {
+				height: 120px;
+			}
+			.has-ie-6 #list-container {
+				width: 100%;
 			}
 
 			#artists { left: 33.3%; }
 			#albums { right: 0; }
 
 			#grid {
-				height: 99%;
+				position: absolute;
+				left: 0;
+				right: 0;
+				top: 187px;
+				bottom: 0;
+				height: auto; /* override default height: 30em; in dgrid.css */
+				/*height: 99%;*/ /* TODO: what about IE6? */
 			}
+			
+			.has-ie-6 #grid {
+				width: 100%;
+				/* Give the grid a height.  Not optimal, but we'd need more JS for better. */
+				height: 20em;
+			}
+			
 			#grid .dgrid-cell {
 				border: 0;
 			}
@@ -131,7 +144,7 @@
 					"dojo/_base/array",
 					"dgrid/test/data_songs",
 					"dojo/domReady!"
-				], 
+				],
 				function(List, Grid, Selection, Keyboard, declare, arrayUtil){
 					//	a formatting function for the Duration column.
 					var timeFormatter = function(t){
@@ -151,6 +164,7 @@
 						{label: 'Album', field: 'Album'},
 						{label: 'Genre', field: 'Genre'}
 					];
+
 					window.grid = new (declare([Grid, Selection, Keyboard]))({
 						store: songStore,
 						columns: columns
@@ -262,8 +276,6 @@
 			<div id="artists"></div>
 			<div id="albums"></div>
 		</div>
-		<div id="grid-container">
-			<div id="grid"></div>
-		</div>
+		<div id="grid"></div>
 	</body>
 </html>
