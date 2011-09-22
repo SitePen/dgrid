@@ -148,11 +148,12 @@
 				function(List, Grid, Selection, Keyboard, declare, arrayUtil){
 					//	a formatting function for the Duration column.
 					var timeFormatter = function(t){
-						var tmp = parseInt(t, 10);
+						var tmp = parseInt(t, 10), min, sec;
 						if(isNaN(tmp)){ return t; }
-						var min = Math.floor(tmp/60),
-							sec = tmp % 60;
-						return "" + min + ":" + (sec + "00").substring(0, 2);
+						min = Math.floor(tmp/60);
+						sec = tmp % 60;
+						// don't forget to pad seconds.
+						return "" + min + ":" + (sec < 10 ? "0" : "") + sec;
 					};
 
 					//	define the column structure on the main grid, and create it.
@@ -183,9 +184,9 @@
 					var g = unique(arrayUtil.map(songStore.data, function(item){ return item.Genre; })),
 						art = unique(arrayUtil.map(songStore.data, function(item){ return item.Artist; })),
 						alb = unique(arrayUtil.map(songStore.data, function(item){ return item.Album; }));
-					g.unshift("All (" + g.length + " Genre" + (g.length > 1 ? "s" : "") + ")");
-					art.unshift("All (" + art.length + " Artist" + (art.length > 1 ? "s" : "") + ")");
-					alb.unshift("All (" + alb.length + " Album" + (alb.length > 1 ? "s" : "") + ")");
+					g.unshift("All (" + g.length + " Genre" + (g.length != 1 ? "s" : "") + ")");
+					art.unshift("All (" + art.length + " Artist" + (art.length != 1 ? "s" : "") + ")");
+					alb.unshift("All (" + alb.length + " Album" + (alb.length != 1 ? "s" : "") + ")");
 					genres.renderArray(g);
 					artists.renderArray(art);
 					albums.renderArray(alb);
@@ -201,29 +202,27 @@
 					//	TODO: A little bit smarter on the filtering, since the list interactions are all related.
 					genres.on("select", function(e){
 						//	filter the albums, artists and grid
-						var filter = currentGenre = e.row.data;
+						var
+							filter = currentGenre = e.row.data,
+							art;
 						if(e.row.id == "0"){
 							//	remove filtering
-							var art = unique(arrayUtil.map(songStore.data, function(item){ return item.Artist; })),
-								alb = unique(arrayUtil.map(songStore.data, function(item){ return item.Album; }));
+							art = unique(arrayUtil.map(songStore.data, function(item){ return item.Artist; }));
 							grid.query = {};
 						} else {
 							//	create filtering
-							var art = unique(arrayUtil.map(arrayUtil.filter(songStore.data, function(item){ return item.Genre == filter; }), function(item){ return item.Artist; })),
-								alb = unique(arrayUtil.map(arrayUtil.filter(songStore.data, function(item){ return item.Genre == filter; }), function(item){ return item.Album; }));
+							art = unique(arrayUtil.map(arrayUtil.filter(songStore.data, function(item){ return item.Genre == filter; }), function(item){ return item.Artist; }));
 							grid.query = { "Genre": filter };
 						}
-						art.unshift("All (" + art.length + " Artist" + (art.length > 1 ? "s" : "") + ")");
-						alb.unshift("All (" + alb.length + " Album" + (alb.length > 1 ? "s" : "") + ")");
+						art.unshift("All (" + art.length + " Artist" + (art.length != 1 ? "s" : "") + ")");
 						
 						artists.refresh();	//	clear contents
 						artists.renderArray(art);
 						artists.select(0); //	reselect "all", triggering albums+grid refresh
 					});
+
 					artists.on("select", function(e){
 						//	filter the albums, grid
-						//	TODO: ids are reset on re-render, which is a problem.  We expect the fake "All Artists" to be id 0 but apparently they
-						//	are being assigned new ids on pull.
 						var filter = e.row.data, alb;
 						if(e.row.id == "0"){
 							if(genres.selection[0]){
@@ -239,16 +238,13 @@
 							alb = unique(arrayUtil.map(arrayUtil.filter(songStore.data, function(item){ return item.Artist == filter; }), function(item){ return item.Album; }));
 							grid.query.Artist = filter;
 						}
-						alb.unshift("All (" + alb.length + " Album" + (alb.length > 1 ? "s" : "") + ")");
-
-						// Reset album filter since artist selection changed
-						delete grid.query.Album;
+						alb.unshift("All (" + alb.length + " Album" + (alb.length != 1 ? "s" : "") + ")");
 
 						albums.refresh(); //	clear contents
 						albums.renderArray(alb);
-						albums.select(0); //	reselect "all" item
-						grid.refresh();
+						albums.select(0); //	reselect "all" item, triggering grid refresh
 					});
+
 					albums.on("select", function(e){
 						//	filter the grid
 						var filter = e.row.data;
