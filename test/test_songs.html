@@ -215,11 +215,10 @@
 						}
 						art.unshift("All (" + art.length + " Artist" + (art.length > 1 ? "s" : "") + ")");
 						alb.unshift("All (" + alb.length + " Album" + (alb.length > 1 ? "s" : "") + ")");
+						
 						artists.refresh();	//	clear contents
-						albums.refresh();
 						artists.renderArray(art);
-						albums.renderArray(alb);
-						grid.refresh();
+						artists.select(0); //	reselect "all", triggering albums+grid refresh
 					});
 					artists.on("select", function(e){
 						//	filter the albums, grid
@@ -247,6 +246,7 @@
 
 						albums.refresh(); //	clear contents
 						albums.renderArray(alb);
+						albums.select(0); //	reselect "all" item
 						grid.refresh();
 					});
 					albums.on("select", function(e){
