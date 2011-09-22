@@ -26,6 +26,22 @@ return declare([List], {
 		this.queryOptions || (this.queryOptions = {});
 	},
 	
+	setStore: function(store, query, queryOptions){
+		// summary:
+		//		Assigns a new store (and optionally query/queryOptions) to the list,
+		//		and tells it to refresh.
+		this.store = store;
+		this.setQuery(query, queryOptions);
+	},
+	setQuery: function(query, queryOptions){
+		// summary:
+		//		Assigns a new query (and optionally queryOptions) to the list,
+		//		and tells it to refresh.
+		this.query = query !== undefined ? query : this.query;
+		this.queryOptions = queryOptions || this.queryOptions;
+		this.refresh();
+	},
+	
 	renderQuery: function(query, preloadNode){
 		// summary:
 		//		Creates a preload node for rendering a query into, and executes the query
