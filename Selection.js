@@ -8,6 +8,10 @@ return declare([List], {
 	//		event (or events, in dojo/on format) to listen on to trigger select logic
 	selectionEvent: "mousedown,cellfocusin",
 	
+	// deselectOnRefresh: Boolean
+	//		If true, the selection object will be cleared when refresh is called.
+	deselectOnRefresh: true,
+	
 	create: function(){
 		this.selection = {};
 		return this.inherited(arguments);
@@ -204,6 +208,14 @@ return declare([List], {
 			this.select(row.id);
 		}
 	},
+	
+	refresh: function(){
+		if(this.deselectOnRefresh){
+			this.selection = {};
+		}
+		this.inherited(arguments);
+	},
+	
 	renderArray: function(){
 		var rows = this.inherited(arguments);
 		var selection = this.selection;
