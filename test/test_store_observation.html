@@ -26,53 +26,57 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dojo/on", "dgrid/OnDemandGrid","dgrid/Tree","dgrid/Editor", "dgrid/Keyboard", "dgrid/Selection", "dgrid/test/data", "dojo/domReady!"], 
-				function(on, Grid, Tree, Editor, Keyboard, Selection, testStore){
-					var columns = [
-						Tree({label:'Name', field:'name', sortable: false}),
-						Editor({label: 'A CheckBox', field: 'bool', sortable: false}, "checkbox"),
-						Editor({label:'Type', field:'type', sortable: false}, "text"),
-						Editor({label:'Population', field:'population'}, "text", "dblclick"),
-						Editor({label:'Timezone', field:'timezone'}, "text", "dblclick")
-					];
+			require(["dojo/on", "dgrid/OnDemandGrid","dgrid/Keyboard", "dgrid/test/data", "dojo/domReady!"],
+				function(on, Grid, Keyboard, testStore){
+					var columns = {
+						col1: 'Column 1',
+						col2: {label: 'Column 2'},
+						col3: 'Column 3',
+						col4: 'Column 4',
+						"last-col": {label: 'Column 5', field: 'col5'}
+					};
 					
-					window.tree = dojo.declare([Grid, Keyboard, Selection])({
-						store: testCountryStore,
-						query: {type: "continent"},
-						selectionMode: "single",
+					window.grid = dojo.declare([Grid])({
+						store: testStore,
 						columns: columns
-					}, "tree");
-					on(document.getElementById("save"), "click", function(){
-						tree.save();
+					}, "grid");
+					on(document.getElementById("setstore"), "click", function(){
+						console.log("setting store to colorStore: ", colorStore);
+						window.grid.setStore(colorStore);//no query
 					});
-					on(document.getElementById("add-country"), "click", function(){
-						testCountryStore.put({ id: 'GR', name:'Greece', type:'country', parent: 'EU'});
+					on(document.getElementById("restore"), "click", function(){
+						console.log("setting store to testStore");
+						grid.setStore(testStore);//no query
 					});
-					on(document.getElementById("add-continent"), "click", function(){
-						testCountryStore.put({ id: 'NE', name:'My New Europe', type:'continent'});
-	        			testCountryStore.put({ id: 'NI', name:'My New Italy', type:'country', parent: 'NE'});
+					on(document.getElementById("colorQuery"), "click", function(){
+						console.log("setting store to colorStore and setting query to show only primary colors");
+						grid.setStore(colorStore, {col3: "Primary"});//query set to only show primary colors
 					});
-					on(document.getElementById("delete"), "click", function(){
-						for(var id in tree.selection){
-							testCountryStore.remove(id);
-						}
+					on(document.getElementById("resetQuery"), "click", function(){
+						console.log("reset query to show all");
+						grid.setQuery({});
 					});
-					window.tree2 =dojo.declare([Grid, Keyboard])({
-						store: testCountryStore,
-						query: {type: "continent"},
-						selectionMode: "single",
-						columns: columns
-					}, "tree2");
+					on(document.getElementById("empty"), "click", function(){
+						console.log("set store to emptyStore");
+						grid.setStore(emptyStore, {});
+					});
+					on(document.getElementById("error"), "click", function(){
+						console.log("set store to errorStore");
+						grid.setStore(errorStore,{});
+					});
+
 				});
 		</script>
 	</head>
 	<body class="claro">
-		<h2>A couple of tree/grids, test to see if they stay in sync</h2>
-		<div id="tree"></div>
-		<button id="save">Save</button>
-		<button id="add-continent">Add Continent</button>
-		<button id="add-country">Add Greece To Europe</button>
-		<button id="delete">Delete Selected</button>
-		<div id="tree2"></div>
+		<h2>Simple test to show setting a new store and query to dgrid</h2>
+		<div id="grid"></div>
+		<button id="setstore">Set Color Store</button>
+		<button id="restore">Set Original Store</button>
+		<button id="colorQuery">Set color store and query</button>
+		<button id="resetQuery">Reset query</button>
+		<button id="empty">Set to empty store</button>
+		<button id="error">Set to error store</button>
+		
 	</body>
 </html>

@@ -16,6 +16,7 @@ define(["dojo/store/Memory", "dojo/store/Observable"],function(Memory, Observabl
 		{ col1: "important", col2: false, col3: "replied", col4: 'To problems of corruption by', col5: 9.12, col6: -3, col7: true },
 		{ col1: "note", col2: false, col3: "replied", col4: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris', col5: 12.15, col6: -4, col7: false }
 	];
+
 	var rows = 100;
 	for(var i=0, l=data_list.length; i<rows; i++){
 		data.items.push(dojo.mixin({ id: i }, data_list[i%l]));
@@ -23,6 +24,36 @@ define(["dojo/store/Memory", "dojo/store/Observable"],function(Memory, Observabl
 
 	// global var testStore
 	testStore = Observable(Memory({data: data}));
+
+	//sample color data
+	data2 = {
+		identifier: 'id',
+		label: 'id',
+		items: []
+	};
+	colors = [
+		{ col1: "Red", col2: false, col3: "Primary", col4: 'A primary color', col5: 255, col6: 0, col7: 0 },
+		{ col1: "Yellow", col2: false, col3: "Primary", col4: 'A primary color', col5: 255, col6: 255, col7: 0 },
+		{ col1: "Blue", col2: false, col3: "Primary", col4: 'A primary color', col5: 0, col6: 0, col7: 255 },
+		{ col1: "Orange", col2: false, col3: "Secondary", col4: 'A Secondary color', col5: 255, col6: 165, col7: 0 },
+		{ col1: "Purple", col2: false, col3: "Secondary", col4: 'A Secondary color', col5: 160, col6: 32, col7: 240 },
+		{ col1: "Green", col2: false, col3: "Secondary", col4: 'A Secondary color', col5: 0, col6: 192, col7: 0 },
+		{ col1: "Pink", col2: false, col3: "Hue", col4:'A hue' , col5: 255, col6: 192, col7: 203 }
+	];
+
+	for(var i=0, l=colors.length; i<rows; i++){
+		data2.items.push(dojo.mixin({ id: i }, colors[i%l]));
+	}
+
+	// global var colorStore
+	colorStore = Observable(Memory({data: data2}));
+
+	//empty store
+	emptyData = { identifier: 'id', label: 'id', items:[]};
+	emptyStore = Observable(Memory({data: emptyData}));
+
+	//store with non-existent url
+	errorStore = Observable(Memory({url: "../../junkurl.json"}));
 
 	var typesData = [];
 	for(var i = 0; i < 20; i++){
