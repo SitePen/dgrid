@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Test TreeGrid</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+		<meta name="viewport" content="width=570" />
+		<style type="text/css">
+			@import "../../dojo/resources/dojo.css";
+			@import "../css/skins/claro.css";
+			.dgrid {
+				width: 700px;
+			}
+			.dgrid .field-bool {
+				width: 20%;
+			}
+			.dgrid .field-type {
+				width: 80px;
+			}
+			.ui-widget{
+				margin: 10px;
+			}
+		</style>
+		<script>
+			var start= new Date().getTime();
+		</script>
+		<script type="text/javascript" src="../../dojo/dojo.js" 
+			data-dojo-config="async: true"></script>
+		<script type="text/javascript">
+			require(["dojo/on", "dgrid/OnDemandGrid","dgrid/Tree","dgrid/Editor", "dgrid/Keyboard", "dgrid/Selection", "dgrid/test/data", "dojo/domReady!"], 
+				function(on, Grid, Tree, Editor, Keyboard, Selection, testStore){
+					var columns = [
+						Tree({label:'Name', field:'name', sortable: false}),
+						Editor({label: 'A CheckBox', field: 'bool', sortable: false}, "checkbox"),
+						Editor({label:'Type', field:'type', sortable: false}, "text"),
+						Editor({label:'Population', field:'population'}, "text", "dblclick"),
+						Editor({label:'Timezone', field:'timezone'}, "text", "dblclick")
+					];
+					
+					window.tree = dojo.declare([Grid, Keyboard, Selection])({
+						store: testCountryStore,
+						query: {type: "continent"},
+						selectionMode: "single",
+						columns: columns
+					}, "tree");
+					on(document.getElementById("save"), "click", function(){
+						tree.save();
+					});
+					on(document.getElementById("add-country"), "click", function(){
+						testCountryStore.put({ id: 'GR', name:'Greece', type:'country', parent: 'EU'});
+					});
+					on(document.getElementById("add-continent"), "click", function(){
+						testCountryStore.put({ id: 'NE', name:'My New Europe', type:'continent'});
+	        			testCountryStore.put({ id: 'NI', name:'My New Italy', type:'country', parent: 'NE'});
+					});
+					on(document.getElementById("delete"), "click", function(){
+						for(var id in tree.selection){
+							testCountryStore.remove(id);
+						}
+					});
+					window.tree2 =dojo.declare([Grid, Keyboard])({
+						store: testCountryStore,
+						query: {type: "continent"},
+						selectionMode: "single",
+						columns: columns
+					}, "tree2");
+				});
+		</script>
+	</head>
+	<body class="claro">
+		<h2>A couple of tree/grids, test to see if they stay in sync</h2>
+		<div id="tree"></div>
+		<button id="save">Save</button>
+		<button id="add-continent">Add Continent</button>
+		<button id="add-country">Add Greece To Europe</button>
+		<button id="delete">Delete Selected</button>
+		<div id="tree2"></div>
+	</body>
+</html>
