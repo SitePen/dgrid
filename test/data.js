@@ -53,7 +53,7 @@ define(["dojo/store/Memory", "dojo/store/Observable"],function(Memory, Observabl
 	emptyStore = Observable(Memory({data: emptyData}));
 
 	//store with non-existent url
-	errorStore = Observable(Memory({url: "../../junkurl.json"}));
+	//errorStore = Observable(Memory({data: junk}));
 
 	var typesData = [];
 	for(var i = 0; i < 20; i++){
