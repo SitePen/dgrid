@@ -89,9 +89,10 @@
 						selectionMode: "single"
 					},"grid2");
 
-					window.grid3 = dojo.declare([Grid])({
+					window.grid3 = dojo.declare([Grid, Keyboard])({
 						store: testTypesStore,
-						columns: columns3
+						columns: columns3,
+						selectionMode: "single"
 					}, "grid3");
 				
 					on(document.getElementById("setstore"), "click", function(){
@@ -119,7 +120,8 @@
 						grid.setStore(errorStore,{});
 					});
 					on(document.getElementById("save"), "click", function(){
-						grid.save();
+						console.log("save to store");
+						grid2.save();
 					});
 
 				});

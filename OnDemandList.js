@@ -260,10 +260,7 @@ return declare([List], {
 	save: function(){
 		var store = this.store;
 		var puts = [];
-		console.log("in save");
-		console.log('dirty: ', this.dirty);
 		for(var id in this.dirty){
-
 			var put = (function(dirty){
 				return function(object){
 					// copy all the dirty properties onto the original

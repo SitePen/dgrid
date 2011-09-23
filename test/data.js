@@ -23,7 +23,7 @@ define(["dojo/store/Memory", "dojo/store/Observable"],function(Memory, Observabl
 	}
 
 	// global var testStore
-	testStore = Observable(Memory({data: data}));
+	testStore = Observable(new Memory({data: data}));
 
 	//sample color data
 	data2 = {
@@ -46,11 +46,11 @@ define(["dojo/store/Memory", "dojo/store/Observable"],function(Memory, Observabl
 	}
 
 	// global var colorStore
-	colorStore = Observable(Memory({data: data2}));
+	colorStore = Observable(new Memory({data: data2}));
 
 	//empty store
 	emptyData = { identifier: 'id', label: 'id', items:[]};
-	emptyStore = Observable(Memory({data: emptyData}));
+	emptyStore = Observable(new Memory({data: emptyData}));
 
 	//store with non-existent url
 	//errorStore = Observable(Memory({data: junk}));
@@ -69,7 +69,7 @@ define(["dojo/store/Memory", "dojo/store/Observable"],function(Memory, Observabl
 		});
 	}
 	// global var testTypesStore
-	testTypesStore = Observable(Memory({data: typesData}));
+	testTypesStore = Observable(new Memory({data: typesData}));
 
 	// global var testCountryStore
 	testCountryStore = Observable(new Memory({
