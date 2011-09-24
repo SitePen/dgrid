@@ -191,11 +191,6 @@
 					artists.renderArray(art);
 					albums.renderArray(alb);
 
-					//	set the initial selections on the lists.
-					genres.select(0);
-					artists.select(0);
-					albums.select(0);
-
 					var currentGenre; // updated on genre select
 
 					//	start listening for selections on the lists.
@@ -218,7 +213,12 @@
 						
 						artists.refresh();	//	clear contents
 						artists.renderArray(art);
-						artists.select(0); //	reselect "all", triggering albums+grid refresh
+						
+						// need this in a setTimeout so that this selection event completes
+						// first (for genres.selection[0] check in artists select handler)
+						setTimeout(function(){
+							artists.select(0); //	reselect "all", triggering albums+grid refresh
+						});
 					});
 
 					artists.on("select", function(e){
@@ -256,6 +256,9 @@
 						}
 						grid.refresh();
 					});
+
+					//	set the initial selections on the lists.
+					genres.select(0);
 
 				}	//	end "main" function
 			);	//	end require
