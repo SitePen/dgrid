@@ -15,17 +15,18 @@ return function(column, editor, editOn){
 	
 	var grid;
 	function onchange(event){
+		// event handler triggered on change of common input elements
 		var target = event.target;
 		if("lastValue" in target && target.className.indexOf("dgrid-input") > -1){
 			target.lastValue = setProperty(target.parentNode, target.lastValue,
 				target[target.type == "checkbox" || target.type == "radio"  ? "checked" : "value"]);
 		}
 	}
+	
 	var renderWidget = typeof editor == "string" ?
 		function(value, cell, object, onblur){
-			var input;
 			// when editor is a string, we use a common <input> as the editor
-			input = cell.input || (cell.input = put(cell, "input[type=" + editor + "].dgrid-input", {
+			var input = cell.input || (cell.input = put(cell, "input[type=" + editor + "].dgrid-input", {
 				name: column.field || this.id + "-selection",
 				tabIndex: isNaN(column.tabIndex) ? -1 : column.tabIndex
 			}));
@@ -48,10 +49,21 @@ return function(column, editor, editOn){
 				}
 			}
 			if(onblur){
+				// editor is not always-on (i.e. editOn was specified)
+				var signal, stopper;
+				
 				input.focus();
-				var signal = on(input, "blur", function(){
+				
+				if(editOn){
+					// don't allow event to confuse grid when editor is already active
+					stopper = on(input, editOn, function(evt){
+						evt.stopPropagation();
+					});
+				}
+				signal = on(input, "blur", function(){
 					// unhook and delete the input now
 					signal.remove();
+					stopper && stopper.remove();
 					put(input, "!");
 					cell.input = null;
 					onblur(input.lastValue);
@@ -67,11 +79,21 @@ return function(column, editor, editOn){
 				data = setProperty(cell, data, value);
 			});
 			if(onblur){
+				// editor is not always-on (i.e. editOn was specified)
+				var stopper;
 				widget.focus();
+				
+				if(editOn){
+					// don't allow event to confuse grid when editor is already active
+					stopper = on(widget.domNode, editOn, function(evt){
+						evt.stopPropagation();
+					});
+				}
 				widget.connect(widget, "onBlur", function(){
 					setTimeout(function(){
 						// we have to wait on this for the widget will throw errors
 						// about keydown events that happen right after blur
+						stopper && stopper.remove();
 						widget.destroyRecursive();
 					}, 0);
 					onblur(data);
