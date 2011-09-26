@@ -73,10 +73,15 @@ return declare([List], {
 			grid = this,
 			lastRow;
 		
-		// this is to stop IE 8's web accelerator and selection
-		// TODO: can we refine this? I think this also nerfs selection in text editor widgets...
+		// This is to stop IE8+'s web accelerator and selection.
+		// It also stops selection in Chrome/Safari.
 		listeners.push(on.pausable(this.domNode, "selectstart", function(event){
-			event.preventDefault();
+			// In IE, this also bubbles from text selection inside editor fields;
+			// we don't want to prevent that!
+			var tag = event.target && event.target.tagName;
+			if(tag != "INPUT" && tag != "TEXTAREA"){
+				event.preventDefault();
+			}
 		}));
 		
 		function focus(event){
