@@ -33,7 +33,7 @@
 						Editor({label: 'A CheckBox', field: 'bool', sortable: false}, "checkbox"),
 						Editor({label:'Type', field:'type', sortable: false}, "text"),
 						Editor({label:'Population', field:'population'}, "text", "dblclick"),
-						Editor({label:'Timezone', field:'timezone'}, "text", "dblclick")
+						Editor({label:'Timezone (autoSave)', field:'timezone', autoSave:true}, "text", "dblclick")
 					];
 					
 					window.tree = dojo.declare([Grid, Keyboard, Selection])({
