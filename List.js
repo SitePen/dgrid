@@ -354,8 +354,10 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			this.refresh();
 			if(this.lastCollection){
 				this.lastCollection.sort(function(a,b){
-					return a[property] > b[property] == !descending ? 1 : -1;
-				})
+					// fall back undefined values to "" for more consistent behavior
+					return (typeof a[property] == "undefined" ? "" : a[property]) >
+						(typeof b[property] == "undefined" ? "" : b[property]) == !descending ? 1 : -1;
+				});
 				this.renderArray(this.lastCollection);
 			}
 		}
