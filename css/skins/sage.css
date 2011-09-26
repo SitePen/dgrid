@@ -60,13 +60,11 @@
 }
 
 .sage .dgrid-selected,
-.sage .dgrid-selected:hover
-.sage .dgrid-selected .dgrid-cell {
+.sage .dgrid-selected:hover {
     background: #B3D18B;
     text-shadow: 0 1px 0 rgba(255,255,255,.6);
-/*	border-top: 1px solid #959E60; */
 }
 
 .sage .ui-state-highlight{
-	background-color:#000099;
+	background-color:#009;
 }
