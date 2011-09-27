@@ -37,3 +37,8 @@ html.has-quirks .dgrid-column-set {
 	/* at it works in quirks even in IE7*/
 	width: 100%;
 }
+
+/* indicator of a successful load */
+#dgrid-css-columnset-loaded {
+	display: none;
+}

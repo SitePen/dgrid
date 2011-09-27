@@ -141,6 +141,6 @@ html.has-quirks .dgrid-row-table, html.has-ie-6 .dgrid-row-table {
 }
 
 /* indicator of a successful load */
-#dgrid-css-loaded {
+#dgrid-css-dgrid-loaded {
 	display: none;
 }
