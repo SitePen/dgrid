@@ -55,7 +55,9 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 		return "dgrid_" + autogen++;
 	}
 	
-	return declare(TouchScroll ? [TouchScroll] : [], { 
+	return declare(TouchScroll ? [TouchScroll] : [], {
+		tabableHeader: false,
+		
 		constructor: function(params, srcNodeRef){
 		var self = this;
 		// summary:
@@ -103,6 +105,7 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			return "dgrid-" + shortName;
 		},
 		listType: "list",
+		
 		create: function(params, srcNodeRef){
 			// mix in params now, but wait until postScript to create
 			if(params){
@@ -118,13 +121,16 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			this.postCreate && this.postCreate();
 			// remove srcNodeRef instance property post-create
 			delete this.srcNodeRef;
+			// to preserve "it just works" behavior, call startup if we're visible
+			if(this.domNode.offsetHeight){
+				this.startup();
+			}
 		},
 		postMixInProperties: function(){
 			this.observers = [];
 			this._listeners = [];
 			this._rowIdToObject = {};
 		},
-		tabableHeader: false,
 		buildRendering: function(){
 			var domNode = this.domNode;
 			this.id = domNode.id = domNode.id || this.id || generateId();
@@ -146,8 +152,6 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			this.renderHeader(headerNode);
 			
 			this.contentNode = put(this.bodyNode, "div.dgrid-content.ui-widget-content");
-			this.resize();
-			this.refresh();
 			aspect.after(this, "scrollTo", function(){
 				listen.emit(bodyNode, "scroll", {});
 			});
@@ -156,6 +160,17 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 				grid.resize();
 			});
 		},
+		startup: function(){
+			// summary:
+			//		Called automatically after postCreate if the component is already
+			//		visible; otherwise, should be called manually once placed.
+			
+			if(this._started){ return; } // prevent double-triggering
+			this._started = true;
+			this.resize();
+			this.refresh();
+		},
+		
 		configStructure: function(){
 			// does nothing in List, this is more of a hook for the Grid
 		},
