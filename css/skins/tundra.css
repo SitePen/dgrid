@@ -1,25 +1,30 @@
-.ui-widget-content { 
-	border: 1px solid #aaaaaa; background: #ffffff; color: #000000; 
+.tundra .ui-widget-content {
+	border: 1px solid #aaa;
+	background: #fff;
+	color: #000;
 }
 
-.ui-widget-header { 
+.tundra .ui-widget-header {
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#ffe8e8e8');
 	background: #e8e8e8 -webkit-gradient(linear, left top, left bottom, from(#fff), to(#e8e8e8));
 	background: #e8e8e8 -moz-linear-gradient(top,  #fff,  #e8e8e8);
 	background: #e8e8e8 -o-linear-gradient(top,  #fff,  #e8e8e8);
-	font-weight: bold; 
+	font-weight: bold;
 }
-.ui-widget-header th:hover {
+.tundra .ui-widget-header th:hover {
 	background: #f8f8f8;
 	background: #d2e0eb -webkit-gradient(linear, left top, left bottom, from(#fff), to(#eee));
 	background: #d2e0eb -moz-linear-gradient(top,  #fff,  #eee);
 	background: #d2e0eb -o-linear-gradient(top,  #fff,  #eee);
 }
 
-.ui-state-active {
-	background-color: #aec7e3;  
-
+.tundra .ui-state-active {
+	background-color: #aec7e3;
 }
-.ui-state-default:hover {
+.tundra .ui-state-default:hover {
 	background-color: #60a1ea;
+}
+
+.tundra .ui-state-highlight {
+	background-color: #ff6;
 }

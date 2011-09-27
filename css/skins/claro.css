@@ -1,7 +1,7 @@
 .claro .ui-widget { 
-	border: 1px solid #aaaaaa; 
-	background: #ffffff; 
-	color: #000000; 
+	border: 1px solid #aaa;
+	background: #fff;
+	color: #000;
 }
 .claro .ui-widget-header { 
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ebf1f6', endColorstr='#d2e0eb');
@@ -36,13 +36,13 @@
 }
 
 .claro .ui-state-active {
-	background-color:#cee6fa;
+	background-color: #cee6fa;
 }
 
 .claro .ui-state-active:hover {
 	background-color: #9bc6f2;
 }
 
-.claro .ui-state-highlight{
-	background-color:#ff6;
+.claro .ui-state-highlight {
+	background-color: #ff6;
 }
