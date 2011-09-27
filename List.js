@@ -176,7 +176,12 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 				this.addCssRule(".dgrid-scrollbar-width", "width: " + scrollbarWidth + "px");
 				this.addCssRule(".dgrid-scrollbar-height", "height: " + scrollbarWidth + "px");
 				
-				if(scrollbarWidth != 17){
+				if(has("ie") < 7){
+					// IE6 doesn't support left + right + width:auto; set width directly
+					headerNode.style.width = bodyNode.clientWidth + "px";
+				}else if(scrollbarWidth != 17){
+					// for other browsers, we can perform a one-time operation which adds
+					// a rule to account for scrollbar width in all grid headers.
 					this.addCssRule(".dgrid-header", "right: " + scrollbarWidth + "px");
 				}
 			}
