@@ -160,10 +160,12 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			// does nothing in List, this is more of a hook for the Grid
 		},
 		resize: function(){
-			var bodyNode = this.bodyNode;
-			var headerNode = this.headerNode;
+			var
+				bodyNode = this.bodyNode,
+				headerNode = this.headerNode,
+				quirks = has("quirks") || has("ie") < 7;
 			this.headerScrollNode.style.height = bodyNode.style.marginTop = headerNode.offsetHeight + "px";
-			if(has("quirks") || has("ie") < 7){
+			if(quirks){
 				// in quirks mode, the "bottom" CSS property is ignored, so do this to fix it
 				// We might want to use a CSS expression or the xstyle package to fix this.
 				// We guard against negative values in case of issues with external CSS.
@@ -172,20 +174,26 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			}
 			if(!scrollbarWidth){
 				// we haven't computed the scroll bar width yet, do so now, and add a new rule if need be
+				// (this is only executed once, when the first List/Grid is initialized)
 				scrollbarWidth = bodyNode.offsetWidth - bodyNode.clientWidth;
 				
 				// add rules that can be used where scrollbar width/height is needed
 				this.addCssRule(".dgrid-scrollbar-width", "width: " + scrollbarWidth + "px");
 				this.addCssRule(".dgrid-scrollbar-height", "height: " + scrollbarWidth + "px");
 				
-				if(has("ie") < 7){
-					// IE6 doesn't support left + right + width:auto; set width directly
-					headerNode.style.width = bodyNode.clientWidth + "px";
-				}else if(scrollbarWidth != 17){
-					// for other browsers, we can perform a one-time operation which adds
+				if(scrollbarWidth != 17 && !quirks){
+					// for modern browsers, we can perform a one-time operation which adds
 					// a rule to account for scrollbar width in all grid headers.
 					this.addCssRule(".dgrid-header", "right: " + scrollbarWidth + "px");
 				}
+			}
+			if(quirks){
+				// old IE doesn't support left + right + width:auto; set width directly
+				headerNode.style.width = bodyNode.clientWidth + "px";
+				setTimeout(function(){
+					// sync up (after the browser catches up with the new width)
+					headerNode.scrollLeft = bodyNode.scrollLeft;
+				}, 0);
 			}
 		},
 		addCssRule: function(selector, css){
