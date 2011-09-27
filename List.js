@@ -178,7 +178,6 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 				
 				if(scrollbarWidth != 17){
 					this.addCssRule(".dgrid-header", "right: " + scrollbarWidth + "px");
-					this.addCssRule(".dgrid-header-scroll", "width: " + scrollbarWidth + "px");
 				}
 			}
 		},
