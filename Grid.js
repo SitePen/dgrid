@@ -223,15 +223,14 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "dojo/q
 			// extension of List.resize to allow accounting for
 			// column sizes larger than actual grid area
 			var
+				headerTableNode = this.headerNode.firstChild,
 				contentNode = this.contentNode,
-				firstRowNode = document.getElementById(this.id + "-row-0"),
 				width;
 			
 			this.inherited(arguments);
 			
-			if(contentNode && firstRowNode){
-				firstRowNode = firstRowNode.firstChild; // table node with full width
-				if((width = firstRowNode.offsetWidth) != contentNode.offsetWidth){
+			if(contentNode){
+				if((width = headerTableNode.offsetWidth) != contentNode.offsetWidth){
 					// update size of content node if necessary (to match size of rows)
 					contentNode.style.width = width + "px";
 				}

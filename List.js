@@ -144,6 +144,8 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			});
 			this.configStructure();
 			this.renderHeader(headerNode);
+			
+			this.contentNode = put(this.bodyNode, "div.dgrid-content.ui-widget-content");
 			this.resize();
 			this.refresh();
 			aspect.after(this, "scrollTo", function(){
@@ -170,7 +172,7 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			}
 			if(!scrollbarWidth){
 				// we haven't computed the scroll bar width yet, do so now, and add a new rule if need be
-				scrollbarWidth = 1 + bodyNode.offsetWidth - bodyNode.clientWidth;
+				scrollbarWidth = bodyNode.offsetWidth - bodyNode.clientWidth;
 				
 				// add rules that can be used where scrollbar width/height is needed
 				this.addCssRule(".dgrid-scrollbar-width", "width: " + scrollbarWidth + "px");
@@ -217,17 +219,14 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			//		refreshes the contents of the grid
 			this._rowIdToObject = {};
 			this._autoId = 0;
-			if(this.contentNode){
-				// remove the content so it can be recreated
-				this.contentNode.innerHTML = "";
-				// remove any listeners
-				for(var i = 0;i < this.observers.length; i++){
-					this.observers[i].cancel();
-				}
-				this.observers = [];
-			}else{
-				this.contentNode = put(this.bodyNode, "div.dgrid-content.ui-widget-content");
+			
+			// remove the content so it can be recreated
+			this.contentNode.innerHTML = "";
+			// remove any listeners
+			for(var i = 0;i < this.observers.length; i++){
+				this.observers[i].cancel();
 			}
+			this.observers = [];
 			if(this.init){
 				this.init({
 					domNode: this.bodyNode,

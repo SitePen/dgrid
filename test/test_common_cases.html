@@ -8,9 +8,10 @@
 			@import "../../dojo/resources/dojo.css";
 			@import "../css/dgrid.css";
 			@import "../css/skins/claro.css";
-			.heading {
+			h2 {
 				font-weight: bold;
 				padding-bottom: 0.25em;
+				clear: both;
 			}
 			#grid { 
 				width: 70%;
@@ -24,6 +25,20 @@
 			#grid .column-col4 {
 				width: 180px;
 			}
+			
+			#scrollgrid {
+				width: 50%;
+			}
+			#scrollgrid .dgrid-cell {
+				width: 100px; /* force all columns to have SOME width */
+			}
+			#scrollgrid .column-col1 {
+				width: 500px;
+			}
+			#scrollgrid .column-col4 {
+				width: 300px;
+			}
+			
 			#tree {
 				width: 700px;
 				height: 200px;
@@ -42,10 +57,6 @@
 			.dgrid {
 				margin: 10px;
 			}
-			/*#grid .dgrid-row{
-				height:30px;
-				overflow: hidden;
-			}*/
 		</style>
 		<script>
 			var start= new Date().getTime();
@@ -67,6 +78,12 @@
 						store: testStore,
 						columns: columns
 					}, "grid");
+					
+					window.scrollgrid = dojo.declare([Grid, Selection, Keyboard])({
+						store: testStore,
+						columns: columns
+					}, "scrollgrid");
+					
 					window.tree = dojo.declare([Grid, Selection, Keyboard])({
 						store: testCountryStore,
 						query: {type: "continent"},
@@ -97,5 +114,8 @@
 		<h2>A grid with tree column and then a simple list (floated left)</h2>
 		<div tabIndex="2" id="tree"></div>
 		<div tabIndex="1" id="list"></div>
+		<h2>Same as basic grid, but with column widths exceeding grid width</h2>
+		<p>(for testing that nodes occupy correct widths - pay attention to hover/selection style)</p>
+		<div id="scrollgrid"></div>
 	</body>
 </html>
