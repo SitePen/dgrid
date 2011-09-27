@@ -9,7 +9,7 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "dojo/q
 	
 	return declare([List], {
 		columns: null,
-		// summary:
+		// cellNavigation: Boolean
 		//		This indicates that focus is at the cell level. This may be set to false to cause
 		//		focus to be at the row level, which is useful if you want only want row-level
 		//		navigation.
