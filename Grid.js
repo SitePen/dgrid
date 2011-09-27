@@ -1,10 +1,12 @@
 define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "dojo/query", "./Editor", "./List", "dojo/_base/sniff"], function(has, put, declare, listen, query, Editor, List){
 	var contentBoxSizing = has("ie") < 8 && !has("quirks");
+	
 	function appendIfNode(parent, subNode){
 		if(subNode && subNode.nodeType){
 			parent.appendChild(subNode);
 		}
 	}
+	
 	return declare([List], {
 		columns: null,
 		// summary:
@@ -216,6 +218,26 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "dojo/q
 				}
 			});
 		},
+		
+		resize: function(){
+			// extension of List.resize to allow accounting for
+			// column sizes larger than actual grid area
+			var
+				contentNode = this.contentNode,
+				firstRowNode = document.getElementById(this.id + "-row-0"),
+				width;
+			
+			this.inherited(arguments);
+			
+			if(contentNode && firstRowNode){
+				firstRowNode = firstRowNode.firstChild; // table node with full width
+				if((width = firstRowNode.offsetWidth) != contentNode.offsetWidth){
+					// update size of content node if necessary (to match size of rows)
+					contentNode.style.width = width + "px";
+				}
+			}
+		},
+		
 		sort: function(property, descending){
 			// summary:
 			//		Extension of List.js sort to update sort arrow in UI

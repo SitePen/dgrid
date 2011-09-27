@@ -39,8 +39,8 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dgrid/OnDemandGrid", "dgrid/ColumnResizer", "dgrid/test/data", "dojo/domReady!"],
-				function(Grid, ColumnResizer, testStore){
+			require(["dgrid/OnDemandGrid", "dgrid/ColumnResizer", "dgrid/Selection", "dgrid/test/data", "dojo/domReady!"],
+				function(Grid, ColumnResizer, Selection, testStore){
 					var columns = { // you can declare columns as an object hash (key translates to field)
 						col1: 'Column 1Column1Column 1 Column 1',
 						col2: {label: 'Column2222222222222222222222222', sortable: false},
@@ -48,7 +48,7 @@
 						col4: 'Column 4',
 						"last-col": {label: 'Column 5', field: 'col5'}
 					};
-					window.grid = dojo.declare([Grid, ColumnResizer])({
+					window.grid = dojo.declare([Grid, Selection, ColumnResizer])({
 						store: testStore,
 						columns: columns
 					}, "grid");
