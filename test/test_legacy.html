@@ -164,8 +164,8 @@
 					id: "test4c"
 				});
 				query(".test4c")[0].appendChild(grid4c.domNode);
-				// need to call resize to calculate header size after node is placed
-				grid4c.resize();
+				// need to call startup after node is placed manually
+				grid4c.startup();
 				
 				// Test 4d: no srcNodeRef, no id - should end up with id=dgrid_1
 				window.grid4d = new OnDemandGrid({
@@ -173,8 +173,8 @@
 					columns: columnsNew
 				});
 				query(".test4d")[0].appendChild(grid4d.domNode);
-				// need to call resize to calculate header size after node is placed
-				grid4d.resize();
+				// need to call startup after node is placed manually
+				grid4d.startup();
 			});
 			
 		</script>

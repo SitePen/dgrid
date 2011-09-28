@@ -84,5 +84,7 @@
 }
 
 .cactus .ui-state-highlight{
-	background-color: #009; /* TODO: change */
+	background: #d6e5a5;
+	color: #000;
+	text-shadow: none;
 }
