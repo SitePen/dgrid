@@ -73,14 +73,14 @@
 			<colgroup span="2"></colgroup>
 			<thead>
 				<tr>
-					<th field="col1">Column 1</th>
-					<th field="col2" sortable="false">Column 2</th>
-					<th field="col1" rowspan="2">Column 1</th>
-					<th field="col4">Column 4</th>
+					<th data-dgrid-props="field:'col1'">Column 1</th>
+					<th data-dgrid-props="field:'col2', sortable:false">Column 2</th>
+					<th rowspan="2" data-dgrid-props="field:'col1'">Column 1</th>
+					<th data-dgrid-props="field:'col4'">Column 4</th>
 				</tr>
 				<tr>
-					<th field="col3" colspan="2">Column 3</th>
-					<th field="col5">Column 5</th>
+					<th colspan="2" data-dgrid-props="field:'col3'">Column 3</th>
+					<th data-dgrid-props="field:'col5'">Column 5</th>
 				</tr>
 			</thead>
 		</table>
@@ -90,22 +90,22 @@
 			<colgroup span="4"></colgroup>
 			<thead>
 				<tr>
-					<th field="col1" rowspan="3">rowspan=3</th>
-					<th field="col2" colspan="2">colspan=2</th>
-					<th field="col3" rowspan="2">rowspan=2</th>
-					<th field="col4" colspan="2">colspan=2</th>
-					<th field="col5" rowspan="2">rowspan=2</th>
+					<th rowspan="3" data-dgrid-props="field:'col1'">rowspan=3</th>
+					<th colspan="2" data-dgrid-props="field:'col2'">colspan=2</th>
+					<th rowspan="2" data-dgrid-props="field:'col3'">rowspan=2</th>
+					<th colspan="2" data-dgrid-props="field:'col4'">colspan=2</th>
+					<th rowspan="2" data-dgrid-props="field:'col5'">rowspan=2</th>
 				</tr>
 				<tr>
-					<th field="col2" rowspan="2">rowspan=2</th>
-					<th field="col3">Column 3</th>
-					<th field="col4" rowspan="2">rowspan=2</th>
-					<th field="col5">Column 5</th>
+					<th rowspan="2" data-dgrid-props="field:'col2'">rowspan=2</th>
+					<th data-dgrid-props="field:'col3'">Column 3</th>
+					<th rowspan="2" data-dgrid-props="field:'col4'">rowspan=2</th>
+					<th data-dgrid-props="field:'col5'">Column 5</th>
 				</tr>
 				<tr>
-					<th field="col2">Column 2</th>
-					<th field="col3">Column 3</th>
-					<th field="col5" colspan="2">colspan=2</th>
+					<th data-dgrid-props="field:'col2'">Column 2</th>
+					<th data-dgrid-props="field:'col3'">Column 3</th>
+					<th colspan="2" data-dgrid-props="field:'col5'">colspan=2</th>
 				</tr>
 			</thead>
 		</table>
