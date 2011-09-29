@@ -129,7 +129,7 @@
 				gridFromHtmlTestProps.renderArray(testOrderedData);
 				
 				// need to expose GridFromHtml as a global for parser to find.
-				window.GridFromHtml = GridFromHtml;
+				window.dgrid = { GridFromHtml: GridFromHtml };
 				
 				// also, need a store, since there's currently no way to effectively
 				// invoke renderArray from HTML.
@@ -241,7 +241,7 @@
 		
 		<h2>3a: Same as 2a, parsed from declarative markup (using a store)</h2>
 		<table id="gridDeclarativeLegacyFormatter" data-dojo-id="gridDeclarativeLegacyFormatter"
-			data-dojo-type="GridFromHtml" data-dojo-props="store: store">
+			data-dojo-type="dgrid.GridFromHtml" data-dojo-props="store: store">
 			<thead>
 				<tr>
 					<th data-dgrid-props="field:'_item', sortable:false, formatter:testFormatter">Step</th>
@@ -250,7 +250,7 @@
 		</table>
 		<h2>3b: Same as 2b, parsed from declarative markup (using a store)</h2>
 		<table id="gridDeclarativeLegacyGet" data-dojo-id="gridDeclarativeLegacyGet"
-			data-dojo-type="GridFromHtml" data-dojo-props="store: store">
+			data-dojo-type="dgrid.GridFromHtml" data-dojo-props="store: store">
 			<tbody>
 				<tr>
 					<th data-dgrid-props="field:'order', get:testGet">Step</th>
@@ -261,7 +261,7 @@
 		</table>
 		<h2>3c: Same as 2c, parsed from declarative markup (using a store)</h2>
 		<table id="gridDeclarativeNew" data-dojo-id="gridDeclarativeNew"
-			data-dojo-type="GridFromHtml" data-dojo-props="store: store">
+			data-dojo-type="dgrid.GridFromHtml" data-dojo-props="store: store">
 			<tr>
 				<th data-dgrid-props="field:'order',
 					renderCell:testRenderCell, renderHeaderCell:testRenderHeaderCell">Step</th>
