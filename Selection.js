@@ -91,9 +91,10 @@ return declare([List], {
 				var row = event.target;
 				console.log("in focus; event: ", event, "; row: ", row);
 				if(mode == "single" && lastRow && event.ctrlKey){
+					// allow deselection even within single select mode
 					grid.deselect(lastRow);
 					if(lastRow == row){
-						return; // allow deselection even within single select mode
+						return;
 					}
 				}
 				if(!event.ctrlKey){
@@ -102,7 +103,7 @@ return declare([List], {
 					}
 					grid.select(row);
 				}else{
-					grid.select(row, null, null);
+					grid.select(row, null, null); // toggle
 				}
 				if(event.shiftKey && mode != "single"){
 					// select range
@@ -165,9 +166,10 @@ return declare([List], {
 			bubbles: true,
 			row: row
 		}))){
-			selection[row.id] = value;
 			if(!value && !this.allSelected){
 				delete this.selection[row.id];
+			}else{
+				selection[row.id] = value;
 			}
 		}
 		if(element){
