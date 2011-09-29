@@ -112,8 +112,9 @@ define(["./OnDemandGrid", "dojo/_base/declare", "dojo/_base/lang", "dojo/dom-con
 				getNum = GridFromHtml.utils.getNumFromAttr,
 				obj = {}, tmp;
 			
-			// respect standard attributes
+			// inspect standard attributes first
 			obj.label = th.innerHTML;
+			obj.field = th.className || th.innerHTML; // often overridden in props
 			if(th.className){ obj.className = th.className; }
 			if((tmp = getNum(th, "rowspan"))){ obj.rowSpan = tmp; }
 			if((tmp = getNum(th, "colspan"))){ obj.colSpan = tmp; }
