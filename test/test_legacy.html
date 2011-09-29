@@ -129,7 +129,7 @@
 				gridFromHtmlTestProps.renderArray(testOrderedData);
 				
 				// need to expose GridFromHtml as a global for parser to find.
-				window.GridFromHtml = GridFromHtml;
+				window.dgrid = { GridFromHtml: GridFromHtml };
 				
 				// also, need a store, since there's currently no way to effectively
 				// invoke renderArray from HTML.
@@ -200,7 +200,7 @@
 		<table id="gridFromHtmlLegacyFormatter">
 			<thead>
 				<tr>
-					<th field="_item" sortable="false" formatter="testFormatter">Step</th>
+					<th data-dgrid-props="field:'_item', sortable:false, formatter:testFormatter">Step</th>
 				</tr>
 			</thead>
 		</table>
@@ -208,19 +208,19 @@
 		<table id="gridFromHtmlLegacyGet">
 			<tbody>
 				<tr>
-					<th field="order" get="testGet">Step</th>
+					<th data-dgrid-props="field:'order', get:testGet">Step</th>
 					<th>name</th>
-					<th field="description" sortable="false">what to do</th>
+					<th data-dgrid-props="field:'description', sortable:false">what to do</th>
 				</tr>
 			</tbody>
 		</table>
 		<h2>2c: Same as 1c, using GridFromHtml</h2>
 		<table id="gridFromHtmlNew">
 			<tr>
-				<th field="order"
-					renderCell="testRenderCell" renderHeaderCell="testRenderHeaderCell">Step</th>
+				<th data-dgrid-props="field:'order',
+					renderCell:testRenderCell, renderHeaderCell:testRenderHeaderCell">Step</th>
 				<th>name</th>
-				<th field="description" sortable="false">what to do</th>
+				<th data-dgrid-props="field:'description', sortable:false">what to do</th>
 			</tr>
 		</table>
 		<hr/>
@@ -228,12 +228,11 @@
 		<table id="gridFromHtmlTestProps">
 			<thead>
 				<tr>
-					<th field="name" rowspan="2">No sortable attr (defaults to true)</th>
-					<th field="name" colspan="2" sortable>sortable attr present, no value</th>
+					<th rowspan="2" data-dgrid-props="field:'name'">No sortable attr (defaults to true)</th>
+					<th data-dgrid-props="field:'name', sortable:false">sortable="false"</th>
 				</tr>
 				<tr>
-					<th field="name" sortable="false">sortable="false"</th>
-					<th field="name" sortable="true">sortable="true"</th>
+					<th data-dgrid-props="field:'name', sortable:true">sortable="true"</th>
 				</tr>
 			</thead>
 		</table>
@@ -242,32 +241,32 @@
 		
 		<h2>3a: Same as 2a, parsed from declarative markup (using a store)</h2>
 		<table id="gridDeclarativeLegacyFormatter" data-dojo-id="gridDeclarativeLegacyFormatter"
-			data-dojo-type="GridFromHtml" data-dojo-props="store: store">
+			data-dojo-type="dgrid.GridFromHtml" data-dojo-props="store: store">
 			<thead>
 				<tr>
-					<th field="_item" sortable="false" formatter="testFormatter">Step</th>
+					<th data-dgrid-props="field:'_item', sortable:false, formatter:testFormatter">Step</th>
 				</tr>
 			</thead>
 		</table>
 		<h2>3b: Same as 2b, parsed from declarative markup (using a store)</h2>
 		<table id="gridDeclarativeLegacyGet" data-dojo-id="gridDeclarativeLegacyGet"
-			data-dojo-type="GridFromHtml" data-dojo-props="store: store">
+			data-dojo-type="dgrid.GridFromHtml" data-dojo-props="store: store">
 			<tbody>
 				<tr>
-					<th field="order" get="testGet">Step</th>
+					<th data-dgrid-props="field:'order', get:testGet">Step</th>
 					<th>name</th>
-					<th field="description" sortable="false">what to do</th>
+					<th data-dgrid-props="field:'description', sortable:false">what to do</th>
 				</tr>
 			</tbody>
 		</table>
 		<h2>3c: Same as 2c, parsed from declarative markup (using a store)</h2>
 		<table id="gridDeclarativeNew" data-dojo-id="gridDeclarativeNew"
-			data-dojo-type="GridFromHtml" data-dojo-props="store: store">
+			data-dojo-type="dgrid.GridFromHtml" data-dojo-props="store: store">
 			<tr>
-				<th field="order"
-					renderCell="testRenderCell" renderHeaderCell="testRenderHeaderCell">Step</th>
+				<th data-dgrid-props="field:'order',
+					renderCell:testRenderCell, renderHeaderCell:testRenderHeaderCell">Step</th>
 				<th>name</th>
-				<th field="description" sortable="false">what to do</th>
+				<th data-dgrid-props="field:'description', sortable:false">what to do</th>
 			</tr>
 		</table>
 		

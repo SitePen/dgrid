@@ -2,6 +2,9 @@ define(["./OnDemandGrid", "dojo/_base/declare", "dojo/_base/lang", "dojo/dom-con
 	// This module supports parsing grid structure information from an HTML table.
 	// This module does NOT support ColumnSets; see GridWithColumnSetsFromHtml
 	
+	// name of data attribute to check for column properties
+	var bagName = "data-dgrid-props";
+	
 	function getSubRowsFromDom(domNode){
 		// summary:
 		//		generate columns from DOM. Should this be in here, or a separate module?
@@ -86,26 +89,40 @@ define(["./OnDemandGrid", "dojo/_base/declare", "dojo/_base/lang", "dojo/dom-con
 			val = val && Number(val);
 			return isNaN(val) ? undefined : val;
 		},
+		getPropsFromNode: function(node){
+			// used to pull properties out of bag e.g. "data-dgrid-props".
+			var obj, str = node.getAttribute(bagName);
+			if(!str){ return {}; } // no props bag specified!
+			
+			// Yes, eval is evil, but this is the same thing that dojo.parser
+			// does for data-dojo-props - which is what we want to mimic.
+			try{
+				obj = eval("({" + str + "})");
+			}catch(e){
+				throw new Error("Error in " + bagName + " {" + str + "}: " + e.toString());
+			}
+			return obj;
+		},
 		
 		// Function for aggregating th attributes into column properties
 		getColumnFromCell: function(th){
 			var
 				getObj = GridFromHtml.utils.getObjFromAttr,
 				getBool = GridFromHtml.utils.getBoolFromAttr,
-				getNum = GridFromHtml.utils.getNumFromAttr;
+				getNum = GridFromHtml.utils.getNumFromAttr,
+				obj = {}, tmp;
 			
-			return {
-				label: th.innerHTML,
-				field: th.getAttribute("field") || th.className || th.innerHTML,
-				className: th.className,
-				sortable: getBool(th, "sortable"),
-				get: getObj(th, "get"),
-				formatter: getObj(th, "formatter"),
-				renderCell: getObj(th, "renderCell"),
-				renderHeaderCell: getObj(th, "renderHeaderCell"),
-				rowSpan: getNum(th, "rowspan"),
-				colSpan: getNum(th, "colspan")
-			}
+			// inspect standard attributes first
+			obj.label = th.innerHTML;
+			obj.field = th.className || th.innerHTML; // often overridden in props
+			if(th.className){ obj.className = th.className; }
+			if((tmp = getNum(th, "rowspan"))){ obj.rowSpan = tmp; }
+			if((tmp = getNum(th, "colspan"))){ obj.colSpan = tmp; }
+			
+			// look for rest of properties in data attribute
+			// (properties in data attribute can override the HTML attributes above)
+			dojo.mixin(obj, GridFromHtml.utils.getPropsFromNode(th));
+			return obj;
 		}
 	}
 	return GridFromHtml;
