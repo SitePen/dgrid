@@ -123,20 +123,6 @@ define(["./OnDemandGrid", "dojo/_base/declare", "dojo/_base/lang", "dojo/dom-con
 			// (properties in data attribute can override the HTML attributes above)
 			dojo.mixin(obj, GridFromHtml.utils.getPropsFromNode(th));
 			return obj;
-			/*
-			return {
-				label: th.innerHTML,
-				field: th.getAttribute("field") || th.className || th.innerHTML,
-				className: th.className,
-				sortable: getBool(th, "sortable"),
-				get: getObj(th, "get"),
-				formatter: getObj(th, "formatter"),
-				renderCell: getObj(th, "renderCell"),
-				renderHeaderCell: getObj(th, "renderHeaderCell"),
-				rowSpan: getNum(th, "rowspan"),
-				colSpan: getNum(th, "colspan")
-			};
-			*/
 		}
 	}
 	return GridFromHtml;
