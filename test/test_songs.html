@@ -8,6 +8,7 @@
 		<style type="text/css">
 			@import "../../dojo/resources/dojo.css";
 			@import "../css/skins/itunes.css";
+			@import "../css/hider.css";
 			html, body {
 				width: 100%;
 				height: 100%;
@@ -140,12 +141,13 @@
 					"dgrid/OnDemandGrid",
 					"dgrid/Selection",
 					"dgrid/Keyboard",
+					"dgrid/ColumnHider",
 					"dojo/_base/declare",
 					"dojo/_base/array",
 					"dgrid/test/data_songs",
 					"dojo/domReady!"
 				],
-				function(List, Grid, Selection, Keyboard, declare, arrayUtil){
+				function(List, Grid, Selection, Keyboard, Hider, declare, arrayUtil){
 					//	a formatting function for the Duration column.
 					var timeFormatter = function(t){
 						var tmp = parseInt(t, 10), min, sec;
@@ -166,7 +168,7 @@
 						{label: 'Genre', field: 'Genre'}
 					];
 
-					window.grid = new (declare([Grid, Selection, Keyboard]))({
+					window.grid = new (declare([Grid, Selection, Keyboard, Hider]))({
 						store: songStore,
 						columns: columns
 					}, "grid");
