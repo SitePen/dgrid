@@ -1,5 +1,5 @@
 // example sample data and code
-define(["dojo/store/Memory", "dojo/store/Observable"],function(Memory, Observable){
+define(["dojo/store/Memory", "dojo/store/Observable", "dojo/store/util/QueryResults"],function(Memory, Observable, QueryResults){
 	// some sample data
 	// global var "data"
 	data = {
@@ -120,7 +120,12 @@ define(["dojo/store/Memory", "dojo/store/Observable"],function(Memory, Observabl
 					{ id: 'BuenosAires', name:'Buenos Aires', type:'city', parent: 'AR' }
 		],
 		getChildren: function(parent, options){
-			return this.query({parent: parent.id}, options);
+			var def = new dojo.Deferred();
+			var q = this.query({parent: parent.id}, options);
+			setTimeout(function(){
+				def.resolve(q);
+			}, 2000);
+			return QueryResults(def.promise);
 		},
 		mayHaveChildren: function(parent){
 			return parent.type != "city";
