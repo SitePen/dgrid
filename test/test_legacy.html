@@ -109,27 +109,7 @@
 					columns: columnsNew
 				}, "gridNew");
 				gridNew.renderArray(testOrderedData);
-				
-				// GridFromHtml tests
-				
-				window.gridFromHtmlLegacyFormatter = new GridFromHtml({},
-					"gridFromHtmlLegacyFormatter");
-				gridFromHtmlLegacyFormatter.renderArray(testOrderedData);
-				
-				window.gridFromHtmlLegacyGet = new GridFromHtml({},
-					"gridFromHtmlLegacyGet");
-				gridFromHtmlLegacyGet.renderArray(testOrderedData);
-				
-				window.gridFromHtmlNew = new GridFromHtml({},
-					"gridFromHtmlNew");
-				gridFromHtmlNew.renderArray(testOrderedData);
-				
-				window.gridFromHtmlTestProps = new GridFromHtml({},
-					"gridFromHtmlTestProps");
-				gridFromHtmlTestProps.renderArray(testOrderedData);
-				
-				// need to expose GridFromHtml as a global for parser to find.
-				window.dgrid = { GridFromHtml: GridFromHtml };
+
 				
 				// also, need a store, since there's currently no way to effectively
 				// invoke renderArray from HTML.
@@ -148,22 +128,22 @@
 				window.grid4a = new OnDemandGrid({
 					store: store,
 					columns: columnsNew,
-					id: "test4a"
-				}, query(".test4a")[0]);
+					id: "test2a"
+				}, query(".test2a")[0]);
 				
 				// Test 4b: srcNodeRef + no id - should end up with id=dgrid_0
 				window.grid4b = new OnDemandGrid({
 					store: store,
 					columns: columnsNew
-				}, query(".test4b")[0]);
+				}, query(".test2b")[0]);
 				
 				// Test 4c: no srcNodeRef, specify id to dgrid
 				window.grid4c = new OnDemandGrid({
 					store: store,
 					columns: columnsNew,
-					id: "test4c"
+					id: "test2c"
 				});
-				query(".test4c")[0].appendChild(grid4c.domNode);
+				query(".test2c")[0].appendChild(grid4c.domNode);
 				// need to call startup after node is placed manually
 				grid4c.startup();
 				
@@ -172,7 +152,7 @@
 					store: store,
 					columns: columnsNew
 				});
-				query(".test4d")[0].appendChild(grid4d.domNode);
+				query(".test2d")[0].appendChild(grid4d.domNode);
 				// need to call startup after node is placed manually
 				grid4d.startup();
 			});
@@ -194,91 +174,17 @@
 		
 		<hr/>
 		
-		<!-- GridFromHtml should look for TRs with THs anywhere.
-			Testing here with one thead, one tbody, and one implicit. -->
-		<h2>2a: Same as 1a, using GridFromHtml</h2>
-		<table id="gridFromHtmlLegacyFormatter">
-			<thead>
-				<tr>
-					<th data-dgrid-props="field:'_item', sortable:false, formatter:testFormatter">Step</th>
-				</tr>
-			</thead>
-		</table>
-		<h2>2b: Same as 1b, using GridFromHtml</h2>
-		<table id="gridFromHtmlLegacyGet">
-			<tbody>
-				<tr>
-					<th data-dgrid-props="field:'order', get:testGet">Step</th>
-					<th>name</th>
-					<th data-dgrid-props="field:'description', sortable:false">what to do</th>
-				</tr>
-			</tbody>
-		</table>
-		<h2>2c: Same as 1c, using GridFromHtml</h2>
-		<table id="gridFromHtmlNew">
-			<tr>
-				<th data-dgrid-props="field:'order',
-					renderCell:testRenderCell, renderHeaderCell:testRenderHeaderCell">Step</th>
-				<th>name</th>
-				<th data-dgrid-props="field:'description', sortable:false">what to do</th>
-			</tr>
-		</table>
-		<hr/>
-		<h2>2d: Testing numeric and boolean property (un)specification in GridFromHtml</h2>
-		<table id="gridFromHtmlTestProps">
-			<thead>
-				<tr>
-					<th rowspan="2" data-dgrid-props="field:'name'">No sortable attr (defaults to true)</th>
-					<th data-dgrid-props="field:'name', sortable:false">sortable="false"</th>
-				</tr>
-				<tr>
-					<th data-dgrid-props="field:'name', sortable:true">sortable="true"</th>
-				</tr>
-			</thead>
-		</table>
+
 		
 		<hr/>
 		
-		<h2>3a: Same as 2a, parsed from declarative markup (using a store)</h2>
-		<table id="gridDeclarativeLegacyFormatter" data-dojo-id="gridDeclarativeLegacyFormatter"
-			data-dojo-type="dgrid.GridFromHtml" data-dojo-props="store: store">
-			<thead>
-				<tr>
-					<th data-dgrid-props="field:'_item', sortable:false, formatter:testFormatter">Step</th>
-				</tr>
-			</thead>
-		</table>
-		<h2>3b: Same as 2b, parsed from declarative markup (using a store)</h2>
-		<table id="gridDeclarativeLegacyGet" data-dojo-id="gridDeclarativeLegacyGet"
-			data-dojo-type="dgrid.GridFromHtml" data-dojo-props="store: store">
-			<tbody>
-				<tr>
-					<th data-dgrid-props="field:'order', get:testGet">Step</th>
-					<th>name</th>
-					<th data-dgrid-props="field:'description', sortable:false">what to do</th>
-				</tr>
-			</tbody>
-		</table>
-		<h2>3c: Same as 2c, parsed from declarative markup (using a store)</h2>
-		<table id="gridDeclarativeNew" data-dojo-id="gridDeclarativeNew"
-			data-dojo-type="dgrid.GridFromHtml" data-dojo-props="store: store">
-			<tr>
-				<th data-dgrid-props="field:'order',
-					renderCell:testRenderCell, renderHeaderCell:testRenderHeaderCell">Step</th>
-				<th>name</th>
-				<th data-dgrid-props="field:'description', sortable:false">what to do</th>
-			</tr>
-		</table>
-		
-		<hr/>
-		
-		<h2>4a: Grid on domnode with no initial id, id specified as param (will become DOM node id)</h2>
-		<div class="test4a"></div>
-		<h2>4b: Grid on domnode with no initial id, dgrid / DOM node id autogenerated</h2>
-		<div class="test4b"></div>
-		<h2>4c: Grid with no srcNodeRef (placed inside another domNode), id specified as param (will become DOM node id)</h2>
-		<div class="test4c"></div>
-		<h2>4d: Grid with no srcNodeRef (placed inside another domNode), dgrid / DOM node id autogenerated</h2>
-		<div class="test4d"></div>
+		<h2>2a: Grid on domnode with no initial id, id specified as param (will become DOM node id)</h2>
+		<div class="test2a"></div>
+		<h2>2b: Grid on domnode with no initial id, dgrid / DOM node id autogenerated</h2>
+		<div class="test2b"></div>
+		<h2>2c: Grid with no srcNodeRef (placed inside another domNode), id specified as param (will become DOM node id)</h2>
+		<div class="test2c"></div>
+		<h2>2d: Grid with no srcNodeRef (placed inside another domNode), dgrid / DOM node id autogenerated</h2>
+		<div class="test2d"></div>
 	</body>
 </html>
