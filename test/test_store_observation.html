@@ -53,7 +53,7 @@
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
 			require(["dojo/on", "dgrid/OnDemandGrid","dgrid/Keyboard", "dgrid/Selection", "dgrid/Editor", "dijit/form/DateTextBox", "dijit/form/HorizontalSlider", "dijit/form/NumberSpinner",  "dgrid/test/data","dojo/dom-construct", "dojo/domReady!"],
-				function(on, Grid, Keyboard, Selection,  Editor, DateTextBox, Slider, NumberSpinner, data, dom){
+				function(on, Grid, Keyboard, Selection,  Editor, DateTextBox, Slider, NumberSpinner, data, domConstruct){
 					var columns = {
 						col1: 'Column 1',
 						col2: {label: 'Column 2'},
@@ -140,16 +140,16 @@
 					on(document.getElementById("save"), "click", function(){
 						console.log("save to store");
 						grid2.save();
-						dom.empty("dirty");
+						domConstruct.empty("dirty");
 					});
 					var dirtyListener = grid2.on("datachange", function(event){
 						setTimeout(function(){
-							dom.empty("dirty");
+							domConstruct.empty("dirty");
 							for(var rowId in grid2.dirty){
-								var node = dom.toDom("<div>rowId: "+rowId + "</div>");
-								dom.create(node, null,"dirty","last");
+								var node = domConstruct.create("div",
+									{ innerHTML: "rowId: "+rowId }, "dirty");
 							}
-						},500);
+						}, 0);
 					});
 					on(document.getElementById("add"), "click", function(){
 						smallColorStore.put({id: smallColorStore.data.length+1, col1: "Grey", col2: false, col3: "Hue", col4:'A hue' , col5: 192, col6: 192, col7: 192 });
