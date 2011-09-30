@@ -2,7 +2,7 @@
 	"http://www.w3.org/TR/html4/loose.dtd">
 <html>
 	<head>
-		<title>Test renderRow and legacy functionality</title>
+		<title>GridFromHtml Tests</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 		<meta name="viewport" content="width=570" />
 		<style type="text/css">
@@ -95,24 +95,17 @@
 				// invoke renderArray from HTML.
 				store = Observable(Memory({data: testOrderedData}));
 				parser.parse();
-				
-				function byId(id){
-					return document.getElementById(id);
-				}
-				
-
-				
-
 			});
 			
 		</script>
 	</head>
 	<body class="claro">
 
-		
+		<p>Compare the outcome of the first group of tests with the first group in
+			<a href="test_legacy.html">test_legacy.html</a>.</p>
 		<!-- GridFromHtml should look for TRs with THs anywhere.
 			Testing here with one thead, one tbody, and one implicit. -->
-		<h2>GridFromHtml</h2>
+		<h2>1a: GridFromHtml with single column with formatter for _item field</h2>
 		<table id="gridFromHtmlLegacyFormatter">
 			<thead>
 				<tr>
@@ -120,7 +113,7 @@
 				</tr>
 			</thead>
 		</table>
-		<h2>1b: using GridFromHtml</h2>
+		<h2>1b: GridFromHtml with single column with get for order field</h2>
 		<table id="gridFromHtmlLegacyGet">
 			<tbody>
 				<tr>
@@ -130,7 +123,9 @@
 				</tr>
 			</tbody>
 		</table>
-		<h2>1c:using GridFromHtml</h2>
+		<h2>1c: GridFromHtml with single column with renderCell function</h2>
+		<p>(should look same as previous but with underlined first header cell
+			and italicized first column values)</p>
 		<table id="gridFromHtmlNew">
 			<tr>
 				<th data-dgrid-props="field:'order',
@@ -139,8 +134,43 @@
 				<th data-dgrid-props="field:'description', sortable:false">what to do</th>
 			</tr>
 		</table>
+		
 		<hr/>
-		<h2>1d: Testing numeric and boolean property (un)specification in GridFromHtml</h2>
+		
+		<h2>2a: same as 1a, parsed from declarative markup (using a store)</h2>
+		<table id="gridDeclarativeLegacyFormatter" data-dojo-id="gridDeclarativeLegacyFormatter"
+			data-dojo-type="dgrid.GridFromHtml" data-dojo-props="store: store">
+			<thead>
+				<tr>
+					<th data-dgrid-props="field:'_item', sortable:false, formatter:testFormatter">Step</th>
+				</tr>
+			</thead>
+		</table>
+		<h2>2b: same as 1b, parsed from declarative markup (using a store)</h2>
+		<table id="gridDeclarativeLegacyGet" data-dojo-id="gridDeclarativeLegacyGet"
+			data-dojo-type="dgrid.GridFromHtml" data-dojo-props="store: store">
+			<tbody>
+				<tr>
+					<th data-dgrid-props="field:'order', get:testGet">Step</th>
+					<th>name</th>
+					<th data-dgrid-props="field:'description', sortable:false">what to do</th>
+				</tr>
+			</tbody>
+		</table>
+		<h2>2c: same as 1c, parsed from declarative markup (using a store)</h2>
+		<table id="gridDeclarativeNew" data-dojo-id="gridDeclarativeNew"
+			data-dojo-type="dgrid.GridFromHtml" data-dojo-props="store: store">
+			<tr>
+				<th data-dgrid-props="field:'order',
+					renderCell:testRenderCell, renderHeaderCell:testRenderHeaderCell">Step</th>
+				<th>name</th>
+				<th data-dgrid-props="field:'description', sortable:false">what to do</th>
+			</tr>
+		</table>
+		
+		<hr/>
+		
+		<h2>3a: Testing numeric and boolean property (un)specification in GridFromHtml</h2>
 		<table id="gridFromHtmlTestProps">
 			<thead>
 				<tr>
@@ -153,37 +183,5 @@
 			</thead>
 		</table>
 		
-		<hr/>
-		
-		<h2>2a: parsed from declarative markup (using a store)</h2>
-		<table id="gridDeclarativeLegacyFormatter" data-dojo-id="gridDeclarativeLegacyFormatter"
-			data-dojo-type="dgrid.GridFromHtml" data-dojo-props="store: store">
-			<thead>
-				<tr>
-					<th data-dgrid-props="field:'_item', sortable:false, formatter:testFormatter">Step</th>
-				</tr>
-			</thead>
-		</table>
-		<h2>2b:parsed from declarative markup (using a store)</h2>
-		<table id="gridDeclarativeLegacyGet" data-dojo-id="gridDeclarativeLegacyGet"
-			data-dojo-type="dgrid.GridFromHtml" data-dojo-props="store: store">
-			<tbody>
-				<tr>
-					<th data-dgrid-props="field:'order', get:testGet">Step</th>
-					<th>name</th>
-					<th data-dgrid-props="field:'description', sortable:false">what to do</th>
-				</tr>
-			</tbody>
-		</table>
-		<h2>2c:  parsed from declarative markup (using a store)</h2>
-		<table id="gridDeclarativeNew" data-dojo-id="gridDeclarativeNew"
-			data-dojo-type="dgrid.GridFromHtml" data-dojo-props="store: store">
-			<tr>
-				<th data-dgrid-props="field:'order',
-					renderCell:testRenderCell, renderHeaderCell:testRenderHeaderCell">Step</th>
-				<th>name</th>
-				<th data-dgrid-props="field:'description', sortable:false">what to do</th>
-			</tr>
-		</table>
 	</body>
 </html>

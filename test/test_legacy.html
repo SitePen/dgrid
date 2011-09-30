@@ -116,53 +116,48 @@
 				store = Observable(Memory({data: testOrderedData}));
 				parser.parse();
 				
-				function byId(id){
-					return document.getElementById(id);
-				}
-				
 				// Test 4x: testing dgrid w/o srcNodeRef, or w/ srcNodeRef w/o id
 				// Purposely testing with store to see how init is handled.
 				// (works fine if you renderArray after node placement)
 				
 				// Test 4a: srcNodeRef + no id, specify id to dgrid
-				window.grid4a = new OnDemandGrid({
+				window.grid2a = new OnDemandGrid({
 					store: store,
 					columns: columnsNew,
 					id: "test2a"
 				}, query(".test2a")[0]);
 				
 				// Test 4b: srcNodeRef + no id - should end up with id=dgrid_0
-				window.grid4b = new OnDemandGrid({
+				window.grid2b = new OnDemandGrid({
 					store: store,
 					columns: columnsNew
 				}, query(".test2b")[0]);
 				
 				// Test 4c: no srcNodeRef, specify id to dgrid
-				window.grid4c = new OnDemandGrid({
+				window.grid2c = new OnDemandGrid({
 					store: store,
 					columns: columnsNew,
 					id: "test2c"
 				});
-				query(".test2c")[0].appendChild(grid4c.domNode);
+				query(".test2c")[0].appendChild(grid2c.domNode);
 				// need to call startup after node is placed manually
-				grid4c.startup();
+				grid2c.startup();
 				
 				// Test 4d: no srcNodeRef, no id - should end up with id=dgrid_1
-				window.grid4d = new OnDemandGrid({
+				window.grid2d = new OnDemandGrid({
 					store: store,
 					columns: columnsNew
 				});
-				query(".test2d")[0].appendChild(grid4d.domNode);
+				query(".test2d")[0].appendChild(grid2d.domNode);
 				// need to call startup after node is placed manually
-				grid4d.startup();
+				grid2d.startup();
 			});
 			
 		</script>
 	</head>
 	<body class="claro">
 		<p>This page tests various responsibilities of renderRow in Grid.js,
-			particularly those sensitive to dojox-grid-friendly properties.
-			It also tests mappings made in GridFromHtml.js.</p>
+			particularly those sensitive to dojox-grid-friendly properties.</p>
 		<h2>1a: Grid with single column with formatter for _item field (legacy grid behavior)</h2>
 		<div id="gridLegacyFormatter"></div>
 		<h2>1b: Grid with single column with get for order field (legacy grid behavior)</h2>
@@ -171,10 +166,6 @@
 		<p>(dgrid behavior; should look same as previous but with underlined first header cell
 			and italicized first column values)</p>
 		<div id="gridNew"></div>
-		
-		<hr/>
-		
-
 		
 		<hr/>
 		
