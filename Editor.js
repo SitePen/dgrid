@@ -115,7 +115,7 @@ return function(column, editor, editOn){
 					var asDate = new Date(value);
 					value = isNaN(asDate.getTime()) ? value : asDate;
 				}
-				if(on.emit(cellElement, "datachange", {oldValue: oldValue, value: value, bubbles: true, cancelable: true})){
+				if(on.emit(cellElement, "datachange", {rowId: row.id, oldValue: oldValue, value: value, bubbles: true, cancelable: true})){
 					var
 						dirty = grid.dirty[row.id],
 						object = row.data;

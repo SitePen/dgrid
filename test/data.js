@@ -47,7 +47,11 @@ define(["dojo/store/Memory", "dojo/store/Observable", "dojo/store/util/QueryResu
 
 	// global var colorStore
 	colorStore = Observable(new Memory({data: data2}));
-
+	data2.items= [];
+	for(var i=0; i<colors.length; i++){
+		data2.items.push(dojo.mixin({ id: i }, colors[i]));
+	}
+	smallColorStore = Observable(new Memory({data: data2}));
 	//empty store
 	emptyData = { identifier: 'id', label: 'id', items:[]};
 	emptyStore = Observable(new Memory({data: emptyData}));
