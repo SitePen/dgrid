@@ -246,6 +246,9 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "dojo/q
 			var target = this._sortNode ||
 				query("#" + this.id + " .dgrid-header .field-" + property)[0];
 			
+			// skip this logic if field being sorted isn't actually displayed
+			if(!target){ return this.inherited(arguments); }
+			
 			target = target.contents || target;
 			if(this._lastSortedArrow){
 				// remove the sort classes from parent node
