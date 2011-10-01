@@ -41,15 +41,20 @@
 				{order: 8, name:"remove", description:"Using a spatula, lift cookies off onto wax paper or a cooling rack"},
 				{order: 9, name:"eat", description:"Eat and enjoy!"}
 			];
-			var columns = {
+			var columns3 = {
 				order: "step", // give column a custom name
 				name: {},
 				description: {label: "what to do", sortable: false}
 			};
+			var columns2 = {
+				name: {},
+				description: {label: "what to do", sortable: false}
+			};
+			
 			require(["dgrid/Grid", "dojo/domReady!"],
 				function(Grid){
 					window.grid = new Grid({
-						columns: columns
+						columns: columns3
 					}, "grid");
 					grid.renderArray(data);
 				});
@@ -59,9 +64,13 @@
 	<body class="claro">
 		<h2>A basic grid rendered from an array</h2>
 		<div id="grid"></div>
-		<div>Buttons to test programmatic sort (on name field):
-		<button onclick="window.grid.sort('name')">Sort Asc</button>
-		<button onclick="window.grid.sort('name',true)">Sort Desc</button>
+		<div>Buttons to test resetting columns:
+			<button onclick="grid.setColumns(columns3);">order, name, description</button>
+			<button onclick="grid.setColumns(columns2);">name, description</button>
+		</div>
+		<div>Buttons to test programmatic sort (on order field):
+			<button onclick="grid.sort('order');">Sort Asc</button>
+			<button onclick="grid.sort('order',true);">Sort Desc</button>
 		</div>
 	</body>
 </html>

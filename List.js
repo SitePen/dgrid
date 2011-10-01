@@ -149,7 +149,7 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 				listen.emit(domNode, "scroll", {scrollTarget: bodyNode});
 			});
 			this.configStructure();
-			this.renderHeader(headerNode);
+			this.renderHeader();
 			
 			this.contentNode = put(this.bodyNode, "div.dgrid-content.ui-widget-content");
 			aspect.after(this, "scrollTo", function(){
