@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>list.addCssRule tests</title>
+		<style>
+.box {
+	padding: 8px;
+	margin: 2px;
+	float: left;
+}
+		</style>
+	</head>
+	<body>
+		<p>Click a box to remove its unique style.</p>
+		<div id="container"></div>
+		<script src="../../dojo/dojo.js" data-dojo-config="async:1"></script>
+		<script>
+require(["dgrid/List", "put-selector/put", "dojo/on", "dojo/query"], function(List, put, on){
+	var
+		addRule = List.prototype.addCssRule,
+		container = byId("container"),
+		rules = {}, sheet, i;
+	
+	function byId(id){ return document.getElementById(id); }
+	
+	for(i = 1; i <= 20; i++){
+		put(container, "div#box" + i + ".box");
+		rules["box" + i] = addRule("#box" + i, "background-color: rgb(" +
+			Math.floor(Math.random() * 256) + "," +
+			Math.floor(Math.random() * 256) + "," +
+			Math.floor(Math.random() * 256) +	");");
+	}
+	
+	on(container, ".box:click", function(evt){
+		rules[evt.target.id].remove();
+	});
+})
+		</script>
+	</body>
+</html>
