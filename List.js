@@ -3,6 +3,49 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 	// Add user agent/feature CSS classes 
 	hasClass("mozilla", "opera", "ie-6", "ie-6-7", "quirks", "no-quirks");
 
+	// establish an extra stylesheet which addCssRule calls will use,
+	// plus an array to track actual indices in stylesheet for removal
+	var
+		extraSheet = put(document.getElementsByTagName("head")[0], "style"),
+		extraRules = [];
+	// keep reference to actual StyleSheet object (.styleSheet for IE < 9)
+	extraSheet = extraSheet.sheet || extraSheet.styleSheet;
+	
+	// functions for adding and removing extra style rules.
+	// addExtraRule is exposed on the List prototype as addCssRule.
+	function addExtraRule(selector, css){
+		var index = extraRules.length;
+		extraRules[index] = (extraSheet.cssRules || extraSheet.rules).length;
+		extraSheet.addRule ?
+			extraSheet.addRule(selector, css) :
+			extraSheet.insertRule(selector + '{' + css + '}', index);
+		return {
+			remove: function(){ removeExtraRule(index); }
+		}
+	}
+	function removeExtraRule(index){
+		var
+			realIndex = extraRules[index],
+			i, l = extraRules.length;
+		if (realIndex === undefined) { return; } // already removed
+		
+		// remove rule indicated in internal array at index
+		extraSheet.deleteRule ?
+			extraSheet.deleteRule(realIndex) :
+			extraSheet.removeRule(realIndex); // IE < 9
+		
+		// Clear internal array item representing rule that was just deleted.
+		// NOTE: we do NOT splice, since the point of this array is specifically
+		// to negotiate the splicing that occurs in the stylesheet itself!
+		extraRules[index] = undefined;
+		
+		// Then update array items as necessary to downshift remaining rule indices.
+		// Can start at index, since array is sparse but strictly increasing.
+		for(i = index; i < l; i++){
+			if(extraRules[i] > realIndex){ extraRules[i]--; }
+		}
+	}
+	
 	var scrollbarWidth;
 	var byId = function(id){
 		return document.getElementById(id);
@@ -211,19 +254,7 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 				}, 0);
 			}
 		},
-		addCssRule: function(selector, css){
-			var styleSheets = document.styleSheets;
-			var styleSheet = styleSheets[styleSheets.length - 1]; 
-			var index = (styleSheet.cssRules || styleSheet.rules).length;
-			styleSheet.addRule ?
-				styleSheet.addRule(selector, css) :
-				styleSheet.insertRule(selector + '{' + css + '}', index);
-			return {
-				remove: function(){
-					styleSheet.deleteRule(index);
-				}
-			}
-		},
+		addCssRule: addExtraRule,
 		on: function(eventType, listener){
 			// delegate events to the domNode
 			var signal = listen(this.domNode, eventType, listener);
