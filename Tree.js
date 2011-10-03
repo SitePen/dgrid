@@ -48,7 +48,7 @@ return function(column){
 							return grid.store.getChildren(row.data, options);
 						};
 						query.level = target.level;
-						grid.renderQuery ? 
+						grid.renderQuery ?
 							grid.renderQuery(query, preloadNode) :
 							grid.renderArray(query({}), preloadNode);
 					}
