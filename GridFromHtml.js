@@ -94,8 +94,8 @@ define(["./OnDemandGrid", "dojo/_base/declare", "dojo/_base/lang", "dojo/dom-con
 			var obj, str = node.getAttribute(bagName);
 			if(!str){ return {}; } // no props bag specified!
 			
-			// Yes, eval is evil, but this is the same thing that dojo.parser
-			// does for data-dojo-props - which is what we want to mimic.
+			// Yes, eval is evil, but this is ultimately the same thing that
+			// dojo.parser does for objects.
 			try{
 				obj = eval("(" + str + ")");
 			}catch(e){
