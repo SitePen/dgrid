@@ -30,14 +30,16 @@
 				// GridFromHtml tests
 				window.gridFromHtmlLegacyGet = new GridFromHtml({},
 					"gridFromHtmlLegacyGet");
-				gridFromHtmlLegacyGet.renderArray(testOrderedData);
+				gridFromHtmlLegacyGet.renderArray(testTypesStore);
 				
 				// need to expose GridFromHtml as a global for parser to find.
 				window.dgrid = { GridFromHtml: GridFromHtml };
+				window.Editor = Editor;
+				window.DateTextBox = DateTextBox;
 				
 				// also, need a store, since there's currently no way to effectively
 				// invoke renderArray from HTML.
-				store = Observable(Memory({data: testOrderedData}));
+				store = Observable(Memory({data: testTypesStore}));
 				parser.parse();
 				
 				function byId(id){
@@ -58,9 +60,9 @@
 		<table id="gridFromHtmlLegacyGet">
 			<tbody>
 				<tr>
-					<th data-dgrid-props="Editor({field: 'date'}, DateTextBox)">Date</th>
+					<th data-dgrid-column="Editor({field: 'date'}, DateTextBox)">Date</th>
 					<th>name</th>
-					<th data-dgrid-props="field:'description', sortable:false">what to do</th>
+					<th data-dgrid-column="{field:'text', sortable:false}">Text</th>
 				</tr>
 			</tbody>
 		</table>
