@@ -27,25 +27,18 @@
 			require(["dgrid/GridFromHtml", "dojo/store/Memory", "dojo/store/Observable", "dojo/_base/declare", "dojo/parser", "dojo/query","dgrid/Keyboard", "dgrid/Editor", "dijit/form/DateTextBox", "dijit/form/HorizontalSlider", "dijit/form/NumberSpinner", "dgrid/test/data", "dojo/domReady!"],
 			function(GridFromHtml, Memory, Observable, declare, parser, query,Keyboard, Editor, DateTextBox, Slider, NumberSpinner){
 
+				window.dgrid = { GridFromHtml: GridFromHtml };
+				window.Editor = Editor;
+				window.DateTextBox = DateTextBox;
+
+				// also, need a store, since there's currently no way to effectively
+				// invoke renderArray from HTML.
+				store = Observable(Memory({data: testTypesStore}));
 				// GridFromHtml tests
 				window.gridFromHtmlLegacyGet = new GridFromHtml({},
 					"gridFromHtmlLegacyGet");
 				gridFromHtmlLegacyGet.renderArray(testTypesStore);
-				
-				// need to expose GridFromHtml as a global for parser to find.
-				window.dgrid = { GridFromHtml: GridFromHtml };
-				window.Editor = Editor;
-				window.DateTextBox = DateTextBox;
-				
-				// also, need a store, since there's currently no way to effectively
-				// invoke renderArray from HTML.
-				store = Observable(Memory({data: testTypesStore}));
 				parser.parse();
-				
-				function byId(id){
-					return document.getElementById(id);
-				}
-
 			});
 			
 		</script>
@@ -61,7 +54,6 @@
 			<tbody>
 				<tr>
 					<th data-dgrid-column="Editor({field: 'date'}, DateTextBox)">Date</th>
-					<th>name</th>
 					<th data-dgrid-column="{field:'text', sortable:false}">Text</th>
 				</tr>
 			</tbody>
