@@ -1,5 +1,5 @@
-define(["dojo/_base/declare", "dojo/on", "dojo/query", "dojo/dom", "put-selector/put", "dojo/dom-class", "dojo/_base/html", "dojo/NodeList-dom"], 
-	function(declare, listen, query, dom, put, cls){
+define(["dojo/_base/declare", "dojo/has", "dojo/on", "dojo/query", "dojo/dom", "put-selector/put", "dojo/dom-class",  "dojo/NodeList-dom"], 
+	function(declare, has, listen, query, dom, put, cls){
 /*
  *	Column Hider plugin for dgrid
  *	v.1.0.0
@@ -23,17 +23,19 @@ define(["dojo/_base/declare", "dojo/on", "dojo/query", "dojo/dom", "put-selector
 		hiderToggleNode: null,		//	the toggler to open the menu
 		hiderMenuOpened: false,		//	current state of the menu
 		hideState: null,			//	dictionary of current columns state
+		_columnStyleRules: null,	//	private map to hold the return of column.setStyle
 		postCreate: function(){
 			this.inherited(arguments);
 			var grid = this;
 			this.hideState = {};
+			this._columnStyleRules = {};
 
 			//	assume that if this plugin is used, then columns are hidable.
 			//	create the toggle node.
 			var scrollerNode = query("#" + grid.domNode.id + " .dgrid-header-scroll")[0];
 			this.hiderToggleNode = put(scrollerNode, "div.dgrid-hider-toggle", "+");
 			this.hiderToggleNode.setAttribute("title", "Click here to show or hide columns.");
-			listen(scrollerNode, "mousedown", function(e){
+			listen(this.hiderToggleNode, "mousedown", function(e){
 				grid._toggleHiderMenu(e);
 			});
 
@@ -44,11 +46,17 @@ define(["dojo/_base/declare", "dojo/on", "dojo/query", "dojo/dom", "put-selector
 
 				// create the HTML for each column selector.
 				var div = put(".dgrid-hider-menu-row");
-				var check = put(div, "input.dgrid-hider-menu-check.hider-menu-check-" + id + "#" + grid.domNode.id + "-hider-check-" + id + "[type=checkbox]");
+				var check = put(div, "input.dgrid-hider-menu-check.hider-menu-check-" + id + "#" + grid.domNode.id + "-hider-menu-check-" + id + "[type=checkbox]");
 				put(div, "label.dgrid-hider-menu-label.hider-menu-label-" + id, col.label);
-				listen(check, "change", function(e){
-					grid._toggleColumnState(grid, e);
-				});
+				if(has("ie") < 9){
+					listen(check, "click", function(e){
+						grid._toggleColumnState(grid, e);
+					});
+				} else {
+					listen(check, "change", function(e){
+						grid._toggleColumnState(grid, e);
+					});
+				}
 
 				//	track our state
 				this.hideState[id] = ("hidden" in col) && col.hidden;
@@ -59,12 +67,19 @@ define(["dojo/_base/declare", "dojo/on", "dojo/query", "dojo/dom", "put-selector
 
 				//	if our state is true, go hide the column.
 				if(this.hideState[id]){
-					grid.styleColumn(id, "display: none");
+					this._columnStyleRules[id] = grid.styleColumn(id, "display: none");
 				}
 			}
 			//	make sure our menu is initially hidden, then attach to the document.
 			this.hiderMenuNode.style.display = "none";
 			put(grid.domNode, this.hiderMenuNode);
+
+			//	adjust the header if needed
+			grid._adjustScrollerNode(grid);
+
+			//	attach a listener to the document body to close the menu
+			//listen(document.body, "click", function(e){
+			//});
 		},
 
 		_toggleHiderMenu: function(e){
@@ -76,8 +91,26 @@ define(["dojo/_base/declare", "dojo/on", "dojo/query", "dojo/dom", "put-selector
 		_toggleColumnState: function(grid, e){
 			//	show or hide the given column
 			var id = e.target.id.split("-").pop();
-			grid.styleColumn(id, "display: " + (e.target.checked?"table-cell":"none"));
-			grid.hideState[id] = e.target.checked;
+			grid.hideState[id] = !e.target.checked;
+			if(grid._columnStyleRules[id]){
+				grid._columnStyleRules[id].remove();
+				delete grid._columnStyleRules[id];
+			} else {
+				grid._columnStyleRules[id] = grid.styleColumn(id, "display: none;");
+			}
+	//		grid._columnStyleRules[id] = grid.styleColumn(id, "display: " + (e.target.checked?"table-cell":"none"));
+
+			//	adjust the size of the header
+			grid._adjustScrollerNode(grid);
+		},
+
+		_adjustScrollerNode: function(grid){
+			var header = query("#" + grid.domNode.id + " .dgrid-header-row")[0],
+				scrollnode = query("#" + grid.domNode.id + " .dgrid-header-scroll")[0],
+				scroller = query("#" + grid.domNode.id + " .dgrid-scroller")[0],
+				h = header.clientHeight;
+			scrollnode.style.height = (h + 1) + "px";
+			scroller.style.marginTop = (h + 1) + "px";
 		}
 	});
 });
