@@ -152,7 +152,9 @@
 						}, 0);
 					});
 					on(document.getElementById("add"), "click", function(){
-						smallColorStore.put({id: smallColorStore.data.length+1, col1: "Grey", col2: false, col3: "Hue", col4:'A hue' , col5: 192, col6: 192, col7: 192 });
+						var id = smallColorStore.data.length+Math.floor(Math.random()*1001);
+						console.log("id: ", id);
+						smallColorStore.put({id: id, col1: "Grey", col2: false, col3: "Hue", col4:'A hue' , col5: 192, col6: 192, col7: 192 });
 					});
 					on(document.getElementById("delete"), "click", function(){
 						for(var id in grid4.selection){
