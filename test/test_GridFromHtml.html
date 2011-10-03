@@ -109,7 +109,7 @@
 		<table id="gridFromHtmlLegacyFormatter">
 			<thead>
 				<tr>
-					<th data-dgrid-props="field:'_item', sortable:false, formatter:testFormatter">Step</th>
+					<th data-dgrid-column="{field:'_item', sortable:false, formatter:testFormatter}">Step</th>
 				</tr>
 			</thead>
 		</table>
@@ -117,9 +117,9 @@
 		<table id="gridFromHtmlLegacyGet">
 			<tbody>
 				<tr>
-					<th data-dgrid-props="field:'order', get:testGet">Step</th>
+					<th data-dgrid-column="{field:'order', get:testGet}">Step</th>
 					<th>name</th>
-					<th data-dgrid-props="field:'description', sortable:false">what to do</th>
+					<th data-dgrid-column="{field:'description', sortable:false}">what to do</th>
 				</tr>
 			</tbody>
 		</table>
@@ -128,10 +128,10 @@
 			and italicized first column values)</p>
 		<table id="gridFromHtmlNew">
 			<tr>
-				<th data-dgrid-props="field:'order',
-					renderCell:testRenderCell, renderHeaderCell:testRenderHeaderCell">Step</th>
+				<th data-dgrid-column="{field:'order',
+					renderCell:testRenderCell, renderHeaderCell:testRenderHeaderCell}">Step</th>
 				<th>name</th>
-				<th data-dgrid-props="field:'description', sortable:false">what to do</th>
+				<th data-dgrid-column="{field:'description', sortable:false}">what to do</th>
 			</tr>
 		</table>
 		
@@ -142,7 +142,7 @@
 			data-dojo-type="dgrid.GridFromHtml" data-dojo-props="store: store">
 			<thead>
 				<tr>
-					<th data-dgrid-props="field:'_item', sortable:false, formatter:testFormatter">Step</th>
+					<th data-dgrid-column="{field:'_item', sortable:false, formatter:testFormatter}">Step</th>
 				</tr>
 			</thead>
 		</table>
@@ -151,9 +151,9 @@
 			data-dojo-type="dgrid.GridFromHtml" data-dojo-props="store: store">
 			<tbody>
 				<tr>
-					<th data-dgrid-props="field:'order', get:testGet">Step</th>
+					<th data-dgrid-column="{field:'order', get:testGet}">Step</th>
 					<th>name</th>
-					<th data-dgrid-props="field:'description', sortable:false">what to do</th>
+					<th data-dgrid-column="{field:'description', sortable:false}">what to do</th>
 				</tr>
 			</tbody>
 		</table>
@@ -161,10 +161,10 @@
 		<table id="gridDeclarativeNew" data-dojo-id="gridDeclarativeNew"
 			data-dojo-type="dgrid.GridFromHtml" data-dojo-props="store: store">
 			<tr>
-				<th data-dgrid-props="field:'order',
-					renderCell:testRenderCell, renderHeaderCell:testRenderHeaderCell">Step</th>
+				<th data-dgrid-column="{field:'order',
+					renderCell:testRenderCell, renderHeaderCell:testRenderHeaderCell}">Step</th>
 				<th>name</th>
-				<th data-dgrid-props="field:'description', sortable:false">what to do</th>
+				<th data-dgrid-column="{field:'description', sortable:false}">what to do</th>
 			</tr>
 		</table>
 		
@@ -174,11 +174,11 @@
 		<table id="gridFromHtmlTestProps">
 			<thead>
 				<tr>
-					<th rowspan="2" data-dgrid-props="field:'name'">No sortable attr (defaults to true)</th>
-					<th data-dgrid-props="field:'name', sortable:false">sortable="false"</th>
+					<th rowspan="2" data-dgrid-column="{field:'name'}">No sortable attr (defaults to true)</th>
+					<th data-dgrid-column="{field:'name', sortable:false}">sortable="false"</th>
 				</tr>
 				<tr>
-					<th data-dgrid-props="field:'name', sortable:true">sortable="true"</th>
+					<th data-dgrid-column="{field:'name', sortable:true}">sortable="true"</th>
 				</tr>
 			</thead>
 		</table>
