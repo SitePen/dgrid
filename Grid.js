@@ -1,4 +1,4 @@
-define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "dojo/query", "./Editor", "./List", "dojo/_base/sniff"], function(has, put, declare, listen, query, Editor, List){
+define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Editor", "./List", "dojo/_base/sniff"], function(has, put, declare, listen, Editor, List){
 	var contentBoxSizing = has("ie") < 8 && !has("quirks");
 	
 	function appendIfNode(parent, subNode){
@@ -176,7 +176,7 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "dojo/q
 			}
 			
 			var row = this.createRowCells("th[role=columnheader]", function(th, column){
-				var contentNode = th;
+				var contentNode = column.headerNode = th;
 				if(contentBoxSizing){
 					// we're interested in the th, but we're passed the inner div
 					th = th.parentNode;
@@ -251,27 +251,34 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "dojo/q
 			
 			// if we were invoked from a header cell click handler, grab
 			// stashed target node; otherwise (e.g. direct sort call) need to look up
-			var target = this._sortNode ||
-				query("#" + this.id + " .dgrid-header .field-" + property)[0];
-			
-			// skip this logic if field being sorted isn't actually displayed
-			if(!target){ return this.inherited(arguments); }
-			
-			target = target.contents || target;
-			if(this._lastSortedArrow){
-				// remove the sort classes from parent node
-				put(this._lastSortedArrow, "<!dgrid-sort-up!dgrid-sort-down");
-				// destroy the lastSortedArrow node
-				put(this._lastSortedArrow, "!");
+			var target = this._sortNode, columns, column, i;
+			if(!target){
+				columns = this.columns;
+				for(i in columns){
+					column = columns[i];
+					if(column.field == property){
+						target = column.headerNode;
+					}
+				}
 			}
-			// place sort arrow under clicked node, and add up/down sort class
-			this._lastSortedArrow = put(target.firstChild, "-div.dgrid-sort-arrow.ui-icon[role=presentation]");
-			this._lastSortedArrow.innerHTML = "&nbsp;";
-			put(target, descending ? ".dgrid-sort-down" : ".dgrid-sort-up");
-			// call resize in case relocation of sort arrow caused any height changes
-			this.resize();
-			
-			delete this._sortNode;
+			// skip this logic if field being sorted isn't actually displayed
+			if(target){
+				target = target.contents || target;
+				if(this._lastSortedArrow){
+					// remove the sort classes from parent node
+					put(this._lastSortedArrow, "<!dgrid-sort-up!dgrid-sort-down");
+					// destroy the lastSortedArrow node
+					put(this._lastSortedArrow, "!");
+				}
+				// place sort arrow under clicked node, and add up/down sort class
+				this._lastSortedArrow = put(target.firstChild, "-div.dgrid-sort-arrow.ui-icon[role=presentation]");
+				this._lastSortedArrow.innerHTML = "&nbsp;";
+				put(target, descending ? ".dgrid-sort-down" : ".dgrid-sort-up");
+				// call resize in case relocation of sort arrow caused any height changes
+				this.resize();
+				
+				delete this._sortNode;
+			}
 			this.inherited(arguments);
 		},
 		styleColumn: function(colId, css){
