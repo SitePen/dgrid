@@ -3,7 +3,7 @@ define(["./OnDemandGrid", "dojo/_base/declare", "dojo/_base/lang", "dojo/dom-con
 	// This module does NOT support ColumnSets; see GridWithColumnSetsFromHtml
 	
 	// name of data attribute to check for column properties
-	var bagName = "data-dgrid-props";
+	var bagName = "data-dgrid-column";
 	
 	function getSubRowsFromDom(domNode){
 		// summary:
@@ -90,14 +90,14 @@ define(["./OnDemandGrid", "dojo/_base/declare", "dojo/_base/lang", "dojo/dom-con
 			return isNaN(val) ? undefined : val;
 		},
 		getPropsFromNode: function(node){
-			// used to pull properties out of bag e.g. "data-dgrid-props".
+			// used to pull properties out of bag e.g. "data-dgrid-column".
 			var obj, str = node.getAttribute(bagName);
 			if(!str){ return {}; } // no props bag specified!
 			
 			// Yes, eval is evil, but this is the same thing that dojo.parser
 			// does for data-dojo-props - which is what we want to mimic.
 			try{
-				obj = eval("({" + str + "})");
+				obj = eval("(" + str + ")");
 			}catch(e){
 				throw new Error("Error in " + bagName + " {" + str + "}: " + e.toString());
 			}
