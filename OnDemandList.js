@@ -113,7 +113,7 @@ return declare([List], {
 	sort: function(property, descending){
 		// summary:
 		//		Sort the content
-		
+
 		// prevent default storeless sort logic as long as we have a store
 		if(this.store){ this.lastCollection = null; }
 		this.inherited(arguments);
@@ -155,8 +155,8 @@ return declare([List], {
 				var toDelete = [];
 				while(row = nextRow){ // intentional assignment
 					var rowHeight = row.offsetHeight;
-					if(reclaimedHeight + rowHeight + farOffRemoval > distanceOff){
-						// we have reclaimed enough rows, let's call it good
+					if(reclaimedHeight + rowHeight + farOffRemoval > distanceOff || nextRow.className.indexOf("dgrid-row") < 0){
+						// we have reclaimed enough rows or we have gone beyond grid rows, let's call it good
 						break;
 					}
 					count++;
@@ -164,10 +164,6 @@ return declare([List], {
 					var nextRow = row[traversal]; // have to do this before removing it
 					delete grid._rowIdToObject[row.id]; // clear out of the lookup
 					toDelete.push(row);
-					if(nextRow.className == "dgrid-preload"){
-						reclaimedHeight = distanceOff;
-						break;
-					}
 				}
 				// now adjust the preloadNode based on the reclaimed space
 				preloadNode.count += count;
