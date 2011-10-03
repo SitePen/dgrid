@@ -18,7 +18,7 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 		extraRules[index] = (extraSheet.cssRules || extraSheet.rules).length;
 		extraSheet.addRule ?
 			extraSheet.addRule(selector, css) :
-			extraSheet.insertRule(selector + '{' + css + '}', index);
+			extraSheet.insertRule(selector + '{' + css + '}', extraRules[index]);
 		return {
 			remove: function(){ removeExtraRule(index); }
 		}
