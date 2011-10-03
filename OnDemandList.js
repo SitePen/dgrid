@@ -113,7 +113,9 @@ return declare([List], {
 	sort: function(property, descending){
 		// summary:
 		//		Sort the content
-		this.lastCollection = null;
+		
+		// prevent default storeless sort logic as long as we have a store
+		if(this.store){ this.lastCollection = null; }
 		this.inherited(arguments);
 	},
 	refresh: function(){

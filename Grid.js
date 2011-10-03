@@ -161,11 +161,20 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "dojo/q
 			// 2. So that outline style can be set on a row when it is focused, and Safari's outline style is broken on <table>
 			return put("div[role=gridcell]>", row);
 		},
-		renderHeader: function(headerNode){
+		renderHeader: function(){
 			// summary:
 			//		Setup the headers for the grid
-			var grid = this;
-			var columns = this.columns;
+			var
+				grid = this,
+				columns = this.columns,
+				headerNode = this.headerNode,
+				i = headerNode.childNodes.length;
+			
+			// clear out existing header in case we're resetting
+			while(i--){
+				put(headerNode.childNodes[i], "!");
+			}
+			
 			var row = this.createRowCells("th[role=columnheader]", function(th, column){
 				var contentNode = th;
 				if(contentBoxSizing){
@@ -246,6 +255,9 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "dojo/q
 			var target = this._sortNode ||
 				query("#" + this.id + " .dgrid-header .field-" + property)[0];
 			
+			// skip this logic if field being sorted isn't actually displayed
+			if(!target){ return this.inherited(arguments); }
+			
 			target = target.contents || target;
 			if(this._lastSortedArrow){
 				// remove the sort classes from parent node
@@ -302,6 +314,18 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "dojo/q
 			}else{
 				this.subRows = [this._configColumns("", this.columns)];
 			}
+		},
+		setColumns: function(columns){
+			// reset instance variables
+			this.subRows = null;
+			this.columns = columns;
+			// re-run logic
+			this.configStructure();
+			this.renderHeader();
+			this.refresh();
+			// re-render last collection if present
+			this.lastCollection && this.renderArray(this.lastCollection);
 		}
+		// TODO: setSubRows
 	});
 });

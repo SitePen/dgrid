@@ -11,7 +11,7 @@
 				width: 700px;
 			}
 			.dgrid .field-bool {
-				width: 20%;
+				width: 20px;
 			}
 			.dgrid .field-type {
 				width: 80px;
@@ -29,17 +29,17 @@
 			require(["dojo/on", "dgrid/OnDemandGrid","dgrid/Tree","dgrid/Editor", "dgrid/Keyboard", "dgrid/Selection", "dgrid/test/data", "dojo/domReady!"], 
 				function(on, Grid, Tree, Editor, Keyboard, Selection, testStore){
 					var columns = [
+						Editor({label: ' ', field: 'bool', sortable: false}, "checkbox"),
 						Tree({label:'Name', field:'name', sortable: false}),
-						Editor({label: 'A CheckBox', field: 'bool', sortable: false}, "checkbox"),
-						Editor({label:'Type', field:'type', sortable: false}, "text"),
-						Editor({label:'Population', field:'population'}, "text", "dblclick"),
-						Editor({label:'Timezone (autoSave)', field:'timezone', autoSave:true}, "text", "dblclick")
+						{label:'Type', field:'type', sortable: false},
+						{label:'Population', field:'population'},
+						{label:'Timezone', field:'timezone'}
 					];
 					
 					window.tree = dojo.declare([Grid, Keyboard, Selection])({
 						store: testCountryStore,
 						query: {type: "continent"},
-						selectionMode: "single",
+						selectionMode: "multiple",
 						columns: columns
 					}, "tree");
 					on(document.getElementById("save"), "click", function(){
@@ -54,25 +54,20 @@
 					});
 					on(document.getElementById("delete"), "click", function(){
 						for(var id in tree.selection){
+							console.log("id: ", id);
 							testCountryStore.remove(id);
 						}
 					});
-					window.tree2 =dojo.declare([Grid, Keyboard])({
-						store: testCountryStore,
-						query: {type: "continent"},
-						selectionMode: "single",
-						columns: columns
-					}, "tree2");
+
 				});
 		</script>
 	</head>
 	<body class="claro">
-		<h2>A couple of tree/grids, test to see if they stay in sync</h2>
+		<h2>Lazy-loading tree grid, with store functionality</h2>
 		<div id="tree"></div>
 		<button id="save">Save</button>
 		<button id="add-continent">Add Continent</button>
 		<button id="add-country">Add Greece To Europe</button>
 		<button id="delete">Delete Selected</button>
-		<div id="tree2"></div>
 	</body>
 </html>

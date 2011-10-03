@@ -1,5 +1,5 @@
 // example sample data and code
-define(["dojo/store/Memory", "dojo/store/Observable"],function(Memory, Observable){
+define(["dojo/store/Memory", "dojo/store/Observable", "dojo/store/util/QueryResults"],function(Memory, Observable, QueryResults){
 	// some sample data
 	// global var "data"
 	data = {
@@ -47,7 +47,11 @@ define(["dojo/store/Memory", "dojo/store/Observable"],function(Memory, Observabl
 
 	// global var colorStore
 	colorStore = Observable(new Memory({data: data2}));
-
+	data2.items= [];
+	for(var i=0; i<colors.length; i++){
+		data2.items.push(dojo.mixin({ id: i }, colors[i]));
+	}
+	smallColorStore = Observable(new Memory({data: data2}));
 	//empty store
 	emptyData = { identifier: 'id', label: 'id', items:[]};
 	emptyStore = Observable(new Memory({data: emptyData}));
@@ -83,7 +87,7 @@ define(["dojo/store/Memory", "dojo/store/Observable"],function(Memory, Observabl
 					{ id: 'Mombasa', name:'Mombasa', type:'city', parent: 'KE' },
 				{ id: 'SD', name:'Sudan', type:'country', parent: 'AF'},
 					{ id: 'Khartoum', name:'Khartoum', type:'city', parent: 'SD' },
-				{ id: 'AS', name:'Asia', type:'continent'},
+				{ id: 'AS', name:'Asia', type:'continent', population: '3.2 billion'},
 					{ id: 'CN', name:'China', type:'country', parent: 'AS' },
 						{ id: 'Shanghai', name:'Shanghai', type:'city', parent: 'CN' },
 					{ id: 'IN', name:'India', type:'country', parent: 'AS' },
@@ -95,7 +99,7 @@ define(["dojo/store/Memory", "dojo/store/Observable"],function(Memory, Observabl
 				{ id: 'OC', name:'Oceania', type:'continent', population:'21 million'},
 				{ id: 'AU', name:'Australia', type:'country', population:'21 million', parent: 'OC' },
 					{ id: 'Sydney', name:'Sydney', type:'city', parent: 'AU' },
-				{ id: 'EU', name:'Europe', type:'continent' },
+				{ id: 'EU', name:'Europe', type:'continent', population: '774 million' },
 				{ id: 'DE', name:'Germany', type:'country', parent: 'EU' },
 					{ id: 'Berlin', name:'Berlin', type:'city', parent: 'DE' },
 				{ id: 'FR', name:'France', type:'country', parent: 'EU' },
@@ -104,7 +108,7 @@ define(["dojo/store/Memory", "dojo/store/Observable"],function(Memory, Observabl
 					{ id: 'Madrid', name:'Madrid', type:'city', parent: 'ES' },
 				{ id: 'IT', name:'Italy', type:'country', parent: 'EU' },
 					{ id: 'Rome', name:'Rome', type:'city', parent: 'IT' },
-			{ id: 'NA', name:'North America', type:'continent'},
+			{ id: 'NA', name:'North America', type:'continent', population: '575 million'},
 				{ id: 'MX', name:'Mexico', type:'country',  population:'108 million', area:'1,972,550 sq km', parent: 'NA' },
 					{ id: 'Mexico City', name:'Mexico City', type:'city', population:'19 million', timezone:'-6 UTC', parent: 'MX'},
 					{ id: 'Guadalajara', name:'Guadalajara', type:'city', population:'4 million', timezone:'-6 UTC', parent: 'MX' },
@@ -113,14 +117,19 @@ define(["dojo/store/Memory", "dojo/store/Observable"],function(Memory, Observabl
 					{ id: 'Toronto', name:'Toronto', type:'city', population:'2.5 million', timezone:'-5 UTC', parent: 'CA' },
 				{ id: 'US', name:'United States of America', type:'country', parent: 'NA' },
 					{ id: 'New York', name:'New York', type:'city', parent: 'US' },
-			{ id: 'SA', name:'South America', type:'continent' },
+			{ id: 'SA', name:'South America', type:'continent', population: '445 million' },
 				{ id: 'BR', name:'Brazil', type:'country', population:'186 million', parent: 'SA' },
 					{ id: 'Brasilia', name:'Brasilia', type:'city', parent: 'BR' },
 				{ id: 'AR', name:'Argentina', type:'country', population:'40 million', parent: 'SA' },
 					{ id: 'BuenosAires', name:'Buenos Aires', type:'city', parent: 'AR' }
 		],
 		getChildren: function(parent, options){
-			return this.query({parent: parent.id}, options);
+			var def = new dojo.Deferred();
+			var q = this.query({parent: parent.id}, options);
+			setTimeout(function(){
+				def.resolve(q);
+			}, 1000);
+			return QueryResults(def.promise);
 		},
 		mayHaveChildren: function(parent){
 			return parent.type != "city";
