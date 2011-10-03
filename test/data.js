@@ -25,6 +25,19 @@ define(["dojo/store/Memory", "dojo/store/Observable", "dojo/store/util/QueryResu
 	// global var testStore
 	testStore = Observable(new Memory({data: data}));
 
+	testAsyncStore = Observable(new Memory({
+		data: data,
+		query: function(){
+			var results = Memory.prototype.query.apply(this, arguments);
+			var def = new dojo.Deferred();
+			setTimeout(function(){
+				def.resolve(results);
+			}, 500);
+			var promisedResults = QueryResults(def.promise);
+			promisedResults.total = results.total;
+			return promisedResults;
+		}
+	}));
 	//sample color data
 	data2 = {
 		identifier: 'id',
