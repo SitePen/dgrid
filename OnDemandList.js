@@ -269,7 +269,7 @@ return declare([List], {
 				}
 				adjustHeight(preloadNode);
 				// create a loading node as a placeholder while the data is loaded 
-				var loadingNode = put(beforeNode, "-tr.dgrid-loading[style=height:" + count * this.rowHeight + "px]");
+				var loadingNode = put(beforeNode, "-div.dgrid-loading[style=height:" + count * this.rowHeight + "px]");
 				// use the query associated with the preload node to get the next "page"
 				options.query = preloadNode.query;
 				// query now to fill in these rows
