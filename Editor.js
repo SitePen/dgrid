@@ -74,6 +74,10 @@ return function(column, editor, editOn){
 			// using a widget as the editor.
 			var widget = new editor(column.widgetArgs || {},
 				cell.appendChild(document.createElement("div")));
+			if(column.customCode){
+				console.log("object: ", object);
+				column.customCode(data, widget);
+			}
 			widget.set("value", data);
 			widget.watch("value", function(key, oldValue, value){
 				data = setProperty(cell, data, value);
@@ -181,6 +185,7 @@ return function(column, editor, editOn){
 					column.editOn, function(){
 				if(!column.canEdit || column.canEdit(object, value)){
 					cell.innerHTML = "";
+					console.log("value, cell, object", value, cell, object);
 					renderWidget(value, cell, object, function(newData){
 						originalRenderCell(object, value = newData, cell);
 					});

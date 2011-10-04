@@ -32,8 +32,8 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Tree","dgrid/Selection", "dgrid/Keyboard", "dgrid/Editor", "dijit/form/DateTextBox", "dijit/form/HorizontalSlider", "dijit/form/NumberSpinner", "dgrid/test/data", "dojo/domReady!"], 
-				function(List, Grid, Tree, Selection, Keyboard, Editor, DateTextBox, Slider, NumberSpinner){
+			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Tree","dgrid/Selection", "dgrid/Keyboard", "dgrid/Editor", "dijit/form/DateTextBox", "dijit/form/HorizontalSlider", "dijit/form/NumberSpinner", "dijit/form/ToggleButton", "dijit/form/TimeTextBox","dgrid/test/data", "dojo/domReady!"],
+				function(List, Grid, Tree, Selection, Keyboard, Editor, DateTextBox, Slider, NumberSpinner, ToggleButton, TimeTextBox){
 					var columns = [
 						Editor({label: 'A Date', field: 'date'}, DateTextBox),
 						Editor({label: 'Real Number', field: 'floatNum'}, Slider),
@@ -46,17 +46,34 @@
 						Editor({label: 'CheckBox', field: 'bool'}, "checkbox"),
 						Editor({label: 'Radio', selector: true}, "radio")
 					];
+
+					var columns2 = [
+						Editor({label: 'Toggle', field: 'bool2', customCode: function(value, widget){ widget.set("checked", value); console.log("shit got done");},
+								widgetArgs: {iconClass: "dijitCheckBoxIcon", label: "Toggle"}}, ToggleButton),
+						Editor({label: 'Time', field: 'time', widgetArgs: {
+																	timePattern: 'HH:mm:ss',
+                                                                    clickableIncrement: 'T00:15:00',
+                                                                    visibleIncrement: 'T00:15:00',
+                                                                    visibleRange: 'T01:00:00'}}, TimeTextBox)
+					];
 					window.grid = new (dojo.declare([Grid, Selection, Keyboard]))({
 						store: testTypesStore,
 						columns: columns,
 						selectionMode: "single"
 					}, "grid");
+
+					window.grid2 = new (dojo.declare([Grid, Selection, Keyboard]))({
+						store: testTypesStore,
+						columns: columns2,
+						selectionMode: "multiple"
+					}, "grid2");
 					grid.on(".field-integer:change", function(event){
 						if(event.value > 100){
 							event.preventDefault();
 							alert("Values about 100 not allowed");
 						}
 					});
+					console.log("store: ", testTypesStore);
 				});
 				
 		</script>
@@ -66,5 +83,8 @@
 		(This test requires dijit to be installed)	
 		<div id="grid"></div>
 		<button type="button" id="save" onclick="grid.save()">Save</button>
+		<h2>A basic grid with more editors</h2>
+		(This test requires dijit to be installed)
+		<div id="grid2"></div>
 	</body>
 </html>

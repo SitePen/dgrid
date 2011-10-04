@@ -58,6 +58,14 @@
 				</tr>
 			</tbody>
 		</table>
-
+	<h2>2: Fully declarative GridFromHtml</h2>
+	<table id="gridDeclarativeNew" data-dojo-id="gridDeclarativeNew"
+			data-dojo-type="dgrid.GridFromHtml" data-dojo-props="store: store">
+			<tr>
+				<th data-dgrid-column="Editor({field:'date'}, DateTextBox)">Date</th>
+				<th>floatNum</th>
+				<th data-dgrid-column="{field:'text', sortable:false}">Text</th>
+			</tr>
+		</table>
 	</body>
 </html>
