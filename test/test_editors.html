@@ -32,8 +32,8 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Tree","dgrid/Selection", "dgrid/Keyboard", "dgrid/Editor", "dijit/form/DateTextBox", "dijit/form/HorizontalSlider", "dijit/form/NumberSpinner", "dijit/form/ToggleButton", "dijit/form/TimeTextBox","dgrid/test/data", "dojo/domReady!"],
-				function(List, Grid, Tree, Selection, Keyboard, Editor, DateTextBox, Slider, NumberSpinner, ToggleButton, TimeTextBox){
+			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Tree","dgrid/Selection", "dgrid/Keyboard", "dgrid/Editor", "dijit/form/DateTextBox", "dijit/form/HorizontalSlider", "dijit/form/NumberSpinner", "dijit/form/ToggleButton", "dijit/form/TimeTextBox",  "dijit/form/Select","dojo/data/ObjectStore", "dgrid/test/data", "dojo/domReady!"],
+				function(List, Grid, Tree, Selection, Keyboard, Editor, DateTextBox, Slider, NumberSpinner, ToggleButton, TimeTextBox, Select, ObjectStore){
 					var columns = [
 						Editor({label: 'A Date', field: 'date'}, DateTextBox),
 						Editor({label: 'Real Number', field: 'floatNum'}, Slider),
@@ -46,17 +46,24 @@
 						Editor({label: 'CheckBox', field: 'bool'}, "checkbox"),
 						Editor({label: 'Radio', selector: true}, "radio")
 					];
-
+					var stateStore = new ObjectStore({"objectStore":testStateStore});
+					console.log("state store: ", stateStore);
 					var columns2 = [
 						Editor({label: 'Toggle', field: 'bool2', widgetArgs: function(item){
-																				console.log("in widgetArgs: ", object);
+																				console.log("in widgetArgs: ", item);
 																				return {checked: item.bool2, iconClass: "dijitCheckBoxIcon", label: "Toggle"};}
 						}, ToggleButton),
 						Editor({label: 'Time', field: 'time', widgetArgs: {
 																	timePattern: 'HH:mm:ss',
                                                                     clickableIncrement: 'T00:15:00',
                                                                     visibleIncrement: 'T00:15:00',
-                                                                    visibleRange: 'T01:00:00'}}, TimeTextBox)
+                                                                    visibleRange: 'T01:00:00'}}, TimeTextBox),
+						Editor({label: 'Select', field: 'bool', widgetArgs: function(item){
+							return {options:[{value:item.bool+"", label: item.bool+"", selected: true}, {value: !item.bool+"", label: !item.bool+""}]}}
+							}, Select),
+						Editor({label: 'Select Store', field: 'key', widgetArgs: function(item){
+							return {store: stateStore}}
+							}, Select)
 					];
 					window.grid = new (dojo.declare([Grid, Selection, Keyboard]))({
 						store: testTypesStore,

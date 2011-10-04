@@ -184,7 +184,6 @@ return function(column, editor, editOn){
 					column.editOn, function(){
 				if(!column.canEdit || column.canEdit(object, value)){
 					cell.innerHTML = "";
-					console.log("value, cell, object", value, cell, object);
 					renderWidget(value, cell, object, function(newData){
 						originalRenderCell(object, value = newData, cell);
 					});
