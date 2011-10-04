@@ -72,12 +72,11 @@ return function(column, editor, editOn){
 		} :
 		function(data, cell, object, onblur){
 			// using a widget as the editor.
-			var widget = new editor(column.widgetArgs || {},
-				cell.appendChild(document.createElement("div")));
-			if(column.customCode){
-				console.log("object: ", object);
-				column.customCode(data, widget);
-			}
+			var
+				// widgetArgs can be either a hash or a function returning a hash
+				args = typeof column.widgetArgs == "function" ?
+					lang.hitch(grid, column.widgetArgs)(object) : column.widgetArgs || {},
+				widget = new editor(args, cell.appendChild(put("div")));
 			widget.set("value", data);
 			widget.watch("value", function(key, oldValue, value){
 				data = setProperty(cell, data, value);

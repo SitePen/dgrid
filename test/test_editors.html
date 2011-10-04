@@ -48,8 +48,10 @@
 					];
 
 					var columns2 = [
-						Editor({label: 'Toggle', field: 'bool2', customCode: function(value, widget){ widget.set("checked", value); console.log("shit got done");},
-								widgetArgs: {iconClass: "dijitCheckBoxIcon", label: "Toggle"}}, ToggleButton),
+						Editor({label: 'Toggle', field: 'bool2', widgetArgs: function(item){
+																				console.log("in widgetArgs: ", object);
+																				return {checked: item.bool2, iconClass: "dijitCheckBoxIcon", label: "Toggle"};}
+						}, ToggleButton),
 						Editor({label: 'Time', field: 'time', widgetArgs: {
 																	timePattern: 'HH:mm:ss',
                                                                     clickableIncrement: 'T00:15:00',
