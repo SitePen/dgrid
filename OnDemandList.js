@@ -175,10 +175,14 @@ return declare([List], {
 					preloadNode.style.height = (preloadNode.offsetHeight + reclaimedHeight) + "px";
 				}
 				// we remove the elements after expanding the preload node so that the contraction doesn't alter the scroll position
+				var trashBin = put("div");
 				for(var i = 0; i < toDelete.length; i++){
-					put(toDelete[i], "!"); // remove it from the DOM
+					put(trashBin, toDelete[i]); // remove it from the DOM
 				}
-				
+				setTimeout(function(){
+					// we can defer the destruction until later
+					put(trashBin, "!");
+				},1);
 			}
 			
 		}
