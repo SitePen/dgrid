@@ -46,18 +46,21 @@
 						Editor({label: 'CheckBox', field: 'bool'}, "checkbox"),
 						Editor({label: 'Radio', selector: true}, "radio")
 					];
-					var stateStore = new ObjectStore({"objectStore":testStateStore});
+					stateStore = new ObjectStore({
+						objectStore:testStateStore,
+						labelProperty: "name"
+					});
 					console.log("state store: ", stateStore);
 					var columns2 = [
 						Editor({label: 'Toggle', field: 'bool2', widgetArgs: function(item){
-																				console.log("in widgetArgs: ", item);
-																				return {checked: item.bool2, iconClass: "dijitCheckBoxIcon", label: "Toggle"};}
-						}, ToggleButton),
+								console.log("in widgetArgs: ", item);
+								return {checked: item.bool2, iconClass: "dijitCheckBoxIcon", label: "Toggle"};
+							}}, ToggleButton),
 						Editor({label: 'Time', field: 'time', widgetArgs: {
-																	timePattern: 'HH:mm:ss',
-                                                                    clickableIncrement: 'T00:15:00',
-                                                                    visibleIncrement: 'T00:15:00',
-                                                                    visibleRange: 'T01:00:00'}}, TimeTextBox),
+							timePattern: 'HH:mm:ss',
+							clickableIncrement: 'T00:15:00',
+							visibleIncrement: 'T00:15:00',
+							visibleRange: 'T01:00:00'}}, TimeTextBox),
 						Editor({label: 'Select', field: 'bool', widgetArgs: function(item){
 							return {options:[{value:item.bool+"", label: item.bool+"", selected: true}, {value: !item.bool+"", label: !item.bool+""}]}}
 							}, Select),

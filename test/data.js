@@ -91,6 +91,7 @@ define(["dojo/store/Memory", "dojo/store/Observable", "dojo/store/util/QueryResu
 	testTypesStore = Observable(new Memory({data: typesData}));
 
 	testStateStore = Observable(new Memory({
+		idProperty: "abbreviation",
 		data: [
 		{ "abbreviation": "AL", "name": "Alabama" },
 		{ "abbreviation": "AK", "name": "Alaska" },
