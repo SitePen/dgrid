@@ -12,7 +12,7 @@ return declare([List], {
 	queryOptions: null,
 	query: null,
 	store: null,
-	minRowsPerPage: 25,		
+	minRowsPerPage: 25,
 	maxRowsPerPage: 100,
 	maxEmptySpace: 10000,
 	// rows can be removed if they are this distance in pixels from the visible viewing area.
@@ -57,7 +57,7 @@ return declare([List], {
 				preloadNode = put(this.contentNode, "div.dgrid-preload");
 			preloadNode.previous = topPreloadNode;
 		}
-		// this preload node is used to represent the area of the grid that hasn't been 
+		// this preload node is used to represent the area of the grid that hasn't been
 		// downloaded yet
 		preloadNode.preload = true;
 		preloadNode.query = query;
@@ -67,7 +67,7 @@ return declare([List], {
 		if(priorPreload){
 			// the preload nodes (if there are multiple) are represented as a linked list, need to insert it
 			if((preloadNode.next = priorPreload.next)){
-				var previous = preloadNode.next.previous; 
+				var previous = preloadNode.next.previous;
 			}
 			preloadNode.previous = previous;
 			preloadNode.next = preloadNode;
@@ -100,8 +100,8 @@ return declare([List], {
 				if(total){
 					preloadNode.style.height = Math.min(total * self.rowHeight, self.maxEmptySpace) + "px";
 				}else{
-					// if total is 0, IE quirks mode can't handle 0px height for some reason, I don't know why, but we are setting display: none for now 
-					preloadNode.style.display = "none"; 
+					// if total is 0, IE quirks mode can't handle 0px height for some reason, I don't know why, but we are setting display: none for now
+					preloadNode.style.display = "none";
 				}
 				self.onscroll(); // recheck the scroll position in case the query didn't fill the screen
 				// can remove the loading node now
@@ -113,7 +113,7 @@ return declare([List], {
 	sort: function(property, descending){
 		// summary:
 		//		Sort the content
-
+		
 		// prevent default storeless sort logic as long as we have a store
 		if(this.store){ this.lastCollection = null; }
 		this.inherited(arguments);
@@ -127,12 +127,12 @@ return declare([List], {
 				queryOptions.sort = self.sortOrder;
 				return self.store.query(self.query, queryOptions);
 			});
-		}		
+		}
 	},
 	lastScrollTop: 0,
 	onscroll: function(){
 		// summary:
-		//		Checks to make sure that everything in the viewable area has been 
+		//		Checks to make sure that everything in the viewable area has been
 		// 		downloaded, and triggering a request for the necessary data when needed.
 		var scrollNode = this.bodyNode;
 		var transform = this.contentNode.style.webkitTransform;
@@ -148,7 +148,7 @@ return declare([List], {
 			var farOffRemoval = grid.farOffRemoval;
 			// we check if it is twice as much as farOffRemoval and then prune down to farOffRemoval, we could make that configurable as well
 			if(distanceOff > 2 * farOffRemoval){
-				// ok, there is preloadNode that is far off, let's remove rows until we get to farOffRemoval 
+				// ok, there is preloadNode that is far off, let's remove rows until we get to farOffRemoval
 				var row, nextRow = preloadNode[traversal];
 				var reclaimedHeight = 0;
 				var count = 0;
@@ -189,12 +189,12 @@ return declare([List], {
 		function adjustHeight(preloadNode){
 			var newHeight = preloadNode.count * grid.rowHeight;
 			preloadNode.style.height = (preloadNode.start > 0 ? Math.min(newHeight, grid.maxEmptySpace) : newHeight) + "px";
-		}		
+		}
 		// there can be multiple preloadNodes (if they split, or multiple queries are created),
 		//	so we can traverse them until we find whatever is in the current viewport, making
 		//	sure we don't backtrack
 		while(preloadNode && preloadNode != priorPreload){
-			priorPreload = this.preloadNode; 
+			priorPreload = this.preloadNode;
 			this.preloadNode = preloadNode;
 			var preloadTop = preloadNode.offsetTop;
 			var preloadHeight;
@@ -224,7 +224,7 @@ return declare([List], {
 					count += offset;
 					offset = 0;
 				}
-				count = Math.min(Math.max(count, this.minRowsPerPage), 
+				count = Math.min(Math.max(count, this.minRowsPerPage),
 									this.maxRowsPerPage, preloadNode.count);
 				if(count == 0){
 					return;
@@ -272,7 +272,7 @@ return declare([List], {
 					keepScrollTo = beforeNode.offsetTop;
 				}
 				adjustHeight(preloadNode);
-				// create a loading node as a placeholder while the data is loaded 
+				// create a loading node as a placeholder while the data is loaded
 				var loadingNode = put(beforeNode, "-div.dgrid-loading[style=height:" + count * this.rowHeight + "px]");
 				// use the query associated with the preload node to get the next "page"
 				options.query = preloadNode.query;
@@ -283,10 +283,10 @@ return declare([List], {
 						beforeNode = loadingNode.nextSibling;
 						loadingNode.parentNode.removeChild(loadingNode);
 						if(keepScrollTo){
-							// if the preload area above the nodes is approximated based on average 
-							// row height, we may need to adjust the scroll once they are filled in 
-							// so we don't "jump" in the scrolling position 
-							scrollNode.scrollTop += beforeNode.offsetTop - keepScrollTo; 
+							// if the preload area above the nodes is approximated based on average
+							// row height, we may need to adjust the scroll once they are filled in
+							// so we don't "jump" in the scrolling position
+							scrollNode.scrollTop += beforeNode.offsetTop - keepScrollTo;
 						}
 				}, console.error);
 				preloadNode = preloadNode.previous;
