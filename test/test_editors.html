@@ -71,8 +71,8 @@
 							return {store: stateStore}}
 							}, FilteringSelect),
 						Editor({label: 'Select Store', field: 'text', widgetArgs: function(item){
-							return {store: stateStore}}
-							}, DijitEditor)
+							return {store: stateStore, style: "height: 150px;"}}
+							}, DijitEditor, "focus")
 					];
 					window.grid = new (dojo.declare([Grid, Selection, Keyboard]))({
 						store: testTypesStore,
