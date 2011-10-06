@@ -125,7 +125,6 @@ return function(column, editor, editOn){
 					var
 						dirty = grid.dirty[row.id],
 						object = row.data;
-					
 					if(!dirty){
 						dirty = grid.dirty[row.id] = {};
 						if(!column.autoSave){

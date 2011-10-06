@@ -66,13 +66,13 @@
 							}, Select),
 						Editor({label: 'Select Store', field: 'state', widgetArgs: function(item){
 							return {store: stateStore, style: "width:120px;"}}
-							}, Select),
+							}, Select, "focus"),
 						Editor({label: 'Select Store', field: 'state', widgetArgs: function(item){
 							return {store: stateStore}}
-							}, FilteringSelect),
-						Editor({label: 'Select Store', field: 'text', widgetArgs: function(item){
-							return {store: stateStore, style: "height: 150px;"}}
-							}, DijitEditor, "focus")
+							}, FilteringSelect, "focus"),
+						Editor({label: 'Dijit/Editor', field: 'text', widgetArgs: function(item){
+							return {store: stateStore, style: "height: 150px;"}}, autoSave:false
+							}, DijitEditor)
 					];
 					window.grid = new (dojo.declare([Grid, Selection, Keyboard]))({
 						store: testTypesStore,
@@ -91,7 +91,6 @@
 							alert("Values about 100 not allowed");
 						}
 					});
-
 				});
 				
 		</script>
@@ -101,8 +100,8 @@
 		(This test requires dijit to be installed)	
 		<div id="grid"></div>
 		<button type="button" id="save" onclick="grid.save()">Save</button>
-		<h2>A basic grid with more editors</h2>
-		(This test requires dijit to be installed)
+		<h2>Another basic grid with more editors</h2>
+		(Click fields to edit)
 		<div id="grid2"></div>
 	</body>
 </html>
