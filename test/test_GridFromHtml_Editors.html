@@ -7,6 +7,7 @@
 		<meta name="viewport" content="width=570" />
 		<style type="text/css">
 			@import "../../dojo/resources/dojo.css";
+			@import "../../dijit/themes/claro/claro.css";
 			@import "../css/skins/claro.css";
 			body {
 				padding: 0 80px; /* side padding to make it easier to scroll doc */
@@ -23,7 +24,6 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			var store; // defined later, Memory store containing data
 			require(["dgrid/GridFromHtml", "dojo/store/Memory", "dojo/store/Observable", "dojo/_base/declare", "dojo/parser", "dojo/query","dgrid/Keyboard", "dgrid/Editor", "dijit/form/DateTextBox", "dijit/form/HorizontalSlider", "dijit/form/NumberSpinner", "dgrid/test/data", "dojo/domReady!"],
 			function(GridFromHtml, Memory, Observable, declare, parser, query,Keyboard, Editor, DateTextBox, Slider, NumberSpinner){
 
@@ -31,13 +31,10 @@
 				window.Editor = Editor;
 				window.DateTextBox = DateTextBox;
 
-				// also, need a store, since there's currently no way to effectively
-				// invoke renderArray from HTML.
-				store = Observable(Memory({data: testTypesStore}));
 				// GridFromHtml tests
 				window.gridFromHtmlLegacyGet = new GridFromHtml({},
 					"gridFromHtmlLegacyGet");
-				gridFromHtmlLegacyGet.renderArray(testTypesStore);
+				gridFromHtmlLegacyGet.renderArray(testTypesStore.data);
 				parser.parse();
 			});
 			
@@ -49,21 +46,20 @@
 		<!-- GridFromHtml should look for TRs with THs anywhere.
 			Testing here with one thead, one tbody, and one implicit. -->
 
-		<h2>1b: using GridFromHtml</h2>
+		<h2>1: using GridFromHtml</h2>
 		<table id="gridFromHtmlLegacyGet">
 			<tbody>
 				<tr>
-					<th data-dgrid-column="Editor({field: 'date'}, DateTextBox)">Date</th>
+					<th data-dgrid-column="Editor({field: 'date', label:'date'}, DateTextBox)">Date</th>
 					<th data-dgrid-column="{field:'text', sortable:false}">Text</th>
 				</tr>
 			</tbody>
 		</table>
 	<h2>2: Fully declarative GridFromHtml</h2>
 	<table id="gridDeclarativeNew" data-dojo-id="gridDeclarativeNew"
-			data-dojo-type="dgrid.GridFromHtml" data-dojo-props="store: store">
+			data-dojo-type="dgrid.GridFromHtml" data-dojo-props="store: testTypesStore">
 			<tr>
-				<th data-dgrid-column="Editor({field:'date'}, DateTextBox)">Date</th>
-				<th>floatNum</th>
+				<th data-dgrid-column="Editor({field:'date', label:'date'}, DateTextBox)">Date</th>
 				<th data-dgrid-column="{field:'text', sortable:false}">Text</th>
 			</tr>
 		</table>
