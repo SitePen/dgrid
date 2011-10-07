@@ -13,7 +13,6 @@ return declare([], {
 	// width: Integer
 	//      new width of the column
 		var x = this.styleColumn(colId, "width: " + width + "px;");
-		this.resize();
 	},
 	renderHeader: function(){
 		this.inherited(arguments);
@@ -119,6 +118,7 @@ return declare([], {
 		}
 
 		this.resizeColumnWidth(cell.columnId, newWidth);
+		this.resize();
 		this._hideResizer();
 	},
 	_updateResizerPosition: function(e){

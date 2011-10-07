@@ -41,11 +41,18 @@
 		<script type="text/javascript">
 			require(["dgrid/OnDemandGrid", "dgrid/ColumnResizer", "dgrid/Selection", "dgrid/test/data", "dojo/domReady!"],
 				function(Grid, ColumnResizer, Selection, testStore){
-					var columns = { // you can declare columns as an object hash (key translates to field)
+					columns = { // you can declare columns as an object hash (key translates to field)
 						col1: 'Column 1Column1Column 1 Column 1',
 						col2: {label: 'Column2222222222222222222222222', sortable: false},
 						col3: 'Column3333333333333333333',
 						col4: 'Column 4',
+						"last-col": {label: 'Column 5', field: 'col5'}
+					};
+
+					columns2 = { // you can declare columns as an object hash (key translates to field)
+						col2: 'Col2',
+						col4: {label: 'Col4', sortable: false},
+						col1: 'Col1',
 						"last-col": {label: 'Column 5', field: 'col5'}
 					};
 					window.grid = dojo.declare([Grid, Selection, ColumnResizer])({
@@ -58,5 +65,9 @@
 	<body class="claro">
 		<h2>A basic grid with column resizing</h2>
 		<div id="grid"></div>
+	<div>Buttons to test changing column structure:
+			<button onclick="grid.setColumns(columns2);">New Structure</button>
+			<button onclick="grid.setColumns(columns);">Original</button>
+		</div>
 	</body>
 </html>
