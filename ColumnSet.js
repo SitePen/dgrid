@@ -61,7 +61,7 @@ function(styleSheet, has, put, declare, listen, aspect, query, Grid, hasClass){
 			function reposition(){
 				positionScrollers(grid, domNode);
 			}
-			listen(window, "resize", reposition);
+			aspect.after(this, "resize", reposition);
 			listen(domNode, ".dgrid-column-set:cellfocusin", onScroll);
 			aspect.after(this, "styleColumn", reposition);		
 		},
