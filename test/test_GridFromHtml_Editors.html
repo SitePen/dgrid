@@ -24,13 +24,17 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dgrid/GridFromHtml", "dojo/store/Memory", "dojo/store/Observable", "dojo/_base/declare", "dojo/parser", "dojo/query","dgrid/Keyboard", "dgrid/Editor", "dijit/form/DateTextBox", "dijit/form/HorizontalSlider", "dijit/form/NumberSpinner", "dgrid/test/data", "dojo/domReady!"],
-			function(GridFromHtml, Memory, Observable, declare, parser, query,Keyboard, Editor, DateTextBox, Slider, NumberSpinner){
+			require(["dgrid/GridFromHtml", "dojo/store/Memory", "dojo/store/Observable", "dojo/_base/declare", "dojo/parser", "dojo/query","dgrid/Keyboard","dijit/form/Select", "dgrid/Editor", "dijit/form/DateTextBox", "dijit/form/HorizontalSlider", "dijit/form/NumberSpinner", "dojo/data/ObjectStore","dgrid/test/data", "dojo/domReady!"],
+			function(GridFromHtml, Memory, Observable, declare, parser, query,Select,Keyboard, Editor, DateTextBox, Slider, NumberSpinner, ObjectStore){
 
 				window.dgrid = { GridFromHtml: GridFromHtml };
 				window.Editor = Editor;
 				window.DateTextBox = DateTextBox;
-
+				window.Select = Select;
+				window.stateStore = new ObjectStore({
+						objectStore:testStateStore,
+						labelProperty: "name"
+					});
 				// GridFromHtml tests
 				window.gridFromHtmlLegacyGet = new GridFromHtml({},
 					"gridFromHtmlLegacyGet");
@@ -52,6 +56,7 @@
 				<tr>
 					<th data-dgrid-column="Editor({field: 'date', label:'date'}, DateTextBox)">Date</th>
 					<th data-dgrid-column="{field:'text', sortable:false}">Text</th>
+					<th data-dgrid-column="Editor({label: 'Text editable', field: 'text'}, 'text', 'dblclick')">Text Editable</th>
 				</tr>
 			</tbody>
 		</table>
@@ -61,6 +66,8 @@
 			<tr>
 				<th data-dgrid-column="Editor({field:'date', label:'date'}, DateTextBox)">Date</th>
 				<th data-dgrid-column="{field:'text', sortable:false}">Text</th>
+				<th data-dgrid-column="Editor({label: 'State', field: 'state', widgetArgs: {store: stateStore, style: 'width:120px;'}
+							}, Select)">State</th>
 			</tr>
 		</table>
 	</body>

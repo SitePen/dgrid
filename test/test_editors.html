@@ -64,15 +64,9 @@
 						Editor({label: 'Select', field: 'bool', widgetArgs: function(item){
 							return {style: "width:75px;", options:[{value:item.bool+"", label: item.bool+"", selected: true}, {value: !item.bool+"", label: !item.bool+""}]}}
 							}, Select),
-						Editor({label: 'Select Store', field: 'state', widgetArgs: function(item){
-							return {store: stateStore, style: "width:120px;"}}
-							}, Select, "focus"),
-						Editor({label: 'Select Store', field: 'state', widgetArgs: function(item){
-							return {store: stateStore}}
-							}, FilteringSelect, "focus"),
-						Editor({label: 'Dijit/Editor', field: 'text', widgetArgs: function(item){
-							return {store: stateStore, style: "height: 150px;"}}, autoSave:false
-							}, DijitEditor)
+						Editor({label: 'Select Store', field: 'state', widgetArgs: {store: stateStore, style: "width:120px;"}}, Select, "focus"),
+						Editor({label: 'Select Store', field: 'state', widgetArgs: {store: stateStore}}, FilteringSelect, "click"),
+						Editor({label: 'Dijit/Editor (dblclick)', field: 'text', widgetArgs: {store: stateStore, style: "height: 150px;"}, autoSave:false}, DijitEditor, "dblclick")
 					];
 					window.grid = new (dojo.declare([Grid, Selection, Keyboard]))({
 						store: testTypesStore,
