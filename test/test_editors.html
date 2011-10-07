@@ -52,6 +52,7 @@
 					});
 
 					var columns2 = [
+						{label: "id", field: 'id'},
 						Editor({label: 'Toggle', field: 'bool2', widgetArgs: function(item){
 
 								return {checked: item.bool2, iconClass: "dijitCheckBoxIcon", label: "Toggle"};
@@ -64,7 +65,7 @@
 						Editor({label: 'Select', field: 'bool', widgetArgs: function(item){
 							return {style: "width:75px;", options:[{value:item.bool+"", label: item.bool+"", selected: true}, {value: !item.bool+"", label: !item.bool+""}]}}
 							}, Select),
-						Editor({label: 'Select Store', field: 'state', widgetArgs: {store: stateStore, style: "width:120px;"}}, Select, "focus"),
+						Editor({label: 'Select Store', field: 'state', widgetArgs: {store: stateStore, style: "width:120px;"}}, Select, "click"),
 						Editor({label: 'Select Store', field: 'state', widgetArgs: {store: stateStore}}, FilteringSelect, "click"),
 						Editor({label: 'Dijit/Editor (dblclick)', field: 'text', widgetArgs: {store: stateStore, style: "height: 150px;"}, autoSave:false}, DijitEditor, "dblclick")
 					];
