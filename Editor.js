@@ -80,7 +80,6 @@ return function(column, editor, editOn){
 				widget;
 			args.value = data; // set value based on data
 			widget = new editor(args, cell.appendChild(put("div")));
-			console.log("watch exists: ", !!widget.watch);
 			widget.watch("value", function(key, oldValue, value){
 				data = setProperty(cell, data, value);
 			});
@@ -102,7 +101,7 @@ return function(column, editor, editOn){
 						stopper && stopper.remove();
 						widget.destroyRecursive();
 					}, 0);
-					onblur(data);
+					setTimeout(function(){onblur(data)},0);
 				});
 			}
 			return widget;

@@ -89,7 +89,7 @@ return declare([List], {
 			if(!event._selected && (event.type == "mousedown" || !event.ctrlKey || event.keyCode == 32)){
 				event._selected = true;
 				var row = event.target;
-				console.log("in focus; event: ", event, "; row: ", row);
+				//console.log("in focus; event: ", event, "; row: ", row);
 				if(mode == "single" && lastRow && event.ctrlKey){
 					// allow deselection even within single select mode
 					grid.deselect(lastRow);
