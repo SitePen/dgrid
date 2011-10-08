@@ -127,7 +127,7 @@ define(["dojo/store/Memory", "dojo/store/Observable", "dojo/store/util/QueryResu
 		]
 		}));
 	var typesData = [];
-	for(var i = 0; i < 20; i++){
+	for(var i = 0; i < 12; i++){
 		typesData.push({
 			id: i,
 			integer: Math.floor(Math.random() * 100),

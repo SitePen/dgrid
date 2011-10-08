@@ -100,8 +100,8 @@ return function(column, editor, editOn){
 						// about keydown events that happen right after blur
 						stopper && stopper.remove();
 						widget.destroyRecursive();
+						onblur(data);
 					}, 0);
-					setTimeout(function(){onblur(data)},0);
 				});
 			}
 			return widget;
