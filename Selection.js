@@ -1,4 +1,4 @@
-define(["dojo/_base/declare", "dojo/on", "./List", "put-selector/put", "dojo/has"], function(declare, on, List, put, has){
+define(["dojo/_base/declare", "dojo/on", "./List", "put-selector/put", "dojo/has", "dojo/aspect"], function(declare, on, List, put, has, aspect){
 return declare([List], {
 	// summary:
 	//		Add selection capabilities to a grid. The grid will have a selection property and
@@ -70,8 +70,8 @@ return declare([List], {
 		
 		var
 			listeners = this._selectionListeners = [],
-			grid = this,
-			lastRow;
+			grid = this;
+			
 		
 		// This is to stop IE8+'s web accelerator and selection.
 		// It also stops selection in Chrome/Safari.
@@ -88,12 +88,12 @@ return declare([List], {
 			var mode = grid.selectionMode;
 			if(!event._selected && (event.type == "mousedown" || !event.ctrlKey || event.keyCode == 32)){
 				event._selected = true;
-				var row = event.target;
+				var row = event.target, _lastRow = grid._lastRow;
 				console.log("in focus; event: ", event, "; row: ", row);
-				if(mode == "single" && lastRow && event.ctrlKey){
+				if(mode == "single" && _lastRow && event.ctrlKey){
 					// allow deselection even within single select mode
-					grid.deselect(lastRow);
-					if(lastRow == row){
+					grid.deselect(_lastRow);
+					if(_lastRow == row){
 						return;
 					}
 				}
@@ -105,11 +105,19 @@ return declare([List], {
 				}else{
 					grid.select(row, null, null); // toggle
 				}
-				if(event.shiftKey && mode != "single"){
-					// select range
-					grid.select(lastRow, row);
+				if(event.shiftKey && mode != "single"){ //select range
+					
+					// If there's a lastRow, highlight select range
+					if(_lastRow) {
+						grid.select(_lastRow, row);
+					}
+					else { // Otherwise, highlight the current and move on
+						grid.select(row);
+						grid._lastRow = row;
+					}
+					
 				}else{
-					lastRow = row;
+					grid._lastRow = row;
 				}
 				if(event.type == "mousedown" && (event.shiftKey || event.ctrlKey)){
 					// prevent selection in firefox
@@ -150,9 +158,11 @@ return declare([List], {
 			// default to true
 			value = true;
 		} 
+		
 		if(!row.element){
 			row = this.row(row);
 		}
+		
 		var selection = this.selection;
 		var previousValue = selection[row.id];
 		if(value === null){
@@ -220,6 +230,7 @@ return declare([List], {
 		if(this.deselectOnRefresh){
 			this.selection = {};
 		}
+		this._lastRow = null;
 		this.inherited(arguments);
 	},
 	
