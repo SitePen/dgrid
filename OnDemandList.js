@@ -169,7 +169,7 @@ return declare([List], {
 				preloadNode.count += count;
 				if(below){
 					preloadNode.start -= count;
-					adjustHeight(preloadNode);
+					adjustHeight(grid, preloadNode);
 				}else{
 					// if it is above, we can calculate the change in exact row changes, which we must do to not mess with the scrolling
 					preloadNode.style.height = (preloadNode.offsetHeight + reclaimedHeight) + "px";
@@ -186,7 +186,7 @@ return declare([List], {
 			}
 			
 		}
-		function adjustHeight(preloadNode){
+		function adjustHeight(grid, preloadNode){
 			var newHeight = preloadNode.count * grid.rowHeight;
 			preloadNode.style.height = (preloadNode.start > 0 ? Math.min(newHeight, grid.maxEmptySpace) : newHeight) + "px";
 		}
@@ -271,7 +271,8 @@ return declare([List], {
 				if(keepScrollTo){
 					keepScrollTo = beforeNode.offsetTop;
 				}
-				adjustHeight(preloadNode);
+				
+				adjustHeight(this, preloadNode);
 				// create a loading node as a placeholder while the data is loaded
 				var loadingNode = put(beforeNode, "-div.dgrid-loading[style=height:" + count * this.rowHeight + "px]");
 				// use the query associated with the preload node to get the next "page"

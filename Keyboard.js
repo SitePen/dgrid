@@ -67,6 +67,13 @@ return declare([List], {
 				}
 			});
 			on(areaNode, "keydown", function(event){
+				
+				// For now, don't squash browser-specific functionalities by letting
+				// ALT and META function as they would natively
+				if(event.metaKey || event.altKey) {
+					return;
+				}
+				
 				var focusedElement = event.target;
 				var keyCode = event.keyCode;
 				if(handledEvent(event)){
