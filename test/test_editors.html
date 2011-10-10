@@ -52,7 +52,6 @@
 					});
 
 					var columns2 = [
-						{label: "id", field: 'id'},
 						Editor({label: 'Toggle', field: 'bool2', widgetArgs: function(item){
 
 								return {checked: item.bool2, iconClass: "dijitCheckBoxIcon", label: "Toggle"};
@@ -63,7 +62,7 @@
 							visibleIncrement: 'T00:15:00',
 							visibleRange: 'T01:00:00'}}, TimeTextBox),
 						Editor({
-							label: 'Select',
+							label: 'Select Options',
 							field: 'bool',
 							widgetArgs: function(item){
 								return {
@@ -76,8 +75,9 @@
 							}
 						}, Select),
 						Editor({label: 'Select Store', field: 'state', widgetArgs: {store: stateStore, maxHeight: -1, style: "width:120px;"}}, Select, "click"),
-						Editor({label: 'Select Store', field: 'state', widgetArgs: {store: stateStore}}, FilteringSelect, "click"),
-						Editor({label: 'Dijit/Editor (dblclick)', field: 'text', widgetArgs: {store: stateStore, style: "height: 150px;"}, autoSave:false}, DijitEditor, "dblclick")
+						Editor({label: 'FilteringSelect Store', field: 'state', widgetArgs: {store: stateStore}}, FilteringSelect, "click"),
+						Editor({label: 'Dijit/Editor', field: 'text', widgetArgs: {store: stateStore, style: "height: 150px;"}, autoSave:false}, DijitEditor)
+						//Note that widgets that have multiple focusable children aren't supported by editOn functionality, for example: dijit/Editor
 					];
 					window.grid = new (dojo.declare([Grid, Selection, Keyboard]))({
 						store: testTypesStore,
@@ -88,7 +88,7 @@
 					window.grid2 = new (dojo.declare([Grid, Selection, Keyboard]))({
 						store: testTypesStore,
 						columns: columns2,
-						selectionMode: "multiple"
+						selectionMode: "single"
 					}, "grid2");
 					grid.on(".field-integer:change", function(event){
 						if(event.value > 100){
