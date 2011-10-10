@@ -1,4 +1,4 @@
-define(["dojo/_base/declare", "dojo/on", "./List", "put-selector/put", "dojo/has", "dojo/aspect"], function(declare, on, List, put, has, aspect){
+define(["dojo/_base/declare", "dojo/on", "./List", "put-selector/put", "dojo/has"], function(declare, on, List, put, has){
 return declare([List], {
 	// summary:
 	//		Add selection capabilities to a grid. The grid will have a selection property and
