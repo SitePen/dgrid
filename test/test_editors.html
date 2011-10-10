@@ -62,10 +62,20 @@
 							clickableIncrement: 'T00:15:00',
 							visibleIncrement: 'T00:15:00',
 							visibleRange: 'T01:00:00'}}, TimeTextBox),
-						Editor({label: 'Select', field: 'bool', widgetArgs: function(item){
-							return {style: "width:75px;", options:[{value:item.bool+"", label: item.bool+"", selected: true}, {value: !item.bool+"", label: !item.bool+""}]}}
-							}, Select),
-						Editor({label: 'Select Store', field: 'state', widgetArgs: {store: stateStore, style: "width:120px;"}}, Select, "click"),
+						Editor({
+							label: 'Select',
+							field: 'bool',
+							widgetArgs: function(item){
+								return {
+									style: "width:75px;",
+									options: [
+										{value:item.bool+"", label: item.bool+"", selected: true},
+										{value: !item.bool+"", label: !item.bool+""}
+									]
+								};
+							}
+						}, Select),
+						Editor({label: 'Select Store', field: 'state', widgetArgs: {store: stateStore, maxHeight: -1, style: "width:120px;"}}, Select, "click"),
 						Editor({label: 'Select Store', field: 'state', widgetArgs: {store: stateStore}}, FilteringSelect, "click"),
 						Editor({label: 'Dijit/Editor (dblclick)', field: 'text', widgetArgs: {store: stateStore, style: "height: 150px;"}, autoSave:false}, DijitEditor, "dblclick")
 					];
