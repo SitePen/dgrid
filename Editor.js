@@ -147,19 +147,6 @@ return function(column, editor, editOn){
 					return oldValue;
 				}   
 			}
-			if(column.selector){
-				if(editor == "radio" || column.selector == "single"){
-					grid.clearSelection();
-				}
-				if(row){
-					suppressSelect = true;
-					grid.select(row.id, null, value);
-					suppressSelect = false;
-				}else{
-					// select all
-					grid[value ? "selectAll" : "clearSelection"]();
-				}
-			}
 		}
 		return value;
 	}
@@ -168,21 +155,6 @@ return function(column, editor, editOn){
 		var cmp; // stores input/widget being rendered
 		if(!grid){
 			grid = column.grid;
-			if(column.selector){
-				grid.on("select,deselect", function(event){
-					// Selector only cares about selection events from rows.
-					// We can't just use event delegation here, because we *don't* want
-					// to capture events bubbled from deeper (e.g. text editors).
-					if(!suppressSelect && /\bdgrid-row\b/.test(event.target.className)){
-						var cell = grid.cell(event.row.id, column.id).element;
-						renderWidget(event.type == "select", cell.contents || cell, object);
-					}
-				});
-			}
-		}
-		if(column.selector){
-			var row = object && grid.row(object);
-			value = row && grid.selection[row.id];
 		}
 		if(column.editOn){ // TODO: Make this use event delegation, particularly now that we can do event delegation with focus events
 			// if we are dealing with IE<8, the cell element is the padding cell, need to go to parent
