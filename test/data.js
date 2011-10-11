@@ -196,11 +196,13 @@ define(["dojo/store/Memory", "dojo/store/Observable", "dojo/store/util/QueryResu
 		],
 		getChildren: function(parent, options){
 			var def = new dojo.Deferred();
-			var q = this.query({parent: parent.id}, options);
+			var immediateResults = this.query({parent: parent.id}, options);
 			setTimeout(function(){
-				def.resolve(q);
+				def.resolve(immediateResults);
 			}, 1000);
-			return QueryResults(def.promise);
+			var results = QueryResults(def.promise);
+			results.observe = immediateResults.observe;
+			return results;
 		},
 		mayHaveChildren: function(parent){
 			return parent.type != "city";
