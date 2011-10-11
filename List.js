@@ -233,6 +233,7 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			if(!scrollbarWidth){
 				// we haven't computed the scroll bar width yet, do so now, and add a new rule if need be
 				// (this is only executed once, when the first List/Grid is initialized)
+				console.log("offsetWidth - clientWidth = ", bodyNode.offsetWidth, bodyNode.clientWidth);
 				scrollbarWidth = bodyNode.offsetWidth - bodyNode.clientWidth+1;
 				
 				// add rules that can be used where scrollbar width/height is needed
