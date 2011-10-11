@@ -95,12 +95,12 @@ return function(column, editor, editOn){
 					});
 				}
 				widget.connect(widget, "onBlur", function(){
+					// if widget supports validation and is invalid, don't dismiss
+					if(widget.isValid && !widget.isValid()){ return; }
+					
 					setTimeout(function(){
 						// we have to wait on this for the widget will throw errors
 						// about keydown events that happen right after blur
-						if(widget.isValid && !widget.isValid()){
-							return;
-						}
 						stopper && stopper.remove();
 						widget.destroyRecursive();
 						onblur(data);
