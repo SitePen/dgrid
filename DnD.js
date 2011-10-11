@@ -14,22 +14,35 @@ function(List, declare, lang, Deferred, DnDSource, DnDManager, put){
 	//   it makes extending/overriding this plugin seem a bit obtuse
 	//   * barring that, might at least want to use safeMixin here
 	
+	
+	var GridDnDSource = dojo.declare(DnDSource, {
+		grid: null,
+		getObject: function(node){
+			// summary: 
+			//		getObject is a method which should be defined on any source intending
+			// 		on interfacing with dgrid DnD
+			var grid = this.grid, 
+				store = grid.store, 
+				row = grid.row(node);
+			return store.get(row.id);
+		}
+		
+	});
+	
 	function setupDnD(grid){
 		if(grid.dndTarget){
 			return;
 		}
 		var store = grid.store;
 		// make the contents a DnD source/target
-		var targetSource = grid.dndTarget = new DnDSource(grid.bodyNode, 
-			lang.delegate(grid.dndTargetConfig, {dropParent: grid.contentNode}));
-		// getObject is a method which should be defined on any source intending
-		// on interfacing with dgrid DnD
-		targetSource.getObject = function(node){
-			var row = grid.row(node);
-			return store.get(row.id);
-		}
-		// add cross-reference to grid for potential use in inter-grid drop logic
-		targetSource.grid = grid;
+		var targetSource = grid.dndTarget = new GridDnDSource(
+			grid.bodyNode, 
+			lang.delegate(grid.dndTargetConfig, {
+				// add cross-reference to grid for potential use in inter-grid drop logic
+				grid: grid,
+				dropParent: grid.contentNode
+			})
+		);
 		
 		// fix _legalMouseDown to only allow starting drag from an item
 		// (not from bodyNode outside contentNode)
