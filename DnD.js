@@ -34,6 +34,8 @@ function(List, declare, lang, Deferred, DnDSource, DnDManager, put){
 			// DnDSource.prototype._legalMouseDown.apply(this, arguments);
 			return legal && evt.target != this.grid.bodyNode;
 		},
+
+		// DnD method overrides
 		onDrop: function(sourceSource, nodes, copy){
 			// summary: 
 			// 		on drop, determine where to move/copy the objects
@@ -127,7 +129,16 @@ function(List, declare, lang, Deferred, DnDSource, DnDManager, put){
 				DnDManager.manager().avatar.node.style.width =
 					this.grid.domNode.offsetWidth / 2 + "px";
 			}
-		}
+		},
+		checkAcceptance: function(source, nodes){
+			// summary: 
+			// 		augment checkAcceptance to block drops from sources without getObject
+			return source.getObject &&
+				DnDSource.prototype.checkAcceptance.apply(this, arguments);
+		}		
+		// TODO: could potentially also implement copyState to jive with default
+		// onDrop* implementations (checking whether store.copy is available);
+		// not doing that just yet until we're sure about default impl.
 	});
 	
 	function setupDnD(grid){
@@ -145,15 +156,6 @@ function(List, declare, lang, Deferred, DnDSource, DnDManager, put){
 			})
 		);
 		
-		// DnD method overrides
-		// augment checkAcceptance to block drops from sources without getObject
-		targetSource.checkAcceptance = function(source, nodes){
-			return source.getObject &&
-				DnDSource.prototype.checkAcceptance.apply(this, arguments);
-		};
-		// TODO: could potentially also implement copyState to jive with default
-		// onDrop* implementations (checking whether store.copy is available);
-		// not doing that just yet until we're sure about default impl.
 	}
 	return declare([List], {
 		dndSourceType: "row",
