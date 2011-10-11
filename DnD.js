@@ -35,7 +35,8 @@ function(List, declare, lang, Deferred, DnDSource, DnDManager, put){
 			return legal && evt.target != this.grid.bodyNode;
 		},
 		onDrop: function(sourceSource, nodes, copy){
-			// on drop, determine where to move/copy the objects
+			// summary: 
+			// 		on drop, determine where to move/copy the objects
 			var targetSource = this,
 				targetRow = this.targetAnchor, 
 				grid = this.grid, 
@@ -61,6 +62,22 @@ function(List, declare, lang, Deferred, DnDSource, DnDManager, put){
 					targetSource.onDropInternal(nodes, copy, target);
 				}
 			});
+		},
+		onDropInternal: function(nodes, copy, targetItem){
+			var targetSource = this,
+				grid = this.grid, 
+				store = grid.store; 
+				
+			nodes.forEach(function(node){
+				Deferred.when(targetSource.getObject(node), function(object){
+					// For copy DnD operations, copy object, if supported by store;
+					// otherwise settle for put anyway.
+					// (put will relocate an existing item with the same id, i.e. move).
+					store[copy && store.copy ? "copy" : "put"](object, {
+						before: targetItem
+					});
+				});
+			});
 		}
 	});
 	
@@ -80,18 +97,6 @@ function(List, declare, lang, Deferred, DnDSource, DnDManager, put){
 		);
 		
 		// DnD method overrides
-		targetSource.onDropInternal = function(nodes, copy, targetItem){
-			nodes.forEach(function(node){
-				Deferred.when(targetSource.getObject(node), function(object){
-					// For copy DnD operations, copy object, if supported by store;
-					// otherwise settle for put anyway.
-					// (put will relocate an existing item with the same id, i.e. move).
-					store[copy && store.copy ? "copy" : "put"](object, {
-						before: targetItem
-					});
-				});
-			});
-		};
 		targetSource.onDropExternal = function(sourceSource, nodes, copy, targetItem){
 			// Note: this default implementation expects that two grids do not
 			// share the same store.  There may be more ideal implementations in the
