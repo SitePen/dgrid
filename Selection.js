@@ -70,8 +70,7 @@ return declare([List], {
 		
 		var
 			listeners = this._selectionListeners = [],
-			grid = this,
-			lastRow;
+			grid = this;
 		
 		// This is to stop IE8+'s web accelerator and selection.
 		// It also stops selection in Chrome/Safari.
@@ -88,7 +87,7 @@ return declare([List], {
 			var mode = grid.selectionMode;
 			if(!event._selected && (event.type == "mousedown" || !event.ctrlKey || event.keyCode == 32)){
 				event._selected = true;
-				var row = event.target;
+				var row = event.target, lastRow = grid._lastRow;
 				//console.log("in focus; event: ", event, "; row: ", row);
 				if(mode == "single" && lastRow && event.ctrlKey){
 					// allow deselection even within single select mode
@@ -105,11 +104,12 @@ return declare([List], {
 				}else{
 					grid.select(row, null, null); // toggle
 				}
-				if(event.shiftKey && mode != "single"){
-					// select range
+				if(event.shiftKey && lastRow && mode != "single"){ // select range
 					grid.select(lastRow, row);
 				}else{
-					lastRow = row;
+					// update lastRow reference for potential subsequent shift+select
+					// (current row was already selected by earlier logic)
+					grid._lastRow = row;
 				}
 				if(event.type == "mousedown" && (event.shiftKey || event.ctrlKey)){
 					// prevent selection in firefox
@@ -220,6 +220,7 @@ return declare([List], {
 		if(this.deselectOnRefresh){
 			this.selection = {};
 		}
+		this._lastRow = null;
 		this.inherited(arguments);
 	},
 	
