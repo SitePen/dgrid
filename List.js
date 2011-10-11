@@ -100,37 +100,6 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 	
 	return declare(TouchScroll ? [TouchScroll] : [], {
 		tabableHeader: false,
-		
-		constructor: function(params, srcNodeRef){
-		var self = this;
-		// summary:
-		//		The set of observers for the data
-	/* TODO: Implement this to hide (detach from DOM) out-of-sight nodes to improve performance
-	 * clearTop = function(){
-		var scrollNode = self.bodyNode;
-		var transform = self.contentNode.style.webkitTransform;
-		var visibleTop = scrollNode.scrollTop + (transform ? -transform.match(/translate[\w]*\(.*?,(.*?)px/)[1] : 0);
-		
-		var elements = self.contentNode.childNodes;
-		for(var i = 0; i < elements.length; i++){
-			if(elements[i].offsetTop > visibleTop){
-				break;
-			}
-		}
-		self.otherNode = create("div", {
-		});
-		var last = elements[i];
-		for(; i > 0; i--){
-			self.otherNode.appendChild(elements[i -1]);
-		}
-		var node = create("div", {
-			style: {
-				height: visibleTop + "px"
-			}
-		});
-		self.contentNode.insertBefore(node, last);
-	};*/
-		},
 		postscript: function(params, srcNodeRef){
 			// invoke create in postScript to allow descendants to
 			// perform logic before create/postCreate happen (a la dijit/_WidgetBase)
