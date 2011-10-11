@@ -6,7 +6,6 @@ define(["dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put"], funct
 
 		var grid;
 		function onchange(event){
-			console.log("onchange", event);
 			// event handler triggered on change of selector inputs
 			var target = event.target;
 			if(target.className.indexOf("dgrid-selector-input") > -1){
@@ -34,7 +33,6 @@ define(["dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put"], funct
 		function onSelect(event){
 			var match;
 			if(!event._selected && (!event.ctrlKey || event.keyCode == 32) && (match = event.target.className.match(selectorRE))){
-				console.log("onSelect", event.type, event._selected, event.timeStamp);
 				var input;
 				if(match[1] == "cell" && (input = event.target.firstChild) && input.nodeType == 1){
 					var fireChange = true;
