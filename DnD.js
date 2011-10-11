@@ -115,6 +115,18 @@ function(List, declare, lang, Deferred, DnDSource, DnDManager, put){
 					});
 				});
 			});
+		},
+		onDndStart: function(source, nodes, copy){
+			// summary: 
+			// 		listen for start events to apply style change to avatar
+			
+			this.inherited(arguments); // DnDSource.prototype.onDndStart.apply(this, arguments);
+			if(source == this){
+				// Set avatar width to half the grid's width.
+				// Kind of a naive default, but prevents ridiculously wide avatars.
+				DnDManager.manager().avatar.node.style.width =
+					this.grid.domNode.offsetWidth / 2 + "px";
+			}
 		}
 	});
 	
@@ -134,16 +146,6 @@ function(List, declare, lang, Deferred, DnDSource, DnDManager, put){
 		);
 		
 		// DnD method overrides
-		// listen for start events to apply style change to avatar
-		targetSource.onDndStart = function(source, nodes, copy){
-			DnDSource.prototype.onDndStart.apply(this, arguments);
-			if(source == this){
-				// Set avatar width to half the grid's width.
-				// Kind of a naive default, but prevents ridiculously wide avatars.
-				DnDManager.manager().avatar.node.style.width =
-					grid.domNode.offsetWidth / 2 + "px";
-			}
-		};
 		// augment checkAcceptance to block drops from sources without getObject
 		targetSource.checkAcceptance = function(source, nodes){
 			return source.getObject &&
