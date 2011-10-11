@@ -78,31 +78,17 @@ function(List, declare, lang, Deferred, DnDSource, DnDManager, put){
 					});
 				});
 			});
-		}
-	});
-	
-	function setupDnD(grid){
-		if(grid.dndTarget){
-			return;
-		}
-		var store = grid.store;
-		// make the contents a DnD source/target
-		var targetSource = grid.dndTarget = new GridDnDSource(
-			grid.bodyNode, 
-			lang.delegate(grid.dndTargetConfig, {
-				// add cross-reference to grid for potential use in inter-grid drop logic
-				grid: grid,
-				dropParent: grid.contentNode
-			})
-		);
-		
-		// DnD method overrides
-		targetSource.onDropExternal = function(sourceSource, nodes, copy, targetItem){
+		},
+		onDropExternal: function(sourceSource, nodes, copy, targetItem){
 			// Note: this default implementation expects that two grids do not
 			// share the same store.  There may be more ideal implementations in the
 			// case of two grids using the same store (perhaps differentiated by
 			// query), dragging to each other.
+			var targetSource = this,
+				grid = this.grid, 
+				store = grid.store; 
 			var sourceGrid = sourceSource.grid;
+			
 			// TODO: bail out if sourceSource.getObject isn't defined?
 			nodes.forEach(function(node, i){
 				Deferred.when(sourceSource.getObject(node), function(object){
@@ -129,7 +115,25 @@ function(List, declare, lang, Deferred, DnDSource, DnDManager, put){
 					});
 				});
 			});
-		};
+		}
+	});
+	
+	function setupDnD(grid){
+		if(grid.dndTarget){
+			return;
+		}
+		var store = grid.store;
+		// make the contents a DnD source/target
+		var targetSource = grid.dndTarget = new GridDnDSource(
+			grid.bodyNode, 
+			lang.delegate(grid.dndTargetConfig, {
+				// add cross-reference to grid for potential use in inter-grid drop logic
+				grid: grid,
+				dropParent: grid.contentNode
+			})
+		);
+		
+		// DnD method overrides
 		// listen for start events to apply style change to avatar
 		targetSource.onDndStart = function(source, nodes, copy){
 			DnDSource.prototype.onDndStart.apply(this, arguments);
