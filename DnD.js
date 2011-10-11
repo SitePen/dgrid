@@ -14,6 +14,9 @@ function(List, declare, lang, Deferred, DnDSource, DnDManager, put){
 	//   it makes extending/overriding this plugin seem a bit obtuse
 	//   * barring that, might at least want to use safeMixin here
 	
+	// TODO: 
+	// 	* consider moving GridDnDSource to an external module 
+	// 	and making it a usable extension point
 	
 	var GridDnDSource = dojo.declare(DnDSource, {
 		grid: null,
@@ -155,8 +158,8 @@ function(List, declare, lang, Deferred, DnDSource, DnDManager, put){
 				dropParent: grid.contentNode
 			})
 		);
-		
 	}
+	
 	return declare([List], {
 		dndSourceType: "row",
 		dndTargetConfig: null,
