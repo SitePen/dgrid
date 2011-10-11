@@ -24,10 +24,10 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dgrid/OnDemandGrid", "dgrid/Editor","dgrid/Selection", "dgrid/Keyboard", "dgrid/test/data", "dojo/domReady!"], 
-				function(Grid, Editor, Selection, Keyboard, testStore){
+			require(["dgrid/OnDemandGrid", "dgrid/Selector", "dgrid/Selection", "dgrid/Keyboard", "dgrid/test/data", "dojo/domReady!"], 
+				function(Grid, Selector, Selection, Keyboard, testStore){
 					var columns = { // you can declare columns as an object hash (key translates to field)
-						col1: Editor({selector: true, sortable: false}, "checkbox"),
+						col1: Selector({ type: "checkbox" }),
 						id: "ID",
 						col2: {label: 'Column 2', sortable: false},
 						col3: {label: 'Column 3'}
@@ -38,7 +38,7 @@
 						columns: columns
 					}, "grid");
 					var columnsRadio = { // you can declare columns as an object hash (key translates to field)
-						col1: Editor({label: 'Radio', selector: true, sortable: false}, "radio"),
+						col1: Selector({ label: 'Radio', type: "radio" }),
 						id: "ID",
 						col2: {label: 'Column 2', sortable: false},
 						col3: {label: 'Column 3'}
