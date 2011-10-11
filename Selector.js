@@ -5,44 +5,20 @@ define(["dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put"], funct
 		column.sortable = false;
 
 		var grid;
-		function onchange(event){
-			// event handler triggered on change of selector inputs
-			var target = event.target;
-			if(target.className.indexOf("dgrid-selector-input") > -1){
-				var cellElement = target.parentNode,
-					cell = grid.cell(cellElement),
-					row = cell.row,
-					column = cell.column,
-					value = target.checked;
-
+		function onSelect(event){
+			if(!event._selected && (!event.ctrlKey || event.keyCode == 32)){
+				var row = grid.row(event),
+					value = null;
 				if(type == "radio"){
 					grid.clearSelection();
+					value = true;
 				}
-				if(row){
-					suppressSelect = true;
-					grid.select(row.id, null, value);
-					suppressSelect = false;
-				}else{
-					// select all
-					grid[value ? "selectAll" : "clearSelection"]();
-				}
-			}
-		}
 
-		var selectorRE = /dgrid-selector-(cell|input)/;
-		function onSelect(event){
-			var match;
-			if(!event._selected && (!event.ctrlKey || event.keyCode == 32) && (match = event.target.className.match(selectorRE))){
-				var input;
-				if(match[1] == "cell" && (input = event.target.firstChild) && input.nodeType == 1){
-					var fireChange = true;
-					if(type == "radio"){
-						fireChange = !input.checked;
-						input.checked = true;
-					}else{
-						input.checked = !input.checked;
-					}
-					fireChange && on.emit(input, "change", { bubbles: true, cancelable: true });
+				if(row){
+					grid.select(row.id, null, value);
+				}else if(type != "radio"){
+					put(this, (grid.allSelected ? "!" : ".") + "dgrid-select-all");
+					grid[grid.allSelected ? "clearSelection" : "selectAll"]();
 				}
 				event._selected = true;
 				return;
@@ -55,57 +31,34 @@ define(["dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put"], funct
 			aspect.before(grid, "_initSelectionEvents", function(){
 				// Add listeners for these events before Selection adds its own
 				// so we can short-circuit what Selection will do
-				on(this.contentNode, "mousedown,cellfocusin", onSelect);
+				on(this.contentNode, ".dgrid-selector-cell:mousedown,.dgrid-selector-cell:cellfocusin", onSelect);
+				on(this.headerNode, ".dgrid-selector-cell:mousedown,.dgrid-selector-cell:cellfocusin", onSelect);
 			});
-			grid.on(".dgrid-selector-input:change", onchange);
 		}
 
 		var renderInput = typeof type == "function" ? type : function(value, cell, object){
-			var input = cell.input || (cell.input = put(cell, "input[type=" + type + "].dgrid-selector-input", {
-				name: column.field || this.id + "-selection",
+			var input = cell.input || (cell.input = put(cell, "div.ui-icon.dgrid-selector-input.dgrid-selector-"+type, {
 				tabIndex: isNaN(column.tabIndex) ? -1 : column.tabIndex
 			}));
-			input.value = value || "";
-			input.checked = value;
 
 			if(!grid._hasSelectionInputListener){
 				setupSelectionEvents();
-			}
-			if(has("ie") < 9){
-				// IE<9 doesn't fire change events for all the right things,
-				// and it doesn't bubble, double fail.
-				if(cell.input.type == "radio" || cell.input.type == "checkbox"){
-					// listen for clicks because IE doesn't fire change events properly for checks/radios
-					on(input, "click", onchange);
-				}else{
-					on(input, "change", onchange);
-				}
 			}
 
 			return input;
 		};
 
-		var rowRE = /\bdgrid-row\b/,
-			suppressSelect;
+		var rowRE = /\bdgrid-row\b/;
 		column.renderCell = function(object, value, cell, options, header){
 			if(!grid){
 				grid = column.grid;
-				grid.on("select,deselect", function(event){
-					// Selector only cares about selection events from rows.
-					// We can't just use event delegation here, because we *don't* want
-					// to capture events bubbled from deeper (e.g. text editors).
-					if(!suppressSelect && rowRE.test(event.target.className)){
-						var cell = grid.cell(event.row.id, column.id).element;
-						renderInput(event.type == "select", cell.contents || cell, object);
-					}
-				});
 			}
 
 			var row = object && grid.row(object);
 			value = row && grid.selection[row.id];
 
-			if(header && typeof object == "string"){
-				cell.appendChild(document.createTextNode(object));
+			if(header && (type == "radio" || typeof object == "string")){
+				cell.appendChild(document.createTextNode(object||""));
 				if(!grid._hasSelectionInputListener){
 					setupSelectionEvents();
 				}
