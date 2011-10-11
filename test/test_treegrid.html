@@ -39,7 +39,6 @@
 					window.tree = dojo.declare([Grid, Keyboard, Selection])({
 						store: testCountryStore,
 						query: {type: "continent"},
-						selectionMode: "multiple",
 						columns: columns
 					}, "tree");
 					on(document.getElementById("save"), "click", function(){
