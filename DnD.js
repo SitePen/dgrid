@@ -25,36 +25,22 @@ function(List, declare, lang, Deferred, DnDSource, DnDManager, put){
 				store = grid.store, 
 				row = grid.row(node);
 			return store.get(row.id);
-		}
-		
-	});
-	
-	function setupDnD(grid){
-		if(grid.dndTarget){
-			return;
-		}
-		var store = grid.store;
-		// make the contents a DnD source/target
-		var targetSource = grid.dndTarget = new GridDnDSource(
-			grid.bodyNode, 
-			lang.delegate(grid.dndTargetConfig, {
-				// add cross-reference to grid for potential use in inter-grid drop logic
-				grid: grid,
-				dropParent: grid.contentNode
-			})
-		);
-		
-		// fix _legalMouseDown to only allow starting drag from an item
-		// (not from bodyNode outside contentNode)
-		targetSource._legalMouseDown = function(evt){
-			var legal = DnDSource.prototype._legalMouseDown.apply(this, arguments);
-			return legal && evt.target != grid.bodyNode;
-		};
-		
-		// DnD method overrides
-		targetSource.onDrop = function(sourceSource, nodes, copy){
+		},
+		_legalMouseDown: function(evt){
+			// summary: 
+			// 		fix _legalMouseDown to only allow starting drag from an item
+			// 		(not from bodyNode outside contentNode)
+			var legal = this.inherited("_legalMouseDown", arguments);
+			// DnDSource.prototype._legalMouseDown.apply(this, arguments);
+			return legal && evt.target != this.grid.bodyNode;
+		},
+		onDrop: function(sourceSource, nodes, copy){
 			// on drop, determine where to move/copy the objects
-			var targetRow = targetSource.targetAnchor;
+			var targetSource = this,
+				targetRow = this.targetAnchor, 
+				grid = this.grid, 
+				store = grid.store; 
+				
 			if(!this.before && targetRow){
 				// target before next node if dropped within bottom half of this node
 				// (unless there's no node to target at all)
@@ -75,7 +61,25 @@ function(List, declare, lang, Deferred, DnDSource, DnDManager, put){
 					targetSource.onDropInternal(nodes, copy, target);
 				}
 			});
-		};
+		}
+	});
+	
+	function setupDnD(grid){
+		if(grid.dndTarget){
+			return;
+		}
+		var store = grid.store;
+		// make the contents a DnD source/target
+		var targetSource = grid.dndTarget = new GridDnDSource(
+			grid.bodyNode, 
+			lang.delegate(grid.dndTargetConfig, {
+				// add cross-reference to grid for potential use in inter-grid drop logic
+				grid: grid,
+				dropParent: grid.contentNode
+			})
+		);
+		
+		// DnD method overrides
 		targetSource.onDropInternal = function(nodes, copy, targetItem){
 			nodes.forEach(function(node){
 				Deferred.when(targetSource.getObject(node), function(object){
