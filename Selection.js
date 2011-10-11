@@ -18,12 +18,13 @@ return declare([List], {
 	},
 	postCreate: function(){
 		this.inherited(arguments);
+
 		var mode = this.selectionMode;
+		this.selectionMode = ""; // force first setSelectionMode call to pause handlers
+								 // if selection mode is "none"
 		
-		if(mode != "none"){ // forego initial event hookup if selectionMode is none
-			this.selectionMode = "none"; // force first setSelectionMode call to run
-			this.setSelectionMode(mode);
-		}
+		this._initSelectionEvents(); // first time; set up event hooks
+		this.setSelectionMode(mode);
 	},
 	
 	// selection:
@@ -42,9 +43,6 @@ return declare([List], {
 		
 		if(mode == this.selectionMode){ return; } // prevent unnecessary spinning
 		
-		if(!this._selectionListeners){
-			this._initSelectionEvents(); // first time; set up event hooks
-		}
 		listeners = this._selectionListeners;
 		
 		// If switching to none, pause listeners; if switching from none, resume.
