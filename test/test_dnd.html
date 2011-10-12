@@ -19,12 +19,21 @@
 			
 			.clear { clear: both; }
 			
-			#another-target, #another-source {
+			#another-target, #another-source, #invalid-source {
 				float: left;
-				width: 504px;
-				height: 300px;
+				width: 204px;
+				height: 200px;
+				margin-right: 5px;
 				border: 1px solid green;
 			}
+			#another-target .dojoDndItem, #another-source .dojoDndItem, #invalid-source .dojoDndItem {
+				margin: 1px; 
+				padding: 4px 8px;
+				background-color: #eee;
+				border-bottom: 2px solid #9c9;
+				border-top: 2px solid #fff;
+			}
+			
 			#grid1 {
 				height: 200px;
 			}
@@ -103,6 +112,23 @@
 						return this.getItem(node.id).data;
 					};
 					
+					var invalidSource = new DnDSource(dojo.byId("invalid-source"), {
+						accept: ["grue"]
+					});
+					invalidSource.insertNodes(false, [
+						{ type: ["grue"], data: new nameObj({
+							order: 10,
+							name: "zork-grue",
+							description: "A sinister, lurking presence in the dark places of the earth.."
+						})},
+						{ type: ["grue"], data: new nameObj({
+							order: 11,
+							name: "ur-grue",
+							description: "Evil god of darkness."
+						})}
+					], false, null);
+					
+					
 					// Set up 2 more grids sharing the same store, to DnD between.
 					// Again, there are many ways to spin this, this is just one way.
 					var SharedDnDGrid = dojo.declare(DnDGrid, {
@@ -164,6 +190,7 @@
 		<div id="grid2"></div>
 		<div id="another-target">Another Target</div>
 		<div id="another-source">Another Source</div>
+		<div id="invalid-source">An Invalid Source</div>
 		<div class="clear">
 			<h2>Example of 2 grids w/ inter-grid DnD, sharing the same store</h2>
 			<div id="grid3"></div>
