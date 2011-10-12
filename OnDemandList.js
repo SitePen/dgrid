@@ -48,6 +48,7 @@ return declare([List], {
 		//		for the first page of data. Subsequent data will be downloaded as it comes
 		//		into view.
 		if(!preloadNode){
+			var rootQuery = true;
 			var topPreloadNode = put(this.contentNode, "div.dgrid-preload");
 			topPreloadNode.preload = true;
 			topPreloadNode.query = query;
@@ -92,7 +93,7 @@ return declare([List], {
 				if(trCount){ self.rowHeight = height / trCount; }
 				
 				total -= trCount;
-				if(!total && trCount){
+				if(!total && trCount && rootQuery){
 					put(trs[trCount-1], ".dgrid-last-row");
 				}
 				preloadNode.count = total;

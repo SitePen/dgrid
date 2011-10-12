@@ -337,12 +337,12 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			function mapEach(object){
 				return lastRow = self.insertRow(object, rowsFragment, null, start++, options);
 			}
-			function whenDone(rows){
+			function whenDone(resolvedRows){
 				(beforeNode && beforeNode.parentNode || self.contentNode).insertBefore(rowsFragment, beforeNode || null);
 				if(!beforeNode){
 					put(lastRow, ".dgrid-last-row");
 				}
-				return rows;
+				return rows = resolvedRows;
 			}
 			return whenDone(rows);
 		},
