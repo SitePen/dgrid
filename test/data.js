@@ -195,17 +195,21 @@ define(["dojo/store/Memory", "dojo/store/Observable", "dojo/store/util/QueryResu
 					{ id: 'BuenosAires', name:'Buenos Aires', type:'city', parent: 'AR' }
 		],
 		getChildren: function(parent, options){
+			return this.query({parent: parent.id}, options);
+		},
+		mayHaveChildren: function(parent){
+			return parent.type != "city";
+		},
+		query: function(query, options){
 			var def = new dojo.Deferred();
-			var immediateResults = this.query({parent: parent.id}, options);
+			var immediateResults = this.queryEngine(query, options)(this.data);
 			setTimeout(function(){
 				def.resolve(immediateResults);
 			}, 1000);
 			var results = QueryResults(def.promise);
-			results.observe = immediateResults.observe;
+			console.log("results: ", results);
 			return results;
-		},
-		mayHaveChildren: function(parent){
-			return parent.type != "city";
+
 		}
 	}));
 	
