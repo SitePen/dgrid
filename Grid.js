@@ -239,7 +239,7 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "dojo/q
 			this.inherited(arguments);
 			
 			if(contentNode){
-				if((width = headerTableNode.offsetWidth) != contentNode.offsetWidth){
+				if((width = headerTableNode.offsetWidth) != contentNode.offsetWidth && width){ // width > 0 check for headless widget
 					// update size of content node if necessary (to match size of rows)
 					contentNode.style.width = width + "px";
 				}
