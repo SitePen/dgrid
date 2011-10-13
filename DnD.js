@@ -14,23 +14,20 @@ function(List, declare, lang, Deferred, DnDSource, DnDManager, put){
 	//   it makes extending/overriding this plugin seem a bit obtuse
 	//   * barring that, might at least want to use safeMixin here
 	
-	// TODO: 
-	// 	* consider moving GridDnDSource to an external module 
-	// 	and making it a usable extension point
+	// TODO:
+	// 	* consider moving GridDnDSource to an external module
 	
-	var GridDnDSource = dojo.declare(DnDSource, {
+	var GridDnDSource = declare(DnDSource, {
 		grid: null,
 		getObject: function(node){
-			// summary: 
+			// summary:
 			//		getObject is a method which should be defined on any source intending
 			// 		on interfacing with dgrid DnD
-			var grid = this.grid, 
-				store = grid.store, 
-				row = grid.row(node);
-			return store.get(row.id);
+			var grid = this.grid;
+			return grid.store.get(grid.row(node).id);
 		},
 		_legalMouseDown: function(evt){
-			// summary: 
+			// summary:
 			// 		fix _legalMouseDown to only allow starting drag from an item
 			// 		(not from bodyNode outside contentNode)
 			var legal = this.inherited("_legalMouseDown", arguments);
@@ -40,13 +37,13 @@ function(List, declare, lang, Deferred, DnDSource, DnDManager, put){
 
 		// DnD method overrides
 		onDrop: function(sourceSource, nodes, copy){
-			// summary: 
+			// summary:
 			// 		on drop, determine where to move/copy the objects
 			var targetSource = this,
-				targetRow = this.targetAnchor, 
-				grid = this.grid, 
-				store = grid.store; 
-				
+				targetRow = this.targetAnchor,
+				grid = this.grid,
+				store = grid.store;
+			
 			if(!this.before && targetRow){
 				// target before next node if dropped within bottom half of this node
 				// (unless there's no node to target at all)
@@ -70,9 +67,8 @@ function(List, declare, lang, Deferred, DnDSource, DnDManager, put){
 		},
 		onDropInternal: function(nodes, copy, targetItem){
 			var targetSource = this,
-				grid = this.grid, 
-				store = grid.store; 
-				
+				store = this.grid.store;
+			
 			nodes.forEach(function(node){
 				Deferred.when(targetSource.getObject(node), function(object){
 					// For copy DnD operations, copy object, if supported by store;
@@ -89,10 +85,8 @@ function(List, declare, lang, Deferred, DnDSource, DnDManager, put){
 			// share the same store.  There may be more ideal implementations in the
 			// case of two grids using the same store (perhaps differentiated by
 			// query), dragging to each other.
-			var targetSource = this,
-				grid = this.grid, 
-				store = grid.store; 
-			var sourceGrid = sourceSource.grid;
+			var store = this.grid.store,
+				sourceGrid = sourceSource.grid;
 			
 			// TODO: bail out if sourceSource.getObject isn't defined?
 			nodes.forEach(function(node, i){
@@ -122,7 +116,7 @@ function(List, declare, lang, Deferred, DnDSource, DnDManager, put){
 			});
 		},
 		onDndStart: function(source, nodes, copy){
-			// summary: 
+			// summary:
 			// 		listen for start events to apply style change to avatar
 			
 			this.inherited(arguments); // DnDSource.prototype.onDndStart.apply(this, arguments);
@@ -134,7 +128,7 @@ function(List, declare, lang, Deferred, DnDSource, DnDManager, put){
 			}
 		},
 		checkAcceptance: function(source, nodes){
-			// summary: 
+			// summary:
 			// 		augment checkAcceptance to block drops from sources without getObject
 			return source.getObject &&
 				DnDSource.prototype.checkAcceptance.apply(this, arguments);
@@ -148,10 +142,9 @@ function(List, declare, lang, Deferred, DnDSource, DnDManager, put){
 		if(grid.dndTarget){
 			return;
 		}
-		var store = grid.store;
 		// make the contents a DnD source/target
-		var targetSource = grid.dndTarget = new GridDnDSource(
-			grid.bodyNode, 
+		grid.dndTarget = new GridDnDSource(
+			grid.bodyNode,
 			lang.delegate(grid.dndTargetConfig, {
 				// add cross-reference to grid for potential use in inter-grid drop logic
 				grid: grid,
@@ -160,7 +153,7 @@ function(List, declare, lang, Deferred, DnDSource, DnDManager, put){
 		);
 	}
 	
-	return declare([List], {
+	var DnD = declare([], {
 		dndSourceType: "row",
 		dndTargetConfig: null,
 		postMixInProperties: function(){
@@ -168,7 +161,7 @@ function(List, declare, lang, Deferred, DnDSource, DnDManager, put){
 			// initialize default dndTargetConfig
 			this.dndTargetConfig = {
 				accept: [this.dndSourceType]
-			}
+			};
 		},
 		postCreate: function(){
 			this.inherited(arguments);
@@ -184,4 +177,7 @@ function(List, declare, lang, Deferred, DnDSource, DnDManager, put){
 			return row;
 		}
 	});
+	DnD.GridSource = GridDnDSource;
+	
+	return DnD;
 });
