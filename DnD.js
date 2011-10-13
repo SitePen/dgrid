@@ -14,34 +14,39 @@ function(List, declare, lang, Deferred, DnDSource, DnDManager, put){
 	//   it makes extending/overriding this plugin seem a bit obtuse
 	//   * barring that, might at least want to use safeMixin here
 	
-	function setupDnD(grid){
-		if(grid.dndTarget){
-			return;
-		}
-		var store = grid.store;
-		// make the contents a DnD source/target
-		var targetSource = grid.dndTarget = new DnDSource(grid.bodyNode, 
-			lang.delegate(grid.dndTargetConfig, {dropParent: grid.contentNode}));
-		// getObject is a method which should be defined on any source intending
-		// on interfacing with dgrid DnD
-		targetSource.getObject = function(node){
-			var row = grid.row(node);
+	// TODO: 
+	// 	* consider moving GridDnDSource to an external module 
+	// 	and making it a usable extension point
+	
+	var GridDnDSource = dojo.declare(DnDSource, {
+		grid: null,
+		getObject: function(node){
+			// summary: 
+			//		getObject is a method which should be defined on any source intending
+			// 		on interfacing with dgrid DnD
+			var grid = this.grid, 
+				store = grid.store, 
+				row = grid.row(node);
 			return store.get(row.id);
-		}
-		// add cross-reference to grid for potential use in inter-grid drop logic
-		targetSource.grid = grid;
-		
-		// fix _legalMouseDown to only allow starting drag from an item
-		// (not from bodyNode outside contentNode)
-		targetSource._legalMouseDown = function(evt){
-			var legal = DnDSource.prototype._legalMouseDown.apply(this, arguments);
-			return legal && evt.target != grid.bodyNode;
-		};
-		
+		},
+		_legalMouseDown: function(evt){
+			// summary: 
+			// 		fix _legalMouseDown to only allow starting drag from an item
+			// 		(not from bodyNode outside contentNode)
+			var legal = this.inherited("_legalMouseDown", arguments);
+			// DnDSource.prototype._legalMouseDown.apply(this, arguments);
+			return legal && evt.target != this.grid.bodyNode;
+		},
+
 		// DnD method overrides
-		targetSource.onDrop = function(sourceSource, nodes, copy){
-			// on drop, determine where to move/copy the objects
-			var targetRow = targetSource.targetAnchor;
+		onDrop: function(sourceSource, nodes, copy){
+			// summary: 
+			// 		on drop, determine where to move/copy the objects
+			var targetSource = this,
+				targetRow = this.targetAnchor, 
+				grid = this.grid, 
+				store = grid.store; 
+				
 			if(!this.before && targetRow){
 				// target before next node if dropped within bottom half of this node
 				// (unless there's no node to target at all)
@@ -62,8 +67,12 @@ function(List, declare, lang, Deferred, DnDSource, DnDManager, put){
 					targetSource.onDropInternal(nodes, copy, target);
 				}
 			});
-		};
-		targetSource.onDropInternal = function(nodes, copy, targetItem){
+		},
+		onDropInternal: function(nodes, copy, targetItem){
+			var targetSource = this,
+				grid = this.grid, 
+				store = grid.store; 
+				
 			nodes.forEach(function(node){
 				Deferred.when(targetSource.getObject(node), function(object){
 					// For copy DnD operations, copy object, if supported by store;
@@ -74,13 +83,17 @@ function(List, declare, lang, Deferred, DnDSource, DnDManager, put){
 					});
 				});
 			});
-		};
-		targetSource.onDropExternal = function(sourceSource, nodes, copy, targetItem){
+		},
+		onDropExternal: function(sourceSource, nodes, copy, targetItem){
 			// Note: this default implementation expects that two grids do not
 			// share the same store.  There may be more ideal implementations in the
 			// case of two grids using the same store (perhaps differentiated by
 			// query), dragging to each other.
+			var targetSource = this,
+				grid = this.grid, 
+				store = grid.store; 
 			var sourceGrid = sourceSource.grid;
+			
 			// TODO: bail out if sourceSource.getObject isn't defined?
 			nodes.forEach(function(node, i){
 				Deferred.when(sourceSource.getObject(node), function(object){
@@ -107,26 +120,46 @@ function(List, declare, lang, Deferred, DnDSource, DnDManager, put){
 					});
 				});
 			});
-		};
-		// listen for start events to apply style change to avatar
-		targetSource.onDndStart = function(source, nodes, copy){
-			DnDSource.prototype.onDndStart.apply(this, arguments);
+		},
+		onDndStart: function(source, nodes, copy){
+			// summary: 
+			// 		listen for start events to apply style change to avatar
+			
+			this.inherited(arguments); // DnDSource.prototype.onDndStart.apply(this, arguments);
 			if(source == this){
 				// Set avatar width to half the grid's width.
 				// Kind of a naive default, but prevents ridiculously wide avatars.
 				DnDManager.manager().avatar.node.style.width =
-					grid.domNode.offsetWidth / 2 + "px";
+					this.grid.domNode.offsetWidth / 2 + "px";
 			}
-		};
-		// augment checkAcceptance to block drops from sources without getObject
-		targetSource.checkAcceptance = function(source, nodes){
+		},
+		checkAcceptance: function(source, nodes){
+			// summary: 
+			// 		augment checkAcceptance to block drops from sources without getObject
 			return source.getObject &&
 				DnDSource.prototype.checkAcceptance.apply(this, arguments);
-		};
+		}		
 		// TODO: could potentially also implement copyState to jive with default
 		// onDrop* implementations (checking whether store.copy is available);
 		// not doing that just yet until we're sure about default impl.
+	});
+	
+	function setupDnD(grid){
+		if(grid.dndTarget){
+			return;
+		}
+		var store = grid.store;
+		// make the contents a DnD source/target
+		var targetSource = grid.dndTarget = new GridDnDSource(
+			grid.bodyNode, 
+			lang.delegate(grid.dndTargetConfig, {
+				// add cross-reference to grid for potential use in inter-grid drop logic
+				grid: grid,
+				dropParent: grid.contentNode
+			})
+		);
 	}
+	
 	return declare([List], {
 		dndSourceType: "row",
 		dndTargetConfig: null,
