@@ -4,7 +4,7 @@ define(["./OnDemandGrid", "dojo/_base/declare", "dojo/_base/lang", "dojo/dom-con
 	
 	// name of data attribute to check for column properties
 	var bagName = "data-dgrid-column";
-	
+	var grid = null; //cheap fix for lacking grid property in column object
 	function getSubRowsFromDom(domNode){
 		// summary:
 		//		generate columns from DOM. Should this be in here, or a separate module?
@@ -37,6 +37,7 @@ define(["./OnDemandGrid", "dojo/_base/declare", "dojo/_base/lang", "dojo/dom-con
 		configStructure: function(){
 			// summary:
 			//		Configure subRows based on HTML originally in srcNodeRef
+			grid = this;
 			if(!this._checkedTrs){
 				this._checkedTrs = true;
 				this.subRows = getSubRowsFromDom(this.srcNodeRef, this.subRows);
@@ -98,6 +99,7 @@ define(["./OnDemandGrid", "dojo/_base/declare", "dojo/_base/lang", "dojo/dom-con
 			// dojo.parser does for objects.
 			try{
 				obj = eval("(" + str + ")");
+				obj.grid = grid;
 			}catch(e){
 				throw new Error("Error in " + bagName + " {" + str + "}: " + e.toString());
 			}
