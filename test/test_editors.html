@@ -32,8 +32,8 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Tree","dgrid/Selection", "dgrid/Keyboard", "dgrid/Editor", "dijit/form/DateTextBox", "dijit/form/HorizontalSlider", "dijit/form/NumberSpinner", "dijit/form/ToggleButton", "dijit/form/TimeTextBox",  "dijit/form/Select","dojo/data/ObjectStore", "dijit/form/FilteringSelect", "dijit/Editor", "dgrid/test/data", "dojo/domReady!"],
-				function(List, Grid, Tree, Selection, Keyboard, Editor, DateTextBox, Slider, NumberSpinner, ToggleButton, TimeTextBox, Select, ObjectStore, FilteringSelect, DijitEditor){
+			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Tree","dgrid/Selection", "dgrid/Keyboard", "dgrid/Editor", "dijit/form/DateTextBox", "dijit/form/HorizontalSlider", "dijit/form/NumberSpinner", "dgrid/test/data", "dojo/domReady!"],
+				function(List, Grid, Tree, Selection, Keyboard, Editor, DateTextBox, Slider, NumberSpinner){
 					var columns = [
 						Editor({label: 'A Date', field: 'date'}, DateTextBox),
 						Editor({label: 'Real Number', field: 'floatNum'}, Slider),

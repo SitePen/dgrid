@@ -65,17 +65,17 @@
 							}
 						}, Select),
 						Editor({label: 'Select Store', field: 'state', widgetArgs: {store: stateStore, maxHeight: 150, style: "width:120px;"}}, Select, "click"),
-						Editor({label: 'FilteringSelect Store', field: 'state', widgetArgs: {store: stateStore, maxHeight: 150}}, FilteringSelect),
-						Editor({label: 'Dijit/Editor', field: 'text', widgetArgs: {store: stateStore, style: "height: 150px;"}, autoSave:false}, DijitEditor)
+						Editor({label: 'FilteringSelect Store', field: 'state', widgetArgs: {store: stateStore, maxHeight: 150, style: "width:120px;"}}, FilteringSelect),
+						Editor({label: 'Dijit/Editor', field: 'text', widgetArgs: {style: "height: 150px;"}}, DijitEditor)
 						//Note that widgets that have multiple focusable children aren't supported by editOn functionality, for example: dijit/Editor
 					];
 
 
-					window.grid2 = new (dojo.declare([Grid, Selection, Keyboard]))({
+					window.grid = new (dojo.declare([Grid, Selection, Keyboard]))({
 						store: testTypesStore,
 						columns: columns2,
 						selectionMode: "none"
-					}, "grid2");
+					}, "grid");
 
 				});
 				
@@ -84,6 +84,6 @@
 	<body class="claro">
 		<h2>Another basic grid with more editors</h2>
 		(Click fields to edit)
-		<div id="grid2"></div>
+		<div id="grid"></div>
 	</body>
 </html>
