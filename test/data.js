@@ -207,7 +207,6 @@ define(["dojo/store/Memory", "dojo/store/Observable", "dojo/store/util/QueryResu
 				def.resolve(immediateResults);
 			}, 1000);
 			var results = QueryResults(def.promise);
-			console.log("results: ", results);
 			return results;
 
 		}
