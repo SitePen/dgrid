@@ -7,7 +7,7 @@ install with <a href="https://github.com/kriszyp/cpm">CPM</a>:
 cpm install dgrid
 </pre>
 Or download it along with it's dependencies, which are <a href="https://github.com/kriszyp/xstyle">xstyle</a>, <a href="https://github.com/kriszyp/put-selector">put-selector</a> 
-and <a href="http://dojotoolkit.org">dojo</a> (make sure to download the project to view this link, it is not available from github). 
+and <a href="http://dojotoolkit.org">dojo</a> (make sure to download the project to view this link, it is not available from GitHub). 
 
 The components are broken down into the following top level widget modules:
 
@@ -82,7 +82,7 @@ the name of the column. We can more succinctly write simple columns:
 		}
 </pre> 
 
-The dgrid components are designed to be highly CSS driven for optimal performance and organization, so visual styling should be controlled
+dgrid components are designed to be highly CSS-driven for optimal performance and organization, so visual styling should be controlled
 through CSS. The grid creates classes based on the column ids (or if you provided a className property) with
 the convention of "column-<column-id>". For example, you could define a grid and CSS like:
 <pre>
@@ -107,7 +107,7 @@ define(["dgrid/Grid"], function(Grid){
 </pre>
 The Grid class also provides a styleColumn(colId, css) method to programmatically
 style a column.
-See the <a href="doc/api.html?dgrid/doc/Grid">API viewer for a list methods available on the List component</a> (make sure to download the project to view this link, it is not available from github).
+See the <a href="doc/api.html?dgrid/doc/Grid">API viewer for a list methods available on the List component</a> (make sure to download the project to view this link, it is not available from GitHub).
 
 <h2>OnDemandList</h2>
 This extends List to provide on-demand lazy loading or paging of data as the user
@@ -154,7 +154,7 @@ object has the following properties:
 </ul>
 * on(event, listener) - Basic event listener functionality, just delegates to the DOM element using standard dojo/on behavior.    
 * renderArray(array, beforeNode) - This can be called to render an array. The beforeNode parameter can be used to render at a specific place in the list.
-* renderRow(value, options) - This can be overriden to provide a custom rendering of each row
+* renderRow(value, options) - This can be overridden to provide a custom rendering of each row
 
 <h1>Plugins</h1>
 The following modules can be used as plugins to add extra functionality to a Grid. To use
@@ -222,7 +222,7 @@ across cells and rows, providing accessibility and ease of use.
 <h1>Column Plugins</h1>
 The following modules are plugins designed for specific columns of cells. This plugins are
 used by creating an instance and using it was a column in the columns. For example, to 
-create a columns where the first column has a tree expander and the second column has
+create a column set where the first column has a tree expander and the second column has
 a checkbox, we could do:
 <pre>
 define(["dgrid/OnDemandGrid", "dgrid/Tree", "dgrid/Editor"], function(Grid, Tree, Editor){
@@ -250,28 +250,28 @@ boolean indicating whether or not the row can be expanded.
 This provides editing capability of text data in cells in the column. This is simply an Editor with the text input that shows on double click. 
 
 <h2>CheckBox</h2>
-Renders boolean values with a checkbox that can be checked and unchecked to indicate
+Renders boolean values with a checkbox that can be checked and unchecked to indicate and
 edit the value.
 
 <h2>ColumnResizer</h2>
-The ColumnResizer plugin from https://github.com/kriszyp/grid-2.0/tree/simple-plugin/gridx/modules *need to update path
+The ColumnResizer plugin from <a href="https://github.com/kriszyp/grid-2.0/tree/simple-plugin/gridx/modules">https://github.com/kriszyp/grid-2.0/tree/simple-plugin/gridx/modules</a> *need to update path
 can be used to add column resizing (via dragging) functionality.
 
 <h2>DnD</h2>
-The DnD can be used to add row drag n' drop functionality. The store should be order-aware and 
+The DnD plugin can be used to add row drag n' drop functionality. The store should be order-aware and 
 support the options.before parameter on put() calls to properly respond to drag n' drop
 operations.
 
 <h1>Themes/Skins</h1>
 The dgrid automatically loads the necessary structural CSS to work properly. However, you can
-also use one of the the included skins/themes. There is a claro.css, tundra.css, soria.css, and nihilo.css theme
+also use one of the the included skins/themes. There are claro.css, tundra.css, soria.css, and nihilo.css theme
 files in the css/skins directory that can be used to skin the dgrid to a particular
 look and feel.
 
 <h2>Grid Structure for custom CSS Styling</h2>
-The dgrid is designed to be styled and customized through CSS. Many of these classes
-can be discovered by simply looking at elements in your debugger and see the class names
-and applied CSS rules. As mentioned above, perhaps the most important class is the column-<id>
+dgrid is designed to be styled and customized through CSS. Many of these classes
+can be discovered by simply looking at elements in your debugger. 
+Perhaps the most important class is the column-<id>
 assigned to each cell in grids which allow for per column styling. The following class 
 names are used by the dgrid and can be referenced from CSS:
 <ul>
@@ -289,7 +289,7 @@ names are used by the dgrid and can be referenced from CSS:
 <li>dgrid-expando-icon - Applied to the expando icon on tree nodes</li>
 <li>dgrid-header-scroll - Applied to the node in the top right corner over the top of the scrollbar</li>
 </ul>
-The following generic class names are also available for generic skinning (follows the jQuery themeroller convention):
+The following generic class names are also available for generic skinning (follows the jQuery ThemeRoller convention):
 <ul>
 <li>ui-widget-content - Applied to each dgrid list or grid at the top element</li>
 <li>ui-widget-header - Applied to the element that contains the header rendering</li>
