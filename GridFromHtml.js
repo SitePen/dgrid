@@ -110,18 +110,21 @@ define(["./OnDemandGrid", "dojo/_base/declare", "dojo/_base/lang", "dojo/dom-con
 				getObj = GridFromHtml.utils.getObjFromAttr,
 				getBool = GridFromHtml.utils.getBoolFromAttr,
 				getNum = GridFromHtml.utils.getNumFromAttr,
-				obj = {}, tmp;
+				obj, tmp;
 			
-			// inspect standard attributes first
-			obj.label = th.innerHTML;
-			obj.field = th.className || th.innerHTML; // often overridden in props
-			if(th.className){ obj.className = th.className; }
-			if((tmp = getNum(th, "rowspan"))){ obj.rowSpan = tmp; }
-			if((tmp = getNum(th, "colspan"))){ obj.colSpan = tmp; }
+			// Look for properties in data attribute.
+			// It's imperative that we hold on to this object as returned, as the
+			// object may be augmented further by other sources,
+			// e.g. Grid adding the grid property to reference the instance.
+			obj = GridFromHtml.utils.getPropsFromNode(th);
 			
-			// look for rest of properties in data attribute
-			// (properties in data attribute can override the HTML attributes above)
-			dojo.mixin(obj, GridFromHtml.utils.getPropsFromNode(th));
+			// inspect standard attributes, but data attribute takes precedence
+			obj.label = obj.label || th.innerHTML;
+			obj.field = obj.field || th.className || th.innerHTML;
+			if(!obj.className && th.className){ obj.className = th.className; }
+			if(!obj.rowSpan && (tmp = getNum(th, "rowspan"))){ obj.rowSpan = tmp; }
+			if(!obj.colSpan && (tmp = getNum(th, "colspan"))){ obj.colSpan = tmp; }
+			
 			return obj;
 		}
 	}
