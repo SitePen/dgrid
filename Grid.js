@@ -181,7 +181,6 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "dojo/q
 					// we're interested in the th, but we're passed the inner div
 					th = th.parentNode;
 				}
-				column.grid = grid;
 				var field = column.field;
 				if(field){
 					th.field = field;
@@ -297,7 +296,12 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "dojo/q
 				columnId = column.id = column.id || (isNaN(columnId) ? columnId : (prefix + columnId));
 				if(prefix){
 					this.columns[columnId] = column;
-				} 
+				}
+				
+				// add reference to this instance to each column object,
+				// for potential use by column plugins
+				column.grid = this;
+				
 				subRow.push(column); // make sure it can be iterated on
 			}
 			return isArray ? rowColumns : subRow;
