@@ -125,7 +125,9 @@ return declare([List], {
 			// render the query
 			var self = this;
 			this.renderQuery(function(queryOptions){
-				queryOptions.sort = self.sortOrder;
+				if(self.sortOrder){
+					queryOptions.sort = self.sortOrder;
+				}
 				return self.store.query(self.query, queryOptions);
 			});
 		}
