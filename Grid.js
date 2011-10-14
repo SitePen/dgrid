@@ -325,6 +325,7 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "dojo/q
 			this.refresh();
 			// re-render last collection if present
 			this.lastCollection && this.renderArray(this.lastCollection);
+			this.resize();
 		}
 		// TODO: setSubRows
 	});

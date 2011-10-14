@@ -13,9 +13,8 @@ return declare([], {
 	// width: Integer
 	//      new width of the column
 		var x = this.styleColumn(colId, "width: " + width + "px;");
-		this.resize();
 	},
-	postCreate: function(){
+	renderHeader: function(){
 		this.inherited(arguments);
 		
 		var grid = this;
@@ -47,7 +46,7 @@ return declare([], {
 				grid.mouseMoveListen.pause();
 				grid.mouseUpListen.pause();
 			});
-	},//end postCreate
+	}, // end renderHeader
 
 	_resizeMouseDown: function(e){
 	// Summary:
@@ -119,6 +118,7 @@ return declare([], {
 		}
 
 		this.resizeColumnWidth(cell.columnId, newWidth);
+		this.resize();
 		this._hideResizer();
 	},
 	_updateResizerPosition: function(e){

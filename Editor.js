@@ -69,12 +69,17 @@ return function(column, editor, editOn){
 					onblur(input.lastValue);
 				});
 			}
+			return input;
 		} :
 		function(data, cell, object, onblur){
 			// using a widget as the editor.
-			var widget = new editor(column.widgetArgs || {},
-				cell.appendChild(document.createElement("div")));
-			widget.set("value", data);
+			var
+				// widgetArgs can be either a hash or a function returning a hash
+				args = typeof column.widgetArgs == "function" ?
+					lang.hitch(grid, column.widgetArgs)(object) : column.widgetArgs || {},
+				widget;
+			args.value = data; // set value based on data
+			widget = new editor(args, cell.appendChild(put("div")));
 			widget.watch("value", function(key, oldValue, value){
 				data = setProperty(cell, data, value);
 			});
@@ -90,15 +95,19 @@ return function(column, editor, editOn){
 					});
 				}
 				widget.connect(widget, "onBlur", function(){
+					// if widget supports validation and is invalid, don't dismiss
+					if(widget.isValid && !widget.isValid()){ return; }
+					
 					setTimeout(function(){
 						// we have to wait on this for the widget will throw errors
 						// about keydown events that happen right after blur
 						stopper && stopper.remove();
 						widget.destroyRecursive();
+						onblur(data);
 					}, 0);
-					onblur(data);
 				});
 			}
+			return widget;
 		};
 	function setProperty(cellElement, oldValue, value){
 		if(oldValue != value){
@@ -119,7 +128,6 @@ return function(column, editor, editOn){
 					var
 						dirty = grid.dirty[row.id],
 						object = row.data;
-					
 					if(!dirty){
 						dirty = grid.dirty[row.id] = {};
 						if(!column.autoSave){
@@ -157,6 +165,7 @@ return function(column, editor, editOn){
 	}
 	var suppressSelect;
 	column.renderCell = function(object, value, cell, options){
+		var cmp; // stores input/widget being rendered
 		if(!grid){
 			grid = column.grid;
 			if(column.selector){
@@ -181,14 +190,18 @@ return function(column, editor, editOn){
 					column.editOn, function(){
 				if(!column.canEdit || column.canEdit(object, value)){
 					cell.innerHTML = "";
-					renderWidget(value, cell, object, function(newData){
+					cmp = renderWidget(value, cell, object, function(newData){
 						originalRenderCell(object, value = newData, cell);
 					});
+					// if component is a widget, call startup now (already visible)
+					if (cmp.startup) { cmp.startup(); }
 				}
 			});
 			originalRenderCell(object, value, cell, options);
 		}else{
-			renderWidget(value, cell, object);
+			cmp = renderWidget(value, cell, object);
+			// if component is a widget, call startup once execution stack completes
+			if (cmp.startup) { setTimeout(function(){ cmp.startup(); }, 0); }
 		}
 	}
 	if(!column.label){

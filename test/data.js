@@ -25,6 +25,19 @@ define(["dojo/store/Memory", "dojo/store/Observable", "dojo/store/util/QueryResu
 	// global var testStore
 	testStore = Observable(new Memory({data: data}));
 
+	testAsyncStore = Observable(new Memory({
+		data: data,
+		query: function(){
+			var results = Memory.prototype.query.apply(this, arguments);
+			var def = new dojo.Deferred();
+			setTimeout(function(){
+				def.resolve(results);
+			}, 500);
+			var promisedResults = QueryResults(def.promise);
+			promisedResults.total = results.total;
+			return promisedResults;
+		}
+	}));
 	//sample color data
 	data2 = {
 		identifier: 'id',
@@ -58,22 +71,80 @@ define(["dojo/store/Memory", "dojo/store/Observable", "dojo/store/util/QueryResu
 
 	//store with non-existent url
 	//errorStore = Observable(Memory({data: junk}));
-
+	testStateStore = Observable(new Memory({
+			idProperty: "abbreviation",
+			data: [
+			{ "abbreviation": "AL", "name": "Alabama" },
+			{ "abbreviation": "AK", "name": "Alaska" },
+			{ "abbreviation": "AZ", "name": "Arizona" },
+			{ "abbreviation": "AR", "name": "Arkansas" },
+			{ "abbreviation": "CA", "name": "California" },
+			{ "abbreviation": "CO", "name": "Colorado" },
+			{ "abbreviation": "CT", "name": "Connecticut" },
+			{ "abbreviation": "DE", "name": "Delaware" },
+			{ "abbreviation": "FL", "name": "Florida" },
+			{ "abbreviation": "GA", "name": "Georgia" },
+			{ "abbreviation": "HI", "name": "Hawaii" },
+			{ "abbreviation": "ID", "name": "Idaho" },
+			{ "abbreviation": "IL", "name": "Illinois" },
+			{ "abbreviation": "IN", "name": "Indiana" },
+			{ "abbreviation": "IA", "name": "Iowa" },
+			{ "abbreviation": "KS", "name": "Kansas" },
+			{ "abbreviation": "KY", "name": "Kentucky" },
+			{ "abbreviation": "LA", "name": "Louisiana" },
+			{ "abbreviation": "ME", "name": "Maine" },
+			{ "abbreviation": "MD", "name": "Maryland" },
+			{ "abbreviation": "MA", "name": "Massachusetts" },
+			{ "abbreviation": "MI", "name": "Michigan" },
+			{ "abbreviation": "MN", "name": "Minnesota" },
+			{ "abbreviation": "MS", "name": "Mississippi" },
+			{ "abbreviation": "MO", "name": "Missouri" },
+			{ "abbreviation": "MT", "name": "Montana" },
+			{ "abbreviation": "NE", "name": "Nebraska" },
+			{ "abbreviation": "NV", "name": "Nevada" },
+			{ "abbreviation": "NH", "name": "New Hampshire" },
+			{ "abbreviation": "NJ", "name": "New Jersey" },
+			{ "abbreviation": "NM", "name": "New Mexico" },
+			{ "abbreviation": "NY", "name": "New York" },
+			{ "abbreviation": "NC", "name": "North Carolina" },
+			{ "abbreviation": "ND", "name": "North Dakota" },
+			{ "abbreviation": "OH", "name": "Ohio" },
+			{ "abbreviation": "OK", "name": "Oklahoma" },
+			{ "abbreviation": "OR", "name": "Oregon" },
+			{ "abbreviation": "PA", "name": "Pennsylvania" },
+			{ "abbreviation": "RI", "name": "Rhode Island" },
+			{ "abbreviation": "SC", "name": "South Carolina" },
+			{ "abbreviation": "SD", "name": "South Dakota" },
+			{ "abbreviation": "TN", "name": "Tennessee" },
+			{ "abbreviation": "TX", "name": "Texas" },
+			{ "abbreviation": "UT", "name": "Utah" },
+			{ "abbreviation": "VT", "name": "Vermont" },
+			{ "abbreviation": "VA", "name": "Virginia" },
+			{ "abbreviation": "WA", "name": "Washington" },
+			{ "abbreviation": "WV", "name": "West Virginia" },
+			{ "abbreviation": "WI", "name": "Wisconsin" },
+			{ "abbreviation": "WY", "name": "Wyoming" }
+		]
+		}));
 	var typesData = [];
-	for(var i = 0; i < 20; i++){
+	for(var i = 0; i < 12; i++){
 		typesData.push({
 			id: i,
 			integer: Math.floor(Math.random() * 100),
 			floatNum: Math.random() * 100,
 			date: new Date(new Date().getTime() * Math.random() * 2),
 			date2: new Date(new Date().getTime() - Math.random() * 1000000000),
+			time: "T08:45:00",
 			text: "A number in text " + Math.random(),
 			bool: Math.random() > 0.5,
-			bool2: Math.random() > 0.5
+			bool2: Math.random() > 0.5,
+			state: testStateStore.data[Math.floor(Math.random() * 50)].abbreviation
 		});
 	}
 	// global var testTypesStore
 	testTypesStore = Observable(new Memory({data: typesData}));
+
+
 
 	// global var testCountryStore
 	testCountryStore = Observable(new Memory({
@@ -124,15 +195,20 @@ define(["dojo/store/Memory", "dojo/store/Observable", "dojo/store/util/QueryResu
 					{ id: 'BuenosAires', name:'Buenos Aires', type:'city', parent: 'AR' }
 		],
 		getChildren: function(parent, options){
-			var def = new dojo.Deferred();
-			var q = this.query({parent: parent.id}, options);
-			setTimeout(function(){
-				def.resolve(q);
-			}, 1000);
-			return QueryResults(def.promise);
+			return this.query({parent: parent.id}, options);
 		},
 		mayHaveChildren: function(parent){
 			return parent.type != "city";
+		},
+		query: function(query, options){
+			var def = new dojo.Deferred();
+			var immediateResults = this.queryEngine(query, options)(this.data);
+			setTimeout(function(){
+				def.resolve(immediateResults);
+			}, 1000);
+			var results = QueryResults(def.promise);
+			return results;
+
 		}
 	}));
 	
