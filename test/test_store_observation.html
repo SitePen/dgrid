@@ -52,8 +52,8 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dojo/on", "dgrid/OnDemandGrid","dgrid/Keyboard", "dgrid/Selection", "dgrid/Editor", "dijit/form/DateTextBox", "dijit/form/HorizontalSlider", "dijit/form/NumberSpinner",  "dgrid/test/data","dojo/dom-construct", "dojo/store/Memory", "dojo/domReady!"],
-				function(on, Grid, Keyboard, Selection,  Editor, DateTextBox, Slider, NumberSpinner, data, domConstruct, Memory){
+			require(["dojo/on", "dgrid/OnDemandGrid","dgrid/Keyboard", "dgrid/Selection", "dgrid/Editor", "dijit/form/DateTextBox", "dijit/form/HorizontalSlider", "dijit/form/NumberSpinner",  "dgrid/test/data", "dojo/_base/lang", "dojo/dom-construct", "dojo/store/Memory", "dojo/domReady!"],
+				function(on, Grid, Keyboard, Selection,  Editor, DateTextBox, Slider, NumberSpinner, data, lang, domConstruct, Memory){
 					
 					// Create error store
 					errorStore = new dojo.store.Memory();
@@ -62,7 +62,7 @@
 					};
 					
 					// Create error store with PUT
-					putErrorStore = new dojo.store.Memory();
+					putErrorStore = new dojo.store.Memory({ data: lang.clone(testTypesStore.data) });
 					putErrorStore.put = function() {
 						throw new Error("PUT ERROR");
 					};
@@ -72,9 +72,16 @@
 					defErrorStore.query = function() {
 						var def = new dojo.Deferred();
 						setTimeout(function() { def.reject("Homie don't play that"); }, 200);
-						return def;
+						return def.promise;
 					};
 					
+					// Create error store that returns a promise on put, which it rejects
+					defPutErrorStore = new dojo.store.Memory({ data: lang.clone(testTypesStore.data) });
+					defPutErrorStore.put = function() {
+						var def = new dojo.Deferred();
+						setTimeout(function() { def.reject("Watch where you put things!"); }, 200);
+						return def.promise;
+					};
 					
 					var columns = {
 						col1: 'Column 1',
@@ -133,8 +140,9 @@
 						columns: columns4,
 						selectionMode: "multiple"
 					}, "grid4");
-
-				
+					
+					// buttons for 1st grid
+					
 					on(document.getElementById("setstore"), "click", function(){
 						console.log("setting store to colorStore: ", colorStore);
 						window.grid.setStore(colorStore);//no query
@@ -160,24 +168,34 @@
 						grid.setStore(errorStore,{});
 					});
 					
-					on(document.getElementById("errorput"), "click", function(){
-						console.log("set store to errorStore, firing put");
-						grid.setStore(putErrorStore,{});
-						putErrorStore.put({});
-					});
-					
 					on(document.getElementById("error2"), "click", function(){
 						console.log("set store to defErrorStore");
 						grid.setStore(defErrorStore,{});
 					});
+					
+					// buttons / listeners for 2nd grid
 					
 					on(document.getElementById("save"), "click", function(){
 						console.log("save to store");
 						grid2.save();
 						domConstruct.empty("dirty");
 					});
+					
+					on(document.getElementById("setorigeditstore"), "click", function(){
+						grid2.setStore(testTypesStore, {});
+					});
+					
+					on(document.getElementById("seterrorputstore"), "click", function(){
+						grid2.setStore(putErrorStore, {});
+					});
+					
+					on(document.getElementById("setdeferrorputstore"), "click", function(){
+						grid2.setStore(defPutErrorStore, {});
+					});
+					
 					var dirtyListener = grid2.on("datachange", function(event){
 						setTimeout(function(){
+							// clear "dirty items" list after change has been processed
 							domConstruct.empty("dirty");
 							for(var rowId in grid2.dirty){
 								var node = domConstruct.create("div",
@@ -185,6 +203,9 @@
 							}
 						}, 0);
 					});
+					
+					// buttons for 3rd grid
+					
 					on(document.getElementById("add"), "click", function(){
 						var id = smallColorStore.data.length+Math.floor(Math.random()*1001);
 						console.log("id: ", id);
@@ -207,7 +228,6 @@
 		<button id="resetQuery">Reset query</button>
 		<button id="empty">Set to empty store</button>
 		<button id="error">Set to error store</button>
-		<button id="errorput">Set to error store and put</button>
 		<button id="error2">Set to error store (def)</button>
 
 		<br><br>
@@ -218,6 +238,9 @@
 		<div id="grid3"></div>
 		</div>
 		<button id="save">Save Changes</button>
+		<button id="setorigeditstore">Set to original store</button>
+		<button id="seterrorputstore">Set to store which causes error on put</button>
+		<button id="setdeferrorputstore">Set to store which rejects Deferred on put</button>
 		<br>
 		<h2>Simple test to show adding/deleting items</h2>
 		<div id="grid4"></div>
