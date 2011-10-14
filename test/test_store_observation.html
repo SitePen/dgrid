@@ -52,8 +52,30 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dojo/on", "dgrid/OnDemandGrid","dgrid/Keyboard", "dgrid/Selection", "dgrid/Editor", "dijit/form/DateTextBox", "dijit/form/HorizontalSlider", "dijit/form/NumberSpinner",  "dgrid/test/data","dojo/dom-construct", "dojo/domReady!"],
-				function(on, Grid, Keyboard, Selection,  Editor, DateTextBox, Slider, NumberSpinner, data, domConstruct){
+			require(["dojo/on", "dgrid/OnDemandGrid","dgrid/Keyboard", "dgrid/Selection", "dgrid/Editor", "dijit/form/DateTextBox", "dijit/form/HorizontalSlider", "dijit/form/NumberSpinner",  "dgrid/test/data","dojo/dom-construct", "dojo/store/Memory", "dojo/domReady!"],
+				function(on, Grid, Keyboard, Selection,  Editor, DateTextBox, Slider, NumberSpinner, data, domConstruct, Memory){
+					
+					// Create error store
+					errorStore = new dojo.store.Memory();
+					errorStore.query = function() {
+						throw new Error("Some Error");
+					};
+					
+					// Create error store with PUT
+					putErrorStore = new dojo.store.Memory();
+					putErrorStore.put = function() {
+						throw new Error("PUT ERROR");
+					};
+					
+					// Create error store that has its deferred rejected
+					defErrorStore = new dojo.store.Memory();
+					defErrorStore.query = function() {
+						var def = new dojo.Deferred();
+						setTimeout(function() { def.reject("Homie don't play that"); }, 200);
+						return def;
+					};
+					
+					
 					var columns = {
 						col1: 'Column 1',
 						col2: {label: 'Column 2'},
@@ -137,6 +159,18 @@
 						console.log("set store to errorStore");
 						grid.setStore(errorStore,{});
 					});
+					
+					on(document.getElementById("errorput"), "click", function(){
+						console.log("set store to errorStore, firing put");
+						grid.setStore(putErrorStore,{});
+						putErrorStore.put({});
+					});
+					
+					on(document.getElementById("error2"), "click", function(){
+						console.log("set store to defErrorStore");
+						grid.setStore(defErrorStore,{});
+					});
+					
 					on(document.getElementById("save"), "click", function(){
 						console.log("save to store");
 						grid2.save();
@@ -173,6 +207,8 @@
 		<button id="resetQuery">Reset query</button>
 		<button id="empty">Set to empty store</button>
 		<button id="error">Set to error store</button>
+		<button id="errorput">Set to error store and put</button>
+		<button id="error2">Set to error store (def)</button>
 
 		<br><br>
 		<h2>Simple test to show editor effect on store data</h2>
