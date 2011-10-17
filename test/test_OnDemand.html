@@ -206,14 +206,17 @@
 					
 					on(document.getElementById("setorigeditstore"), "click", function(){
 						grid2.setStore(testTypesStore, {});
+						domConstruct.empty("dirty");
 					});
 					
 					on(document.getElementById("seterrorputstore"), "click", function(){
 						grid2.setStore(putErrorStore, {});
+						domConstruct.empty("dirty");
 					});
 					
 					on(document.getElementById("setdeferrorputstore"), "click", function(){
 						grid2.setStore(defPutErrorStore, {});
+						domConstruct.empty("dirty");
 					});
 					
 					var dirtyListener = grid2.on("datachange", function(event){
