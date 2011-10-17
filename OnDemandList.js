@@ -76,9 +76,15 @@ return declare([List], {
 			this.preloadNode = preloadNode;
 		}
 		var options = lang.delegate(this.queryOptions ? this.queryOptions : null, {start: 0, count: this.minRowsPerPage, query: query});
+
 		// execute the query
-		var results = query(options);
 		var self = this;
+		var err = lang.hitch(this, "emitError");
+		
+		// Execute the query, catch an error if occurs
+		var results = query(options);
+		Deferred.when(results, function(){}, err);
+		
 		// render the result set
 		return Deferred.when(this.renderArray(results, preloadNode, options), function(trs){
 			return Deferred.when(results.total || results.length, function(total){
@@ -107,8 +113,8 @@ return declare([List], {
 				self.onscroll(); // recheck the scroll position in case the query didn't fill the screen
 				// can remove the loading node now
 				return trs;
-			});
-		}, console.error);
+			}, err);
+		}, err);
 	},
 	sortOrder: null,
 	sort: function(property, descending){
@@ -144,6 +150,7 @@ return declare([List], {
 		var priorPreload, preloadNode = this.preloadNode;
 		var lastScrollTop = this.lastScrollTop;
 		this.lastScrollTop = visibleTop;
+		var err = lang.hitch(this, "emitError");
 
 
 		function removeDistantNodes(grid, preloadNode, distanceOff, traversal, below){
@@ -282,7 +289,10 @@ return declare([List], {
 				options.query = preloadNode.query;
 				// query now to fill in these rows
 				var results = preloadNode.query(options);
-				Deferred.when(this.renderArray(results, loadingNode, options),function(){
+				// Catch error
+				Deferred.when(results, function(){}, err);
+				
+				Deferred.when(this.renderArray(results, loadingNode, options), function(){
 						// can remove the loading node now
 						beforeNode = loadingNode.nextSibling;
 						loadingNode.parentNode.removeChild(loadingNode);
@@ -292,35 +302,58 @@ return declare([List], {
 							// so we don't "jump" in the scrolling position
 							scrollNode.scrollTop += beforeNode.offsetTop - keepScrollTo;
 						}
-				}, console.error);
+				}, err);
 				preloadNode = preloadNode.previous;
 
 			}
 		}
 	},
 	getBeforePut: true,
-	save: function(){
-		var store = this.store;
-		var puts = [];
-		for(var id in this.dirty){
-			var put = (function(dirty){
-				return function(object){
-					// copy all the dirty properties onto the original
-					for(key in dirty){
-						object[key] = dirty[key];
-					}
-					// put it
-					store.put(object);
+	save: function() {
+		// Keep track of the store and puts
+		var store = this.store,
+			dirty = this.dirty,
+			puts = [],
+			err = lang.hitch(this, "emitError");
+		
+		// For every dirty item, grab the ID
+		for(var id in this.dirty) {
+			// Create put function to handle the saving of the the item
+			var put = (function(dirtyObj) {
+				// Return a function handler
+				return function(object) {
+					// Copy dirty props to the original
+					for(key in dirtyObj) object[key] = dirtyObj[key];
+					// Put it in the store
+					try {
+						// Try the put
+						var ret = store.put(object); 
+						// Manage the return value
+						dojo.when(ret, function() {
+							// Delete the item now that it's been confirmed updated
+							delete dirty[id];
+							console.info("Succesfully saved an item at index ", id, ";  dirty is: ", dojo.clone(dirty));
+						}, err);
+						
+					} catch(e) { err(e); }
 				};
-			})(this.dirty[id]);
+			})(dirty[id]);
+			
+			// Add a new item to the put
 			puts.push(this.getBeforePut ?
 				// retrieve the full object from the store
-				Deferred.when(store.get(id), put) :
+				Deferred.when(store.get(id), put, err) :
 				// just use the cached object
 				put(this.row(id).data));
 		}
-		this.dirty = {}; // clear it
+		
+		// Return the puts array
 		return puts;
+	},
+	
+	emitError: function(errMessage) {
+		console.warn("emitting error: '", errMessage, "';  dirty is: ", dojo.clone(this.dirty));
+		listen.emit(this.domNode, "error", {});
 	}
 });
 
