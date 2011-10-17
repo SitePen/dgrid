@@ -79,6 +79,8 @@ return declare([List], {
 		// execute the query
 		var results = query(options);
 		var self = this;
+		var err = lang.hitch(this, "emitError");
+		
 		// render the result set
 		return Deferred.when(this.renderArray(results, preloadNode, options), function(trs){
 			return Deferred.when(results.total || results.length, function(total){
@@ -107,8 +109,8 @@ return declare([List], {
 				self.onscroll(); // recheck the scroll position in case the query didn't fill the screen
 				// can remove the loading node now
 				return trs;
-			});
-		}, console.error);
+			}, err);
+		}, err);
 	},
 	sortOrder: null,
 	sort: function(property, descending){
@@ -298,7 +300,7 @@ return declare([List], {
 			}
 		}
 	},
-	getBeforePut: true,
+	getBeforePut: true,/*
 	save: function(){
 		var store = this.store;
 		var puts = [];
@@ -321,6 +323,53 @@ return declare([List], {
 		}
 		this.dirty = {}; // clear it
 		return puts;
+	}*/
+	save: function() {
+		// Keep track of the store and puts
+		var store = this.store,
+			dirty = this.dirty,
+			puts = [],
+			err = lang.hitch(this, "emitError");
+		
+		// For every dirty item, grab the ID
+		for(var id in this.dirty) {
+			// Create put function to handle the saving of the the item
+			var put = (function(dirtyObj) {
+				// Return a function handler
+				return function(object) {
+					// Copy dirty props to the original
+					for(key in dirtyObj) object[key] = dirtyObj[key];
+					// Put it in the store
+					try {
+						// Try the put
+						var ret = store.put(object); 
+						// Manage the return value
+						dojo.when(ret, function() {
+							// Delete the item now that it's been confirmed updated
+							delete dirty[id];
+							console.info("Succesfully saved an item at index ", id, ";  dirty is: ", dojo.clone(dirty));
+						}, err);
+						
+					} catch(ex) { err(ex); }
+				};
+			})(dirty[id]);
+			
+			// Add a new item to the put
+			puts.push(this.getBeforePut ?
+				// retrieve the full object from the store
+				Deferred.when(store.get(id), put, err) :
+				// just use the cached object
+				put(this.row(id).data)
+			);
+		}
+		
+		// Return the puts array
+		return puts;
+	},
+	
+	emitError: function(errMessage) {
+		console.warn("emitting error: '", errMessage, "';  dirty is: ", dojo.clone(this.dirty));
+		listen.emit(this.domNode, "error", {});
 	}
 });
 
