@@ -76,10 +76,14 @@ return declare([List], {
 			this.preloadNode = preloadNode;
 		}
 		var options = lang.delegate(this.queryOptions ? this.queryOptions : null, {start: 0, count: this.minRowsPerPage, query: query});
+
 		// execute the query
-		var results = query(options);
 		var self = this;
 		var err = lang.hitch(this, "emitError");
+		
+		// Execute the query, catch an error if occurs
+		var results = query(options);
+		Deferred.when(results, function(){}, err);
 		
 		// render the result set
 		return Deferred.when(this.renderArray(results, preloadNode, options), function(trs){
@@ -146,6 +150,7 @@ return declare([List], {
 		var priorPreload, preloadNode = this.preloadNode;
 		var lastScrollTop = this.lastScrollTop;
 		this.lastScrollTop = visibleTop;
+		var err = lang.hitch(this, "emitError");
 
 
 		function removeDistantNodes(grid, preloadNode, distanceOff, traversal, below){
@@ -284,7 +289,10 @@ return declare([List], {
 				options.query = preloadNode.query;
 				// query now to fill in these rows
 				var results = preloadNode.query(options);
-				Deferred.when(this.renderArray(results, loadingNode, options),function(){
+				// Catch error
+				Deferred.when(results, function(){}, err);
+				
+				Deferred.when(this.renderArray(results, loadingNode, options), function(){
 						// can remove the loading node now
 						beforeNode = loadingNode.nextSibling;
 						loadingNode.parentNode.removeChild(loadingNode);
@@ -294,36 +302,13 @@ return declare([List], {
 							// so we don't "jump" in the scrolling position
 							scrollNode.scrollTop += beforeNode.offsetTop - keepScrollTo;
 						}
-				}, console.error);
+				}, err);
 				preloadNode = preloadNode.previous;
 
 			}
 		}
 	},
-	getBeforePut: true,/*
-	save: function(){
-		var store = this.store;
-		var puts = [];
-		for(var id in this.dirty){
-			var put = (function(dirty){
-				return function(object){
-					// copy all the dirty properties onto the original
-					for(key in dirty){
-						object[key] = dirty[key];
-					}
-					// put it
-					store.put(object);
-				};
-			})(this.dirty[id]);
-			puts.push(this.getBeforePut ?
-				// retrieve the full object from the store
-				Deferred.when(store.get(id), put) :
-				// just use the cached object
-				put(this.row(id).data));
-		}
-		this.dirty = {}; // clear it
-		return puts;
-	}*/
+	getBeforePut: true,
 	save: function() {
 		// Keep track of the store and puts
 		var store = this.store,
@@ -350,7 +335,7 @@ return declare([List], {
 							console.info("Succesfully saved an item at index ", id, ";  dirty is: ", dojo.clone(dirty));
 						}, err);
 						
-					} catch(ex) { err(ex); }
+					} catch(e) { err(e); }
 				};
 			})(dirty[id]);
 			
@@ -359,8 +344,7 @@ return declare([List], {
 				// retrieve the full object from the store
 				Deferred.when(store.get(id), put, err) :
 				// just use the cached object
-				put(this.row(id).data)
-			);
+				put(this.row(id).data));
 		}
 		
 		// Return the puts array
