@@ -8,9 +8,18 @@
 			@import "../../dojo/resources/dojo.css";
 			@import "../../dijit/themes/claro/claro.css";
 			@import "../css/skins/claro.css";
-			#grid {
+			
+			.ui-widget {
+				margin: 10px;
+			}
+			
+			.dgrid-grid {
 				width: 700px;
 			}
+			.dgrid-list {
+				width: 200px;
+			}
+			
 			#grid2 {
 				width: 500px;
 				float: left;
@@ -19,18 +28,14 @@
 				width: 500px;
 				float: right;
 			}
-			#grid4 {
-				width: 700px;
-			}
+			
 			.dgrid .field-bool {
 				width: 6em;
 			}
 			.dgrid .field-type {
 				width: 80px;
 			}
-			.ui-widget{
-				margin: 10px;
-			}
+			
 			#grid2 .field-date, #grid2 .field-date2 {
 				width: 16em;
 			}
@@ -45,6 +50,10 @@
 				clear:both;
 				margin-bottom: 20px;
 			}
+			
+			#gridAddDel, #listAddDel {
+				float: left;
+			}
 		</style>
 		<script>
 			var start= new Date().getTime();
@@ -52,8 +61,8 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dojo/on", "dgrid/OnDemandGrid","dgrid/Keyboard", "dgrid/Selection", "dgrid/Editor", "dijit/form/DateTextBox", "dijit/form/HorizontalSlider", "dijit/form/NumberSpinner",  "dgrid/test/data", "dojo/_base/lang", "dojo/dom-construct", "dojo/store/Memory", "dojo/domReady!"],
-				function(on, Grid, Keyboard, Selection,  Editor, DateTextBox, Slider, NumberSpinner, data, lang, domConstruct, Memory){
+			require(["dojo/on", "dgrid/OnDemandList", "dgrid/OnDemandGrid","dgrid/Keyboard", "dgrid/Selection", "dgrid/Editor", "dijit/form/DateTextBox", "dijit/form/HorizontalSlider", "dijit/form/NumberSpinner",  "dgrid/test/data", "dojo/_base/lang", "dojo/dom-construct", "dojo/store/Memory", "dojo/domReady!"],
+				function(on, List, Grid, Keyboard, Selection, Editor, DateTextBox, Slider, NumberSpinner, data, lang, domConstruct, Memory){
 					
 					// Create error store
 					errorStore = new dojo.store.Memory();
@@ -135,11 +144,25 @@
 						columns: columns3
 					}, "grid3");
 
-					window.grid4 = dojo.declare([Grid, Keyboard, Selection])({
+					window.gridAddDel = dojo.declare([Grid, Keyboard, Selection])({
 						store: smallColorStore,
 						columns: columns4,
 						selectionMode: "multiple"
-					}, "grid4");
+					}, "gridAddDel");
+					
+					// also throw in a List connected to the same store
+					// (so additions/deletions should show up in both)
+					window.listAddDel = dojo.declare([List, Keyboard, Selection])({
+						store: smallColorStore,
+						columns: columns4,
+						selectionMode: "multiple",
+						renderRow: function(object, options){
+							// need to define renderRow to accommodate store items
+							return domConstruct.create("div", {
+								innerHTML: object.col1
+							});
+						}
+					}, "listAddDel");
 					
 					// buttons for 1st grid
 					
@@ -212,7 +235,7 @@
 						smallColorStore.put({id: id, col1: "Grey", col2: false, col3: "Hue", col4:'A hue' , col5: 192, col6: 192, col7: 192 });
 					});
 					on(document.getElementById("delete"), "click", function(){
-						for(var id in grid4.selection){
+						for(var id in gridAddDel.selection){
 							smallColorStore.remove(id);
 						}
 					});
@@ -243,8 +266,12 @@
 		<button id="setdeferrorputstore">Set to store which rejects Deferred on put</button>
 		<br>
 		<h2>Simple test to show adding/deleting items</h2>
-		<div id="grid4"></div>
-		<button id="add">Add Color</button>
-		<button id="delete">Delete Selected</button>
+		<p>(With an OnDemandList alongside, also observing the changes)</p>
+		<div id="gridAddDel"></div>
+		<div id="listAddDel"></div>
+		<div style="clear:both">
+			<button id="add">Add Color</button>
+			<button id="delete">Delete Selected</button>
+		</div>
 	</body>
 </html>
