@@ -380,9 +380,11 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			this.refresh();
 			if(this.lastCollection){
 				this.lastCollection.sort(function(a,b){
+					var aVal = a[property], bVal = b[property];
 					// fall back undefined values to "" for more consistent behavior
-					return (typeof a[property] == "undefined" ? "" : a[property]) >
-						(typeof b[property] == "undefined" ? "" : b[property]) == !descending ? 1 : -1;
+					if (aVal === undefined) aVal = "";
+					if (bVal === undefined) bVal = "";
+					return aVal == bVal ? 0 : (aVal > bVal == !descending ? 1 : -1);
 				});
 				this.renderArray(this.lastCollection);
 			}
