@@ -332,7 +332,7 @@ return declare([List], {
 						dojo.when(ret, function() {
 							// Delete the item now that it's been confirmed updated
 							delete dirty[id];
-							console.info("Succesfully saved an item at index ", id, ";  dirty is: ", dojo.clone(dirty));
+							// console.info("Succesfully saved an item at index ", id, ";  dirty is: ", dojo.clone(dirty));
 						}, err);
 						
 					} catch(e) { err(e); }
@@ -351,9 +351,9 @@ return declare([List], {
 		return puts;
 	},
 	
-	emitError: function(errMessage) {
-		console.warn("emitting error: '", errMessage, "';  dirty is: ", dojo.clone(this.dirty));
-		listen.emit(this.domNode, "error", {});
+	emitError: function(err) {
+		// console.warn("emitting error: '", errMessage, "';  dirty is: ", dojo.clone(this.dirty));
+		listen.emit(this.domNode, "error", err);
 	}
 });
 
