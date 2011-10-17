@@ -75,7 +75,7 @@ return declare([List], {
 		}else{
 			this.preloadNode = preloadNode;
 		}
-		var options = {start: 0, count: this.minRowsPerPage, query: query};
+		var options = lang.delegate(this.queryOptions ? this.queryOptions : null, {start: 0, count: this.minRowsPerPage, query: query});
 		// execute the query
 		var results = query(options);
 		var self = this;
@@ -125,7 +125,9 @@ return declare([List], {
 			// render the query
 			var self = this;
 			this.renderQuery(function(queryOptions){
-				queryOptions.sort = self.sortOrder;
+				if(self.sortOrder){
+					queryOptions.sort = self.sortOrder;
+				}
 				return self.store.query(self.query, queryOptions);
 			});
 		}

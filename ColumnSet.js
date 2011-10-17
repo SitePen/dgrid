@@ -1,9 +1,9 @@
 define(["xstyle/css!./css/columnset.css", "dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/query", "./Grid", "xstyle/has-class", "dojo/_base/sniff"], 
 function(styleSheet, has, put, declare, listen, aspect, query, Grid, hasClass){
-		//	summary:
+		// summary:
 		//		This module provides column sets to isolate horizontal scroll of sets of 
-		// 		columns from each other. This mainly serves the purpose of allowing for
-		// 		column locking.
+		//		columns from each other. This mainly serves the purpose of allowing for
+		//		column locking.
 	hasClass("safari", "ie-7");
 	return declare([Grid], {
 		columnSets: [],
@@ -14,7 +14,6 @@ function(styleSheet, has, put, declare, listen, aspect, query, Grid, hasClass){
 				// iterate through the columnSets
 				var columnSet = this.columnSets[i];
 				var cell = put(tr, tag + ".dgrid-column-set-cell.column-set-" + i + " div.dgrid-column-set[colsetid=" + i + "]");
-				/*var td = put(tag + ".dgrid-column-set[colsetid=" + i + "]"*/
 				this.subRows = columnSet;
 				cell.appendChild(this.inherited(arguments));
 			}
@@ -31,12 +30,16 @@ function(styleSheet, has, put, declare, listen, aspect, query, Grid, hasClass){
 			// summary:
 			//		Setup the headers for the grid
 			this.inherited(arguments);
-			var columnSets = this.columnSets;
 			this.bodyNode.style.bottom = "17px";
-			var domNode = this.domNode;
-			var scrollers = this._columnSetScrollers = {};
-			var scrollerContents = this._columnSetScrollerContents = {};
-			var scrollLefts = this._columnSetScrollLefts = {}; 
+			
+			var columnSets = this.columnSets,
+				domNode = this.domNode,
+				scrollers = this._columnSetScrollers,
+				scrollerContents = this._columnSetScrollerContents = {},
+				scrollLefts = this._columnSetScrollLefts = {},
+				grid = this,
+				i, l;
+			
 			function onScroll(){
 				var scrollLeft = this.scrollLeft;
 				var colSetId = this.getAttribute("colsetid");
@@ -48,22 +51,39 @@ function(styleSheet, has, put, declare, listen, aspect, query, Grid, hasClass){
 						});
 				}
 			}
-			for(var i = 0, l = columnSets.length; i < l; i++){
-				(function(columnSet, i){
-					var scroller = scrollers[i] =
-						put(domNode, "div.dgrid-column-set-scroller.dgrid-scrollbar-height.column-set-scroller-" + i + "[colsetid=" + i +"]");
-					scrollerContents[i] = put(scroller, "div.dgrid-column-set-scroller-content");
-					listen(scroller, "scroll", onScroll);
-				})(columnSets[i], i);
+			
+			function putScroller(columnSet, i){
+				// function called for each columnSet
+				var scroller = scrollers[i] =
+					put(domNode, "div.dgrid-column-set-scroller.dgrid-scrollbar-height.column-set-scroller-" + i + "[colsetid=" + i +"]");
+				scrollerContents[i] = put(scroller, "div.dgrid-column-set-scroller-content");
+				listen(scroller, "scroll", onScroll);
 			}
-			var grid = this;
-			positionScrollers(this, domNode);
+			
 			function reposition(){
 				positionScrollers(grid, domNode);
 			}
-			aspect.after(this, "resize", reposition);
-			listen(domNode, ".dgrid-column-set:cellfocusin", onScroll);
-			aspect.after(this, "styleColumn", reposition);		
+			
+			if (scrollers) {
+				// this isn't the first time; destroy existing scroller nodes first
+				for(i in scrollers){
+					put("!", scrollers[i]);
+				}
+			} else {
+				// first-time-only operations
+				aspect.after(this, "resize", reposition);
+				listen(domNode, ".dgrid-column-set:cellfocusin", onScroll);
+				aspect.after(this, "styleColumn", reposition);		
+			}
+			
+			// reset to new object to be populated in loop below
+			scrollers = this._columnSetScrollers = {};
+			
+			for(i = 0, l = columnSets.length; i < l; i++){
+				putScroller(columnSets[i], i);
+			}
+			
+			positionScrollers(this, domNode);
 		},
 		configStructure: function(){
 			this.columns = {};
@@ -74,19 +94,25 @@ function(styleSheet, has, put, declare, listen, aspect, query, Grid, hasClass){
 					columnSet[j] = this._configColumns(i + '-' + j + '-', columnSet[j]);
 				}
 			}
+		},
+		setColumnSets: function(columnSets){
+			this.columnSets = columnSets;
+			this.configStructure();
+			this._updateColumns();
 		}
 	});
 	function positionScrollers(grid, domNode){
-		var left = 0, scrollerWidth = 0;
-		var scrollers = grid._columnSetScrollers;
-		var scrollerContents = grid._columnSetScrollerContents;
-		var columnSets = grid.columnSets;
-		for(var i = 0, l = columnSets.length; i < l; i++){
+		var scrollers = grid._columnSetScrollers,
+			scrollerContents = grid._columnSetScrollerContents,
+			columnSets = grid.columnSets,
+			left = 0, scrollerWidth = 0,
+			i, l, columnSetElement, contentWidth;
+		for(i = 0, l = columnSets.length; i < l; i++){
 			// iterate through the columnSets
 			left += scrollerWidth;
-			var columnSetElement = query('.dgrid-column-set[colsetid="' + i +'"]', domNode)[0];
-			var scrollerWidth = columnSetElement.offsetWidth;
-			var contentWidth = columnSetElement.firstChild.offsetWidth;
+			columnSetElement = query('.dgrid-column-set[colsetid="' + i +'"]', domNode)[0];
+			scrollerWidth = columnSetElement.offsetWidth;
+			contentWidth = columnSetElement.firstChild.offsetWidth;
 			scrollerContents[i].style.width = contentWidth + "px";
 			scrollers[i].style.width = scrollerWidth + "px";
 			scrollers[i].style.overflowX = contentWidth > scrollerWidth ? "scroll" : "auto"; // IE seems to need it be set explicitly
@@ -106,5 +132,4 @@ function(styleSheet, has, put, declare, listen, aspect, query, Grid, hasClass){
 			doAdjustScrollLeft();
 		}
 	}
-	
 });
