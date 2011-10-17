@@ -77,13 +77,18 @@ return declare([List], {
 			this.preloadNode = preloadNode;
 		}
 		var options = lang.delegate(this.queryOptions ? this.queryOptions : null, {start: 0, count: this.minRowsPerPage, query: query});
-
-		// execute the query
 		var self = this;
 		var err = lang.hitch(this, "emitError");
+		var results;
 		
-		// Execute the query, catch an error if occurs
-		var results = query(options);
+		// Execute the query
+		// Catch errors in case of synchronous query:
+		try{ results = query(options); }
+		catch(e){
+			err(e);
+			return;
+		}
+		// Catch errors in case of asynchronous query:
 		Deferred.when(results, function(){}, err);
 		
 		// render the result set
@@ -288,9 +293,16 @@ return declare([List], {
 				var loadingNode = put(beforeNode, "-div.dgrid-loading[style=height:" + count * this.rowHeight + "px]");
 				// use the query associated with the preload node to get the next "page"
 				options.query = preloadNode.query;
+				
 				// query now to fill in these rows
-				var results = preloadNode.query(options);
-				// Catch error
+				var results;
+				// Catch errors in case of synchronous query:
+				try{ results = preloadNode.query(options); }
+				catch(e){
+					err(e);
+					return;
+				}
+				// Catch errors in case of asynchronous query:
 				Deferred.when(results, function(){}, err);
 				
 				Deferred.when(this.renderArray(results, loadingNode, options), function(){
@@ -323,20 +335,21 @@ return declare([List], {
 			var put = (function(dirtyObj) {
 				// Return a function handler
 				return function(object) {
+					var ret, key;
 					// Copy dirty props to the original
-					for(key in dirtyObj) object[key] = dirtyObj[key];
+					for(key in dirtyObj){ object[key] = dirtyObj[key]; }
 					// Put it in the store
-					try {
-						// Try the put
-						var ret = store.put(object); 
-						// Manage the return value
-						dojo.when(ret, function() {
-							// Delete the item now that it's been confirmed updated
-							delete dirty[id];
-							// console.info("Succesfully saved an item at index ", id, ";  dirty is: ", dojo.clone(dirty));
-						}, err);
-						
-					} catch(e) { err(e); }
+					try{
+						ret = store.put(object);
+					}catch(e){
+						err(e); // report synchronous error
+						return;
+					}
+					// Manage the return value
+					dojo.when(ret, function() {
+						// Delete the item now that it's been confirmed updated
+						delete dirty[id];
+					}, err);
 				};
 			})(dirty[id]);
 			
@@ -353,8 +366,7 @@ return declare([List], {
 	},
 	
 	emitError: function(err) {
-		// console.warn("emitting error: '", errMessage, "';  dirty is: ", dojo.clone(this.dirty));
-		listen.emit(this.domNode, "error", err);
+		listen.emit(this.domNode, "error", { error: err });
 	}
 });
 

@@ -164,7 +164,11 @@
 						}
 					}, "listAddDel");
 					
-					// buttons for 1st grid
+					// buttons / listeners for 1st grid
+					
+					grid.on("error", function(evt) {
+						console.warn("error on grid: ", evt.error);
+					});
 					
 					on(document.getElementById("setstore"), "click", function(){
 						console.log("setting store to colorStore: ", colorStore);
@@ -198,28 +202,7 @@
 					
 					// buttons / listeners for 2nd grid
 					
-					on(document.getElementById("save"), "click", function(){
-						console.log("save to store");
-						grid2.save();
-						domConstruct.empty("dirty");
-					});
-					
-					on(document.getElementById("setorigeditstore"), "click", function(){
-						grid2.setStore(testTypesStore, {});
-						domConstruct.empty("dirty");
-					});
-					
-					on(document.getElementById("seterrorputstore"), "click", function(){
-						grid2.setStore(putErrorStore, {});
-						domConstruct.empty("dirty");
-					});
-					
-					on(document.getElementById("setdeferrorputstore"), "click", function(){
-						grid2.setStore(defPutErrorStore, {});
-						domConstruct.empty("dirty");
-					});
-					
-					var dirtyListener = grid2.on("datachange", function(event){
+					function updateDirty(){
 						setTimeout(function(){
 							// clear "dirty items" list after change has been processed
 							domConstruct.empty("dirty");
@@ -228,7 +211,34 @@
 									{ innerHTML: "rowId: "+rowId }, "dirty");
 							}
 						}, 0);
+					}
+					
+					grid2.on("error", function(evt) {
+						console.warn("error on grid2: ", evt.error);
 					});
+					
+					on(document.getElementById("save"), "click", function(){
+						console.log("save to store");
+						grid2.save();
+						updateDirty();
+					});
+					
+					on(document.getElementById("setorigeditstore"), "click", function(){
+						grid2.setStore(testTypesStore, {});
+						updateDirty();
+					});
+					
+					on(document.getElementById("seterrorputstore"), "click", function(){
+						grid2.setStore(putErrorStore, {});
+						updateDirty();
+					});
+					
+					on(document.getElementById("setdeferrorputstore"), "click", function(){
+						grid2.setStore(defPutErrorStore, {});
+						updateDirty();
+					});
+					
+					var dirtyListener = grid2.on("datachange", updateDirty);
 					
 					// buttons for 3rd grid
 					
@@ -241,6 +251,13 @@
 						for(var id in gridAddDel.selection){
 							smallColorStore.remove(id);
 						}
+					});
+					
+					// hook up a listener for error events on the document to test bubbling
+					// (currently error events don't seem to bubble,
+					// but perhaps we want them to?)
+					on(document, "error", function(evt){
+						console.log("document received error: ", evt.error);
 					});
 				});
 		</script>
