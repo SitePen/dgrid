@@ -332,12 +332,22 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 			this.columns = columns;
 			// re-run logic
 			this.configStructure();
+			this._updateColumns();
+		},
+		setSubRows: function(subrows){
+			this.subRows = subrows;
+			this.configStructure();
+			this._updateColumns();
+		},
+		_updateColumns: function(){
+			// summary:
+			//		Called after e.g. columns, subRows, columnSets are updated
+			
 			this.renderHeader();
 			this.refresh();
 			// re-render last collection if present
 			this.lastCollection && this.renderArray(this.lastCollection);
 			this.resize();
 		}
-		// TODO: setSubRows
 	});
 });

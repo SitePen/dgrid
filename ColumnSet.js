@@ -34,7 +34,7 @@ function(styleSheet, has, put, declare, listen, aspect, query, Grid, hasClass){
 			var columnSets = this.columnSets;
 			this.bodyNode.style.bottom = "17px";
 			var domNode = this.domNode;
-			var scrollers = this._columnSetScrollers = {};
+			var scrollers = this._columnSetScrollers;
 			var scrollerContents = this._columnSetScrollerContents = {};
 			var scrollLefts = this._columnSetScrollLefts = {}; 
 			function onScroll(){
@@ -48,6 +48,17 @@ function(styleSheet, has, put, declare, listen, aspect, query, Grid, hasClass){
 						});
 				}
 			}
+			
+			if (scrollers) {
+				// this isn't the first call; destroy existing scroller nodes first
+				for(var i in scrollers){
+					put("!", scrollers[i]);
+				}
+			}
+			
+			// reset to new object to be populated in loop below
+			scrollers = this._columnSetScrollers = {};
+			
 			for(var i = 0, l = columnSets.length; i < l; i++){
 				(function(columnSet, i){
 					var scroller = scrollers[i] =
@@ -74,6 +85,11 @@ function(styleSheet, has, put, declare, listen, aspect, query, Grid, hasClass){
 					columnSet[j] = this._configColumns(i + '-' + j + '-', columnSet[j]);
 				}
 			}
+		},
+		setColumnSets: function(columnSets){
+			this.columnSets = columnSets;
+			this.configStructure();
+			this._updateColumns();
 		}
 	});
 	function positionScrollers(grid, domNode){
