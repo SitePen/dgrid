@@ -8,6 +8,10 @@
     background-image: url("images/ui-icons_222222_256x240_white.png");
 }
 
+.squid .dgrid-header {
+	padding: 0 1px; /* add side padding to align with borders on content area */
+}
+
 .squid .ui-widget-header {
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#140e09', endColorstr='#2d1f14');
 	background: #2d1f14 -webkit-gradient(linear, left top, left bottom, from(#140e09), to(#2d1f14));
