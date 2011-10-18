@@ -148,7 +148,8 @@ return declare([List], {
 			(!element || on.emit(element, value ? "select" : "deselect", {
 			cancelable: true,
 			bubbles: true,
-			row: row
+			row: row,
+			grid: this
 		}))){
 			if(!value && !this.allSelected){
 				delete this.selection[row.id];
