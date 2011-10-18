@@ -57,7 +57,7 @@ return declare([List], {
 							element.focus();
 						}
 						put(element, ".dgrid-focus");
-						on.emit(cellFocusedElement, "cellfocusin", event);
+						on.emit(cellFocusedElement, "cellfocusin", dojo.mixin({ parentType: event.type }, event));
 					}
 				}
 			}
