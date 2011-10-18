@@ -15,6 +15,7 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 		//		navigation.
 		cellNavigation: true,
 		tabableHeader: true,
+		showHeader: true,
 		column: function(target){
 			// summary:
 			//		Get the column object by node, or event, or a columnId
@@ -237,9 +238,10 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 			
 			this.inherited(arguments);
 			
-			if(contentNode){
+			if(contentNode && headerTableNode){
 				if((width = headerTableNode.offsetWidth) != contentNode.offsetWidth){
 					// update size of content node if necessary (to match size of rows)
+					// (if headerTableNode can't be found, there isn't much we can do)
 					contentNode.style.width = width + "px";
 				}
 			}
