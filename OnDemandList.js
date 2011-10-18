@@ -31,6 +31,7 @@ return declare([List], {
 		//		Assigns a new store (and optionally query/queryOptions) to the list,
 		//		and tells it to refresh.
 		this.store = store;
+		this.dirty = {}; // discard dirty map, as it applied to a previous store
 		this.setQuery(query, queryOptions);
 	},
 	setQuery: function(query, queryOptions){
@@ -319,7 +320,7 @@ return declare([List], {
 				// just use the cached object
 				put(this.row(id).data));
 		}
-		this.dirty = {}; // clear it
+		this.dirty = {}; // clear map - contents are no longer dirty
 		return puts;
 	}
 });
