@@ -202,7 +202,10 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			if(!scrollbarWidth){
 				// we haven't computed the scroll bar width yet, do so now, and add a new rule if need be
 				// (this is only executed once, when the first List/Grid is initialized)
-				scrollbarWidth = bodyNode.offsetWidth - bodyNode.clientWidth + 1;
+				scrollbarWidth = bodyNode.offsetWidth - bodyNode.clientWidth;
+				
+				// avoid crazy issues in IE7 only, with certain widgets inside
+				if(has("ie") === 7){ scrollbarWidth++; }
 				
 				// add rules that can be used where scrollbar width/height is needed
 				this.addCssRule(".dgrid-scrollbar-width", "width: " + scrollbarWidth + "px");
