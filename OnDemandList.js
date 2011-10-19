@@ -1,4 +1,11 @@
 define(["dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/on", "put-selector/put", "./List"], function(declare, lang, Deferred, listen, put, List){
+
+function emitError(err){
+	// Called in cases where an error is encountered during internal logic.
+	// Should be called in the context of an instance.
+	listen.emit(this.domNode, "error", { error: err });
+}
+
 return declare([List], {
 	create: function(params, srcNodeRef){
 		this.inherited(arguments);
@@ -78,7 +85,7 @@ return declare([List], {
 		}
 		var options = lang.delegate(this.queryOptions ? this.queryOptions : null, {start: 0, count: this.minRowsPerPage, query: query});
 		var self = this;
-		var err = lang.hitch(this, "emitError");
+		var err = lang.hitch(this, emitError);
 		var results;
 		
 		// Execute the query
@@ -156,7 +163,7 @@ return declare([List], {
 		var priorPreload, preloadNode = this.preloadNode;
 		var lastScrollTop = this.lastScrollTop;
 		this.lastScrollTop = visibleTop;
-		var err = lang.hitch(this, "emitError");
+		var err = lang.hitch(this, emitError);
 
 
 		function removeDistantNodes(grid, preloadNode, distanceOff, traversal, below){
@@ -327,7 +334,7 @@ return declare([List], {
 		var store = this.store,
 			dirty = this.dirty,
 			puts = [],
-			err = lang.hitch(this, "emitError");
+			err = lang.hitch(this, emitError);
 		
 		// For every dirty item, grab the ID
 		for(var id in this.dirty) {
@@ -363,10 +370,6 @@ return declare([List], {
 		
 		// Return the puts array
 		return puts;
-	},
-	
-	emitError: function(err) {
-		listen.emit(this.domNode, "error", { error: err });
 	}
 });
 
