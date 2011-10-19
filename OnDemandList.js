@@ -40,6 +40,10 @@ return declare([List], {
 		//		and tells it to refresh.
 		this.query = query !== undefined ? query : this.query;
 		this.queryOptions = queryOptions || this.queryOptions;
+		// stash sort details if the queryOptions included them
+		if(queryOptions && queryOptions.sort){
+			this.sortOrder = queryOptions.sort;
+		}
 		this.refresh();
 	},
 	
