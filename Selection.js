@@ -18,12 +18,8 @@ return declare([List], {
 	},
 	postCreate: function(){
 		this.inherited(arguments);
-		var mode = this.selectionMode;
-		
-		if(mode != "none"){ // forego initial event hookup if selectionMode is none
-			this.selectionMode = "none"; // force first setSelectionMode call to run
-			this.setSelectionMode(mode);
-		}
+
+		this._initSelectionEvents(); // first time; set up event hooks
 	},
 	
 	// selection:
@@ -37,25 +33,7 @@ return declare([List], {
 	setSelectionMode: function(mode){
 		// summary:
 		//		Updates selectionMode, hooking up listener if necessary.
-		
-		var listeners, listenerAction, i;
-		
 		if(mode == this.selectionMode){ return; } // prevent unnecessary spinning
-		
-		if(!this._selectionListeners){
-			this._initSelectionEvents(); // first time; set up event hooks
-		}
-		listeners = this._selectionListeners;
-		
-		// If switching to none, pause listeners; if switching from none, resume.
-		// (If switching between non-none modes, don't need to change anything.)
-		listenerAction = mode == "none" ? "pause" :
-			(this.selectionMode == "none" ? "resume" : "");
-		if(listenerAction){
-			for(i = listeners.length; i--;){
-				listeners[i][listenerAction]();
-			}
-		}
 		
 		// Start selection fresh when switching mode.
 		this.clearSelection();
@@ -63,85 +41,91 @@ return declare([List], {
 		this.selectionMode = mode;
 	},
 	
+	_handleSelect: function(event, currentTarget){
+		if(this.selectionMode == "none" || (event.type == "cellfocusin" && event.parentType == "mousedown")){
+			// don't run if selection mode is none or if coming from a cellfocusin from a mousedown
+			return;
+		}
+
+		var mode = this.selectionMode;
+		if(event.type == "mousedown" || !event.ctrlKey || event.keyCode == 32){
+			var row = event.target, lastRow = this._lastRow;
+			//console.log("in focus; event: ", event, "; row: ", row);
+			if(mode == "single" && lastRow && event.ctrlKey){
+				// allow deselection even within single select mode
+				this.deselect(lastRow);
+				if(lastRow == row){
+					return;
+				}
+			}
+			if(!event.ctrlKey){
+				if(mode != "multiple"){
+					this.clearSelection();
+				}
+				this.select(row);
+			}else{
+				this.select(row, null, null); // toggle
+			}
+			if(event.shiftKey && lastRow && mode != "single"){ // select range
+				this.select(lastRow, row);
+			}else{
+				// update lastRow reference for potential subsequent shift+select
+				// (current row was already selected by earlier logic)
+				this._lastRow = row;
+			}
+			if(event.type == "mousedown" && (event.shiftKey || event.ctrlKey)){
+				// prevent selection in firefox
+				event.preventDefault();
+			}
+		}
+	},
+
 	_initSelectionEvents: function(){
 		// summary:
 		//		Performs first-time hookup of event handlers containing logic
 		//		required for selection to operate.
 		
-		var
-			listeners = this._selectionListeners = [],
-			grid = this;
+		var grid = this;
 		
 		// This is to stop IE8+'s web accelerator and selection.
 		// It also stops selection in Chrome/Safari.
-		listeners.push(on.pausable(this.domNode, "selectstart", function(event){
+		on(this.domNode, "selectstart", function(event){
 			// In IE, this also bubbles from text selection inside editor fields;
 			// we don't want to prevent that!
 			var tag = event.target && event.target.tagName;
 			if(tag != "INPUT" && tag != "TEXTAREA"){
 				event.preventDefault();
 			}
-		}));
+		});
 		
 		function focus(event){
-			var mode = grid.selectionMode;
-			if(!event._selected && (event.type == "mousedown" || !event.ctrlKey || event.keyCode == 32)){
-				event._selected = true;
-				var row = event.target, lastRow = grid._lastRow;
-				//console.log("in focus; event: ", event, "; row: ", row);
-				if(mode == "single" && lastRow && event.ctrlKey){
-					// allow deselection even within single select mode
-					grid.deselect(lastRow);
-					if(lastRow == row){
-						return;
-					}
-				}
-				if(!event.ctrlKey){
-					if(mode != "multiple"){
-						grid.clearSelection();
-					}
-					grid.select(row);
-				}else{
-					grid.select(row, null, null); // toggle
-				}
-				if(event.shiftKey && lastRow && mode != "single"){ // select range
-					grid.select(lastRow, row);
-				}else{
-					// update lastRow reference for potential subsequent shift+select
-					// (current row was already selected by earlier logic)
-					grid._lastRow = row;
-				}
-				if(event.type == "mousedown" && (event.shiftKey || event.ctrlKey)){
-					// prevent selection in firefox
-					event.preventDefault();
-				}
-			}
+			grid._handleSelect(event, this);
 		}
 		
 		// listen for actions that should cause selections
-		listeners.push(on.pausable(this.contentNode, this.selectionEvent, focus));
+		on(this.contentNode, this.selectionEvent, focus);
 		if(has("touch")){
 			// first listen for touch taps if available
 			var lastTouch, lastTouchX, lastTouchY, lastTouchEvent, isTap;
-			listeners.push(on.pausable(this.contentNode, "touchstart", function(event){
+			on(this.contentNode, "touchstart", function(event){
 				console.log("touchstart");
 				lastTouch = event.touches[0];
 				lastTouchX = lastTouch.pageX;
 				lastTouchY = lastTouch.pageY;
 				lastTouchEvent = event;
 				isTap = true;
-			}));
-			listeners.push(on.pausable(this.contentNode, "touchmove", function(event){
+			});
+			on(this.contentNode, "touchmove", function(event){
 				var thisTouch = event.touches[0];
 				isTap = Math.pow(lastTouchX - thisTouch.pageX, 2) + Math.pow(lastTouchY - thisTouch.pageY, 2) < 100; // 10 pixel radius sound good?
 				console.log("touchmove istap: ", isTap);
-			}));
-			listeners.push(on.pausable(this.contentNode, "touchend", function(event){
+			});
+			on(this.contentNode, "touchend", function(event){
 				if(isTap){
 					console.log("touchend");
 					focus(lastTouchEvent);
 				}
-			}));
+			});
 		}
 	},
 	
@@ -164,7 +148,8 @@ return declare([List], {
 			(!element || on.emit(element, value ? "select" : "deselect", {
 			cancelable: true,
 			bubbles: true,
-			row: row
+			row: row,
+			grid: this
 		}))){
 			if(!value && !this.allSelected){
 				delete this.selection[row.id];
