@@ -6,8 +6,8 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 		<meta name="viewport" content="width=570" />
 		<style type="text/css">
-			@import "../../dojo/resources/dojo.css";
-			@import "../css/skins/itunes.css";
+			@import "../../../dojo/resources/dojo.css";
+			@import "../../css/skins/itunes.css";
 			html, body {
 				width: 100%;
 				height: 100%;
@@ -21,7 +21,7 @@
 			#header {
 				position: relative;
 				height: 64px;
-				background-image: url(../css/skins/images/itunes/header-background.png);
+				background-image: url(../../css/skins/images/itunes/header-background.png);
 				background-repeat: repeat-x;
 			}
 			#header-content {
@@ -35,7 +35,7 @@
 				font-weight: bold;
 				text-align: center;
 				padding-top: 12px;
-				background-image: url(../css/skins/images/itunes/header.png);
+				background-image: url(../../css/skins/images/itunes/header.png);
 				background-repeat: no-repeat;
 			}
 			#list-container {
@@ -110,7 +110,7 @@
 				text-align: right; 
 			}
 		</style>
-		<script type="text/javascript" src="../../dojo/dojo.js" 
+		<script type="text/javascript" src="../../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
 			function unique(arr){
@@ -142,7 +142,7 @@
 					"dgrid/Keyboard",
 					"dojo/_base/declare",
 					"dojo/_base/array",
-					"dgrid/test/data_songs",
+					"dgrid/demos/itunes/data",
 					"dojo/domReady!"
 				],
 				function(List, Grid, Selection, Keyboard, declare, arrayUtil){
