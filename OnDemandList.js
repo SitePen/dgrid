@@ -328,8 +328,8 @@ return declare([List], {
 				// returns a function to pass as a step in the promise chain,
 				// with the id variable closured
 				return this.getBeforePut ?
-					function(){ var r = store.get(id); console.log("get:", id, r); return r; } :
-					function(){ var r = self.row(id).data; console.log("row:", id, r); return r; };
+					function(){ return store.get(id); } :
+					function(){ return self.row(id).data; };
 			};
 		
 		// For every dirty item, grab the ID
