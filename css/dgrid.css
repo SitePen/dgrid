@@ -141,6 +141,25 @@ html.has-quirks .dgrid-header-hidden .dgrid-cell {
 	background-color: #BFD6EB;
 }
 
+/* selectors */
+.dgrid-selector-checkbox {
+	border: 1px solid black;
+	width: 14px;
+	height: 14px;
+	background-position: -160px -144px;
+}
+.dgrid-selector-radio {
+	background-position: -97px -144px;
+}
+.dgrid-selected .dgrid-selector-checkbox,
+.dgrid-select-all .dgrid-selector-checkbox {
+	background-position: -65px -146px;
+}
+.dgrid-selected .dgrid-selector-radio,
+.dgrid-select-all .dgrid-selector-radio {
+	background-position: -80px -144px;
+}
+
 .dgrid-input {
 	width: 99%;
 }
