@@ -1,4 +1,13 @@
 define(["dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/on", "put-selector/put", "./List"], function(declare, lang, Deferred, listen, put, List){
+
+function emitError(err){
+	// called by _trackError in context of list/grid, if an error is encountered
+	listen.emit(this.domNode, "error", { error: err });
+}
+
+// noop is used as Deferred callback when we're only interested in errors
+function noop(r){ return r; }
+
 return declare([List], {
 	create: function(params, srcNodeRef){
 		this.inherited(arguments);
@@ -77,22 +86,11 @@ return declare([List], {
 			this.preloadNode = preloadNode;
 		}
 		var options = lang.delegate(this.queryOptions ? this.queryOptions : null, {start: 0, count: this.minRowsPerPage, query: query});
+		// execute the query
+		var results = query(options);
 		var self = this;
-		var err = lang.hitch(this, "emitError");
-		var results;
-		
-		// Execute the query
-		// Catch errors in case of synchronous query:
-		try{ results = query(options); }
-		catch(e){
-			err(e);
-			return;
-		}
-		// Catch errors in case of asynchronous query:
-		Deferred.when(results, function(){}, err);
-		
 		// render the result set
-		return Deferred.when(this.renderArray(results, preloadNode, options), function(trs){
+		Deferred.when(this.renderArray(results, preloadNode, options), function(trs){
 			return Deferred.when(results.total || results.length, function(total){
 				// now we need to adjust the height and total count based on the first result set
 				var trCount = trs.length;
@@ -119,8 +117,11 @@ return declare([List], {
 				self.onscroll(); // recheck the scroll position in case the query didn't fill the screen
 				// can remove the loading node now
 				return trs;
-			}, err);
-		}, err);
+			});
+		});
+		
+		// return results so that callers can handle potential of async error
+		return results;
 	},
 	sortOrder: null,
 	sort: function(property, descending){
@@ -136,11 +137,13 @@ return declare([List], {
 		if(this.store){
 			// render the query
 			var self = this;
-			this.renderQuery(function(queryOptions){
-				if(self.sortOrder){
-					queryOptions.sort = self.sortOrder;
-				}
-				return self.store.query(self.query, queryOptions);
+			this._trackError(function(){
+				return self.renderQuery(function(queryOptions){
+					if(self.sortOrder){
+						queryOptions.sort = self.sortOrder;
+					}
+					return self.store.query(self.query, queryOptions);
+				});
 			});
 		}
 	},
@@ -156,9 +159,7 @@ return declare([List], {
 		var priorPreload, preloadNode = this.preloadNode;
 		var lastScrollTop = this.lastScrollTop;
 		this.lastScrollTop = visibleTop;
-		var err = lang.hitch(this, "emitError");
-
-
+		
 		function removeDistantNodes(grid, preloadNode, distanceOff, traversal, below){
 			// we check to see the the nodes are "far off"
 			var farOffRemoval = grid.farOffRemoval;
@@ -295,15 +296,10 @@ return declare([List], {
 				options.query = preloadNode.query;
 				
 				// query now to fill in these rows
-				var results;
-				// Catch errors in case of synchronous query:
-				try{ results = preloadNode.query(options); }
-				catch(e){
-					err(e);
-					return;
-				}
-				// Catch errors in case of asynchronous query:
-				Deferred.when(results, function(){}, err);
+				var results = this._trackError(function(){
+					return preloadNode.query(options);
+				});
+				if(results === undefined){ return; } // sync query failed
 				
 				Deferred.when(this.renderArray(results, loadingNode, options), function(){
 						// can remove the loading node now
@@ -315,7 +311,7 @@ return declare([List], {
 							// so we don't "jump" in the scrolling position
 							scrollNode.scrollTop += beforeNode.offsetTop - keepScrollTo;
 						}
-				}, err);
+				});
 				preloadNode = preloadNode.previous;
 
 			}
@@ -324,10 +320,17 @@ return declare([List], {
 	getBeforePut: true,
 	save: function() {
 		// Keep track of the store and puts
-		var store = this.store,
+		var self = this,
+			store = this.store,
 			dirty = this.dirty,
-			puts = [],
-			err = lang.hitch(this, "emitError");
+			dfd = new Deferred(), promise = dfd.promise,
+			getFunc = function(id){
+				// returns a function to pass as a step in the promise chain,
+				// with the id variable closured
+				return this.getBeforePut ?
+					function(){ var r = store.get(id); console.log("get:", id, r); return r; } :
+					function(){ var r = self.row(id).data; console.log("row:", id, r); return r; };
+			};
 		
 		// For every dirty item, grab the ID
 		for(var id in this.dirty) {
@@ -335,38 +338,55 @@ return declare([List], {
 			var put = (function(dirtyObj) {
 				// Return a function handler
 				return function(object) {
-					var ret, key;
+					var key;
 					// Copy dirty props to the original
 					for(key in dirtyObj){ object[key] = dirtyObj[key]; }
-					// Put it in the store
-					try{
-						ret = store.put(object);
-					}catch(e){
-						err(e); // report synchronous error
-						return;
-					}
-					// Manage the return value
-					dojo.when(ret, function() {
+					// Put it in the store, returning the result/promise
+					return dojo.when(store.put(object), function() {
 						// Delete the item now that it's been confirmed updated
 						delete dirty[id];
-					}, err);
+					});
 				};
 			})(dirty[id]);
 			
-			// Add a new item to the put
-			puts.push(this.getBeforePut ?
-				// retrieve the full object from the store
-				Deferred.when(store.get(id), put, err) :
-				// just use the cached object
-				put(this.row(id).data));
+			// Add this item onto the promise chain,
+			// getting the item from the store first if desired.
+			promise = promise.then(getFunc(id)).then(put);
 		}
 		
-		// Return the puts array
-		return puts;
+		// Kick off and return the promise representing all applicable get/put ops.
+		// If the success callback is fired, all operations succeeded; otherwise,
+		// save will stop at the first error it encounters.
+		dfd.resolve();
+		return promise;
 	},
 	
-	emitError: function(err) {
-		listen.emit(this.domNode, "error", { error: err });
+	_trackError: function(func){
+		// summary:
+		//		Utility function to handle emitting of error events.
+		// func: Function|String
+		//		A function which performs some store operation, or a String identifying
+		//		a function to be invoked (sans arguments) hitched against the instance.
+		//		If sync, it can return a value, but may throw an error on failure.
+		//		If async, it should return a promise, which would fire the error
+		//		callback on failure.
+		// tags:
+		//		protected
+		
+		var result;
+		
+		if(typeof func == "string"){ func = lang.hitch(this, func); }
+		
+		try{
+			result = func();
+		}catch(err){
+			// report sync error
+			emitError.call(this, err);
+			// TODO: should we re-throw? probably not, but callers may have to handle undefined.
+		}
+		
+		// wrap in when call to handle reporting of potential async error
+		return Deferred.when(result, noop, lang.hitch(this, emitError));
 	}
 });
 

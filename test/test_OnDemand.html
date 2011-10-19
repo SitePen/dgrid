@@ -45,11 +45,6 @@
 			#grid2 .field-bool { /* checkbox */
 				width: 4em;
 			}
-			#save {
-				display:block;
-				clear:both;
-				margin-bottom: 20px;
-			}
 			
 			#gridAddDel, #listAddDel {
 				float: left;
@@ -280,7 +275,14 @@
 		<div style="float:left;margin-left:20px;"><div><h3>Dirty Items</h3></div><div id="dirty"></div></div>
 		<div id="grid3"></div>
 		</div>
-		<button id="save">Save Changes</button>
+		<div style="clear:both"><button id="save">Save Changes</button></div>
+		<p>The following buttons switch between stores in the left grid above,
+			to test handling of errors on put operations.</p>
+		<p>Note that clicking Save will NOT emit an error event on the grid,
+			as direct invocations of save are expected to handle the returned promise
+			as they see fit.  However, modifying an editor field with autoSave enabled
+			will cause an error event to be emitted, since in this case it is
+			the grid which initiated the operation.</p>
 		<button id="setorigeditstore">Set to original store</button>
 		<button id="seterrorputstore">Set to store which causes error on put</button>
 		<button id="setdeferrorputstore">Set to store which rejects Deferred on put</button>

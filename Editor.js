@@ -140,7 +140,7 @@ return function(column, editor, editOn){
 					}
 					dirty[column.field] = object[column.field] = value;
 					if(column.autoSave){
-						grid.save();
+						grid._trackError("save");
 					}
 				}else{
 					// else keep the value the same
