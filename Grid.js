@@ -244,7 +244,6 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 				
 				contentNode.style.width = ""; // reset first
 				
-				//console.log("width after reset:", contentNode.offsetWidth);
 				if(contentNode && headerTableNode){
 					if((width = headerTableNode.offsetWidth) != contentNode.offsetWidth){
 						// update size of content node if necessary (to match size of rows)
