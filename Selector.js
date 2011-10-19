@@ -24,10 +24,12 @@ define(["dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put", "dojo/
 				put(this, (grid.allSelected ? "!" : ".") + "dgrid-select-all");
 				grid[grid.allSelected ? "clearSelection" : "selectAll"]();
 			}
-			if(event.shiftKey && lastRow){
-				grid.select(lastRow, row);
-			}else if(row){
-				grid._lastRow = row.element;
+			if(type != "radio"){
+				if(event.shiftKey && lastRow){
+					grid.select(lastRow, row);
+				}else if(row){
+					grid._lastRow = row.element;
+				}
 			}
 		}
 
