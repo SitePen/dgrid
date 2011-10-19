@@ -238,11 +238,19 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 			
 			this.inherited(arguments);
 			
-			if(contentNode && headerTableNode){
-				if((width = headerTableNode.offsetWidth) != contentNode.offsetWidth){
-					// update size of content node if necessary (to match size of rows)
-					// (if headerTableNode can't be found, there isn't much we can do)
-					contentNode.style.width = width + "px";
+			if(!has("ie") || (has("ie") > 7 && !has("quirks"))){
+				// Force contentNode width to match up with header width.
+				// (Old IEs don't have a problem due to how they layout.)
+				
+				contentNode.style.width = ""; // reset first
+				
+				//console.log("width after reset:", contentNode.offsetWidth);
+				if(contentNode && headerTableNode){
+					if((width = headerTableNode.offsetWidth) != contentNode.offsetWidth){
+						// update size of content node if necessary (to match size of rows)
+						// (if headerTableNode can't be found, there isn't much we can do)
+						contentNode.style.width = width + "px";
+					}
 				}
 			}
 		},
