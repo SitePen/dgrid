@@ -188,3 +188,12 @@ html.has-ie-6 .dgrid-header-scroll {
 #dgrid-css-dgrid-loaded {
 	display: none;
 }
+
+/* will be used to calculate the width of the scrollbar */
+.dgrid-scrollbar-measure {
+	width: 100px;
+	height: 100px;
+	overflow: scroll;
+	position: absolute;
+	top: -9999px;
+}
