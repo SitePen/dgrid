@@ -9,13 +9,7 @@ function(List, declare, lang, Deferred, DnDSource, DnDManager, put){
 	
 	// TODOs:
 	// * consider sending items rather than nodes to onDropExternal/Internal
-	// * consider declaring an extension to dojo.dnd.Source rather than
-	//   clobbering on every instance we create;
-	//   it makes extending/overriding this plugin seem a bit obtuse
-	//   * barring that, might at least want to use safeMixin here
-	
-	// TODO:
-	// 	* consider moving GridDnDSource to an external module
+	// * consider emitting store errors via OnDemandList._trackError
 	
 	var GridDnDSource = declare(DnDSource, {
 		grid: null,
