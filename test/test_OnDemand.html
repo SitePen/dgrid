@@ -45,11 +45,6 @@
 			#grid2 .field-bool { /* checkbox */
 				width: 4em;
 			}
-			#save {
-				display:block;
-				clear:both;
-				margin-bottom: 20px;
-			}
 			
 			#gridAddDel, #listAddDel {
 				float: left;
@@ -164,7 +159,11 @@
 						}
 					}, "listAddDel");
 					
-					// buttons for 1st grid
+					// buttons / listeners for 1st grid
+					
+					grid.on("error", function(evt) {
+						console.warn("error on grid: ", evt.error);
+					});
 					
 					on(document.getElementById("setstore"), "click", function(){
 						console.log("setting store to colorStore: ", colorStore);
@@ -198,28 +197,7 @@
 					
 					// buttons / listeners for 2nd grid
 					
-					on(document.getElementById("save"), "click", function(){
-						console.log("save to store");
-						grid2.save();
-						domConstruct.empty("dirty");
-					});
-					
-					on(document.getElementById("setorigeditstore"), "click", function(){
-						grid2.setStore(testTypesStore, {});
-						domConstruct.empty("dirty");
-					});
-					
-					on(document.getElementById("seterrorputstore"), "click", function(){
-						grid2.setStore(putErrorStore, {});
-						domConstruct.empty("dirty");
-					});
-					
-					on(document.getElementById("setdeferrorputstore"), "click", function(){
-						grid2.setStore(defPutErrorStore, {});
-						domConstruct.empty("dirty");
-					});
-					
-					var dirtyListener = grid2.on("datachange", function(event){
+					function updateDirty(){
 						setTimeout(function(){
 							// clear "dirty items" list after change has been processed
 							domConstruct.empty("dirty");
@@ -228,7 +206,34 @@
 									{ innerHTML: "rowId: "+rowId }, "dirty");
 							}
 						}, 0);
+					}
+					
+					grid2.on("error", function(evt) {
+						console.warn("error on grid2: ", evt.error);
 					});
+					
+					on(document.getElementById("save"), "click", function(){
+						console.log("save to store");
+						grid2.save();
+						updateDirty();
+					});
+					
+					on(document.getElementById("setorigeditstore"), "click", function(){
+						grid2.setStore(testTypesStore, {});
+						updateDirty();
+					});
+					
+					on(document.getElementById("seterrorputstore"), "click", function(){
+						grid2.setStore(putErrorStore, {});
+						updateDirty();
+					});
+					
+					on(document.getElementById("setdeferrorputstore"), "click", function(){
+						grid2.setStore(defPutErrorStore, {});
+						updateDirty();
+					});
+					
+					var dirtyListener = grid2.on("datachange", updateDirty);
 					
 					// buttons for 3rd grid
 					
@@ -241,6 +246,13 @@
 						for(var id in gridAddDel.selection){
 							smallColorStore.remove(id);
 						}
+					});
+					
+					// hook up a listener for error events on the document to test bubbling
+					// (currently error events don't seem to bubble,
+					// but perhaps we want them to?)
+					on(document, "error", function(evt){
+						console.log("document received error: ", evt.error);
 					});
 				});
 		</script>
@@ -263,7 +275,14 @@
 		<div style="float:left;margin-left:20px;"><div><h3>Dirty Items</h3></div><div id="dirty"></div></div>
 		<div id="grid3"></div>
 		</div>
-		<button id="save">Save Changes</button>
+		<div style="clear:both"><button id="save">Save Changes</button></div>
+		<p>The following buttons switch between stores in the left grid above,
+			to test handling of errors on put operations.</p>
+		<p>Note that clicking Save will NOT emit an error event on the grid,
+			as direct invocations of save are expected to handle the returned promise
+			as they see fit.  However, modifying an editor field with autoSave enabled
+			will cause an error event to be emitted, since in this case it is
+			the grid which initiated the operation.</p>
 		<button id="setorigeditstore">Set to original store</button>
 		<button id="seterrorputstore">Set to store which causes error on put</button>
 		<button id="setdeferrorputstore">Set to store which rejects Deferred on put</button>
