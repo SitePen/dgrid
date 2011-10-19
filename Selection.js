@@ -143,29 +143,30 @@ return declare([List], {
 			// indicates a toggle
 			value = !previousValue;
 		}
-		var element = row.element;
+		var element = row.element,
+			notPrevented;
 		if(value != previousValue &&
-			(!element || on.emit(element, value ? "select" : "deselect", {
+			(!element || (notPrevented = on.emit(element, value ? "select" : "deselect", {
 			cancelable: true,
 			bubbles: true,
 			row: row,
 			grid: this
-		}))){
+		})))){
 			if(!value && !this.allSelected){
 				delete this.selection[row.id];
 			}else{
 				selection[row.id] = value;
 			}
-		}
-		if(element){
-			// add or remove classes as appropriate
-			if(value){
-				put(element, ".dgrid-selected.ui-state-active");
-			}else{
-				put(element, "!dgrid-selected!ui-state-active");
+			if(element){
+				// add or remove classes as appropriate
+				if(value){
+					put(element, ".dgrid-selected.ui-state-active");
+				}else{
+					put(element, "!dgrid-selected!ui-state-active");
+				}
 			}
 		}
-		if(toRow){
+		if(toRow && notPrevented){
 			if(!toRow.element){
 				toRow = this.row(toRow);
 			}
