@@ -219,9 +219,11 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 					Math.max((this.domNode.offsetHeight - headerNode.offsetHeight), 0) + "px";
 			}
 			if(!scrollbarWidth){
-				// we haven't computed the scroll bar width yet, do so now, and add a new rule if need be
-				// (this is only executed once, when the first List/Grid is initialized)
-				scrollbarWidth = bodyNode.offsetWidth - bodyNode.clientWidth;
+				
+				// Measure the browser's scrollbar width using a DIV we'll delete right away
+				var scrollDiv = put(document.body, "div.dgrid-scrollbar-measure");
+				scrollbarWidth = scrollDiv.offsetWidth - scrollDiv.clientWidth;
+				put(scrollDiv, "!");
 				
 				// avoid crazy issues in IE7 only, with certain widgets inside
 				if(has("ie") === 7){ scrollbarWidth++; }
