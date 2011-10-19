@@ -160,7 +160,7 @@ html.has-quirks .dgrid-row-table, html.has-ie-6 .dgrid-row-table {
 }
 
 html.has-quirks .dgrid-header-scroll,
-html.has-ie6 .dgrid-header-scroll {
+html.has-ie-6 .dgrid-header-scroll {
 	/* ensure that header scroll node can shrink to 0 height in IE6 & quirks */
 	font-size: 0;
 }
