@@ -35,17 +35,19 @@ return declare([], {
 					grid._resizeMouseDown(e);
 			});
 		}
-		grid.mouseMoveListen = listen.pausable(document.body, "mousemove", function(e){
-			// while resizing, update the position of the resizer bar
-			if(!grid._resizing){return;}
-			grid._updateResizerPosition(e);
-		});
-		grid.mouseUpListen = listen.pausable(document.body, "mouseup", function(e){
+		if(!grid.mouseMoveListen){
+			grid.mouseMoveListen = listen.pausable(document.body, "mousemove", function(e){
+				// while resizing, update the position of the resizer bar
+				if(!grid._resizing){return;}
+				grid._updateResizerPosition(e);
+			});
+			grid.mouseUpListen = listen.pausable(document.body, "mouseup", function(e){
 				if(!grid._resizing){return;}
 				grid._resizeMouseUp(e);
 				grid.mouseMoveListen.pause();
 				grid.mouseUpListen.pause();
 			});
+		}
 	}, // end renderHeader
 
 	_resizeMouseDown: function(e){

@@ -100,6 +100,10 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 	
 	return declare(TouchScroll ? [TouchScroll] : [], {
 		tabableHeader: false,
+		// showHeader: Boolean
+		//		Whether to render header (sub)rows.
+		showHeader: false,
+		
 		postscript: function(params, srcNodeRef){
 			// invoke create in postScript to allow descendants to
 			// perform logic before create/postCreate happen (a la dijit/_WidgetBase)
@@ -148,7 +152,8 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			this.id = domNode.id = domNode.id || this.id || generateId();
 			put(domNode, "[role=grid].ui-widget.dgrid.dgrid-" + this.listType);
 			var headerNode = this.headerNode = put(domNode, 
-				"div.dgrid-header.dgrid-header-row.ui-widget-header");
+				"div.dgrid-header.dgrid-header-row.ui-widget-header" +
+				(this.showHeader ? "" : ".dgrid-header-hidden"));
 			if(has("quirks") || has("ie") < 8){
 				var spacerNode = put(domNode, "div.dgrid-spacer");
 			}
@@ -183,6 +188,20 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			this.refresh();
 		},
 		
+		setShowHeader: function(show){
+			// this is in List rather than just in Grid, primarily for two reasons:
+			// (1) just in case someone *does* want to show a header in a List
+			// (2) helps address IE < 8 header display issue in List
+			
+			this.showHeader = show;
+			
+			// add/remove class which has styles for "hiding" header
+			put(this.headerNode, (show ? "!" : ".") + "dgrid-header-hidden");
+			
+			this.renderHeader();
+			this.resize(); // to account for (dis)appearance of header
+		},
+		
 		configStructure: function(){
 			// does nothing in List, this is more of a hook for the Grid
 		},
@@ -202,7 +221,10 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			if(!scrollbarWidth){
 				// we haven't computed the scroll bar width yet, do so now, and add a new rule if need be
 				// (this is only executed once, when the first List/Grid is initialized)
-				scrollbarWidth = bodyNode.offsetWidth - bodyNode.clientWidth + 1;
+				scrollbarWidth = bodyNode.offsetWidth - bodyNode.clientWidth;
+				
+				// avoid crazy issues in IE7 only, with certain widgets inside
+				if(has("ie") === 7){ scrollbarWidth++; }
 				
 				// add rules that can be used where scrollbar width/height is needed
 				this.addCssRule(".dgrid-scrollbar-width", "width: " + scrollbarWidth + "px");

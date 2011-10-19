@@ -18,6 +18,25 @@
 	right: 0px;
 }
 
+.dgrid-header-hidden,
+html.has-quirks .dgrid-header-hidden .dgrid-cell {
+	/*
+		Used to "hide" header, without losing size information for reference.
+		!important is used to supersede theme styles at higher specificity.
+		Left/right box styles are untouched, as they may influence width of
+		.dgrid-content as updated in Grid's resize method.
+		Note: Still not quite perfect in IE Quirks mode (1px left over).
+	*/
+	font-size: 0; /* allow shrinkage in IE Quirks mode for Lists */
+	height: 0 !important;
+	border-top: none !important;
+	border-bottom: none !important;
+	margin-top: 0 !important;
+	margin-bottom: 0 !important;
+	padding-top: 0 !important;
+	padding-bottom: 0 !important;
+}
+
 .dgrid-sortable {
 	cursor: pointer;
 }
@@ -157,6 +176,12 @@ html.has-ie-6-7.has-no-quirks .dgrid-row-table {
 html.has-quirks .dgrid-row-table, html.has-ie-6 .dgrid-row-table {
 	/* similar story, height looks too high */
 	height: auto; 
+}
+
+html.has-quirks .dgrid-header-scroll,
+html.has-ie6 .dgrid-header-scroll {
+	/* ensure that header scroll node can shrink to 0 height in IE6 & quirks */
+	font-size: 0;
 }
 
 /* indicator of a successful load */
