@@ -40,6 +40,17 @@
 					gridRowNavigation.on("deselect", function(event){
 						console.log("deselected", event.row);	
 					});
+					gridRowNavigationPrevent = dojo.declare([Grid, Selection, Keyboard])({
+						store: testStore,
+						cellNavigation: false,
+						columns: columns
+					}, "grid-row-navigation-prevent");
+					gridRowNavigationPrevent.on("select", function(event){
+						event.preventDefault();
+					});
+					gridRowNavigationPrevent.on("deselect", function(event){
+						event.preventDefault();
+					});
 					var columns2 = {
 						col1: 'Column 1',
 						col2: {label: 'Column 2', sortable: false},
@@ -77,6 +88,14 @@
 			<button type="button" onclick="gridRowNavigation.setSelectionMode('extended');">Extended</button>
 		</div>
 		<div id="grid-row-navigation"></div>
+		<h2>A grid with row-level selection that is prevented (and row-level navigation)</h2>
+		<div>Set selectionMode:
+			<button type="button" onclick="gridRowNavigationPrevent.setSelectionMode('none');">None</button>
+			<button type="button" onclick="gridRowNavigationPrevent.setSelectionMode('single');">Single</button>
+			<button type="button" onclick="gridRowNavigationPrevent.setSelectionMode('multiple');">Multiple</button>
+			<button type="button" onclick="gridRowNavigationPrevent.setSelectionMode('extended');">Extended</button>
+		</div>
+		<div id="grid-row-navigation-prevent"></div>
 		<h2>A grid with cell-level selection (default selection mode of "extended")</h2>
 		<div id="grid-cell-navigation"></div>
 		<h2>A grid with cell-level selection and selection mode of "single"</h2>
