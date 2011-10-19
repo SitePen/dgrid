@@ -13,7 +13,9 @@ function(styleSheet, has, put, declare, listen, aspect, query, Grid, hasClass){
 			for(var i = 0, l = this.columnSets.length; i < l; i++){
 				// iterate through the columnSets
 				var columnSet = this.columnSets[i];
-				var cell = put(tr, tag + ".dgrid-column-set-cell.column-set-" + i + " div.dgrid-column-set[colsetid=" + i + "]");
+				
+				var cell = put(tr, tag + ".dgrid-column-set-cell.column-set-" + i + (tag == "td" ? "[height=100%]" : "") + " div.dgrid-column-set[colsetid=" + i + "]");
+				
 				this.subRows = columnSet;
 				cell.appendChild(this.inherited(arguments));
 			}

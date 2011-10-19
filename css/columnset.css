@@ -2,11 +2,13 @@
 	overflow: hidden;
 	width: 100%;
 	position: relative; /* This is needed because we setting position: relative on cells in the grid for focus in IE7*/
+	height: 100% !important; /* Fixes Firefox + WebKit border issues */
 }
 
 .dgrid-column-set-cell {
 	vertical-align: top;
 }
+
 .dgrid-column-set-scroller {
 	position: absolute;
 	bottom: 0px;
