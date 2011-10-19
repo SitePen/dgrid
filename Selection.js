@@ -1,4 +1,5 @@
 define(["dojo/_base/declare", "dojo/on", "./List", "put-selector/put", "dojo/has"], function(declare, on, List, put, has){
+var ctrlEquiv = has("mac") ? "metaKey" : "ctrlKey";
 return declare([List], {
 	// summary:
 	//		Add selection capabilities to a grid. The grid will have a selection property and
@@ -37,6 +38,7 @@ return declare([List], {
 		
 		// Start selection fresh when switching mode.
 		this.clearSelection();
+		this._lastRow = null;
 		
 		this.selectionMode = mode;
 	},
@@ -47,33 +49,38 @@ return declare([List], {
 			return;
 		}
 
-		var mode = this.selectionMode;
+		var mode = this.selectionMode,
+			ctrlKey = event.type == "mousedown" ? event[ctrlEquiv] : event.ctrlKey;
 		if(event.type == "mousedown" || !event.ctrlKey || event.keyCode == 32){
-			var row = event.target, lastRow = this._lastRow;
+			var row = this.row(event.target),
+				lastRow = this._lastRow && this.row(this._lastRow);
 			//console.log("in focus; event: ", event, "; row: ", row);
-			if(mode == "single" && lastRow && event.ctrlKey){
+			if(mode == "single" && lastRow && ctrlKey){
 				// allow deselection even within single select mode
 				this.deselect(lastRow);
-				if(lastRow == row){
+				if(lastRow.id == row.id){
 					return;
 				}
 			}
-			if(!event.ctrlKey){
+			if(!ctrlKey){
 				if(mode != "multiple"){
 					this.clearSelection();
 				}
-				this.select(row);
-			}else{
+				// if we're selecting a range, don't select
+				// the current row here or the range select
+				// won't work later
+				!event.shiftKey && this.select(row);
+			}else if(!event.shiftKey){
 				this.select(row, null, null); // toggle
 			}
 			if(event.shiftKey && lastRow && mode != "single"){ // select range
-				this.select(lastRow, row);
+				this.select(row, lastRow);
 			}else{
 				// update lastRow reference for potential subsequent shift+select
 				// (current row was already selected by earlier logic)
-				this._lastRow = row;
+				this._lastRow = row.element;
 			}
-			if(event.type == "mousedown" && (event.shiftKey || event.ctrlKey)){
+			if(event.type == "mousedown" && (event.shiftKey || ctrlKey)){
 				// prevent selection in firefox
 				event.preventDefault();
 			}
