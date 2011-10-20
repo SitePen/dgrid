@@ -5,9 +5,6 @@ function emitError(err){
 	listen.emit(this.domNode, "error", { error: err });
 }
 
-// noop is used as Deferred callback when we're only interested in errors
-function noop(r){ return r; }
-
 return declare([List], {
 	create: function(params, srcNodeRef){
 		this.inherited(arguments);
@@ -392,7 +389,7 @@ return declare([List], {
 		}
 		
 		// wrap in when call to handle reporting of potential async error
-		return Deferred.when(result, noop, lang.hitch(this, emitError));
+		return Deferred.when(result, null, lang.hitch(this, emitError));
 	}
 });
 
