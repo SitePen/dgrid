@@ -18,6 +18,25 @@
 	right: 0px;
 }
 
+.dgrid-header-hidden,
+html.has-quirks .dgrid-header-hidden .dgrid-cell {
+	/*
+		Used to "hide" header, without losing size information for reference.
+		!important is used to supersede theme styles at higher specificity.
+		Left/right box styles are untouched, as they may influence width of
+		.dgrid-content as updated in Grid's resize method.
+		Note: Still not quite perfect in IE Quirks mode (1px left over).
+	*/
+	font-size: 0; /* allow shrinkage in IE Quirks mode for Lists */
+	height: 0 !important;
+	border-top: none !important;
+	border-bottom: none !important;
+	margin-top: 0 !important;
+	margin-bottom: 0 !important;
+	padding-top: 0 !important;
+	padding-bottom: 0 !important;
+}
+
 .dgrid-sortable {
 	cursor: pointer;
 }
@@ -122,6 +141,25 @@
 	background-color: #BFD6EB;
 }
 
+/* selectors */
+.dgrid-selector-checkbox {
+	border: 1px solid black;
+	width: 14px;
+	height: 14px;
+	background-position: -160px -144px;
+}
+.dgrid-selector-radio {
+	background-position: -97px -144px;
+}
+.dgrid-selected .dgrid-selector-checkbox,
+.dgrid-select-all .dgrid-selector-checkbox {
+	background-position: -65px -146px;
+}
+.dgrid-selected .dgrid-selector-radio,
+.dgrid-select-all .dgrid-selector-radio {
+	background-position: -80px -144px;
+}
+
 .dgrid-input {
 	width: 99%;
 }
@@ -140,7 +178,22 @@ html.has-quirks .dgrid-row-table, html.has-ie-6 .dgrid-row-table {
 	height: auto; 
 }
 
+html.has-quirks .dgrid-header-scroll,
+html.has-ie-6 .dgrid-header-scroll {
+	/* ensure that header scroll node can shrink to 0 height in IE6 & quirks */
+	font-size: 0;
+}
+
 /* indicator of a successful load */
 #dgrid-css-dgrid-loaded {
 	display: none;
+}
+
+/* will be used to calculate the width of the scrollbar */
+.dgrid-scrollbar-measure {
+	width: 100px;
+	height: 100px;
+	overflow: scroll;
+	position: absolute;
+	top: -9999px;
 }

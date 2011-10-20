@@ -49,7 +49,9 @@ return function(column){
 						};
 						query.level = target.level;
 						grid.renderQuery ?
-							grid.renderQuery(query, preloadNode) :
+							grid._trackError(function(){
+								return grid.renderQuery(query, preloadNode);
+							}) :
 							grid.renderArray(query({}), preloadNode);
 					}
 					// show or hide all the children

@@ -1,5 +1,5 @@
-define(["./List", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/dnd/Source", "dojo/dnd/Manager", "put-selector/put", "xstyle/css!dojo/resources/dnd.css"],
-function(List, declare, lang, Deferred, DnDSource, DnDManager, put){
+define(["dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/dnd/Source", "dojo/dnd/Manager", "put-selector/put", "xstyle/css!dojo/resources/dnd.css"],
+function(declare, lang, Deferred, DnDSource, DnDManager, put){
 	// TODOC: store requirements
 	// * requires a store (sounds obvious, but not all Lists/Grids have stores...)
 	// * must support options.before in put calls
@@ -9,13 +9,7 @@ function(List, declare, lang, Deferred, DnDSource, DnDManager, put){
 	
 	// TODOs:
 	// * consider sending items rather than nodes to onDropExternal/Internal
-	// * consider declaring an extension to dojo.dnd.Source rather than
-	//   clobbering on every instance we create;
-	//   it makes extending/overriding this plugin seem a bit obtuse
-	//   * barring that, might at least want to use safeMixin here
-	
-	// TODO:
-	// 	* consider moving GridDnDSource to an external module
+	// * consider emitting store errors via OnDemandList._trackError
 	
 	var GridDnDSource = declare(DnDSource, {
 		grid: null,

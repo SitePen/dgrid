@@ -5,14 +5,14 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<meta name="viewport" content="width=570" />
 		<style type="text/css">
-			@import "../../dojo/resources/dojo.css";
-			@import "../css/skins/claro.css";
+			@import "../../../dojo/resources/dojo.css";
+			@import "../../css/skins/claro.css";
 			.heading {
 				font-weight: bold;
 				padding-bottom: 0.25em;
 			}
-			#grid { 
-				width: 766px;<!-- needs to be 16px more than total column width -->
+			#grid, #gridWide { 
+				width: 750px;
 			}
 			#grid .column-col1 {
 				width: 100px;
@@ -29,6 +29,15 @@
 			#grid .column-last-col {
 				width: 150px;
 			}
+			
+			#gridWide .column-col1,
+			#gridWide .column-col2,
+			#gridWide .column-col3,
+			#gridWide .column-col4,
+			#gridWide .column-col5 {
+				width: 200px;
+			}
+			
 			.ui-widget{
 				margin: 10px;
 			}
@@ -36,10 +45,10 @@
 		<script>
 			var start= new Date().getTime();
 		</script>
-		<script type="text/javascript" src="../../dojo/dojo.js" 
+		<script type="text/javascript" src="../../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dgrid/OnDemandGrid", "dgrid/ColumnResizer", "dgrid/Selection", "dgrid/test/data", "dojo/domReady!"],
+			require(["dgrid/OnDemandGrid", "dgrid/extensions/ColumnResizer", "dgrid/Selection", "dgrid/test/data", "dojo/domReady!"],
 				function(Grid, ColumnResizer, Selection, testStore){
 					columns = { // you can declare columns as an object hash (key translates to field)
 						col1: 'Column 1Column1Column 1 Column 1',
@@ -59,15 +68,21 @@
 						store: testStore,
 						columns: columns
 					}, "grid");
+					window.gridWide = dojo.declare([Grid, Selection, ColumnResizer])({
+						store: testStore,
+						columns: columns
+					}, "gridWide");
 				});
 		</script>
 	</head>
 	<body class="claro">
 		<h2>A basic grid with column resizing</h2>
 		<div id="grid"></div>
-	<div>Buttons to test changing column structure:
+		<div>Buttons to test changing column structure:
 			<button onclick="grid.setColumns(columns2);">New Structure</button>
 			<button onclick="grid.setColumns(columns);">Original</button>
 		</div>
+		<h2>Another grid w/ columns whose width initially exceed the table's width</h2>
+		<div id="gridWide"></div>
 	</body>
 </html>

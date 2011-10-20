@@ -15,6 +15,7 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 		//		navigation.
 		cellNavigation: true,
 		tabableHeader: true,
+		showHeader: true,
 		column: function(target){
 			// summary:
 			//		Get the column object by node, or event, or a columnId
@@ -237,10 +238,18 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 			
 			this.inherited(arguments);
 			
-			if(contentNode){
-				if((width = headerTableNode.offsetWidth) != contentNode.offsetWidth){
-					// update size of content node if necessary (to match size of rows)
-					contentNode.style.width = width + "px";
+			if(!has("ie") || (has("ie") > 7 && !has("quirks"))){
+				// Force contentNode width to match up with header width.
+				// (Old IEs don't have a problem due to how they layout.)
+				
+				contentNode.style.width = ""; // reset first
+				
+				if(contentNode && headerTableNode){
+					if((width = headerTableNode.offsetWidth) != contentNode.offsetWidth){
+						// update size of content node if necessary (to match size of rows)
+						// (if headerTableNode can't be found, there isn't much we can do)
+						contentNode.style.width = width + "px";
+					}
 				}
 			}
 		},

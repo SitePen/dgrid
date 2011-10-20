@@ -6,12 +6,12 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 		<meta name="viewport" content="width=570" />
 		<style type="text/css">
-			@import "../../dojo/resources/dojo.css";
+			@import "../../../dojo/resources/dojo.css";
 			/* need a theme for some dnd styles (e.g. before/after indicators).
 			   Using tundra because claro has a silly dojoDndItemBefore/After bug
 			*/
-			@import "../../dijit/themes/tundra/tundra.css";
-			@import "../css/skins/tundra.css";
+			@import "../../../dijit/themes/tundra/tundra.css";
+			@import "../../css/skins/tundra.css";
 			.heading {
 				font-weight: bold;
 				padding-bottom: 0.25em;
@@ -49,11 +49,11 @@
 				margin: 10px;
 			}
 		</style>
-		<script type="text/javascript" src="../../dojo/dojo.js" 
+		<script type="text/javascript" src="../../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dojo", "dgrid/List", "dgrid/OnDemandGrid","dgrid/Tree","dgrid/Selection", "dgrid/ColumnResizer", "dgrid/DnD", "dgrid/Keyboard", "dojo/dnd/Source", "dgrid/test/data", "dojo/domReady!"],
-				function(dojo, List, Grid, Tree, Selection, ColumnResizer, DndRow, Keyboard, DnDSource){
+			require(["dojo", "dgrid/List", "dgrid/OnDemandGrid","dgrid/Tree","dgrid/Selection", "dgrid/extensions/DnD", "dgrid/Keyboard", "dojo/dnd/Source", "dgrid/test/data", "dojo/domReady!"],
+				function(dojo, List, Grid, Tree, Selection, DndRow, Keyboard, DnDSource){
 					var
 						DnDGrid = dojo.declare([Grid, Selection, DndRow, Keyboard]),
 						columns = [
