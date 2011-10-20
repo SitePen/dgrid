@@ -400,9 +400,25 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 		sort: function(property, descending){
 			// summary:
 			//		Sort the content
-			this.sortOrder = [{attribute: property, descending: descending}];
+			// property: String|Array
+			//		String specifying field to sort by, or actual array of objects
+			//		with attribute and descending properties
+			// descending: boolean
+			//		In the case where property is a string, this argument
+			//		specifies whether to sort ascending (false) or descending (true)
+			
+			this.sortOrder = typeof property != "string" ? property :
+				[{attribute: property, descending: descending}];
 			this.refresh();
+			
 			if(this.lastCollection){
+				// if an array was passed in, flatten to just first sort attribute
+				// for default array sort logic
+				if(typeof property != "string"){
+					descending = property[0].descending;
+					property = property[0].attribute;
+				}
+				
 				this.lastCollection.sort(function(a,b){
 					var aVal = a[property], bVal = b[property];
 					// fall back undefined values to "" for more consistent behavior
