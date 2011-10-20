@@ -5,7 +5,7 @@ return declare([Selection], {
 	//		fire "select" and "deselect" events.
 	
 	// ensure we don't select when an individual cell is not identifiable
-	selectionEvent: ".dgrid-cell:mousedown,cellfocusin",
+	selectionEvent: ".dgrid-cell:mousedown,.dgrid-cell:cellfocusin",
 	
 	select: function(cell, toCell, value){
 		if(value === undefined){
@@ -35,38 +35,40 @@ return declare([Selection], {
 			// indicates a toggle
 			value = !previous;
 		}
-		var element = cell.element;
-		if(previous != value){
-			if(!element || listen.emit(element, value ? "select" : "deselect", {
-				cancelable: true,
-				bubbles: true,
-				cell: cell
-			})){
-				previousRow = previousRow || {};
-				previousRow[cell.column.id] = value;
-				this.selection[rowId] = previousRow;
-				
-				// Check for all-false objects to see if it can be deleted.
-				// This prevents build-up of unnecessary iterations later.
-				var hasSelected = false;
-				for(var i in previousRow){
-					if(previousRow[i] === true){
-						hasSelected = true;
-						break;
-					}
+		var element = cell.element,
+			notPrevented;
+		if(previous != value &&
+			(!element || (notPrevented = listen.emit(element, value ? "select" : "deselect", {
+			cancelable: true,
+			bubbles: true,
+			cell: cell,
+			grid: this
+		})))){
+			previousRow = previousRow || {};
+			previousRow[cell.column.id] = value;
+			this.selection[rowId] = previousRow;
+			
+			// Check for all-false objects to see if it can be deleted.
+			// This prevents build-up of unnecessary iterations later.
+			var hasSelected = false;
+			for(var i in previousRow){
+				if(previousRow[i] === true){
+					hasSelected = true;
+					break;
 				}
-				if(!hasSelected){ delete this.selection[rowId]; }
+			}
+			if(!hasSelected){ delete this.selection[rowId]; }
+
+			if(element){
+				// add or remove classes as appropriate
+				if(value){
+					put(element, ".dgrid-selected.ui-state-active");
+				}else{
+					put(element, "!dgrid-selected!ui-state-active");
+				}
 			}
 		}
-		if(element){
-			// add or remove classes as appropriate
-			if(value){
-				put(element, ".dgrid-selected.ui-state-active");
-			}else{
-				put(element, "!dgrid-selected!ui-state-active");
-			}
-		}
-		if(toCell){
+		if(toCell && notPrevented){
 			// a range
 			if(!toCell.element){
 				toCell = this.cell(toCell);
@@ -108,6 +110,16 @@ return declare([Selection], {
 				}
 			}while(nextNode = cell.row.element[traverser]);
 		}
-	}
+	},
+	isSelected: function(object, columnId){
+		if(!object){
+			return false;
+		}
+		if(!object.element){
+			object = this.cell(object, columnId);
+		}
+
+		return this.selection[object.row.id] && !!this.selection[object.row.id][object.column.id];
+ 	}
 });
 });
