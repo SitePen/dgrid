@@ -29,7 +29,7 @@
 							col3: 'Column 3',
 							col4: Editor({label: 'Editable'}, "text")
 						},
-						prevent = false;
+						prevent;
 					
 					on(document.body, "select",
 						function(event){
@@ -89,6 +89,7 @@
 		<div>preventDefault on selection in all grids?
 			<button type="button" id="btnPreventDefaultOn">Yes</button>
 			<button type="button" id="btnPreventDefaultOff">No</button>
+		</div>
 		<h2>A grid with row-level selection (and row-level navigation)</h2>
 		<div>Set selectionMode:
 			<button type="button" onclick="gridRowNavigation.setSelectionMode('none');">None</button>
