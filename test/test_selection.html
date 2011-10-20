@@ -34,14 +34,14 @@
 					on(document.body, "select",
 						function(event){
 							var msg = "selected" + (prevent ? " (prevented): " : ": ");
-							console.log(msg, event.grid.id, event.row);
+							console.log(msg, event.grid.id, event.row||event.cell);
 							if(prevent){ event.preventDefault(); }
 						}
 					);
 					on(document.body, "deselect",
 						function(event){
 							var msg = "deselected" + (prevent ? " (prevented): " : ": ");
-							console.log(msg, event.grid.id, event.row);
+							console.log(msg, event.grid.id, event.row||event.cell);
 							if(prevent){ event.preventDefault(); }
 						}
 					);
