@@ -354,7 +354,7 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			return row;
 		},
 		renderRow: function(value, options){
-			return put("div", value);
+			return put("div", "" + value);
 		},
 		row: function(target){
 			// summary:
