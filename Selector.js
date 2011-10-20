@@ -39,7 +39,7 @@ define(["dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put", "dojo/
 						}
 					}
 					if(!target || target == grid.contentNode){
-						_handleSelect.call(this, event);
+						_handleSelect.call(this, event, currentTarget);
 					}else{
 						onSelect.call(target, event);
 					}
