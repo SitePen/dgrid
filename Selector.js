@@ -17,9 +17,9 @@ define(["dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put", "dojo/
 				grid.select(row.id, null, true);
 			}else{
 				if(row){
-					var lastRow = event.shiftKey ? grid.row(grid._lastRow) : null;
+					var lastRow = event.shiftKey ? grid.row(grid._lastSelected) : null;
 					grid.select(row, lastRow||null, lastRow ? undefined : null);
-					grid._lastRow = row.element;
+					grid._lastSelected = row.element;
 				}else{
 					put(this, (grid.allSelected ? "!" : ".") + "dgrid-select-all");
 					grid[grid.allSelected ? "clearSelection" : "selectAll"]();
