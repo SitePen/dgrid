@@ -1,4 +1,4 @@
-define(["dojo/_base/declare", "dojo/on", "./List", "put-selector/put", "dojo/has"], function(declare, on, List, put, has){
+define(["dojo/_base/declare", "dojo/on", "./List", "put-selector/put", "dojo/has", "dojo/query"], function(declare, on, List, put, has){
 var ctrlEquiv = has("mac") ? "metaKey" : "ctrlKey";
 return declare([List], {
 	// summary:
