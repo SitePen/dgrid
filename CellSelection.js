@@ -1,4 +1,4 @@
-define(["dojo/_base/declare", "./Selection", "dojo/on", "put-selector/put", "dojo/query"], function(declare, Selection, listen, put){
+define(["dojo/_base/declare", "./Selection", "dojo/on", "put-selector/put"], function(declare, Selection, listen, put){
 return declare([Selection], {
 	// summary:
 	// 		Add cell level selection capabilities to a grid. The grid will have a selection property and
