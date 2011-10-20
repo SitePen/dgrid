@@ -202,12 +202,14 @@
 						}
 						sortByCol1.descending = sortDescending;
 						grid.setQuery(grid.query, { sort: [sortByCol1] });
+						
+						console.log("sortOrder after setQuery: ", grid.sortOrder, grid.queryOptions);
 					});
 					on(document.getElementById("sort"), "click", function(){
-						console.log("sortOrder: ", grid.sortOrder);
-						
 						sortDescending ^= 1; // toggle true/false
 						grid.sort("col1", sortDescending);
+						
+						console.log("sortOrder after sort: ", grid.sortOrder);
 					});
 
 
@@ -290,12 +292,13 @@
 	<body class="claro">
 		<h2>Simple test to show setting a new store and query to dgrid</h2>
 		<div id="grid"></div>
-		<button id="setstore">Set Color Store</button>
-		<button id="restore">Set Original Store</button>
 		<button id="colorQuery">Set color store and query</button>
 		<button id="resetQuery">Reset query</button>
 		<button id="setQueryWithOptions">Set query with queryOptions</button>
 		<button id="sort">sort</button>
+		<br>
+		<button id="setstore">Set Color Store</button>
+		<button id="restore">Set Original Store</button>
 		<button id="empty">Set to empty store</button>
 		<button id="error">Set to error store</button>
 		<button id="error2">Set to error store (def)</button>
