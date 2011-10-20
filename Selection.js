@@ -50,7 +50,7 @@ return declare([List], {
 		var mode = this.selectionMode;
 		if(event.type == "mousedown" || !event.ctrlKey || event.keyCode == 32){
 			var row = event.target, lastRow = this._lastRow;
-			//console.log("in focus; event: ", event, "; row: ", row);
+			
 			if(mode == "single" && lastRow && event.ctrlKey){
 				// allow deselection even within single select mode
 				this.deselect(lastRow);
@@ -108,7 +108,6 @@ return declare([List], {
 			// first listen for touch taps if available
 			var lastTouch, lastTouchX, lastTouchY, lastTouchEvent, isTap;
 			on(this.contentNode, "touchstart", function(event){
-				console.log("touchstart");
 				lastTouch = event.touches[0];
 				lastTouchX = lastTouch.pageX;
 				lastTouchY = lastTouch.pageY;
@@ -118,11 +117,9 @@ return declare([List], {
 			on(this.contentNode, "touchmove", function(event){
 				var thisTouch = event.touches[0];
 				isTap = Math.pow(lastTouchX - thisTouch.pageX, 2) + Math.pow(lastTouchY - thisTouch.pageY, 2) < 100; // 10 pixel radius sound good?
-				console.log("touchmove istap: ", isTap);
 			});
 			on(this.contentNode, "touchend", function(event){
 				if(isTap){
-					console.log("touchend");
 					focus(lastTouchEvent);
 				}
 			});

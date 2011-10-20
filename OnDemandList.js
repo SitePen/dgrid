@@ -386,7 +386,6 @@ return declare([List], {
 		}catch(err){
 			// report sync error
 			emitError.call(this, err);
-			// TODO: should we re-throw? probably not, but callers may have to handle undefined.
 		}
 		
 		// wrap in when call to handle reporting of potential async error
