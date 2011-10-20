@@ -47,13 +47,16 @@ return declare([List], {
 		// summary:
 		//		Assigns a new query (and optionally queryOptions) to the list,
 		//		and tells it to refresh.
+		
+		var sort = queryOptions && queryOptions.sort;
+		
 		this.query = query !== undefined ? query : this.query;
 		this.queryOptions = queryOptions || this.queryOptions;
-		// stash sort details if the queryOptions included them
-		if(queryOptions && queryOptions.sort){
-			this.sortOrder = queryOptions.sort;
-		}
-		this.refresh();
+		
+		// If we have new sort criteria, pass them through sort
+		// (which will update sortOrder and call refresh in itself).
+		// Otherwise, just refresh.
+		sort ? this.sort(sort) : this.refresh();
 	},
 	
 	renderQuery: function(query, preloadNode){
