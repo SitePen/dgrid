@@ -7,7 +7,7 @@ return declare([List], {
 	
 	// selectionEvent: String
 	//		event (or events, in dojo/on format) to listen on to trigger select logic
-	selectionEvent: "mousedown,cellfocusin",
+	selectionEvent: ".dgrid-row:mousedown,.dgrid-row:cellfocusin",
 	
 	// deselectOnRefresh: Boolean
 	//		If true, the selection object will be cleared when refresh is called.
@@ -38,7 +38,7 @@ return declare([List], {
 		
 		// Start selection fresh when switching mode.
 		this.clearSelection();
-		this._lastRow = null;
+		this._lastSelected = null;
 		
 		this.selectionMode = mode;
 	},
@@ -52,33 +52,36 @@ return declare([List], {
 		var mode = this.selectionMode,
 			ctrlKey = event.type == "mousedown" ? event[ctrlEquiv] : event.ctrlKey;
 		if(event.type == "mousedown" || !event.ctrlKey || event.keyCode == 32){
-			var row = this.row(event.target),
-				lastRow = this._lastRow && this.row(this._lastRow);
+			var row = currentTarget,
+				lastRow = this._lastSelected;
 			//console.log("in focus; event: ", event, "; row: ", row);
-			if(mode == "single" && lastRow && ctrlKey){
-				// allow deselection even within single select mode
-				this.deselect(lastRow);
-				if(lastRow.id == row.id){
-					return;
+			if(mode == "single"){
+				if(lastRow == row){
+					if(ctrlKey){
+						// allow deselection even within single select mode
+						this.select(row, null, null);
+					}
+				}else{
+					lastRow && this.deselect(lastRow);
+					this.select(row);
 				}
-			}
-			if(!ctrlKey){
-				if(mode != "multiple"){
+				this._lastSelected = row;
+			}else{
+				var value;
+				if(mode == "extended" && !ctrlKey){
 					this.clearSelection();
 				}
-				// if we're selecting a range, don't select
-				// the current row here or the range select
-				// won't work later
-				!event.shiftKey && this.select(row);
-			}else if(!event.shiftKey){
-				this.select(row, null, null); // toggle
-			}
-			if(event.shiftKey && lastRow && mode != "single"){ // select range
-				this.select(row, lastRow);
-			}else{
-				// update lastRow reference for potential subsequent shift+select
-				// (current row was already selected by earlier logic)
-				this._lastRow = row.element;
+				if(!event.shiftKey){
+					// null == toggle; undefined == true;
+					lastRow = value = ctrlKey ? null : undefined;
+				}
+				this.select(row, lastRow, value);
+
+				if(!lastRow){
+					// update lastRow reference for potential subsequent shift+select
+					// (current row was already selected by earlier logic)
+					this._lastSelected = row;
+				}
 			}
 			if(event.type == "mousedown" && (event.shiftKey || ctrlKey)){
 				// prevent selection in firefox
@@ -208,12 +211,22 @@ return declare([List], {
 			this.select(row.id);
 		}
 	},
+	isSelected: function(object){
+		if(!object){
+			return false;
+		}
+		if(!object.element){
+			object = this.row(object);
+		}
+
+		return !!this.selection[object.id];
+	},
 	
 	refresh: function(){
 		if(this.deselectOnRefresh){
 			this.selection = {};
 		}
-		this._lastRow = null;
+		this._lastSelected = null;
 		this.inherited(arguments);
 	},
 	
