@@ -5,8 +5,8 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<meta name="viewport" content="width=570" />
 		<style type="text/css">
-			@import "../../dojo/resources/dojo.css";
-			@import "../css/skins/claro.css";
+			@import "../../../dojo/resources/dojo.css";
+			@import "../../css/skins/claro.css";
 			.heading {
 				font-weight: bold;
 				padding-bottom: 0.25em;
@@ -45,10 +45,10 @@
 		<script>
 			var start= new Date().getTime();
 		</script>
-		<script type="text/javascript" src="../../dojo/dojo.js" 
+		<script type="text/javascript" src="../../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dgrid/OnDemandGrid", "dgrid/ColumnResizer", "dgrid/Selection", "dgrid/test/data", "dojo/domReady!"],
+			require(["dgrid/OnDemandGrid", "dgrid/extensions/ColumnResizer", "dgrid/Selection", "dgrid/test/data", "dojo/domReady!"],
 				function(Grid, ColumnResizer, Selection, testStore){
 					columns = { // you can declare columns as an object hash (key translates to field)
 						col1: 'Column 1Column1Column 1 Column 1',

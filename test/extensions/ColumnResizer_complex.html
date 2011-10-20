@@ -5,9 +5,9 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 		<meta name="viewport" content="width=570" />
 		<style type="text/css">
-			@import "../../dojo/resources/dojo.css";
-			@import "../css/skins/claro.css";
-			@import "../css/dgrid.css"; /* this ensures that are rules come after dgrid.css */
+			@import "../../../dojo/resources/dojo.css";
+			@import "../../css/skins/claro.css";
+			@import "../../css/dgrid.css"; /* this ensures that our rules come after dgrid.css */
 			.heading {
 				font-weight: bold;
 				padding-bottom: 0.25em;
@@ -32,10 +32,10 @@
 			}
 		</style>
 
-		<script type="text/javascript" src="../../dojo/dojo.js" 
+		<script type="text/javascript" src="../../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dgrid/OnDemandGrid", "dgrid/GridWithColumnSetsFromHtml", "dgrid/ColumnSet", "dgrid/Tree", "dgrid/Selection", "dgrid/Keyboard", "dgrid/ColumnResizer", "dgrid/test/data", "dojo/domReady!"],
+			require(["dgrid/OnDemandGrid", "dgrid/GridWithColumnSetsFromHtml", "dgrid/ColumnSet", "dgrid/Tree", "dgrid/Selection", "dgrid/Keyboard", "dgrid/extensions/ColumnResizer", "dgrid/test/data", "dojo/domReady!"],
 				function(Grid, GridFromHtml, ColumnSet, Tree, Selection, Keyboard,ColumnResizer, testStore){
 					window.grid = dojo.declare([Grid, ColumnSet, Selection, Keyboard, ColumnResizer])({
 						store: testStore,

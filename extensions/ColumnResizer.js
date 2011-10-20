@@ -1,4 +1,5 @@
-define(["dojo/_base/declare", "dojo/on", "dojo/query", "dojo/dom", "put-selector/put", "dojo/dom-geometry", "dojo/dom-class", "dojo/_base/html", "xstyle/css!./css/resize.css"], function(declare, listen, query, dom, put, geom, cls){
+define(["dojo/_base/declare", "dojo/on", "dojo/query", "dojo/dom", "put-selector/put", "dojo/dom-geometry", "dojo/dom-class", "dojo/_base/html", "xstyle/css!../css/extensions/ColumnResizer.css"],
+function(declare, listen, query, dom, put, geom, cls){
 	
 return declare([], {
 	resizeNode: null,
