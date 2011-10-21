@@ -1,12 +1,13 @@
 This project provides widgets for lists of data, including simple sets of scrolling rows,
 grids of data, on-demand lazy-loaded data, and various plugins for additional functionality. 
 This project also provides touch scrolling for mobile devices with native style
-momentum, bouncing, and scrollbars. To use this package, install with
-[CPM](https://github.com/kriszyp/cpm):
+momentum, bouncing, and scrollbars.
+
+To use this package, install it with [CPM](https://github.com/kriszyp/cpm):
 
     cpm install dgrid
 
-Or download it along with its dependencies, which are:
+Alternatively, download dgrid and its dependencies, which are:
 
 * [xstyle](https://github.com/kriszyp/xstyle)
 * [put-selector](https://github.com/kriszyp/put-selector)
@@ -15,11 +16,18 @@ Or download it along with its dependencies, which are:
       however, some of the test pages also use components from Dijit, and
       Dojox (namely grid for a comparison test, and mobile for a mobile page).
 
+Please note that as of the v0.2.0 release of dgrid, Dojo 1.7 is not yet final.
+dgrid v0.2.0 requires at least
+[Dojo 1.7 RC2](http://download.dojotoolkit.org/release-1.7.0rc2/).
+
 The dgrid project is available under the same dual BSD/AFLv2 license as the Dojo Toolkit.
 
 # Components
 
-dgrid's primary components are broken down into the following top-level modules:
+dgrid's primary components fall into the following top-level modules.
+
+Further information on these modules may be available via the API viewer,
+accessible via `doc/api.html` in the downloaded package.
 
 ## List
 
@@ -41,56 +49,32 @@ The List can be used to render an array of data. For example:
 
 The base List class (inherited by all other classes) also has the following methods:
 
-* `row(value)`: This will look up the requested row and return a Row object.
+* `row(target)`: This will look up the requested row and return a Row object.
   The single parameter may be a DOM event, DOM node, data object id, or data object.
-  The Row object has the following properties:
-    * `id`: The data object id
+  The returned Row object has the following properties:
+    * `id`: The data object's id
     * `element`: The row's DOM element
     * `data`: The data object represented by the row
 * `on(event, listener)`: Basic event listener functionality;
-  simply delegates to the DOM element using standard `dojo/on` behavior.
+  simply delegates to the top-level DOM element of the List, using standard `dojo/on` behavior.
 * `renderArray(array, beforeNode)`: This can be called to render an array.
   The `beforeNode` parameter can be used to render at a specific place in the List.
 * `renderRow(value, options)`: This can be overridden to provide
-  custom rendering logic for rows
+  custom rendering logic for rows.
 * `sort(property, descending)`: This can be called to sort the List by a given
   property; if the second parameter is passed `true`, the sort will be in descending order.
   The Grid and OnDemandList modules further extend this functionality.
 
-See the [API viewer](doc/api.html?dgrid/doc/List)
-for a list of methods available on the List component.
-(Make sure to download the project to view this link; it is not available from GitHub.)
-
 ## Grid
 
-This extends List to provide tabular display of data in columns. The Grid component will
-provide a header for each column that corresponds to columns within the scrollable
-grid of data. The columns of the grid are defined by using the `columns` property.
-The columns property should be a hash (object) or array, containing column definition objects.
+Grid extends List to provide tabular display of data in columns.
+The columns of the grid are typically defined via the `columns` property.
+This property can be a hash (object) or array, containing column definition objects.
 When `columns` is an object, each property's key is used as the id of the column, and
 each value is the column definition object. When `columns` is an array,
-the numeric indices become the column IDs. The column definition object
-may have the following properties (all are optional):
+the numeric indices become the column IDs.
 
-* `field`: This is the property from the object in the list to display in the body of the grid. 
-  Defaults to the id of the column (if no `get()` function is provided).
-* `label`: This is the label to show in the header of the grid.
-  Defaults to the id of the column.
-* `className` - A DOM/CSS class to assign to the cells in the column. 
-* `id` - This is the id of the column; normally this is determined automatically
-  from the keys or indices in the `columns` object or array.
-* `sortable`: This indicates whether or not you can sort on this column/field.
-  Defaults to `true`.
-    * Note that you can always programmatically sort a Grid by a given column using the
-      `sort(property, descending)` method, regardless of whether that column's `sortable` status
-      or even presence in the Grid altogether.
-* `get`: This can be a function that will retrieve the value to render from the object in the list.
-* `formatter`: This can be a function that will convert the value to an HTML string for rendering.
-* `renderCell`: This can be a function that will be called to render the value into the target &lt;td> for each cell.
-  (If `formatter` is specified, `renderCell` is ignored.)
-* `renderHeaderCell` - This can be a function that will be called to render the value into the target &lt;th> for the columns header.
-
-For example, we could create a grid with columns like:
+For example, we could create a grid like so:
 
     define(["dgrid/Grid"], function(List){
         var grid = new Grid({
@@ -113,8 +97,29 @@ For example, we could create a grid with columns like:
         ...
     });
 
-The column definition may alternately simply be a string, in which case the value of the string is
-interpreted as the name of the column. Thus, we can more succinctly write simple columns:
+The column definition object may have the following properties (all are optional):
+
+* `field`: This is the property from the object in the list to display in the body of the grid. 
+  Defaults to the id of the column (if no `get()` function is provided).
+* `label`: This is the label to show in the header of the grid.
+  Defaults to the id of the column.
+* `className` - A DOM/CSS class to assign to the cells in the column. 
+* `id` - This is the id of the column; normally this is determined automatically
+  from the keys or indices in the `columns` object or array.
+* `sortable`: This indicates whether or not you can sort on this column/field.
+  Defaults to `true`.
+    * Note that you can always programmatically sort a Grid by a given column using the
+      `sort(property, descending)` method, regardless of whether that column's `sortable` status
+      or even presence in the Grid altogether.
+* `get`: This can be a function that will retrieve the value to render from the object in the list.
+* `formatter`: This can be a function that will convert the value to an HTML string for rendering.
+* `renderCell`: This can be a function that will be called to render the value into the target &lt;td> for each cell.
+  (If `formatter` is specified, `renderCell` is ignored.)
+* `renderHeaderCell` - This can be a function that will be called to render the value into the target &lt;th> for the columns header.
+
+Alternatively, the column definition may simply be a string, in which case
+the value of the string is interpreted as the label of the column.
+Thus, we can more succinctly write simple columns:
 
     var grid = new Grid({
         columns: {
@@ -130,6 +135,15 @@ that is, it supports the idea of rendering multiple rows for each item.
 Specification of multiple subrows is very much like specifying columns, except
 that one uses the `subRows` property instead of `columns`, and it receives an
 array of columns objects/arrays.
+
+Both the `columns` and `subRows` properties have respective setters,
+`setColumns` and `setSubRows`, which allow resetting the structure of the Grid
+at a later time.
+
+By default, the Grid renders a header, containing cells which display the
+label of each column.  This can be disabled by setting `showHeader: false`
+in the arguments object to the Grid; it can also be changed later using the
+`setShowHeader` method.
 
 ### Specifying Columns via HTML: GridFromHtml
 
@@ -165,7 +179,7 @@ dgrid components are designed to be highly CSS-driven for optimal performance an
 so visual styling should be controlled through CSS. The Grid creates classes
 based on the column ids and field names with the convention of
 `column-<column-id>` and `field-<field-name>`.
-(If you specify a `className` in the column definition, it is used in place of
+(If a `className` is specified in the column definition, it is used in place of
 `field-<field-name>`.) For example, you could define a grid and CSS like so:
 
     <style>
@@ -193,10 +207,6 @@ The Grid class also provides a `styleColumn(colId, css)` method to programmatica
 add styles to a column, by injecting a rule into a stylesheet in the document.
 This method returns a handle with a `remove` function, which can be called to
 remove the style rule that was added.
-
-See the [API viewer](doc/api.html?dgrid/doc/Grid) for a list of methods available
-on the Grid component.
-(Make sure to download the project to view this link, it is not available from GitHub.)
 
 ## OnDemandList
 
@@ -260,14 +270,14 @@ Selection and Keyboard handling plugins, we could do the following:
         // create a grid based on plugins
         var MyGrid = dojo.declare([Grid, Selection, Keyboard]);
         // instantiate it
-        grid = new MyGrid({
+        var grid = new MyGrid({
             store: myStore,
             ...
         }, "grid");
 
 You can also perform inline mixin and instantiation:
 
-    grid = dojo.declare([Grid, Selection, Keyboard])({
+    var grid = new (dojo.declare([Grid, Selection, Keyboard]))({
         store: myStore,
         ...
     }, "grid");
@@ -276,7 +286,44 @@ Below is a synopsis of available plugins.
 
 ## ColumnSet
 
-TODOC
+The ColumnSet module provides functionality which divides a Grid's columns into
+multiple distinct sets, each of which manage their columns' horizontal scrolling
+independently.  This makes it possible to keep certain columns in view even while
+others are scrolled out of viewing range.
+
+When mixing in ColumnSet, instead of specifying `columns` or `subRows`, one
+specifies `columnSets`, which is essentially an array of `subRows`.  For example,
+in pseudocode:
+
+    var grid = new (dojo.declare([Grid, ColumnSet]))({
+        columnSets: [
+            // left columnset
+            [
+                [
+                    { /* columnset 1, subrow 1, column 1 */ },
+                    { /* columnset 1, subrow 1, column 2 */ }
+                ],
+                [
+                    { /* columnset 1, subrow 2, column 1 */ },
+                    { /* columnset 1, subrow 2, column 2 */ }
+                ]
+            ],
+            // right columnset
+            [
+                [
+                    { /* columnset 2, subrow 1, column 1 */ },
+                    { /* columnset 2, subrow 1, column 2 */ }
+                ],
+                [
+                    { /* columnset 2, subrow 2, column 1 */ },
+                    { /* columnset 2, subrow 2, column 2 */ }
+                ]
+            ]
+        ],
+        ...
+    }, "grid");
+
+More examples can be found in the `complex_column.html` test page.
 
 ## Selection
 
@@ -377,10 +424,41 @@ which returns a boolean indicating whether or not the row can be expanded.
 ## Editor
 
 The Editor plugin provides the ability to render editor widgets within cells
-for a column, directly correlating them with the dirty state of an OnDemandGrid.
-Changes will then be saved back to the store based on edits performed in the grid.
+for a column.  When used in conjunction with the OnDemandGrid module, edited
+fields are directly correlated with the dirty state of the grid;
+changes will then be saved back to the store based on edits performed in the grid.
 
-(TODO: flesh out more)
+The Editor module supports both standard HTML input elements and widgets.
+To create an Editor which uses a simple input element, simply specify the type
+of the input element as the second parameter.  For example, the following would
+result in an Editor which presents a text field for each value in the column:
+
+    Editor({/* column definition here */}, "text")
+
+To create an Editor which uses a widget, pass the widget constructor as the
+second parameter.  For example:
+
+    Editor({/* column definition here */}, TextBox)
+
+Additionally, arguments can be passed to the widget by specifying a
+`widgetArgs` property in the column definition.  `widgetArgs` may be a
+simple object, but it can also be a function, for cases where widget
+initialization parameters may depend on context.  In the latter case,
+the function will be passed the object represented by the current row,
+and should return an args object which will be passed to the widget constructor.
+
+By default, Editors will always be active.  However, a third argument may be
+specified to the Editor function, which indicates which event (or events,
+comma-delimited) should switch the cell into edit mode.  In this case, the
+cell's data will display as normal until that event is fired, at which point
+the editor will be rendered, replacing the cell's content.  When the editor
+loses focus, it will disappear, replaced by the updated content.
+
+By default, changes made to items via Editors do not immediately propagate to
+the store.  However, this can be enabled for a particular Editor by
+specifying `autoSave: true` in the column definition.
+
+For examples of Editor in use, see the `editor.html` and `editor2.html` test pages.
 
 # Extensions
 
