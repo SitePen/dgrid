@@ -173,9 +173,9 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 				listen.emit(bodyNode, "scroll", {});
 			});
 			var grid = this;
-			listen(window, "resize", function(){
+			this._listeners.push(listen(window, "resize", function(){
 				grid.resize();
-			});
+			}));
 		},
 		startup: function(){
 			// summary:
@@ -256,9 +256,22 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			}
 		},
 		destroy: function(){
+			var i,
+				nodeRefs = ["domNode", "headerNode", "headerScrollNode", "bodyNode",
+					"contentNode", "preloadNode", "columns", "subRows", "params"];
+			
 			// cleanup listeners
-			for(var i = 0; i < this._listeners.length; i++){
-				this._listeners.remove();
+			for(i = this._listeners.length; i--;){
+				this._listeners[i].remove();
+			}
+			delete this._listeners;
+			
+			// destroy DOM
+			put("!", this.domNode);
+			
+			// remove properties that are or may contain node references
+			for(i = nodeRefs.length; i--;){
+				delete this[nodeRefs[i]];
 			}
 		},
 		refresh: function(){
