@@ -3,7 +3,7 @@ function(declare, lang, Deferred, listen, put, List){
 
 function emitError(err){
 	// called by _trackError in context of list/grid, if an error is encountered
-	listen.emit(this.domNode, "error", { error: err });
+	listen.emit(this.domNode, "dgrid-error", { error: err });
 }
 
 return declare([List], {

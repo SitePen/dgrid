@@ -6,8 +6,8 @@ define(["dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put", "dojo/
 
 		var grid;
 		function onSelect(event){
-			if(event.type == "cellfocusin" && (event.parentType == "mousedown" || event.keyCode != 32)){
-				// ignore "cellfocusin" from "mousedown" and any keystrokes other than spacebar
+			if(event.type == "dgrid-cellfocusin" && (event.parentType == "mousedown" || event.keyCode != 32)){
+				// ignore "dgrid-cellfocusin" from "mousedown" and any keystrokes other than spacebar
 				return;
 			}
 			var row = grid.row(event), lastRow = grid._lastSelected && grid.row(grid._lastSelected);
@@ -49,7 +49,7 @@ define(["dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put", "dojo/
 				};
 			});
 			aspect.before(grid, "_initSelectionEvents", function(){
-				on(this.headerNode, ".dgrid-selector-cell:mousedown,.dgrid-selector-cell:cellfocusin", onSelect);
+				on(this.headerNode, ".dgrid-selector-cell:mousedown,.dgrid-selector-cell:dgrid-cellfocusin", onSelect);
 			});
 		}
 

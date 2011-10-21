@@ -72,7 +72,7 @@ function(styleSheet, has, put, declare, listen, aspect, query, Grid, hasClass){
 			} else {
 				// first-time-only operations
 				aspect.after(this, "resize", reposition);
-				listen(domNode, ".dgrid-column-set:cellfocusin", onScroll);
+				listen(domNode, ".dgrid-column-set:dgrid-cellfocusin", onScroll);
 				aspect.after(this, "styleColumn", reposition);		
 			}
 			
