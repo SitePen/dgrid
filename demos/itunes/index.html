@@ -193,7 +193,7 @@
 					var currentGenre; // updated on genre select
 
 					//	start listening for selections on the lists.
-					genres.on("select", function(e){
+					genres.on("dgrid-select", function(e){
 						//	filter the albums, artists and grid
 						var
 							filter = currentGenre = e.row.data,
@@ -219,7 +219,7 @@
 						});
 					});
 
-					artists.on("select", function(e){
+					artists.on("dgrid-select", function(e){
 						//	filter the albums, grid
 						var filter = e.row.data, alb;
 						if(e.row.id == "0"){
@@ -243,7 +243,7 @@
 						albums.select(0); //	reselect "all" item, triggering grid refresh
 					});
 
-					albums.on("select", function(e){
+					albums.on("dgrid-select", function(e){
 						//	filter the grid
 						var filter = e.row.data;
 						if(e.row.id == "0"){

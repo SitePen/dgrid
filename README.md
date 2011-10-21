@@ -182,12 +182,12 @@ Below are the plugins that are available:
 <h2>Selection</h2>
 Adds selection capability to a List/Grid. The list instance will include a selection property
 with an a Stateful (instance of dojo.Stateful) that represents the selected items. This
-plugin will also cause "select" and "deselect" events to be fired. For example:
+plugin will also cause "dgrid-select" and "dgrid-deselect" events to be fired. For example:
 <pre>
 grid = dojo.declare([Grid, Selection])({
 	selectionMode: "single",
 	...});
-grid.on("select", function(event){
+grid.on("dgrid-select", function(event){
 	// get the row that was just selected
 	var row = grid.row(event);
 	for(var id in grid.selection){
@@ -196,7 +196,7 @@ grid.on("select", function(event){
 		}
 	}
 });
-grid.on("deselect", function(event){
+grid.on("dgrid-deselect", function(event){
 	var row = grid.row(event);
 	// row was just deselected 
 });
