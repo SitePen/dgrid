@@ -56,8 +56,8 @@
 			function toggleHeader(grid){
 				grid.setShowHeader(!grid.showHeader);
 			}
-			require(["dojo/on", "dgrid/List", "dgrid/OnDemandGrid", "dgrid/Tree", "dgrid/Editor", "dgrid/Selection", "dgrid/Keyboard", "dgrid/test/data", "dojo/domReady!"], 
-				function(on, List, Grid, Tree, Editor, Selection, Keyboard, testStore){
+			require(["dojo/on", "dgrid/List", "dgrid/OnDemandGrid", "dgrid/Tree", "dgrid/Editor", "dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dojo/_base/array", "dgrid/test/data", "dojo/domReady!"], 
+				function(on, List, Grid, Tree, Editor, Selection, Keyboard, declare, arrayUtil, testStore){
 					var columns = { // you can declare columns as an object hash (key translates to field)
 							col1: Editor({label: 'Column 1 column 1 column 1'}, "text", "dblclick"),
 							col2: {label: 'Column 2', sortable: false},
@@ -65,37 +65,37 @@
 							col4: 'Column444444444444444444',
 							"last-col": Editor({label: 'Column 5', field: 'col5'}, "text", "dblclick")
 						},
-						countries = dojo.map(testCountryStore.data, function(country){
+						countries = arrayUtil.map(testCountryStore.data, function(country){
 							return country.name;
 						}),
 						// longer version to test horizontal scrolling in List
-						longCountries = dojo.map(countries, function(country){
+						longCountries = arrayUtil.map(countries, function(country){
 							return country + country + country;
 						});
 					
-					window.grid = dojo.declare([Grid, Selection, Keyboard])({
+					window.grid = declare([Grid, Selection, Keyboard])({
 						store: testStore,
 						columns: columns
 					}, "grid");
 					
-					window.scrollgrid = dojo.declare([Grid, Selection, Keyboard])({
+					window.scrollgrid = declare([Grid, Selection, Keyboard])({
 						store: testStore,
 						columns: columns
 					}, "scrollgrid");
 					
-					window.headerlessgrid = dojo.declare([Grid, Selection, Keyboard])({
+					window.headerlessgrid = declare([Grid, Selection, Keyboard])({
 						store: testStore,
 						columns: columns,
 						showHeader: false
 					}, "headerlessgrid");
 					
-					window.list = dojo.declare([List, Selection, Keyboard])({}, "list");
+					window.list = declare([List, Selection, Keyboard])({}, "list");
 					list.renderArray(countries);
 					
-					window.widelist = dojo.declare([List, Selection, Keyboard])({}, "widelist");
+					window.widelist = declare([List, Selection, Keyboard])({}, "widelist");
 					widelist.renderArray(countries);
 					
-					window.narrowlist = dojo.declare([List, Selection, Keyboard])({}, "narrowlist");
+					window.narrowlist = declare([List, Selection, Keyboard])({}, "narrowlist");
 					narrowlist.renderArray(longCountries);
 				});
 		</script>

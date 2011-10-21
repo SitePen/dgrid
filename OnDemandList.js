@@ -1,4 +1,5 @@
-define(["dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/on", "put-selector/put", "./List"], function(declare, lang, Deferred, listen, put, List){
+define(["dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/on", "put-selector/put", "./List"],
+function(declare, lang, Deferred, listen, put, List){
 
 function emitError(err){
 	// called by _trackError in context of list/grid, if an error is encountered
@@ -346,7 +347,7 @@ return declare([List], {
 					// Copy dirty props to the original
 					for(key in dirtyObj){ object[key] = dirtyObj[key]; }
 					// Put it in the store, returning the result/promise
-					return dojo.when(store.put(object), function() {
+					return Deferred.when(store.put(object), function() {
 						// Delete the item now that it's been confirmed updated
 						delete dirty[id];
 					});

@@ -69,8 +69,8 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dojo/on", "dgrid/List", "dgrid/OnDemandGrid", "dgrid/Tree", "dgrid/Editor", "dgrid/Selection", "dgrid/Keyboard", "dijit/form/DateTextBox", "dijit/form/HorizontalSlider", "dijit/form/NumberSpinner", "dgrid/test/data", "dojo/domReady!"], 
-				function(on, List, Grid, Tree, Editor, Selection, Keyboard, DateTextBox, Slider, NumberSpinner, testStore){
+			require(["dojo/on", "dgrid/List", "dgrid/OnDemandGrid", "dgrid/Tree", "dgrid/Editor", "dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dijit/form/DateTextBox", "dijit/form/HorizontalSlider", "dijit/form/NumberSpinner", "dgrid/test/data", "dojo/domReady!"], 
+				function(on, List, Grid, Tree, Editor, Selection, Keyboard, declare, DateTextBox, Slider, NumberSpinner, testStore){
 					var columns = { // you can declare columns as an object hash (key translates to field)
 						col1: Editor({label: 'Column 1 column 1 column 1'}, "text", "dblclick"),
 						col2: {label: 'Column 2', sortable: false},
@@ -79,19 +79,19 @@
 						"last-col": Editor({label: 'Column 5', field: 'col5'}, "text", "dblclick")
 					};
 					
-					window.grid = dojo.declare([Grid, Selection, Keyboard])({
+					window.grid = declare([Grid, Selection, Keyboard])({
 						store: testStore,
 						columns: columns,
 						showHeader: false
 					}, "grid");
 					
-					window.scrollgrid = dojo.declare([Grid, Selection, Keyboard])({
+					window.scrollgrid = declare([Grid, Selection, Keyboard])({
 						store: testStore,
 						columns: columns,
 						showHeader: false
 					}, "scrollgrid");
 					
-					window.tree = dojo.declare([Grid, Selection, Keyboard])({
+					window.tree = declare([Grid, Selection, Keyboard])({
 						store: testCountryStore,
 						query: {type: "continent"},
 						selectionMode: "single",
@@ -117,7 +117,7 @@
 						Editor({label: 'CheckBox', field: 'bool'}, "checkbox")
 					];
 					
-					window.editorgrid = new (dojo.declare([Grid, Selection, Keyboard]))({
+					window.editorgrid = new (declare([Grid, Selection, Keyboard]))({
 						store: testTypesStore,
 						columns: editorColumns,
 						selectionMode: "single",

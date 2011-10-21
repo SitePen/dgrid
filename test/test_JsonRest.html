@@ -22,15 +22,15 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dojo/store/JsonRest", "dojo/domReady!"], 
-				function(List, Grid, Selection, Keyboard, JsonRest){
+			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dojo/store/JsonRest", "dojo/domReady!"], 
+				function(List, Grid, Selection, Keyboard, declare, JsonRest){
 					var testStore = new JsonRest({target:"./", idProperty: "order"});
 					var columns = [
 						{label:'Name', field:'name', sortable: false},
 						{label:'Description', field:'description', sortable: false}
 					];
 
-					window.grid = new (dojo.declare([Grid, Selection, Keyboard]))({
+					window.grid = new (declare([Grid, Selection, Keyboard]))({
 						query: "data_rest.js",
 						store: testStore,
 						columns: columns
