@@ -111,7 +111,7 @@
 		<script>
 require(["dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dojo/on", "dojo/query", "dojo/store/Memory", "dojo/store/Observable", "put-selector/put"],
 function(Grid, Selection, Keyboard, declare, on, query, Memory, Observable, put){
-	var grid, store, origRenderRow, expandoListener, expanded,
+	var grid, store, origRenderRow, expandoListener, expandedNode,
 		renderers = {
 			gallery: function(obj, options){
 				// function used for renderRow for gallery view (large tiled thumbnails)
@@ -140,7 +140,7 @@ function(Grid, Selection, Keyboard, declare, on, query, Memory, Observable, put)
 			// pause/resume click listener for expando in "table" view
 			expandoListener[view == "table" ? "resume" : "pause"]();
 			// reset expanded node for table view
-			expanded = null;
+			expandedNode = null;
 			// update renderRow function
 			grid.renderRow = renderers[view];
 			// update class on grid domNode
@@ -195,16 +195,18 @@ function(Grid, Selection, Keyboard, declare, on, query, Memory, Observable, put)
 	
 	// listen for clicks to trigger expand/collapse in table view mode
 	expandoListener = on.pausable(grid.domNode, ".dgrid-row:click", function(evt){
-		var node = grid.row(evt).element;
+		var
+			node = grid.row(evt).element,
+			collapsed = node.className.indexOf("collapsed") >= 0;
 		
-		// collapse previously-expanded row
-		expanded && put(expanded, ".collapsed");
-		// expand new row, unless it's the same one
-		node != expanded && put(node,
-			(node.className.indexOf("collapsed") < 0 ? "." : "!") + "collapsed");
+		// toggle state of node which was clicked
+		put(node, (collapsed ? "!" : ".") + "collapsed");
 		
-		// update currently-expanded node for next time
-		expanded = node;
+		// if clicked row wasn't expanded, collapse any previously-expanded row
+		collapsed && expandedNode && put(expandedNode, ".collapsed");
+		
+		// if the row clicked was previously expanded, nothing is expanded now
+		expandedNode = collapsed ? node : null;
 	});
 	
 	// switch views when buttons are clicked
