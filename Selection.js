@@ -62,7 +62,7 @@ return declare([List], {
 						this.select(row, null, null);
 					}
 				}else{
-					lastRow && this.deselect(lastRow);
+					this.clearSelection();
 					this.select(row);
 				}
 				this._lastSelected = row;
