@@ -34,14 +34,14 @@
 						},
 						prevent;
 					
-					on(win.body(), "select",
+					on(win.body(), "dgrid-select",
 						function(event){
 							var msg = "selected" + (prevent ? " (prevented): " : ": ");
 							console.log(msg, event.grid.id, event.row);
 							if(prevent){ event.preventDefault(); }
 						}
 					);
-					on(win.body(), "deselect",
+					on(win.body(), "dgrid-deselect",
 						function(event){
 							var msg = "deselected" + (prevent ? " (prevented): " : ": ");
 							console.log(msg, event.grid.id, event.row);

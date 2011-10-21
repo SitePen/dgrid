@@ -43,7 +43,7 @@ return declare([List], {
 								cellFocusedElement.style.position = "";
 							}
 							event.cell = cellFocusedElement;
-							on.emit(element, "cellfocusout", event);
+							on.emit(element, "dgrid-cellfocusout", event);
 						}
 						cellFocusedElement = element;
 						event.cell = element;
@@ -58,7 +58,7 @@ return declare([List], {
 							element.focus();
 						}
 						put(element, ".dgrid-focus");
-						on.emit(cellFocusedElement, "cellfocusin", lang.mixin({ parentType: event.type }, event));
+						on.emit(cellFocusedElement, "dgrid-cellfocusin", lang.mixin({ parentType: event.type }, event));
 					}
 				}
 			}

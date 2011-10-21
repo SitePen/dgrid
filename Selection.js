@@ -7,7 +7,7 @@ return declare([List], {
 	
 	// selectionEvent: String
 	//		event (or events, in dojo/on format) to listen on to trigger select logic
-	selectionEvent: ".dgrid-row:mousedown,.dgrid-row:cellfocusin",
+	selectionEvent: ".dgrid-row:mousedown,.dgrid-row:dgrid-cellfocusin",
 	
 	// deselectOnRefresh: Boolean
 	//		If true, the selection object will be cleared when refresh is called.
@@ -44,8 +44,8 @@ return declare([List], {
 	},
 	
 	_handleSelect: function(event, currentTarget){
-		if(this.selectionMode == "none" || (event.type == "cellfocusin" && event.parentType == "mousedown")){
-			// don't run if selection mode is none or if coming from a cellfocusin from a mousedown
+		if(this.selectionMode == "none" || (event.type == "dgrid-cellfocusin" && event.parentType == "mousedown")){
+			// don't run if selection mode is none or if coming from a dgrid-cellfocusin from a mousedown
 			return;
 		}
 
@@ -153,7 +153,7 @@ return declare([List], {
 		var element = row.element,
 			notPrevented = true;
 		if(value != previousValue &&
-			(!element || (notPrevented = on.emit(element, value ? "select" : "deselect", {
+			(!element || (notPrevented = on.emit(element, "dgrid-" + (value ? "select" : "deselect"), {
 			cancelable: true,
 			bubbles: true,
 			row: row,

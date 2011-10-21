@@ -5,7 +5,7 @@ return declare([Selection], {
 	//		fire "select" and "deselect" events.
 	
 	// ensure we don't select when an individual cell is not identifiable
-	selectionEvent: ".dgrid-cell:mousedown,.dgrid-cell:cellfocusin",
+	selectionEvent: ".dgrid-cell:mousedown,.dgrid-cell:dgrid-cellfocusin",
 	
 	select: function(cell, toCell, value){
 		if(value === undefined){
@@ -38,7 +38,7 @@ return declare([Selection], {
 		var element = cell.element,
 			notPrevented = true;
 		if(previous != value &&
-			(!element || (notPrevented = listen.emit(element, value ? "select" : "deselect", {
+			(!element || (notPrevented = listen.emit(element, "dgrid-" + (value ? "select" : "deselect"), {
 			cancelable: true,
 			bubbles: true,
 			cell: cell,

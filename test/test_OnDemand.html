@@ -161,7 +161,7 @@
 					
 					// buttons / listeners for 1st grid
 					
-					grid.on("error", function(evt) {
+					grid.on("dgrid-error", function(evt) {
 						console.warn("error on grid: ", evt.error);
 					});
 					
@@ -240,7 +240,7 @@
 						}, 0);
 					}
 					
-					grid2.on("error", function(evt) {
+					grid2.on("dgrid-error", function(evt) {
 						console.warn("error on grid2: ", evt.error);
 					});
 					
@@ -265,7 +265,7 @@
 						updateDirty();
 					});
 					
-					var dirtyListener = grid2.on("datachange", updateDirty);
+					var dirtyListener = grid2.on("dgrid-datachange", updateDirty);
 					
 					// buttons for 3rd grid
 					
@@ -283,7 +283,7 @@
 					// hook up a listener for error events on the document to test bubbling
 					// (currently error events don't seem to bubble,
 					// but perhaps we want them to?)
-					on(document, "error", function(evt){
+					on(document, "dgrid-error", function(evt){
 						console.log("document received error: ", evt.error);
 					});
 				});

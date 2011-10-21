@@ -2,7 +2,7 @@ define(["./create-schema", "./List"],
 function(create, List){
 	with(create){
 	return Constructor(List, 
-		"The Selection module can be mixed in to a list or grid to selection capabilities. This module will cause 'select' and 'deselect' events to be fired on the DOM when rows/cells are selected and deselected.",
+		"The Selection module can be mixed in to a list or grid to selection capabilities. This module will cause 'dgrid-select' and 'dgrid-deselect' events to be fired on the DOM when rows/cells are selected and deselected.",
 		{
 			cellSelection: Boolean("Indicates that selection should take place at the cell level instead of the row level", false),
 			selectionMode: String("Indicates which selection mode to use. The options include 'none' (clicks and keyboard do not select anything, and default browser text selection is available), 'single' (only the last clicked item is selected), 'multiple' (each click adds a selected item, ctrl+click removes), and 'extended' (clicks select last item, but ctrl and shift can be used to select multiple)", "extended"),
