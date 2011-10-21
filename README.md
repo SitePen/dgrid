@@ -180,7 +180,9 @@ so visual styling should be controlled through CSS. The Grid creates classes
 based on the column ids and field names with the convention of
 `column-<column-id>` and `field-<field-name>`.
 (If a `className` is specified in the column definition, it is used in place of
-`field-<field-name>`.) For example, you could define a grid and CSS like so:
+`field-<field-name>`.)
+
+For example, you could define a grid and CSS like so:
 
     <style>
     .column-age {
@@ -192,7 +194,7 @@ based on the column ids and field names with the convention of
     </style>
     <script>
     define(["dgrid/Grid"], function(Grid){
-        grid = new Grid({
+        var grid = new Grid({
                 columns: [ // define the columns
                     age: "Age",
                     first: "First Name",
@@ -206,17 +208,17 @@ based on the column ids and field names with the convention of
 The Grid class also provides a `styleColumn(colId, css)` method to programmatically
 add styles to a column, by injecting a rule into a stylesheet in the document.
 This method returns a handle with a `remove` function, which can be called to
-remove the style rule that was added.
+later remove the style rule that was added.
 
 ## OnDemandList
 
-This extends List to provide on-demand lazy loading or paging of data as the user
+OnDemandList extends List to provide on-demand lazy loading or paging of data as the user
 scrolls through the list, and interacts with a
 [Dojo object store](http://dojotoolkit.org/reference-guide/dojo/store.html) for
 querying of data. This provides a seamless, intuitive interface for viewing
 large sets of data in scalable manner. This also provides sorting delegation to the store.
 
-The OnDemandList requires that a store be specified via the `store` property,
+OnDemandList requires that a store be specified via the `store` property,
 and will call the `query()` method on the store to retrieve the data to be rendered.
 OnDemandList can `query()` with start and count properties so as to only retrieve
 the necessary objects needed to render the visible rows. As the list or grid is
@@ -227,20 +229,29 @@ For best results, the specified store should return query results with an `obser
 method, which enables the list to keep its display up to date with any changes
 that occur in the store after the items are rendered.
 The [`dojo/store/Observable`](http://dojotoolkit.org/reference-guide/dojo/store/Observable.html)
-module can prove useful for this.
+module can prove useful for adding this functionality.
 
 The given store should also support the `get` and `getIdentity` functions.
 
 OnDemandList provides the following properties/methods:
 
 * `renderQuery(query)`: Renders the given query into the list.
-* `sort(property, descending)`: OnDemandList defers sorting to the store.
+* `sort(property, descending)`: OnDemandList's version of this method
+  defers sorting to the store.
 * `sortOrder`: Initially managed by List's `sort()` method,
   this stores the current sort order.
-* `setQuery`: Allows specifying a new `query` object (and optionally, `queryOptions`)
-  that the list will use when issuing queries to the store.
-* `setStore`: Allows specifying a new store (and optionally, also `query` and `queryOptions`)
-  for the list to reference.
+* `save()`: Instructs the list to relay any dirty data (e.g. populated by
+  instances of the Editor column plugin) back to the store.  Returns a promise
+  which resolves when all necessary put operations have completed successfully
+  (even if the store operates synchronously).
+* `getBeforePut`: if true (the default), any `save` operations will re-fetch
+  the item from the store via a `get` call, before applying changes represented by
+  dirty data.
+* `setQuery(query, queryOptions)`: Allows specifying a new `query` object
+  (and optionally, also `queryOptions`) that the list will use when
+  issuing queries to the store.
+* `setStore(store, query, queryOptions)`: Allows specifying a new store
+  (and optionally, also `query` and `queryOptions`) for the list to reference.
 
 ## OnDemandGrid
 
@@ -251,8 +262,8 @@ For example:
         grid = new Grid({
                 store: myStore, // a Dojo object store
                 columns: [ // define the columns
-                    {label: 'Column 1', field: 'col1', editable: true, sortable: true},
-                    {label: 'Column 2', field: 'col2'},
+                    {label: "Column 1", field: "col1", editable: true, sortable: true},
+                    {label: "Column 2", field: "col2"},
                     ...
                 ]
             }, "grid");
@@ -274,6 +285,8 @@ Selection and Keyboard handling plugins, we could do the following:
             store: myStore,
             ...
         }, "grid");
+        ...
+    });
 
 You can also perform inline mixin and instantiation:
 
@@ -323,7 +336,7 @@ in pseudocode:
         ...
     }, "grid");
 
-More examples can be found in the `complex_column.html` test page.
+More concrete examples can be found in the `complex_column.html` test page.
 
 ## Selection
 
@@ -359,7 +372,6 @@ The following properties and methods are added by the Selection plugin:
       but normal clicks add selection without removing previous selections
     * `none`: Nothing can be selected by user interaction;
       only programmatic selection (or selection via selectors) is allowed
-</ul>
 * `select(id)`: Programmatically select a row
 * `deselect(id)`: Programmatically deselect a row
 
@@ -377,7 +389,7 @@ via List's `row` method, CellSelection looks it up via Grid's `cell` method.
 ## Keyboard
 
 This plugin adds keyboard handling functionality.
-The cursor keys can be used to navigate the focus across cells and rows,
+The arrow keys can be used to navigate the focus across cells and rows,
 providing accessibility and ease of use.
 
 When used with grids, this plugin references the `cellNavigation` property of
@@ -387,7 +399,7 @@ operate at the individual cell level (`true`, the default) or at the row level
 
 # Column Plugins
 
-The following modules are plugins designed for specific columns of cells.
+The following modules are plugins designed for specific columns of a Grid.
 These plugins are used by creating an instance and specifying it as a column in
 `columns` (or `subRows`).
 
@@ -399,11 +411,11 @@ tree expander and the second column has a checkbox, we could do this:
                 store: myHierarchicalStore, // a Dojo object store
                 columns: [ // define the columns
                     // first column will have a tree expander:
-                    Tree({label:'Name', field:'name'}),
+                    Tree({label: "Name", field: "name"}),
                     // second column will render with a checkbox: 
-                    Editor({label: 'A CheckBox', field: 'bool'}, "checkbox"),
+                    Editor({label: "A CheckBox", field: "bool"}, "checkbox"),
                     // just a normal column:
-                    {label:'Type', field:'type'},
+                    {label: "Type", field: "type"},
                     ...
                 ]
             }, "grid");
@@ -423,10 +435,10 @@ which returns a boolean indicating whether or not the row can be expanded.
 
 ## Editor
 
-The Editor plugin provides the ability to render editor widgets within cells
+The Editor plugin provides the ability to render editor controls within cells
 for a column.  When used in conjunction with the OnDemandGrid module, edited
 fields are directly correlated with the dirty state of the grid;
-changes will then be saved back to the store based on edits performed in the grid.
+changes can then be saved back to the store based on edits performed in the grid.
 
 The Editor module supports both standard HTML input elements and widgets.
 To create an Editor which uses a simple input element, simply specify the type
@@ -440,11 +452,11 @@ second parameter.  For example:
 
     Editor({/* column definition here */}, TextBox)
 
-Additionally, arguments can be passed to the widget by specifying a
+Additionally, arguments can be passed to the widget constructor by specifying a
 `widgetArgs` property in the column definition.  `widgetArgs` may be a
 simple object, but it can also be a function, for cases where widget
 initialization parameters may depend on context.  In the latter case,
-the function will be passed the object represented by the current row,
+the function will be passed the data object for the current row,
 and should return an args object which will be passed to the widget constructor.
 
 By default, Editors will always be active.  However, a third argument may be
@@ -453,6 +465,11 @@ comma-delimited) should switch the cell into edit mode.  In this case, the
 cell's data will display as normal until that event is fired, at which point
 the editor will be rendered, replacing the cell's content.  When the editor
 loses focus, it will disappear, replaced by the updated content.
+
+**Please note:** if attempting to trigger an Editor on focus (to accommodate
+keyboard and mouse), it is highly recommended to use dgrid's custom event,
+`dgrid-cellfocusin` instead of `focus`, to avoid confusion of events.  Note
+that this requires also mixing the Keyboard module into the Grid.
 
 By default, changes made to items via Editors do not immediately propagate to
 the store.  However, this can be enabled for a particular Editor by
@@ -469,10 +486,10 @@ css/image resources also live under respective `css/extensions` and
 
 ## ColumnResizer
 
-The ColumnResizer plugin, originally based on
-[the gridx ColumnResizer module](https://github.com/evanhw/gridx/blob/master/gridx/modules/ColumnResizer.js)
-but further developed to better integrate with dgrid,
-can be used to add column resizing functionality (accessible via mouse drag).
+The ColumnResizer plugin can be used to add column resizing functionality
+(accessible via mouse drag).  Originally based on
+[the gridx ColumnResizer module](https://github.com/evanhw/gridx/blob/master/gridx/modules/ColumnResizer.js),
+the plugin has been further developed for better performance and integration with dgrid.
 
 ## DnD
 
@@ -492,10 +509,11 @@ relocate the item).
 
 # Themes/Skins
 
-The dgrid automatically loads the necessary structural CSS to work properly. However, you can
-also use one of the the included skins/themes. There are claro.css, tundra.css, soria.css, and nihilo.css theme
-files in the css/skins directory that can be used to skin the dgrid to a particular
-look and feel.
+dgrid automatically loads the necessary structural CSS to work properly.
+However, to make the component far more visually attractive and interesting,
+it is common to also apply one of the the included skins. There are various CSS
+files under the `css/skins` directory which can be used to skin the dgrid to a
+particular look and feel.
 
 ## Grid Structure for custom CSS Styling
 
@@ -524,7 +542,8 @@ The following class names are used by dgrid and can be referenced from CSS:
   (box-sizing is preferred by the grid).
 * `dgrid-focus`: Applied to the element (cell or row) with the focus (for keyboard based navigation)
 * `dgrid-expando-icon`: Applied to the expando icon on tree nodes
-* `dgrid-header-scroll`: Applied to the node in the top right corner, above the vertical scrollbar
+* `dgrid-header-scroll`: Applied to the node in the top right corner of a Grid,
+  above the vertical scrollbar
 
 The following generic class names are also available for generic skinning
 (following the jQuery ThemeRoller convention):
