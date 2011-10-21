@@ -1,21 +1,21 @@
-.itunes .ui-widget { 
+.dTuned .ui-widget {
 	border: 1px solid #aaa;
 	background: #fff;
 	color: #000;
 }
-.itunes .ui-widget-header {
-	background-image: url(images/itunes/grid-header-bg.png);
+.dTuned .ui-widget-header {
+	background-image: url(images/grid-header-bg.png);
 	background-repeat: repeat-x;
 	font-weight: bold;
 }
-.itunes .ui-widget-header .dgrid-cell:hover,
-.itunes .ui-widget-header .dgrid-sort-up,
-.itunes .ui-widget-header .dgrid-sort-down{
-	background-image: url(images/itunes/grid-header-sorted.png);
+.dTuned .ui-widget-header .dgrid-cell:hover,
+.dTuned .ui-widget-header .dgrid-sort-up,
+.dTuned .ui-widget-header .dgrid-sort-down{
+	background-image: url(images/grid-header-sorted.png);
 	background-repeat: repeat-x;
 }
 
-.itunes .ui-state-default {
+.dTuned .ui-state-default {
 	-webkit-transition-duration: 0.2s;
 	-moz-transition-duration: 0.2s;
 	-o-transition-duration: 0.2s;
@@ -24,24 +24,24 @@
 	-moz-transition-property: background-color, border-color;
 	-o-transition-property: background-color, border-color;
 	transition-property: background-color, border-color;
-	background: url("images/row_back.png") #fff repeat-x;
+	background: url("../../../css/skins/images/row_back.png") #fff repeat-x;
 }
-.has-ie-6 .itunes .ui-state-default {
+.has-ie-6 .dTuned .ui-state-default {
 	background-image: none;
 }
 
-.itunes .ui-state-default:hover {
+.dTuned .ui-state-default:hover {
 	background-color: #e9f2fe;
 }
 
-.itunes .ui-state-active {
+.dTuned .ui-state-active {
 	background-color: #cee6fa;
 }
 
-.itunes .ui-state-active:hover {
+.dTuned .ui-state-active:hover {
 	background-color: #9bc6f2;
 }
 
-.itunes .ui-state-highlight {
+.dTuned .ui-state-highlight {
 	background-color: #ff6;
 }
