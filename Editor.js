@@ -152,7 +152,6 @@ return function(column, editor, editOn){
 		}
 		return value;
 	}
-	var suppressSelect;
 	column.renderCell = function(object, value, cell, options){
 		var cmp; // stores input/widget being rendered
 		if(!grid){
@@ -176,11 +175,6 @@ return function(column, editor, editOn){
 			cmp = renderWidget(value, cell, object);
 			// if component is a widget, call startup once execution stack completes
 			if (cmp.startup) { setTimeout(function(){ cmp.startup(); }, 0); }
-		}
-	}
-	if(!column.label){
-		column.renderHeaderCell = function(th){
-			column.renderCell({}, null, th);
 		}
 	}
 	return column;
