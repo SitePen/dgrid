@@ -21,15 +21,15 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dgrid/OnDemandGrid", "dgrid/Editor","dgrid/Selection", "dgrid/CellSelection", "dgrid/Keyboard", "dgrid/test/data", "dojo/domReady!"], 
-				function(Grid, Editor, Selection, CellSelection, Keyboard, testStore){
+			require(["dgrid/OnDemandGrid", "dgrid/Editor","dgrid/Selection", "dgrid/CellSelection", "dgrid/Keyboard", "dojo/_base/declare", "dgrid/test/data", "dojo/domReady!"], 
+				function(Grid, Editor, Selection, CellSelection, Keyboard, declare, testStore){
 					var columns = {
 						col1: 'Column 1',
 						col2: {label: 'Column 2', sortable: false},
 						col3: 'Column 3',
 						col4: Editor({label: 'Editable'}, "text")
 					};
-					gridRowNavigation = dojo.declare([Grid, Selection, Keyboard])({
+					gridRowNavigation = declare([Grid, Selection, Keyboard])({
 						store: testStore,
 						cellNavigation: false,
 						columns: columns
@@ -46,21 +46,21 @@
 						col3: 'Column 3',
 						col4: 'Column 4'
 					};
-					gridCellNavigation = dojo.declare([Grid, CellSelection, Keyboard])({
+					gridCellNavigation = declare([Grid, CellSelection, Keyboard])({
 						store: testStore,
 						columns: columns2
 					}, "grid-cell-navigation");
-					gridCellNavigationSingle = dojo.declare([Grid, CellSelection, Keyboard])({
+					gridCellNavigationSingle = declare([Grid, CellSelection, Keyboard])({
 						store: testStore,
 						columns: columns2,
 						selectionMode: "single"
 					}, "grid-cell-navigation-single");
-					gridCellNavigationMultiple = dojo.declare([Grid, CellSelection, Keyboard])({
+					gridCellNavigationMultiple = declare([Grid, CellSelection, Keyboard])({
 						store: testStore,
 						columns: columns2,
 						selectionMode: "multiple"
 					}, "grid-cell-navigation-multiple");
-					gridCellNavigationNone = dojo.declare([Grid, CellSelection, Keyboard])({
+					gridCellNavigationNone = declare([Grid, CellSelection, Keyboard])({
 						store: testStore,
 						columns: columns2,
 						selectionMode: "none"

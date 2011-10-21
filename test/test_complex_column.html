@@ -38,8 +38,8 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dgrid/OnDemandGrid", "dgrid/GridWithColumnSetsFromHtml", "dgrid/ColumnSet", "dgrid/Tree", "dgrid/Selection", "dgrid/Keyboard", "dojo/on", "dojo/parser", "dgrid/test/data", "dojo/domReady!"],
-				function(Grid, GridFromHtml, ColumnSet, Tree, Selection, Keyboard, on, parser, testStore){
+			require(["dgrid/OnDemandGrid", "dgrid/GridWithColumnSetsFromHtml", "dgrid/ColumnSet", "dgrid/Tree", "dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dojo/on", "dojo/parser", "dgrid/test/data", "dojo/domReady!"],
+				function(Grid, GridFromHtml, ColumnSet, Tree, Selection, Keyboard, declare, on, parser, testStore){
 					var columnSets1 = [
 							[
 								[{label: 'Column 1', field: 'col1'},
@@ -94,12 +94,12 @@
 					
 					function byId(id){ return document.getElementById(id); }
 					
-					window.gridNoColumnSets = dojo.declare([Grid, Selection, Keyboard])({
+					window.gridNoColumnSets = declare([Grid, Selection, Keyboard])({
 						store: testStore,
 						subRows: subRows1
 					}, "gridNoColumnSets");
 					
-					window.grid = dojo.declare([Grid, ColumnSet, Selection, Keyboard])({
+					window.grid = declare([Grid, ColumnSet, Selection, Keyboard])({
 						store: testStore,
 						columnSets: columnSets1
 					}, "grid");
@@ -123,16 +123,16 @@
 					});
 					
 					//NOTE: Grid == OnDemandGrid, GridFromHtml == ver w/ ColumnSet support
-					window.gridFromHtml = dojo.declare([Grid, GridFromHtml, Selection, Keyboard])({
+					window.gridFromHtml = declare([Grid, GridFromHtml, Selection, Keyboard])({
 						store: testStore
 					}, "gridFromHtml");
-					window.gridFromHtml2 = dojo.declare([Grid, GridFromHtml, Selection, Keyboard])({
+					window.gridFromHtml2 = declare([Grid, GridFromHtml, Selection, Keyboard])({
 						store: testStore
 					}, "gridFromHtml2");
 					
 					// test declarative instantiation (need a global for parser)
 					window.dgrid = { GridFromHtml: GridFromHtml };
-					dojo.parser.parse();
+					parser.parse();
 				});
 		</script>
 	</head>

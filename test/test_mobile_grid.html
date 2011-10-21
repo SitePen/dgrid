@@ -21,14 +21,14 @@
 		</script>
 		<script type="text/javascript"  src="../../dojo/dojo.js"></script>
 		<script type="text/javascript">
-			require(["dojo/on", "dgrid/OnDemandGrid", "dgrid/extensions/ColumnResizer", "dgrid/test/data", "dojo/domReady!"],
-				function(on, Grid, ColumnResizer, testStore){
+			require(["dojo/on", "dgrid/OnDemandGrid", "dgrid/extensions/ColumnResizer", "dojo/_base/declare", "dgrid/test/data", "dojo/domReady!"],
+				function(on, Grid, ColumnResizer, declare, testStore){
 					var columns = { // you can declare columns as an object hash (key translates to field)
 						col1: 'Status',
 						col4: 'Expired',
 						"last-col": {label: 'Weight', field: 'col5'}
 					};
-					window.grid = dojo.declare([Grid, ColumnResizer])({
+					window.grid = declare([Grid, ColumnResizer])({
 						store: testStore,
 						columns: columns
 					}, "grid");

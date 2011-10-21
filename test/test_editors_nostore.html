@@ -32,8 +32,8 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dgrid/Grid", "dgrid/Selection", "dgrid/Keyboard", "dgrid/Editor", "dijit/form/NumberSpinner", "dgrid/test/data", "dojo/domReady!"],
-				function(Grid, Selection, Keyboard, Editor, NumberSpinner){
+			require(["dgrid/Grid", "dgrid/Selection", "dgrid/Keyboard", "dgrid/Editor", "dijit/form/NumberSpinner", "dojo/_base/declare", "dgrid/test/data", "dojo/domReady!"],
+				function(Grid, Selection, Keyboard, Editor, NumberSpinner, declare){
 					var columns = [
 						Editor({
 							label: 'Integer',
@@ -46,7 +46,7 @@
 						{label: 'Non editable text', field: 'text', sortable: false}
 					];
 
-					window.grid = new (dojo.declare([Grid, Selection, Keyboard]))({
+					window.grid = new (declare([Grid, Selection, Keyboard]))({
 						columns: columns,
 						selectionMode: "single"
 					}, "grid");

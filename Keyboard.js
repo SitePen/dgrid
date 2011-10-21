@@ -1,4 +1,5 @@
-define(["dojo/_base/declare", "dojo/on", "./List", "dojo/_base/sniff", "put-selector/put"], function(declare, on, List, has, put){
+define(["dojo/_base/declare", "dojo/on", "./List", "dojo/_base/lang", "dojo/_base/sniff", "put-selector/put"],
+function(declare, on, List, lang, has, put){
 var delegatingInputTypes = {
 	checkbox: 1,
 	radio: 1,
@@ -57,7 +58,7 @@ return declare([List], {
 							element.focus();
 						}
 						put(element, ".dgrid-focus");
-						on.emit(cellFocusedElement, "cellfocusin", dojo.mixin({ parentType: event.type }, event));
+						on.emit(cellFocusedElement, "cellfocusin", lang.mixin({ parentType: event.type }, event));
 					}
 				}
 			}
