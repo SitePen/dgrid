@@ -26,16 +26,35 @@
 		<script type="text/javascript">
 			require(["dojo/on", "dojo/_base/window", "dgrid/OnDemandGrid", "dgrid/Selector", "dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dgrid/test/data", "dojo/domReady!"], 
 				function(on, win, Grid, Selector, Selection, Keyboard, declare, testStore){
-					on(win.body(), "select", function(event){
-						console.log("Select from " + event.grid.id);
-					});
 					var columns = { // you can declare columns as an object hash (key translates to field)
-						col1: Selector({ type: "checkbox" }),
-						id: "ID",
-						col2: {label: 'Column 2', sortable: false},
-						col3: {label: 'Column 3'}
-					};
-					window.grid = declare([Grid, Selection, Keyboard])({
+							col1: Selector({ type: "checkbox" }),
+							id: "ID",
+							col2: {label: 'Column 2', sortable: false},
+							col3: {label: 'Column 3'}
+						},
+						prevent;
+					
+					on(win.body(), "select",
+						function(event){
+							var msg = "selected" + (prevent ? " (prevented): " : ": ");
+							console.log(msg, event.grid.id, event.row);
+							if(prevent){ event.preventDefault(); }
+						}
+					);
+					on(win.body(), "deselect",
+						function(event){
+							var msg = "deselected" + (prevent ? " (prevented): " : ": ");
+							console.log(msg, event.grid.id, event.row);
+							if(prevent){ event.preventDefault(); }
+						}
+					);
+					
+					on(document.getElementById("btnPreventDefaultOn"), "click",
+						function(){ prevent = true; });
+					on(document.getElementById("btnPreventDefaultOff"), "click",
+						function(){ prevent = false; });
+					
+					window.grid = dojo.declare([Grid, Selection, Keyboard])({
 						store: testStore,
 						selectionMode: "none",
 						columns: columns
@@ -56,6 +75,10 @@
 		</script>
 	</head>
 	<body class="claro">
+		<div>preventDefault on selection in all grids?
+			<button type="button" id="btnPreventDefaultOn">Yes</button>
+			<button type="button" id="btnPreventDefaultOff">No</button>
+		</div>
 		<h2>A grid with checkbox selectors</h2>
 		<div>
 			<button type="button" onclick="grid.setSelectionMode('none');">
