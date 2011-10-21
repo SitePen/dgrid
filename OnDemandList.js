@@ -337,22 +337,25 @@ return declare([List], {
 					function(){ return self.row(id).data; };
 			};
 		
+		// function called within loop to generate a function for putting an item
+		function putter(id, dirtyObj) {
+			// Return a function handler
+			return function(object) {
+				var key;
+				// Copy dirty props to the original
+				for(key in dirtyObj){ object[key] = dirtyObj[key]; }
+				// Put it in the store, returning the result/promise
+				return Deferred.when(store.put(object), function() {
+					// Delete the item now that it's been confirmed updated
+					delete dirty[id];
+				});
+			};
+		}
+		
 		// For every dirty item, grab the ID
 		for(var id in this.dirty) {
 			// Create put function to handle the saving of the the item
-			var put = (function(dirtyObj) {
-				// Return a function handler
-				return function(object) {
-					var key;
-					// Copy dirty props to the original
-					for(key in dirtyObj){ object[key] = dirtyObj[key]; }
-					// Put it in the store, returning the result/promise
-					return Deferred.when(store.put(object), function() {
-						// Delete the item now that it's been confirmed updated
-						delete dirty[id];
-					});
-				};
-			})(dirty[id]);
+			var put = putter(id, dirty[id]);
 			
 			// Add this item onto the promise chain,
 			// getting the item from the store first if desired.
