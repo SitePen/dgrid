@@ -2,12 +2,12 @@
 	"http://www.w3.org/TR/html4/loose.dtd">
 <html>
 	<head>
-		<title>dGrid as iTunes</title>
+		<title>dTuned</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 		<meta name="viewport" content="width=570" />
 		<style type="text/css">
 			@import "../../../dojo/resources/dojo.css";
-			@import "../../css/skins/itunes.css";
+			@import "resources/dTuned.css";
 			html, body {
 				width: 100%;
 				height: 100%;
@@ -21,7 +21,7 @@
 			#header {
 				position: relative;
 				height: 64px;
-				background-image: url(../../css/skins/images/itunes/header-background.png);
+				background-image: url(resources/images/header-background.png);
 				background-repeat: repeat-x;
 			}
 			#header-content {
@@ -35,7 +35,7 @@
 				font-weight: bold;
 				text-align: center;
 				padding-top: 12px;
-				background-image: url(../../css/skins/images/itunes/header.png);
+				background-image: url(resources/images/header.png);
 				background-repeat: no-repeat;
 			}
 			#list-container {
@@ -141,7 +141,7 @@
 					"dgrid/Keyboard",
 					"dojo/_base/declare",
 					"dojo/_base/array",
-					"dgrid/demos/itunes/data",
+					"dgrid/demos/dTuned/data",
 					"dojo/domReady!"
 				],
 				function(List, Grid, Selection, Keyboard, declare, arrayUtil){
@@ -262,10 +262,10 @@
 			);	//	end require
 		</script>
 	</head>
-	<body class="itunes">
+	<body class="dTuned">
 		<div id="header">
 			<div id="header-content">
-				dGrid as iTunes!
+				dTuned
 			</div>
 		</div>
 		<div id="list-container">
