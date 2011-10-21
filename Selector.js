@@ -10,14 +10,17 @@ define(["dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put", "dojo/
 				// ignore "cellfocusin" from "mousedown" and any keystrokes other than spacebar
 				return;
 			}
-			var row = grid.row(event);
+			var row = grid.row(event), lastRow = grid._lastSelected && grid.row(grid._lastSelected);
 
 			if(type == "radio"){
-				grid.clearSelection();
-				grid.select(row.id, null, true);
+				if(!lastRow || lastRow.id != row.id){
+					lastRow && grid.deselect(lastRow);
+					grid.select(row, null, true);
+					grid._lastSelected = row.element;
+				}
 			}else{
 				if(row){
-					var lastRow = event.shiftKey ? grid.row(grid._lastSelected) : null;
+					lastRow = event.shiftKey ? lastRow : null;
 					grid.select(row, lastRow||null, lastRow ? undefined : null);
 					grid._lastSelected = row.element;
 				}else{
