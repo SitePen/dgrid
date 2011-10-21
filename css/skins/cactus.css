@@ -4,10 +4,6 @@
 	color: #000;
 }
 
-.cactus .ui-icon {
-	background-image: url("images/ui-icons_222222_256x240_white.png");
-}
-
 .cactus .dgrid-header-row {
 	border-bottom: none;
 }
@@ -87,4 +83,9 @@
 	background: #d6e5a5;
 	color: #000;
 	text-shadow: none;
+}
+
+/* need to use white-based image for sort arrow */
+.cactus .dgrid-sort-arrow {
+	background-image: url("images/ui-icons_222222_256x240_white.png");
 }

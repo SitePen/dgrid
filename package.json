@@ -14,12 +14,12 @@
   ],
   "repository": {
     "type":"git",
-    "url":"http://github.com/kriszyp/dgrid"
+    "url":"http://github.com/SitePen/dgrid"
   },
   "dependencies": {
-    "dojo": "1.7.0b5",
-    "put-selector": "0.1.2",
-    "xstyle": "0.0.1"
+    "dojo": "1.7.0rc2",
+    "put-selector": "0.2.0",
+    "xstyle": "0.0.2"
   },
   "directories": {
     "lib": "."

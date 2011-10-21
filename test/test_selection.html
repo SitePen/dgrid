@@ -21,8 +21,8 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dgrid/OnDemandGrid", "dgrid/Editor","dgrid/Selection", "dgrid/CellSelection", "dgrid/Keyboard", "dgrid/test/data", "dojo/on", "dojo/domReady!"], 
-				function(Grid, Editor, Selection, CellSelection, Keyboard, testStore, on){
+			require(["dojo/on", "dojo/_base/window", "dgrid/OnDemandGrid", "dgrid/Editor","dgrid/Selection", "dgrid/CellSelection", "dgrid/Keyboard", "dojo/_base/declare", "dgrid/test/data", "dojo/domReady!"], 
+				function(on, win, Grid, Editor, Selection, CellSelection, Keyboard, declare, testStore){
 					var columns = {
 							col1: 'Column 1',
 							col2: {label: 'Column 2', sortable: false},
@@ -31,14 +31,14 @@
 						},
 						prevent;
 					
-					on(document.body, "select",
+					on(win.body(), "select",
 						function(event){
 							var msg = "selected" + (prevent ? " (prevented): " : ": ");
 							console.log(msg, event.grid.id, event.row||event.cell);
 							if(prevent){ event.preventDefault(); }
 						}
 					);
-					on(document.body, "deselect",
+					on(win.body(), "deselect",
 						function(event){
 							var msg = "deselected" + (prevent ? " (prevented): " : ": ");
 							console.log(msg, event.grid.id, event.row||event.cell);
@@ -63,21 +63,21 @@
 						col3: 'Column 3',
 						col4: 'Column 4'
 					};
-					gridCellNavigation = dojo.declare([Grid, CellSelection, Keyboard])({
+					gridCellNavigation = declare([Grid, CellSelection, Keyboard])({
 						store: testStore,
 						columns: columns2
 					}, "grid-cell-navigation");
-					gridCellNavigationSingle = dojo.declare([Grid, CellSelection, Keyboard])({
+					gridCellNavigationSingle = declare([Grid, CellSelection, Keyboard])({
 						store: testStore,
 						columns: columns2,
 						selectionMode: "single"
 					}, "grid-cell-navigation-single");
-					gridCellNavigationMultiple = dojo.declare([Grid, CellSelection, Keyboard])({
+					gridCellNavigationMultiple = declare([Grid, CellSelection, Keyboard])({
 						store: testStore,
 						columns: columns2,
 						selectionMode: "multiple"
 					}, "grid-cell-navigation-multiple");
-					gridCellNavigationNone = dojo.declare([Grid, CellSelection, Keyboard])({
+					gridCellNavigationNone = declare([Grid, CellSelection, Keyboard])({
 						store: testStore,
 						columns: columns2,
 						selectionMode: "none"

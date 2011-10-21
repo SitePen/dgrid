@@ -31,8 +31,8 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dgrid/test/data_perf", "dojo/domReady!"], 
-				function(List, Grid, Selection, Keyboard, testPerfStore){
+			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dgrid/test/data_perf", "dojo/domReady!"], 
+				function(List, Grid, Selection, Keyboard, declare, testPerfStore){
 					var columns = [
 						{ name: 'Column 0', field: 'id', width: '10%' },
 						{ name: 'Column 1', field: 'integer', width: '10%' },
@@ -46,7 +46,7 @@
 						{ name: 'Column 9', field: 'today', width: '10%' }
 					];
 					var start = new Date().getTime();
-					window.grid = new (dojo.declare([Grid, Selection, Keyboard]))({
+					window.grid = new (declare([Grid, Selection, Keyboard]))({
 						store: testPerfStore,
 						columns: columns
 					}, "grid");

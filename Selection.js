@@ -54,7 +54,7 @@ return declare([List], {
 		if(event.type == "mousedown" || !event.ctrlKey || event.keyCode == 32){
 			var row = currentTarget,
 				lastRow = this._lastSelected;
-			//console.log("in focus; event: ", event, "; row: ", row);
+
 			if(mode == "single"){
 				if(lastRow == row){
 					if(ctrlKey){
@@ -118,7 +118,6 @@ return declare([List], {
 			// first listen for touch taps if available
 			var lastTouch, lastTouchX, lastTouchY, lastTouchEvent, isTap;
 			on(this.contentNode, "touchstart", function(event){
-				console.log("touchstart");
 				lastTouch = event.touches[0];
 				lastTouchX = lastTouch.pageX;
 				lastTouchY = lastTouch.pageY;
@@ -128,11 +127,9 @@ return declare([List], {
 			on(this.contentNode, "touchmove", function(event){
 				var thisTouch = event.touches[0];
 				isTap = Math.pow(lastTouchX - thisTouch.pageX, 2) + Math.pow(lastTouchY - thisTouch.pageY, 2) < 100; // 10 pixel radius sound good?
-				console.log("touchmove istap: ", isTap);
 			});
 			on(this.contentNode, "touchend", function(event){
 				if(isTap){
-					console.log("touchend");
 					focus(lastTouchEvent);
 				}
 			});

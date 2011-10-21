@@ -1,12 +1,10 @@
-define(["dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/on", "put-selector/put", "./List"], function(declare, lang, Deferred, listen, put, List){
+define(["dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/on", "put-selector/put", "./List"],
+function(declare, lang, Deferred, listen, put, List){
 
 function emitError(err){
 	// called by _trackError in context of list/grid, if an error is encountered
 	listen.emit(this.domNode, "error", { error: err });
 }
-
-// noop is used as Deferred callback when we're only interested in errors
-function noop(r){ return r; }
 
 return declare([List], {
 	create: function(params, srcNodeRef){
@@ -47,9 +45,16 @@ return declare([List], {
 		// summary:
 		//		Assigns a new query (and optionally queryOptions) to the list,
 		//		and tells it to refresh.
+		
+		var sort = queryOptions && queryOptions.sort;
+		
 		this.query = query !== undefined ? query : this.query;
 		this.queryOptions = queryOptions || this.queryOptions;
-		this.refresh();
+		
+		// If we have new sort criteria, pass them through sort
+		// (which will update sortOrder and call refresh in itself).
+		// Otherwise, just refresh.
+		sort ? this.sort(sort) : this.refresh();
 	},
 	
 	renderQuery: function(query, preloadNode){
@@ -342,7 +347,7 @@ return declare([List], {
 					// Copy dirty props to the original
 					for(key in dirtyObj){ object[key] = dirtyObj[key]; }
 					// Put it in the store, returning the result/promise
-					return dojo.when(store.put(object), function() {
+					return Deferred.when(store.put(object), function() {
 						// Delete the item now that it's been confirmed updated
 						delete dirty[id];
 					});
@@ -382,11 +387,10 @@ return declare([List], {
 		}catch(err){
 			// report sync error
 			emitError.call(this, err);
-			// TODO: should we re-throw? probably not, but callers may have to handle undefined.
 		}
 		
 		// wrap in when call to handle reporting of potential async error
-		return Deferred.when(result, noop, lang.hitch(this, emitError));
+		return Deferred.when(result, null, lang.hitch(this, emitError));
 	}
 });
 

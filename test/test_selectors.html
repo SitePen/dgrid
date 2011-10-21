@@ -24,8 +24,8 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dojo/on", "dgrid/OnDemandGrid", "dgrid/Selector", "dgrid/Selection", "dgrid/Keyboard", "dgrid/test/data", "dojo/domReady!"], 
-				function(on, Grid, Selector, Selection, Keyboard, testStore){
+			require(["dojo/on", "dojo/_base/window", "dgrid/OnDemandGrid", "dgrid/Selector", "dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dgrid/test/data", "dojo/domReady!"], 
+				function(on, win, Grid, Selector, Selection, Keyboard, declare, testStore){
 					var columns = { // you can declare columns as an object hash (key translates to field)
 							col1: Selector({ type: "checkbox" }),
 							id: "ID",
@@ -34,14 +34,14 @@
 						},
 						prevent;
 					
-					on(document.body, "select",
+					on(win.body(), "select",
 						function(event){
 							var msg = "selected" + (prevent ? " (prevented): " : ": ");
 							console.log(msg, event.grid.id, event.row);
 							if(prevent){ event.preventDefault(); }
 						}
 					);
-					on(document.body, "deselect",
+					on(win.body(), "deselect",
 						function(event){
 							var msg = "deselected" + (prevent ? " (prevented): " : ": ");
 							console.log(msg, event.grid.id, event.row);
@@ -65,7 +65,7 @@
 						col2: {label: 'Column 2', sortable: false},
 						col3: {label: 'Column 3'}
 					};
-					window.gridRadio = dojo.declare([Grid, Selection, Keyboard])({
+					window.gridRadio = declare([Grid, Selection, Keyboard])({
 						store: testStore,
 						selectionMode: "none",
 						columns: columnsRadio

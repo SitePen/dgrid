@@ -125,22 +125,24 @@ return function(column, editor, editOn){
 					value = isNaN(asDate.getTime()) ? value : asDate;
 				}
 				if(on.emit(cellElement, "datachange", {rowId: row.id, oldValue: oldValue, value: value, bubbles: true, cancelable: true})){
-					var
-						dirty = grid.dirty[row.id],
-						object = row.data;
-					if(!dirty){
-						dirty = grid.dirty[row.id] = {};
-						if(!column.autoSave){
-							// Use delegate to protect original data item in non-autoSave case
-							// (i.e. to "protect" items of in-memory stores until save).
-							// This way, row.data will still reflect up to date information
-							// reflecting grid edits, without "corrupting" store items.
-							object = row.data = lang.delegate(row.data, dirty);
+					if(grid.dirty){
+						var
+							dirty = grid.dirty[row.id],
+							object = row.data;
+						if(!dirty){
+							dirty = grid.dirty[row.id] = {};
+							if(!column.autoSave){
+								// Use delegate to protect original data item in non-autoSave case
+								// (i.e. to "protect" items of in-memory stores until save).
+								// This way, row.data will still reflect up to date information
+								// reflecting grid edits, without "corrupting" store items.
+								object = row.data = lang.delegate(row.data, dirty);
+							}
 						}
-					}
-					dirty[column.field] = object[column.field] = value;
-					if(column.autoSave){
-						grid._trackError("save");
+						dirty[column.field] = object[column.field] = value;
+						if(column.autoSave){
+							grid._trackError("save");
+						}
 					}
 				}else{
 					// else keep the value the same
@@ -150,7 +152,6 @@ return function(column, editor, editOn){
 		}
 		return value;
 	}
-	var suppressSelect;
 	column.renderCell = function(object, value, cell, options){
 		var cmp; // stores input/widget being rendered
 		if(!grid){
@@ -174,11 +175,6 @@ return function(column, editor, editOn){
 			cmp = renderWidget(value, cell, object);
 			// if component is a widget, call startup once execution stack completes
 			if (cmp.startup) { setTimeout(function(){ cmp.startup(); }, 0); }
-		}
-	}
-	if(!column.label){
-		column.renderHeaderCell = function(th){
-			column.renderCell({}, null, th);
 		}
 	}
 	return column;
