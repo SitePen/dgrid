@@ -21,46 +21,63 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dgrid/OnDemandGrid", "dgrid/Editor","dgrid/Selection", "dgrid/CellSelection", "dgrid/Keyboard", "dgrid/test/data", "dojo/domReady!"], 
-				function(Grid, Editor, Selection, CellSelection, Keyboard, testStore){
+			require(["dojo/on", "dojo/_base/window", "dgrid/OnDemandGrid", "dgrid/Editor","dgrid/Selection", "dgrid/CellSelection", "dgrid/Keyboard", "dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!"], 
+				function(on, win, Grid, Editor, Selection, CellSelection, Keyboard, declare, testStore){
 					var columns = {
-						col1: 'Column 1',
-						col2: {label: 'Column 2', sortable: false},
-						col3: 'Column 3',
-						col4: Editor({label: 'Editable'}, "text")
-					};
+							col1: 'Column 1',
+							col2: {label: 'Column 2', sortable: false},
+							col3: 'Column 3',
+							col4: Editor({label: 'Editable'}, "text")
+						},
+						prevent;
+					
+					on(win.body(), "dgrid-select",
+						function(event){
+							var msg = "selected" + (prevent ? " (prevented): " : ": ");
+							console.log(msg, event.grid.id, event.row||event.cell);
+							if(prevent){ event.preventDefault(); }
+						}
+					);
+					on(win.body(), "dgrid-deselect",
+						function(event){
+							var msg = "deselected" + (prevent ? " (prevented): " : ": ");
+							console.log(msg, event.grid.id, event.row||event.cell);
+							if(prevent){ event.preventDefault(); }
+						}
+					);
+					
+					on(document.getElementById("btnPreventDefaultOn"), "click",
+						function(){ prevent = true; });
+					on(document.getElementById("btnPreventDefaultOff"), "click",
+						function(){ prevent = false; });
+					
 					gridRowNavigation = dojo.declare([Grid, Selection, Keyboard])({
 						store: testStore,
 						cellNavigation: false,
 						columns: columns
 					}, "grid-row-navigation");
-					gridRowNavigation.on("select", function(event){
-						console.log("selected", event.row);
-					});
-					gridRowNavigation.on("deselect", function(event){
-						console.log("deselected", event.row);	
-					});
+					
 					var columns2 = {
 						col1: 'Column 1',
 						col2: {label: 'Column 2', sortable: false},
 						col3: 'Column 3',
 						col4: 'Column 4'
 					};
-					gridCellNavigation = dojo.declare([Grid, CellSelection, Keyboard])({
+					gridCellNavigation = declare([Grid, CellSelection, Keyboard])({
 						store: testStore,
 						columns: columns2
 					}, "grid-cell-navigation");
-					gridCellNavigationSingle = dojo.declare([Grid, CellSelection, Keyboard])({
+					gridCellNavigationSingle = declare([Grid, CellSelection, Keyboard])({
 						store: testStore,
 						columns: columns2,
 						selectionMode: "single"
 					}, "grid-cell-navigation-single");
-					gridCellNavigationMultiple = dojo.declare([Grid, CellSelection, Keyboard])({
+					gridCellNavigationMultiple = declare([Grid, CellSelection, Keyboard])({
 						store: testStore,
 						columns: columns2,
 						selectionMode: "multiple"
 					}, "grid-cell-navigation-multiple");
-					gridCellNavigationNone = dojo.declare([Grid, CellSelection, Keyboard])({
+					gridCellNavigationNone = declare([Grid, CellSelection, Keyboard])({
 						store: testStore,
 						columns: columns2,
 						selectionMode: "none"
@@ -69,6 +86,10 @@
 		</script>
 	</head>
 	<body class="claro">
+		<div>preventDefault on selection in all grids?
+			<button type="button" id="btnPreventDefaultOn">Yes</button>
+			<button type="button" id="btnPreventDefaultOff">No</button>
+		</div>
 		<h2>A grid with row-level selection (and row-level navigation)</h2>
 		<div>Set selectionMode:
 			<button type="button" onclick="gridRowNavigation.setSelectionMode('none');">None</button>

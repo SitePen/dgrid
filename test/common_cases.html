@@ -1,16 +1,17 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Test Grid Common Cases Extending _WidgetBase</title>
+		<title>Test Grid Common Cases</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 		<meta name="viewport" content="width=570" />
 		<style type="text/css">
 			@import "../../dojo/resources/dojo.css";
 			@import "../css/dgrid.css";
 			@import "../css/skins/claro.css";
-			.heading {
+			h2 {
 				font-weight: bold;
 				padding-bottom: 0.25em;
+				clear: both;
 			}
 			#grid { 
 				width: 70%;
@@ -24,6 +25,20 @@
 			#grid .column-col4 {
 				width: 180px;
 			}
+			
+			#scrollgrid {
+				width: 50%;
+			}
+			#scrollgrid .dgrid-cell {
+				width: 100px; /* force all columns to have SOME width */
+			}
+			#scrollgrid .column-col1 {
+				width: 500px;
+			}
+			#scrollgrid .column-col4 {
+				width: 300px;
+			}
+			
 			#tree {
 				width: 700px;
 				height: 200px;
@@ -43,11 +58,15 @@
 				margin: 10px;
 			}
 		</style>
+		<script>
+			var start= new Date().getTime();
+		</script>
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dojo/on", "dgrid/List", "dgrid/OnDemandGrid", "dgrid/Tree", "dgrid/Editor", "dgrid/Selection", "dgrid/Keyboard", "dijit/_WidgetBase", "dgrid/test/data", "dojo/domReady!"], 
-				function(on, List, Grid, Tree, Editor, Selection, Keyboard, _WidgetBase, testStore){
+			require(["dojo/on", "dgrid/List", "dgrid/OnDemandGrid", "dgrid/Tree", "dgrid/Editor", "dgrid/Selection", "dgrid/Keyboard", "dgrid/test/data/base", "dojo/_base/declare", "dojo/_base/array", "dojo/domReady!"], 
+				function(on, List, Grid, Tree, Editor, Selection, Keyboard, testStore, declare, arrayUtil){
+					console.log("loaded in " + (new Date().getTime() - start) + testStore);
 					var columns = { // you can declare columns as an object hash (key translates to field)
 						col1: Editor({label: 'Column 1 column 1 column 1'}, "text", "dblclick"),
 						col2: {label: 'Column 2', sortable: false},
@@ -55,11 +74,17 @@
 						col4: 'Column444444444444444444',
 						"last-col": Editor({label: 'Column 5', field: 'col5'}, "text", "dblclick")
 					};
-					window.grid = dojo.declare([_WidgetBase, Grid, Selection, Keyboard])({
+					window.grid = declare([Grid, Selection, Keyboard])({
 						store: testStore,
 						columns: columns
 					}, "grid");
-					window.tree = dojo.declare([_WidgetBase, Grid, Selection, Keyboard])({
+					
+					window.scrollgrid = declare([Grid, Selection, Keyboard])({
+						store: testStore,
+						columns: columns
+					}, "scrollgrid");
+					
+					window.tree = declare([Grid, Selection, Keyboard])({
 						store: testCountryStore,
 						query: {type: "continent"},
 						selectionMode: "single",
@@ -71,9 +96,9 @@
 							timezone: 'Timezone'
 						}
 					}, "tree");
-					window.list = dojo.declare([_WidgetBase, List, Selection, Keyboard])({
+					window.list = declare([List, Selection, Keyboard])({
 					}, "list");
-					list.renderArray(dojo.map(testCountryStore.data, function(country){
+					list.renderArray(arrayUtil.map(testCountryStore.data, function(country){
 						return country.name;
 					}));
 					on(document.getElementById("save"), "click", function(){
@@ -89,5 +114,8 @@
 		<h2>A grid with tree column and then a simple list (floated left)</h2>
 		<div tabIndex="2" id="tree"></div>
 		<div tabIndex="1" id="list"></div>
+		<h2>Same as basic grid, but with column widths exceeding grid width</h2>
+		<p>(for testing that nodes occupy correct widths - pay attention to hover/selection style)</p>
+		<div id="scrollgrid"></div>
 	</body>
 </html>

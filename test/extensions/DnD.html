@@ -52,14 +52,16 @@
 		<script type="text/javascript" src="../../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dojo", "dgrid/List", "dgrid/OnDemandGrid","dgrid/Tree","dgrid/Selection", "dgrid/extensions/DnD", "dgrid/Keyboard", "dojo/dnd/Source", "dgrid/test/data", "dojo/domReady!"],
-				function(dojo, List, Grid, Tree, Selection, DndRow, Keyboard, DnDSource){
+			require(["dojo", "dgrid/List", "dgrid/OnDemandGrid","dgrid/Tree","dgrid/Selection", "dgrid/extensions/DnD", "dgrid/Keyboard", "dojo/dnd/Source", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/Deferred",  "dgrid/test/data/base", "dojo/domReady!"],
+				function(dojo, List, Grid, Tree, Selection, DndRow, Keyboard, DnDSource, declare, lang, arrayUtil, Deferred){
 					var
-						DnDGrid = dojo.declare([Grid, Selection, DndRow, Keyboard]),
+						DnDGrid = declare([Grid, Selection, DndRow, Keyboard]),
 						columns = [
 							{label:'Name', field:'name', sortable: false},
 							{label:'Description', field:'description', sortable: false}
 						];
+					
+					function byId(id){ return document.getElementById(id); }
 					
 					// Note: testOrderedStore hard-wires sorting anyway,
 					// so leaving sort disabled on columns in this grid.
@@ -75,7 +77,7 @@
 					}, "grid2");
 					
 					// set up other targets
-					var anotherTargetDiv = dojo.byId("another-target");
+					var anotherTargetDiv = byId("another-target");
 					var target = new DnDSource(anotherTargetDiv, {accept:["row"], isSource:false});
 					target.onDrop = function(source, nodes){
 						nodes.forEach(function(node){
@@ -85,11 +87,11 @@
 					
 					// Set up a dnd source with items that can drag into the grid.
 					// This is one way of doing it; there are likely several...
-					var source = new DnDSource(dojo.byId("another-source"), {
+					var source = new DnDSource(byId("another-source"), {
 						accept: ["row"]
 					});
 					function nameObj(args){
-						dojo.mixin(this, args);
+						lang.mixin(this, args);
 					}
 					nameObj.prototype = {
 						toString: function(){
@@ -112,7 +114,7 @@
 						return this.getItem(node.id).data;
 					};
 					
-					var invalidSource = new DnDSource(dojo.byId("invalid-source"), {
+					var invalidSource = new DnDSource(byId("invalid-source"), {
 						accept: ["grue"]
 					});
 					invalidSource.insertNodes(false, [
@@ -131,7 +133,7 @@
 					
 					// Set up 2 more grids sharing the same store, to DnD between.
 					// Again, there are many ways to spin this, this is just one way.
-					var SharedDnDGrid = dojo.declare(DnDGrid, {
+					var SharedDnDGrid = declare(DnDGrid, {
 						// addedSide: undefined | true
 						//		Indicates whether this grid represents the "added" side, i.e.
 						//		items initially start on the other side then get moved here.
@@ -154,8 +156,8 @@
 							this.dndTarget.copyState = function(){ return false; }
 							// Re-implement onDropExternal to simply swap flag on store item
 							this.dndTarget.onDropExternal = function(source, nodes, copy, targetItem){
-								dojo.forEach(nodes, function(node){
-									dojo.when(source.getObject(node), function(object){
+								arrayUtil.forEach(nodes, function(node){
+									Deferred.when(source.getObject(node), function(object){
 										object.added = grid.addedSide;
 										// If we wanted to support copy, we would probably want
 										// to check the copy flag and call copy instead of put here.
@@ -167,7 +169,7 @@
 					});
 					
 					// set up store to use for these grids
-					var sharedStore = createOrderedStore(dojo.clone(testOrderedData));
+					var sharedStore = createOrderedStore(lang.clone(testOrderedData));
 					
 					window.grid3 = new SharedDnDGrid({
 						dndSourceType: "row-swap",

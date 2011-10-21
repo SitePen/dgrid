@@ -1,5 +1,6 @@
 // example sample data and code
-define(["dojo/store/Memory", "dojo/store/Observable", "dojo/store/util/QueryResults"],function(Memory, Observable, QueryResults){
+define(["dojo/_base/lang", "dojo/_base/Deferred", "dojo/store/Memory", "dojo/store/Observable", "dojo/store/util/QueryResults"],
+function(lang, Deferred, Memory, Observable, QueryResults){
 	// some sample data
 	// global var "data"
 	data = {
@@ -19,7 +20,7 @@ define(["dojo/store/Memory", "dojo/store/Observable", "dojo/store/util/QueryResu
 
 	var rows = 100;
 	for(var i=0, l=data_list.length; i<rows; i++){
-		data.items.push(dojo.mixin({ id: i }, data_list[i%l]));
+		data.items.push(lang.mixin({ id: i }, data_list[i%l]));
 	}
 
 	// global var testStore
@@ -29,10 +30,10 @@ define(["dojo/store/Memory", "dojo/store/Observable", "dojo/store/util/QueryResu
 		data: data,
 		query: function(){
 			var results = Memory.prototype.query.apply(this, arguments);
-			var def = new dojo.Deferred();
+			var def = new Deferred();
 			setTimeout(function(){
 				def.resolve(results);
-			}, 500);
+			}, 200);
 			var promisedResults = QueryResults(def.promise);
 			promisedResults.total = results.total;
 			return promisedResults;
@@ -55,14 +56,14 @@ define(["dojo/store/Memory", "dojo/store/Observable", "dojo/store/util/QueryResu
 	];
 
 	for(var i=0, l=colors.length; i<rows; i++){
-		data2.items.push(dojo.mixin({ id: i }, colors[i%l]));
+		data2.items.push(lang.mixin({ id: i }, colors[i%l]));
 	}
 
 	// global var colorStore
 	colorStore = Observable(new Memory({data: data2}));
 	data2.items= [];
 	for(var i=0; i<colors.length; i++){
-		data2.items.push(dojo.mixin({ id: i }, colors[i]));
+		data2.items.push(lang.mixin({ id: i }, colors[i]));
 	}
 	smallColorStore = Observable(new Memory({data: data2}));
 	//empty store
@@ -201,11 +202,11 @@ define(["dojo/store/Memory", "dojo/store/Observable", "dojo/store/util/QueryResu
 			return parent.type != "city";
 		},
 		query: function(query, options){
-			var def = new dojo.Deferred();
+			var def = new Deferred();
 			var immediateResults = this.queryEngine(query, options)(this.data);
 			setTimeout(function(){
 				def.resolve(immediateResults);
-			}, 1000);
+			}, 200);
 			var results = QueryResults(def.promise);
 			return results;
 

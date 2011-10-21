@@ -1,4 +1,3 @@
-/*Column resizing plugin*/
 .dgrid-column-resizer {
 	position: absolute;
 	height: 100%;
@@ -27,7 +26,9 @@ html.has-ie-6 .dgrid-resize-handler {
 }
 
 html.has-no-quirks .dgrid-resize-header-container {
-	position: relative; /* in set to relative so we can do the resizing against this node... except when in quirks mode, where we have to use the th */
+	/* set to relative so we can do the resizing against this node...
+		except when in quirks mode, where we have to use the th */
+	position: relative;
 }
 html.has-ie-6 .dgrid-resize-header-container {
 	position: static; /* and in IE6 we have to do the th hack */

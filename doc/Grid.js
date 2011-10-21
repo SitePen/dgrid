@@ -6,7 +6,7 @@ function(create, List){
 		label: String("The label to display in the column header"),
 		sortable: Boolean("Controls whether clicking in the column header will sort the grid by this column; defaults to true"),
 		className: String("A CSS className to apply to the DOM element for the cells in this column"),
-		id: String("The column id"), // TODO: document default
+		id: String("The column id; normally unspecified, defaults to the array index or hash key"),
 		renderCell: Method("This function can be specified to provide custom rendering of the cells in this column.",{
 			object: Object("This is the object to be rendered for this row"),
 			value: Union("", "This is the value to render"),

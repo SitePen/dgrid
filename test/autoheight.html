@@ -2,7 +2,7 @@
 	"http://www.w3.org/TR/html4/loose.dtd">
 <html>
 	<head>
-		<title>Test Tundra Theme</title>
+		<title>Test height:auto</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 		<meta name="viewport" content="width=570" />
 		<style type="text/css">
@@ -27,13 +27,13 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dgrid/test/data", "dojo/domReady!"], 
-				function(List, Grid, Selection, Keyboard, ProgressBar){
+			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!"], 
+				function(List, Grid, Selection, Keyboard, declare){
 					var columns = [
 						{label: 'Column 1', field: 'name'},
 						{label: 'Column 2', field: 'type'}
 					];
-					window.grid = new (dojo.declare([Grid, Selection, Keyboard]))({
+					window.grid = new (declare([Grid, Selection, Keyboard]))({
 						store: testCountryStore,
 						columns: columns,
 						query: {type:"continent"}
@@ -42,9 +42,9 @@
 				
 		</script>
 	</head>
-	<body class="tundra">
-		<h2>A basic grid tundra theme</h2>
+	<body class="claro">
+		<h2>A basic grid with height:auto</h2>
 		<div id="grid"></div>
-		<a href="https://github.com/kriszyp/dgrid">dgrid</a>
+		<a href="https://github.com/SitePen/dgrid">dgrid</a>
 	</body>
 </html>

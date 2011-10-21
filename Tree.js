@@ -1,4 +1,4 @@
-define(["dojo/_base/declare", "put-selector/put", "dojo/_base/Deferred", "dojo/query"], function(declare, put, Deferred, querySelector){// TODO: eliminate the dojo/query dep by supporting simple event delegation in the List module
+define(["dojo/_base/declare", "put-selector/put", "dojo/_base/Deferred", "dojo/query"], function(declare, put, Deferred, querySelector){
 
 return function(column){
     // summary:
@@ -63,8 +63,6 @@ return function(column){
 					}else{
 						container.parentNode.removeChild(container);
 					}
-/*					put(container, (expanded ? "!" : ".") + "dgrid-tree-container-contracted");
-					container.style.display = styleDisplay;// TODO: maybe use a CSS class here*/
 				}
 			});
 		};

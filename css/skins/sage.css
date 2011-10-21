@@ -5,10 +5,6 @@
 	text-shadow: 0 1px 0 rgba(255,255,255,.9);
 }
 
-.sage .ui-icon {
-    background-image: url("images/ui-icons_222222_256x240_white.png");
-}
-
 .sage .dgrid-header-row {
     border-bottom: none;
 }
@@ -67,4 +63,9 @@
 
 .sage .ui-state-highlight {
 	background-color: #d5e8bd;
+}
+
+/* need to use white-based image for sort arrow */
+.sage .dgrid-sort-arrow {
+	background-image: url("images/ui-icons_222222_256x240_white.png");
 }

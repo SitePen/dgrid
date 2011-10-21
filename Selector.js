@@ -6,29 +6,26 @@ define(["dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put", "dojo/
 
 		var grid;
 		function onSelect(event){
-			if(event.type == "cellfocusin" && (event.parentType == "mousedown" || event.keyCode != 32)){
-				// ignore "cellfocusin" from "mousedown" and any keystrokes other than spacebar
+			if(event.type == "dgrid-cellfocusin" && (event.parentType == "mousedown" || event.keyCode != 32)){
+				// ignore "dgrid-cellfocusin" from "mousedown" and any keystrokes other than spacebar
 				return;
 			}
-			var row = grid.row(event),
-				lastRow = grid._lastRow,
-				value = null;
+			var row = grid.row(event), lastRow = grid._lastSelected && grid.row(grid._lastSelected);
 
 			if(type == "radio"){
-				grid.clearSelection();
-				value = true;
-			}
-			if(row){
-				grid.select(row.id, null, value);
-			}else if(type != "radio"){
-				put(this, (grid.allSelected ? "!" : ".") + "dgrid-select-all");
-				grid[grid.allSelected ? "clearSelection" : "selectAll"]();
-			}
-			if(type != "radio"){
-				if(event.shiftKey && lastRow){
-					grid.select(lastRow, row);
-				}else if(row){
-					grid._lastRow = row.element;
+				if(!lastRow || lastRow.id != row.id){
+					grid.clearSelection();
+					grid.select(row, null, true);
+					grid._lastSelected = row.element;
+				}
+			}else{
+				if(row){
+					lastRow = event.shiftKey ? lastRow : null;
+					grid.select(row, lastRow||null, lastRow ? undefined : null);
+					grid._lastSelected = row.element;
+				}else{
+					put(this, (grid.allSelected ? "!" : ".") + "dgrid-select-all");
+					grid[grid.allSelected ? "clearSelection" : "selectAll"]();
 				}
 			}
 		}
@@ -45,14 +42,14 @@ define(["dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put", "dojo/
 						}
 					}
 					if(!target || target == grid.contentNode){
-						_handleSelect.call(this, event);
+						_handleSelect.call(this, event, currentTarget);
 					}else{
 						onSelect.call(target, event);
 					}
 				};
 			});
 			aspect.before(grid, "_initSelectionEvents", function(){
-				on(this.headerNode, ".dgrid-selector-cell:mousedown,.dgrid-selector-cell:cellfocusin", onSelect);
+				on(this.headerNode, ".dgrid-selector-cell:mousedown,.dgrid-selector-cell:dgrid-cellfocusin", onSelect);
 			});
 		}
 

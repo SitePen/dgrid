@@ -56,33 +56,33 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dojo/on", "dgrid/OnDemandList", "dgrid/OnDemandGrid","dgrid/Keyboard", "dgrid/Selection", "dgrid/Editor", "dijit/form/DateTextBox", "dijit/form/HorizontalSlider", "dijit/form/NumberSpinner",  "dgrid/test/data", "dojo/_base/lang", "dojo/dom-construct", "dojo/store/Memory", "dojo/domReady!"],
-				function(on, List, Grid, Keyboard, Selection, Editor, DateTextBox, Slider, NumberSpinner, data, lang, domConstruct, Memory){
+			require(["dojo/on", "dgrid/OnDemandList", "dgrid/OnDemandGrid","dgrid/Keyboard", "dgrid/Selection", "dgrid/Editor", "dijit/form/DateTextBox", "dijit/form/HorizontalSlider", "dijit/form/NumberSpinner",  "dgrid/test/data/base", "dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array", "dojo/_base/Deferred", "dojo/dom-construct", "dojo/store/Memory", "dojo/domReady!"],
+				function(on, List, Grid, Keyboard, Selection, Editor, DateTextBox, Slider, NumberSpinner, data, lang, declare, arrayUtil, Deferred, domConstruct, Memory){
 					
 					// Create error store
-					errorStore = new dojo.store.Memory();
+					errorStore = new Memory();
 					errorStore.query = function() {
 						throw new Error("Some Error");
 					};
 					
 					// Create error store with PUT
-					putErrorStore = new dojo.store.Memory({ data: lang.clone(testTypesStore.data) });
+					putErrorStore = new Memory({ data: lang.clone(testTypesStore.data) });
 					putErrorStore.put = function() {
 						throw new Error("PUT ERROR");
 					};
 					
 					// Create error store that has its deferred rejected
-					defErrorStore = new dojo.store.Memory();
+					defErrorStore = new Memory();
 					defErrorStore.query = function() {
-						var def = new dojo.Deferred();
+						var def = new Deferred();
 						setTimeout(function() { def.reject("Homie don't play that"); }, 200);
 						return def.promise;
 					};
 					
 					// Create error store that returns a promise on put, which it rejects
-					defPutErrorStore = new dojo.store.Memory({ data: lang.clone(testTypesStore.data) });
+					defPutErrorStore = new Memory({ data: lang.clone(testTypesStore.data) });
 					defPutErrorStore.put = function() {
-						var def = new dojo.Deferred();
+						var def = new Deferred();
 						setTimeout(function() { def.reject("Watch where you put things!"); }, 200);
 						return def.promise;
 					};
@@ -123,23 +123,23 @@
 						col6: 'G',
 						"last-col": {label: 'B', field: 'col7'}
 					};
-					window.grid = dojo.declare([Grid])({
+					window.grid = declare([Grid])({
 						store: testStore,
 						columns: columns
 					}, "grid");
 
-					window.grid2 = dojo.declare([Grid, Selection, Keyboard])({
+					window.grid2 = declare([Grid, Selection, Keyboard])({
 						store: testTypesStore,
 						columns: columns2,
 						selectionMode: "single"
 					},"grid2");
 
-					window.grid3 = dojo.declare([Grid, Keyboard])({
+					window.grid3 = declare([Grid, Keyboard])({
 						store: testTypesStore,
 						columns: columns3
 					}, "grid3");
 
-					window.gridAddDel = dojo.declare([Grid, Keyboard, Selection])({
+					window.gridAddDel = declare([Grid, Keyboard, Selection])({
 						store: smallColorStore,
 						columns: columns4,
 						selectionMode: "multiple"
@@ -147,7 +147,7 @@
 					
 					// also throw in a List connected to the same store
 					// (so additions/deletions should show up in both)
-					window.listAddDel = dojo.declare([List, Keyboard, Selection])({
+					window.listAddDel = declare([List, Keyboard, Selection])({
 						store: smallColorStore,
 						columns: columns4,
 						selectionMode: "multiple",
@@ -161,7 +161,7 @@
 					
 					// buttons / listeners for 1st grid
 					
-					grid.on("error", function(evt) {
+					grid.on("dgrid-error", function(evt) {
 						console.warn("error on grid: ", evt.error);
 					});
 					
@@ -189,7 +189,7 @@
 						sortDescending ^= 1; // toggle true/false
 					
 						// get an existing sortOrder
-						var sortByCol1 = dojo.filter(
+						var sortByCol1 = arrayUtil.filter(
 								grid.sortOrder || [], 
 								function(sortBy){
 									return sortBy.attribute == "col1";
@@ -202,12 +202,14 @@
 						}
 						sortByCol1.descending = sortDescending;
 						grid.setQuery(grid.query, { sort: [sortByCol1] });
+						
+						console.log("sortOrder after setQuery: ", grid.sortOrder, grid.queryOptions);
 					});
 					on(document.getElementById("sort"), "click", function(){
-						console.log("sortOrder: ", grid.sortOrder);
-						
 						sortDescending ^= 1; // toggle true/false
 						grid.sort("col1", sortDescending);
+						
+						console.log("sortOrder after sort: ", grid.sortOrder);
 					});
 
 
@@ -238,7 +240,7 @@
 						}, 0);
 					}
 					
-					grid2.on("error", function(evt) {
+					grid2.on("dgrid-error", function(evt) {
 						console.warn("error on grid2: ", evt.error);
 					});
 					
@@ -263,7 +265,7 @@
 						updateDirty();
 					});
 					
-					var dirtyListener = grid2.on("datachange", updateDirty);
+					var dirtyListener = grid2.on("dgrid-datachange", updateDirty);
 					
 					// buttons for 3rd grid
 					
@@ -281,7 +283,7 @@
 					// hook up a listener for error events on the document to test bubbling
 					// (currently error events don't seem to bubble,
 					// but perhaps we want them to?)
-					on(document, "error", function(evt){
+					on(document, "dgrid-error", function(evt){
 						console.log("document received error: ", evt.error);
 					});
 				});
@@ -290,12 +292,13 @@
 	<body class="claro">
 		<h2>Simple test to show setting a new store and query to dgrid</h2>
 		<div id="grid"></div>
-		<button id="setstore">Set Color Store</button>
-		<button id="restore">Set Original Store</button>
 		<button id="colorQuery">Set color store and query</button>
 		<button id="resetQuery">Reset query</button>
 		<button id="setQueryWithOptions">Set query with queryOptions</button>
 		<button id="sort">sort</button>
+		<br>
+		<button id="setstore">Set Color Store</button>
+		<button id="restore">Set Original Store</button>
 		<button id="empty">Set to empty store</button>
 		<button id="error">Set to error store</button>
 		<button id="error2">Set to error store (def)</button>

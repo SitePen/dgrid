@@ -26,8 +26,8 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dojo/on", "dgrid/OnDemandGrid","dgrid/Tree","dgrid/Editor", "dgrid/Keyboard", "dgrid/Selection", "dgrid/test/data", "dojo/domReady!"], 
-				function(on, Grid, Tree, Editor, Keyboard, Selection, testStore){
+			require(["dojo/on", "dgrid/OnDemandGrid","dgrid/Tree","dgrid/Editor", "dgrid/Keyboard", "dgrid/Selection", "dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!"], 
+				function(on, Grid, Tree, Editor, Keyboard, Selection, declare, testStore){
 					var columns = [
 						Editor({label: ' ', field: 'bool', sortable: false}, "checkbox"),
 						Tree({label:'Name', field:'name', sortable: false}),
@@ -36,7 +36,7 @@
 						{label:'Timezone', field:'timezone'}
 					];
 					
-					window.tree = dojo.declare([Grid, Keyboard, Selection])({
+					window.tree = declare([Grid, Keyboard, Selection])({
 						store: testCountryStore,
 						query: {type: "continent"},
 						columns: columns

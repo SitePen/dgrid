@@ -53,10 +53,10 @@
 				// then add the rest of the dependencies for the test...
 				deps = deps.concat("dgrid/List", "dgrid/OnDemandGrid", "dgrid/Tree",
 					"dgrid/Selection", "dgrid/Keyboard", "dgrid/Editor",
-					"dojo/dom-construct", "dgrid/test/data", "dojo/domReady!");
+					"dojo/_base/declare", "dojo/dom-construct", "dgrid/test/data/base", "dojo/domReady!");
 				
 				require(deps, 
-				function(css1, css2, List, Grid, Tree, Selection, Keyboard, Editor, domConstruct, testStore){
+				function(css1, css2, List, Grid, Tree, Selection, Keyboard, Editor, declare, domConstruct, testStore){
 					var
 						columns = [
 							{label: 'Column 1', field: 'col1'},
@@ -79,14 +79,14 @@
 					
 					// add links to test all skins, w/ dgrid.css loaded first/last
 					for(i = 0; i < l; i++){
-						href = "test_skin.html?skin=" + skins[i];
+						href = "skin.html?skin=" + skins[i];
 						slhtml.push('<a href="' + href + '">' + skins[i] + '</a>');
 						sfhtml.push('<a href="' + href + '&skinFirst=true">' + skins[i] + '</a>');
 					}
 					byId("skinlast").innerHTML = slhtml.join(" / ");
 					byId("skinfirst").innerHTML = sfhtml.join(" / ");
 					
-					window.grid = new (dojo.declare([Grid, Selection, Keyboard]))({
+					window.grid = new (declare([Grid, Selection, Keyboard]))({
 						store: testStore,
 						columns: columns
 					}, "grid");

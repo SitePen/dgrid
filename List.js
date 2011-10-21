@@ -173,9 +173,9 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 				listen.emit(bodyNode, "scroll", {});
 			});
 			var grid = this;
-			listen(window, "resize", function(){
+			this._listeners.push(listen(window, "resize", function(){
 				grid.resize();
-			});
+			}));
 		},
 		startup: function(){
 			// summary:
@@ -256,9 +256,22 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			}
 		},
 		destroy: function(){
+			var i,
+				nodeRefs = ["domNode", "headerNode", "headerScrollNode", "bodyNode",
+					"contentNode", "preloadNode", "columns", "subRows", "params"];
+			
 			// cleanup listeners
-			for(var i = 0; i < this._listeners.length; i++){
-				this._listeners.remove();
+			for(i = this._listeners.length; i--;){
+				this._listeners[i].remove();
+			}
+			delete this._listeners;
+			
+			// destroy DOM
+			put("!", this.domNode);
+			
+			// remove properties that are or may contain node references
+			for(i = nodeRefs.length; i--;){
+				delete this[nodeRefs[i]];
 			}
 		},
 		refresh: function(){
@@ -400,9 +413,25 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 		sort: function(property, descending){
 			// summary:
 			//		Sort the content
-			this.sortOrder = [{attribute: property, descending: descending}];
+			// property: String|Array
+			//		String specifying field to sort by, or actual array of objects
+			//		with attribute and descending properties
+			// descending: boolean
+			//		In the case where property is a string, this argument
+			//		specifies whether to sort ascending (false) or descending (true)
+			
+			this.sortOrder = typeof property != "string" ? property :
+				[{attribute: property, descending: descending}];
 			this.refresh();
+			
 			if(this.lastCollection){
+				// if an array was passed in, flatten to just first sort attribute
+				// for default array sort logic
+				if(typeof property != "string"){
+					descending = property[0].descending;
+					property = property[0].attribute;
+				}
+				
 				this.lastCollection.sort(function(a,b){
 					var aVal = a[property], bVal = b[property];
 					// fall back undefined values to "" for more consistent behavior

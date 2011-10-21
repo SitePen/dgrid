@@ -84,7 +84,6 @@
 				top: 187px;
 				bottom: 0;
 				height: auto; /* override default height: 30em; in dgrid.css */
-				/*height: 99%;*/ /* TODO: what about IE6? */
 			}
 			
 			.has-ie-6 #grid {
@@ -201,8 +200,7 @@
 					var currentGenre; // updated on genre select
 
 					//	start listening for selections on the lists.
-					//	TODO: A little bit smarter on the filtering, since the list interactions are all related.
-					genres.on("select", function(e){
+					genres.on("dgrid-select", function(e){
 						//	filter the albums, artists and grid
 						var
 							filter = currentGenre = e.row.data,
@@ -228,7 +226,7 @@
 						});
 					});
 
-					artists.on("select", function(e){
+					artists.on("dgrid-select", function(e){
 						//	filter the albums, grid
 						var filter = e.row.data, alb;
 						if(e.row.id == "0"){
@@ -252,7 +250,7 @@
 						albums.select(0); //	reselect "all" item, triggering grid refresh
 					});
 
-					albums.on("select", function(e){
+					albums.on("dgrid-select", function(e){
 						//	filter the grid
 						var filter = e.row.data;
 						if(e.row.id == "0"){

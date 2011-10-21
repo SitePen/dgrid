@@ -42,8 +42,8 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dgrid/test/data", "dojo/domReady!"], 
-				function(List, Grid, Selection, Keyboard, ProgressBar){
+			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!"], 
+				function(List, Grid, Selection, Keyboard, declare){
 					var columns = [
 						{label: 'Column 1', field: 'col1'},
 						{label: 'Column 2', field: 'col2', sortable: false},
@@ -51,7 +51,7 @@
 						{label: 'Column 4', field: 'col4'},
 						{label: 'Column 5', field: 'col5'}
 					];
-					window.grid = new (dojo.declare([Grid, Selection, Keyboard]))({
+					window.grid = new (declare([Grid, Selection, Keyboard]))({
 						store: testStore,
 						columns: columns
 					}, "grid");

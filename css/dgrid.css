@@ -60,7 +60,6 @@ html.has-quirks .dgrid-header-hidden .dgrid-cell {
 	vertical-align: top;
 	border: 1px solid #ddd;
 	border-bottom-style: none;
-	/*border-top: 1px solid transparent;*/
 	box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	-ms-box-sizing: border-box;

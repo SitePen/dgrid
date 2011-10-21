@@ -1,12 +1,13 @@
-define(["dojo/_base/declare", "dojo/on", "./List", "put-selector/put", "dojo/has"], function(declare, on, List, put, has){
+define(["dojo/_base/declare", "dojo/on", "./List", "put-selector/put", "dojo/has", "dojo/query"], function(declare, on, List, put, has){
+var ctrlEquiv = has("mac") ? "metaKey" : "ctrlKey";
 return declare([List], {
 	// summary:
 	//		Add selection capabilities to a grid. The grid will have a selection property and
-	//		fire "select" and "deselect" events.
+	//		fire "dgrid-select" and "dgrid-deselect" events.
 	
 	// selectionEvent: String
 	//		event (or events, in dojo/on format) to listen on to trigger select logic
-	selectionEvent: "mousedown,cellfocusin",
+	selectionEvent: ".dgrid-row:mousedown,.dgrid-row:dgrid-cellfocusin",
 	
 	// deselectOnRefresh: Boolean
 	//		If true, the selection object will be cleared when refresh is called.
@@ -37,43 +38,52 @@ return declare([List], {
 		
 		// Start selection fresh when switching mode.
 		this.clearSelection();
+		this._lastSelected = null;
 		
 		this.selectionMode = mode;
 	},
 	
 	_handleSelect: function(event, currentTarget){
-		if(this.selectionMode == "none" || (event.type == "cellfocusin" && event.parentType == "mousedown")){
-			// don't run if selection mode is none or if coming from a cellfocusin from a mousedown
+		if(this.selectionMode == "none" || (event.type == "dgrid-cellfocusin" && event.parentType == "mousedown")){
+			// don't run if selection mode is none or if coming from a dgrid-cellfocusin from a mousedown
 			return;
 		}
 
-		var mode = this.selectionMode;
+		var mode = this.selectionMode,
+			ctrlKey = event.type == "mousedown" ? event[ctrlEquiv] : event.ctrlKey;
 		if(event.type == "mousedown" || !event.ctrlKey || event.keyCode == 32){
-			var row = event.target, lastRow = this._lastRow;
-			//console.log("in focus; event: ", event, "; row: ", row);
-			if(mode == "single" && lastRow && event.ctrlKey){
-				// allow deselection even within single select mode
-				this.deselect(lastRow);
+			var row = currentTarget,
+				lastRow = this._lastSelected;
+
+			if(mode == "single"){
 				if(lastRow == row){
-					return;
+					if(ctrlKey){
+						// allow deselection even within single select mode
+						this.select(row, null, null);
+					}
+				}else{
+					this.clearSelection();
+					this.select(row);
 				}
-			}
-			if(!event.ctrlKey){
-				if(mode != "multiple"){
+				this._lastSelected = row;
+			}else{
+				var value;
+				if(mode == "extended" && !ctrlKey){
 					this.clearSelection();
 				}
-				this.select(row);
-			}else{
-				this.select(row, null, null); // toggle
+				if(!event.shiftKey){
+					// null == toggle; undefined == true;
+					lastRow = value = ctrlKey ? null : undefined;
+				}
+				this.select(row, lastRow, value);
+
+				if(!lastRow){
+					// update lastRow reference for potential subsequent shift+select
+					// (current row was already selected by earlier logic)
+					this._lastSelected = row;
+				}
 			}
-			if(event.shiftKey && lastRow && mode != "single"){ // select range
-				this.select(lastRow, row);
-			}else{
-				// update lastRow reference for potential subsequent shift+select
-				// (current row was already selected by earlier logic)
-				this._lastRow = row;
-			}
-			if(event.type == "mousedown" && (event.shiftKey || event.ctrlKey)){
+			if(event.type == "mousedown" && (event.shiftKey || ctrlKey)){
 				// prevent selection in firefox
 				event.preventDefault();
 			}
@@ -108,7 +118,6 @@ return declare([List], {
 			// first listen for touch taps if available
 			var lastTouch, lastTouchX, lastTouchY, lastTouchEvent, isTap;
 			on(this.contentNode, "touchstart", function(event){
-				console.log("touchstart");
 				lastTouch = event.touches[0];
 				lastTouchX = lastTouch.pageX;
 				lastTouchY = lastTouch.pageY;
@@ -118,11 +127,9 @@ return declare([List], {
 			on(this.contentNode, "touchmove", function(event){
 				var thisTouch = event.touches[0];
 				isTap = Math.pow(lastTouchX - thisTouch.pageX, 2) + Math.pow(lastTouchY - thisTouch.pageY, 2) < 100; // 10 pixel radius sound good?
-				console.log("touchmove istap: ", isTap);
 			});
 			on(this.contentNode, "touchend", function(event){
 				if(isTap){
-					console.log("touchend");
 					focus(lastTouchEvent);
 				}
 			});
@@ -143,29 +150,30 @@ return declare([List], {
 			// indicates a toggle
 			value = !previousValue;
 		}
-		var element = row.element;
+		var element = row.element,
+			notPrevented = true;
 		if(value != previousValue &&
-			(!element || on.emit(element, value ? "select" : "deselect", {
+			(!element || (notPrevented = on.emit(element, "dgrid-" + (value ? "select" : "deselect"), {
 			cancelable: true,
 			bubbles: true,
 			row: row,
 			grid: this
-		}))){
+		})))){
 			if(!value && !this.allSelected){
 				delete this.selection[row.id];
 			}else{
 				selection[row.id] = value;
 			}
-		}
-		if(element){
-			// add or remove classes as appropriate
-			if(value){
-				put(element, ".dgrid-selected.ui-state-active");
-			}else{
-				put(element, "!dgrid-selected!ui-state-active");
+			if(element){
+				// add or remove classes as appropriate
+				if(value){
+					put(element, ".dgrid-selected.ui-state-active");
+				}else{
+					put(element, "!dgrid-selected!ui-state-active");
+				}
 			}
 		}
-		if(toRow){
+		if(toRow && notPrevented){
 			if(!toRow.element){
 				toRow = this.row(toRow);
 			}
@@ -200,12 +208,22 @@ return declare([List], {
 			this.select(row.id);
 		}
 	},
+	isSelected: function(object){
+		if(!object){
+			return false;
+		}
+		if(!object.element){
+			object = this.row(object);
+		}
+
+		return !!this.selection[object.id];
+	},
 	
 	refresh: function(){
 		if(this.deselectOnRefresh){
 			this.selection = {};
 		}
-		this._lastRow = null;
+		this._lastSelected = null;
 		this.inherited(arguments);
 	},
 	
