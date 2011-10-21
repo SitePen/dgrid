@@ -1,5 +1,6 @@
-define(["dojo/_base/declare", "dojo/on", "./List", "dojo/_base/lang", "dojo/_base/sniff", "put-selector/put"],
+define(["dojo/_base/declare", "dojo/on", "./List", "dojo/_base/lang", "dojo/has", "put-selector/put", "dojo/_base/sniff"],
 function(declare, on, List, lang, has, put){
+
 var delegatingInputTypes = {
 	checkbox: 1,
 	radio: 1,
