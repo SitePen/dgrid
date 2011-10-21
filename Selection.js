@@ -154,7 +154,7 @@ return declare([List], {
 			value = !previousValue;
 		}
 		var element = row.element,
-			notPrevented;
+			notPrevented = true;
 		if(value != previousValue &&
 			(!element || (notPrevented = on.emit(element, value ? "select" : "deselect", {
 			cancelable: true,

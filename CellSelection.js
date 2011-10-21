@@ -36,7 +36,7 @@ return declare([Selection], {
 			value = !previous;
 		}
 		var element = cell.element,
-			notPrevented;
+			notPrevented = true;
 		if(previous != value &&
 			(!element || (notPrevented = listen.emit(element, value ? "select" : "deselect", {
 			cancelable: true,
