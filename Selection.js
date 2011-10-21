@@ -3,7 +3,7 @@ var ctrlEquiv = has("mac") ? "metaKey" : "ctrlKey";
 return declare([List], {
 	// summary:
 	//		Add selection capabilities to a grid. The grid will have a selection property and
-	//		fire "select" and "deselect" events.
+	//		fire "dgrid-select" and "dgrid-deselect" events.
 	
 	// selectionEvent: String
 	//		event (or events, in dojo/on format) to listen on to trigger select logic
