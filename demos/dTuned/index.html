@@ -6,18 +6,8 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 		<meta name="viewport" content="width=570" />
 		<style type="text/css">
-<<<<<<< HEAD:test/test_songs.html
-			@import "../../dojo/resources/dojo.css";
-			@import "../css/skins/itunes.css";
-			@import "../css/hider.css";
-=======
 			@import "../../../dojo/resources/dojo.css";
-<<<<<<< HEAD:demos/itunes/index.html
-			@import "../../css/skins/itunes.css";
->>>>>>> upstream/master:demos/itunes/index.html
-=======
 			@import "resources/dTuned.css";
->>>>>>> upstream/master:demos/dTuned/index.html
 			html, body {
 				width: 100%;
 				height: 100%;
@@ -149,13 +139,12 @@
 					"dgrid/OnDemandGrid",
 					"dgrid/Selection",
 					"dgrid/Keyboard",
-					"dgrid/ColumnHider",
 					"dojo/_base/declare",
 					"dojo/_base/array",
 					"dgrid/demos/dTuned/data",
 					"dojo/domReady!"
 				],
-				function(List, Grid, Selection, Keyboard, Hider, declare, arrayUtil){
+				function(List, Grid, Selection, Keyboard, declare, arrayUtil){
 					//	a formatting function for the Duration column.
 					var timeFormatter = function(t){
 						var tmp = parseInt(t, 10), min, sec;
@@ -176,7 +165,7 @@
 						{label: 'Genre', field: 'Genre'}
 					];
 
-					window.grid = new (declare([Grid, Selection, Keyboard, Hider]))({
+					window.grid = new (declare([Grid, Selection, Keyboard]))({
 						store: songStore,
 						columns: columns
 					}, "grid");
