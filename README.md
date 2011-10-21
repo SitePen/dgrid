@@ -12,7 +12,8 @@ Or download it along with its dependencies, which are:
 * [put-selector](https://github.com/kriszyp/put-selector)
 * [The Dojo Toolkit](http://dojotoolkit.org) version 1.7
     * Out of the DTK components, Dojo core is the only hard dependency for dgrid;
-      however, some of the test pages also use components from Dijit and Dojox.
+      however, some of the test pages also use components from Dijit, and
+      Dojox (namely grid for a comparison test, and mobile for a mobile page).
 
 The dgrid project is available under the same dual BSD/AFLv2 license as the Dojo Toolkit.
 
@@ -138,15 +139,25 @@ via the GridFromHtml module.  When using this module, a `table` element should
 be specified as the source node for the grid instance; it then scans for `th`
 nodes within rows (typically placed inside the `thead`) to determine columns.
 
-Here is an example: (TODO)
+Column properties are specified within the `th`, primarily via the
+`data-dgrid-column` attribute, which should contain a JavaScript object.
+Properties which coincide with standard HTML attributes can also be specified
+as such, e.g. `class`, `rowspan`, and `colspan`.  The innerHTML of the `th` is
+interpreted as the column's `label` by default.
 
-    <table>
-    </table>
-    <script>
-    </script>
-    
-More examples can be found in the `GridFromHtml.html` and
-`complex_columns.html` test pages.
+Note that *unlike* `data-dojo-props`, `data-dgrid-column` requires that you
+include the surrounding curly braces around the object - this allows
+alternatively specifying a column plugin instead of just a straight-up object.
+(Note, however, that referencing column plugins requires that they be exposed
+in the global scope, perhaps under a namespace.)
+
+Examples of creating grids from HTML can be found in the
+`GridFromHtml.html` and `complex_columns.html` test pages.
+
+It is also possible to specify columnsets (for the `ColumnSet` module) via
+HTML tables by using the `GridWithColumnSetsFromHtml` module.  ColumnSets are
+expressed in HTML via `colgroup` tags.  See the `complex_columns.html` test
+page for an example of this as well.
 
 ### Grid Styling
 
@@ -212,12 +223,14 @@ The given store should also support the `get` and `getIdentity` functions.
 
 OnDemandList provides the following properties/methods:
 
-* `renderQuery(query)`: This will render the given query into the list.
-* `sort(property, descending)`: The OnDemandList performs sorting by calling
-  `store.query()` with the `sort` attribute of `queryOptions` populated according
-  to the provided parameters.
+* `renderQuery(query)`: Renders the given query into the list.
+* `sort(property, descending)`: OnDemandList defers sorting to the store.
 * `sortOrder`: Initially managed by List's `sort()` method,
   this stores the current sort order.
+* `setQuery`: Allows specifying a new `query` object (and optionally, `queryOptions`)
+  that the list will use when issuing queries to the store.
+* `setStore`: Allows specifying a new store (and optionally, also `query` and `queryOptions`)
+  for the list to reference.
 
 ## OnDemandGrid
 
@@ -225,7 +238,6 @@ This module is simply the composition of Grid and OnDemandList.
 For example:
 
     define(["dgrid/OnDemandGrid"], function(Grid){
-        // attach to a DOM id
         grid = new Grid({
                 store: myStore, // a Dojo object store
                 columns: [ // define the columns
@@ -260,18 +272,22 @@ You can also perform inline mixin and instantiation:
         ...
     }, "grid");
 
-Below is a synopsis of the plugins that are currently available.
+Below is a synopsis of available plugins.
+
+## ColumnSet
+
+TODOC
 
 ## Selection
 
 Adds selection capability to a List/Grid. The list instance will include a
 `selection` property representing the selected items.  This plugin will also
-fire `select` and `deselect` events. For example:
+fire `dgrid-select` and `dgrid-deselect` events. For example:
 
     grid = dojo.declare([Grid, Selection])({
         selectionMode: "single",
         ...});
-    grid.on("select", function(event){
+    grid.on("dgrid-select", function(event){
         // get the row that was just selected
         var row = grid.row(event);
         for(var id in grid.selection){
@@ -280,7 +296,7 @@ fire `select` and `deselect` events. For example:
             }
         }
     });
-    grid.on("deselect", function(event){
+    grid.on("dgrid-deselect", function(event){
         var row = grid.row(event);
         // row was just deselected 
     });
@@ -297,13 +313,19 @@ The following properties and methods are added by the Selection plugin:
     * `none`: Nothing can be selected by user interaction;
       only programmatic selection (or selection via selectors) is allowed
 </ul>
-* `select(id)`: Programmatically select a row (by object id)
-* `deselect(id)`: Programmatically deselect a row (by object id)
+* `select(id)`: Programmatically select a row
+* `deselect(id)`: Programmatically deselect a row
+
+The `select` and `deselect` methods can be passed an object id, or anything else
+acceptable by List's `row` method.
 
 ### CellSelection
 
 The CellSelection plugin extends upon the functionality of the Selection plugin
 to provide celection at the cell level.
+
+Whereas Selection's `select` and `deselect` methods look up the passed argument
+via List's `row` method, CellSelection looks it up via Grid's `cell` method.
 
 ## Keyboard
 
@@ -315,28 +337,6 @@ When used with grids, this plugin references the `cellNavigation` property of
 the grid instance, to determine whether keyboard navigation and focus should
 operate at the individual cell level (`true`, the default) or at the row level
 (`false`).
-
-## ColumnResizer
-
-The ColumnResizer plugin, loosely based on
-[the gridx ColumnResizer module](https://github.com/kriszyp/grid-2.0/tree/simple-plugin/gridx/modules),
-can be used to add column resizing functionality (accessible via mouse drag).
-
-## DnD
-
-The DnD plugin can be used to add row drag'n'drop functionality.
-
-### Requirements
-
-The DnD module assumes usage of the OnDemandGrid module; thus, it
-expects a store to be in use.
-
-The store should be order-aware, supporting the `options.before` parameter
-on `add()` and `put()` calls to properly respond to DnD operations.
-
-Additionally, if the store supports a `copy` method, it will be called for
-DnD copy operations within the same list/grid (since a `put` would normally
-relocate the item).
 
 # Column Plugins
 
@@ -382,12 +382,38 @@ Changes will then be saved back to the store based on edits performed in the gri
 
 (TODO: flesh out more)
 
-## TextBox
+# Extensions
 
-This provides editing capability of text data in cells in the column.
-This is simply an Editor with the text input that shows on double click. 
+The following are additional plugins which dwell outside dgrid's core feature set.
+Extensions live in the `extensions` subdirectory; their tests and
+css/image resources also live under respective `css/extensions` and
+`test/extensions` subdirectories.
+
+## ColumnResizer
+
+The ColumnResizer plugin, originally based on
+[the gridx ColumnResizer module](https://github.com/evanhw/gridx/blob/master/gridx/modules/ColumnResizer.js)
+but further developed to better integrate with dgrid,
+can be used to add column resizing functionality (accessible via mouse drag).
+
+## DnD
+
+The DnD plugin can be used to add row drag'n'drop functionality.
+
+### Requirements
+
+The DnD module assumes usage of the OnDemandList or OnDemandGrid module; thus, it
+expects a store to be in use.
+
+The store should be order-aware, supporting the `options.before` parameter
+on `add()` and `put()` calls to properly respond to DnD operations.
+
+Additionally, if the store supports a `copy` method, it will be called for
+DnD copy operations within the same list/grid (since a `put` would normally
+relocate the item).
 
 # Themes/Skins
+
 The dgrid automatically loads the necessary structural CSS to work properly. However, you can
 also use one of the the included skins/themes. There are claro.css, tundra.css, soria.css, and nihilo.css theme
 files in the css/skins directory that can be used to skin the dgrid to a particular
