@@ -14,7 +14,7 @@ define(["dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put", "dojo/
 
 			if(type == "radio"){
 				if(!lastRow || lastRow.id != row.id){
-					grid.clearSelection(lastRow);
+					grid.clearSelection();
 					grid.select(row, null, true);
 					grid._lastSelected = row.element;
 				}
