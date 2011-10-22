@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Test Grid Column Resize</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="viewport" content="width=570" />
+		<style type="text/css">
+			@import "../../../dojo/resources/dojo.css";
+			@import "../../css/skins/claro.css";
+			.heading {
+				font-weight: bold;
+				padding-bottom: 0.25em;
+			}
+			#grid, #gridWide { 
+				width: 750px;
+			}
+			#grid .column-col1 {
+				width: 100px;
+			}
+			#grid .column-col2 {
+				width: 100px;
+			}
+			#grid .column-col3 {
+				width: auto;
+			}
+			#grid .column-col4 {
+				width: 100px;
+			}
+			#grid .column-last-col {
+				width: 150px;
+			}
+			
+			#gridWide .column-col1,
+			#gridWide .column-col2,
+			#gridWide .column-col3,
+			#gridWide .column-col4,
+			#gridWide .column-col5 {
+				width: 200px;
+			}
+			
+			.ui-widget{
+				margin: 10px;
+			}
+		</style>
+		<script>
+			var start= new Date().getTime();
+		</script>
+		<script type="text/javascript" src="../../../dojo/dojo.js" 
+			data-dojo-config="async: true"></script>
+		<script type="text/javascript">
+			require(["dgrid/OnDemandGrid", "dgrid/extensions/ColumnResizer", "dgrid/Selection", "dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!"],
+				function(Grid, ColumnResizer, Selection, declare, testStore){
+					columns = { // you can declare columns as an object hash (key translates to field)
+						col1: 'Column 1Column1Column 1 Column 1',
+						col2: {label: 'Column2222222222222222222222222', sortable: false},
+						col3: 'Column3333333333333333333',
+						col4: 'Column 4',
+						"last-col": {label: 'Column 5', field: 'col5'}
+					};
+
+					columns2 = { // you can declare columns as an object hash (key translates to field)
+						col2: 'Col2',
+						col4: {label: 'Col4', sortable: false},
+						col1: 'Col1',
+						"last-col": {label: 'Column 5', field: 'col5'}
+					};
+					window.grid = declare([Grid, Selection, ColumnResizer])({
+						store: testStore,
+						columns: columns
+					}, "grid");
+					window.gridWide = declare([Grid, Selection, ColumnResizer])({
+						store: testStore,
+						columns: columns
+					}, "gridWide");
+				});
+		</script>
+	</head>
+	<body class="claro">
+		<h2>A basic grid with column resizing</h2>
+		<div id="grid"></div>
+		<div>Buttons to test changing column structure:
+			<button onclick="grid.setColumns(columns2);">New Structure</button>
+			<button onclick="grid.setColumns(columns);">Original</button>
+		</div>
+		<h2>Another grid w/ columns whose width initially exceed the table's width</h2>
+		<div id="gridWide"></div>
+	</body>
+</html>

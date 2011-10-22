@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Test Grid Selectors</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+		<meta name="viewport" content="width=570" />
+		<style type="text/css">
+			@import "../../dojo/resources/dojo.css";
+			@import "../css/skins/claro.css";
+			.heading {
+				font-weight: bold;
+				padding-bottom: 0.25em;
+			}
+			.dgrid { 
+				width: 70%;
+			}
+			.column-col1 {
+				width: 40px;
+			}
+			.ui-widget{
+				margin: 10px;
+			}
+		</style>
+		<script type="text/javascript" src="../../dojo/dojo.js" 
+			data-dojo-config="async: true"></script>
+		<script type="text/javascript">
+			require(["dojo/on", "dojo/_base/window", "dgrid/OnDemandGrid", "dgrid/Selector", "dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!"], 
+				function(on, win, Grid, Selector, Selection, Keyboard, declare, testStore){
+					var columns = { // you can declare columns as an object hash (key translates to field)
+							col1: Selector({ type: "checkbox" }),
+							id: "ID",
+							col2: {label: 'Column 2', sortable: false},
+							col3: {label: 'Column 3'}
+						},
+						prevent;
+					
+					on(win.body(), "dgrid-select",
+						function(event){
+							var msg = "selected" + (prevent ? " (prevented): " : ": ");
+							console.log(msg, event.grid.id, event.row);
+							if(prevent){ event.preventDefault(); }
+						}
+					);
+					on(win.body(), "dgrid-deselect",
+						function(event){
+							var msg = "deselected" + (prevent ? " (prevented): " : ": ");
+							console.log(msg, event.grid.id, event.row);
+							if(prevent){ event.preventDefault(); }
+						}
+					);
+					
+					on(document.getElementById("btnPreventDefaultOn"), "click",
+						function(){ prevent = true; });
+					on(document.getElementById("btnPreventDefaultOff"), "click",
+						function(){ prevent = false; });
+					
+					window.grid = dojo.declare([Grid, Selection, Keyboard])({
+						store: testStore,
+						selectionMode: "none",
+						columns: columns
+					}, "grid");
+					var columnsRadio = { // you can declare columns as an object hash (key translates to field)
+						col1: Selector({ label: 'Radio', type: "radio" }),
+						id: "ID",
+						col2: {label: 'Column 2', sortable: false},
+						col3: {label: 'Column 3'}
+					};
+					window.gridRadio = declare([Grid, Selection, Keyboard])({
+						store: testStore,
+						selectionMode: "none",
+						columns: columnsRadio
+					}, "grid-radio");
+				}
+			);
+		</script>
+	</head>
+	<body class="claro">
+		<div>preventDefault on selection in all grids?
+			<button type="button" id="btnPreventDefaultOn">Yes</button>
+			<button type="button" id="btnPreventDefaultOff">No</button>
+		</div>
+		<h2>A grid with checkbox selectors</h2>
+		<div>
+			<button type="button" onclick="grid.setSelectionMode('none');">
+				Set selection mode to "none"</button>
+			<button type="button" onclick="grid.setSelectionMode('single');">
+				Set selection mode to "single"</button>
+			<button type="button" onclick="grid.setSelectionMode('multiple');">
+				Set selection mode to "multiple"</button>
+			<button type="button" onclick="grid.setSelectionMode('extended');">
+				Set selection mode to "extended"</button>
+		</div>
+		<div id="grid"></div>
+		<h2>A grid with radio selectors</h2>
+		<div>
+			<button type="button" onclick="gridRadio.setSelectionMode('none');">
+				Set selection mode to "none"</button>
+			<button type="button" onclick="gridRadio.setSelectionMode('single');">
+				Set selection mode to "single" (to test sync)</button>
+		</div>
+		<div id="grid-radio"></div>
+	</body>
+</html>
