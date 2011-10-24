@@ -58,8 +58,8 @@
 					];
 					window.grid = new (declare([Grid, Selection, Keyboard]))({
 						store: testStore,
-						columns: columns,
-						isRTL: true
+						columns: columns
+						
 					}, "grid");
 				});
 				
@@ -77,8 +77,8 @@
 						window.tree = declare([Grid, Keyboard, Selection])({
 							store: testCountryStore,
 							query: {type: "continent"},
-							columns: columns,
-							isRTL: true
+							columns: columns
+							
 						}, "tree");
 						
 				});
@@ -96,8 +96,8 @@
 						window.headerless = declare([Grid, Selection, Keyboard])({
 							store: testStore,
 							columns: columns,
-							showHeader: false,
-							isRTL: true
+							showHeader: false
+							
 						}, "headerless");
 						
 				});
@@ -144,8 +144,7 @@
 						window.moreeditors = new (declare([Grid, Selection, Keyboard]))({
 							store: testTypesStore,
 							columns: columns2,
-							selectionMode: "none",
-							isRTL: true
+							selectionMode: "none"
 						}, "moreeditors");
 
 					});

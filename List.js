@@ -137,9 +137,9 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			}
 			this.domNode = srcNodeRef || put("div");
 			
-			if(this.isRTL) {
-				this.domNode.className += " dgrid-rtl" + (this.isRTL && isWebkit ? "" : " dgrid-rtl-nonwebkit");
-			}
+			// Set RTL
+			// Taken from dojo/dom-geometry
+			this.isRTL = (document.body.dir || document.documentElement.dir || document.body.style).toLowerCase() == "rtl";
 			
 			this.postMixInProperties();
 			// apply id to widget and domNode,
@@ -171,6 +171,12 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			var bodyNode = this.bodyNode = put(domNode, "div.dgrid-scroller");
 			var grid = this;
 			this.headerScrollNode = put(domNode, "div.dgrid-header-scroll.dgrid-scrollbar-width.ui-widget-header");
+			
+			
+			if(this.isRTL) {
+				this.domNode.className += " dgrid-rtl" + (this.isRTL && isWebkit ? "" : " dgrid-rtl-nonwebkit");
+			}
+			
 			listen(bodyNode, "scroll", function(event){
 				// keep the header aligned with the body
 				if(!grid.isRTL || isWebkit) {
