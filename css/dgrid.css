@@ -6,12 +6,14 @@
 	height: 30em;
 	display: block;
 }
+
 .dgrid-header {
 	background-color: #eee;
 	position: absolute;
 	right: 17px; /*scrollbar width; */
 	left: 0px;
 }
+
 .dgrid-header-scroll {
 	position: absolute;
 	top: 0px;
@@ -59,12 +61,16 @@ html.has-quirks .dgrid-header-hidden .dgrid-cell {
 	overflow: hidden;
 	vertical-align: top;
 	border: 1px solid #ddd;
+	
 	border-bottom-style: none;
+	border-left-style: none;
+	
 	box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	-ms-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 }
+
 .dgrid-last-row .dgrid-cell {
 	border-bottom-style: solid;
 }
@@ -195,4 +201,38 @@ html.has-ie-6 .dgrid-header-scroll {
 	overflow: scroll;
 	position: absolute;
 	top: -9999px;
+}
+
+
+/* rtl support 
+
+	IMPORTANT:
+	WebKit places the scrollbarson the RIGHT, even when in RTL mode :(
+	.dgrid-rtl is given to the domNode if the grid's isRTL is true
+	.dgrid-rtl-nonwebkit is given to the domNode if the grid's isRTL is true AND the client isn't WebKit
+*/
+.dgrid-rtl, .dgrid-rtl .dgrid-scroller {
+	direction: rtl;
+}
+.dgrid-rtl-nonwebkit .dgrid-header {
+	right: 0;
+	left: 17px;
+}
+
+.dgrid-rtl-nonwebkit .dgrid-header-scroll {
+	left: 0px;
+	right: auto;
+}
+
+.dgrid-rtl .dgrid-cell {
+	text-align: right;
+	border-left-style: solid;
+	border-right-style: none;
+}
+
+.dgrid-rtl .ui-icon-triangle-1-e {
+	background-position: -96px -16px;
+}
+.dgrid-rtl .ui-icon-triangle-1-se {
+	background-position: -80px -16px;
 }
