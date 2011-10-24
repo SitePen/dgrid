@@ -183,6 +183,12 @@ html.has-ie-6 .dgrid-header-scroll {
 	font-size: 0;
 }
 
+/* firefox 3.6 selection issue */
+html.has-mozilla .dgrid-cell:focus {
+	outline-offset: -1px;
+}
+
+
 /* indicator of a successful load */
 #dgrid-css-dgrid-loaded {
 	display: none;
