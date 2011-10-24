@@ -157,7 +157,7 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			
 			// Set RTL
 			// Taken from dojo/dom-geometry
-			this.isRTL = (document.body.dir || document.documentElement.dir || document.body.style).toLowerCase() == "rtl";
+			this.isRTL = (document.body.dir || document.documentElement.dir || document.body.style.direction).toLowerCase() == "rtl";
 			
 			put(domNode, "[role=grid].ui-widget.dgrid.dgrid-" + this.listType);
 			var headerNode = this.headerNode = put(domNode, 
