@@ -1,4 +1,4 @@
-define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Editor", "./List", "dojo/_base/sniff"], function(has, put, declare, listen, Editor, List){
+define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "dojo/_base/lang", "./Editor", "./List", "dojo/_base/sniff"], function(has, put, declare, listen, lang, Editor, List){
 	var contentBoxSizing = has("ie") < 8 && !has("quirks");
 	
 	function appendIfNode(parent, subNode){
@@ -333,6 +333,9 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 		configStructure: function(){
 			// configure the columns and subRows
 			var subRows = this.subRows;
+			if(subRows ? subRows._dgridProcessed : this.columns && this.columns._dgridProcessed){
+				throw new Error("The columns or subrows passed to the Grid have already been processed.");
+			}
 			if(subRows){
 				// we have subRows, but no columns yet, need to create the columns
 				this.columns = {};
@@ -342,6 +345,7 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 			}else{
 				this.subRows = [this._configColumns("", this.columns)];
 			}
+			this.columns._dgridProcessed = this.subRows._dgridProcessed = true;
 		},
 		setColumns: function(columns){
 			// reset instance variables

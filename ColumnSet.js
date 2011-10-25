@@ -87,6 +87,9 @@ function(styleSheet, has, put, declare, listen, aspect, query, Grid, hasClass){
 		},
 		configStructure: function(){
 			this.columns = {};
+			if(this.columnSets && this.columnSets._dgridProcessed){
+				throw new Error("The column set passed to the Grid has already been processed.");
+			}
 			for(var i = 0, l = this.columnSets.length; i < l; i++){
 				// iterate through the columnSets
 				var columnSet = this.columnSets[i];
@@ -94,6 +97,7 @@ function(styleSheet, has, put, declare, listen, aspect, query, Grid, hasClass){
 					columnSet[j] = this._configColumns(i + '-' + j + '-', columnSet[j]);
 				}
 			}
+			this.columnSets._dgridProcessed = true;
 		},
 		setColumnSets: function(columnSets){
 			this.columnSets = columnSets;

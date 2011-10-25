@@ -50,12 +50,16 @@
 				name: {},
 				description: {label: "what to do", sortable: false}
 			};
+			var setColumns;
 			
-			require(["dgrid/Grid", "dojo/domReady!"],
-				function(Grid){
+			require(["dgrid/Grid", "dojo/_base/lang", "dojo/domReady!"],
+				function(Grid, lang){
 					window.grid = new Grid({
-						columns: columns3
+						columns: lang.clone(columns3)
 					}, "grid");
+					setColumns = function(grid, columns){
+						grid.setColumns(lang.clone(columns));
+					};
 					grid.renderArray(data);
 				});
 				
@@ -65,8 +69,8 @@
 		<h2>A basic grid rendered from an array</h2>
 		<div id="grid"></div>
 		<div>Buttons to test resetting columns:
-			<button onclick="grid.setColumns(columns3);">order, name, description</button>
-			<button onclick="grid.setColumns(columns2);">name, description</button>
+			<button onclick="setColumns(grid, columns3);">order, name, description</button>
+			<button onclick="setColumns(grid, columns2);">name, description</button>
 		</div>
 		<div>Buttons to test programmatic sort (on order field):
 			<button onclick="grid.sort('order');">Sort Asc</button>

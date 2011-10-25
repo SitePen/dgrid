@@ -48,8 +48,12 @@
 		<script type="text/javascript" src="../../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dgrid/OnDemandGrid", "dgrid/extensions/ColumnResizer", "dgrid/Selection", "dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!"],
-				function(Grid, ColumnResizer, Selection, declare, testStore){
+			var setColumns;
+			require(["dgrid/OnDemandGrid", "dgrid/extensions/ColumnResizer", "dgrid/Selection", "dojo/_base/declare", "dgrid/test/data/base", "dojo/_base/lang", "dojo/domReady!"],
+				function(Grid, ColumnResizer, Selection, declare, testStore, lang){
+					setColumns = function(grid, columns){
+						grid.setColumns(lang.clone(columns));
+					};
 					columns = { // you can declare columns as an object hash (key translates to field)
 						col1: 'Column 1Column1Column 1 Column 1',
 						col2: {label: 'Column2222222222222222222222222', sortable: false},
@@ -66,11 +70,11 @@
 					};
 					window.grid = declare([Grid, Selection, ColumnResizer])({
 						store: testStore,
-						columns: columns
+						columns: lang.clone(columns)
 					}, "grid");
 					window.gridWide = declare([Grid, Selection, ColumnResizer])({
 						store: testStore,
-						columns: columns
+						columns: lang.clone(columns)
 					}, "gridWide");
 				});
 		</script>
@@ -79,8 +83,8 @@
 		<h2>A basic grid with column resizing</h2>
 		<div id="grid"></div>
 		<div>Buttons to test changing column structure:
-			<button onclick="grid.setColumns(columns2);">New Structure</button>
-			<button onclick="grid.setColumns(columns);">Original</button>
+			<button onclick="setColumns(grid, columns2);">New Structure</button>
+			<button onclick="setColumns(grid, columns);">Original</button>
 		</div>
 		<h2>Another grid w/ columns whose width initially exceed the table's width</h2>
 		<div id="gridWide"></div>
