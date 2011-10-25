@@ -32,8 +32,7 @@ define(["dojo/_base/declare", "dojo/has", "dojo/on", "dojo/query", "dojo/dom", "
 
 			//	assume that if this plugin is used, then columns are hidable.
 			//	create the toggle node.
-			var scrollerNode = query("#" + grid.domNode.id + " .dgrid-header-scroll")[0];
-			this.hiderToggleNode = put(scrollerNode, "div.dgrid-hider-toggle", "+");
+			this.hiderToggleNode = put(this.headerScrollNode, "div.dgrid-hider-toggle", "+");
 			this.hiderToggleNode.setAttribute("title", "Click here to show or hide columns.");
 			listen(this.hiderToggleNode, "mousedown", function(e){
 				grid._toggleHiderMenu(e);
@@ -117,9 +116,9 @@ define(["dojo/_base/declare", "dojo/has", "dojo/on", "dojo/query", "dojo/dom", "
 		},
 
 		_adjustScrollerNode: function(grid){
-			var header = query("#" + grid.domNode.id + " .dgrid-header-row")[0],
-				scrollnode = query("#" + grid.domNode.id + " .dgrid-header-scroll")[0],
-				scroller = query("#" + grid.domNode.id + " .dgrid-scroller")[0],
+			var header = this.headerNode,
+				scrollnode = this.headerScrollNode,
+				scroller = this.bodyNode,
 				h = header.clientHeight;
 			scrollnode.style.height = (h + 1) + "px";
 			scroller.style.marginTop = (h + 1) + "px";
