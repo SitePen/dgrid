@@ -38,8 +38,8 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dgrid/OnDemandGrid", "dgrid/GridWithColumnSetsFromHtml", "dgrid/ColumnSet", "dgrid/Tree", "dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dojo/on", "dojo/parser", "dgrid/test/data/base", "dojo/domReady!"],
-				function(Grid, GridFromHtml, ColumnSet, Tree, Selection, Keyboard, declare, on, parser, testStore){
+			require(["dgrid/OnDemandGrid", "dgrid/GridWithColumnSetsFromHtml", "dgrid/ColumnSet", "dgrid/Tree", "dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dojo/on", "dojo/parser", "dgrid/test/data/base", "dojo/_base/lang", "dojo/domReady!"],
+				function(Grid, GridFromHtml, ColumnSet, Tree, Selection, Keyboard, declare, on, parser, testStore, lang){
 					var columnSets1 = [
 							[
 								[{label: 'Column 1', field: 'col1'},
@@ -71,7 +71,7 @@
 									[{label: 'Column 5', field: 'col5'}]
 							]],
 						// same structures as above, without being split into ColumnSets
-						subRows1 = [
+						subRows1 = window.subRows1 = [
 							[
 								{label: 'Column 1', field: 'col1'},
 								{label: 'Column 2', field: 'col2', sortable: false},
@@ -81,7 +81,7 @@
 								{label: 'Column 3', field: 'col3', colSpan: 2},
 								{label: 'Column 5', field: 'col5'}
 							]],
-						subRows2 = [
+						subRows2 = window.subRows2 = [
 							[
 								{label: 'Column 1', field: 'col1'},
 								{label: 'Column 3', field: 'col3', rowSpan: 2},
@@ -96,30 +96,30 @@
 					
 					window.gridNoColumnSets = declare([Grid, Selection, Keyboard])({
 						store: testStore,
-						subRows: subRows1
+						subRows: lang.clone(subRows1)
 					}, "gridNoColumnSets");
 					
 					window.grid = declare([Grid, ColumnSet, Selection, Keyboard])({
 						store: testStore,
-						columnSets: columnSets1
+						columnSets: lang.clone(columnSets1)
 					}, "grid");
 					
 					// hook up buttons for testing setSubRows / setColumnSets
 					on(byId("btnSubRows1"), "click", function(){
-						gridNoColumnSets.setSubRows(subRows1);
+						gridNoColumnSets.setSubRows(lang.clone(subRows1));
 					});
 					on(byId("btnSubRows2"), "click", function(){
-						gridNoColumnSets.setSubRows(subRows2);
+						gridNoColumnSets.setSubRows(lang.clone(subRows2));
 					});
 					
 					on(byId("btnColumnSets1"), "click", function(){
-						grid.setColumnSets(columnSets1);
+						grid.setColumnSets(lang.clone(columnSets1));
 					});
 					on(byId("btnColumnSets2"), "click", function(){
-						grid.setColumnSets(columnSets2);
+						grid.setColumnSets(lang.clone(columnSets2));
 					});
 					on(byId("btnColumnSets3"), "click", function(){
-						grid.setColumnSets(columnSets3);
+						grid.setColumnSets(lang.clone(columnSets3));
 					});
 					
 					//NOTE: Grid == OnDemandGrid, GridFromHtml == ver w/ ColumnSet support
