@@ -188,11 +188,6 @@ html.has-mozilla .dgrid-focus {
 	outline-offset: -1px;
 }
 
-/* indicator of a successful load */
-#dgrid-css-dgrid-loaded {
-	display: none;
-}
-
 /* will be used to calculate the width of the scrollbar */
 .dgrid-scrollbar-measure {
 	width: 100px;
@@ -200,4 +195,9 @@ html.has-mozilla .dgrid-focus {
 	overflow: scroll;
 	position: absolute;
 	top: -9999px;
+}
+
+/* indicator of a successful load */
+#dgrid-css-dgrid-loaded {
+	display: none;
 }
