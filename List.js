@@ -5,15 +5,17 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 
 	// establish an extra stylesheet which addCssRule calls will use,
 	// plus an array to track actual indices in stylesheet for removal
-	var
-		extraSheet = put(document.getElementsByTagName("head")[0], "style"),
-		extraRules = [];
-	// keep reference to actual StyleSheet object (.styleSheet for IE < 9)
-	extraSheet = extraSheet.sheet || extraSheet.styleSheet;
+	var extraSheet = null, extraRules = [];
 	
 	// functions for adding and removing extra style rules.
 	// addExtraRule is exposed on the List prototype as addCssRule.
 	function addExtraRule(selector, css){
+		if(!extraSheet){
+			// append to body to ensure our styles override
+			extraSheet = put(document.body || document.getElementsByTagName("body")[0], "style");
+			// keep reference to actual StyleSheet object (.styleSheet for IE < 9)
+			extraSheet = extraSheet.sheet || extraSheet.styleSheet;
+		}
 		var index = extraRules.length;
 		extraRules[index] = (extraSheet.cssRules || extraSheet.rules).length;
 		extraSheet.addRule ?
@@ -21,7 +23,7 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			extraSheet.insertRule(selector + '{' + css + '}', extraRules[index]);
 		return {
 			remove: function(){ removeExtraRule(index); }
-		}
+		};
 	}
 	function removeExtraRule(index){
 		var
