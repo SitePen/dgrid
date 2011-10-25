@@ -64,7 +64,7 @@ return declare([], {
 
 		if(!grid.mouseMoveListen){
 			listen(grid.headerNode, ".dgrid-resize-handler:mousedown", function(e){
-				grid._resizeMouseDown(e, target);
+				grid._resizeMouseDown(e, this);
 			});
 			grid.mouseMoveListen = listen.pausable(document.body, "mousemove", function(e){
 				// while resizing, update the position of the resizer bar
