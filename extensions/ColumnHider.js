@@ -1,5 +1,5 @@
-define(["dojo/_base/declare", "dojo/has", "dojo/on", "dojo/query", "dojo/dom", "put-selector/put", "dojo/dom-class",  "dojo/NodeList-dom"], 
-	function(declare, has, listen, query, dom, put, cls){
+define(["dojo/_base/declare", "dojo/has", "dojo/on", "dojo/query", "dojo/dom", "put-selector/put", "dojo/NodeList-dom"], 
+	function(declare, has, listen, query, dom, put){
 /*
  *	Column Hider plugin for dgrid
  *	v.1.0.0
@@ -47,7 +47,7 @@ define(["dojo/_base/declare", "dojo/has", "dojo/on", "dojo/query", "dojo/dom", "
 				// create the HTML for each column selector.
 				var div = put(".dgrid-hider-menu-row");
 				var check = put(div, "input.dgrid-hider-menu-check.hider-menu-check-" + id + "#" + grid.domNode.id + "-hider-menu-check-" + id + "[type=checkbox]");
-				put(div, "label.dgrid-hider-menu-label.hider-menu-label-" + id, col.label);
+				put(div, "label.dgrid-hider-menu-label.hider-menu-label-" + id + "[for='" + grid.domNode.id + "-hider-menu-check-" + id + "]", col.label);
 				if(has("ie") < 9){
 					listen(check, "click", function(e){
 						grid._toggleColumnState(grid, e);
@@ -78,8 +78,14 @@ define(["dojo/_base/declare", "dojo/has", "dojo/on", "dojo/query", "dojo/dom", "
 			grid._adjustScrollerNode(grid);
 
 			//	attach a listener to the document body to close the menu
-			//listen(document.body, "click", function(e){
-			//});
+			var self = this;
+			listen(document.body, "click", function(e){
+				//	if we clicked outside of our domNode, close the dropdown.
+				if(!self.hiderMenuOpened) return;
+				var n = e.target;
+				while(n && n != self.domNode){ n = n.parentNode; }
+				if(!n){ self._toggleHiderMenu(e); }
+			});
 		},
 
 		_toggleHiderMenu: function(e){
@@ -98,10 +104,16 @@ define(["dojo/_base/declare", "dojo/has", "dojo/on", "dojo/query", "dojo/dom", "
 			} else {
 				grid._columnStyleRules[id] = grid.styleColumn(id, "display: none;");
 			}
-	//		grid._columnStyleRules[id] = grid.styleColumn(id, "display: " + (e.target.checked?"table-cell":"none"));
+			grid.columnStateChange(grid, grid.columns[id].field, e.target.checked);
 
 			//	adjust the size of the header
 			grid._adjustScrollerNode(grid);
+		},
+
+		columnStateChange: function(grid, field, state){
+			//	stub for listening to the change of column state, this actually does nothing
+			//	on its own.
+			console.log("Changing ", field, " to ", (state ? "show" : "hide"));
 		},
 
 		_adjustScrollerNode: function(grid){
