@@ -183,6 +183,11 @@ html.has-ie-6 .dgrid-header-scroll {
 	font-size: 0;
 }
 
+html.has-mozilla .dgrid-focus {
+	/* fix row focus outline (prevents horizontal scroll in FF 3.6) */
+	outline-offset: -1px;
+}
+
 /* indicator of a successful load */
 #dgrid-css-dgrid-loaded {
 	display: none;
