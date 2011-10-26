@@ -153,11 +153,11 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 		},
 		buildRendering: function(){
 			var domNode = this.domNode;
-			this.id = domNode.id = domNode.id || this.id || generateId();
+			// Detect RTL on html/body nodes; taken from dojo/dom-geometry
+			var isRTL = this.isRTL = (document.body.dir || document.documentElement.dir ||
+				document.body.style.direction).toLowerCase() == "rtl";
 			
-			// Set RTL
-			// Taken from dojo/dom-geometry
-			this.isRTL = (document.body.dir || document.documentElement.dir || document.body.style.direction).toLowerCase() == "rtl";
+			this.id = domNode.id = domNode.id || this.id || generateId();
 			
 			put(domNode, "[role=grid].ui-widget.dgrid.dgrid-" + this.listType);
 			var headerNode = this.headerNode = put(domNode, 
@@ -170,16 +170,13 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			var grid = this;
 			this.headerScrollNode = put(domNode, "div.dgrid-header-scroll.dgrid-scrollbar-width.ui-widget-header");
 			
-			
-			if(this.isRTL) {
-				this.domNode.className += " dgrid-rtl" + (this.isRTL && isWebkit ? "" : " dgrid-rtl-nonwebkit");
+			if(isRTL) {
+				this.domNode.className += " dgrid-rtl" + (isWebkit ? "" : " dgrid-rtl-nonwebkit");
 			}
 			
 			listen(bodyNode, "scroll", function(event){
 				// keep the header aligned with the body
-				if(!grid.isRTL || isWebkit) {
-					headerNode.scrollLeft = bodyNode.scrollLeft;
-				}
+				headerNode.scrollLeft = bodyNode.scrollLeft;
 				event.stopPropagation(); // we will refire, since browsers are not consistent about propagation here
 				listen.emit(domNode, "scroll", {scrollTarget: bodyNode});
 			});
@@ -235,8 +232,8 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 				bodyNode.style.height =
 					Math.max((this.domNode.offsetHeight - headerNode.offsetHeight), 0) + "px";
 			}
+			
 			if(!scrollbarWidth){
-				
 				// Measure the browser's scrollbar width using a DIV we'll delete right away
 				var scrollDiv = put(document.body, "div.dgrid-scrollbar-measure");
 				scrollbarWidth = scrollDiv.offsetWidth - scrollDiv.clientWidth;
@@ -252,11 +249,12 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 				if(scrollbarWidth != 17 && !quirks){
 					// for modern browsers, we can perform a one-time operation which adds
 					// a rule to account for scrollbar width in all grid headers.
-					var isRTLAll = this.isRTL && !isWebkit;
-					var selector = (isRTLAll ? (".dgrid-rtl ") : "") + ".dgrid-header";
-					this.addCssRule(selector, (isRTLAll ? "left" : "right") + ": " + scrollbarWidth + "px");
+					this.addCssRule(".dgrid-header", "right: " + scrollbarWidth + "px");
+					// add another for RTL grids
+					this.addCssRule(".dgrid-rtl-nonwebkit .dgrid-header", "left: " + scrollbarWidth + "px");
 				}
 			}
+			
 			if(quirks){
 				// old IE doesn't support left + right + width:auto; set width directly
 				headerNode.style.width = bodyNode.clientWidth + "px";
