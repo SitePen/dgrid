@@ -1,4 +1,5 @@
-define(["./OnDemandGrid", "dojo/_base/declare", "dojo/dom-construct", "dojo/_base/Deferred", "require"], function(OnDemandGrid, declare, domConstruct, Deferred, require){
+define(["./OnDemandGrid", "dojo/_base/declare", "put-selector/put"],
+function(OnDemandGrid, declare, put){
 	// This module supports parsing grid structure information from an HTML table.
 	// This module does NOT support ColumnSets; see GridWithColumnSetsFromHtml
 	
@@ -66,7 +67,7 @@ define(["./OnDemandGrid", "dojo/_base/declare", "dojo/dom-construct", "dojo/_bas
 			this.inherited(arguments, [params, div]);
 			
 			// destroy srcNodeRef for good now that we're done with it
-			domConstruct.destroy(srcNodeRef);
+			put("!", srcNodeRef);
 		}
 	});
 	

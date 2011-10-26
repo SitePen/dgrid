@@ -1,4 +1,4 @@
-define(["./Grid", "./GridFromHtml", "./ColumnSet", "dojo/_base/declare"], function(Grid, GridFromHtml, ColumnSet, declare){
+define(["./GridFromHtml", "./ColumnSet", "dojo/_base/declare"], function(GridFromHtml, ColumnSet, declare){
 	//Possible TODO: make more resilient for cases of bad markup?
 	//(e.g. cases where rowspans/colspans don't always break even / add up)
 	function getColumnSetsFromDom(domNode){
