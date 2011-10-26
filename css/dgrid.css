@@ -134,7 +134,6 @@ html.has-quirks .dgrid-header-hidden .dgrid-cell {
 	display: block;
 	float: right;
 	margin: 0 4px 0 5px;
-	padding-left: 0;
 	height: 12px;
 }
 .dgrid-sort-up .dgrid-sort-arrow {
