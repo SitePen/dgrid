@@ -321,8 +321,9 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 			// configure the current column
 			var subRow = [];
 			var isArray = rowColumns instanceof Array;
+			var column, origColumn;
 			for(var columnId in rowColumns){
-				var column = origColumn = rowColumns[columnId];
+				column = origColumn = rowColumns[columnId];
 				if(typeof column == "string"){
 					column = {label:column};
 				}else{
