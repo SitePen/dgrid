@@ -61,9 +61,7 @@ html.has-quirks .dgrid-header-hidden .dgrid-cell {
 	overflow: hidden;
 	vertical-align: top;
 	border: 1px solid #ddd;
-	
 	border-bottom-style: none;
-	border-left-style: none;
 	
 	box-sizing: border-box;
 	-moz-box-sizing: border-box;

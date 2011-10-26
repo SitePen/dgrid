@@ -43,12 +43,18 @@
 					skin = params.skin || "claro",
 					xstylePrefix = "xstyle/css!dgrid/css/",
 					xstyleBase = xstylePrefix + "dgrid.css",
+					xstyleRtl = xstylePrefix + "dgrid_rtl.css",
 					xstyleSkin = xstylePrefix + "skins/" + skin + ".css",
 					// put CSS first to control loading order (don't let List load it)
 					// decide whether dgrid.css or skin CSS is loaded first via query param
-					deps = params.skinFirst ? [xstyleSkin, xstyleBase] : [xstyleBase, xstyleSkin];
+					deps = params.skinFirst ? [xstyleSkin, xstyleBase, xstyleRtl] :
+						[xstyleBase, xstyleRtl, xstyleSkin],
+					rtl = params.dir == "rtl";
 				
-				document.body.className = skin; // add skin class to body
+				// add skin class to body
+				document.body.className = skin;
+				// add dir=rtl to body if specified in query
+				rtl && (document.body.dir = "rtl");
 				
 				// then add the rest of the dependencies for the test...
 				deps = deps.concat("dgrid/List", "dgrid/OnDemandGrid", "dgrid/Tree",
@@ -56,7 +62,7 @@
 					"dojo/_base/declare", "dojo/dom-construct", "dgrid/test/data/base", "dojo/domReady!");
 				
 				require(deps, 
-				function(css1, css2, List, Grid, Tree, Selection, Keyboard, Editor, declare, domConstruct, testStore){
+				function(css1, css2, css3, List, Grid, Tree, Selection, Keyboard, Editor, declare, domConstruct, testStore){
 					var
 						columns = [
 							{label: 'Column 1', field: 'col1'},
@@ -80,6 +86,8 @@
 					// add links to test all skins, w/ dgrid.css loaded first/last
 					for(i = 0; i < l; i++){
 						href = "skin.html?skin=" + skins[i];
+						rtl && (href += "&dir=rtl");
+						
 						slhtml.push('<a href="' + href + '">' + skins[i] + '</a>');
 						sfhtml.push('<a href="' + href + '&skinFirst=true">' + skins[i] + '</a>');
 					}

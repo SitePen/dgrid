@@ -19,10 +19,8 @@
 	right: auto;
 }
 
-.dgrid-rtl .dgrid-cell {
+.dgrid-rtl-nonwebkit .dgrid-cell {
 	text-align: right;
-	border-left-style: solid;
-	border-right-style: none;
 }
 
 /* Reverse position of sort arrow */
