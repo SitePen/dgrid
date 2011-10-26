@@ -67,7 +67,7 @@ function(OnDemandGrid, declare, put){
 			this.inherited(arguments, [params, div]);
 			
 			// destroy srcNodeRef for good now that we're done with it
-			put("!", srcNodeRef);
+			put(srcNodeRef, "!");
 		}
 	});
 	
