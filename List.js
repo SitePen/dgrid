@@ -1,7 +1,10 @@
 define(["put-selector/put", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/has", "dojo/has!touch?./TouchScroll", "xstyle/has-class", "dojo/_base/sniff", "xstyle/css!./css/dgrid.css"], 
 function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 	// Add user agent/feature CSS classes 
-	hasClass("mozilla", "opera", "ie-6", "ie-6-7", "quirks", "no-quirks");
+	hasClass("mozilla", "opera", "webkit", "ie-6", "ie-6-7", "quirks", "no-quirks");
+	
+	// Am I webkit? (for RTL)
+	var isWebkit = has("webkit");
 
 	// establish an extra stylesheet which addCssRule calls will use,
 	// plus an array to track actual indices in stylesheet for removal
@@ -146,10 +149,16 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			this.observers = [];
 			this._listeners = [];
 			this._rowIdToObject = {};
+			
 		},
 		buildRendering: function(){
 			var domNode = this.domNode;
 			this.id = domNode.id = domNode.id || this.id || generateId();
+			
+			// Set RTL
+			// Taken from dojo/dom-geometry
+			this.isRTL = (document.body.dir || document.documentElement.dir || document.body.style.direction).toLowerCase() == "rtl";
+			
 			put(domNode, "[role=grid].ui-widget.dgrid.dgrid-" + this.listType);
 			var headerNode = this.headerNode = put(domNode, 
 				"div.dgrid-header.dgrid-header-row.ui-widget-header" +
@@ -158,10 +167,19 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 				var spacerNode = put(domNode, "div.dgrid-spacer");
 			}
 			var bodyNode = this.bodyNode = put(domNode, "div.dgrid-scroller");
+			var grid = this;
 			this.headerScrollNode = put(domNode, "div.dgrid-header-scroll.dgrid-scrollbar-width.ui-widget-header");
+			
+			
+			if(this.isRTL) {
+				this.domNode.className += " dgrid-rtl" + (this.isRTL && isWebkit ? "" : " dgrid-rtl-nonwebkit");
+			}
+			
 			listen(bodyNode, "scroll", function(event){
 				// keep the header aligned with the body
-				headerNode.scrollLeft = bodyNode.scrollLeft;
+				if(!grid.isRTL || isWebkit) {
+					headerNode.scrollLeft = bodyNode.scrollLeft;
+				}
 				event.stopPropagation(); // we will refire, since browsers are not consistent about propagation here
 				listen.emit(domNode, "scroll", {scrollTarget: bodyNode});
 			});
@@ -172,7 +190,6 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			aspect.after(this, "scrollTo", function(){
 				listen.emit(bodyNode, "scroll", {});
 			});
-			var grid = this;
 			this._listeners.push(listen(window, "resize", function(){
 				grid.resize();
 			}));
@@ -235,7 +252,9 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 				if(scrollbarWidth != 17 && !quirks){
 					// for modern browsers, we can perform a one-time operation which adds
 					// a rule to account for scrollbar width in all grid headers.
-					this.addCssRule(".dgrid-header", "right: " + scrollbarWidth + "px");
+					var isRTLAll = this.isRTL && !isWebkit;
+					var selector = (isRTLAll ? (".dgrid-rtl ") : "") + ".dgrid-header";
+					this.addCssRule(selector, (isRTLAll ? "left" : "right") + ": " + scrollbarWidth + "px");
 				}
 			}
 			if(quirks){
