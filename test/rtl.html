@@ -19,7 +19,7 @@
 				padding-bottom: 0.25em;
 			}
 			.ui-widget{
-				margin: 10px;
+				margin: 2em;
 			}
 			/* this is not part of theme, but you can add odd-even coloring this way*/
 			.dgrid-row-odd {
@@ -46,9 +46,8 @@
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
 		
-			// The very first grid -- copied from simple
-			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!", "xstyle/css!../css/dgrid_rtl.css"], 
-				function(List, Grid, Selection, Keyboard, declare){
+			require(["dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dgrid/Tree", "dgrid/Editor", "dojo/_base/declare", "dojo/on", "dojo/data/ObjectStore", "dijit/form/ToggleButton", "dijit/form/TimeTextBox",  "dijit/form/Select", "dijit/form/FilteringSelect", "dijit/Editor", "dgrid/test/data/base", "dojo/domReady!", "xstyle/css!../css/dgrid_rtl.css"], 
+				function(Grid, Selection, Keyboard, Tree, Editor, declare, on, ObjectStore, ToggleButton, TimeTextBox, Select, FilteringSelect, DijitEditor, testStore){
 					var columns = [
 						{label: 'Column 1', field: 'col1'},
 						{label: 'Column 2', field: 'col2', sortable: false},
@@ -61,115 +60,91 @@
 						columns: columns
 						
 					}, "grid");
-				});
-				
-				
-				require(["dojo/on", "dgrid/OnDemandGrid","dgrid/Tree","dgrid/Editor", "dgrid/Keyboard", "dgrid/Selection", "dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!", "xstyle/css!../css/dgrid_rtl.css"], 
-					function(on, Grid, Tree, Editor, Keyboard, Selection, declare, testStore){
-						var columns = [
-							Editor({label: ' ', field: 'bool', sortable: false}, "checkbox"),
-							Tree({label:'Name', field:'name', sortable: false}),
-							{label:'Type', field:'type', sortable: false},
-							{label:'Population', field:'population'},
-							{label:'Timezone', field:'timezone'}
-						];
+					
+					var columnsTree = [
+						Editor({label: ' ', field: 'bool', sortable: false}, "checkbox"),
+						Tree({label:'Name', field:'name', sortable: false}),
+						{label:'Type', field:'type', sortable: false},
+						{label:'Population', field:'population'},
+						{label:'Timezone', field:'timezone'}
+					];
+					
+					window.tree = declare([Grid, Keyboard, Selection])({
+						store: testCountryStore,
+						query: {type: "continent"},
+						columns: columnsTree
+					}, "tree");
+					
+					var columnsHeaderless = { // you can declare columns as an object hash (key translates to field)
+						col1: Editor({label: 'Column 1 column 1 column 1'}, "text", "dblclick"),
+						col2: {label: 'Column 2', sortable: false},
+						col3: Editor({label: 'Column 3'}, "text", "dblclick"),
+						col4: 'Column444444444444444444',
+						"last-col": Editor({label: 'Column 5', field: 'col5'}, "text", "dblclick")
+					};
 
-						window.tree = declare([Grid, Keyboard, Selection])({
-							store: testCountryStore,
-							query: {type: "continent"},
-							columns: columns
-							
-						}, "tree");
+					window.headerless = declare([Grid, Selection, Keyboard])({
+						store: testStore,
+						columns: columnsHeaderless,
+						showHeader: false
 						
-				});
-				
-				require(["dojo/on", "dgrid/List", "dgrid/OnDemandGrid", "dgrid/Tree", "dgrid/Editor", "dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dijit/form/DateTextBox", "dijit/form/HorizontalSlider", "dijit/form/NumberSpinner", "dgrid/test/data/base", "dojo/domReady!", "xstyle/css!../css/dgrid_rtl.css"], 
-					function(on, List, Grid, Tree, Editor, Selection, Keyboard, declare, DateTextBox, Slider, NumberSpinner, testStore){
-						var columns = { // you can declare columns as an object hash (key translates to field)
-							col1: Editor({label: 'Column 1 column 1 column 1'}, "text", "dblclick"),
-							col2: {label: 'Column 2', sortable: false},
-							col3: Editor({label: 'Column 3'}, "text", "dblclick"),
-							col4: 'Column444444444444444444',
-							"last-col": Editor({label: 'Column 5', field: 'col5'}, "text", "dblclick")
-						};
-
-						window.headerless = declare([Grid, Selection, Keyboard])({
-							store: testStore,
-							columns: columns,
-							showHeader: false
-							
-						}, "headerless");
+					}, "headerless");
 						
-				});
-				
-				require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Tree","dgrid/Selection", "dgrid/Keyboard", "dgrid/Editor", "dijit/form/ToggleButton", "dijit/form/TimeTextBox",  "dijit/form/Select","dojo/data/ObjectStore", "dijit/form/FilteringSelect", "dijit/Editor", "dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!", "xstyle/css!../css/dgrid_rtl.css"],
-					function(List, Grid, Tree, Selection, Keyboard, Editor, ToggleButton, TimeTextBox, Select, ObjectStore, FilteringSelect, DijitEditor, declare){
-
-						stateStore = new ObjectStore({
-							objectStore:testStateStore,
-							labelProperty: "name"
-						});
-
-						var columns2 = [
-							{field: 'id', label: 'id'},
-							Editor({label: 'Toggle', field: 'bool2', widgetArgs: function(item){
-
-									return {checked: item.bool2, iconClass: "dijitCheckBoxIcon", label: "Toggle"};
-								}}, ToggleButton),
-							Editor({label: 'Time', field: 'time', widgetArgs: {
-								timePattern: 'HH:mm:ss',
-								clickableIncrement: 'T00:15:00',
-								visibleIncrement: 'T00:15:00',
-								visibleRange: 'T01:00:00'}}, TimeTextBox),
-							Editor({
-								label: 'Select Options',
-								field: 'bool',
-								widgetArgs: function(item){
-									return {
-										style: "width:75px;",
-										options: [
-											{value:item.bool+"", label: item.bool+"", selected: true},
-											{value: !item.bool+"", label: !item.bool+""}
-										]
-									};
-								}
-							}, Select),
-							Editor({label: 'Select Store', field: 'state', widgetArgs: {store: stateStore, maxHeight: 150, style: "width:120px;"}}, Select, "click"),
-							Editor({label: 'FilteringSelect Store', field: 'state', widgetArgs: {store: stateStore, maxHeight: 150, style: "width:120px;"}}, FilteringSelect),
-							Editor({label: 'Dijit/Editor', field: 'text', widgetArgs: {style: "height: 150px;"}}, DijitEditor)
-							//Note that widgets that have multiple focusable children aren't supported by editOn functionality, for example: dijit/Editor
-						];
-
-
-						window.moreeditors = new (declare([Grid, Selection, Keyboard]))({
-							store: testTypesStore,
-							columns: columns2,
-							selectionMode: "none"
-						}, "moreeditors");
-
+					stateStore = new ObjectStore({
+						objectStore:testStateStore,
+						labelProperty: "name"
 					});
-				
+
+					var columnsEditor = [
+						{field: 'id', label: 'id'},
+						Editor({label: 'Toggle', field: 'bool2', widgetArgs: function(item){
+
+								return {checked: item.bool2, iconClass: "dijitCheckBoxIcon", label: "Toggle"};
+							}}, ToggleButton),
+						Editor({label: 'Time', field: 'time', widgetArgs: {
+							timePattern: 'HH:mm:ss',
+							clickableIncrement: 'T00:15:00',
+							visibleIncrement: 'T00:15:00',
+							visibleRange: 'T01:00:00'}}, TimeTextBox),
+						Editor({
+							label: 'Select Options',
+							field: 'bool',
+							widgetArgs: function(item){
+								return {
+									style: "width:75px;",
+									options: [
+										{value:item.bool+"", label: item.bool+"", selected: true},
+										{value: !item.bool+"", label: !item.bool+""}
+									]
+								};
+							}
+						}, Select),
+						Editor({label: 'Select Store', field: 'state', widgetArgs: {store: stateStore, maxHeight: 150, style: "width:120px;"}}, Select, "click"),
+						Editor({label: 'FilteringSelect Store', field: 'state', widgetArgs: {store: stateStore, maxHeight: 150, style: "width:120px;"}}, FilteringSelect),
+						Editor({label: 'Dijit/Editor', field: 'text', widgetArgs: {style: "height: 150px;"}}, DijitEditor)
+						//Note that widgets that have multiple focusable children aren't supported by editOn functionality, for example: dijit/Editor
+					];
+					
+					window.moreeditors = new (declare([Grid, Selection, Keyboard]))({
+						store: testTypesStore,
+						columns: columnsEditor,
+						selectionMode: "none"
+					}, "moreeditors");
+					
+				});
 		</script>
 	</head> 
 	<body class="claro" dir="rtl" style="direction:rtl;">
-		<h2>A basic grid tundra theme</h2>
+		<h2>A basic grid</h2>
 		<div id="grid"></div>
-		
-		<br /><br />
 		
 		<h2>Lazy-loading tree grid, with store functionality</h2>
 		<div id="tree"></div>
 		
-		<br /><br />
-		
 		<h2>Headerless grid</h2>
 		<div id="headerless"></div>
 		
-		<br /><br />
-		
 		<h2>More Editors</h2>
 		<div id="moreeditors"></div>
-		
-		
 	</body>
 </html>
