@@ -8,12 +8,12 @@ return function(column){
         	put(td, "span.dgrid-expando-text", value);
         }
     };
-	column.renderCell = function(object, value, td, options){
+	column.renderCell = function(object, value, td, options, parentGrid){
 		// summary:
 		//		Renders a cell that can be expanded, creating more rows
 		var level = Number(options.query.level) + 1;
 		level = isNaN(level) ? 0 : level;
-		var grid = this.grid;
+		var grid = parentGrid;
 		var mayHaveChildren = !grid.store.mayHaveChildren || grid.store.mayHaveChildren(object);
 		// create the expando
 		var expando = put(td, "div.dgrid-expando-icon" + (mayHaveChildren ? ".ui-icon.ui-icon-triangle-1-e" : "") +
@@ -27,7 +27,7 @@ return function(column){
 		if(!grid._hasTreeListener){
 			// just setup the event listener once and use event delegation for better memory use
 			grid._hasTreeListener = true;
-			this.grid.on(column.expandOn || ".dgrid-expando-icon:click,.dgrid-content .column-" + column.id + ":dblclick", function(event){
+			grid.on(column.expandOn || ".dgrid-expando-icon:click,.dgrid-content .column-" + column.id + ":dblclick", function(event){
 				var target = this.className.indexOf("dgrid-expando-icon") > -1 ? this :
 					querySelector(".dgrid-expando-icon", this)[0];
 				if(target.mayHaveChildren){
