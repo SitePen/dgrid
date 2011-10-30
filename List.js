@@ -1,4 +1,4 @@
-define(["put-selector/put", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/has", "dojo/has!touch?./TouchScroll", "xstyle/has-class", "dojo/_base/sniff", "xstyle/css!./css/dgrid.css"], 
+define(["put-selector/put", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/has", "dojo/has!touch?./SimpleTouchScroll", "xstyle/has-class", "dojo/_base/sniff", "xstyle/css!./css/dgrid.css"], 
 function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 	// Add user agent/feature CSS classes 
 	hasClass("mozilla", "opera", "webkit", "ie-6", "ie-6-7", "quirks", "no-quirks");
@@ -166,7 +166,7 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			if(has("quirks") || has("ie") < 8){
 				var spacerNode = put(domNode, "div.dgrid-spacer");
 			}
-			var bodyNode = this.bodyNode = put(domNode, "div.dgrid-scroller");
+			var bodyNode = this.bodyNode = this.touchNode = put(domNode, "div.dgrid-scroller");
 			var grid = this;
 			this.headerScrollNode = put(domNode, "div.dgrid-header-scroll.dgrid-scrollbar-width.ui-widget-header");
 			
@@ -184,9 +184,6 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			this.renderHeader();
 			
 			this.contentNode = put(this.bodyNode, "div.dgrid-content.ui-widget-content");
-			aspect.after(this, "scrollTo", function(){
-				listen.emit(bodyNode, "scroll", {});
-			});
 			this._listeners.push(listen(window, "resize", function(){
 				grid.resize();
 			}));
@@ -196,6 +193,7 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			//		Called automatically after postCreate if the component is already
 			//		visible; otherwise, should be called manually once placed.
 			
+			this.inherited(arguments);
 			if(this._started){ return; } // prevent double-triggering
 			this._started = true;
 			this.resize();
@@ -304,12 +302,6 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 				this.observers[i].cancel();
 			}
 			this.observers = [];
-			if(this.init){
-				this.init({
-					domNode: this.bodyNode,
-					containerNode: this.contentNode
-				});
-			}
 			this.preloadNode = null;
 		},
 		renderArray: function(results, beforeNode, options){
