@@ -114,6 +114,7 @@ return declare([List], {
 		
 		// listen for actions that should cause selections
 		on(this.contentNode, this.selectionEvent, focus);
+		/* touch seems to fire mousedown anyway, so this ends up firing an extra event
 		if(has("touch")){
 			// first listen for touch taps if available
 			var lastTouch, lastTouchX, lastTouchY, lastTouchEvent, isTap;
@@ -134,6 +135,7 @@ return declare([List], {
 				}
 			});
 		}
+		*/
 	},
 	
 	select: function(row, toRow, value){
