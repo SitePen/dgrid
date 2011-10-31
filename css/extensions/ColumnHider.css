@@ -1,9 +1,12 @@
-/* Column hiding plugin */
 .dgrid-hider-toggle {
 	font-weight:normal;
 }
 .dgrid-hider-toggle:hover {
 	font-weight: bold;
+}
+html.has-quirks .dgrid-header-scroll .dgrid-hider-toggle,
+html.has-ie-6 .dgrid-header-scroll .dgrid-hider-toggle {
+	font-size: 12px; /* override zeroed font-size for IE6/Quirks in dgrid.css */
 }
 
 .dgrid-hider-menu {
@@ -20,7 +23,7 @@
 
 .dgrid-hider-menu-row {
 	position: relative;
-	padding: 4px 2px 2px 20px;
+	padding: 2px;
 }
 .dgrid-hider-menu-check {
 	position: absolute;
@@ -28,4 +31,6 @@
 	left: 2px;
 }
 .dgrid-hider-menu-label {
+	display: block;
+	margin-left: 20px;
 }
