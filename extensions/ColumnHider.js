@@ -17,7 +17,22 @@ define(["dojo/_base/declare", "dojo/has", "dojo/on", "dojo/query", "dojo/dom", "
  *		are looking for something more fancy, you'll probably need to use this
  *		definition as a template to write your own plugin.
  *
- */ 
+ */
+	
+	var activeGrid, // references grid for which the menu is currently open
+		bodyListener = listen.pausable(document.body, "mousedown", function(e){
+			// If an event reaches this listener, the menu is open,
+			// but a click occurred outside, so close the dropdown.
+			activeGrid && activeGrid._toggleHiderMenu(e);
+		});
+	
+	function getColumnIdFromCheckbox(cb, grid){
+		// given one of the checkboxes from the hider menu,
+		// return the id of the corresponding column.
+		// (e.g. gridIDhere-hider-menu-check-colIDhere -> colIDhere)
+		return cb.id.substr(grid.id.length + 18);
+	}
+	
 	return declare([], {
 		hiderMenuNode: null,		//	the menu to show/hide columns
 		hiderToggleNode: null,		//	the toggler to open the menu
@@ -32,29 +47,30 @@ define(["dojo/_base/declare", "dojo/has", "dojo/on", "dojo/query", "dojo/dom", "
 
 			//	assume that if this plugin is used, then columns are hidable.
 			//	create the toggle node.
-			this.hiderToggleNode = put(this.headerScrollNode, "div.dgrid-hider-toggle", "+");
+			this.hiderToggleNode = put(this.headerScrollNode, "div.dgrid-hider-toggle.dgrid-cell-padding", "+");
 			this.hiderToggleNode.setAttribute("title", "Click here to show or hide columns.");
-			listen(this.hiderToggleNode, "mousedown", function(e){
+			this._listeners.push(listen(this.hiderToggleNode, "click", function(e){
 				grid._toggleHiderMenu(e);
-			});
+			}));
 
 			//	create the column list, with checkboxes.
-			this.hiderMenuNode = put("div.dgrid-hider-menu");
+			this.hiderMenuNode = put("div#dgrid-hider-menu-" + this.id + ".dgrid-hider-menu");
 			for(var id in this.columns){
 				var col = this.columns[id];
 
 				// create the HTML for each column selector.
 				var div = put(".dgrid-hider-menu-row");
-				var check = put(div, "input.dgrid-hider-menu-check.hider-menu-check-" + id + "#" + grid.domNode.id + "-hider-menu-check-" + id + "[type=checkbox]");
-				put(div, "label.dgrid-hider-menu-label.hider-menu-label-" + id + "[for='" + grid.domNode.id + "-hider-menu-check-" + id + "]", col.label);
+				var checkId = grid.domNode.id + "-hider-menu-check-" + id;
+				var check = put(div, "input.dgrid-hider-menu-check.hider-menu-check-" + id + "#" + checkId + "[type=checkbox]");
+				put(div, "label.dgrid-hider-menu-label.hider-menu-label-" + id + "[for='" + checkId + "]", col.label);
 				if(has("ie") < 9){
-					listen(check, "click", function(e){
+					this._listeners.push(listen(check, "click", function(e){
 						grid._toggleColumnState(grid, e);
-					});
+					}));
 				} else {
-					listen(check, "change", function(e){
+					this._listeners.push(listen(check, "change", function(e){
 						grid._toggleColumnState(grid, e);
-					});
+					}));
 				}
 
 				//	track our state
@@ -69,33 +85,37 @@ define(["dojo/_base/declare", "dojo/has", "dojo/on", "dojo/query", "dojo/dom", "
 					this._columnStyleRules[id] = grid.styleColumn(id, "display: none");
 				}
 			}
+			listen(this.hiderMenuNode, "mousedown", function(evt){
+				// stop click events from propagating here, so that we can simply
+				// track body clicks for hide without having to drill-up to check
+				evt.stopPropagation();
+			});
 			//	make sure our menu is initially hidden, then attach to the document.
 			this.hiderMenuNode.style.display = "none";
 			put(grid.domNode, this.hiderMenuNode);
-
+			
 			//	adjust the header if needed
-			grid._adjustScrollerNode(grid);
+			grid.resize();
 
 			//	attach a listener to the document body to close the menu
 			var self = this;
-			listen(document.body, "click", function(e){
-				//	if we clicked outside of our domNode, close the dropdown.
-				if(!self.hiderMenuOpened) return;
-				var n = e.target;
-				while(n && n != self.domNode){ n = n.parentNode; }
-				if(!n){ self._toggleHiderMenu(e); }
-			});
 		},
-
-		_toggleHiderMenu: function(e){
-			//	show or hide the hider menu
-			this.hiderMenuNode.style.display = (this.hiderMenuOpened ? "none" : "");
-			this.hiderMenuOpened = !this.hiderMenuOpened;
+		
+		_toggleHiderMenu: function(){
+			var hidden = this.hiderMenuOpened; // reflects hidden state after toggle
+			// show or hide the hider menu
+			this.hiderMenuNode.style.display = (hidden ? "none" : "");
+			// pause or resume the listener for clicks outside the menu
+			bodyListener[hidden ? "pause" : "resume"]();
+			// update activeGrid appropriately
+			activeGrid = hidden ? null : this;
+			// toggle the instance property
+			this.hiderMenuOpened = !hidden;
 		},
 
 		_toggleColumnState: function(grid, e){
 			//	show or hide the given column
-			var id = e.target.id.split("-").pop();
+			var id = getColumnIdFromCheckbox(e.target, this);
 			grid.hideState[id] = !e.target.checked;
 			if(grid._columnStyleRules[id]){
 				grid._columnStyleRules[id].remove();
@@ -108,19 +128,9 @@ define(["dojo/_base/declare", "dojo/has", "dojo/on", "dojo/query", "dojo/dom", "
 				column: grid.columns[id],
 				hidden: !e.target.checked
 			});
-			//grid.columnStateChange(grid, grid.columns[id].field, e.target.checked);
 
 			//	adjust the size of the header
-			grid._adjustScrollerNode(grid);
-		},
-
-		_adjustScrollerNode: function(grid){
-			var header = this.headerNode,
-				scrollnode = this.headerScrollNode,
-				scroller = this.bodyNode,
-				h = header.clientHeight;
-			scrollnode.style.height = (h + 1) + "px";
-			scroller.style.marginTop = (h + 1) + "px";
+			grid.resize();
 		}
 	});
 });
