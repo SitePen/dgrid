@@ -15,6 +15,7 @@
 	border: 1px solid black;
 	z-index: 99999;
 	padding: 4px;
+	overflow: hidden;
 }
 
 .dgrid-hider-menu-row {
