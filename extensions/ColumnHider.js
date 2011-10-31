@@ -1,4 +1,4 @@
-define(["dojo/_base/declare", "dojo/has", "dojo/on", "dojo/query", "dojo/dom", "put-selector/put", "dojo/NodeList-dom"], 
+define(["dojo/_base/declare", "dojo/has", "dojo/on", "dojo/query", "dojo/dom", "put-selector/put", "dojo/NodeList-dom", "xstyle/css!../css/extensions/ColumnHider.css"], 
 	function(declare, has, listen, query, dom, put){
 /*
  *	Column Hider plugin for dgrid
@@ -103,16 +103,15 @@ define(["dojo/_base/declare", "dojo/has", "dojo/on", "dojo/query", "dojo/dom", "
 			} else {
 				grid._columnStyleRules[id] = grid.styleColumn(id, "display: none;");
 			}
-			grid.columnStateChange(grid, grid.columns[id].field, e.target.checked);
+			// emit event to notify of column state change
+			listen.emit(grid.domNode, "dgrid-columnstatechange", {
+				column: grid.columns[id],
+				hidden: !e.target.checked
+			});
+			//grid.columnStateChange(grid, grid.columns[id].field, e.target.checked);
 
 			//	adjust the size of the header
 			grid._adjustScrollerNode(grid);
-		},
-
-		columnStateChange: function(grid, field, state){
-			//	stub for listening to the change of column state, this actually does nothing
-			//	on its own.
-			console.log("Changing ", field, " to ", (state ? "show" : "hide"));
 		},
 
 		_adjustScrollerNode: function(grid){
