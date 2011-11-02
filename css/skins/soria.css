@@ -3,10 +3,24 @@
 	color: #000;
 }
 .soria .ui-widget-header {
-	background: url(../../../dijit/themes/soria/images/titleBar.png) #e9e9e9 repeat-x top;
+    background: #f2f4fe; /* Old browsers */
+    background: -moz-linear-gradient(top, #f2f4fe 0%, #d0dff5 50%, #c6d8f0 51%, #c2d5ef 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#f2f4fe), color-stop(50%,#d0dff5), color-stop(51%,#c6d8f0), color-stop(100%,#c2d5ef)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, #f2f4fe 0%,#d0dff5 50%,#c6d8f0 51%,#c2d5ef 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, #f2f4fe 0%,#d0dff5 50%,#c6d8f0 51%,#c2d5ef 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, #f2f4fe 0%,#d0dff5 50%,#c6d8f0 51%,#c2d5ef 100%); /* IE10+ */
+    background: linear-gradient(top, #f2f4fe 0%,#d0dff5 50%,#c6d8f0 51%,#c2d5ef 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f2f4fe', endColorstr='#c2d5ef',GradientType=0 ); /* IE6-9 */
 }
 .soria .ui-widget-header th:hover {
-	background: url(../../../dijit/themes/soria/images/titleBarActive.png) #e9e9e9 repeat-x top;
+    background: #dae2ed; /* Old browsers */
+    background: -moz-linear-gradient(top, #dae2ed 0%, #b2c7e8 49%, #a8c1eb 50%, #9ebaec 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#dae2ed), color-stop(49%,#b2c7e8), color-stop(50%,#a8c1eb), color-stop(100%,#9ebaec)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, #dae2ed 0%,#b2c7e8 49%,#a8c1eb 50%,#9ebaec 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, #dae2ed 0%,#b2c7e8 49%,#a8c1eb 50%,#9ebaec 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, #dae2ed 0%,#b2c7e8 49%,#a8c1eb 50%,#9ebaec 100%); /* IE10+ */
+    background: linear-gradient(top, #dae2ed 0%,#b2c7e8 49%,#a8c1eb 50%,#9ebaec 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#dae2ed', endColorstr='#9ebaec',GradientType=0 ); /* IE6-9 */
 }
 
 .soria .ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active {
