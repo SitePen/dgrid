@@ -32,7 +32,6 @@
 	background: -o-linear-gradient(top, #000000 0%,#2d1f14 100%); /* Opera 11.10+ */
 	background: -ms-linear-gradient(top, #000000 0%,#2d1f14 100%); /* IE10+ */
 	background: linear-gradient(top, #000000 0%,#2d1f14 100%); /* W3C */
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#000000', endColorstr='#2d1f14',GradientType=0 ); /* IE6-9 */
 }
 
 .squid .ui-state-default {
