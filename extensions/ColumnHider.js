@@ -61,8 +61,9 @@ define(["dojo/_base/declare", "dojo/has", "dojo/on", "dojo/query", "dojo/dom", "
 				// create the HTML for each column selector.
 				var div = put(".dgrid-hider-menu-row");
 				var checkId = grid.domNode.id + "-hider-menu-check-" + id;
-				var check = put(div, "input.dgrid-hider-menu-check.hider-menu-check-" + id + "#" + checkId + "[type=checkbox]");
-				put(div, "label.dgrid-hider-menu-label.hider-menu-label-" + id + "[for='" + checkId + "]", col.label);
+				// insert checkbox inside of label to make IE < 8 behave properly
+				var label = put(div, "label.dgrid-hider-menu-label.hider-menu-label-" + id, col.label);
+				var check = put(label.firstChild, "-input.dgrid-hider-menu-check.hider-menu-check-" + id + "#" + checkId + "[type=checkbox]");
 				if(has("ie") < 9){
 					this._listeners.push(listen(check, "click", function(e){
 						grid._toggleColumnState(grid, e);

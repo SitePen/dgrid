@@ -29,8 +29,16 @@ html.has-ie-6 .dgrid-header-scroll .dgrid-hider-toggle {
 	position: absolute;
 	top: 2px;
 	left: 2px;
+	padding: 0;
 }
 .dgrid-hider-menu-label {
 	display: block;
-	margin-left: 20px;
+	padding-left: 20px;
+}
+
+html.has-quirks .dgrid-hider-menu-check,
+html.has-ie-6-7 .dgrid-hider-menu-check {
+	/* IE < 8 seems to ignore padding: 0, so counteract */
+	top: 0;
+	left: 0;
 }
