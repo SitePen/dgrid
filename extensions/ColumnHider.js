@@ -20,11 +20,7 @@ define(["dojo/_base/declare", "dojo/has", "dojo/on", "dojo/query", "dojo/dom", "
  */
 	
 	var activeGrid, // references grid for which the menu is currently open
-		bodyListener = listen.pausable(document.body, "mousedown", function(e){
-			// If an event reaches this listener, the menu is open,
-			// but a click occurred outside, so close the dropdown.
-			activeGrid && activeGrid._toggleHiderMenu(e);
-		});
+		bodyListener; // references pausable event handler for body mousedown
 	
 	function getColumnIdFromCheckbox(cb, grid){
 		// given one of the checkboxes from the hider menu,
@@ -78,6 +74,15 @@ define(["dojo/_base/declare", "dojo/has", "dojo/on", "dojo/query", "dojo/dom", "
 					e.stopPropagation();
 				}));
 				
+				// hook up top-level mousedown listener if it hasn't been yet
+				if(!bodyListener){
+					bodyListener = listen.pausable(document.body, "mousedown", function(e){
+						// If an event reaches this listener, the menu is open,
+						// but a click occurred outside, so close the dropdown.
+						activeGrid && activeGrid._toggleHiderMenu(e);
+					});
+					bodyListener.pause(); // pause initially; will resume when menu opens
+				}
 			}else{ // subsequent run
 				// remove active rules, and clear out the menu (to be repopulated)
 				for (id in this._columnStyleRules){
