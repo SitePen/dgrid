@@ -7,13 +7,30 @@ return declare([], {
 	gridWidth: null, //place holder for the grid width property
 	_resizedColumns: false, //flag that indicates if resizer has converted column widths to px
 	resizeColumnWidth: function(colId, width){
-	// Summary:
-	//      calls grid's styleColumn function to add a style for the column
-	// colId: String
-	//      column id
-	// width: Integer
-	//      new width of the column
+		// Summary:
+		//      calls grid's styleColumn function to add a style for the column
+		// colId: String
+		//      column id
+		// width: Integer
+		//      new width of the column
+		if(!this._columnStyles){
+			this._columnStyles = {};
+		}
+		var old = this._columnStyles[colId];
 		var x = this.styleColumn(colId, "width: " + width + "px;");
+		old && old.remove();
+
+		// keep a reference
+		this._columnStyles[colId] = x;
+	},
+	configStructure: function(){
+		this._resizedColumns = false;
+		for(var name in this._columnStyles){
+			this._columnStyles[name].remove();
+		}
+		this._columnStyles = {};
+
+		this.inherited(arguments);
 	},
 	renderHeader: function(){
 		this.inherited(arguments);
@@ -21,22 +38,34 @@ return declare([], {
 		var grid = this;
 		grid.gridWidth = grid.headerNode.clientWidth - 1; //for some reason, total column width needs to be 1 less than this
 
-		for(id in this.columns){
-			var col = this.columns[id];
-			var colNode = query("#" + grid.domNode.id + " .column-"+id)[0];//grabs header node
+		var colNodes = query(".dgrid-cell", grid.headerNode),
+			i = colNodes.length;
+
+		while(i--){
+			var colNode = colNodes[i],
+				id = colNode.columnId,
+				col = this.columns[id],
+				childNodes = colNode.childNodes;
+
+			if(!col){ continue; }
 
 			var headerTextNode = put("div.dgrid-resize-header-container");
 			colNode.contents = headerTextNode;
-			var childNodes = colNode.childNodes;
+
 			// move all the children to the header text node
-			while(childNodes.length > 0){
+			while(childNodes.length){
 				put(headerTextNode, childNodes[0]);
 			}
-			listen(put(colNode, headerTextNode, "div.dgrid-resize-handler.resizeNode-"+id), "mousedown", function(e){
-					grid._resizeMouseDown(e);
-			});
+			var resizer = put(colNode, headerTextNode, "div.dgrid-resize-handler.resizeNode-"+id);
+			if(resizer){
+				resizer.columnId = id;
+			}
 		}
+
 		if(!grid.mouseMoveListen){
+			listen(grid.headerNode, ".dgrid-resize-handler:mousedown", function(e){
+				grid._resizeMouseDown(e, this);
+			});
 			grid.mouseMoveListen = listen.pausable(document.body, "mousemove", function(e){
 				// while resizing, update the position of the resizer bar
 				if(!grid._resizing){return;}
@@ -51,50 +80,53 @@ return declare([], {
 		}
 	}, // end renderHeader
 
-	_resizeMouseDown: function(e){
-	// Summary:
-	//      called when mouse button is pressed on the header
-	// e: Object
-	//      mousedown event object
+	_resizeMouseDown: function(e, target){
+		// Summary:
+		//      called when mouse button is pressed on the header
+		// e: Object
+		//      mousedown event object
 		
 		// preventDefault actually seems to be enough to prevent browser selection
 		// in all but IE < 9.  setSelectable works for those.
 		e.preventDefault();
 		dom.setSelectable(this.domNode, false);
-		var grid = this;
-		grid._resizing = true;
-		grid._startX = grid._getResizeMouseLocation(e); //position of the target
-		grid._gridX = geom.position(grid.bodyNode).x;//position of the grid in the body *not sure why we need this?*
-		grid._targetCell = grid._getResizeCell(e);
+		this._resizing = true;
+		this._startX = this._getResizeMouseLocation(e); //position of the target
+		this._gridX = geom.position(this.bodyNode).x;//position of the grid in the body *not sure why we need this?*
+
+		this._targetCell = target.parentNode.parentNode;
 		
 		// show resizer inlined
-		if(!grid._resizer){
-			grid._resizer = put(grid.domNode, "div.dgrid-column-resizer");
+		if(!this._resizer){
+			this._resizer = put(this.domNode, "div.dgrid-column-resizer");
 		}else{
-			grid.mouseMoveListen.resume();
-			grid.mouseUpListen.resume();
+			this.mouseMoveListen.resume();
+			this.mouseUpListen.resume();
 		}
 
-		grid._resizer.style.display = "block";
-		grid._updateResizerPosition(e);
+		this._resizer.style.display = "block";
+		this._updateResizerPosition(e);
 	},
 	_resizeMouseUp: function(e){
-	// Summary:
-	//      called when mouse button is released
-	// e: Object
-	//      mouseup event object
+		// Summary:
+		//      called when mouse button is released
+		// e: Object
+		//      mouseup event object
 
 		this._resizing = false;
 		this._readyToResize = false;
 
 		//This is used to set all the column widths to a static size
 		if(!this._resizedColumns){
-			for(id in this.columns){
-				var col = this.columns[id];
-				var width = query("#" + this.domNode.id + " .column-"+id)[0].offsetWidth;
+			var colNodes = query(".dgrid-cell", this.headerNode),
+				i = colNodes.length;
+
+			while(i--){
+				var colNode = colNodes[i],
+					id = colNode.columnId,
+					width = colNode.offsetWidth;
 				this.resizeColumnWidth(id, width);
 			}
-			this._resizedColumns = true;
 		}
 		dom.setSelectable(this.domNode, true);
 
@@ -125,10 +157,10 @@ return declare([], {
 		this._hideResizer();
 	},
 	_updateResizerPosition: function(e){
-	// Summary:
-	//      updates position of resizer bar as mouse moves
-	// e: Object
-	//      mousemove event object
+		// Summary:
+		//      updates position of resizer bar as mouse moves
+		// e: Object
+		//      mousemove event object
 
 		var mousePos = this._getResizeMouseLocation(e),
 			delta = mousePos - this._startX, //change from where user clicked to where they drag
@@ -141,51 +173,37 @@ return declare([], {
 	},
 
 	_hideResizer: function(){
-	// Summary:
-	//      sets resizer bar display to none
+		// Summary:
+		//      sets resizer bar display to none
 		this._resizer.style.display = "none";
 	},
 	_getResizeMouseLocation: function(e){
-	//Summary:
-	//      returns position of mouse relative to the left edge
-	// e: event object
-	//      mouse move event object
+		//Summary:
+		//      returns position of mouse relative to the left edge
+		// e: event object
+		//      mouse move event object
 		var posX = 0;
 		if(e.pageX){
 			posX = e.pageX;
-		}
-		else if(e.clientX){
-			posX = e.clientX + document.body.scrollLeft
-				+ document.documentElement.scrollLeft;
+		}else if(e.clientX){
+			posX = e.clientX + document.body.scrollLeft +
+				document.documentElement.scrollLeft;
 		}
 		return posX;
 	},
-	_getResizeCell: function(e){
-	// Summary:
-	//      get the target of the mouse move event
-	// e: Object
-	//      mousemove event object
-		var node;
-		if(e.target){
-			node = e.target;
-		}else if(e.srcElement){
-			node = e.srcElement;
-		}
-		if(node.nodeType == 3 || !node.columnId){ // defeat Safari bug first and IE oddity 2nd
-			node = node.parentNode.parentNode;
-		}
-		return node;
-	},
 	_getResizedColumnWidths: function (){
-	//Summary:
-	//      returns object containing new column width and column id
-		var totalWidth = 0;
-		var lastColId = null;
-		for(id in this.columns){
-			var col = this.columns[id];
-			var width = query("#" + this.domNode.id + " .column-"+id)[0].offsetWidth;
-			totalWidth += width;
-			lastColId = id;
+		//Summary:
+		//      returns object containing new column width and column id
+		var totalWidth = 0,
+			colNodes = query(".dgrid-cell", this.headerNode),
+			i = colNodes.length;
+
+		if(!i){ return {}; }
+
+		var lastColId = colNodes[i-1].columnId;
+
+		while(i--){
+			totalWidth += colNodes[i].offsetWidth;
 		}
 		return {totalWidth: totalWidth, lastColId: lastColId};
 	}
