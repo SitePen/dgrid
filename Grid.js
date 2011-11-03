@@ -348,18 +348,17 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 			this.subRows = null;
 			this.columns = columns;
 			// re-run logic
-			this.configStructure();
 			this._updateColumns();
 		},
 		setSubRows: function(subrows){
 			this.subRows = subrows;
-			this.configStructure();
 			this._updateColumns();
 		},
 		_updateColumns: function(){
 			// summary:
 			//		Called after e.g. columns, subRows, columnSets are updated
 			
+			this.configStructure();
 			this.renderHeader();
 			this.refresh();
 			// re-render last collection if present

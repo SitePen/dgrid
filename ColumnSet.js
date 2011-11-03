@@ -97,7 +97,6 @@ function(styleSheet, has, put, declare, listen, aspect, query, Grid, hasClass){
 		},
 		setColumnSets: function(columnSets){
 			this.columnSets = columnSets;
-			this.configStructure();
 			this._updateColumns();
 		}
 	});
