@@ -362,9 +362,11 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			}
 			function whenDone(resolvedRows){
 				(beforeNode && beforeNode.parentNode || self.contentNode).insertBefore(rowsFragment, beforeNode || null);
+				/*
 				if(!beforeNode){
 					put(lastRow, ".dgrid-last-row");
 				}
+				*/
 				return rows = resolvedRows;
 			}
 			return whenDone(rows);
