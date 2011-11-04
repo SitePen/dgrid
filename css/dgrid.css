@@ -61,29 +61,17 @@ html.has-quirks .dgrid-header-hidden .dgrid-cell {
 	overflow: hidden;
 	vertical-align: top;
 	border: 1px solid #ddd;
-	border-bottom-style: none;
+	border-top-style: none;
 	
 	box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	-ms-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 }
-
-.dgrid-last-row .dgrid-cell {
-	border-bottom-style: solid;
-}
-
 .dgrid-cell-padding {
 	padding: 3px;
 }
 
-.dgrid-right-corner {
-	width: 17px;
-}
-.dgrid-header-row {
-	border-bottom: 1px solid #ccc;
-}
-.dgrid-main,
 .dgrid-content {
 	position: relative;
 }

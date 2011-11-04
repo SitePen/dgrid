@@ -1,3 +1,7 @@
+.tundra .dgrid {
+	border-color: #bba;
+}
+
 .tundra .ui-widget-content {
 	background: #fff;
 	color: #000;
@@ -33,4 +37,12 @@
 
 .tundra .ui-state-highlight {
 	background-color: #ff6;
+}
+
+.tundra .dgrid-cell {
+	border-color: #ddc;
+}
+
+.tundra .ui-widget-header .dgrid-cell {
+	border-color: #bba;
 }

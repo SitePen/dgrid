@@ -1,3 +1,7 @@
+.nihilo .dgrid {
+	border-color: #bba;
+}
+
 .nihilo .ui-widget-content {
 	background: #fff;
 	color: #000;
@@ -10,7 +14,7 @@
 	border-right-color: #acab99;
 }
 
-.nihilo .ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active {
+.nihilo .ui-state-active {
 	background-color: #aec7e3;
 }
 .nihilo .ui-state-default:hover {
@@ -19,4 +23,12 @@
 
 .nihilo .ui-state-highlight {
 	background-color: #ff6;
+}
+
+.nihilo .dgrid-cell {
+	border-color: #ddc;
+}
+
+.nihilo .ui-widget-header .dgrid-cell {
+	border-color: #bba;
 }

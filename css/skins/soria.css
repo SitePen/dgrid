@@ -1,3 +1,7 @@
+.soria .dgrid {
+	border-color: #bba;
+}
+
 .soria .ui-widget-content {
 	background: #fff;
 	color: #000;
@@ -22,7 +26,7 @@
 	background: linear-gradient(top, #dae2ed 0%,#b2c7e8 49%,#a8c1eb 50%,#9ebaec 100%); /* W3C */
 }
 
-.soria .ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active {
+.soria .ui-state-active {
 	background-color: #aec7e3;
 }
 .soria .ui-state-default:hover {
@@ -31,4 +35,12 @@
 
 .soria .ui-state-highlight {
 	background-color: #ff6;
+}
+
+.soria .dgrid-cell {
+	border-color: #ddc;
+}
+
+.soria .ui-widget-header .dgrid-cell {
+	border-color: #bba;
 }

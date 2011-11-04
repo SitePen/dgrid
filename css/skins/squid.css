@@ -63,3 +63,7 @@
 .squid .ui-state-highlight {
 	background-color: #666;
 }
+
+.squid .dgrid-cell {
+	border-color: #ccc;
+}

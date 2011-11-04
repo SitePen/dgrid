@@ -1,4 +1,4 @@
-.claro .ui-widget { 
+.claro .dgrid {
 	border: 1px solid #aaa;
 	background: #fff;
 	color: #000;
@@ -52,4 +52,12 @@
 
 .claro .ui-state-highlight {
 	background-color: #ff6;
+}
+
+.claro .dgrid-cell {
+	border-color: #edc;
+}
+
+.claro .ui-widget-header .dgrid-cell {
+	border-color: #bbb;
 }
