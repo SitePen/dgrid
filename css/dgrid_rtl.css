@@ -19,7 +19,7 @@
 	right: auto;
 }
 
-.dgrid-rtl-nonwebkit .dgrid-cell {
+.dgrid-rtl .dgrid-cell {
 	text-align: right;
 }
 
