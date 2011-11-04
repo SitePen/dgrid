@@ -297,11 +297,13 @@ return declare([List], {
 				// use the query associated with the preload node to get the next "page"
 				options.query = preloadNode.query;
 				
-				// query now to fill in these rows
-				var results = this._trackError(function(){
-					return preloadNode.query(options);
-				});
-				if(results === undefined){ return; } // sync query failed
+				// Query now to fill in these rows.
+				// Keep _trackError-wrapped results separate, since if results is a
+				// promise, it will lose QueryResults functions when chained by `when`
+				var results = preloadNode.query(options),
+					trackedResults = this._trackError(function(){ return results; });
+				
+				if(trackedResults === undefined){ return; } // sync query failed
 				
 				Deferred.when(this.renderArray(results, loadingNode, options), function(){
 						// can remove the loading node now
