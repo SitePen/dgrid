@@ -331,7 +331,7 @@ return declare([List], {
 			getFunc = function(id){
 				// returns a function to pass as a step in the promise chain,
 				// with the id variable closured
-				return this.getBeforePut ?
+				return self.getBeforePut ?
 					function(){ return store.get(id); } :
 					function(){ return self.row(id).data; };
 			};
