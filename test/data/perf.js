@@ -14,5 +14,5 @@ define(["dojo/store/Memory", "dojo/store/Observable"],function(Memory, Observabl
 			today: new Date(today)
 		});
 	}
-	return new Memory({data: perfData});
+	return Observable(new Memory({data: perfData}));
 });
