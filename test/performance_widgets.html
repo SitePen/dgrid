@@ -69,6 +69,8 @@
 						columns: columns
 					}, "grid");
 					console.timeEnd("grid construction");
+					
+					window.store = testPerfStore; // for tinkering
 			});
 			
 			function logDirty(){
@@ -79,6 +81,11 @@
 				}
 				console.log("Total dirty items: " + n);
 			}
+			
+			function toggleGBP(){
+				grid.getBeforePut = !grid.getBeforePut;
+				console.log("getBeforePut now " + grid.getBeforePut);
+			}
 		</script>
 	</head>
 	<body class="tundra">
@@ -86,6 +93,7 @@
 		<button onclick="countWidgets();">Count widgets in registry</button>
 		<h2 class="heading">A performance test designed to go head to head with DataGrid's test_datagrid_performance.html</h2>
 		<div id="grid"></div>
+		<button type="button" onclick="toggleGBP();">Toggle getBeforePut</button>
 		<button type="button" onclick="logDirty();">Log Dirty Data</button>
 		<button type="button" onclick="grid.save();">Save</button>
 	</body>
