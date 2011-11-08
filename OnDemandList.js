@@ -7,15 +7,6 @@ function emitError(err){
 }
 
 return declare([List], {
-	create: function(params, srcNodeRef){
-		this.inherited(arguments);
-		this.dirty = {};
-		var self = this;
-		// check visibility on scroll events
-		listen(this.bodyNode, "scroll", function(event){
-			self.onscroll(event);
-		});
-	},
 	queryOptions: null,
 	query: null,
 	store: null,
@@ -31,6 +22,16 @@ return declare([List], {
 		// Create empty query objects on each instance, not the prototype
 		this.query || (this.query = {});
 		this.queryOptions || (this.queryOptions = {});
+		this.dirty = {};
+	},
+	
+	postCreate: function(){
+		this.inherited(arguments);
+		var self = this;
+		// check visibility on scroll events
+		listen(this.bodyNode, "scroll", function(event){
+			self.onscroll(event);
+		});
 	},
 	
 	setStore: function(store, query, queryOptions){
@@ -149,6 +150,22 @@ return declare([List], {
 			});
 		}
 	},
+	
+	insertRow: function(object, parent, beforeNode, i, options){
+		var store = this.store,
+			dirty = this.dirty,
+			id = store && store.getIdentity(object),
+			dirtyObj;
+		
+		if(id in dirty){ dirtyObj = dirty[id]; }
+		if(dirtyObj){
+			// restore dirty object as delegate on top of original object,
+			// to provide protection for subsequent changes as well
+			object = lang.delegate(object, dirtyObj);
+		}
+		return this.inherited(arguments);
+	},
+	
 	lastScrollTop: 0,
 	onscroll: function(){
 		// summary:
