@@ -17,9 +17,13 @@ return declare([List], {
 	// set this to infinity if you never want rows removed
 	farOffRemoval: 1000,
 	rowHeight: 22,
+	// getBeforePut: boolean
+	//		If true, a get request will be performed to the store before each put
+	//		as a baseline when saving; otherwise, existing row data will be used.
+	getBeforePut: true,
 	
 	constructor: function(){
-		// Create empty query objects on each instance, not the prototype
+		// Create empty objects on each instance, not the prototype
 		this.query || (this.query = {});
 		this.queryOptions || (this.queryOptions = {});
 		this.dirty = {};
@@ -126,6 +130,7 @@ return declare([List], {
 		// return results so that callers can handle potential of async error
 		return results;
 	},
+	
 	sortOrder: null,
 	sort: function(property, descending){
 		// summary:
@@ -338,7 +343,19 @@ return declare([List], {
 			}
 		}
 	},
-	getBeforePut: true,
+	
+	setDirty: function(id, field, value){
+		// summary:
+		//		Updates dirty data of a field for the item with the specified ID.
+		var dirty = this.dirty,
+			dirtyObj = dirty[id];
+		
+		if(!dirtyObj){
+			dirtyObj = dirty[id] = {};
+		}
+		dirtyObj[field] = value;
+	},
+	
 	save: function() {
 		// Keep track of the store and puts
 		var self = this,

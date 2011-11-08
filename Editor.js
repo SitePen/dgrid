@@ -125,6 +125,8 @@ return function(column, editor, editOn){
 					value = isNaN(asDate.getTime()) ? value : asDate;
 				}
 				if(on.emit(cellElement, "dgrid-datachange", {rowId: row.id, oldValue: oldValue, value: value, bubbles: true, cancelable: true})){
+					grid.setDirty && grid.setDirty(row.id, column.field, value);
+					/* TODO: remove (refactor to ODL)
 					if(grid.dirty){
 						var
 							dirty = grid.dirty[row.id],
@@ -144,6 +146,7 @@ return function(column, editor, editOn){
 							grid._trackError("save");
 						}
 					}
+					*/
 				}else{
 					// else keep the value the same
 					return oldValue;
