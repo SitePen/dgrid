@@ -126,27 +126,6 @@ return function(column, editor, editOn){
 				}
 				if(on.emit(cellElement, "dgrid-datachange", {rowId: row.id, oldValue: oldValue, value: value, bubbles: true, cancelable: true})){
 					grid.setDirty && grid.setDirty(row.id, column.field, value);
-					/* TODO: remove (refactor to ODL)
-					if(grid.dirty){
-						var
-							dirty = grid.dirty[row.id],
-							object = row.data;
-						if(!dirty){
-							dirty = grid.dirty[row.id] = {};
-							if(!column.autoSave){
-								// Use delegate to protect original data item in non-autoSave case
-								// (i.e. to "protect" items of in-memory stores until save).
-								// This way, row.data will still reflect up to date information
-								// reflecting grid edits, without "corrupting" store items.
-								object = row.data = lang.delegate(row.data, dirty);
-							}
-						}
-						dirty[column.field] = object[column.field] = value;
-						if(column.autoSave){
-							grid._trackError("save");
-						}
-					}
-					*/
 				}else{
 					// else keep the value the same
 					return oldValue;
