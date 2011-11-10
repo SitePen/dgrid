@@ -327,19 +327,21 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 				// observe the results for changes
 				this.observers.push(results.observe(function(object, from, to){
 					// a change in the data took place
-					if(from > -1){
+					if(from > -1 && rows[from] && rows[from].parentNode){
 						// remove from old slot
 						self.row(rows.splice(from, 1)[0]).remove();
 					}
 					if(to > -1){
-						// add to new slot
+						// add to new slot (either before an existing row, or at the end)
 						var before = rows[to] || beforeNode;
-						var row = self.insertRow(object, before.parentNode, before, (options.start + to), options);
-						put(row, ".ui-state-highlight");
-						setTimeout(function(){
-							put(row, "!ui-state-highlight");
-						}, 250);
-						rows.splice(to, 0, row);
+						if(before.parentNode){
+							var row = self.insertRow(object, before.parentNode, before, (options.start + to), options);
+							put(row, ".ui-state-highlight");
+							setTimeout(function(){
+								put(row, "!ui-state-highlight");
+							}, 250);
+							rows.splice(to, 0, row);
+						}
 					}
 				}, true));
 			}
