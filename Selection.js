@@ -7,7 +7,7 @@ return declare([List], {
 	
 	// selectionEvent: String
 	//		event (or events, in dojo/on format) to listen on to trigger select logic
-	selectionEvent: ".dgrid-row:mousedown,.dgrid-row:dgrid-cellfocusin",
+	selectionEvent: has("touch") ? "" : ".dgrid-row:mousedown,.dgrid-row:dgrid-cellfocusin",
 	
 	// deselectOnRefresh: Boolean
 	//		If true, the selection object will be cleared when refresh is called.
@@ -113,7 +113,8 @@ return declare([List], {
 		}
 		
 		// listen for actions that should cause selections
-		on(this.contentNode, this.selectionEvent, focus);
+		this.selectionEvent && on(this.contentNode, this.selectionEvent, focus);
+		
 		if(has("touch")){
 			// first listen for touch taps if available
 			var lastTouch, lastTouchX, lastTouchY, lastTouchEvent, isTap;
@@ -130,7 +131,7 @@ return declare([List], {
 			});
 			on(this.contentNode, "touchend", function(event){
 				if(isTap){
-					focus(lastTouchEvent);
+					grid._handleSelect(lastTouchEvent, grid.row(event).element);
 				}
 			});
 		}

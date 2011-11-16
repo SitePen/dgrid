@@ -36,6 +36,9 @@ define(["dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put", "dojo/
 			aspect.around(grid, "_handleSelect", function(_handleSelect){
 				return function(event, currentTarget){
 					var target = event.target;
+					// work around iOS potentially reporting text node as target
+					if(target.nodeType == 3){ target = target.parentNode; }
+					
 					while(!query.matches(target, ".dgrid-selector-cell", grid.contentNode)){
 						if(target == grid.contentNode || !(target = target.parentNode)){
 							break;
