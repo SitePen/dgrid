@@ -1,11 +1,11 @@
-define(["dojo/_base/declare", "./Selection", "dojo/on", "put-selector/put"], function(declare, Selection, listen, put){
+define(["dojo/_base/declare", "./Selection", "dojo/on", "put-selector/put", "dojo/has"], function(declare, Selection, listen, put, has){
 return declare([Selection], {
 	// summary:
 	// 		Add cell level selection capabilities to a grid. The grid will have a selection property and
 	//		fire "dgrid-select" and "dgrid-deselect" events.
 	
 	// ensure we don't select when an individual cell is not identifiable
-	selectionEvent: ".dgrid-cell:mousedown,.dgrid-cell:dgrid-cellfocusin",
+	selectionEvent: has("touch") ? "" : ".dgrid-cell:mousedown,.dgrid-cell:dgrid-cellfocusin",
 	
 	select: function(cell, toCell, value){
 		if(value === undefined){
