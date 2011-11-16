@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=570" />
 		<style type="text/css">
 			@import "../../dojo/resources/dojo.css";
-			@import "../css/skins/claro.css";
+			@import "../css/skins/nihilo.css";
 			.heading {
 				font-weight: bold;
 				padding-bottom: 0.25em;
@@ -31,17 +31,16 @@
 						},
 						prevent;
 					
-					on(win.body(), "dgrid-select",
+					on(win.body(), "dgrid-select,dgrid-deselect",
 						function(event){
-							var msg = "selected" + (prevent ? " (prevented): " : ": ");
-							console.log(msg, event.grid.id, event.row||event.cell);
-							if(prevent){ event.preventDefault(); }
-						}
-					);
-					on(win.body(), "dgrid-deselect",
-						function(event){
-							var msg = "deselected" + (prevent ? " (prevented): " : ": ");
-							console.log(msg, event.grid.id, event.row||event.cell);
+							var msg = (event.type == "dgrid-deselect" ? "de" : "");
+							msg += "selected" + (prevent ? " (prevented): " : ": ");
+							if(event.cell){
+								console.log(msg + event.grid.id + ": row " + event.cell.row.id +
+									", col " + event.cell.column.field);
+							}else{
+								console.log(msg + event.grid.id + ": row " + event.row.id);
+							}
 							if(prevent){ event.preventDefault(); }
 						}
 					);
@@ -85,7 +84,7 @@
 				});
 		</script>
 	</head>
-	<body class="claro">
+	<body class="nihilo">
 		<div>preventDefault on selection in all grids?
 			<button type="button" id="btnPreventDefaultOn">Yes</button>
 			<button type="button" id="btnPreventDefaultOff">No</button>
