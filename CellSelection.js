@@ -5,7 +5,7 @@ return declare([Selection], {
 	//		fire "dgrid-select" and "dgrid-deselect" events.
 	
 	// ensure we don't select when an individual cell is not identifiable
-	selectionEvent: has("touch") ? "" : ".dgrid-cell:mousedown,.dgrid-cell:dgrid-cellfocusin",
+	selectionDelegate: ".dgrid-cell",
 	
 	select: function(cell, toCell, value){
 		if(value === undefined){

@@ -5,9 +5,14 @@ return declare([List], {
 	//		Add selection capabilities to a grid. The grid will have a selection property and
 	//		fire "dgrid-select" and "dgrid-deselect" events.
 	
-	// selectionEvent: String
-	//		event (or events, in dojo/on format) to listen on to trigger select logic
-	selectionEvent: has("touch") ? "" : ".dgrid-row:mousedown,.dgrid-row:dgrid-cellfocusin",
+	// selectionDelegate: String
+	//		Selector to delegate to as target of selection events.
+	selectionDelegate: ".dgrid-row",
+	
+	// selectionEvents: String
+	//		Event (or events, comma-delimited) to listen on to trigger select logic.
+	//		Note: this is ignored in the case of touch devices.
+	selectionEvents: "mousedown,dgrid-cellfocusin",
 	
 	// deselectOnRefresh: Boolean
 	//		If true, the selection object will be cleared when refresh is called.
@@ -95,7 +100,8 @@ return declare([List], {
 		//		Performs first-time hookup of event handlers containing logic
 		//		required for selection to operate.
 		
-		var grid = this;
+		var grid = this,
+			selector = this.selectionDelegate;
 		
 		// This is to stop IE8+'s web accelerator and selection.
 		// It also stops selection in Chrome/Safari.
@@ -112,28 +118,28 @@ return declare([List], {
 			grid._handleSelect(event, this);
 		}
 		
-		// listen for actions that should cause selections
-		this.selectionEvent && on(this.contentNode, this.selectionEvent, focus);
-		
 		if(has("touch")){
 			// first listen for touch taps if available
 			var lastTouch, lastTouchX, lastTouchY, lastTouchEvent, isTap;
-			on(this.contentNode, "touchstart", function(event){
+			on(this.contentNode, on.selector(selector, "touchstart"), function(event){
 				lastTouch = event.touches[0];
 				lastTouchX = lastTouch.pageX;
 				lastTouchY = lastTouch.pageY;
 				lastTouchEvent = event;
 				isTap = true;
 			});
-			on(this.contentNode, "touchmove", function(event){
+			on(this.contentNode, on.selector(selector, "touchmove"), function(event){
 				var thisTouch = event.touches[0];
 				isTap = Math.pow(lastTouchX - thisTouch.pageX, 2) + Math.pow(lastTouchY - thisTouch.pageY, 2) < 100; // 10 pixel radius sound good?
 			});
-			on(this.contentNode, "touchend", function(event){
+			on(this.contentNode, on.selector(selector, "touchend"), function(event){
 				if(isTap){
-					grid._handleSelect(lastTouchEvent, grid.row(event).element);
+					grid._handleSelect(lastTouchEvent, this);
 				}
 			});
+		}else{
+			// listen for actions that should cause selections
+			on(this.contentNode, on.selector(selector, this.selectionEvents), focus);
 		}
 	},
 	
