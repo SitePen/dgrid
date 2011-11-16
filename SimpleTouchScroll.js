@@ -1,6 +1,7 @@
 define(["dojo/_base/declare", "dojo/on"],
 function(declare, on){
 	var
+		bodyTouchListener, // stores handle to body touch handler once connected
 		timerRes = 15, // ms between drag velocity measurements and animation "ticks"
 		touches = 0, // records number of touches on document
 		current = {}, // records info for widget currently being scrolled
@@ -10,9 +11,6 @@ function(declare, on){
 	function updatetouchcount(evt){
 		touches = evt.touches.length;
 	}
-	
-	// hook up touch listeners to entire body to track number of active touches
-	on(document.body, "touchstart,touchend,touchcancel", updatetouchcount);
 	
 	// functions for handling touch events on node to be scrolled
 	
@@ -125,6 +123,13 @@ function(declare, on){
 			});
 			on(node, "touchmove", ontouchmove);
 			on(node, "touchend,touchcancel", ontouchend);
+			
+			if(!bodyTouchListener){
+				// first time: hook up touch listeners to entire body,
+				// to track number of active touches
+				bodyTouchListener = on(document.body,
+					"touchstart,touchend,touchcancel", updatetouchcount);
+			}
 		},
 		glideDecel: function(n){
 			// summary:
