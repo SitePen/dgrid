@@ -76,7 +76,7 @@ html.has-quirks .dgrid-header-hidden .dgrid-cell {
 	position: relative;
 }
 
-.dgrid-scroller{
+.dgrid-scroller {
 	overflow-x: auto;
 	overflow-y: scroll;
 	position: absolute;
@@ -99,17 +99,17 @@ html.has-quirks .dgrid-header-hidden .dgrid-cell {
 	background-position: -48px -16px;
 }
 
-.dgrid-expando-icon{
+.dgrid-expando-icon {
 	width: 16px;
 	height: 16px;
 }
-.dgrid-tree-container{
+.dgrid-tree-container {
 	-webkit-transition-duration: 1s;
 	-moz-transition-duration: 1s;
 	-o-transition-duration: 1s;
 	transition-duration: 1s;
 }
-.dgrid-tree-contracted{
+.dgrid-tree-contracted {
 	height: 0px;
 	overflow: hidden;
 }
@@ -128,7 +128,7 @@ html.has-quirks .dgrid-header-hidden .dgrid-cell {
 
 /* selection*/
 .dgrid-selected {
-	background-color: #BFD6EB;
+	background-color: #bfd6eb;
 }
 
 /* selectors */
