@@ -60,14 +60,15 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 	}
 	Row.prototype = {
 		remove: function(){
-			var rowElement = this.element;
-			var contentNode = rowElement.parentNode;
-			contentNode.removeChild(rowElement);
-			var connected = rowElement.connected;
-			if(connected){
-				// if it has a connected node, remove that as well
-				contentNode.removeChild(connected);
-			}
+			var
+				rowElement = this.element,
+				contentNode = rowElement.parentNode,
+				connected = rowElement.connected,
+				connectedParent = connected && connected.parentNode;
+			
+			contentNode && contentNode.removeChild(rowElement);
+			// if it has a connected node, remove that as well
+			connectedParent && connectedParent.removeChild(connected);
 		}
 	};
 	function move(item, steps, targetClass){

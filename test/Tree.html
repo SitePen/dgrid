@@ -35,6 +35,7 @@
 						{label:'Population', field:'population'},
 						{label:'Timezone', field:'timezone'}
 					];
+					var count = 0;
 					
 					window.tree = declare([Grid, Keyboard, Selection])({
 						store: testCountryStore,
@@ -57,7 +58,11 @@
 							testCountryStore.remove(id);
 						}
 					});
-
+					on(document.getElementById("edit-continent"), "click", function(){
+						var item = testCountryStore.get("EU");
+						item.name = "Europe Edit " + (++count);
+						testCountryStore.put(item);
+					});
 				});
 		</script>
 	</head>
@@ -68,5 +73,6 @@
 		<button id="add-continent">Add Continent</button>
 		<button id="add-country">Add Greece To Europe</button>
 		<button id="delete">Delete Selected</button>
+		<button id="edit-continent">Edit Europe</button>
 	</body>
 </html>
