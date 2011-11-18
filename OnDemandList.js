@@ -3,7 +3,9 @@ function(declare, lang, Deferred, listen, put, List){
 
 function emitError(err){
 	// called by _trackError in context of list/grid, if an error is encountered
-	listen.emit(this.domNode, "dgrid-error", { error: err });
+	if(listen.emit(this.domNode, "dgrid-error", {error: err, cancelable: true, bubbles: true})){
+		console.error(err);
+	}
 }
 
 return declare([List], {
@@ -27,6 +29,7 @@ return declare([List], {
 	//		If true, a get request will be performed to the store before each put
 	//		as a baseline when saving; otherwise, existing row data will be used.
 	getBeforePut: true,
+	noDataMessage: "",
 	
 	constructor: function(){
 		// Create empty objects on each instance, not the prototype
@@ -110,6 +113,9 @@ return declare([List], {
 				// now we need to adjust the height and total count based on the first result set
 				var trCount = trs.length;
 				total = total || trCount;
+				if(!total){
+					self.contentNode.innerHTML = self.noDataMessage;
+				}
 				var height = 0;
 				for(var i = 0; i < trCount; i++){
 					height += trs[i].offsetHeight;
