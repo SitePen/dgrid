@@ -10,7 +10,9 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 	// plus an array to track actual indices in stylesheet for removal
 	var
 		extraSheet = put(document.getElementsByTagName("head")[0], "style"),
-		extraRules = [];
+		extraRules = [],
+		oddClass = "dgrid-row-odd",
+		evenClass = "dgrid-row-even";
 	// keep reference to actual StyleSheet object (.styleSheet for IE < 9)
 	extraSheet = extraSheet.sheet || extraSheet.styleSheet;
 	
@@ -107,6 +109,10 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 		// showHeader: Boolean
 		//		Whether to render header (sub)rows.
 		showHeader: false,
+		// maintainOddEven: Boolean
+		// 		Indicates whether to maintain the odd/even classes when new rows are inserted.
+		//		This can be disabled to improve insertion performance if odd/even styling is not employed
+		maintainOddEven: true,
 		
 		postscript: function(params, srcNodeRef){
 			// invoke create in postScript to allow descendants to
@@ -300,10 +306,36 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			this.contentNode.innerHTML = "";
 			// remove any listeners
 			for(var i = 0;i < this.observers.length; i++){
-				this.observers[i].cancel();
+				var observer = this.observers[i];
+				observer && observer.cancel();
 			}
 			this.observers = [];
 			this.preloadNode = null;
+		},
+		newRow: function(object, before, to, options){
+			if(before.parentNode){
+				var i = options.start + to;
+				var row = this.insertRow(object, before.parentNode, before, i, options);
+				put(row, ".ui-state-highlight");
+				setTimeout(function(){
+					put(row, "!ui-state-highlight");
+				}, 250);
+				return row;
+			}
+		},
+		adjustRowIndices: function(firstRow){
+			if(this.maintainOddEven){
+				// this traverses through rows to maintain odd/even classes on the rows when indexes shift;
+				var next = firstRow;
+				var rowIndex = next.rowIndex;
+				do{
+					if(next.rowIndex > -1){
+						// skip non-numeric, non-rows
+						put(next, '.' + (rowIndex % 2 == 1 ? oddClass : evenClass) + '!' + (rowIndex % 2 == 0 ? oddClass : evenClass));
+						next.rowIndex = rowIndex++;
+					}
+				}while((next = next.nextSibling) && next.rowIndex != rowIndex);
+			}
 		},
 		renderArray: function(results, beforeNode, options){
 			// summary:
@@ -318,25 +350,31 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			}
 			if(results.observe){
 				// observe the results for changes
-				this.observers.push(results.observe(function(object, from, to){
+				var observerIndex = this.observers.push(results.observe(function(object, from, to){
+					var firstRow;
 					// a change in the data took place
 					if(from > -1 && rows[from] && rows[from].parentNode){
 						// remove from old slot
-						self.row(rows.splice(from, 1)[0]).remove();
+						var row = rows.splice(from, 1)[0];
+						firstRow = row.nextSibling;
+						firstRow.rowIndex--;
+						row = self.row(row);
+						row && row.remove();
+						rowIndex = from;
 					}
-					if(to > -1){
+					if(to > -1){						
 						// add to new slot (either before an existing row, or at the end)
-						var before = rows[to] || beforeNode;
-						if(before.parentNode){
-							var row = self.insertRow(object, before.parentNode, before, (options.start + to), options);
-							put(row, ".ui-state-highlight");
-							setTimeout(function(){
-								put(row, "!ui-state-highlight");
-							}, 250);
+						var row = self.newRow(object, rows[to] || beforeNode, to, options);
+						if(row){
+							row.observerIndex = observerIndex;
 							rows.splice(to, 0, row);
+							if(!firstRow || to < first.rowIndex){
+								firstRow = row;
+							}
 						}
 					}
-				}, true));
+					firstRow && self.adjustRowIndices(firstRow);
+				}, true)) - 1;
 			}
 			var rowsFragment = document.createDocumentFragment();
 			// now render the results
@@ -353,10 +391,13 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			}
 			var lastRow;
 			function mapEach(object){
-				return lastRow = self.insertRow(object, rowsFragment, null, start++, options);
+				lastRow = self.insertRow(object, rowsFragment, null, start++, options);
+				lastRow.observerIndex = observerIndex;
+				return lastRow;
 			}
 			function whenDone(resolvedRows){
 				(beforeNode && beforeNode.parentNode || self.contentNode).insertBefore(rowsFragment, beforeNode || null);
+				self.adjustRowIndices(resolvedRows[resolvedRows.length - 1]);
 				return rows = resolvedRows;
 			}
 			return whenDone(rows);
@@ -368,11 +409,16 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 		insertRow: function(object, parent, beforeNode, i, options){
 			// summary:
 			//		Renders a single row in the grid
-			var row = this.renderRow(object, options);
-			row.className = (row.className || "") + " ui-state-default dgrid-row " + (i% 2 == 1 ? "dgrid-row-odd" : "dgrid-row-even");
-			// get the row id for easy retrieval
-			this._rowIdToObject[row.id = this.id + "-row-" + ((this.store && this.store.getIdentity) ? this.store.getIdentity(object) : this._autoId++)] = object;
-			parent.insertBefore(row, beforeNode);
+			var id = this.id + "-row-" + ((this.store && this.store.getIdentity) ? this.store.getIdentity(object) : this._autoId++);
+			var row = byId(id);
+			if(!row){
+				row = this.renderRow(object, options);
+				row.className = (row.className || "") + " ui-state-default dgrid-row " + (i% 2 == 1 ? oddClass : evenClass);
+				// get the row id for easy retrieval
+				this._rowIdToObject[row.id = id] = object;
+				parent.insertBefore(row, beforeNode);
+			}
+			row.rowIndex = i;
 			return row;
 		},
 		renderRow: function(value, options){
