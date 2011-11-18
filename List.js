@@ -397,7 +397,8 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			}
 			function whenDone(resolvedRows){
 				(beforeNode && beforeNode.parentNode || self.contentNode).insertBefore(rowsFragment, beforeNode || null);
-				self.adjustRowIndices(resolvedRows[resolvedRows.length - 1]);
+				lastRow = resolvedRows[resolvedRows.length - 1];
+				lastRow && self.adjustRowIndices(lastRow);
 				return rows = resolvedRows;
 			}
 			return whenDone(rows);
