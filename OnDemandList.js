@@ -17,6 +17,7 @@ return declare([List], {
 	// set this to infinity if you never want rows removed
 	farOffRemoval: 1000,
 	rowHeight: 22,
+	queryRowsOverlap: 1,
 	// getBeforePut: boolean
 	//		If true, a get request will be performed to the store before each put
 	//		as a baseline when saving; otherwise, existing row data will be used.
@@ -61,7 +62,6 @@ return declare([List], {
 		// Otherwise, just refresh.
 		sort ? this.sort(sort) : this.refresh();
 	},
-	
 	renderQuery: function(query, preloadNode){
 		// summary:
 		//		Creates a preload node for rendering a query into, and executes the query
@@ -72,7 +72,7 @@ return declare([List], {
 			var topPreloadNode = put(this.contentNode, "div.dgrid-preload");
 			topPreloadNode.preload = true;
 			topPreloadNode.query = query;
-			topPreloadNode.start = 0;
+			topPreloadNode.rowIndex = 0;
 			topPreloadNode.count = 0;
 			topPreloadNode.next =
 				preloadNode = put(this.contentNode, "div.dgrid-preload");
@@ -82,7 +82,7 @@ return declare([List], {
 		// downloaded yet
 		preloadNode.preload = true;
 		preloadNode.query = query;
-		preloadNode.start = this.minRowsPerPage;
+		preloadNode.rowIndex = this.minRowsPerPage;
 		preloadNode.count = 0;
 		var priorPreload = this.preloadNode;
 		if(priorPreload){
@@ -114,7 +114,7 @@ return declare([List], {
 				
 				total -= trCount;
 				preloadNode.count = total;
-				preloadNode.start = trCount;
+				preloadNode.rowIndex = trCount;
 				if(total){
 					preloadNode.style.height = Math.min(total * self.rowHeight, self.maxEmptySpace) + "px";
 				}else{
@@ -187,9 +187,9 @@ return declare([List], {
 		function removeDistantNodes(grid, preloadNode, distanceOff, traversal, below){
 			// we check to see the the nodes are "far off"
 			var farOffRemoval = grid.farOffRemoval;
-			// we check if it is twice as much as farOffRemoval and then prune down to farOffRemoval, we could make that configurable as well
+			// by checking to see if it is the farOffRemoval distance away
 			if(distanceOff > 2 * farOffRemoval){
-				// ok, there is preloadNode that is far off, let's remove rows until we get to farOffRemoval
+				// ok, there is preloadNode that is far off, let's remove rows until we get to in the current viewpoint
 				var row, nextRow = preloadNode[traversal];
 				var reclaimedHeight = 0;
 				var count = 0;
@@ -200,16 +200,24 @@ return declare([List], {
 						// we have reclaimed enough rows or we have gone beyond grid rows, let's call it good
 						break;
 					}
-					count++;
-					reclaimedHeight += rowHeight;
 					var nextRow = row[traversal]; // have to do this before removing it
+					var lastObserverIndex, currentObserverIndex = row.observerIndex;
+					if(currentObserverIndex != lastObserverIndex && lastObserverIndex > -1){
+						// we have gathered a whole page of observed rows, we can delete them now
+						var observers = grid.observers; 
+						observers[lastObserverIndex].cancel();
+						observers[lastObserverIndex] = 0; // remove it so we don't call cancel twice
+					}
+					reclaimedHeight += rowHeight;
+					count++;
+					lastObserverIndex = currentObserverIndex;
 					delete grid._rowIdToObject[row.id]; // clear out of the lookup
 					toDelete.push(row);
 				}
 				// now adjust the preloadNode based on the reclaimed space
 				preloadNode.count += count;
 				if(below){
-					preloadNode.start -= count;
+					preloadNode.rowIndex -= count;
 					adjustHeight(grid, preloadNode);
 				}else{
 					// if it is above, we can calculate the change in exact row changes, which we must do to not mess with the scrolling
@@ -229,7 +237,7 @@ return declare([List], {
 		}
 		function adjustHeight(grid, preloadNode){
 			var newHeight = preloadNode.count * grid.rowHeight;
-			preloadNode.style.height = (preloadNode.start > 0 ? Math.min(newHeight, grid.maxEmptySpace) : newHeight) + "px";
+			preloadNode.style.height = (preloadNode.rowIndex > 0 ? Math.min(newHeight, grid.maxEmptySpace) : newHeight) + "px";
 		}
 		// there can be multiple preloadNodes (if they split, or multiple queries are created),
 		//	so we can traverse them until we find whatever is in the current viewport, making
@@ -250,12 +258,12 @@ return declare([List], {
 				preloadNode = preloadNode.next;
 			}else{
 				// the preload node is visible, or close to visible, better show it
-				var offset = ((preloadNode.start ? visibleTop : visibleBottom) - preloadTop) / this.rowHeight;
+				var offset = ((preloadNode.rowIndex ? visibleTop : visibleBottom) - preloadTop) / this.rowHeight;
 				var count = (visibleBottom - visibleTop) / this.rowHeight;
 				// utilize momentum for predictions
 				var momentum = Math.max(Math.min((visibleTop - lastScrollTop) * this.rowHeight, this.maxRowsPerPage/2), this.maxRowsPerPage/-2);
 				count += Math.min(Math.abs(momentum), 10);
-				if(preloadNode.start == 0){
+				if(preloadNode.rowIndex == 0){
 					// at the top, adjust from bottom to top
 					offset -= count;
 				}
@@ -275,8 +283,8 @@ return declare([List], {
 				var options = this.queryOptions ? lang.delegate(this.queryOptions) : {};
 				preloadNode.count -= count;
 				var beforeNode = preloadNode;
-				var keepScrollTo;
-				if(preloadNode.start > 0){
+				var keepScrollTo, queryRowsOverlap = this.queryRowsOverlap;
+				if(preloadNode.rowIndex > 0){
 					// add new rows below
 					var previous = preloadNode.previous;
 					if(previous){
@@ -287,11 +295,12 @@ return declare([List], {
 							preloadNode.previous.count += offset;
 							adjustHeight(this, preloadNode.previous);
 							preloadNode.count -= offset;
-							preloadNode.start += offset;
+							preloadNode.rowIndex += offset;
+							queryRowsOverlap = 0;
 						}
 					}
-					options.start = preloadNode.start;
-					preloadNode.start += count;
+					options.start = preloadNode.rowIndex - queryRowsOverlap;
+					preloadNode.rowIndex += count;
 				}else{
 					// add new rows above
 					if(preloadNode.next){
@@ -301,8 +310,9 @@ return declare([List], {
 						if(beforeNode == preloadNode.next){
 							// all of the nodes were removed, can position wherever we want
 							preloadNode.next.count += preloadNode.count - offset;
-							preloadNode.next.start = offset + count;
+							preloadNode.next.rowIndex = offset + count;
 							preloadNode.count = offset;
+							queryRowsOverlap = 0;
 						}else{
 							keepScrollTo = true;
 						}
@@ -310,7 +320,7 @@ return declare([List], {
 					}
 					options.start = preloadNode.count;
 				}
-				options.count = count;
+				options.count = count + queryRowsOverlap;
 				if(keepScrollTo){
 					keepScrollTo = beforeNode.offsetTop;
 				}
