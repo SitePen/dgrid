@@ -282,8 +282,10 @@ return declare([List], {
 					if(previous){
 						removeDistantNodes(this, previous, visibleTop - (previous.offsetTop + previous.offsetHeight), 'nextSibling');
 						if(offset > 0 && previous == preloadNode.previousSibling){
+							// all of the nodes above were removed
 							offset = Math.min(preloadNode.count, offset);
 							preloadNode.previous.count += offset;
+							adjustHeight(this, preloadNode.previous);
 							preloadNode.count -= offset;
 							preloadNode.start += offset;
 						}
