@@ -1,5 +1,6 @@
 .dgrid-hider-toggle {
 	font-weight:normal;
+	cursor: pointer;
 }
 .dgrid-hider-toggle:hover {
 	font-weight: bold;
