@@ -159,7 +159,7 @@ return declare([List], {
 		}
 		var element = row.element,
 			notPrevented = true;
-		if(value != previousValue &&
+		if(value == previousValue ||
 			(!element || (notPrevented = on.emit(element, "dgrid-" + (value ? "select" : "deselect"), {
 			cancelable: true,
 			bubbles: true,
