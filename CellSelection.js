@@ -37,7 +37,7 @@ return declare([Selection], {
 		}
 		var element = cell.element,
 			notPrevented = true;
-		if(previous != value &&
+		if(previous == value ||
 			(!element || (notPrevented = listen.emit(element, "dgrid-" + (value ? "select" : "deselect"), {
 			cancelable: true,
 			bubbles: true,
