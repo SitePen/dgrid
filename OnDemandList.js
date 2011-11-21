@@ -114,7 +114,7 @@ return declare([List], {
 				var trCount = trs.length;
 				total = total || trCount;
 				if(!total){
-					self.contentNode.innerHTML = self.noDataMessage;
+					put(self.contentNode, "div.dgrid-no-data").innerHTML = self.noDataMessage;
 				}
 				var height = 0;
 				for(var i = 0; i < trCount; i++){
