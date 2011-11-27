@@ -195,11 +195,11 @@ For example, you could define a grid and CSS like so:
     <script>
     define(["dgrid/Grid"], function(Grid){
         var grid = new Grid({
-                columns: [ // define the columns
+                columns: { // define the columns
                     age: "Age",
                     first: "First Name",
                     ...
-                ]});
+                }}, ...);
         grid.renderArray(someData);
         ...
     });
