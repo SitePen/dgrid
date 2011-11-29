@@ -125,7 +125,8 @@
 					};
 					window.grid = declare([Grid])({
 						store: testStore,
-						columns: columns
+						columns: columns,
+						noDataMessage: "Nobody here but us chickens!"
 					}, "grid");
 
 					window.grid2 = declare([Grid, Selection, Keyboard])({
