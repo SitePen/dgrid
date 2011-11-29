@@ -20,8 +20,8 @@
 		<div id="grid2"></div>
 		<script src="../../dojo/dojo.js" data-dojo-config="async:true"></script>
 		<script>
-require(["dgrid/OnDemandGrid", "dojo/store/Memory", "dojo/store/Observable", "dojo/store/util/QueryResults", "dojo/data/ItemFileWriteStore", "dojo/store/DataStore", "dojo/_base/Deferred"],
-function(Grid, Memory, Observable, QueryResults, ItemFileWriteStore, DataStore, Deferred){
+require(["dgrid/OnDemandGrid", "dojo/store/Memory", "dojo/store/Observable", "dojo/store/util/QueryResults", "dojo/data/ItemFileWriteStore", "dojo/store/DataStore", "dojo/_base/Deferred", "dojo/_base/lang"],
+function(Grid, Memory, Observable, QueryResults, ItemFileWriteStore, DataStore, Deferred, lang){
 	var items = [], ifws, datastore, asyncstore, grid, grid2, i,
 		names = ["sasquatch", "foo", "bar", "zaphod", "beeblebrox"];
 	
@@ -33,7 +33,7 @@ function(Grid, Memory, Observable, QueryResults, ItemFileWriteStore, DataStore, 
 		});
 	}
 	
-	ifws = new ItemFileWriteStore({ data: { identifier: "id", items: items } });
+	ifws = new ItemFileWriteStore({ data: { identifier: "id", items: lang.clone(items) } });
 	datastore = window.datastore = Observable(new DataStore({store: ifws}));
 	
 	grid = new Grid({
