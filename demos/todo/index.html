@@ -4,7 +4,7 @@
 		<meta charset="utf-8">
 		<title>Todo List</title>
 		<link rel="stylesheet" href="../../../dojo/resources/dojo.css">
-		<link rel="stylesheet" href="../../css/skins/tundra.css">
+		<link rel="stylesheet" href="../../css/skins/slate.css">
 		<!-- some of the DnD styles reside within the Dijit theme -->
 		<link rel="stylesheet" href="../../../dijit/themes/tundra/Common.css">
 		<style>
@@ -57,7 +57,7 @@
 }
 		</style>
 	</head>
-	<body class="tundra">
+	<body class="slate">
 		<div id="container">
 			<form id="itemForm" class="actionArea topArea">
 				<input type="text" id="txtTask" name="task">
@@ -164,7 +164,6 @@ function(Grid, Selection, Editor, DnD, declare, json, Memory, Observable, put){
 					label: "TODOs",
 					sortable: false,
 					formatter: function(item){
-						console.log("formatter: ", item.completed)
 						//TODO: something's up with IE6 (first check doesn't check)
 						return "<div" + (item.completed ? ' class="completed"' : "") +
 							">" + item.summary + "</div>";
