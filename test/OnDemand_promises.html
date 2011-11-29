@@ -14,15 +14,15 @@
 		<p>This test page tests two types of stores that return promises from their
 		query methods: the dojo.store.DataStore wrapper for dojo.data stores,
 		and an instance of dojo.store.Memory with a promise returned from query.</p>
-		<h2>Grid w/ ItemFileReadStore via DataStore</h2>
+		<h2>Grid w/ ItemFileWriteStore via DataStore</h2>
 		<div id="grid"></div>
 		<h2>Grid w/ dojo.store w/ async query results</h2>
 		<div id="grid2"></div>
 		<script src="../../dojo/dojo.js" data-dojo-config="async:true"></script>
 		<script>
-require(["dgrid/OnDemandGrid", "dojo/store/Memory", "dojo/store/util/QueryResults", "dojo/data/ItemFileReadStore", "dojo/store/DataStore", "dojo/_base/Deferred"],
-function(Grid, Memory, QueryResults, ItemFileReadStore, DataStore, Deferred){
-	var items = [], ifrs, datastore, asyncstore, grid, grid2, i,
+require(["dgrid/OnDemandGrid", "dojo/store/Memory", "dojo/store/Observable", "dojo/store/util/QueryResults", "dojo/data/ItemFileWriteStore", "dojo/store/DataStore", "dojo/_base/Deferred"],
+function(Grid, Memory, Observable, QueryResults, ItemFileWriteStore, DataStore, Deferred){
+	var items = [], ifws, datastore, asyncstore, grid, grid2, i,
 		names = ["sasquatch", "foo", "bar", "zaphod", "beeblebrox"];
 	
 	// generate data
@@ -33,15 +33,15 @@ function(Grid, Memory, QueryResults, ItemFileReadStore, DataStore, Deferred){
 		});
 	}
 	
-	ifrs = new ItemFileReadStore({ data: { identifier: "id", items: items } });
-	datastore = new DataStore({store: ifrs});
+	ifws = new ItemFileWriteStore({ data: { identifier: "id", items: items } });
+	datastore = window.datastore = Observable(new DataStore({store: ifws}));
 	
 	grid = new Grid({
 		columns: { id: "id", name: "name" },
 		store: datastore
 	}, "grid");
 	
-	asyncstore = new Memory({
+	asyncstore = window.asyncstore = Observable(new Memory({
 		data: items,
 		query: function(query, options){
 			var results, def, promisedResults;
@@ -54,7 +54,7 @@ function(Grid, Memory, QueryResults, ItemFileReadStore, DataStore, Deferred){
 			promisedResults.total = results.total;
 			return promisedResults;
 		}
-	});
+	}));
 	
 	grid2 = new Grid({
 		columns: { id: "id", name: "name" },
