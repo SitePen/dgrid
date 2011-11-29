@@ -368,7 +368,7 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 						if(row){
 							row.observerIndex = observerIndex;
 							rows.splice(to, 0, row);
-							if(!firstRow || to < first.rowIndex){
+							if(!firstRow || to < firstRow.rowIndex){
 								firstRow = row;
 							}
 						}
