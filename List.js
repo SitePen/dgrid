@@ -373,7 +373,7 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 							}
 						}
 					}
-					firstRow && self.adjustRowIndices(firstRow);
+					from != to && firstRow && self.adjustRowIndices(firstRow);
 				}, true)) - 1;
 			}
 			var rowsFragment = document.createDocumentFragment();
