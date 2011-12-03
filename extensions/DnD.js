@@ -34,7 +34,7 @@ function(declare, lang, Deferred, DnDSource, DnDManager, put){
 			// summary:
 			// 		on drop, determine where to move/copy the objects
 			var targetSource = this,
-				targetRow = this.targetAnchor,
+				targetRow = this._targetAnchor = this.targetAnchor, // save for Internal
 				grid = this.grid,
 				store = grid.store;
 			
@@ -61,7 +61,14 @@ function(declare, lang, Deferred, DnDSource, DnDManager, put){
 		},
 		onDropInternal: function(nodes, copy, targetItem){
 			var targetSource = this,
+				anchor = targetSource._targetAnchor,
+				targetRow = this.before ? anchor.previousSibling : anchor.nextSibling,
 				store = this.grid.store;
+			
+			// Don't bother continuing if the drop is really not moving anything.
+			// (Don't need to worry about edge first/last cases since
+			// dropping directly on self doesn't fire onDrop)
+			if(!copy && targetRow === nodes[0]){ return; }
 			
 			nodes.forEach(function(node){
 				Deferred.when(targetSource.getObject(node), function(object){
@@ -109,6 +116,7 @@ function(declare, lang, Deferred, DnDSource, DnDManager, put){
 				});
 			});
 		},
+		
 		onDndStart: function(source, nodes, copy){
 			// summary:
 			// 		listen for start events to apply style change to avatar
@@ -121,6 +129,7 @@ function(declare, lang, Deferred, DnDSource, DnDManager, put){
 					this.grid.domNode.offsetWidth / 2 + "px";
 			}
 		},
+		
 		checkAcceptance: function(source, nodes){
 			// summary:
 			// 		augment checkAcceptance to block drops from sources without getObject
@@ -164,7 +173,7 @@ function(declare, lang, Deferred, DnDSource, DnDManager, put){
 		insertRow: function(object){
 			// override to add dojoDndItem class to make the rows draggable
 			var row = this.inherited(arguments);
-			put(row, '.dojoDndItem');
+			put(row, ".dojoDndItem");
 			// setup the source if it hasn't been done yet
 			setupDnD(this);
 			this.dndTarget.setItem(row.id, {data: object, type: [this.dndSourceType]});
