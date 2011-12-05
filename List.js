@@ -159,7 +159,8 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			
 		},
 		buildRendering: function(){
-			var domNode = this.domNode;
+			var domNode = this.domNode,
+				grid = this;
 			// Detect RTL on html/body nodes; taken from dojo/dom-geometry
 			var isRTL = this.isRTL = (document.body.dir || document.documentElement.dir ||
 				document.body.style.direction).toLowerCase() == "rtl";
@@ -174,7 +175,6 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 				var spacerNode = put(domNode, "div.dgrid-spacer");
 			}
 			var bodyNode = this.bodyNode = this.touchNode = put(domNode, "div.dgrid-scroller");
-			var grid = this;
 			this.headerScrollNode = put(domNode, "div.dgrid-header-scroll.dgrid-scrollbar-width.ui-widget-header");
 			
 			if(isRTL) {
@@ -191,9 +191,28 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			this.renderHeader();
 			
 			this.contentNode = put(this.bodyNode, "div.dgrid-content.ui-widget-content");
-			this._listeners.push(listen(window, "resize", function(){
-				grid.resize();
-			}));
+			this._listeners.push(listen(window, "resize",
+				has("ie") < 7 && !has("quirks") ? function(evt){
+					// IE6 triggers window.resize on any element resize;
+					// avoid useless calls (and infinite loop if height: auto).
+					// The measurement logic here is based on dojo/window logic.
+					var root, w, h, dims;
+					
+					if(!grid._started){ return; } // no sense calling resize yet
+					
+					root = document.documentElement;
+					w = root.clientWidth;
+					h = root.clientHeight;
+					dims = grid._prevWinDims || [];
+					if(dims[0] !== w || dims[1] !== h){
+						grid.resize();
+						grid._prevWinDims = [w, h];
+					}
+				} :
+				function(evt){
+					grid._started && grid.resize();
+				}
+			));
 		},
 		startup: function(){
 			// summary:
