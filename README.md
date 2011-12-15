@@ -3,24 +3,42 @@ grids of data, on-demand lazy-loaded data, and various plugins for additional fu
 This project also provides touch scrolling for mobile devices with native style
 momentum, bouncing, and scrollbars.
 
-To use this package, install it with [CPM](https://github.com/kriszyp/cpm):
+The dgrid project is available under the same dual BSD/AFLv2 license as the Dojo Toolkit.
+
+# Installation
+
+## Automatic Download with CPM
+
+dgrid can be installed via [CPM](https://github.com/kriszyp/cpm)
+using the following command:
 
     cpm install dgrid
 
-Alternatively, download dgrid and its dependencies, which are:
+## Manual Download
+
+Alternatively, dgrid and its dependencies can be downloaded individually:
 
 * [xstyle](https://github.com/kriszyp/xstyle)
 * [put-selector](https://github.com/kriszyp/put-selector)
-* [The Dojo Toolkit](http://dojotoolkit.org) version 1.7
+* [The Dojo Toolkit](http://dojotoolkit.org) SDK version 1.7
     * Out of the DTK components, Dojo core is the only hard dependency for dgrid;
       however, some of the test pages also use components from Dijit, and
       Dojox (namely grid for a comparison test, and mobile for a mobile page).
 
-Please note that as of the v0.2.0 release of dgrid, Dojo 1.7 is not yet final.
-dgrid v0.2.0 requires at least
-[Dojo 1.7 RC2](http://download.dojotoolkit.org/release-1.7.0rc2/).
+It is recommended to arrange all dependencies as siblings, resulting in a
+directory structure like the following:
 
-The dgrid project is available under the same dual BSD/AFLv2 license as the Dojo Toolkit.
+* `dgrid`
+* `dijit` (optional, dependency of some dgrid tests)
+* `dojo`
+* `dojox` (optional, dependency of some dgrid tests)
+* `put-selector`
+* `xstyle`
+* `util` (optional, e.g. if pursuing a custom build)
+
+dgrid v0.2.0 requires at least Dojo 1.7 RC2.  As of this writing,
+[Dojo 1.7.1](http://download.dojotoolkit.org/release-1.7.1/) is highly
+recommended.
 
 # Components
 
