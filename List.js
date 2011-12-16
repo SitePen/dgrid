@@ -485,6 +485,8 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 		down: function(row, steps){
 			return this.row(move(row, steps || 1, "dgrid-row"));
 		},
+		
+		sortOrder: null,
 		sort: function(property, descending){
 			// summary:
 			//		Sort the content
