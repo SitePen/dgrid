@@ -97,7 +97,7 @@ define(["dojo/_base/declare", "dojo/has", "dojo/on", "dojo/query", "dojo/dom", "
 			for(id in this.columns){
 				col = this.columns[id];
 				// allow cols to opt out of the hider (specifically for selector col)
-				if (col.unhidable) continue;
+				if (col.unhideable) continue;
 				
 				// create the HTML for each column selector.
 				div = put(hiderMenuNode, "div.dgrid-hider-menu-row");
