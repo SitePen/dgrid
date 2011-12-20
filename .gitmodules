@@ -4,6 +4,3 @@
 [submodule "xstyle"]
 	path = xstyle
 	url = https://github.com/kriszyp/xstyle.git
-[submodule "dgrid"]
-	path = dgrid
-	url = https://github.com/SitePen/dgrid.git
