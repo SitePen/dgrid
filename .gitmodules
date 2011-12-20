@@ -1,0 +1,9 @@
+[submodule "put-selector"]
+	path = put-selector
+	url = https://github.com/kriszyp/put-selector.git
+[submodule "xstyle"]
+	path = xstyle
+	url = https://github.com/kriszyp/xstyle.git
+[submodule "dgrid"]
+	path = dgrid
+	url = https://github.com/SitePen/dgrid.git
