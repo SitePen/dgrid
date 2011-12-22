@@ -7,6 +7,17 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 		}
 	}
 	
+	// borrow simplified version of _mixin from dojo/_base/lang
+	function mixin(dest, src){
+		var name, s, i, empty = {};
+		for(name in src){
+			s = src[name];
+			if (!(name in dest) || (dest[name] !== s && (!(name in empty) || empty[name] !== s)))
+			dest[name] = s;
+		}
+		return dest;
+	}
+	
 	return declare([List], {
 		columns: null,
 		// cellNavigation: Boolean
@@ -137,6 +148,7 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 			return this.cell(this._move(cell, steps || 1, "dgrid-cell"));
 		},
 		renderRow: function(object, options){
+			var grid = this;
 			var row = this.createRowCells("td", function(td, column){
 				var data = object;
 				// we support the field, get, and formatter properties like the DataGrid
@@ -152,7 +164,7 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 				}else if(column.renderCell){
 					// A column can provide a renderCell method to do its own DOM manipulation, 
 					// event handling, etc.
-					appendIfNode(td, column.renderCell(object, data, td, options));
+					appendIfNode(td, column.renderCell(object, data, td, options, grid));
 				}else if(data != null){
 					td.appendChild(document.createTextNode(data));
 				}
@@ -188,7 +200,7 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 				}
 				// allow for custom header content manipulation
 				if(column.renderHeaderCell){
-					appendIfNode(contentNode, column.renderHeaderCell(contentNode));
+					appendIfNode(contentNode, column.renderHeaderCell(contentNode, grid));
 				}else if(column.label || column.field){
 					contentNode.appendChild(document.createTextNode(column.label || column.field));
 				}
@@ -308,39 +320,43 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 		_configColumns: function(prefix, rowColumns){
 			// configure the current column
 			var subRow = [];
-			var isArray = rowColumns instanceof Array; 
+			var isArray = rowColumns instanceof Array;
+			var column, origColumn;
 			for(var columnId in rowColumns){
-				var column = rowColumns[columnId];
+				column = origColumn = rowColumns[columnId];
 				if(typeof column == "string"){
-					rowColumns[columnId] = column = {label:column};
+					column = {label:column};
+				}else{
+					// protect originally-supplied object from changes
+					column = mixin({}, origColumn);
 				}
+				// perform some atomic normalizations, which are safe to push
+				// back on the original column definition object as well
+				// (which can later be referenced by column plugins)
 				if(!isArray && !column.field){
-					column.field = columnId;
+					column.field = origColumn.field = columnId;
 				}
-				columnId = column.id = column.id || (isNaN(columnId) ? columnId : (prefix + columnId));
-				if(prefix){
-					this.columns[columnId] = column;
-				}
+				columnId = column.id = origColumn.id =
+					column.id || (isNaN(columnId) ? columnId : (prefix + columnId));
 				
-				// add reference to this instance to each column object,
-				// for potential use by column plugins
-				column.grid = this;
+				this.columns[columnId] = column;
 				
 				subRow.push(column); // make sure it can be iterated on
 			}
-			return isArray ? rowColumns : subRow;
+			return subRow;
 		},
 		configStructure: function(){
 			// configure the columns and subRows
-			var subRows = this.subRows;
+			var columns = this.columns, subRows = this.subRows;
+			
+			this.columns = {}; // reset before continuing into _configColumns
 			if(subRows){
 				// we have subRows, but no columns yet, need to create the columns
-				this.columns = {};
 				for(var i = 0; i < subRows.length; i++){
 					subRows[i] = this._configColumns(i + '-', subRows[i]);
 				}
 			}else{
-				this.subRows = [this._configColumns("", this.columns)];
+				this.subRows = [this._configColumns("", columns)];
 			}
 		},
 		setColumns: function(columns){

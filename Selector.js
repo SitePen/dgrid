@@ -68,9 +68,9 @@ define(["dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put", "dojo/
 			return input;
 		};
 
-		column.renderCell = function(object, value, cell, options, header){
+		column.renderCell = function(object, value, cell, options, parentGrid, header){
 			if(!grid){
-				grid = column.grid;
+				grid = parentGrid;
 			}
 
 			var row = object && grid.row(object);
@@ -86,8 +86,8 @@ define(["dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put", "dojo/
 			}
 		};
 
-		column.renderHeaderCell = function(th){
-			column.renderCell(column.label || {}, null, th, null, true);
+		column.renderHeaderCell = function(th, parentGrid){
+			column.renderCell(column.label || {}, null, th, null, parentGrid, true);
 		};
 
 		var cn = column.className;

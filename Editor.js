@@ -134,10 +134,10 @@ return function(column, editor, editOn){
 		}
 		return value;
 	}
-	column.renderCell = function(object, value, cell, options){
+	column.renderCell = function(object, value, cell, options, parentGrid){
 		var cmp; // stores input/widget being rendered
 		if(!grid){
-			grid = column.grid;
+			grid = parentGrid;
 		}
 		if(column.editOn){ // TODO: Make this use event delegation, particularly now that we can do event delegation with focus events
 			// if we are dealing with IE<8, the cell element is the padding cell, need to go to parent
