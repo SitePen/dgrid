@@ -17,7 +17,7 @@
     "url":"http://github.com/SitePen/dgrid"
   },
   "dependencies": {
-    "dojo": "1.7.0rc2",
+    "dojo": "1.7.1",
     "put-selector": "0.2.0",
     "xstyle": "0.0.2"
   },
