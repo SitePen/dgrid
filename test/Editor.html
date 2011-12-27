@@ -30,7 +30,7 @@
 			}
 		</style>
 		<script type="text/javascript" src="../../dojo/dojo.js" 
-			data-dojo-config="async: true"></script>
+			data-dojo-config="async: true, isDebug: true"></script>
 		<script type="text/javascript">
 			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Tree","dgrid/Selection", "dgrid/Keyboard", "dgrid/Editor", "dijit/form/DateTextBox", "dijit/form/HorizontalSlider", "dijit/form/NumberSpinner", "dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!"],
 				function(List, Grid, Tree, Selection, Keyboard, Editor, DateTextBox, Slider, NumberSpinner, declare){
@@ -51,7 +51,12 @@
 						columns: columns,
 						selectionMode: "single"
 					}, "grid");
-
+					
+					grid.on("dgrid-datachange", function(evt){
+						console.log("data changed: " + evt.oldValue + " -> " + evt.value);
+						console.log("cell: ", evt.cell, evt.cell.row.id);
+					});
+					
 					grid.on(".field-integer:change", function(event){
 						if(event.value > 100){
 							event.preventDefault();

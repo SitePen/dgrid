@@ -124,7 +124,16 @@ return function(column, editor, editOn){
 					var asDate = new Date(value);
 					value = isNaN(asDate.getTime()) ? value : asDate;
 				}
-				if(on.emit(cellElement, "dgrid-datachange", {rowId: row.id, oldValue: oldValue, value: value, bubbles: true, cancelable: true})){
+				// TODO: remove rowId in lieu of cell (or grid.row/grid.cell)
+				// (for now, deprecate)
+				if(on.emit(cellElement, "dgrid-datachange", {
+							cell: cell,
+							rowId: row.id,
+							oldValue: oldValue,
+							value: value,
+							bubbles: true,
+							cancelable: true
+						})){
 					grid.setDirty && grid.setDirty(row.id, column.field, value);
 				}else{
 					// else keep the value the same
