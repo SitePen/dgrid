@@ -1,12 +1,12 @@
 define(["dojo/on", "dojo/has", "dojo/_base/lang", "put-selector/put", "dojo/_base/sniff"],
 function(on, has, lang, put){
 
-var activeValues = []; // used to track active field's original/new values
+var activeValues = [], // used to track active field's original/new values
+	ignoreChange = false; // used to ignore change immediately after esc/enter
 
 // common functions shared by all Editor "instances"
 
 function setProperty(grid, cellElement, oldValue, value){
-	console.log("setProperty:", oldValue, value);
 	if(oldValue != value){
 		var cell = grid.cell(cellElement);
 		var row = cell.row;
@@ -47,20 +47,27 @@ function setProperty(grid, cellElement, oldValue, value){
 function changeHandler(grid, evt){
 	// event handler triggered on change of common input elements
 	var target = evt.target;
+	if(ignoreChange){ return;	}
+	
 	if(activeValues[0] !== undefined && target.className.indexOf("dgrid-input") > -1){
 		activeValues[1] = setProperty(grid, target.parentNode, activeValues[1],
 			target[target.type == "checkbox" || target.type == "radio"  ? "checked" : "value"]);
 	}
 }
 
-function keyHandler(grid, evt){
-	// event handler for reacting to enter/escape keypresses to save/cancel edits
+function dismissOnKey(column, evt){
+	// Contains logic for reacting to enter/escape keypresses to save/cancel edits.
+	// Returns boolean specifying whether this key event should dismiss the field.
 	var key = evt.keyCode || evt.which;
-	if (key == 27){ // escape - revert + defocus
-		
-	}else if (key == 13){ // enter - defocus
-		
+	
+	if (key == 27){ // escape: revert + dismiss
+		activeValues[1] = activeValues[0];
+		ignoreChange = true;
+		return true;
+	}else if (key == 13 && column.dismissOnEnter !== false){ // enter: dismiss
+		return true;
 	}
+	return false; // don't dismiss
 }
 
 function renderInput(grid, column, value, cell, object, onblur){
@@ -94,7 +101,19 @@ function renderInput(grid, column, value, cell, object, onblur){
 	}
 	if(onblur){
 		// editor is not always-on (i.e. editOn was specified)
-		var signal, stopper;
+		var signal, stopper, keyHandler,
+			inputBlurHandler = function(){
+				// unhook and delete the input
+				signal.remove();
+				stopper && stopper.remove();
+				keyHandler && keyHandler.remove();
+				input.blur(); // force FF/IE to fire onchange first
+				put(input, "!");
+				cell.input = null;
+				// pass new value to onblur handler
+				onblur(activeValues[1]);
+				ignoreChange = false;
+			};
 		
 		input.focus();
 		
@@ -103,16 +122,12 @@ function renderInput(grid, column, value, cell, object, onblur){
 			stopper = on(input, editOn, function(evt){
 				evt.stopPropagation();
 			});
+			// hook up esc/enter handling
+			keyHandler = on(input, "keydown", function(evt){
+				dismissOnKey(column, evt) && inputBlurHandler();
+			});
 		}
-		signal = on(input, "blur", function(){
-			// unhook and delete the input now
-			signal.remove();
-			stopper && stopper.remove();
-			put(input, "!");
-			cell.input = null;
-			// pass new value to onblur handler
-			onblur(activeValues[1]);
-		});
+		signal = on(input, "blur", inputBlurHandler);
 	}
 	return input;
 }
@@ -132,12 +147,30 @@ function renderDijit(grid, column, data, cell, object, onblur){
 	widget.watch("value", function(key, oldValue, value){
 		if(!widget.isValid || widget.isValid()){
 			// only update internal value if widget is in a valid state
-			activeValues[1] = setProperty(grid, cell, activeValues[1], value);
+			if(activeValues[1] !== undefined){
+				activeValues[1] = setProperty(grid, cell, activeValues[1], value);
+			}
 		}
 	});
 	if(onblur){
 		// editor is not always-on (i.e. editOn was specified)
-		var stopper;
+		var stopper,
+			widgetBlurHandler = function(){
+				// if widget supports validation and is invalid, don't dismiss
+				// TODO: prevent from activating another field in the column?
+				if(widget.isValid && !widget.isValid()){ return; }
+				
+				setTimeout(function(){
+					// we have to wait on this for the widget will throw errors
+					// about keydown events that happen right after blur
+					stopper && stopper.remove();
+					widget.destroyRecursive();
+					// pass new value to onblur handler
+					onblur(activeValues[1]);
+					ignoreChange = false;
+				}, 0);
+			};
+		
 		widget.focus();
 		
 		if(editOn){
@@ -146,18 +179,11 @@ function renderDijit(grid, column, data, cell, object, onblur){
 				evt.stopPropagation();
 			});
 		}
-		widget.connect(widget, "onBlur", function(){
-			// if widget supports validation and is invalid, don't dismiss
-			// TODO: prevent from activating another field in the column?
-			if(widget.isValid && !widget.isValid()){ return; }
-			
-			setTimeout(function(){
-				// we have to wait on this for the widget will throw errors
-				// about keydown events that happen right after blur
-				stopper && stopper.remove();
-				widget.destroyRecursive();
-				onblur(activeValues[1]);
-			}, 0);
+		widget.connect(widget, "onBlur", widgetBlurHandler);
+		
+		// connect key event handler for escape/enter cancel/confirm
+		widget.connect(widget, "onKeyDown", function(evt){
+			dismissOnKey(column, evt) && widgetBlurHandler();
 		});
 	}
 	return widget;
