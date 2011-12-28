@@ -1,9 +1,12 @@
 define(["dojo/on", "dojo/has", "dojo/_base/lang", "put-selector/put", "dojo/_base/sniff"],
 function(on, has, lang, put){
 
+var activeValues = []; // used to track active field's original/new values
+
 // common functions shared by all Editor "instances"
 
 function setProperty(grid, cellElement, oldValue, value){
+	console.log("setProperty:", oldValue, value);
 	if(oldValue != value){
 		var cell = grid.cell(cellElement);
 		var row = cell.row;
@@ -41,27 +44,39 @@ function setProperty(grid, cellElement, oldValue, value){
 	return value;
 }
 
-function changeHandler(grid, event){
+function changeHandler(grid, evt){
 	// event handler triggered on change of common input elements
-	var target = event.target;
-	if("lastValue" in target && target.className.indexOf("dgrid-input") > -1){
-		target.lastValue = setProperty(grid, target.parentNode, target.lastValue,
+	var target = evt.target;
+	if(activeValues[0] !== undefined && target.className.indexOf("dgrid-input") > -1){
+		activeValues[1] = setProperty(grid, target.parentNode, activeValues[1],
 			target[target.type == "checkbox" || target.type == "radio"  ? "checked" : "value"]);
+	}
+}
+
+function keyHandler(grid, evt){
+	// event handler for reacting to enter/escape keypresses to save/cancel edits
+	var key = evt.keyCode || evt.which;
+	if (key == 27){ // escape - revert + defocus
+		
+	}else if (key == 13){ // enter - defocus
+		
 	}
 }
 
 function renderInput(grid, column, value, cell, object, onblur){
 	// Handler for simple HTML input fields
 	var editOn = column.editOn,
+		editor = column.editor,
 		input = cell.input ||
-			(cell.input = put(cell, "input[type=" + column.editor + "].dgrid-input", {
-				name: column.field || this.id + "-selection",
+			(cell.input = put(cell, "input[type=" + editor + "].dgrid-input", {
+				name: column.field, // TODO: item id?
 				tabIndex: isNaN(column.tabIndex) ? -1 : column.tabIndex
 			}));
 	
 	input.value = value || "";
-	input.checked = value;
-	input.lastValue = value;
+	if(editor == "radio" || editor == "checkbox"){ input.checked = value; }
+	activeValues = [value, value]; // initialize old and new value for active field
+	
 	if(!grid._hasInputListener){
 		// register one listener at the top level that receives events delegated
 		grid._hasInputListener = true;
@@ -95,7 +110,8 @@ function renderInput(grid, column, value, cell, object, onblur){
 			stopper && stopper.remove();
 			put(input, "!");
 			cell.input = null;
-			onblur(input.lastValue);
+			// pass new value to onblur handler
+			onblur(activeValues[1]);
 		});
 	}
 	return input;
@@ -108,10 +124,16 @@ function renderDijit(grid, column, data, cell, object, onblur){
 		// widgetArgs can be either a hash or a function returning a hash
 		args = typeof column.widgetArgs == "function" ?
 			lang.hitch(grid, column.widgetArgs)(object) : column.widgetArgs || {};
+	
 	args.value = data; // set value based on data
+	activeValues = [data, data]; // initialize old and new value for active field
+	
 	widget = new column.editor(args, cell.appendChild(put("div")));
 	widget.watch("value", function(key, oldValue, value){
-		data = setProperty(grid, cell, data, value);
+		if(!widget.isValid || widget.isValid()){
+			// only update internal value if widget is in a valid state
+			activeValues[1] = setProperty(grid, cell, activeValues[1], value);
+		}
 	});
 	if(onblur){
 		// editor is not always-on (i.e. editOn was specified)
@@ -126,6 +148,7 @@ function renderDijit(grid, column, data, cell, object, onblur){
 		}
 		widget.connect(widget, "onBlur", function(){
 			// if widget supports validation and is invalid, don't dismiss
+			// TODO: prevent from activating another field in the column?
 			if(widget.isValid && !widget.isValid()){ return; }
 			
 			setTimeout(function(){
@@ -133,7 +156,7 @@ function renderDijit(grid, column, data, cell, object, onblur){
 				// about keydown events that happen right after blur
 				stopper && stopper.remove();
 				widget.destroyRecursive();
-				onblur(data);
+				onblur(activeValues[1]);
 			}, 0);
 		});
 	}
