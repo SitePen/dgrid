@@ -1,4 +1,4 @@
-define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Editor", "./List", "dojo/_base/sniff"], function(has, put, declare, listen, Editor, List){
+define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./List", "dojo/_base/sniff"], function(has, put, declare, listen, List){
 	var contentBoxSizing = has("ie") < 8 && !has("quirks");
 	
 	function appendIfNode(parent, subNode){
@@ -7,7 +7,7 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 		}
 	}
 	
-	return declare([List], {
+	var Grid = declare([List], {
 		columns: null,
 		// cellNavigation: Boolean
 		//		This indicates that focus is at the cell level. This may be set to false to cause
@@ -366,4 +366,12 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 			this.resize();
 		}
 	});
+	
+	// expose default implementation of renderCell e.g. for use by column plugins
+	Grid.defaultRenderCell = function(object, data, td, options){
+		if(data != null){
+			td.appendChild(document.createTextNode(data));
+		}
+	}
+	return Grid;
 });
