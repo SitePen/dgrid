@@ -1,10 +1,8 @@
-define(["dojo/on", "dojo/has", "dojo/_base/lang", "put-selector/put", "dojo/_base/sniff"],
-function(on, has, lang, put){
+define(["dojo/_base/kernel", "dojo/on", "dojo/has", "dojo/_base/lang", "./Grid", "put-selector/put", "dojo/_base/sniff"],
+function(kernel, on, has, lang, Grid, put){
 
 var activeValues = [], // used to track active field's original/new values
 	ignoreChange = false; // used to ignore change immediately after esc/enter
-
-// common functions shared by all Editor "instances"
 
 function setProperty(grid, cellElement, oldValue, value){
 	if(oldValue != value){
@@ -13,10 +11,10 @@ function setProperty(grid, cellElement, oldValue, value){
 		var column = cell.column;
 		if(column.field && row){
 			// first try to keep the type the same if possible
-			if(typeof oldValue == 'number'){
+			if(typeof oldValue == "number"){
 				value = isNaN(value) ? value : parseFloat(value);
-			}else if(typeof oldValue == 'boolean'){
-				value = value == 'true' ? true : value == 'false' ? false : value;
+			}else if(typeof oldValue == "boolean"){
+				value = value == "true" ? true : value == "false" ? false : value;
 			}else if(oldValue instanceof Date){
 				var asDate = new Date(value);
 				value = isNaN(asDate.getTime()) ? value : asDate;
@@ -44,6 +42,8 @@ function setProperty(grid, cellElement, oldValue, value){
 	return value;
 }
 
+// general event logic
+
 function changeHandler(grid, evt){
 	// event handler triggered on change of common input elements
 	var target = evt.target;
@@ -70,165 +70,192 @@ function dismissOnKey(column, evt){
 	return false; // don't dismiss
 }
 
-function renderInput(grid, column, value, cell, object, onblur){
-	// Handler for simple HTML input fields
-	var editOn = column.editOn,
-		editor = column.editor,
-		input = cell.input ||
-			(cell.input = put(cell, "input[type=" + editor + "].dgrid-input", {
-				name: column.field, // TODO: item id?
-				tabIndex: isNaN(column.tabIndex) ? -1 : column.tabIndex
-			}));
-	
-	input.value = value || "";
-	if(editor == "radio" || editor == "checkbox"){ input.checked = value; }
-	activeValues = [value, value]; // initialize old and new value for active field
-	
-	if(!grid._hasInputListener){
-		// register one listener at the top level that receives events delegated
-		grid._hasInputListener = true;
-		grid.on("change", function(evt){ changeHandler(grid, evt); });
-	}
-	if(has("ie") < 9){
-		// IE<9 doesn't fire change events for all the right things,
-		// and it doesn't bubble, double fail.
-		if(cell.input.type == "radio" || cell.input.type == "checkbox"){
-			// listen for clicks because IE doesn't fire change events properly for checks/radios
-			on(input, "click", function(evt){ changeHandler(grid, evt); });
-		}else{
-			on(input, "change", function(evt){ changeHandler(grid, evt); });
-		}
-	}
-	if(onblur){
-		// editor is not always-on (i.e. editOn was specified)
-		var signal, stopper, keyHandler,
-			inputBlurHandler = function(){
-				// unhook and delete the input
-				signal.remove();
-				stopper && stopper.remove();
-				keyHandler && keyHandler.remove();
-				input.blur(); // force FF/IE to fire onchange first
-				put(input, "!");
-				cell.input = null;
-				// pass new value to onblur handler
-				onblur(activeValues[1]);
-				ignoreChange = false;
-			};
-		
-		input.focus();
-		
-		if(editOn){
-			// don't allow event to confuse grid when editor is already active
-			stopper = on(input, editOn, function(evt){
-				evt.stopPropagation();
-			});
-			// hook up esc/enter handling
-			keyHandler = on(input, "keydown", function(evt){
-				dismissOnKey(column, evt) && inputBlurHandler();
-			});
-		}
-		signal = on(input, "blur", inputBlurHandler);
-	}
-	return input;
-}
+// editor creation/hookup/placement logic
 
-function renderDijit(grid, column, data, cell, object, onblur){
-	// Handler for Dijit-based editor fields
-	var widget,
+function createEditor(column){
+	// Creates an editor instance based on column definition properties,
+	// and hooks up events.
+	var editor = column.editor,
 		editOn = column.editOn,
-		// widgetArgs can be either a hash or a function returning a hash
-		args = typeof column.widgetArgs == "function" ?
-			lang.hitch(grid, column.widgetArgs)(object) : column.widgetArgs || {};
+		grid = column.grid,
+		isWidget = typeof editor != "string", // string == standard HTML input
+		args, cmp, node, className, putstr;
 	
-	args.value = data; // set value based on data
-	activeValues = [data, data]; // initialize old and new value for active field
+	// TODO: deprecate widgetArgs in favor of editorArgs
+	// (leaving open the possibility of using it for HTML textarea, etc)
+	args = column.editorArgs || column.widgetArgs || {};
+	if(typeof args == "function"){ args = lang.hitch(grid, args)(column); }
 	
-	widget = new column.editor(args, cell.appendChild(put("div")));
-	widget.watch("value", function(key, oldValue, value){
-		if(!widget.isValid || widget.isValid()){
+	if(isWidget){
+		// add dgrid-input to className to make consistent with HTML inputs
+		className = args.className;
+		args.className = (className ? className + " " : "") + "dgrid-input";
+		
+		cmp = new editor(args);
+		cmp.watch("value", function(key, oldValue, value){
 			// only update internal value if widget is in a valid state
-			if(activeValues[1] !== undefined){
-				activeValues[1] = setProperty(grid, cell, activeValues[1], value);
+			if(!this.isValid || this.isValid()){
+				if(activeValues[1] !== undefined){
+					activeValues[1] = setProperty(
+						grid, this.domNode.parentNode, activeValues[1], value);
+				}
+			}
+		});
+	}else{
+		// considerations for standard HTML form elements
+		if(!column.grid._hasInputListener){
+			// register one listener at the top level that receives events delegated
+			grid._hasInputListener = true;
+			grid.on("change", function(evt){ changeHandler(grid, evt); });
+		}
+		if(has("ie") < 9){
+			// IE<9 doesn't fire change events for all the right things,
+			// and it doesn't bubble.
+			// TODO: test IE9 quirks
+			if(editor == "radio" || editor == "checkbox"){
+				// listen for clicks since IE doesn't fire change events properly for checks/radios
+				on(cmp, "click", function(evt){ changeHandler(grid, evt); });
+			}else{
+				on(cmp, "change", function(evt){ changeHandler(grid, evt); });
 			}
 		}
-	});
-	if(onblur){
-		// editor is not always-on (i.e. editOn was specified)
-		var stopper,
-			widgetBlurHandler = function(){
-				// if widget supports validation and is invalid, don't dismiss
-				// TODO: prevent from activating another field in the column?
-				if(widget.isValid && !widget.isValid()){ return; }
-				
-				setTimeout(function(){
-					// we have to wait on this for the widget will throw errors
-					// about keydown events that happen right after blur
-					stopper && stopper.remove();
-					widget.destroyRecursive();
-					// pass new value to onblur handler
-					onblur(activeValues[1]);
-					ignoreChange = false;
-				}, 0);
-			};
 		
-		widget.focus();
-		
-		if(editOn){
-			// don't allow event to confuse grid when editor is already active
-			stopper = on(widget.domNode, editOn, function(evt){
-				evt.stopPropagation();
-			});
-		}
-		widget.connect(widget, "onBlur", widgetBlurHandler);
-		
-		// connect key event handler for escape/enter cancel/confirm
-		widget.connect(widget, "onKeyDown", function(evt){
-			dismissOnKey(column, evt) && widgetBlurHandler();
-		});
+		putstr = editor == "textarea" ? "textarea" :
+			"input[type=" + editor + "]";
+		cmp = put(putstr + ".dgrid-input", lang.mixin({
+			name: column.field, // TODO: item id?
+			tabIndex: isNaN(column.tabIndex) ? -1 : column.tabIndex
+		}, args));
 	}
-	return widget;
+	
+	return cmp;
 }
 
+function createSharedEditor(column, originalRenderCell){
+	// Creates an editor instance with additional considerations for
+	// shared usage across an entire column (for columns with editOn specified).
+	
+	var cmp = createEditor(column),
+		isWidget = cmp.domNode,
+		node = cmp.domNode || cmp,
+		parentNode,
+		stopper, keyHandler, blurHandler,
+		onblur = function(){
+			// FIXME: currently having problems due to blur being multi-fired
+			// (Wasn't an issue previously because the listener was already unhooked)
+			
+			// force FF/IE to fire onchange first when fired from esc/enter
+			node.blur();
+			
+			// remove the editor from the cell
+			parentNode = node.parentNode;
+			parentNode.removeChild(node);
+			
+			// pass new value to original renderCell implementation for this cell
+			//TODO: test; is the cost of grid.row() worth hooking this centrally?
+			//(maybe expand info about active editor instead?)
+			originalRenderCell(column.grid.row(parentNode).data, activeValues[1],
+				parentNode);
+			
+			// reset state
+			ignoreChange = false;
+			activeValues = [];
+		};
+	
+	// don't allow event to confuse grid when editor is already active
+	// TODO: delegate via `.column-<id> .dgrid-input`?
+	stopper = on(node, column.editOn, function(evt){
+		evt.stopPropagation();
+	});
+	
+	// hook up enter/esc key handling
+	// TODO: test for various input widgets - is domNode good enough?
+	keyHandler = on(node, "keydown", function(evt){
+		dismissOnKey(column, evt) && onblur();
+	});
+	
+	if(isWidget){
+		// need to further wrap blur callback, to check for validity first,
+		// and to add a timeout to avoid throwing errors for key events after blur
+		// (TODO: verify if the timeout is still needed since we no longer destroy)
+		cmp.connect(cmp, "onBlur", function(){
+			if(cmp.isValid && !cmp.isValid()){ return; }
+			setTimeout(onblur, 0);
+		});
+	}else{
+		blurHandler = on(node, "blur", onblur);
+	}
+	
+	return cmp;
+}
+
+function showEditor(cmp, column, value, cell, object){
+	// Places a shared editor into the newly-active cell in the column.
+	var grid = column.grid,
+		editor = column.editor,
+		editOn = column.editOn,
+		isWidget = cmp.domNode;
+	
+	// update value of input/widget first
+	if(isWidget){
+		cmp.set("value", value);
+	}else{
+		cmp.value = value;
+		if(editor == "radio" || editor == "checkbox"){ cmp.checked = !!value; }
+	}
+	
+	cell.innerHTML = "";
+	put(cell, cmp.domNode || cmp);
+	// if component is a widget, call startup if this is the first placement
+	if(isWidget && !cmp._started){ cmp.startup(); }
+}
+
+// Editor column plugin function
 
 return function(column, editor, editOn){
 	// summary:
 	//		Adds editing capability to a column's cells.
 	
-	var originalRenderCell = column.renderCell || function(object, value, td){
-		if(value != null){
-			td.appendChild(document.createTextNode(value));
-		}
-	};
+	var originalRenderCell = column.renderCell || Grid.defaultRenderCell;
+	
 	// accept arguments as parameters to Editor function, or from column def,
 	// but normalize to column def.
 	// (TODO: maybe should only accept from column def to begin with...)
 	column.editor = editor || column.editor;
 	column.editOn = editOn || column.editOn;
 	
-	// when editor is a string, we use a standard HTML input as the editor
-	var renderEditor = typeof column.editor == "string" ? renderInput : renderDijit;
-	
 	column.renderCell = function(object, value, cell, options){
-		var cmp, // stores input/widget being rendered
-			grid = column.grid,
-			editOn = column.editOn;
+		var cmp, // stores input/widget component being rendered
+			grid = column.grid;
 		
-		if(editOn){ // TODO: Make this use event delegation, particularly now that we can do event delegation with focus events
-			// if we are dealing with IE<8, the cell element is the padding cell, need to go to parent
+		if(editOn){
+			// On first run, create one shared widget/input which will be swapped into
+			// the active cell.
+			if(!column.editorInstance){
+				column.editorInstance = createSharedEditor(column, originalRenderCell);
+			}
+			
+			// TODO: Consider using event delegation
+			// (Would require using dgrid's focus events for activating on focus)
+			
+			// in IE<8, cell is the child of the td due to the extra padding node
 			on(cell.tagName == "TD" ? cell : cell.parentNode,
 					editOn, function(){
+				var cmp = column.editorInstance;
 				if(!column.canEdit || column.canEdit(object, value)){
-					cell.innerHTML = "";
-					cmp = renderEditor(grid, column, value, cell, object, function(newData){
-						originalRenderCell(object, value = newData, cell);
-					});
-					// if component is a widget, call startup now (already visible)
-					if (cmp.startup) { cmp.startup(); }
+					showEditor(cmp, column, value, cell, object);
+					// initialize old and new value for active field
+					activeValues = [value, value];
+					// focus the newly-placed control
+					cmp.focus && cmp.focus(); // supported by form widgets and HTML inputs
 				}
 			});
+			// initially render content in non-edit mode
 			originalRenderCell(object, value, cell, options);
 		}else{
-			cmp = renderEditor(grid, column, value, cell, object);
+			// always-on: create editor immediately upon rendering each cell
+			cmp = createEditor(column);
+			showEditor(cmp, column, value, cell, object);
 			// if component is a widget, call startup once execution stack completes
 			if (cmp.startup) { setTimeout(function(){ cmp.startup(); }, 0); }
 		}
