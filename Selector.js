@@ -57,9 +57,9 @@ define(["dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put", "dojo/
 		}
 
 		var renderInput = typeof type == "function" ? type : function(value, cell, object){
-			var input = cell.input || (cell.input = put(cell, "div.ui-icon.dgrid-selector-input.dgrid-selector-"+type, {
+			var input = put(cell, "div.ui-icon.dgrid-selector-input.dgrid-selector-"+type, {
 				tabIndex: isNaN(column.tabIndex) ? -1 : column.tabIndex
-			}));
+			});
 
 			if(!grid._hasSelectorInputListener){
 				setupSelectionEvents();
