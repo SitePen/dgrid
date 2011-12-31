@@ -271,6 +271,8 @@ return declare([List], {
 						// the preload is above the line of sight
 						preloadNode = preloadNode.next;
 					}else{
+						// catch another case where grid is not visible
+						if (!grid.rowHeight) return;
 						// the preload node is visible, or close to visible, better show it
 						var offset = ((preloadNode.rowIndex ? visibleTop : visibleBottom) - preloadTop) / grid.rowHeight;
 						var count = (visibleBottom - visibleTop) / grid.rowHeight;
