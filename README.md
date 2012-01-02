@@ -86,7 +86,7 @@ For example, we could create a grid like so:
                     label: "Last Name"
                 },
                 age: {
-                    get: function(object){
+                    get: function(index, object){
                         return (new Date().getTime() - object.birthDate.getTime()) / 31536000000;
                     }
                 }
