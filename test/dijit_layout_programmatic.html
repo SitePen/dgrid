@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Test dijit programmatic layout</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+		<meta name="viewport" content="width=570"/>
+		<style type="text/css">
+			@import "../../dijit/themes/claro/document.css";
+			@import "../../dijit/themes/claro/claro.css";
+			@import "../css/skins/claro.css";
+			html, body {
+				padding: 0;
+				width: 100%;
+				height: 100%;
+			}
+			.dijitDialog {
+				width: 500px;
+			}
+		</style>
+		<script type="text/javascript" src="../../dojo/dojo.js"
+			data-dojo-config="async: true"></script>
+		<script type="text/javascript">
+			// callbacks for button clicks
+			function showProgContentDialog(){
+				dlgProgContent.show();
+				//dlgProgContent.content.startup(); //this is a workaround
+			}
+
+			require(["dgrid/OnDemandGrid",
+				"dgrid/Selection",
+				"dijit/Dialog",
+				"dijit/registry",
+				"dojo/_base/lang",
+				"dojo/_base/declare",
+				"dojo/parser",
+				// widgets only used declaratively
+				"dijit/layout/BorderContainer",
+				"dijit/layout/TabContainer",
+				"dijit/layout/ContentPane",
+				"dijit/Toolbar",
+				"dijit/form/Button",
+				// non-returns
+				"dgrid/test/data/base",
+				"dojo/domReady!"
+			], function(Grid, Selection, Dialog, registry, lang, declare, parser, BC, TC, CP, Toolbar, Button){
+
+				var
+					gridCols = window.gridCols = {
+						col1: 'Column 1',
+						col2: {name: 'Column 2', sortable: false},
+						col3: 'Column 3',
+						col4: 'Column 4'
+					},
+					//args to be passed to programmatic dgrid instances
+					gridArgs = {
+						store: testStore,
+						columns: gridCols,
+						selectionMode: 'single'
+					};
+					var gridLeft = new (declare([Grid, Selection]))(lang.mixin({id: 'gridLeft'}, gridArgs), "gridLeftDiv");
+					var gridTab1 = new (declare([Grid, Selection]))(lang.mixin({id: 'gridTab1'}, gridArgs), "gridTab1Div");
+					var gridTab2 = new (declare([Grid, Selection]))(lang.mixin({id: 'gridTab1'}, gridArgs), "gridTab2Div");
+					var bc = new BC({
+						id: 'bcMain',
+						design: 'headline'
+
+					}, "bcDiv");
+
+					var tb = new Toolbar({
+						id: 'tbTop',
+						region: 'top'
+					}, "toolbar");
+					var tc = new TC({
+						id: 'tab',
+						class: 'bcCenter',
+						region: 'center'
+					}, "tabContainer");
+
+
+					tc.addChild( new CP({
+						id: 'tab1',
+						title: 'Tab 1',
+						content: gridTab1
+					}, "cpTab1Div") );
+					tc.addChild( new CP({
+						id: 'tab2',
+						title: 'Tab 2',
+						content: gridTab2
+					}, "cpTab2Div") );
+
+					tb.addChild( new Button ({
+						id: "btnDialog",
+						label: "Programmatic dialog w/ dgrid",
+						onClick: showProgContentDialog
+					}, "btnDiv"));
+					bc.addChild( tb );
+					bc.addChild( new CP({
+						id: 'cpLeft',
+						region: 'left',
+						content: gridLeft
+					}, "cpLeftDiv") );
+					bc.addChild( tc );
+
+					bc.startup();
+				// test setting a dgrid as content of a dialog programmatically
+				window.dlgProgContent = new Dialog({
+					content: new (declare([Grid, Selection]))(lang.mixin({id: "gridDlgProgContent"}, gridArgs))
+				});
+
+				//parser.parse();
+			});
+		</script>
+	</head>
+	<body class="claro">
+		<div id="bcDiv" style='height:99%; width:99%'></div>
+		<div id="toolbar"></div>
+		<div id="btnDiv"></div>
+		<div id="tabContainer"></div>
+		<div id="gridLeftDiv"></div>
+		<div id="gridTab1Div"></div>
+		<div id="gridTab2Div"></div>
+		<div id="cpLeftDiv" style="width:300px"></div>
+		<div id="cpTab1Div"></div>
+		<div id="cpTab2Div"></div>
+	</body>
+</html>
