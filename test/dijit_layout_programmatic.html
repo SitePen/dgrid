@@ -37,6 +37,7 @@
 
 			require(["dgrid/OnDemandGrid",
 				"dgrid/Selection",
+				"dgrid/extensions/DijitRegistry",
 				"dijit/Dialog",
 				"dijit/registry",
 				"dojo/_base/lang",
@@ -46,11 +47,12 @@
 				"dijit/layout/ContentPane",
 				"dijit/Toolbar",
 				"dijit/form/Button",
+				"dijit/registry",
 				// non-returns
 				"dgrid/test/data/base",
 				"dojo/domReady!"
-			], function(Grid, Selection, Dialog, registry, lang, declare, BC, TC, CP, Toolbar, Button){
-
+			], function(Grid, Selection, DijitRegistry, Dialog, registry, lang, declare, BC, TC, CP, Toolbar, Button){
+				
 				var
 					gridCols = window.gridCols = {
 						col1: "Column 1",
@@ -64,11 +66,11 @@
 						columns: gridCols,
 						selectionMode: "single"
 					},
-					CustomGrid = declare([Grid, Selection]),
+					CustomGrid = declare([Grid, Selection, DijitRegistry]),
 					gridLeft = new CustomGrid(lang.mixin({id: "gridLeft"}, gridArgs)),
 					gridTab1 = new CustomGrid(lang.mixin({id: "gridTab1"}, gridArgs)),
 					gridTab2 = new CustomGrid(lang.mixin({id: "gridTab2"}, gridArgs));
-				
+					console.log("after registry: ", registry.toArray());
 				var bc = new BC({
 					design: "headline"
 				}, "bc");
