@@ -64,13 +64,11 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 		remove: function(){
 			var
 				rowElement = this.element,
-				contentNode = rowElement.parentNode,
-				connected = rowElement.connected,
-				connectedParent = connected && connected.parentNode;
-			
-			contentNode && contentNode.removeChild(rowElement);
+				connected = rowElement.connected;
+			// remove row
+			put(rowElement, "!");
 			// if it has a connected node, remove that as well
-			connectedParent && connectedParent.removeChild(connected);
+			connected && put(connected, "!");
 		}
 	};
 	function move(item, steps, targetClass){
