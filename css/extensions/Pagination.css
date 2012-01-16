@@ -1,18 +1,24 @@
 .dgrid-pagination {
-	line-height: 1em;
+	padding: 2px;
 }
 
-.dgrid-pagination .status {
+.dgrid-pagination .dgrid-status {
 	float: left;
 }
 
-.dgrid-pagination .navigation {
+.dgrid-pagination .dgrid-navigation {
 	float: right;
 }
-.dgrid-pagination .navigation a {
-	font-size: 1.5em;
-	padding: 0 4px;
-	text-decoration: none;
+.dgrid-pagination .dgrid-navigation span, .dgrid-pagination .dgrid-navigation a {
 	font-weight: bold;
+	color: #aaa;
+	padding: 2px 4px;
+}
+.dgrid-pagination .dgrid-navigation a {
+	text-decoration: none;
 	color: #000;
+}
+.dgrid-page-input {
+	width: 3em;
+	height: 1em;
 }

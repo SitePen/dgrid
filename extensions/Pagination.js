@@ -9,9 +9,15 @@ function(_StoreMixin, declare, lang, on, string, Deferred, put, i18n){
 		rowsPerPage: 10,
 		
 		showFooter: true,
-		
+		// pagingTextBox: Boolean
+		// 		Indicate whether or not to show a textbox for paging
+		pagingTextBox: false,
 		_currentPage: 1,
 		_total: 0,
+		// pagingTextBox: Number|Boolean
+		// 		The number of page links to show (also depends on proximity to start and end)
+		//		Set to false to disable the page links
+		pagingLinks: 10, 
 		
 		buildRendering: function(){
 			var grid = this;
@@ -22,14 +28,9 @@ function(_StoreMixin, declare, lang, on, string, Deferred, put, i18n){
 			var paginationNode = this.paginationNode =
 					put(this.footerNode, "div.dgrid-pagination"),
 				statusNode = this.paginationStatusNode =
-					put(paginationNode, "div.status"),
+					put(paginationNode, "div.dgrid-status"),
 				navigationNode = this.paginationNavigationNode =
-					put(paginationNode, "div.navigation");
-			
-			navigationNode.innerHTML = '<a href="#" class="first">&laquo;</a> ' +
-				'<a href="#" class="previous">&lsaquo;</a> ' +
-				'<a href="#" class="next">&rsaquo;</a> ' +
-				'<a href="#" class="last">&raquo;</a>';
+					put(paginationNode, "div.dgrid-navigation");
 			
 			on(navigationNode, "a:click", function(evt){
 				evt.preventDefault();
@@ -40,16 +41,57 @@ function(_StoreMixin, declare, lang, on, string, Deferred, put, i18n){
 				
 				// determine navigation target based on clicked link's class
 				console.log(this.className, curr, max);
-				if(this.className == "first"){
+				if(this.className == "dgrid-page-link"){
+					grid.gotoPage(+this.innerHTML); // the innerHTML has the page number
+				}
+				if(this.className == "dgrid-first"){
 					grid.gotoPage(1);
-				}else if(this.className == "previous"){
+				}else if(this.className == "dgrid-previous"){
 					if(curr > 1){ grid.gotoPage(curr - 1); }
-				}else if(this.className == "next"){
+				}else if(this.className == "dgrid-next"){
 					if(curr < max){ grid.gotoPage(curr + 1); }
-				}else if(this.className == "last"){
+				}else if(this.className == "dgrid-last"){
 					grid.gotoPage(max);
 				}
 			});
+		},
+		updateNavigation: function(currentPage){
+			// summary:
+			//		Update status and navigation controls based on total count from query
+			function pageLink(page){
+				put(navigationNode, (page == currentPage ? 'span' : 'a[href=#]') + '.dgrid-page-link', page);
+			}
+			var navigationNode = this.paginationNavigationNode,
+				currentPage = this._currentPage,
+				pagingLinks = this.pagingLinks,
+				end = this._total / this.rowsPerPage;
+				
+			navigationNode.innerHTML = "";
+			// create a previous link
+			put(navigationNode,  (currentPage <= 1 ? 'span' : 'a[href=#]') + '.dgrid-previous', '‹'); // « ‹ › »
+			if(pagingLinks){
+				// always include the first page (back to the beginning)
+				pageLink(1);
+				var start = Math.floor(currentPage - pagingLinks / 2);
+				if(start > 2) {
+					// visual indication of skipped page links
+					put(navigationNode, 'span.dgrid-page-skip', '...');
+				}else{
+					start = 2;
+				}
+				// now iterate through all the page links we should show
+				for(var i = start; i < Math.min(start + pagingLinks, end + 1); i++){
+					pageLink(i);
+				}
+			}
+			if(this.pagingTextBox){
+				// include a paging text box
+				var grid = this;
+				on(put(navigationNode, 'input.dgrid-page-input[type=text][value=$]', currentPage), "change", function(){
+					grid.gotoPage(+this.value);
+				});
+			}
+			put(navigationNode, (end <= currentPage ? 'span' : 'a[href=#]') + '.dgrid-next', '›'); // « ‹ › »
 		},
 		
 		refresh: function(){
@@ -106,6 +148,7 @@ function(_StoreMixin, declare, lang, on, string, Deferred, put, i18n){
 				});
 				grid._total = total;
 				grid._currentPage = page;
+				grid.updateNavigation();
 			});
 			
 			return Deferred.when(this.renderArray(results, loadingNode, options), function(trs){
