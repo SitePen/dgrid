@@ -141,9 +141,7 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 				var data = object;
 				// we support the field, get, and formatter properties like the DataGrid
 				if(column.get){
-					// FIXME: signature of get is (inRowIndex, inItem)
-					// Is it possible for us to produce row index here for first arg?
-					data = column.get(0, object);
+					data = column.get(object);
 				}else if("field" in column && column.field != "_item"){
 					data = data[column.field];
 				}
