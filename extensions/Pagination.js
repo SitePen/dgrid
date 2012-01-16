@@ -40,7 +40,6 @@ function(_StoreMixin, declare, lang, on, string, Deferred, put, i18n){
 					max = Math.ceil(grid._total / grid.rowsPerPage);
 				
 				// determine navigation target based on clicked link's class
-				console.log(this.className, curr, max);
 				if(this.className == "dgrid-page-link"){
 					grid.gotoPage(+this.innerHTML); // the innerHTML has the page number
 				}
@@ -106,56 +105,59 @@ function(_StoreMixin, declare, lang, on, string, Deferred, put, i18n){
 		gotoPage: function(page){
 			// summary:
 			//		Loads the given page.  Note that page numbers start at 1.
-			
-			console.log('goto:', page);
-			var grid = this,
-				count = this.rowsPerPage,
-				start = (page - 1) * count,
-				options = lang.delegate(this.queryOptions || {}, {
-					start: start,
-					count: count
-				}),
-				results,
-				contentNode = this.contentNode,
-				rows = this._rowIdToObject,
-				substrLen = 5 + this.id.length, // trimmed from front of row IDs
-				r, loadingNode;
-			
-			if(this.sortOrder){ options.sort = this.sortOrder; }
-			
-			// remove any currently-rendered rows
-			for(r in rows){
-				this.row(r.substr(substrLen)).remove();
-			}
-			this._rowIdToObject = {};
-			contentNode.innerHTML = "";
-			
-			loadingNode = put(contentNode, "div.dgrid-loading");
-			
-			// set flag to deactivate pagination event handlers until loaded
-			this._isLoading = true;
-			
-			// Run new query and pass it into renderArray
-			// TODO: error handler (should also clear _isLoading)
-			results = this.store.query(this.query, options);
-			
-			Deferred.when(results.total, function(total){
-				// update status text based on now-current page and total
-				grid.paginationStatusNode.innerHTML = string.substitute(i18n.status, {
-					start: start + 1,
-					end: start + count,
-					total: total
+			var grid = this;
+			this._trackError(function(){
+				var count = grid.rowsPerPage,
+					start = (page - 1) * count,
+					options = lang.delegate(grid.queryOptions || {}, {
+						start: start,
+						count: count
+					}),
+					results,
+					contentNode = grid.contentNode,
+					rows = grid._rowIdToObject,
+					substrLen = 5 + grid.id.length, // trimmed from front of row IDs
+					r, loadingNode;
+				
+				if(grid.sortOrder){ options.sort = grid.sortOrder; }
+				
+				// remove any currently-rendered rows
+				for(r in rows){
+					grid.row(r.substr(substrLen)).remove();
+				}
+				grid._rowIdToObject = {};
+				contentNode.innerHTML = "";
+				
+				loadingNode = put(contentNode, "div.dgrid-loading");
+				
+				// set flag to deactivate pagination event handlers until loaded
+				grid._isLoading = true;
+				
+				// Run new query and pass it into renderArray
+				results = grid.store.query(grid.query, options);
+				
+				Deferred.when(results.total, function(total){
+					// update status text based on now-current page and total
+					grid.paginationStatusNode.innerHTML = string.substitute(i18n.status, {
+						start: start + 1,
+						end: start + count,
+						total: total
+					});
+					grid._total = total;
+					grid._currentPage = page;
+					grid.updateNavigation();
 				});
-				grid._total = total;
-				grid._currentPage = page;
-				grid.updateNavigation();
-			});
-			
-			return Deferred.when(this.renderArray(results, loadingNode, options), function(trs){
-				put(loadingNode, "!");
-				delete grid._isLoading;
-				// reset scroll position now that new page is loaded
-				grid.bodyNode.scrollTop = 0;
+				
+				return Deferred.when(grid.renderArray(results, loadingNode, options), function(trs){
+					put(loadingNode, "!");
+					delete grid._isLoading;
+					// reset scroll position now that new page is loaded
+					grid.bodyNode.scrollTop = 0;
+				}, function(error){
+					// enable loading again before throwing the error
+					delete grid._isLoading;
+					throw error;
+				});
 			});
 		}
 	});
