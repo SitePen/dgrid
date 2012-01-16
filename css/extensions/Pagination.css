@@ -1,0 +1,18 @@
+.dgrid-pagination {
+	line-height: 1em;
+}
+
+.dgrid-pagination .status {
+	float: left;
+}
+
+.dgrid-pagination .navigation {
+	float: right;
+}
+.dgrid-pagination .navigation a {
+	font-size: 1.5em;
+	padding: 0 4px;
+	text-decoration: none;
+	font-weight: bold;
+	color: #000;
+}
