@@ -1,4 +1,6 @@
-define(["dojo/_base/declare", "dojo/on", "./List", "put-selector/put", "dojo/has", "dojo/query"], function(declare, on, List, put, has){
+define(["dojo/_base/declare", "dojo/_base/Deferred", "dojo/on", "./List", "put-selector/put", "dojo/has", "dojo/query"],
+function(declare, Deferred, on, List, put, has){
+
 var ctrlEquiv = has("mac") ? "metaKey" : "ctrlKey";
 return declare([List], {
 	// summary:
@@ -235,15 +237,20 @@ return declare([List], {
 	},
 	
 	renderArray: function(){
-		var rows = this.inherited(arguments);
-		var selection = this.selection;
-		for(var i = 0; i < rows.length; i++){
-			var row = this.row(rows[i]);
-			var selected = row.id in selection ? selection[row.id] : this.allSelected;
-			if(selected){
-				this.select(row, null, selected);
+		var grid = this,
+			rows = this.inherited(arguments);
+		
+		Deferred.when(rows, function(rows){
+			var selection = grid.selection,
+				i, row, selected;
+			for(i = 0; i < rows.length; i++){
+				row = grid.row(rows[i]);
+				selected = row.id in selection ? selection[row.id] : grid.allSelected;
+				if(selected){
+					grid.select(row, null, selected);
+				}
 			}
-		}
+		});
 		return rows;
 	}
 });
