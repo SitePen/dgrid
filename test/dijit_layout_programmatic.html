@@ -70,7 +70,7 @@
 					gridLeft = new CustomGrid(lang.mixin({id: "gridLeft"}, gridArgs)),
 					gridTab1 = new CustomGrid(lang.mixin({id: "gridTab1"}, gridArgs)),
 					gridTab2 = new CustomGrid(lang.mixin({id: "gridTab2"}, gridArgs));
-					console.log("after registry: ", registry.toArray());
+				
 				var bc = new BC({
 					design: "headline"
 				}, "bc");
@@ -117,7 +117,7 @@
 				
 				// test setting a dgrid as content of a dialog programmatically
 				window.dlgProgContent = new Dialog({
-					content: new (declare([Grid, Selection]))(lang.mixin({id: "gridDlgProgContent"}, gridArgs))
+					content: new CustomGrid(lang.mixin({id: "gridDlgProgContent"}, gridArgs))
 				});
 			});
 		</script>
