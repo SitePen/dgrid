@@ -2,8 +2,6 @@ define(["dojo/_base/declare","dijit/registry"],
 function(declare, registry){
 /*
  *	Dijit registry extension for dgrid
- *	v.1.0.0
- *	cbarrett 2012-01-15
  */
 	return declare([], {
 		// summary:
