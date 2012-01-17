@@ -6,17 +6,20 @@
 	float: left;
 }
 
-.dgrid-pagination .dgrid-navigation {
+.dgrid-pagination .dgrid-navigation, .dgrid-pagination .dgrid-page-size {
 	float: right;
 }
-.dgrid-pagination .dgrid-navigation span, .dgrid-pagination .dgrid-navigation a {
+.dgrid-navigation span {
 	font-weight: bold;
-	color: #aaa;
 	padding: 2px 4px;
+	cursor: pointer;
+}
+.dgrid-pagination .dgrid-page-disabled {
+	color: #aaa;
+	cursor: auto;
 }
 .dgrid-pagination .dgrid-navigation a {
 	text-decoration: none;
-	color: #000;
 }
 .dgrid-page-input {
 	width: 3em;

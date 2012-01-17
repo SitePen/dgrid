@@ -18,6 +18,10 @@ function(_StoreMixin, declare, lang, on, string, Deferred, put, i18n){
 		// 		The number of page links to show (also depends on proximity to start and end)
 		//		Set to false to disable the page links
 		pagingLinks: 10, 
+		// pageSizeOptions: Array[Number]
+		// 		This provides options for different page sizes in a dropdown. If it is empty (default)
+		// 		no page size dropdown will be displayed		
+		pageSizeOptions: [], 
 		
 		buildRendering: function(){
 			var grid = this;
@@ -29,10 +33,22 @@ function(_StoreMixin, declare, lang, on, string, Deferred, put, i18n){
 					put(this.footerNode, "div.dgrid-pagination"),
 				statusNode = this.paginationStatusNode =
 					put(paginationNode, "div.dgrid-status"),
-				navigationNode = this.paginationNavigationNode =
+				pageSizeOptions = this.pageSizeOptions;
+			if(pageSizeOptions.length){
+				var sizeSelect = put(paginationNode, 'select.dgrid-page-size');
+				for(var i = 0; i < pageSizeOptions.length; i++){
+					put(sizeSelect, 'option', pageSizeOptions[i], {value: pageSizeOptions[i]});
+				}
+				on(sizeSelect, "change", function(){
+					grid.rowsPerPage = +sizeSelect.value;
+					grid.gotoPage(1);
+				});
+			}
+
+			var navigationNode = this.paginationNavigationNode =
 					put(paginationNode, "div.dgrid-navigation");
 			
-			on(navigationNode, "a:click", function(evt){
+			on(navigationNode, "span:click", function(evt){
 				evt.preventDefault();
 				if(grid._isLoading){ return; }
 				
@@ -53,21 +69,24 @@ function(_StoreMixin, declare, lang, on, string, Deferred, put, i18n){
 					grid.gotoPage(max);
 				}
 			});
+			
 		},
 		updateNavigation: function(currentPage){
 			// summary:
 			//		Update status and navigation controls based on total count from query
 			function pageLink(page){
-				put(navigationNode, (page == currentPage ? 'span' : 'a[href=#]') + '.dgrid-page-link', page);
+				put(navigationNode, 'span' + (page == currentPage ? '.dgrid-page-disabled' : '') + '.dgrid-page-link', page);
 			}
 			var navigationNode = this.paginationNavigationNode,
 				currentPage = this._currentPage,
 				pagingLinks = this.pagingLinks,
-				end = this._total / this.rowsPerPage;
+				end = this._total / this.rowsPerPage,
+				pagingTextBoxHandle = this._pagingTextBoxHandle;
 				
+			pagingTextBoxHandle && pagingTextBoxHandle.remove(); // remove the old handler if it has been created
 			navigationNode.innerHTML = "";
 			// create a previous link
-			put(navigationNode,  (currentPage <= 1 ? 'span' : 'a[href=#]') + '.dgrid-previous', '‹'); // « ‹ › »
+			put(navigationNode,  'span' + (currentPage <= 1 ? '.dgrid-page-disabled' : '') + '.dgrid-previous', '‹'); // « ‹ › »
 			if(pagingLinks){
 				// always include the first page (back to the beginning)
 				pageLink(1);
@@ -83,14 +102,14 @@ function(_StoreMixin, declare, lang, on, string, Deferred, put, i18n){
 					pageLink(i);
 				}
 			}
+			var grid = this;
 			if(this.pagingTextBox){
 				// include a paging text box
-				var grid = this;
-				on(put(navigationNode, 'input.dgrid-page-input[type=text][value=$]', currentPage), "change", function(){
+				this._pagingTextBoxHandle = on(put(navigationNode, 'input.dgrid-page-input[type=text][value=$]', currentPage), "change", function(){
 					grid.gotoPage(+this.value);
 				});
 			}
-			put(navigationNode, (end <= currentPage ? 'span' : 'a[href=#]') + '.dgrid-next', '›'); // « ‹ › »
+			put(navigationNode, 'span' + (end <= currentPage ? '.dgrid-page-disabled' : '') + '.dgrid-next', '›');			
 		},
 		
 		refresh: function(){
@@ -140,7 +159,7 @@ function(_StoreMixin, declare, lang, on, string, Deferred, put, i18n){
 					// update status text based on now-current page and total
 					grid.paginationStatusNode.innerHTML = string.substitute(i18n.status, {
 						start: start + 1,
-						end: start + count,
+						end: Math.min(total, start + count),
 						total: total
 					});
 					grid._total = total;
