@@ -355,7 +355,6 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 		_updateColumns: function(){
 			// summary:
 			//		Called after e.g. columns, subRows, columnSets are updated
-			
 			this.configStructure();
 			this.renderHeader();
 			this.refresh();

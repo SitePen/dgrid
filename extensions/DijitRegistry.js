@@ -11,13 +11,18 @@ function(declare, registry){
 		
 		buildRendering: function(){
 			registry.add(this);
-			
 			this.inherited(arguments);
-			
 			// Note: for dojo 2.0 may rename widgetId to dojo._scopeName + "_widgetId"
 			this.domNode.setAttribute("widgetId", this.id);
 		},
-		
+		startup: function(){
+			this.inherited(arguments);
+			var parent = registry.getEnclosingWidget(this.domNode.parentNode);
+			//if parent is a widget - remove the window resize listener that List sets on the grid
+			if(parent){
+				this.resizeHandle.remove();
+			}
+		},
 		destroy: function(){
 			this.inherited(arguments);
 			registry.remove(this);

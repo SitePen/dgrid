@@ -189,7 +189,9 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			this.renderHeader();
 			
 			this.contentNode = put(this.bodyNode, "div.dgrid-content.ui-widget-content");
-			this._listeners.push(listen(window, "resize",
+			//added a handle to the window resize handler, so we can kill it if the grid is
+			//inside of a dijit layout
+			this._listeners.push(this.resizeHandle = listen(window, "resize",
 				has("ie") < 7 && !has("quirks") ? function(evt){
 					// IE6 triggers window.resize on any element resize;
 					// avoid useless calls (and infinite loop if height: auto).
@@ -216,7 +218,7 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			// summary:
 			//		Called automatically after postCreate if the component is already
 			//		visible; otherwise, should be called manually once placed.
-			
+
 			this.inherited(arguments);
 			if(this._started){ return; } // prevent double-triggering
 			this._started = true;
@@ -422,7 +424,7 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 		},
 		_autoId: 0,
 		renderHeader: function(){
-			// no-op in a place list 
+			// no-op in a place list
 		},
 		insertRow: function(object, parent, beforeNode, i, options){
 			// summary:
