@@ -11,8 +11,13 @@
 }
 .dgrid-navigation span {
 	font-weight: bold;
-	padding: 2px 4px;
+	padding-right: 4px;
+	padding-left: 4px;
 	cursor: pointer;
+}
+.dgrid-first, .dgrid-last, .dgrid-next, .dgrid-previous {
+	font-size: 130%;
+	padding: 0 4px;
 }
 .dgrid-pagination .dgrid-page-disabled {
 	color: #aaa;
