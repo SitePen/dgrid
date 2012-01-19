@@ -11,11 +11,20 @@ function(declare, registry){
 		
 		buildRendering: function(){
 			registry.add(this);
-			
 			this.inherited(arguments);
-			
 			// Note: for dojo 2.0 may rename widgetId to dojo._scopeName + "_widgetId"
 			this.domNode.setAttribute("widgetId", this.id);
+		},
+		
+		startup: function(){
+			if(this._started){ return; }
+			this.inherited(arguments);
+			
+			// if parent is a widget, assume it will handle resize events, and
+			// remove the window resize listener added by List
+			if(registry.getEnclosingWidget(this.domNode.parentNode)){
+				this._resizeHandle.remove();
+			}
 		},
 		
 		destroy: function(){

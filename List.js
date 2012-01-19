@@ -189,7 +189,8 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			this.renderHeader();
 			
 			this.contentNode = put(this.bodyNode, "div.dgrid-content.ui-widget-content");
-			this._listeners.push(listen(window, "resize",
+			// add window resize handler, with reference for later removal if needed
+			this._listeners.push(this._resizeHandle = listen(window, "resize",
 				has("ie") < 7 && !has("quirks") ? function(evt){
 					// IE6 triggers window.resize on any element resize;
 					// avoid useless calls (and infinite loop if height: auto).
