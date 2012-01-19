@@ -423,7 +423,7 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 		},
 		_autoId: 0,
 		renderHeader: function(){
-			// no-op in a place list 
+			// no-op in a plain list
 		},
 		insertRow: function(object, parent, beforeNode, i, options){
 			// summary:
