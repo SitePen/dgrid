@@ -287,9 +287,7 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			}
 		},
 		destroy: function(){
-			var i,
-				nodeRefs = ["domNode", "headerNode", "headerScrollNode", "bodyNode",
-					"contentNode", "preloadNode", "columns", "subRows", "params"];
+			var i;
 			
 			// cleanup listeners
 			for(i = this._listeners.length; i--;){
@@ -307,11 +305,6 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			
 			// destroy DOM
 			put("!", this.domNode);
-			
-			// remove properties that are or may contain node references
-			for(i = nodeRefs.length; i--;){
-				delete this[nodeRefs[i]];
-			}
 		},
 		refresh: function(){
 			// summary:
