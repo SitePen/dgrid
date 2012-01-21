@@ -41,6 +41,13 @@ return function(column){
 					}
 				}
 			});
+			grid.getRowHeight = function(rowElement){
+				// we override this method so we can provide row height measurements that
+				// include the children of a row
+				var connected = rowElement.connected;
+				// if connected, need to consider this in the total row height
+				return rowElement.offsetHeight + (connected ? connected.offsetHeight : 0); 
+			};
 			
 			this.grid.on(column.expandOn || ".dgrid-expando-icon:click,.dgrid-content .column-" + column.id + ":dblclick", function(event){
 				var target = this.className.indexOf("dgrid-expando-icon") > -1 ? this :
