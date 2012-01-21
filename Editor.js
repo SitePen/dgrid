@@ -1,5 +1,5 @@
-define(["dojo/on", "dojo/has", "dojo/_base/lang", "put-selector/put", "dojo/_base/sniff"],
-function(on, has, lang, put){
+define(["dojo/on", "dojo/has", "dojo/_base/lang", "put-selector/put", "dojo/aspect", "dojo/_base/sniff"],
+function(on, has, lang, put, aspect){
 
 // common functions shared by all Editor "instances"
 
@@ -109,7 +109,8 @@ function renderDijit(grid, column, data, cell, object, onblur){
 		args = typeof column.widgetArgs == "function" ?
 			lang.hitch(grid, column.widgetArgs)(object) : column.widgetArgs || {};
 	args.value = data; // set value based on data
-	widget = new column.editor(args, cell.appendChild(put("div")));
+	// instantiate the widget, and store a reference to it so we can delete it later
+	cell.widget = widget = new column.editor(args, put(cell, "div"));
 	widget.watch("value", function(key, oldValue, value){
 		data = setProperty(grid, cell, data, value);
 	});
@@ -163,6 +164,16 @@ return function(column, editor, editOn){
 		var cmp, // stores input/widget being rendered
 			grid = column.grid,
 			editOn = column.editOn;
+		if(renderEditor == renderDijit && !column._dijitCleanup){
+			// just need to add this once
+			column._dijitCleanup = true;
+			// add advice for cleaning up this cell
+			aspect.before(grid, "removeRow", function(rowElement){
+				// destroy our widget during the row removal operation
+				var cellElement = grid.cell(rowElement, column.id).element;
+				(cellElement.contents || cellElement).widget.destroy();
+			});
+		}		
 		
 		if(editOn){ // TODO: Make this use event delegation, particularly now that we can do event delegation with focus events
 			// if we are dealing with IE<8, the cell element is the padding cell, need to go to parent
