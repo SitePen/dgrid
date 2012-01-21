@@ -22,11 +22,14 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Editor", "dgrid/Keyboard", "dojo/_base/declare", "dojo/store/JsonRest", "dojo/store/Observable", "dojo/store/Cache", "dojo/store/Memory", "dojo/domReady!"], 
-				function(List, Grid, Selection, Editor, Keyboard, declare, JsonRest, Observable, Cache, Memory){
-					var testStore = Observable(Cache(JsonRest({target:"./data/rest.php?", idProperty: "id"}), Memory()));
+			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Editor", "dgrid/Keyboard", "dgrid/Tree", "dojo/_base/declare", "dojo/store/JsonRest", "dojo/store/Observable", "dojo/store/Cache", "dojo/store/Memory", "dojo/domReady!"], 
+				function(List, Grid, Selection, Editor, Keyboard, Tree, declare, JsonRest, Observable, Cache, Memory){
+					var testStore = Observable(Cache(JsonRest({target:"./data/rest.php", idProperty: "id"}), Memory()));
+					testStore.getChildren = function(parent, options){
+						return testStore.query({parent: parent.id}, options);
+					};
 					var columns = [
-						{label:'Name', field:'name', sortable: false},
+						Tree({label:'Name', field:'name', sortable: false}),
 						{label:'Id', field:'id', sortable: false},
 						Editor({label:'Comment', field:'comment', sortable: false}, "text")
 					];
