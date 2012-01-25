@@ -1,4 +1,4 @@
-define(["dojo/_base/declare", "put-selector/put", "dojo/_base/Deferred", "dojo/query"], function(declare, put, Deferred, querySelector){
+define(["dojo/_base/declare", "put-selector/put", "dojo/_base/Deferred", "dojo/query", "dojo/aspect"], function(declare, put, Deferred, querySelector, aspect){
 
 return function(column){
     // summary:
@@ -28,6 +28,20 @@ return function(column){
 		if(!grid._hasTreeListener){
 			// just setup the event listener once and use event delegation for better memory use
 			grid._hasTreeListener = true;
+			aspect.before(grid, "removeRow", function(rowElement, justCleanup){
+				var connected = rowElement.connected;
+				if(connected){
+					// if it has a connected expando node, we process the children
+					querySelector(">.dgrid-row", connected).forEach(function(element){
+						grid.removeRow(element);
+					});
+					// now remove the connected container node
+					if(!justCleanup){
+						put(connected, "!");
+					}
+				}
+			});
+			
 			this.grid.on(column.expandOn || ".dgrid-expando-icon:click,.dgrid-content .column-" + column.id + ":dblclick", function(event){
 				var target = this.className.indexOf("dgrid-expando-icon") > -1 ? this :
 					querySelector(".dgrid-expando-icon", this)[0];
@@ -44,7 +58,6 @@ return function(column){
 						// query for the children
 						var container = rowElement.connected = put('div.dgrid-tree-container');//put(rowElement, '+...
 						preloadNode = target.preloadNode = put(container, 'div');
-						//preloadNode.nextRow = grid.down(row).element;
 						var query = function(options){
 							return grid.store.getChildren(row.data, options);
 						};
