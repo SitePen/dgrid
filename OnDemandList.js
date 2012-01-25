@@ -234,9 +234,9 @@ return declare([List], {
 							reclaimedHeight += rowHeight;
 							count++;
 							lastObserverIndex = currentObserverIndex;
-							delete grid._rowIdToObject[row.id]; // clear out of the lookup
-							// we just do cleanup for, as we will do a more efficient node destruction in the setTimeout below
+							// we just do cleanup here, as we will do a more efficient node destruction in the setTimeout below
 							grid.removeRow(row, true); 
+							delete grid._rowIdToObject[row.id]; // clear out of the lookup
 							toDelete.push(row);
 						}
 						// now adjust the preloadNode based on the reclaimed space
