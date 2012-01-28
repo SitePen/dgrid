@@ -102,10 +102,14 @@ return declare([List], {
 		if(priorPreload){
 			// the preload nodes (if there are multiple) are represented as a linked list, need to insert it
 			if((preload.next = priorPreload.next)){
-				var previous = preload.next.previous;
+				preload.previous = priorPreload;
+			}else{
+				preload.next = priorPreload;
+				preload.previous = priorPreload.previous;
 			}
-			preload.previous = previous;
-			preload.next = preload;
+			// adjust the previous and next links so the linked list is proper
+			preload.previous.next = preload;
+			preload.next.previous = preload; 
 		}else{
 			this.preload = preload;
 		}
@@ -187,7 +191,12 @@ return declare([List], {
 		}
 		return this.inherited(arguments);
 	},
-	
+	getRowHeight: function(rowElement){
+		// summary:
+		//		Calculate the height of a row. This is a method so it can be overriden for
+		//		plugins that add connected elements to a row, like the tree
+		return rowElement.offsetHeight;
+	},
 	lastScrollTop: 0,
 	onscroll: function(){
 		// summary:
@@ -218,7 +227,7 @@ return declare([List], {
 						var count = 0;
 						var toDelete = [];
 						while(row = nextRow){ // intentional assignment
-							var rowHeight = row.offsetHeight;
+							var rowHeight = grid.getRowHeight(row);
 							if(reclaimedHeight + rowHeight + farOffRemoval > distanceOff || nextRow.className.indexOf("dgrid-row") < 0){
 								// we have reclaimed enough rows or we have gone beyond grid rows, let's call it good
 								break;
