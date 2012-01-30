@@ -25,6 +25,14 @@ html.has-ie-6 .dgrid-resize-handler {
 	height:100%;
 }
 
+/* adding the next two rules to make grid resizer larger */
+html.has-touch .dgrid-column-resizer {
+	width: 10px;
+}
+html.has-touch .dgrid-resize-handler {
+	border-left: 10px solid transparent;
+}
+
 html.has-no-quirks .dgrid-resize-header-container {
 	/* set to relative so we can do the resizing against this node...
 		except when in quirks mode, where we have to use the th */

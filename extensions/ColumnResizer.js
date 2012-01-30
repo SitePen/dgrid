@@ -1,6 +1,6 @@
-define(["dojo/_base/declare", "dojo/on", "dojo/query", "dojo/dom", "put-selector/put", "dojo/dom-geometry", "dojo/dom-class", "dojo/_base/html", "xstyle/css!../css/extensions/ColumnResizer.css"],
-function(declare, listen, query, dom, put, geom, cls){
-	
+define(["dojo/_base/declare", "dojo/on", "dojo/query", "dojo/dom", "put-selector/put", "dojo/dom-geometry", "dojo/dom-class", "dojo/touch", "dojo/_base/html", "xstyle/css!../css/extensions/ColumnResizer.css"],
+function(declare, listen, query, dom, put, geom, cls, touch){
+
 return declare([], {
 	resizeNode: null,
 	minWidth: 40,	//minimum column width in px
@@ -32,17 +32,18 @@ return declare([], {
 			while(childNodes.length > 0){
 				put(headerTextNode, childNodes[0]);
 			}
-			listen(put(colNode, headerTextNode, "div.dgrid-resize-handler.resizeNode-"+id), "mousedown", function(e){
+			listen(put(colNode, headerTextNode, "div.dgrid-resize-handler.resizeNode-"+id), touch.press, function(e){
+					e.preventDefault(); // Added for mobile
 					grid._resizeMouseDown(e);
 			});
 		}
 		if(!grid.mouseMoveListen){
-			grid.mouseMoveListen = listen.pausable(document.body, "mousemove", function(e){
+			grid.mouseMoveListen = listen.pausable(document.body, touch.move, function(e){
 				// while resizing, update the position of the resizer bar
 				if(!grid._resizing){return;}
 				grid._updateResizerPosition(e);
 			});
-			grid.mouseUpListen = listen.pausable(document.body, "mouseup", function(e){
+			grid.mouseUpListen = listen.pausable(document.body, touch.release, function(e){
 				if(!grid._resizing){return;}
 				grid._resizeMouseUp(e);
 				grid.mouseMoveListen.pause();
