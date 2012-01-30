@@ -25,12 +25,12 @@ html.has-ie-6 .dgrid-resize-handler {
 	height:100%;
 }
 
-/* adding the next two rules to make grid resizer larger */
-html.has-touch .dgrid-column-resizer {
-	width: 10px;
-}
+/* make the resize handles larger on touch-capable devices */
 html.has-touch .dgrid-resize-handler {
-	border-left: 10px solid transparent;
+	border-left: 20px solid transparent;
+}
+html.has-touch .dgrid-column-resizer {
+	width: 2px;
 }
 
 html.has-no-quirks .dgrid-resize-header-container {
