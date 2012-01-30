@@ -26,10 +26,10 @@ html.has-ie-6 .dgrid-resize-handler {
 }
 
 /* adding the next two rules to make grid resizer larger */
-.dgrid-touch .dgrid-column-resizer {
+html.has-touch .dgrid-column-resizer {
 	width: 10px;
 }
-.dgrid-touch .dgrid-resize-handler {
+html.has-touch .dgrid-resize-handler {
 	border-left: 10px solid transparent;
 }
 
