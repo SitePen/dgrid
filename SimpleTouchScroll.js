@@ -1,6 +1,5 @@
 define(["dojo/_base/declare", "dojo/on"],
 function(declare, on){
-	
 	var
 		bodyTouchListener, // stores handle to body touch handler once connected
 		timerRes = 15, // ms between drag velocity measurements and animation "ticks"
@@ -124,8 +123,6 @@ function(declare, on){
 			});
 			on(node, "touchmove", ontouchmove);
 			on(node, "touchend,touchcancel", ontouchend);
-			
-			this.domNode.className += " dgrid-touch";
 			
 			if(!bodyTouchListener){
 				// first time: hook up touch listeners to entire body,
