@@ -125,7 +125,7 @@ return declare([List], {
 		var results = query(options);
 		var self = this;
 		// render the result set
-		Deferred.when(this.renderArray(results, loadingNode, options), function(trs){
+		Deferred.when(this.renderArray(results, preloadNode, options), function(trs){
 			return Deferred.when(results.total || results.length, function(total){
 				// remove loading node
 				put(loadingNode, "!");
