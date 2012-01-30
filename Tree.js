@@ -64,7 +64,7 @@ return function(column){
 						// if the children have not been created, create a container, a preload node and do the 
 						// query for the children
 						var container = rowElement.connected = put('div.dgrid-tree-container');//put(rowElement, '+...
-						preloadNode = target.preloadNode = put(container, 'div');
+						preloadNode = target.preloadNode = put(container, 'div.dgrid-preload');
 						var query = function(options){
 							return grid.store.getChildren(row.data, options);
 						};

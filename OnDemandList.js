@@ -29,7 +29,12 @@ return declare([List], {
 	//		If true, a get request will be performed to the store before each put
 	//		as a baseline when saving; otherwise, existing row data will be used.
 	getBeforePut: true,
+	// noDataMessage: String
+	//		This is the message that is displayed when do data is available
 	noDataMessage: "",
+	// loadingMessage: String
+	//		This is the message that is displayed when data is loading
+	loadingMessage: "",
 	
 	constructor: function(){
 		// Create empty objects on each instance, not the prototype
@@ -113,13 +118,17 @@ return declare([List], {
 		}else{
 			this.preload = preload;
 		}
+		var loadingNode = put(preloadNode, "-div.dgrid-loading");
+		put(loadingNode, "div.dgrid-below", this.loadingMessage);
 		var options = lang.delegate(this.queryOptions ? this.queryOptions : null, {start: 0, count: this.minRowsPerPage, query: query});
 		// execute the query
 		var results = query(options);
 		var self = this;
 		// render the result set
-		Deferred.when(this.renderArray(results, preloadNode, options), function(trs){
+		Deferred.when(this.renderArray(results, loadingNode, options), function(trs){
 			return Deferred.when(results.total || results.length, function(total){
+				// remove loading node
+				put(loadingNode, "!");
 				// now we need to adjust the height and total count based on the first result set
 				var trCount = trs.length;
 				total = total || trCount;
@@ -315,9 +324,10 @@ return declare([List], {
 						count = Math.round(count);
 						var options = grid.queryOptions ? lang.delegate(grid.queryOptions) : {};
 						preload.count -= count;
-						var beforeNode = preloadNode;
-						var keepScrollTo, queryRowsOverlap = grid.queryRowsOverlap;
-						if(preloadNode.rowIndex > 0){
+						var beforeNode = preloadNode,
+							keepScrollTo, queryRowsOverlap = grid.queryRowsOverlap,
+							below = preloadNode.rowIndex > 0; 
+						if(below){
 							// add new rows below
 							var previous = preload.previous;
 							if(previous){
@@ -361,6 +371,7 @@ return declare([List], {
 						adjustHeight(preload);
 						// create a loading node as a placeholder while the data is loaded
 						var loadingNode = put(beforeNode, "-div.dgrid-loading[style=height:" + count * grid.rowHeight + "px]");
+						put(loadingNode, "div.dgrid-" + (below ? "below" : "above"), grid.loadingMessage);
 						// use the query associated with the preload node to get the next "page"
 						options.query = preload.query;
 						
@@ -375,7 +386,7 @@ return declare([List], {
 						Deferred.when(grid.renderArray(results, loadingNode, options), function(){
 								// can remove the loading node now
 								beforeNode = loadingNode.nextSibling;
-								loadingNode.parentNode.removeChild(loadingNode);
+								put(loadingNode, "!");
 								if(keepScrollTo){
 									// if the preload area above the nodes is approximated based on average
 									// row height, we may need to adjust the scroll once they are filled in
