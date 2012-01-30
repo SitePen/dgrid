@@ -118,7 +118,7 @@ return declare([List], {
 		}else{
 			this.preload = preload;
 		}
-		var loadingNode = put(preloadNode, "-div.dgrid-loading");
+		var loadingNode = put(preloadNode, "-div.dgrid-loading[style=height:" + this.bodyNode.offsetHeight + "px]");
 		put(loadingNode, "div.dgrid-below", this.loadingMessage);
 		var options = lang.delegate(this.queryOptions ? this.queryOptions : null, {start: 0, count: this.minRowsPerPage, query: query});
 		// execute the query
