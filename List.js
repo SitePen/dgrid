@@ -109,7 +109,7 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 				this.data = object;
 				this.element = element;
 			}).prototype.remove = function(){
-				grid.removeRow(this);
+				grid.removeRow(this.element);
 			} 
 			
 			if(srcNodeRef){
@@ -453,7 +453,8 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 		},
 		removeRow: function(rowElement, justCleanup){
 			// summary:
-			// 		just deletes the node in a plain List, column extensions may aspect this to implement their own cleanup routines
+			//		Simply deletes the node in a plain List.
+			//		Column plugins may aspect this to implement their own cleanup routines.
 			if(!justCleanup){
 				put(rowElement, "!");
 			}
