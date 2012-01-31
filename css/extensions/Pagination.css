@@ -15,11 +15,18 @@
 	color: inherit;
 	padding: 0 4px;
 }
+.has-ie-6-7 .dgrid-navigation a {
+	/* IE < 8 doesn't support inherit in most cases.
+		Unfortunately this makes more work for some skins as well...
+	*/
+	color: #000;
+}
 .dgrid-first, .dgrid-last, .dgrid-next, .dgrid-previous {
 	font-size: 130%;
 }
 .dgrid-pagination .dgrid-page-disabled {
 	color: #aaa;
+	cursor: default;
 }
 .dgrid-page-input {
 	margin-top: 1px;

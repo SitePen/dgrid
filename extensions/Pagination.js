@@ -80,7 +80,7 @@ function(_StoreMixin, declare, lang, on, query, string, Deferred, put, i18n){
 				// create a last-page link
 				put(navigationNode,  'a[href=javascript:].dgrid-last', '»');
 			}
-
+			
 			
 			on(navigationNode, "a:click", function(evt){
 				var cls = this.className,

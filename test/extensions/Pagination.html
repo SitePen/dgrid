@@ -6,7 +6,6 @@
 		<meta name="viewport" content="width=570">
 		<style>
 			@import "../../../dojo/resources/dojo.css";
-			@import "../../css/skins/claro.css";
 			.heading {
 				font-weight: bold;
 				padding-bottom: 0.25em;
@@ -34,8 +33,16 @@
 		<script type="text/javascript" src="../../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dgrid/Grid", "dgrid/extensions/Pagination", "dgrid/Selection", "dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!"],
-				function(Grid, Pagination, Selection, declare, testStore){
+			// allow retrieving skin from GET param
+			var skin = "claro", skinDep;
+			(function(){
+				var match = /\bskin=([^&]*)/.exec(location.search);
+				if(match){ skin = match[1]; }
+				skinDep = "xstyle/css!dgrid/css/skins/" + skin + ".css";
+			})();
+			
+			require([skinDep, "dgrid/Grid", "dgrid/extensions/Pagination", "dgrid/Selection", "dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!"],
+				function(skinResource, Grid, Pagination, Selection, declare, testStore){
 					columns = {
 						col1: 'Column 1Column1Column 1 Column 1',
 						col2: {label: 'Column2', sortable: false},
@@ -49,6 +56,8 @@
 						col1: 'Col1',
 						"last-col": {label: 'Column 5', field: 'col5'}
 					};
+					
+					document.body.className = skin;
 					
 					window.grid = declare([Grid, Selection, Pagination])({
 						store: testStore,
@@ -65,7 +74,7 @@
 				});
 		</script>
 	</head>
-	<body class="claro">
+	<body>
 		<h2>A basic grid with the Pagination extension</h2>
 		<div id="grid"></div>
 		<div>Buttons to test changing column structure:

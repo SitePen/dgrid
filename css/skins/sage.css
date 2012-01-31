@@ -70,3 +70,8 @@
 .sage .dgrid-sort-arrow {
 	background-image: url("../images/ui-icons_222222_256x240_white.png");
 }
+
+/* for pagination in IE < 8, need additional rule to override link color */
+.has-ie-6-7 .sage .dgrid-navigation a {
+	color: #fff;
+}
