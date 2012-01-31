@@ -25,15 +25,18 @@ return function(column){
 		expando.mayHaveChildren = mayHaveChildren;
 		var tr, query;
 
-		if(!grid._hasTreeListener){
+		if(!grid.expand){
 			// just setup the event listener once and use event delegation for better memory use
-			grid._hasTreeListener = true;
-			this.grid.on(column.expandOn || ".dgrid-expando-icon:click,.dgrid-content .column-" + column.id + ":dblclick", function(event){
-				var target = this.className.indexOf("dgrid-expando-icon") > -1 ? this :
-					querySelector(".dgrid-expando-icon", this)[0];
+			grid.on(column.expandOn || ".dgrid-expando-icon:click,.dgrid-content .column-" + column.id + ":dblclick", function(){
+				grid.expand(this);
+			});
+			grid.expand = function(target, expand){
+				target = target.element || target; // if a row object was passed in, get the element first 
+				target = target.className.indexOf("dgrid-expando-icon") > -1 ? target :
+					querySelector(".dgrid-expando-icon", target)[0];
 				if(target.mayHaveChildren){
 					// on click we toggle expanding and collapsing
-					var expanded = target.expanded = !target.expanded;
+					var expanded = target.expanded = expand === undefined ? !target.expanded : expand;
 					// update the expando display
 					target.className = "dgrid-expando-icon ui-icon ui-icon-triangle-1-" + (expanded ? "se" : "e"); 
 					var preloadNode = target.preloadNode;
@@ -65,7 +68,7 @@ return function(column){
 						container.parentNode.removeChild(container);
 					}
 				}
-			});
+			};
 		};
 	};
 	return column;
