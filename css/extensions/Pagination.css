@@ -30,7 +30,8 @@
 }
 .dgrid-page-input {
 	margin-top: 1px;
-	width: 2.5em;
+	width: 2em;
+	text-align: center;
 }
 .dgrid-page-size {
 	margin: 1px 4px 0 4px;

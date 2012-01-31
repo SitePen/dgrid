@@ -26,7 +26,6 @@
 			}
 			#grid2.dgrid .dgrid-scroller {
 				position: relative;
-				max-height: 50em;
 			}
 			
 		</style>
@@ -34,19 +33,23 @@
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
 			// allow retrieving skin from GET param
-			var skin = "claro", skinDep;
-			(function(){
-				var match = /\bskin=([^&]*)/.exec(location.search);
-				if(match){ skin = match[1]; }
-				skinDep = "xstyle/css!dgrid/css/skins/" + skin + ".css";
-			})();
+			var skin = "claro",
+				match = /\bskin=([^&]*)/.exec(location.search),
+				skinDep, updateGrid;
+			if(match){ skin = match[1]; }
+			skinDep = "xstyle/css!dgrid/css/skins/" + skin + ".css";
 			
-			require([skinDep, "dgrid/Grid", "dgrid/extensions/Pagination", "dgrid/Selection", "dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!"],
-				function(skinResource, Grid, Pagination, Selection, declare, testStore){
+			require([skinDep, "dgrid/Grid", "dgrid/extensions/Pagination", "dgrid/Selection",
+					"dojo/_base/lang", "dojo/_base/declare", "dojo/dom-construct", "dojo/dom-form", "dgrid/test/data/base", "dojo/domReady!"],
+				function(skinResource, Grid, Pagination, Selection,
+						lang, declare, domConstruct, domForm, testStore){
+					
+					var CustomGrid = declare([Grid, Selection, Pagination]);
+					
 					columns = {
-						col1: 'Column 1Column1Column 1 Column 1',
+						col1: 'Column 1',
 						col2: {label: 'Column2', sortable: false},
-						col3: 'Column3333333333333333333',
+						col3: 'Column 3',
 						col4: 'Column 4',
 						"last-col": {label: 'Column 5', field: 'col5'}
 					};
@@ -59,23 +62,55 @@
 					
 					document.body.className = skin;
 					
-					window.grid = declare([Grid, Selection, Pagination])({
-						store: testStore,
-						columns: columns
-					}, "grid");
-					window.grid2 = declare([Grid, Selection, Pagination])({
+					window.grid2 = new CustomGrid({
 						store: testStore,
 						columns: columns2,
 						pagingLinks: false,
 						pagingTextBox: true,
 						firstLastArrows: true,
-						pageSizeOptions: [10, 25, 30]
+						pageSizeOptions: [10, 15, 25]
 					}, "grid2");
+					
+					function createGrid(args){
+						window.grid = new CustomGrid(
+							lang.mixin({ store: testStore, columns: columns }, args),
+							"grid");
+					}
+					createGrid();
+					
+					var form = document.getElementById("configForm");
+					form.onsubmit = function() {
+						var args = domForm.toObject(form);
+						args.pagingLinks = +args.pagingLinks;
+						if (!args.previousNextArrows) { args.previousNextArrows = false; }
+						
+						// recreate grid using args from form
+						window.grid.destroy();
+						domConstruct.create("div", { id: "grid" }, form, "after");
+						createGrid(args);
+						
+						return false;
+					}
 				});
 		</script>
 	</head>
 	<body>
 		<h2>A basic grid with the Pagination extension</h2>
+		<h3>Configuration</h3>
+		<form id="configForm">
+			<div><label><input type="checkbox" name="firstLastArrows">
+				Show first/last page arrows</label></div>
+			<div><label><input type="checkbox" name="previousNextArrows" checked>
+				Show previous/next page arrows</label></div>
+			<div><label><input type="checkbox" name="pagingTextBox">
+				Show "jump-to" textbox</label></div>
+			<div>
+				<label><input type="text" name="pagingLinks" value="2" size="1">
+					Number of neighboring page numbers to display to each side of current
+					(0 to disable)</label>
+			</div>
+			<div><button type="submit">Update Grid</button></div>
+		</form>
 		<div id="grid"></div>
 		<div>Buttons to test changing column structure:
 			<button onclick="grid.setColumns(columns2);">New Structure</button>

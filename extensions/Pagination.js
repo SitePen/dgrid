@@ -18,10 +18,10 @@ function(_StoreMixin, declare, lang, on, query, string, Deferred, put, i18n){
 		// 		Indicates whether or not to show the first and last arrow links.
 		firstLastArrows: false,
 		
-		// pagingLinks: Number|Boolean
+		// pagingLinks: Number
 		// 		The number of page links to show on each side of the current page
-		//		Set to false to disable page links.
-		pagingLinks: 3,
+		//		Set to 0 (or false) to disable page links.
+		pagingLinks: 2,
 		// pageSizeOptions: Array[Number]
 		// 		This provides options for different page sizes in a dropdown.
 		//		If it is empty (default), no page size dropdown will be displayed.
