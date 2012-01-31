@@ -22,19 +22,27 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dojo/store/JsonRest", "dojo/domReady!"], 
-				function(List, Grid, Selection, Keyboard, declare, JsonRest){
-					var testStore = new JsonRest({target:"./", idProperty: "order"});
+			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Editor", "dgrid/Keyboard", "dgrid/Tree", "dojo/_base/declare", "dojo/store/JsonRest", "dojo/store/Observable", "dojo/store/Cache", "dojo/store/Memory", "dojo/domReady!"], 
+				function(List, Grid, Selection, Editor, Keyboard, Tree, declare, JsonRest, Observable, Cache, Memory){
+					var testStore = Observable(Cache(JsonRest({target:"./data/rest.php", idProperty: "id"}), Memory()));
+					testStore.getChildren = function(parent, options){
+						return testStore.query({parent: parent.id}, options);
+					};
 					var columns = [
-						{label:'Name', field:'name', sortable: false},
-						{label:'Description', field:'description', sortable: false}
+						Tree({label:'Name', field:'name', sortable: false}),
+						{label:'Id', field:'id', sortable: false},
+						Editor({label:'Comment', field:'comment', sortable: false}, "text")
 					];
 
 					window.grid = new (declare([Grid, Selection, Keyboard]))({
-						query: "data/rest.js",
 						store: testStore,
 						columns: columns
 					}, "grid");
+					deleteSelected = function(){
+						for(var i in grid.selection){
+							testStore.remove(i);
+						}
+					}
 				});
 				
 		</script>
@@ -42,5 +50,7 @@
 	<body class="claro">
 		<h2>A basic grid with JsonRest store</h2>
 		<div id="grid"></div>
+		<button onclick='deleteSelected()'>Delete Page</div>
+		<button onclick='grid.save();'>Save</div>
 	</body>
 </html>

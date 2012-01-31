@@ -86,6 +86,14 @@ html.has-quirks .dgrid-header-hidden .dgrid-cell {
 	width: 100%;
 }
 
+.dgrid-loading {
+	position: relative;
+}
+.dgrid-above {
+	position: absolute;
+	bottom: 0;
+}
+
 .ui-icon {
 	width: 16px;
 	height: 16px;

@@ -81,6 +81,12 @@
 						columns: columns2,
 						selectionMode: "none"
 					}, "grid-cell-navigation-none");
+					
+					// cell navigation + row selection
+					gridMixed = dojo.declare([Grid, Selection, Keyboard])({
+						store: testStore,
+						columns: columns
+					}, "grid-mixed");
 				});
 		</script>
 	</head>
@@ -111,5 +117,7 @@
 			<button type="button" onclick="gridCellNavigationNone.setSelectionMode('extended');">Extended</button>
 		</div>
 		<div id="grid-cell-navigation-none"></div>
+		<h2>A grid with row-level selection and cell-level navigation</h2>
+		<div id="grid-mixed"></div>
 	</body>
 </html>

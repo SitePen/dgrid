@@ -25,6 +25,14 @@ html.has-ie-6 .dgrid-resize-handler {
 	height:100%;
 }
 
+/* make the resize handles larger on touch-capable devices */
+html.has-touch .dgrid-resize-handler {
+	border-left: 20px solid transparent;
+}
+html.has-touch .dgrid-column-resizer {
+	width: 2px;
+}
+
 html.has-no-quirks .dgrid-resize-header-container {
 	/* set to relative so we can do the resizing against this node...
 		except when in quirks mode, where we have to use the th */
