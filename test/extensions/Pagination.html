@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Test Pagination Extension</title>
+		<meta name="viewport" content="width=570">
+		<style>
+			@import "../../../dojo/resources/dojo.css";
+			@import "../../css/skins/claro.css";
+			.heading {
+				font-weight: bold;
+				padding-bottom: 0.25em;
+			}
+			.dgrid {
+				width: 750px;
+				margin: 10px;
+			}
+			#grid2 .dgrid-row {
+				height: 22px;
+			}
+			#grid2 .dgrid-cell {
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+			#grid2.dgrid {
+				height: auto;
+			}
+			#grid2.dgrid .dgrid-scroller {
+				position: relative;
+				max-height: 50em;
+			}
+			
+		</style>
+		<script type="text/javascript" src="../../../dojo/dojo.js" 
+			data-dojo-config="async: true"></script>
+		<script type="text/javascript">
+			require(["dgrid/Grid", "dgrid/extensions/Pagination", "dgrid/Selection", "dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!"],
+				function(Grid, Pagination, Selection, declare, testStore){
+					columns = {
+						col1: 'Column 1Column1Column 1 Column 1',
+						col2: {label: 'Column2', sortable: false},
+						col3: 'Column3333333333333333333',
+						col4: 'Column 4',
+						"last-col": {label: 'Column 5', field: 'col5'}
+					};
+					columns2 = {
+						col2: 'Col2',
+						col4: {label: 'Col4', sortable: false},
+						col1: 'Col1',
+						"last-col": {label: 'Column 5', field: 'col5'}
+					};
+					
+					window.grid = declare([Grid, Selection, Pagination])({
+						store: testStore,
+						columns: columns
+					}, "grid");
+					window.grid2 = declare([Grid, Selection, Pagination])({
+						store: testStore,
+						columns: columns2,
+						pagingLinks: false,
+						pagingTextBox: true,
+						firstLastArrows: true,
+						pageSizeOptions: [10, 25, 30]
+					}, "grid2");
+				});
+		</script>
+	</head>
+	<body class="claro">
+		<h2>A basic grid with the Pagination extension</h2>
+		<div id="grid"></div>
+		<div>Buttons to test changing column structure:
+			<button onclick="grid.setColumns(columns2);">New Structure</button>
+			<button onclick="grid.setColumns(columns);">Original</button>
+			<button onclick="testStore.add({col1:'new', col2:true});">Add row</button>
+		</div>
+		<div id="grid2"></div>
+	</body>
+</html>
