@@ -237,7 +237,8 @@ return declare([List], {
 							if(currentObserverIndex != lastObserverIndex && lastObserverIndex > -1){
 								// we have gathered a whole page of observed rows, we can delete them now
 								var observers = grid.observers; 
-								observers[lastObserverIndex].cancel();
+								var observer = observers[lastObserverIndex]; 
+								observer && observer.cancel();
 								observers[lastObserverIndex] = 0; // remove it so we don't call cancel twice
 							}
 							reclaimedHeight += rowHeight;
