@@ -1,7 +1,7 @@
 define(["put-selector/put", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/has", "dojo/has!touch?./SimpleTouchScroll", "xstyle/has-class", "dojo/_base/sniff", "xstyle/css!./css/dgrid.css"], 
 function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 	// Add user agent/feature CSS classes 
-	hasClass("mozilla", "opera", "webkit", "ie-6", "ie-6-7", "quirks", "no-quirks");
+	hasClass("mozilla", "opera", "webkit", "ie-6", "ie-6-7", "quirks", "no-quirks", "touch");
 	
 	// Am I webkit? (for RTL)
 	var isWebkit = has("webkit");
@@ -55,22 +55,7 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 	var byId = function(id){
 		return document.getElementById(id);
 	};
-	function Row(id, object, element){
-		this.id = id;
-		this.data = object;
-		this.element = element;
-	}
-	Row.prototype = {
-		remove: function(){
-			var
-				rowElement = this.element,
-				connected = rowElement.connected;
-			// remove row
-			put(rowElement, "!");
-			// if it has a connected node, remove that as well
-			connected && put(connected, "!");
-		}
-	};
+
 	function move(item, steps, targetClass){
 		var nextSibling, current, element = current = item.element;
 		steps = steps || 1;
@@ -79,8 +64,7 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			if(nextSibling = current[steps < 0 ? 'previousSibling' : 'nextSibling']){
 				do{
 					current = nextSibling;
-					var className = current && current.className;
-					if(className && className.indexOf(targetClass) > -1){
+					if(((current && current.className) + ' ').indexOf(targetClass + ' ') > -1){
 						// it's an element with the correct class name, counts as a real move
 						element = current;
 						steps += steps < 0 ? 1 : -1;
@@ -115,6 +99,14 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 		postscript: function(params, srcNodeRef){
 			// invoke create in postScript to allow descendants to
 			// perform logic before create/postCreate happen (a la dijit/_WidgetBase)
+			var grid = this;
+			(this._Row = function(id, object, element){
+				this.id = id;
+				this.data = object;
+				this.element = element;
+			}).prototype.remove = function(){
+				grid.removeRow(this.element);
+			} 
 			
 			if(srcNodeRef){
 				// normalize srcNodeRef and store on instance during create process.
@@ -189,7 +181,8 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			this.renderHeader();
 			
 			this.contentNode = put(this.bodyNode, "div.dgrid-content.ui-widget-content");
-			this._listeners.push(listen(window, "resize",
+			// add window resize handler, with reference for later removal if needed
+			this._listeners.push(this._resizeHandle = listen(window, "resize",
 				has("ie") < 7 && !has("quirks") ? function(evt){
 					// IE6 triggers window.resize on any element resize;
 					// avoid useless calls (and infinite loop if height: auto).
@@ -295,9 +288,7 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			}
 		},
 		destroy: function(){
-			var i,
-				nodeRefs = ["domNode", "headerNode", "headerScrollNode", "bodyNode",
-					"contentNode", "preloadNode", "columns", "subRows", "params"];
+			var i;
 			
 			// cleanup listeners
 			for(i = this._listeners.length; i--;){
@@ -305,13 +296,16 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			}
 			delete this._listeners;
 			
+			// iterator through all the row elements and destroy them
+			for(i in this._rowIdToObject){
+				var rowElement = byId(i);
+				if(rowElement){
+					this.removeRow(rowElement);
+				}
+			}
+			
 			// destroy DOM
 			put("!", this.domNode);
-			
-			// remove properties that are or may contain node references
-			for(i = nodeRefs.length; i--;){
-				delete this[nodeRefs[i]];
-			}
 		},
 		refresh: function(){
 			// summary:
@@ -375,8 +369,7 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 						var row = rows.splice(from, 1)[0];
 						firstRow = row.nextSibling;
 						firstRow.rowIndex--;
-						row = self.row(row);
-						row && row.remove();
+						self.removeRow(row);
 						rowIndex = from;
 					}
 					if(to > -1){						
@@ -422,7 +415,7 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 		},
 		_autoId: 0,
 		renderHeader: function(){
-			// no-op in a place list 
+			// no-op in a plain list
 		},
 		insertRow: function(object, parent, beforeNode, i, options){
 			// summary:
@@ -442,6 +435,14 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 		renderRow: function(value, options){
 			return put("div", "" + value);
 		},
+		removeRow: function(rowElement, justCleanup){
+			// summary:
+			//		Simply deletes the node in a plain List.
+			//		Column plugins may aspect this to implement their own cleanup routines.
+			if(!justCleanup){
+				put(rowElement, "!");
+			}
+		},
 		row: function(target){
 			// summary:
 			//		Get the row object by id, object, node, or event
@@ -454,7 +455,7 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 				do{
 					var rowId = target.id;
 					if(object = this._rowIdToObject[rowId]){
-						return new Row(rowId.substring(this.id.length + 5), object, target); 
+						return new this._Row(rowId.substring(this.id.length + 5), object, target); 
 					}
 					target = target.parentNode;
 				}while(target && target != this.domNode);
@@ -468,7 +469,7 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 				var id = target;
 				target = this._rowIdToObject[this.id + "-row-" + id];
 			}
-			return new Row(id, target, byId(this.id + "-row-" + id));
+			return new this._Row(id, target, byId(this.id + "-row-" + id));
 		},
 		cell: function(target){
 			// this doesn't do much in a plain list
