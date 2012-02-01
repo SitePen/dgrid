@@ -81,7 +81,7 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 			}
 			return rule.children;
 		},
-		createRowCells: function(tag, each){
+		createRowCells: function(tag, each, subRows){
 			// summary:
 			//		Generates the grid for each row (used by renderHeader and and renderRow)
 			var tr, row = put("table.dgrid-row-table[role=presentation]"),
@@ -92,7 +92,7 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 			}else{
 				var tbody = row;
 			}
-			var subRows = this.subRows;
+			subRows = subRows || this.subRows;
 			for(var si = 0, sl = subRows.length; si < sl; si++){
 				var subRow = subRows[si];
 				if(sl == 1 && !has("ie")){
@@ -154,7 +154,7 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 				}else if(data != null){
 					td.appendChild(document.createTextNode(data));
 				}
-			});
+			}, options && options.subRows);
 			// row gets a wrapper div for a couple reasons:
 			//	1. So that one can set a fixed height on rows (heights can't be set on <table>'s AFAICT)
 			// 2. So that outline style can be set on a row when it is focused, and Safari's outline style is broken on <table>
