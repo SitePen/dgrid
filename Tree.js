@@ -60,9 +60,10 @@ return function(column){
 					var expanded = target.expanded = expand === undefined ? !target.expanded : expand;
 					// update the expando display
 					target.className = "dgrid-expando-icon ui-icon ui-icon-triangle-1-" + (expanded ? "se" : "e"); 
-					var preloadNode = target.preloadNode;
-					var row = grid.row(target);
-					var rowElement = row.element;
+					var preloadNode = target.preloadNode,
+						row = grid.row(target),
+						rowElement = row.element,
+						container;
 					if(!preloadNode){
 						// if the children have not been created, create a container, a preload node and do the 
 						// query for the children
@@ -84,7 +85,7 @@ return function(column){
 					// TODO: see if want to use a CSS class and a transition (must coordinate with keynav so hidden elements aren't included in nav) 
 					if(expanded){
 						put(rowElement, '+', container);
-					}else{
+					}else if(container.parentNode){
 						container.parentNode.removeChild(container);
 					}
 				}
