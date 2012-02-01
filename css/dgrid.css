@@ -74,6 +74,7 @@ html.has-quirks .dgrid-header-hidden .dgrid-cell {
 
 .dgrid-content {
 	position: relative;
+	height: 99%;
 }
 
 .dgrid-scroller {
@@ -88,6 +89,7 @@ html.has-quirks .dgrid-header-hidden .dgrid-cell {
 
 .dgrid-loading {
 	position: relative;
+	height: 100%;
 }
 .dgrid-above {
 	position: absolute;
