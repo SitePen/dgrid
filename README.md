@@ -572,11 +572,21 @@ The following generic class names are also available for generic skinning
 * `ui-state-active`: Applied to selected rows or cells
 * `ui-state-highlight`: Applied to a row for a short time when the contents are change (or it is newly created)
 
-## Known issues
+## Limitations
 
-* Using `dgrid/List` without first loading `dgrid.css` will not work when using the legacy `dojo.require` method
-  due to an asynchronously-resolving plugin dependency. To use `dgrid/List` with `dojo.require`, make sure you have
-  `<link rel="stylesheet" href="path/to/dgrid.css">` in your `<head>` before loading `dgrid/List`.
-* Reusing column definition objects with multiple grids (i.e.
-  `var cols = {}, gridA = new Grid({ columns: cols }), gridB = new Grid({ columns: cols })`) is not supported and will
-  not function properly. Make sure you always create a fresh `columns` object for every grid you instantiate.
+### Use with the Legacy Loader API
+
+Using `dgrid/List` without first loading `dgrid.css` will not work when using the
+legacy `dojo.require` method due to an asynchronously-resolving plugin dependency.
+To use `dgrid/List` with `dojo.require`, make sure you have
+`<link rel="stylesheet" href="path/to/dgrid.css">` in your `<head>` before loading `dgrid/List`.
+
+This also applies for stylesheets loaded by specific mixins (such as `dgrid/ColumnSet`)
+or extensions (such as `dgrid/extensions/ColumnResizer`).
+
+### Reuse of Column Definitions
+
+Reusing a single column definition object between multiple grids (e.g.
+`var cols = {}, gridA = new Grid({ columns: cols }), gridB = new Grid({ columns: cols })`)
+is not supported and will not function properly. Always create a fresh `columns`
+object for every grid you instantiate.
