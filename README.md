@@ -571,3 +571,12 @@ The following generic class names are also available for generic skinning
 * `ui-state-default`: Applied to each row element
 * `ui-state-active`: Applied to selected rows or cells
 * `ui-state-highlight`: Applied to a row for a short time when the contents are change (or it is newly created)
+
+## Known issues
+
+* Using `dgrid/List` without first loading `dgrid.css` will not work when using the legacy `dojo.require` method
+  due to an asynchronously-resolving plugin dependency. To use `dgrid/List` with `dojo.require`, make sure you manually
+  loaded `dgrid.css` before loading `dgrid/List`.
+* Reusing column definition objects with multiple grids (i.e.
+  `var cols = {}, gridA = new Grid({ columns: cols }), gridB = new Grid({ columns: cols })`) is not supported and will
+  not function properly. Make sure you always create a fresh `columns` object for every grid you instantiate.
