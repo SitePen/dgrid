@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Test dijit mixed layout</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+		<title>Test dijit mixed layout</title>
 		<meta name="viewport" content="width=570"/>
 		<style type="text/css">
 			@import "../../dijit/themes/claro/document.css";
@@ -11,36 +11,18 @@
 			html, body {
 				padding: 0;
 				margin: 0;
-				width: 100%;
 				height: 100%;
-				font-family: Lucida Sans,Lucida Grande,Arial !important;
-				font-size: 13px !important;
-				background: white;
-				color: #333;
 				overflow: hidden;
-			}
-			h2 {
-				margin: 12px;
-			}
-			.heading {
-				font-weight: bold;
-				padding-bottom: 0.25em;
-			}
-			.ui-widget{
-				outline: none !important;
 			}
 			#appLayout {
 				height: 100%;
 			}
-			#grid, #grid2 {
-				height:85%;
+			#grid1, #grid2 {
+				height:95%;
 			}
-
-			
-		
 		</style>
 		<script type="text/javascript" src="../../dojo/dojo.js"
-			data-dojo-config="async: true, parseOnLoad: true"></script>
+			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
 			require(["dgrid/OnDemandGrid",
 				"dgrid/Selection",
@@ -70,9 +52,14 @@
 						selectionMode: "single"
 					};
 					var CustomGrid = declare([Grid, Selection, DijitRegistry]);
-
-					gridTab1 = new CustomGrid(lang.mixin({id: "gridTab1"}, gridArgs), "grid"),
-					gridTab2 = new CustomGrid(lang.mixin({id: "gridTab2"}, gridArgs), "grid2");
+					
+					parser.parse();
+					
+					// add grids as content to ContentPanes parsed within page
+					grid1 = new CustomGrid(lang.mixin({id: "grid1"}, gridArgs)),
+					registry.byId("cp1").set("content", grid1);
+					grid2 = new CustomGrid(lang.mixin({id: "grid2"}, gridArgs), "grid2");
+					registry.byId("cp2").set("content", grid2);
 
 			});
 		</script>
@@ -80,11 +67,9 @@
 	<body class="claro">
 		<div id="appLayout" data-dojo-type="dijit.layout.BorderContainer" data-dojo-props="design: 'headline'">
 			<div class="centerPanel" data-dojo-type="dijit.layout.TabContainer" data-dojo-props="region: 'center', tabPosition: 'top'">
-				<div data-dojo-type="dijit.layout.ContentPane" title="grid1" selected="true">
-					<div id="grid"></div>
+				<div data-dojo-type="dijit.layout.ContentPane" id="cp1" title="grid 1" selected="true">
 				</div>
-				<div data-dojo-type="dijit.layout.ContentPane" title="grid2">
-					<div id="grid2"></div>
+				<div data-dojo-type="dijit.layout.ContentPane" id="cp2" title="grid 2">
 				</div>
 			</div>
 			<div class="edgePanel" data-dojo-type="dijit.layout.ContentPane" data-dojo-props="region: 'top'">Test dijit mixed layout - programmatic dgrid in declarative layout</div>
