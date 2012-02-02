@@ -54,3 +54,7 @@ html.has-ie-6 .dgrid-header .dgrid-sort-arrow {
 html.has-quirks .dgrid-header .dgrid-cell-padding, html.has-ie-6 .dgrid-header .dgrid-cell {
 	position:relative;
 }
+
+#dgrid-css-extensions-ColumnResizer-loaded {
+	display: none;
+}
