@@ -1,5 +1,7 @@
-define(["../_StoreMixin", "dojo/_base/declare", "dojo/_base/lang", "dojo/on", "dojo/query", "dojo/string", "dojo/_base/Deferred", "put-selector/put", "dojo/i18n!./nls/pagination", "xstyle/css!../css/extensions/Pagination.css"],
-function(_StoreMixin, declare, lang, on, query, string, Deferred, put, i18n){
+define(["../_StoreMixin", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred",
+	"dojo/on", "dojo/query", "dojo/string", "dojo/has", "put-selector/put", "dojo/i18n!./nls/pagination",
+	"dojo/_base/sniff", "xstyle/css!../css/extensions/Pagination.css"],
+function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n){
 	return declare([_StoreMixin], {
 		// summary:
 		//		An extension for adding discrete pagination to a List or Grid.
@@ -246,6 +248,11 @@ function(_StoreMixin, declare, lang, on, query, string, Deferred, put, i18n){
 						// after renderArray is resolved as well (to prevent jumping)
 						grid._updateNavigation(focusLink);
 					});
+					
+					if (has("ie") < 7 || (has("ie") && has("quirks"))) {
+						// call resize in old IE in case grid is set to height: auto
+						grid.resize();
+					}
 				}, function(error){
 					// enable loading again before throwing the error
 					delete grid._isLoading;

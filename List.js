@@ -259,6 +259,7 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 				// in quirks mode, the "bottom" CSS property is ignored, so do this to fix it
 				// We might want to use a CSS expression or the xstyle package to fix this.
 				// We guard against negative values in case of issues with external CSS.
+				bodyNode.style.height = ""; // reset first
 				bodyNode.style.height =
 					Math.max((this.domNode.offsetHeight - headerHeight - footerHeight), 0) + "px";
 			}
