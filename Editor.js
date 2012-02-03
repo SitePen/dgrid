@@ -87,11 +87,13 @@ function createEditor(column){
 	if(typeof args == "function"){ args = args.call(grid, column); }
 	
 	if(isWidget){
-		// add dgrid-input to className to make consistent with HTML inputs
-		className = args.className;
-		args.className = (className ? className + " " : "") + "dgrid-input";
 		
 		cmp = new editor(args);
+		
+		// Add dgrid-input to className to make consistent with HTML inputs.
+		// (Can't do this using className argument to constructor; causes issues)
+		(cmp.focusNode || cmp.domNode).className += " dgrid-input";
+		
 		cmp.watch("value", function(key, oldValue, value){
 			// only update internal value if widget is in a valid state
 			if(!this.isValid || this.isValid()){
