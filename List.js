@@ -1,7 +1,7 @@
 define(["put-selector/put", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/has", "dojo/has!touch?./SimpleTouchScroll", "xstyle/has-class", "dojo/_base/sniff", "xstyle/css!./css/dgrid.css"], 
 function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 	// Add user agent/feature CSS classes 
-	hasClass("mozilla", "opera", "webkit", "ie-6", "ie-6-7", "quirks", "no-quirks", "touch");
+	hasClass("mozilla", "opera", "webkit", "ie", "ie-6", "ie-6-7", "quirks", "no-quirks", "touch");
 	
 	// Am I webkit? (for RTL)
 	var isWebkit = has("webkit");
@@ -91,9 +91,13 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 		// showHeader: Boolean
 		//		Whether to render header (sub)rows.
 		showHeader: false,
+		// showFooter: Boolean
+		//		Whether to render footer area.  Extensions which display content
+		//		in the footer area should set this to true.
+		showFooter: false,
 		// maintainOddEven: Boolean
 		// 		Indicates whether to maintain the odd/even classes when new rows are inserted.
-		//		This can be disabled to improve insertion performance if odd/even styling is not employed
+		//		This can be disabled to improve insertion performance if odd/even styling is not employed.
 		maintainOddEven: true,
 		
 		postscript: function(params, srcNodeRef){
@@ -146,29 +150,35 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			this.observers = [];
 			this._listeners = [];
 			this._rowIdToObject = {};
-			
 		},
 		buildRendering: function(){
 			var domNode = this.domNode,
-				grid = this;
+				grid = this,
+				headerNode, spacerNode, bodyNode, footerNode, isRTL;
+			
 			// Detect RTL on html/body nodes; taken from dojo/dom-geometry
-			var isRTL = this.isRTL = (document.body.dir || document.documentElement.dir ||
+			isRTL = this.isRTL = (document.body.dir || document.documentElement.dir ||
 				document.body.style.direction).toLowerCase() == "rtl";
 			
 			this.id = domNode.id = domNode.id || this.id || generateId();
 			
 			put(domNode, "[role=grid].ui-widget.dgrid.dgrid-" + this.listType);
-			var headerNode = this.headerNode = put(domNode, 
+			headerNode = this.headerNode = put(domNode, 
 				"div.dgrid-header.dgrid-header-row.ui-widget-header" +
 				(this.showHeader ? "" : ".dgrid-header-hidden"));
 			if(has("quirks") || has("ie") < 8){
-				var spacerNode = put(domNode, "div.dgrid-spacer");
+				spacerNode = put(domNode, "div.dgrid-spacer");
 			}
-			var bodyNode = this.bodyNode = this.touchNode = put(domNode, "div.dgrid-scroller");
+			bodyNode = this.bodyNode = this.touchNode = put(domNode, "div.dgrid-scroller");
 			this.headerScrollNode = put(domNode, "div.dgrid-header-scroll.dgrid-scrollbar-width.ui-widget-header");
 			
+			footerNode = this.footerNode = put("div.dgrid-footer");
+			// hide unless showFooter is true (set by extensions which use footer)
+			if (!this.showFooter) { footerNode.style.display = "none"; }
+			put(domNode, footerNode);
+			
 			if(isRTL) {
-				this.domNode.className += " dgrid-rtl" + (isWebkit ? "" : " dgrid-rtl-nonwebkit");
+				domNode.className += " dgrid-rtl" + (isWebkit ? "" : " dgrid-rtl-nonwebkit");
 			}
 			
 			listen(bodyNode, "scroll", function(event){
@@ -238,14 +248,26 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			var
 				bodyNode = this.bodyNode,
 				headerNode = this.headerNode,
+				footerNode = this.footerNode,
+				headerHeight = headerNode.offsetHeight,
+				footerHeight = this.showFooter ? footerNode.offsetHeight : 0,
 				quirks = has("quirks") || has("ie") < 7;
-			this.headerScrollNode.style.height = bodyNode.style.marginTop = headerNode.offsetHeight + "px";
+			
+			this.headerScrollNode.style.height = bodyNode.style.marginTop = headerHeight + "px";
+			if(footerHeight){ bodyNode.style.marginBottom = footerHeight + "px"; }
+			
 			if(quirks){
-				// in quirks mode, the "bottom" CSS property is ignored, so do this to fix it
-				// We might want to use a CSS expression or the xstyle package to fix this.
+				// in IE6 and quirks mode, the "bottom" CSS property is ignored.
 				// We guard against negative values in case of issues with external CSS.
+				bodyNode.style.height = ""; // reset first
 				bodyNode.style.height =
-					Math.max((this.domNode.offsetHeight - headerNode.offsetHeight), 0) + "px";
+					Math.max((this.domNode.offsetHeight - headerHeight - footerHeight), 0) + "px";
+				if (footerHeight) {
+					// Work around additional glitch where IE 6 / quirks fails to update
+					// the position of the bottom-aligned footer; this jogs its memory.
+					footerNode.style.bottom = '1px';
+					setTimeout(function(){ footerNode.style.bottom = ''; }, 0);
+				}
 			}
 			
 			if(!scrollbarWidth){
@@ -314,6 +336,7 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			this._autoId = 0;
 			
 			// remove the content so it can be recreated
+			// FIXME: this gives no opportunity for properly destroying widgets, etc.
 			this.contentNode.innerHTML = "";
 			// remove any listeners
 			for(var i = 0;i < this.observers.length; i++){
@@ -484,6 +507,8 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 		down: function(row, steps){
 			return this.row(move(row, steps || 1, "dgrid-row"));
 		},
+		
+		sortOrder: null,
 		sort: function(property, descending){
 			// summary:
 			//		Sort the content

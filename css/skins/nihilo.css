@@ -10,6 +10,10 @@
 	background: #fff;
 	border-bottom-color: #919191;
 }
+.nihilo .dgrid-footer {
+	background: #fff;
+	border-top: 1px solid #919191;
+}
 .nihilo .dgrid-header .dgrid-cell {
 	border-right-color: #acab99;
 }
