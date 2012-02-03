@@ -69,7 +69,8 @@
 	border-color: #ccc;
 }
 
-/* for pagination in IE < 8, need additional rule to override link color */
-.has-ie-6-7 .squid .dgrid-navigation a {
+/* for pagination in IE < 8 + quirks, need additional rule to override link color */
+.has-ie-6-7 .squid .dgrid-navigation a,
+.has-ie.has-quirks .squid .dgrid-navigation a {
 	color: #fff;
 }

@@ -15,8 +15,9 @@
 	color: inherit;
 	padding: 0 4px;
 }
-.has-ie-6-7 .dgrid-navigation a {
-	/* IE < 8 doesn't support inherit in most cases.
+.has-ie-6-7 .dgrid-navigation a,
+.has-ie.has-quirks .dgrid-navigation a {
+	/* IE < 8 (and IE quirksmode) doesn't support inherit in most cases.
 		Unfortunately this makes more work for some skins as well...
 	*/
 	color: #000;
@@ -24,7 +25,9 @@
 .dgrid-first, .dgrid-last, .dgrid-next, .dgrid-previous {
 	font-size: 130%;
 }
-.dgrid-pagination .dgrid-page-disabled {
+.dgrid-pagination .dgrid-page-disabled,
+.has-ie-6-7 .dgrid-navigation .dgrid-page-disabled,
+.has-ie.has-quirks .dgrid-navigation .dgrid-page-disabled {
 	color: #aaa;
 	cursor: default;
 }
@@ -36,3 +39,6 @@
 .dgrid-page-size {
 	margin: 1px 4px 0 4px;
 }
+
+/* indicator of a successful load */
+#dgrid-css-extensions-Pagination-loaded { display: none; }

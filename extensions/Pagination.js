@@ -52,7 +52,12 @@ function(_StoreMixin, declare, lang, on, query, string, Deferred, put, i18n){
 					grid.gotoPage(1);
 				});
 			}
-
+			
+			// initialize some content into paginationStatusNode, to ensure
+			// accurate results on initial resize call
+			statusNode.innerHTML = string.substitute(i18n.status,
+				{ start: 1, end: 1, total: 0 });
+			
 			var navigationNode = this.paginationNavigationNode =
 					put(paginationNode, "div.dgrid-navigation");
 
