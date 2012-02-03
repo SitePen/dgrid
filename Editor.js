@@ -84,7 +84,7 @@ function createEditor(column){
 	// TODO: deprecate widgetArgs in favor of editorArgs
 	// (leaving open the possibility of using it for HTML textarea, etc)
 	args = column.editorArgs || column.widgetArgs || {};
-	if(typeof args == "function"){ args = lang.hitch(grid, args)(column); }
+	if(typeof args == "function"){ args = args.call(grid, column); }
 	
 	if(isWidget){
 		// add dgrid-input to className to make consistent with HTML inputs
@@ -163,7 +163,8 @@ function createSharedEditor(column, originalRenderCell){
 		};
 	
 	// don't allow event to confuse grid when editor is already active
-	// TODO: delegate via `.column-<id> .dgrid-input`?
+	// TODO: delegate from bodyNode via `.column-<id> .dgrid-input`?
+	//	(only if we also delegate initial editOn events...)
 	stopper = on(node, column.editOn, function(evt){
 		evt.stopPropagation();
 	});
@@ -236,7 +237,8 @@ return function(column, editor, editOn){
 			}
 			
 			// TODO: Consider using event delegation
-			// (Would require using dgrid's focus events for activating on focus)
+			// (Would require using dgrid's focus events for activating on focus,
+			// which we already advocate in README for optimal use)
 			
 			// in IE<8, cell is the child of the td due to the extra padding node
 			on(cell.tagName == "TD" ? cell : cell.parentNode,
