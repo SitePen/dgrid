@@ -248,20 +248,26 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			var
 				bodyNode = this.bodyNode,
 				headerNode = this.headerNode,
+				footerNode = this.footerNode,
 				headerHeight = headerNode.offsetHeight,
-				footerHeight = this.showFooter ? this.footerNode.offsetHeight : 0,
+				footerHeight = this.showFooter ? footerNode.offsetHeight : 0,
 				quirks = has("quirks") || has("ie") < 7;
 			
 			this.headerScrollNode.style.height = bodyNode.style.marginTop = headerHeight + "px";
 			if(footerHeight){ bodyNode.style.marginBottom = footerHeight + "px"; }
 			
 			if(quirks){
-				// in quirks mode, the "bottom" CSS property is ignored, so do this to fix it
-				// We might want to use a CSS expression or the xstyle package to fix this.
+				// in IE6 and quirks mode, the "bottom" CSS property is ignored.
 				// We guard against negative values in case of issues with external CSS.
 				bodyNode.style.height = ""; // reset first
 				bodyNode.style.height =
 					Math.max((this.domNode.offsetHeight - headerHeight - footerHeight), 0) + "px";
+				if (footerHeight) {
+					// Work around additional glitch where IE 6 / quirks fails to update
+					// the position of the bottom-aligned footer; this jogs its memory.
+					footerNode.style.bottom = '1px';
+					setTimeout(function(){ footerNode.style.bottom = ''; }, 0);
+				}
 			}
 			
 			if(!scrollbarWidth){
