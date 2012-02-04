@@ -42,6 +42,16 @@ function setProperty(grid, cellElement, oldValue, value){
 	return value;
 }
 
+function setPropertyFromWidget(grid, widget, value) {
+	// This function serves as a window into setProperty for widget editors.
+	if(!widget.isValid || widget.isValid()){ // only update if valid
+		if(activeValues[1] !== undefined){
+			activeValues[1] = setProperty(
+				grid, widget.domNode.parentNode, activeValues[1], value);
+		}
+	}
+}
+
 // general event logic
 
 function changeHandler(grid, evt){
@@ -94,15 +104,18 @@ function createEditor(column){
 		// (Can't do this using className argument to constructor; causes issues)
 		(cmp.focusNode || cmp.domNode).className += " dgrid-input";
 		
-		cmp.watch("value", function(key, oldValue, value){
-			// only update internal value if widget is in a valid state
-			if(!this.isValid || this.isValid()){
-				if(activeValues[1] !== undefined){
-					activeValues[1] = setProperty(
-						grid, this.domNode.parentNode, activeValues[1], value);
-				}
-			}
-		});
+		if(editOn){
+			// connect to onBlur if we're deactivating on it anyway; watching on value
+			// will fire too late due to several setTimeouts in Dijit
+			cmp.connect(cmp, "onBlur", function(){
+				setPropertyFromWidget(grid, this, this.get("value"));
+			});
+		}else{
+			// if we're not deactivating on blur, it's safe/prudent to use watch
+			cmp.watch("value", function(key, oldValue, value){
+				setPropertyFromWidget(grid, this, value);
+			});
+		}
 	}else{
 		// considerations for standard HTML form elements
 		if(!column.grid._hasInputListener){
@@ -183,7 +196,7 @@ function createSharedEditor(column, originalRenderCell){
 		// (TODO: verify if the timeout is still needed since we no longer destroy)
 		cmp.connect(cmp, "onBlur", function(){
 			if(cmp.isValid && !cmp.isValid()){ return; }
-			setTimeout(onblur, 0);
+			onblur();
 		});
 	}else{
 		blurHandler = on(node, "blur", onblur);
@@ -224,8 +237,8 @@ return function(column, editor, editOn){
 	// accept arguments as parameters to Editor function, or from column def,
 	// but normalize to column def.
 	// (TODO: maybe should only accept from column def to begin with...)
-	column.editor = editor || column.editor;
-	column.editOn = editOn || column.editOn;
+	column.editor = editor = editor || column.editor;
+	column.editOn = editOn = editOn || column.editOn;
 	
 	column.renderCell = function(object, value, cell, options){
 		var cmp, // stores input/widget component being rendered
