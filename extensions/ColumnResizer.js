@@ -1,19 +1,42 @@
 define(["dojo/_base/declare", "dojo/on", "dojo/query", "dojo/dom", "put-selector/put", "dojo/dom-geometry", "dojo/dom-class", "dojo/touch", "dojo/has", "dojo/_base/html", "xstyle/css!../css/extensions/ColumnResizer.css"],
 function(declare, listen, query, dom, put, geom, cls, touch, has){
 
+var hasPointFromNode = has("touch") && webkitConvertPointFromNodeToPage;
+
 return declare([], {
 	resizeNode: null,
 	minWidth: 40,	//minimum column width in px
 	gridWidth: null, //place holder for the grid width property
 	_resizedColumns: false, //flag that indicates if resizer has converted column widths to px
 	resizeColumnWidth: function(colId, width){
-	// Summary:
-	//      calls grid's styleColumn function to add a style for the column
-	// colId: String
-	//      column id
-	// width: Integer
-	//      new width of the column
-		var x = this.styleColumn(colId, "width: " + width + "px;");
+		// Summary:
+		//      calls grid's styleColumn function to add a style for the column
+		// colId: String
+		//      column id
+		// width: Integer
+		//      new width of the column
+
+		// Keep track of old styles so we don't get a long list in the stylesheet
+		if(!this._columnStyles){
+			this._columnStyles = {};
+		}
+		var old = this._columnStyles[colId],
+			x = this.styleColumn(colId, "width: " + width + "px;");
+
+		old && old.remove();
+
+		// keep a reference
+		this._columnStyles[colId] = x;
+	},
+	configStructure: function(){
+		// Reset and remove column styles when a new structure is set
+		this._resizedColumns = false;
+		for(var name in this._columnStyles){
+			this._columnStyles[name].remove();
+		}
+		this._columnStyles = {};
+
+		this.inherited(arguments);
 	},
 	renderHeader: function(){
 		this.inherited(arguments);
@@ -21,23 +44,32 @@ return declare([], {
 		var grid = this;
 		grid.gridWidth = grid.headerNode.clientWidth - 1; //for some reason, total column width needs to be 1 less than this
 
-		for(id in this.columns){
-			var col = this.columns[id];
-			var colNode = query(".column-"+id, grid.domNode)[0]; //grabs header node
+		var colNodes = query(".dgrid-cell", grid.headerNode),
+			i = colNodes.length;
+
+		while(i--){
+			var colNode = colNodes[i],
+				id = colNode.columnId,
+				col = grid.columns[id],
+				childNodes = colNode.childNodes;
+
+			if(!col){ continue; }
 
 			var headerTextNode = put("div.dgrid-resize-header-container");
 			colNode.contents = headerTextNode;
-			var childNodes = colNode.childNodes;
+
 			// move all the children to the header text node
 			while(childNodes.length > 0){
 				put(headerTextNode, childNodes[0]);
 			}
-			listen(put(colNode, headerTextNode, "div.dgrid-resize-handler.resizeNode-"+id), touch.press, function(e){
-					e.preventDefault(); // Added for mobile
-					grid._resizeMouseDown(e);
-			});
+
+			put(colNode, headerTextNode, "div.dgrid-resize-handler.resizeNode-"+id).columnId = id;
 		}
+
 		if(!grid.mouseMoveListen){
+			listen(grid.headerNode, ".dgrid-resize-handler:mousedown", function(e){
+				grid._resizeMouseDown(e, this);
+			});
 			grid.mouseMoveListen = listen.pausable(document.body, touch.move, function(e){
 				// while resizing, update the position of the resizer bar
 				if(!grid._resizing){return;}
@@ -52,11 +84,11 @@ return declare([], {
 		}
 	}, // end renderHeader
 
-	_resizeMouseDown: function(e){
-	// Summary:
-	//      called when mouse button is pressed on the header
-	// e: Object
-	//      mousedown event object
+	_resizeMouseDown: function(e, target){
+		// Summary:
+		//      called when mouse button is pressed on the header
+		// e: Object
+		//      mousedown event object
 		
 		// preventDefault actually seems to be enough to prevent browser selection
 		// in all but IE < 9.  setSelectable works for those.
@@ -69,12 +101,11 @@ return declare([], {
 		// Grab the position of the grid within the body;  will be used to place the resizer in the correct place
 		// Since geom.position returns an incorrect "x" value (due to mobile zoom and getBoundingClientRect()),
 		// webkitConvertPointFromNodeToPage and WebKitPoint will provide a more accurate point
-		var hasPointFromNode = has("touch") && webkitConvertPointFromNodeToPage;
 		grid._gridX = hasPointFromNode ? 
 						webkitConvertPointFromNodeToPage(grid.bodyNode, new WebKitPoint(0, 0)).x : 
 						geom.position(grid.bodyNode).x;
 						
-		grid._targetCell = grid._getResizeCell(e);
+		grid._targetCell = target.parentNode.parentNode;
 		
 		// show resizer inlined
 		if(!grid._resizer){
@@ -88,19 +119,22 @@ return declare([], {
 		grid._updateResizerPosition(e);
 	},
 	_resizeMouseUp: function(e){
-	// Summary:
-	//      called when mouse button is released
-	// e: Object
-	//      mouseup event object
+		// Summary:
+		//      called when mouse button is released
+		// e: Object
+		//      mouseup event object
 
 		this._resizing = false;
 		this._readyToResize = false;
 
 		//This is used to set all the column widths to a static size
 		if(!this._resizedColumns){
-			for(id in this.columns){
-				var col = this.columns[id];
-				var width = query("#" + this.domNode.id + " .column-"+id)[0].offsetWidth;
+			var colNodes = query(".dgrid-cell", this.headerNode);
+
+			for(var i=0, colNode; colNode = colNodes[i]; i++){
+				var id = colNode.columnId,
+					width = colNode.offsetWidth;
+
 				this.resizeColumnWidth(id, width);
 			}
 			this._resizedColumns = true;
@@ -134,10 +168,10 @@ return declare([], {
 		this._hideResizer();
 	},
 	_updateResizerPosition: function(e){
-	// Summary:
-	//      updates position of resizer bar as mouse moves
-	// e: Object
-	//      mousemove event object
+		// Summary:
+		//      updates position of resizer bar as mouse moves
+		// e: Object
+		//      mousemove event object
 
 		var mousePos = this._getResizeMouseLocation(e),
 			delta = mousePos - this._startX, //change from where user clicked to where they drag
@@ -150,51 +184,37 @@ return declare([], {
 	},
 
 	_hideResizer: function(){
-	// Summary:
-	//      sets resizer bar display to none
+		// Summary:
+		//      sets resizer bar display to none
 		this._resizer.style.display = "none";
 	},
 	_getResizeMouseLocation: function(e){
-	//Summary:
-	//      returns position of mouse relative to the left edge
-	// e: event object
-	//      mouse move event object
+		//Summary:
+		//      returns position of mouse relative to the left edge
+		// e: event object
+		//      mouse move event object
 		var posX = 0;
 		if(e.pageX){
 			posX = e.pageX;
-		}
-		else if(e.clientX){
+		}else if(e.clientX){
 			posX = e.clientX + document.body.scrollLeft
 				+ document.documentElement.scrollLeft;
 		}
 		return posX;
 	},
-	_getResizeCell: function(e){
-	// Summary:
-	//      get the target of the mouse move event
-	// e: Object
-	//      mousemove event object
-		var node;
-		if(e.target){
-			node = e.target;
-		}else if(e.srcElement){
-			node = e.srcElement;
-		}
-		if(node.nodeType == 3 || !node.columnId){ // defeat Safari bug first and IE oddity 2nd
-			node = node.parentNode.parentNode;
-		}
-		return node;
-	},
 	_getResizedColumnWidths: function (){
-	//Summary:
-	//      returns object containing new column width and column id
-		var totalWidth = 0;
-		var lastColId = null;
-		for(id in this.columns){
-			var col = this.columns[id];
-			var width = query("#" + this.domNode.id + " .column-"+id)[0].offsetWidth;
-			totalWidth += width;
-			lastColId = id;
+		//Summary:
+		//      returns object containing new column width and column id
+		var totalWidth = 0,
+			colNodes = query(".dgrid-cell", this.headerNode),
+			i = colNodes.length;
+
+		if(!i){ return {}; }
+
+		var lastColId = colNodes[i-1].columnId;
+
+		while(i--){
+			totalWidth += colNodes[i].offsetWidth;
 		}
 		return {totalWidth: totalWidth, lastColId: lastColId};
 	}
