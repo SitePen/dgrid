@@ -26,8 +26,11 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true, isDebug: true"></script>
 		<script type="text/javascript">
-			require(["dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Keyboard", "dgrid/Editor", "dijit/form/TextBox", "dijit/form/SimpleTextarea", "dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!"],
-				function(Grid, Selection, Keyboard, Editor, TextBox, SimpleTextarea, declare){
+			require(["dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Keyboard", "dgrid/Editor",
+					"dijit/form/TextBox", "dijit/form/SimpleTextarea",
+					"dojo/_base/declare", "dojo/on",
+					"dgrid/test/data/base", "dojo/domReady!"],
+				function(Grid, Selection, Keyboard, Editor, TextBox, SimpleTextarea, declare, on){
 					var columns = [
 							Editor({label: "text input", field: "name", editOn: "click"}, "text"),
 							Editor({label: "Dijit TextBox", field: "description", editOn: "click"}, TextBox)
@@ -48,7 +51,7 @@
 						columns: columns2
 					}, "grid2");
 					
-					grid.on("dgrid-datachange", function(evt){
+					on(document.body, "dgrid-datachange", function(evt){
 						console.log("data changed: " + evt.oldValue + " -> " + evt.value);
 						console.log("cell: ", evt.cell, evt.cell.row.id);
 					});
