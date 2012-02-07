@@ -41,14 +41,13 @@
 							}else{
 								console.log(msg + event.grid.id + ": row " + event.row.id);
 							}
-							if(prevent){ event.preventDefault(); }
+							var selection = [];
+							for(var id in event.grid.selection){
+								selection.push(id);
+							}
+							console.log("selection", selection);
 						}
 					);
-					
-					on(document.getElementById("btnPreventDefaultOn"), "click",
-						function(){ prevent = true; });
-					on(document.getElementById("btnPreventDefaultOff"), "click",
-						function(){ prevent = false; });
 					
 					gridRowNavigation = dojo.declare([Grid, Selection, Keyboard])({
 						store: testStore,
@@ -91,10 +90,6 @@
 		</script>
 	</head>
 	<body class="nihilo">
-		<div>preventDefault on selection in all grids?
-			<button type="button" id="btnPreventDefaultOn">Yes</button>
-			<button type="button" id="btnPreventDefaultOff">No</button>
-		</div>
 		<h2>A grid with row-level selection (and row-level navigation)</h2>
 		<div>Set selectionMode:
 			<button type="button" onclick="gridRowNavigation.setSelectionMode('none');">None</button>
