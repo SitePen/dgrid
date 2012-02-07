@@ -103,7 +103,6 @@ return declare([Selection], {
 		}
 		if(value != previous && element){
 			listen.emit(element, "dgrid-" + (value ? "select" : "deselect"), {
-				cancelable: true,
 				bubbles: true,
 				cell: cell,
 				grid: this

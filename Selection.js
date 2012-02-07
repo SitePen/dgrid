@@ -192,7 +192,6 @@ return declare([List], {
 		}
 		if(value != previousValue && element){
 			on.emit(element, "dgrid-" + (value ? "select" : "deselect"), {
-				cancelable: true,
 				bubbles: true,
 				row: row,
 				grid: this
