@@ -1,11 +1,37 @@
-define(["dojo/_base/declare", "dojo/on", "./List", "dojo/_base/lang", "dojo/has", "put-selector/put", "dojo/_base/sniff"],
-function(declare, on, List, lang, has, put){
+define([
+	"dojo/_base/declare",
+	"dojo/aspect",
+	"dojo/on",
+	"./List",
+	"dojo/_base/lang",
+	"dojo/has",
+	"put-selector/put",
+	"dojo/_base/sniff"
+], function(declare, aspect, on, List, lang, has, put){
 
 var delegatingInputTypes = {
-	checkbox: 1,
-	radio: 1,
-	button: 1
-};
+		checkbox: 1,
+		radio: 1,
+		button: 1
+	},
+	isGridCell = /\bdgrid-cell\b/;
+
+
+has.add("dom-contains", function(){
+	return !!document.createElement("a").contains;
+});
+
+function contains(parent, node){
+	// summary:
+	//		Checks to see if an element is contained by another element.
+	
+	if(has("dom-contains")){
+		return parent.contains(node);
+	}else{
+		return parent.compareDocumentPosition(child) & 8 /* DOCUMENT_POSITION_CONTAINS */;
+	}
+}
+
 return declare([List], {
 	// summary:
 	// 		Add keyboard navigation capability to a grid/list
@@ -19,13 +45,8 @@ return declare([List], {
 			var target = event.target;
 			return target.type && (!delegatingInputTypes[target.type] || event.keyCode == 32);
 		}
+		
 		function navigateArea(areaNode){
-			var cellFocusedElement = areaNode;
-			var next;
-			while((next = cellFocusedElement.firstChild) && next.tagName){
-				cellFocusedElement = next;
-			}
-			cellFocusedElement.tabIndex = grid.tabIndex; // set the tab index of the first child we encounter
 			function focusOnCell(element, event, dontFocus){
 				var cell = grid[grid.cellNavigation ? "cell" : "row"](element);
 				if(cell){
@@ -63,13 +84,62 @@ return declare([List], {
 					}
 				}
 			}
+			
+			function handleRefresh(){
+				// summary:
+				//		Ensures the first element of a grid is keyboard selectable after data has been
+				//		retrieved.
+				
+				// do not update the focused element if we already have a valid one
+				if(isGridCell.test(cellFocusedElement) && contains(areaNode, cellFocusedElement)){
+					return;
+				}
+
+				for(var i = 0, elements = areaNode.getElementsByTagName("*"), element; (element = elements[i]); ++i){
+					if(isGridCell.test(element.className)){
+						cellFocusedElement = element;
+						break;
+					}
+				}
+				
+				cellFocusedElement.tabIndex = grid.tabIndex;
+			}
+
+			var cellFocusedElement = areaNode, next;
+			
+			while((next = cellFocusedElement.firstChild) && next.tagName){
+				cellFocusedElement = next;
+			}
+			
+			if(areaNode === grid.contentNode){
+				// ensure that the first focused element is actually a grid cell, not a
+				// dgrid-preload or dgrid-content element, which should not be focusable,
+				// even when data is loaded asynchronously
+				aspect.before(grid, "refresh", function(ret){
+					// keeping this attached to renderArray causes the selected item to jump
+					// up when someone holds down an arrow key to scroll through the list;
+					// it thinks the focused element is no longer existing within the grid
+					// for some reason
+					var renderConnection = aspect.after(grid, "renderArray", function(ret){
+						renderConnection.remove();
+						renderConnection = null;
+						handleRefresh();
+						return ret;
+					});
+					
+					return ret;
+				});
+			}else if(isGridCell.test(cellFocusedElement.className)){
+				cellFocusedElement.tabIndex = grid.tabIndex;
+			}
+			
 			on(areaNode, "mousedown", function(event){
 				if(!handledEvent(event)){
 					focusOnCell(event.target, event);
 				}
 			});
+			
 			on(areaNode, "keydown", function(event){
-				
 				// For now, don't squash browser-specific functionalities by letting
 				// ALT and META function as they would natively
 				if(event.metaKey || event.altKey) {
@@ -96,7 +166,7 @@ return declare([List], {
 				if(isNaN(move)){
 					return;
 				}
-				var nextSibling, columnId, cell = grid.cell(cellFocusedElement || firstDeepChild(focusedElement));
+				var nextSibling, columnId, cell = grid.cell(cellFocusedElement);
 				var orientation;
 				if(keyCode == 37 || keyCode == 39){
 					// horizontal movement (left and right keys)
@@ -108,7 +178,7 @@ return declare([List], {
 					// other keys are vertical
 					orientation = "down";
 					columnId = cell && cell.column && cell.column.id;
-					cell = grid.row(cellFocusedElement || firstDeepChild(focusedElement));				
+					cell = grid.row(cellFocusedElement);
 				}
 				if(move){
 					cell = cell && grid[orientation](cell, move);
@@ -139,9 +209,11 @@ return declare([List], {
 				event.preventDefault();
 			});
 		}
+		
 		if(grid.tabableHeader){
 			navigateArea(grid.headerNode);
 		}
+		
 		navigateArea(grid.contentNode);
 	}
 });
