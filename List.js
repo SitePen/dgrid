@@ -170,6 +170,11 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 				spacerNode = put(domNode, "div.dgrid-spacer");
 			}
 			bodyNode = this.bodyNode = this.touchNode = put(domNode, "div.dgrid-scroller");
+			
+			// firefox 4 until at least 10 adds overflow: auto elements to the tab index by default for some
+			// reason; force them to be not tabbable
+			bodyNode.tabIndex = -1;
+			
 			this.headerScrollNode = put(domNode, "div.dgrid-header-scroll.dgrid-scrollbar-width.ui-widget-header");
 			
 			footerNode = this.footerNode = put("div.dgrid-footer");
