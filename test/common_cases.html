@@ -85,6 +85,7 @@
 					}, "scrollgrid");
 					
 					window.tree = declare([Grid, Selection, Keyboard])({
+						tabIndex: 2,
 						store: testCountryStore,
 						query: {type: "continent"},
 						selectionMode: "single",
@@ -97,6 +98,7 @@
 						}
 					}, "tree");
 					window.list = declare([List, Selection, Keyboard])({
+						tabIndex: 1
 					}, "list");
 					list.renderArray(arrayUtil.map(testCountryStore.data, function(country){
 						return country.name;
@@ -112,8 +114,8 @@
 		<div id="grid"></div>
 		<button id="save">Save</button>
 		<h2>A grid with tree column and then a simple list (floated left)</h2>
-		<div tabIndex="2" id="tree"></div>
-		<div tabIndex="1" id="list"></div>
+		<div id="tree"></div>
+		<div id="list"></div>
 		<h2>Same as basic grid, but with column widths exceeding grid width</h2>
 		<p>(for testing that nodes occupy correct widths - pay attention to hover/selection style)</p>
 		<div id="scrollgrid"></div>
