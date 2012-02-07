@@ -173,6 +173,13 @@ return declare([List], {
 				put(element, "!dgrid-selected!ui-state-active");
 			}
 		}
+		if(value != previousValue && element){
+			on.emit(element, "dgrid-" + (value ? "select" : "deselect"), {
+				bubbles: true,
+				row: row,
+				grid: this
+			});
+		}
 		if(toRow){
 			if(!toRow.element){
 				toRow = this.row(toRow);
@@ -189,13 +196,6 @@ return declare([List], {
 					break;
 				}
 			}
-		}
-		if(value != previousValue && element){
-			on.emit(element, "dgrid-" + (value ? "select" : "deselect"), {
-				bubbles: true,
-				row: row,
-				grid: this
-			});
 		}
 	},
 	deselect: function(row, toRow){

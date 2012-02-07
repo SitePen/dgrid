@@ -50,7 +50,7 @@ return declare([Selection], {
 			}
 		}
 		if(!hasSelected){ delete this.selection[rowId]; }
-
+		
 		if(element){
 			// add or remove classes as appropriate
 			if(value){
@@ -58,6 +58,13 @@ return declare([Selection], {
 			}else{
 				put(element, "!dgrid-selected!ui-state-active");
 			}
+		}
+		if(value != previous && element){
+			listen.emit(element, "dgrid-" + (value ? "select" : "deselect"), {
+				bubbles: true,
+				cell: cell,
+				grid: this
+			});
 		}
 		if(toCell){
 			// a range
@@ -100,13 +107,6 @@ return declare([Selection], {
 					break;
 				}
 			}while(nextNode = cell.row.element[traverser]);
-		}
-		if(value != previous && element){
-			listen.emit(element, "dgrid-" + (value ? "select" : "deselect"), {
-				bubbles: true,
-				cell: cell,
-				grid: this
-			});
 		}
 	},
 	isSelected: function(object, columnId){
