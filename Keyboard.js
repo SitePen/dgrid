@@ -14,8 +14,8 @@ var delegatingInputTypes = {
 		radio: 1,
 		button: 1
 	},
-	isGridCell = /\bdgrid-cell\b/;
-
+	hasGridCellClass = /\bdgrid-cell\b/,
+	hasGridRowClass = /\bdgrid-row\b/;
 
 has.add("dom-contains", function(){
 	return !!document.createElement("a").contains;
@@ -37,6 +37,7 @@ return declare([List], {
 	// 		Add keyboard navigation capability to a grid/list
 	pageSkip: 10,
 	tabIndex: 0,
+	
 	postCreate: function(){
 		this.inherited(arguments);
 		var grid = this;
@@ -91,12 +92,12 @@ return declare([List], {
 				//		retrieved.
 				
 				// do not update the focused element if we already have a valid one
-				if(isGridCell.test(cellFocusedElement) && contains(areaNode, cellFocusedElement)){
+				if(isFocusable.test(cellFocusedElement) && contains(areaNode, cellFocusedElement)){
 					return;
 				}
 
 				for(var i = 0, elements = areaNode.getElementsByTagName("*"), element; (element = elements[i]); ++i){
-					if(isGridCell.test(element.className)){
+					if(isFocusable.test(element.className)){
 						cellFocusedElement = element;
 						break;
 					}
@@ -104,8 +105,10 @@ return declare([List], {
 				
 				cellFocusedElement.tabIndex = grid.tabIndex;
 			}
-
-			var cellFocusedElement = areaNode, next;
+			
+			var isFocusable = grid.cellNavigation ? hasGridCellClass : hasGridRowClass,
+				cellFocusedElement = areaNode,
+				next;
 			
 			while((next = cellFocusedElement.firstChild) && next.tagName){
 				cellFocusedElement = next;
@@ -129,7 +132,7 @@ return declare([List], {
 					
 					return ret;
 				});
-			}else if(isGridCell.test(cellFocusedElement.className)){
+			}else if(isFocusable.test(cellFocusedElement.className)){
 				cellFocusedElement.tabIndex = grid.tabIndex;
 			}
 			
