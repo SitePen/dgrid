@@ -6,8 +6,9 @@ define([
 	"dojo/_base/lang",
 	"dojo/has",
 	"put-selector/put",
+	"dojo/_base/Deferred",
 	"dojo/_base/sniff"
-], function(declare, aspect, on, List, lang, has, put){
+], function(declare, aspect, on, List, lang, has, put, Deferred){
 
 var delegatingInputTypes = {
 		checkbox: 1,
@@ -85,28 +86,8 @@ return declare([List], {
 					}
 				}
 			}
-			
-			function handleRefresh(){
-				// summary:
-				//		Ensures the first element of a grid is keyboard selectable after data has been
-				//		retrieved.
-				
-				// do not update the focused element if we already have a valid one
-				if(isFocusable.test(cellFocusedElement) && contains(areaNode, cellFocusedElement)){
-					return;
-				}
 
-				for(var i = 0, elements = areaNode.getElementsByTagName("*"), element; (element = elements[i]); ++i){
-					if(isFocusable.test(element.className)){
-						cellFocusedElement = element;
-						break;
-					}
-				}
-				
-				cellFocusedElement.tabIndex = grid.tabIndex;
-			}
-			
-			var isFocusable = grid.cellNavigation ? hasGridCellClass : hasGridRowClass,
+			var isFocusableClass = grid.cellNavigation ? hasGridCellClass : hasGridRowClass,
 				cellFocusedElement = areaNode,
 				next;
 			
@@ -115,24 +96,33 @@ return declare([List], {
 			}
 			
 			if(areaNode === grid.contentNode){
-				// ensure that the first focused element is actually a grid cell, not a
-				// dgrid-preload or dgrid-content element, which should not be focusable,
-				// even when data is loaded asynchronously
-				aspect.before(grid, "refresh", function(ret){
-					// keeping this attached to renderArray causes the selected item to jump
-					// up when someone holds down an arrow key to scroll through the list;
-					// it thinks the focused element is no longer existing within the grid
-					// for some reason
-					var renderConnection = aspect.after(grid, "renderArray", function(ret){
-						renderConnection.remove();
-						renderConnection = null;
-						handleRefresh();
+				aspect.after(grid, "renderArray", function(ret){
+					// summary:
+					//		Ensures the first element of a grid is always keyboard selectable after data has been
+					//		retrieved if there is not already a valid focused element.
+
+					return Deferred.when(ret, function(ret){
+						// do not update the focused element if we already have a valid one
+						if(isFocusableClass.test(cellFocusedElement.className) && contains(areaNode, cellFocusedElement)){
+							return ret;
+						}
+
+						// ensure that the focused element is actually a grid cell, not a
+						// dgrid-preload or dgrid-content element, which should not be focusable,
+						// even when data is loaded asynchronously
+						for(var i = 0, elements = areaNode.getElementsByTagName("*"), element; (element = elements[i]); ++i){
+							if(isFocusableClass.test(element.className)){
+								cellFocusedElement = element;
+								break;
+							}
+						}
+
+						cellFocusedElement.tabIndex = grid.tabIndex;
+
 						return ret;
 					});
-					
-					return ret;
 				});
-			}else if(isFocusable.test(cellFocusedElement.className)){
+			}else if(isFocusableClass.test(cellFocusedElement.className)){
 				cellFocusedElement.tabIndex = grid.tabIndex;
 			}
 			
