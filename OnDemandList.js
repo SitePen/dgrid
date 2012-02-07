@@ -70,7 +70,7 @@ return declare([List, _StoreMixin], {
 		}
 		var loadingNode = put(preloadNode, "-div.dgrid-loading");
 		put(loadingNode, "div.dgrid-below", this.loadingMessage);
-		var options = lang.delegate(this.queryOptions ? this.queryOptions : null, {start: 0, count: this.minRowsPerPage, query: query});
+		var options = this.getQueryOptions({start: 0, count: this.minRowsPerPage, query: query});
 		// execute the query
 		var results = query(options);
 		var self = this;
@@ -110,6 +110,15 @@ return declare([List, _StoreMixin], {
 		// return results so that callers can handle potential of async error
 		return results;
 	},
+	getQueryOptions: function(mixin){
+		// summary:
+		//		Get a fresh queryOptions object with the current sort added to it and any mixin added in
+		options = this.queryOptions ? lang.delegate(this.queryOptions, mixin) : mixin || {};
+		if(this.sortOrder){
+			options.sort = this.sortOrder;
+		}
+		return options;
+	},
 	
 	refresh: function(){
 		this.inherited(arguments);
@@ -118,9 +127,6 @@ return declare([List, _StoreMixin], {
 			var self = this;
 			this._trackError(function(){
 				return self.renderQuery(function(queryOptions){
-					if(self.sortOrder){
-						queryOptions.sort = self.sortOrder;
-					}
 					return self.store.query(self.query, queryOptions);
 				});
 			});
@@ -250,7 +256,7 @@ return declare([List, _StoreMixin], {
 						}
 						offset = Math.round(offset);
 						count = Math.round(count);
-						var options = grid.queryOptions ? lang.delegate(grid.queryOptions) : {};
+						var options = grid.getQueryOptions();
 						preload.count -= count;
 						var beforeNode = preloadNode,
 							keepScrollTo, queryRowsOverlap = grid.queryRowsOverlap,
