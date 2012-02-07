@@ -90,6 +90,18 @@
 								{label: 'Column 2', field: 'col2', sortable: false},
 								{label: 'Column 4', field: 'col4'},
 								{label: 'Column 5', field: 'col5'}
+							]],
+						columnSetsSingleRow = [
+							[
+								[
+									{label: 'Column 1', field: 'col1'},
+									{label: 'Column 2', field: 'col2', sortable: false}
+								]
+							], [
+								[
+									{label: 'Column 1', field: 'col1'},
+									{label: 'Column 4', field: 'col4'}
+								]
 							]];
 					
 					function byId(id){ return document.getElementById(id); }
@@ -98,6 +110,11 @@
 						store: testStore,
 						subRows: subRows1
 					}, "gridNoColumnSets");
+					
+					window.gridSingleRow = declare([Grid, ColumnSet, Selection, Keyboard])({
+						store: testStore,
+						columnSets: columnSetsSingleRow
+					}, "gridSingleRow");
 					
 					window.grid = declare([Grid, ColumnSet, Selection, Keyboard])({
 						store: testStore,
@@ -143,6 +160,8 @@
 			<button id="btnSubRows1">set 1</button>
 			<button id="btnSubRows2">set 2</button>
 		</p>
+		<h2>A Grid with locking columns but only one subrow</h2>
+		<div id="gridSingleRow" class="grid"></div>
 		<h2>A Grid with complex columns including locking columns and subrows</h2>
 		<div id="grid" class="grid"></div>
 		<p>Buttons to test resetting columnSets:

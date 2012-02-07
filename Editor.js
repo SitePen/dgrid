@@ -1,5 +1,13 @@
-define(["dojo/_base/kernel", "dojo/on", "dojo/has", "dojo/_base/lang", "./Grid", "put-selector/put", "dojo/_base/sniff"],
-function(kernel, on, has, lang, Grid, put){
+define([
+	"dojo/_base/kernel",
+	"dojo/_base/lang",
+	"dojo/on",
+	"dojo/aspect",
+	"dojo/has",
+	"./Grid",
+	"put-selector/put",
+	"dojo/_base/sniff"
+], function(kernel, lang, on, aspect, has, Grid, put){
 
 var ignoreChange = false; // used to ignore change on native input after esc/enter
 
@@ -22,6 +30,7 @@ function setProperty(grid, cellElement, oldValue, value){
 			// TODO: remove rowId in lieu of cell (or grid.row/grid.cell)
 			// (keeping for the moment for back-compat, but will note in changes)
 			if(on.emit(cellElement, "dgrid-datachange", {
+						grid: this,
 						cell: cell,
 						rowId: row.id,
 						oldValue: oldValue,
@@ -229,14 +238,35 @@ return function(column, editor, editOn){
 	column.editOn = editOn = editOn || column.editOn;
 	
 	column.renderCell = function(object, value, cell, options){
-		var cmp, // stores input/widget component being rendered
-			grid = column.grid;
+		var cmp, // stores input/widget rendered in non-editOn code path
+			grid = column.grid,
+			isWidget = typeof editor != "string";
+		
+		if(isWidget && !column._dijitCleanup){
+			// add advice for cleaning up widgets in this column
+			column._dijitCleanup = true;
+			
+			aspect.before(grid, "removeRow", function(rowElement){
+				// destroy our widget during the row removal operation
+				var cellElement = grid.cell(rowElement, column.id).element;
+				var widget = (cellElement.contents || cellElement).widget;
+				// widget may not have been created if editOn is used
+				widget && widget.destroyRecursive();
+			});
+		}		
 		
 		if(editOn){
 			// On first run, create one shared widget/input which will be swapped into
 			// the active cell.
 			if(!column.editorInstance){
 				column.editorInstance = createSharedEditor(column, originalRenderCell);
+				
+				if (isWidget) {
+					// clean up shared widget instance when the grid is destroyed
+					aspect.before(grid, "destroy", function(){
+						column.editorInstance.destroyRecursive();
+					});
+				}
 			}
 			
 			// TODO: Consider using event delegation
@@ -259,8 +289,13 @@ return function(column, editor, editOn){
 			// always-on: create editor immediately upon rendering each cell
 			cmp = createEditor(column);
 			showEditor(cmp, column, value, cell, object);
-			// if component is a widget, call startup once execution stack completes
-			if (cmp.startup) { setTimeout(function(){ cmp.startup(); }, 0); }
+			
+			if(isWidget){
+				// maintain reference for later cleanup
+				cell.widget = cmp;
+				// call widget's startup once execution stack completes
+				setTimeout(function(){ cmp.startup(); }, 0);
+			}
 		}
 	};
 	return column;

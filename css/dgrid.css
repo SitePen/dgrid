@@ -10,14 +10,20 @@
 .dgrid-header {
 	background-color: #eee;
 	position: absolute;
-	right: 17px; /*scrollbar width; */
-	left: 0px;
+	right: 17px; /* scrollbar width; revised in List.js if necessary */
+	left: 0;
 }
 
 .dgrid-header-scroll {
 	position: absolute;
-	top: 0px;
-	right: 0px;
+	top: 0;
+	right: 0;
+}
+
+.dgrid-footer {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
 }
 
 .dgrid-header-hidden,
@@ -74,6 +80,7 @@ html.has-quirks .dgrid-header-hidden .dgrid-cell {
 
 .dgrid-content {
 	position: relative;
+	height: 99%;
 }
 
 .dgrid-scroller {
@@ -84,6 +91,15 @@ html.has-quirks .dgrid-header-hidden .dgrid-cell {
 	margin-top: 25px; /* this will be adjusted programmatically to fit below the header*/
 	bottom: 0px;
 	width: 100%;
+}
+
+.dgrid-loading {
+	position: relative;
+	height: 100%;
+}
+.dgrid-above {
+	position: absolute;
+	bottom: 0;
 }
 
 .ui-icon {

@@ -7,6 +7,7 @@
 		<meta name="viewport" content="width=570" />
 		<style type="text/css">
 			@import "../../dojo/resources/dojo.css";
+			@import "../../dijit/themes/claro/claro.css";
 			@import "../css/skins/claro.css";
 			
 			body {
@@ -40,9 +41,9 @@
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
 			var data = [
-				{order: 1, name:"preheat", description:"Preheat your oven to 350F"},
-				{order: 2, name:"mix dry", description:"In a medium bowl, combine flour, salt, and baking soda"},
-				{order: 3, name:"mix butter", description:"In a large bowl, beat butter, then add the brown sugar and white sugar then mix"},
+				{order: 1, name:"preheat", description:"Preheat your oven to 350F",date: new Date()},
+				{order: 2, name:"mix dry", description:"In a medium bowl, combine flour, salt, and baking soda",date: new Date()},
+				{order: 3, name:"mix butter", description:"In a large bowl, beat butter, then add the brown sugar and white sugar then mix",date: new Date()},
 				{order: 4, name:"mix together", description:"Slowly add the dry ingredients from the medium bowl to the wet ingredients in the large bowl, mixing until the dry ingredients are totally combined"},
 				{order: 5, name:"chocolate chips", description:"Add chocolate chips"},
 				{order: 6, name:"make balls", description:"Scoop up a golf ball size amount of dough with a spoon and drop in onto a cookie sheet"},
@@ -50,18 +51,20 @@
 				{order: 8, name:"remove", description:"Using a spatula, lift cookies off onto wax paper or a cooling rack"},
 				{order: 9, name:"eat", description:"Eat and enjoy!"}
 			];
-			var columns3 = {
-				order: "step", // give column a custom name
-				name: {},
-				description: {label: "what to do", sortable: false}
-			};
-			var columns2 = {
-				name: {},
-				description: {label: "what to do", sortable: false}
-			};
 			
-			require(["dgrid/List", "dgrid/Grid", "dojo/_base/array", "dojo/domReady!"],
-				function(List, Grid, arrayUtil){
+			require(["dgrid/List", "dgrid/Grid", "dojo/_base/array", "dgrid/Editor", "dijit/form/DateTextBox", "dojo/domReady!"],
+				function(List, Grid, arrayUtil, Editor, DateTextBox){
+					var columns3 = {
+						order: "step", // give column a custom name
+						name: {},
+						description: {label: "what to do", sortable: false},
+						date: Editor({label: 'Date', field: 'date'}, DateTextBox),
+						
+					};
+					var columns2 = {
+						name: {},
+						description: {label: "what to do", sortable: false}
+					};
 					window.list = new List({}, "list");
 					list.renderArray(arrayUtil.map(data, function(item){
 						return item.name;
@@ -72,7 +75,13 @@
 					}, "grid");
 					grid.renderArray(data);
 				});
-				
+			function countWidgets(){
+				var count = 0;
+				for(var i in dijit.registry._hash){
+					count++;
+				};
+				alert("There are " + count + " widgets");
+			}				
 		</script>
 	</head>
 	<body class="claro">
@@ -82,8 +91,9 @@
 		<div class="clear">
 			<button onclick="grid.destroy();">Destroy Grid</button>
 			<button onclick="list.destroy();">Destroy List</button>
+			<button onclick="countWidgets();">Count Widgets</button>
 		</div>
 		<p>Try resizing the browser window after destroying the grid/list, to ensure
-			no event handlers are left dangling that cause errors.</p>
+			no event handlers are left dangling that cause errors. Also check to make sure there are no widgets (count of 0) after they are destroyed.</p>
 	</body>
 </html>

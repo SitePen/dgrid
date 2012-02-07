@@ -81,7 +81,7 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./List
 			}
 			return rule.children;
 		},
-		createRowCells: function(tag, each){
+		createRowCells: function(tag, each, subRows){
 			// summary:
 			//		Generates the grid for each row (used by renderHeader and and renderRow)
 			var tr, row = put("table.dgrid-row-table[role=presentation]"),
@@ -92,7 +92,7 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./List
 			}else{
 				var tbody = row;
 			}
-			var subRows = this.subRows;
+			subRows = subRows || this.subRows;
 			for(var si = 0, sl = subRows.length; si < sl; si++){
 				var subRow = subRows[si];
 				if(sl == 1 && !has("ie")){
@@ -141,9 +141,7 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./List
 				var data = object;
 				// we support the field, get, and formatter properties like the DataGrid
 				if(column.get){
-					// FIXME: signature of get is (inRowIndex, inItem)
-					// Is it possible for us to produce row index here for first arg?
-					data = column.get(0, object);
+					data = column.get(object);
 				}else if("field" in column && column.field != "_item"){
 					data = data[column.field];
 				}
@@ -156,7 +154,7 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./List
 				}else if(data != null){
 					td.appendChild(document.createTextNode(data));
 				}
-			});
+			}, options && options.subRows);
 			// row gets a wrapper div for a couple reasons:
 			//	1. So that one can set a fixed height on rows (heights can't be set on <table>'s AFAICT)
 			// 2. So that outline style can be set on a row when it is focused, and Safari's outline style is broken on <table>
