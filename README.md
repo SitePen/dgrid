@@ -191,6 +191,29 @@ HTML tables by using the `GridWithColumnSetsFromHtml` module.  ColumnSets are
 expressed in HTML via `colgroup` tags.  See the `complex_columns.html` test
 page for an example of this as well.
 
+#### Using GridFromHtml with the Dojo Parser
+
+Using the parser in Dojo 1.7 with modules designed purely in the AMD format can
+be a bit unwieldy, since at this time the parser still expects `data-dojo-type`
+values to reference variables accessible from the global context.  While existing
+Dojo 1.x components currently continue to expose globals, dgrid does not do so
+by default.  Thus, when intending to parse over dgrid components, it is necessary
+to expose the components via a global namespace first.  For example:
+
+    require(["dgrid/GridFromHtml", "dojo/parser", ..., "dojo/domReady!"],
+    function(GridFromHtml, parser, ...) {
+        window.dgrid = { GridFromHtml: GridFromHtml };
+        parser.parse();
+    });
+
+This can be seen in practice in some of the test pages, such as
+`GridFromHtml.html` and `dijit_layout.html`.
+
+Note that using AMD modules with the Dojo parser should become easier in
+Dojo 1.8, which plans to introduce some level of module ID support to the
+`data-dojo-type` attribute; see
+[Dojo ticket #13778](http://bugs.dojotoolkit.org/ticket/13778).
+
 ### Grid Styling
 
 dgrid components are designed to be highly CSS-driven for optimal performance and organization,
