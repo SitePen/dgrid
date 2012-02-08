@@ -61,17 +61,14 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 		steps = steps || 1;
 		do{
 			// move in the correct direction
-			if(nextSibling = current[steps < 0 ? 'previousSibling' : 'nextSibling']){
-				do{
-					current = nextSibling;
-					if(((current && current.className) + ' ').indexOf(targetClass + ' ') > -1){
-						// it's an element with the correct class name, counts as a real move
-						element = current;
-						steps += steps < 0 ? 1 : -1;
-						break;
-					}
-					// if the next sibling isn't a match, drill down to search
-				}while(nextSibling = current[steps < 0 ? 'lastChild' : 'firstChild']);
+			if((nextSibling = current[steps < 0 ? 'previousSibling' : 'nextSibling'])){
+				current = nextSibling;
+				if(((current && current.className) + ' ').indexOf(targetClass + ' ') > -1){
+					// it's an element with the correct class name, counts as a real move
+					element = current;
+					steps += steps < 0 ? 1 : -1;
+					break;
+				}
 			}else if((current = current.parentNode) == this.domNode){ // intentional assignment
 				// we stepped all the way out of the grid, given up now
 				break;
