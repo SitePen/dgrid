@@ -71,8 +71,10 @@ function createEditor(column){
 		isWidget = typeof editor != "string", // string == standard HTML input
 		args, cmp, node, className, putstr, handleChange;
 	
-	// TODO: deprecate widgetArgs in favor of editorArgs
-	// (leaving open the possibility of using it for HTML textarea, etc)
+	if (column.widgetArgs) {
+		kernel.deprecated("column.widgetArgs", "use column.editorArgs instead",
+			"dgrid 1.0");
+	}
 	args = column.editorArgs || column.widgetArgs || {};
 	if(typeof args == "function"){ args = args.call(grid, column); }
 	
@@ -110,7 +112,7 @@ function createEditor(column){
 		putstr = editor == "textarea" ? "textarea" :
 			"input[type=" + editor + "]";
 		cmp = put(putstr + ".dgrid-input", lang.mixin({
-			name: column.field, // TODO: item id?
+			name: column.field,
 			tabIndex: isNaN(column.tabIndex) ? -1 : column.tabIndex
 		}, args));
 		
@@ -118,7 +120,6 @@ function createEditor(column){
 			// IE<9 doesn't fire change events for all the right things,
 			// and it doesn't bubble.
 			// TODO: test IE9 quirks
-			// FIXME: blowing up here!
 			if(editor == "radio" || editor == "checkbox"){
 				// listen for clicks since IE doesn't fire change events properly for checks/radios
 				on(cmp, "click", function(evt){ handleChange(evt); });
@@ -147,15 +148,10 @@ function createSharedEditor(column, originalRenderCell){
 	function onblur(){
 		var parentNode = node.parentNode;
 		
-		// FIXME: currently having problems due to blur being multi-fired
-		// (Wasn't an issue previously because the listener was already unhooked)
-		
 		// remove the editor from the cell
 		parentNode.removeChild(node);
 		
 		// pass new value to original renderCell implementation for this cell
-		//TODO: test; is the cost of grid.row() worth hooking this centrally?
-		//(maybe expand info about active editor instead?)
 		originalRenderCell(column.grid.row(parentNode).data, cmp._dgridlastvalue,
 			parentNode);
 	}
@@ -188,7 +184,6 @@ function createSharedEditor(column, originalRenderCell){
 	if(isWidget){
 		// need to further wrap blur callback, to check for validity first,
 		// and to add a timeout to avoid throwing errors for key events after blur
-		// (TODO: verify if the timeout is still needed since we no longer destroy)
 		blurHandle = on.pausable(cmp, "blur", function(){
 			if(cmp.isValid && !cmp.isValid()){ return; }
 			onblur();
@@ -200,12 +195,22 @@ function createSharedEditor(column, originalRenderCell){
 	return cmp;
 }
 
-function showEditor(cmp, column, value, cell, object){
+function showEditor(cmp, column, cell, value){
 	// Places a shared editor into the newly-active cell in the column.
 	var grid = column.grid,
 		editor = column.editor,
-		editOn = column.editOn,
-		isWidget = cmp.domNode;
+		isWidget = cmp.domNode,
+		row, field, dirty;
+	
+	// if showEditor is called from the editOn branch (shared editor),
+	// need to grab latest value from data (dirty or otherwise)
+	if (typeof value == "undefined") {
+		row = grid.row(cell);
+		field = column.field;
+		dirty = grid.dirty && grid.dirty[row.id];
+		value = column.field in dirty ? dirty[column.field] :
+			column.get ? column.get(row.data) : row.data[column.field];
+	}
 	
 	// update value of input/widget first
 	if(isWidget){
@@ -278,7 +283,7 @@ return function(column, editor, editOn){
 					editOn, function(){
 				var cmp = column.editorInstance;
 				if(!column.canEdit || column.canEdit(object, value)){
-					showEditor(cmp, column, value, cell, object);
+					showEditor(cmp, column, cell);
 					// focus the newly-placed control
 					cmp.focus && cmp.focus(); // supported by form widgets and HTML inputs
 				}
@@ -288,7 +293,7 @@ return function(column, editor, editOn){
 		}else{
 			// always-on: create editor immediately upon rendering each cell
 			cmp = createEditor(column);
-			showEditor(cmp, column, value, cell, object);
+			showEditor(cmp, column, cell, value);
 			
 			if(isWidget){
 				// maintain reference for later cleanup
