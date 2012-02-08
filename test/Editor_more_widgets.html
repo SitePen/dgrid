@@ -42,11 +42,11 @@
 
 					var columns2 = [
 						{field: 'id', label: 'id'},
-						Editor({label: 'Toggle', field: 'bool2', widgetArgs: function(item){
+						Editor({label: 'Toggle', field: 'bool2', editorArgs: function(item){
 
 								return {checked: item.bool2, iconClass: "dijitCheckBoxIcon", label: "Toggle"};
 							}}, ToggleButton),
-						Editor({label: 'Time', field: 'time', widgetArgs: {
+						Editor({label: 'Time', field: 'time', editorArgs: {
 							timePattern: 'HH:mm:ss',
 							clickableIncrement: 'T00:15:00',
 							visibleIncrement: 'T00:15:00',
@@ -54,7 +54,7 @@
 						Editor({
 							label: 'Select Options',
 							field: 'bool',
-							widgetArgs: function(item){
+							editorArgs: function(item){
 								return {
 									style: "width:75px;",
 									options: [
@@ -64,9 +64,9 @@
 								};
 							}
 						}, Select),
-						Editor({label: 'Select Store', field: 'state', widgetArgs: {store: stateStore, maxHeight: 150, style: "width:120px;"}}, Select, "click"),
-						Editor({label: 'FilteringSelect Store', field: 'state', widgetArgs: {store: stateStore, maxHeight: 150, style: "width:120px;"}}, FilteringSelect),
-						Editor({label: 'Dijit/Editor', field: 'text', widgetArgs: {style: "height: 150px;"}}, DijitEditor)
+						Editor({label: 'Select Store', field: 'state', editorArgs: {store: stateStore, maxHeight: 150, style: "width:120px;"}}, Select, "click"),
+						Editor({label: 'FilteringSelect Store', field: 'state', editorArgs: {store: stateStore, maxHeight: 150, style: "width:120px;"}}, FilteringSelect),
+						Editor({label: 'Dijit/Editor', field: 'text', editorArgs: {style: "height: 150px;"}}, DijitEditor)
 						//Note that widgets that have multiple focusable children aren't supported by editOn functionality, for example: dijit/Editor
 					];
 

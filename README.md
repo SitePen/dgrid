@@ -494,7 +494,7 @@ second parameter.  For example:
     Editor({/* column definition here */}, TextBox)
 
 Additionally, arguments can be passed to the widget constructor by specifying a
-`widgetArgs` property in the column definition.  `widgetArgs` may be a
+`editorArgs` property in the column definition.  `editorArgs` may be a
 simple object, but it can also be a function, for cases where widget
 initialization parameters may depend on context.  In the latter case,
 the function will be passed the data object for the current row,

@@ -37,7 +37,7 @@
 					var columns = [
 						Editor({label: 'A Date', field: 'date'}, DateTextBox),
 						Editor({label: 'Real Number', field: 'floatNum'}, Slider),
-						Editor({label: 'Integer', field: 'integer', widgetArgs: {style: 'width: 5em;', constraints: {min:9,max:1550,places:0}}}, NumberSpinner),
+						Editor({label: 'Integer', field: 'integer', editorArgs: {style: 'width: 5em;', constraints: {min:9,max:1550,places:0}}}, NumberSpinner),
 						Editor({label: 'Text editable if checkbox checked + saved', field: 'text', canEdit: function(object){
 							return object.bool;
 						}}, "text", "dblclick"),
