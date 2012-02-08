@@ -71,11 +71,7 @@ function createEditor(column){
 		isWidget = typeof editor != "string", // string == standard HTML input
 		args, cmp, node, className, putstr, handleChange;
 	
-	if (column.widgetArgs) {
-		kernel.deprecated("column.widgetArgs", "use column.editorArgs instead",
-			"dgrid 1.0");
-	}
-	args = column.editorArgs || column.widgetArgs || {};
+	args = column.editorArgs || {};
 	if(typeof args == "function"){ args = args.call(grid, column); }
 	
 	if(isWidget){
@@ -241,6 +237,13 @@ return function(column, editor, editOn){
 	// (TODO: maybe should only accept from column def to begin with...)
 	column.editor = editor = editor || column.editor;
 	column.editOn = editOn = editOn || column.editOn;
+	
+	// warn for widgetArgs -> editorArgs; TODO: remove @ 1.0
+	if (column.widgetArgs) {
+		kernel.deprecated("column.widgetArgs", "use column.editorArgs instead",
+			"dgrid 1.0");
+		column.editorArgs = column.widgetArgs;
+	}
 	
 	column.renderCell = function(object, value, cell, options){
 		var cmp, // stores input/widget rendered in non-editOn code path
