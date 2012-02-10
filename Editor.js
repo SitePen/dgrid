@@ -204,7 +204,7 @@ function showEditor(cmp, column, cell, value){
 		row = grid.row(cell);
 		field = column.field;
 		dirty = grid.dirty && grid.dirty[row.id];
-		value = column.field in dirty ? dirty[column.field] :
+		value = (dirty && column.field in dirty) ? dirty[column.field] :
 			column.get ? column.get(row.data) : row.data[column.field];
 	}
 	
