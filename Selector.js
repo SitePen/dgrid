@@ -54,11 +54,19 @@ define(["dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put", "dojo/
 			aspect.before(grid, "_initSelectionEvents", function(){
 				on(this.headerNode, ".dgrid-selector-cell:mousedown,.dgrid-selector-cell:dgrid-cellfocusin", onSelect);
 			});
+			grid.on("dgrid-select", function(event){
+				grid.cell(event.row, column.id).element.input.checked = true;
+			});
+			grid.on("dgrid-deselect", function(event){
+				grid.cell(event.row, column.id).element.input.checked = false;
+			});
 		}
-
+		
+		var disabled = column.disabled;
 		var renderInput = typeof type == "function" ? type : function(value, cell, object){
-			var input = cell.input || (cell.input = put(cell, "div.ui-icon.dgrid-selector-input.dgrid-selector-"+type, {
-				tabIndex: isNaN(column.tabIndex) ? -1 : column.tabIndex
+			var input = cell.input || (cell.input = put(cell, "input.ui-icon.dgrid-selector-input[type="+type + "]", {
+				tabIndex: isNaN(column.tabIndex) ? -1 : column.tabIndex,
+				disabled: disabled && (typeof disabled == "function" ? disabled(object) : disabled)
 			}));
 
 			if(!grid._hasSelectorInputListener){
