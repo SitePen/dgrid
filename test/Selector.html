@@ -31,28 +31,14 @@
 							id: "ID",
 							col2: {label: 'Column 2', sortable: false},
 							col3: {label: 'Column 3'}
-						},
-						prevent;
+						};
 					
-					on(win.body(), "dgrid-select",
+					on(win.body(), "dgrid-select,dgrid-deselect",
 						function(event){
-							var msg = "selected" + (prevent ? " (prevented): " : ": ");
-							console.log(msg, event.grid.id, event.row);
-							if(prevent){ event.preventDefault(); }
+							var msg = (event.type == "dgrid-deselect" ? "de" : "") + "selected: ";
+							console.log(msg, event.grid.id, event.row.id);
 						}
 					);
-					on(win.body(), "dgrid-deselect",
-						function(event){
-							var msg = "deselected" + (prevent ? " (prevented): " : ": ");
-							console.log(msg, event.grid.id, event.row);
-							if(prevent){ event.preventDefault(); }
-						}
-					);
-					
-					on(document.getElementById("btnPreventDefaultOn"), "click",
-						function(){ prevent = true; });
-					on(document.getElementById("btnPreventDefaultOff"), "click",
-						function(){ prevent = false; });
 					
 					window.grid = dojo.declare([Grid, Selection, Keyboard])({
 						store: testStore,
@@ -75,10 +61,6 @@
 		</script>
 	</head>
 	<body class="claro">
-		<div>preventDefault on selection in all grids?
-			<button type="button" id="btnPreventDefaultOn">Yes</button>
-			<button type="button" id="btnPreventDefaultOff">No</button>
-		</div>
 		<h2>A grid with checkbox selectors</h2>
 		<div>
 			<button type="button" onclick="grid.setSelectionMode('none');">

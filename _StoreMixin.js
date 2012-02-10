@@ -106,9 +106,10 @@ function(declare, lang, Deferred, listen){
 				getFunc = function(id){
 					// returns a function to pass as a step in the promise chain,
 					// with the id variable closured
-					return self.getBeforePut ?
+					var data;
+					return (self.getBeforePut || !(data = self.row(id).data)) ?
 						function(){ return store.get(id); } :
-						function(){ return self.row(id).data; };
+						function(){ return data; };
 				};
 			
 			// function called within loop to generate a function for putting an item
