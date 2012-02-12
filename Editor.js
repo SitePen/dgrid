@@ -9,7 +9,8 @@ define([
 	"dojo/_base/sniff"
 ], function(kernel, lang, on, aspect, has, Grid, put){
 
-var ignoreChange = false; // used to ignore change on native input after esc/enter
+var ignoreChange = false, // used to ignore change on native input after esc/enter
+	activeCell; // tracks cell currently being edited
 
 function setProperty(grid, cellElement, oldValue, value){
 	// Updates dirty hash and fires dgrid-datachange event for a changed value.
@@ -46,7 +47,7 @@ function setProperty(grid, cellElement, oldValue, value){
 			}else{
 				// else keep the value the same
 				return oldValue;
-			}   
+			}
 		}
 	}
 	return value;
@@ -143,6 +144,7 @@ function createSharedEditor(column, originalRenderCell){
 	
 	function onblur(){
 		var parentNode = node.parentNode;
+		activeCell = null;
 		
 		// remove the editor from the cell
 		parentNode.removeChild(node);
@@ -167,19 +169,16 @@ function createSharedEditor(column, originalRenderCell){
 		}
 	}
 	
-	// don't allow event to confuse grid when editor is already active
-	// TODO: delegate from bodyNode via `.column-<id> .dgrid-input`?
-	//	(only if we also delegate initial editOn events...)
-	stopper = on(node, column.editOn, function(evt){
-		evt.stopPropagation();
-	});
+	// XXX: stop mousedown propagation to prevent confusing Keyboard mixin logic
+	// with certain widgets; perhaps revising KB's `handledEvent` would be better.
+	stopper = on(node, "mousedown", function(evt){ evt.stopPropagation(); });
 	
 	// hook up enter/esc key handling
 	keyHandle = on(focusNode, "keydown", dismissOnKey);
 	
 	if(isWidget){
 		// need to further wrap blur callback, to check for validity first,
-		// and to add a timeout to avoid throwing errors for key events after blur
+		// FIXME: perhaps this isn't a good idea, since the widget will be moved anyway...
 		blurHandle = on.pausable(cmp, "blur", function(){
 			if(cmp.isValid && !cmp.isValid()){ return; }
 			onblur();
@@ -208,20 +207,23 @@ function showEditor(cmp, column, cell, value){
 			column.get ? column.get(row.data) : row.data[column.field];
 	}
 	
-	// update value of input/widget first
-	if(isWidget){
-		cmp.set("value", value);
-	}else{
+	if(!isWidget){
+		// for regular inputs, we can update the value before even showing it
 		cmp.value = value;
 		if(editor == "radio" || editor == "checkbox"){ cmp.checked = !!value; }
 	}
-	// track previous value for short-circuiting or in case we need to revert
-	cmp._dgridlastvalue = value;
 	
 	cell.innerHTML = "";
 	put(cell, cmp.domNode || cmp);
-	// if component is a widget, call startup if this is the first placement
-	if(isWidget && !cmp._started){ cmp.startup(); }
+	
+	if(isWidget){
+		// for widgets, ensure startup is called before setting value,
+		// to maximize compatibility with flaky widgets like dijit/form/Select
+		if (!cmp._started){ cmp.startup(); }
+		cmp.set("value", value);
+	}
+	// track previous value for short-circuiting or in case we need to revert
+	cmp._dgridlastvalue = value;
 }
 
 // Editor column plugin function
@@ -261,7 +263,7 @@ return function(column, editor, editOn){
 				// widget may not have been created if editOn is used
 				widget && widget.destroyRecursive();
 			});
-		}		
+		}
 		
 		if(editOn){
 			// On first run, create one shared widget/input which will be swapped into
@@ -285,7 +287,9 @@ return function(column, editor, editOn){
 			on(cell.tagName == "TD" ? cell : cell.parentNode,
 					editOn, function(){
 				var cmp = column.editorInstance;
-				if(!column.canEdit || column.canEdit(object, value)){
+				if(activeCell != this &&
+						(!column.canEdit || column.canEdit(object, value))){
+					activeCell = this;
 					showEditor(cmp, column, cell);
 					// focus the newly-placed control
 					cmp.focus && cmp.focus(); // supported by form widgets and HTML inputs
