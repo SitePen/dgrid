@@ -189,6 +189,8 @@ function createSharedEditor(column, originalRenderCell){
 	}else{
 		column._editorBlurHandle = on.pausable(node, "blur", onblur);
 	}
+	// don't run handler until widget is activated
+	column._editorBlurHandle.pause();
 	
 	return cmp;
 }
@@ -227,8 +229,6 @@ function showEditor(cmp, column, cell, value){
 	}
 	// track previous value for short-circuiting or in case we need to revert
 	cmp._dgridlastvalue = value;
-	// for editOn instances, resume blur handler once editor is active
-	column._editorBlurHandle && column._editorBlurHandle.resume();
 }
 
 // Editor column plugin function
@@ -281,8 +281,15 @@ return function(column, editor, editOn){
 					(!column.canEdit || column.canEdit(object, value))){
 				activeCell = this;
 				showEditor(cmp, column, cell);
-				// focus the newly-placed control
-				cmp.focus && cmp.focus(); // supported by form widgets and HTML inputs
+				
+				// focus / blur-handler-resume logic is surrounded in a setTimeout
+				// to play nice with Keyboard's dgrid-cellfocusin as an editOn event
+				setTimeout(function(){
+					// focus the newly-placed control
+					cmp.focus && cmp.focus(); // supported by form widgets and HTML inputs
+					// resume blur handler once editor is focused
+					column._editorBlurHandle && column._editorBlurHandle.resume();
+				}, 0);
 			}
 		});
 		// initially render content in non-edit mode
