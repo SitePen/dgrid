@@ -254,66 +254,63 @@ return function(column, editor, editOn){
 		column.editorArgs = column.widgetArgs;
 	}
 	
-	column.renderCell = function(object, value, cell, options){
-		var cmp, // stores input/widget rendered in non-editOn code path
-			grid = column.grid;
+	column.renderCell = editOn ? function(object, value, cell, options){
+		// On first run, create one shared widget/input which will be swapped into
+		// the active cell.
+		if(!column.editorInstance){
+			column.editorInstance = createSharedEditor(column, originalRenderCell);
+		}
 		
-		if(editOn){
-			// On first run, create one shared widget/input which will be swapped into
-			// the active cell.
-			if(!column.editorInstance){
-				column.editorInstance = createSharedEditor(column, originalRenderCell);
-			}
-			
-			if (!cleanupAdded && isWidget) {
-				cleanupAdded = true;
-				// clean up shared widget instance when the grid is destroyed
-				aspect.before(grid, "destroy", function(){
-					column.editorInstance.destroyRecursive();
-				});
-			}
-			
-			// TODO: Consider using event delegation
-			// (Would require using dgrid's focus events for activating on focus,
-			// which we already advocate in README for optimal use)
-			
-			// in IE<8, cell is the child of the td due to the extra padding node
-			on(cell.tagName == "TD" ? cell : cell.parentNode,
-					editOn, function(){
-				var cmp = column.editorInstance;
-				if(activeCell != this &&
-						(!column.canEdit || column.canEdit(object, value))){
-					activeCell = this;
-					showEditor(cmp, column, cell);
-					// focus the newly-placed control
-					cmp.focus && cmp.focus(); // supported by form widgets and HTML inputs
-				}
+		if (!cleanupAdded && isWidget) {
+			cleanupAdded = true;
+			// clean up shared widget instance when the grid is destroyed
+			aspect.before(column.grid, "destroy", function(){
+				column.editorInstance.destroyRecursive();
 			});
-			// initially render content in non-edit mode
-			originalRenderCell(object, value, cell, options);
-		}else{
-			// always-on: create editor immediately upon rendering each cell
+		}
+		
+		// TODO: Consider using event delegation
+		// (Would require using dgrid's focus events for activating on focus,
+		// which we already advocate in README for optimal use)
+		
+		// in IE<8, cell is the child of the td due to the extra padding node
+		on(cell.tagName == "TD" ? cell : cell.parentNode,
+				editOn, function(){
+			var cmp = column.editorInstance;
+			if(activeCell != this &&
+					(!column.canEdit || column.canEdit(object, value))){
+				activeCell = this;
+				showEditor(cmp, column, cell);
+				// focus the newly-placed control
+				cmp.focus && cmp.focus(); // supported by form widgets and HTML inputs
+			}
+		});
+		// initially render content in non-edit mode
+		originalRenderCell(object, value, cell, options);
+	} : function(object, value, cell, options){
+		// always-on: create editor immediately upon rendering each cell
+		var grid = column.grid,
 			cmp = createEditor(column);
-			showEditor(cmp, column, cell, value);
+		showEditor(cmp, column, cell, value);
+		
+		if(isWidget){
+			// maintain reference for later cleanup
+			cell.widget = cmp;
 			
-			if(isWidget){
-				// maintain reference for later cleanup
-				cell.widget = cmp;
+			if(!cleanupAdded){
+				cleanupAdded = true;
 				
-				if(!cleanupAdded){
-					cleanupAdded = true;
-					
-					// add advice for cleaning up widgets in this column
-					aspect.before(grid, "removeRow", function(rowElement){
-						// destroy our widget during the row removal operation
-						var cellElement = grid.cell(rowElement, column.id).element,
-							widget = (cellElement.contents || cellElement).widget;
-						widget && widget.destroyRecursive();
-					});
-				}
+				// add advice for cleaning up widgets in this column
+				aspect.before(grid, "removeRow", function(rowElement){
+					// destroy our widget during the row removal operation
+					var cellElement = grid.cell(rowElement, column.id).element,
+						widget = (cellElement.contents || cellElement).widget;
+					widget && widget.destroyRecursive();
+				});
 			}
 		}
 	};
+	
 	return column;
 };
 });
