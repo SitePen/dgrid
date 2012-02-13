@@ -12,6 +12,13 @@ define([
 var ignoreChange = false, // used to ignore change on native input after esc/enter
 	activeCell; // tracks cell currently being edited
 
+function updateInputValue(input, value){
+	input.value = value;
+	if(input.type == "radio" || input.type == "checkbox"){
+		input.checked = !!value;
+	}
+}
+
 function setProperty(grid, cellElement, oldValue, value){
 	// Updates dirty hash and fires dgrid-datachange event for a changed value.
 	if(oldValue != value){
@@ -55,9 +62,13 @@ function setProperty(grid, cellElement, oldValue, value){
 
 function setPropertyFromWidget(grid, widget, value) {
 	// This function serves as a window into setProperty for widget editors.
+	var cellElement = widget.domNode.parentNode;
 	if(!widget.isValid || widget.isValid()){ // only update if valid
-		widget._dgridlastvalue = setProperty(
-			grid, widget.domNode.parentNode, widget._dgridlastvalue, value);
+		// XXX: setTimeout avoids errors in IE for editOn + autoSave in onblur.
+		setTimeout(function(){
+			widget._dgridlastvalue = setProperty(
+				grid, cellElement, widget._dgridlastvalue, value);
+		}, 0);
 	}
 }
 
@@ -144,7 +155,7 @@ function createSharedEditor(column, originalRenderCell){
 		focusNode = cmp.focusNode || node,
 		reset = isWidget ?
 			function(){ cmp.set("value", cmp._dgridlastvalue); } :
-			function(){ cmp.value = cmp._dgridlastvalue; },
+			function(){ updateInputValue(cmp, cmp._dgridlastvalue); },
 		keyHandle;
 	
 	function onblur(){
@@ -203,11 +214,8 @@ function showEditor(cmp, column, cell, value){
 			column.get ? column.get(row.data) : row.data[column.field];
 	}
 	
-	if(!isWidget){
-		// for regular inputs, we can update the value before even showing it
-		cmp.value = value;
-		if(editor == "radio" || editor == "checkbox"){ cmp.checked = !!value; }
-	}
+	// for regular inputs, we can update the value before even showing it
+	if(!isWidget){ updateInputValue(cmp, value); }
 	
 	cell.innerHTML = "";
 	put(cell, cmp.domNode || cmp);
