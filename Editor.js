@@ -293,7 +293,7 @@ return function(column, editor, editOn){
 			}
 		});
 		// initially render content in non-edit mode
-		originalRenderCell(object, value, cell, options);
+		return originalRenderCell(object, value, cell, options);
 	} : function(object, value, cell, options){
 		// always-on: create editor immediately upon rendering each cell
 		var grid = column.grid,
