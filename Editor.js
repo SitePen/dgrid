@@ -172,6 +172,7 @@ function createSharedEditor(column, originalRenderCell){
 			focusNode.blur();
 			ignoreChange = false;
 		}else if(key == 13 && column.dismissOnEnter !== false){ // enter: dismiss
+			// FIXME: Opera is "reverting" even in this case
 			focusNode.blur();
 		}
 	}
@@ -179,18 +180,8 @@ function createSharedEditor(column, originalRenderCell){
 	// hook up enter/esc key handling
 	keyHandle = on(focusNode, "keydown", dismissOnKey);
 	
-	if(isWidget){
-		// need to further wrap blur callback, to check for validity first,
-		// FIXME: perhaps this isn't a good idea, since the widget will be moved anyway...
-		column._editorBlurHandle = on.pausable(cmp, "blur", function(){
-			if(cmp.isValid && !cmp.isValid()){ return; }
-			onblur();
-		});
-	}else{
-		column._editorBlurHandle = on.pausable(node, "blur", onblur);
-	}
-	// don't run handler until widget is activated
-	column._editorBlurHandle.pause();
+	// hook up blur handler, but don't activate until widget is activated
+	(column._editorBlurHandle = on.pausable(cmp, "blur", onblur)).pause();
 	
 	return cmp;
 }
