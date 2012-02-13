@@ -46,15 +46,18 @@
 						componentTypes = {
 							// native input types
 							text: { generate: generateText },
-							checkbox: { generate: generateBoolStr },
-							radio: { generate: generateBoolStr },
+							checkbox: { generate: generateBool },
+							radio: { generate: generateBool },
 							textarea: { generate: generateText },
 							// TODO: support select?
 							// Dijits
 							"dijit/form/TextBox": { generate: generateText },
 							"dijit/form/SimpleTextarea": { generate: generateText },
-							"dijit/form/CheckBox": { generate: generateBoolStr },
-							"dijit/form/ValidationTextBox": { generate: generateText },
+							"dijit/form/CheckBox": { generate: generateBool },
+							"dijit/form/ValidationTextBox": {
+								generate: generateText,
+								editorArgs: { required: true }
+							},
 							"dijit/form/NumberSpinner": { generate: generateNumber },
 							"dijit/form/DateTextBox": { generate: generateDate },
 							"dijit/form/HorizontalSlider": {
@@ -85,8 +88,8 @@
 					function generateNumber() {
 						return Math.floor(Math.random() * 1000);
 					}
-					function generateBoolStr() {
-						return Math.random() > 0.5 ? "true" : "false";
+					function generateBool() {
+						return Math.random() > 0.5 ? true : false;
 					}
 					function generateDate() {
 						// return a date within the past year
