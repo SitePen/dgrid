@@ -70,17 +70,18 @@ function createEditor(column){
 		editOn = column.editOn,
 		grid = column.grid,
 		isWidget = typeof editor != "string", // string == standard HTML input
-		args, cmp, node, className, putstr, handleChange;
+		args, cmp, node, putstr, handleChange;
 	
 	args = column.editorArgs || {};
 	if(typeof args == "function"){ args = args.call(grid, column); }
 	
 	if(isWidget){
 		cmp = new editor(args);
+		node = cmp.focusNode || cmp.domNode;
 		
 		// Add dgrid-input to className to make consistent with HTML inputs.
 		// (Can't do this using className argument to constructor; causes issues)
-		(cmp.focusNode || cmp.domNode).className += " dgrid-input";
+		node.className += " dgrid-input";
 		
 		// connect to onBlur rather than watching value for changes, since
 		// the latter is delayed by setTimeouts and may also fire from our logic
@@ -108,7 +109,7 @@ function createEditor(column){
 		
 		putstr = editor == "textarea" ? "textarea" :
 			"input[type=" + editor + "]";
-		cmp = put(putstr + ".dgrid-input", lang.mixin({
+		cmp = node = put(putstr + ".dgrid-input", lang.mixin({
 			name: column.field,
 			tabIndex: isNaN(column.tabIndex) ? -1 : column.tabIndex
 		}, args));
@@ -126,6 +127,10 @@ function createEditor(column){
 		}
 	}
 	
+	// XXX: stop mousedown propagation to prevent confusing Keyboard mixin logic
+	// with certain widgets; perhaps revising KB's `handledEvent` would be better.
+	on(node, "mousedown", function(evt){ evt.stopPropagation(); });
+	
 	return cmp;
 }
 
@@ -140,7 +145,7 @@ function createSharedEditor(column, originalRenderCell){
 		reset = isWidget ?
 			function(){ cmp.set("value", cmp._dgridlastvalue); } :
 			function(){ cmp.value = cmp._dgridlastvalue; },
-		stopper, keyHandle, blurHandle;
+		keyHandle;
 	
 	function onblur(){
 		var parentNode = node.parentNode;
@@ -152,6 +157,8 @@ function createSharedEditor(column, originalRenderCell){
 		// pass new value to original renderCell implementation for this cell
 		originalRenderCell(column.grid.row(parentNode).data, cmp._dgridlastvalue,
 			parentNode);
+		
+		column._editorBlurHandle.pause();
 	}
 	
 	function dismissOnKey(evt){
@@ -169,22 +176,18 @@ function createSharedEditor(column, originalRenderCell){
 		}
 	}
 	
-	// XXX: stop mousedown propagation to prevent confusing Keyboard mixin logic
-	// with certain widgets; perhaps revising KB's `handledEvent` would be better.
-	stopper = on(node, "mousedown", function(evt){ evt.stopPropagation(); });
-	
 	// hook up enter/esc key handling
 	keyHandle = on(focusNode, "keydown", dismissOnKey);
 	
 	if(isWidget){
 		// need to further wrap blur callback, to check for validity first,
 		// FIXME: perhaps this isn't a good idea, since the widget will be moved anyway...
-		blurHandle = on.pausable(cmp, "blur", function(){
+		column._editorBlurHandle = on.pausable(cmp, "blur", function(){
 			if(cmp.isValid && !cmp.isValid()){ return; }
 			onblur();
 		});
 	}else{
-		blurHandle = on.pausable(node, "blur", onblur);
+		column._editorBlurHandle = on.pausable(node, "blur", onblur);
 	}
 	
 	return cmp;
@@ -199,7 +202,7 @@ function showEditor(cmp, column, cell, value){
 	
 	// if showEditor is called from the editOn branch (shared editor),
 	// need to grab latest value from data (dirty or otherwise)
-	if (typeof value == "undefined") {
+	if (column.editOn) {
 		row = grid.row(cell);
 		field = column.field;
 		dirty = grid.dirty && grid.dirty[row.id];
@@ -224,6 +227,8 @@ function showEditor(cmp, column, cell, value){
 	}
 	// track previous value for short-circuiting or in case we need to revert
 	cmp._dgridlastvalue = value;
+	// for editOn instances, resume blur handler once editor is active
+	column._editorBlurHandle && column._editorBlurHandle.resume();
 }
 
 // Editor column plugin function
@@ -232,7 +237,9 @@ return function(column, editor, editOn){
 	// summary:
 	//		Adds editing capability to a column's cells.
 	
-	var originalRenderCell = column.renderCell || Grid.defaultRenderCell;
+	var originalRenderCell = column.renderCell || Grid.defaultRenderCell,
+		isWidget = typeof editor != "string",
+		cleanupAdded;
 	
 	// accept arguments as parameters to Editor function, or from column def,
 	// but normalize to column def.
@@ -249,34 +256,21 @@ return function(column, editor, editOn){
 	
 	column.renderCell = function(object, value, cell, options){
 		var cmp, // stores input/widget rendered in non-editOn code path
-			grid = column.grid,
-			isWidget = typeof editor != "string";
-		
-		if(isWidget && !column._dijitCleanup){
-			// add advice for cleaning up widgets in this column
-			column._dijitCleanup = true;
-			
-			aspect.before(grid, "removeRow", function(rowElement){
-				// destroy our widget during the row removal operation
-				var cellElement = grid.cell(rowElement, column.id).element;
-				var widget = (cellElement.contents || cellElement).widget;
-				// widget may not have been created if editOn is used
-				widget && widget.destroyRecursive();
-			});
-		}
+			grid = column.grid;
 		
 		if(editOn){
 			// On first run, create one shared widget/input which will be swapped into
 			// the active cell.
 			if(!column.editorInstance){
 				column.editorInstance = createSharedEditor(column, originalRenderCell);
-				
-				if (isWidget) {
-					// clean up shared widget instance when the grid is destroyed
-					aspect.before(grid, "destroy", function(){
-						column.editorInstance.destroyRecursive();
-					});
-				}
+			}
+			
+			if (!cleanupAdded && isWidget) {
+				cleanupAdded = true;
+				// clean up shared widget instance when the grid is destroyed
+				aspect.before(grid, "destroy", function(){
+					column.editorInstance.destroyRecursive();
+				});
 			}
 			
 			// TODO: Consider using event delegation
@@ -305,8 +299,18 @@ return function(column, editor, editOn){
 			if(isWidget){
 				// maintain reference for later cleanup
 				cell.widget = cmp;
-				// call widget's startup once execution stack completes
-				setTimeout(function(){ cmp.startup(); }, 0);
+				
+				if(!cleanupAdded){
+					cleanupAdded = true;
+					
+					// add advice for cleaning up widgets in this column
+					aspect.before(grid, "removeRow", function(rowElement){
+						// destroy our widget during the row removal operation
+						var cellElement = grid.cell(rowElement, column.id).element,
+							widget = (cellElement.contents || cellElement).widget;
+						widget && widget.destroyRecursive();
+					});
+				}
 			}
 		}
 	};
