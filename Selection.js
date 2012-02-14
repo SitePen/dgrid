@@ -143,6 +143,16 @@ return declare([List], {
 			// listen for actions that should cause selections
 			on(this.contentNode, on.selector(selector, this.selectionEvents), focus);
 		}
+
+		on(this.contentNode, "keydown", function(event) {
+			// bail if not in ctrl mode
+			if (!event[ctrlEquiv]) return;
+			// select all
+			if (event.keyCode == 65) {
+				event.preventDefault();
+				grid.selectAll();
+			}
+		});
 	},
 	
 	select: function(row, toRow, value){
