@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Test Tree Complex Columns</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+		<meta name="viewport" content="width=570" />
+		<style type="text/css">
+			@import "../../dojo/resources/dojo.css";
+			@import "../css/skins/claro.css";
+			@import "../css/dgrid.css"; /* this ensures that are rules come after dgrid.css */
+			.heading {
+				font-weight: bold;
+				padding-bottom: 0.25em;
+			}
+			.grid { 
+				width: 700px;
+			}
+			.grid .column-set-0 { 
+				width: 50%;
+			}
+			
+			.ui-widget{
+				margin: 10px;
+			}
+			.dgrid-sort-arrow {
+				float: left;
+			}
+		</style>
+
+		<script type="text/javascript" src="../../dojo/dojo.js" 
+			data-dojo-config="async: true"></script>
+		<script type="text/javascript">
+			require(["dgrid/OnDemandGrid", "dgrid/GridWithColumnSetsFromHtml", "dgrid/ColumnSet", "dgrid/Tree", "dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!"],
+				function(Grid, GridFromHtml, ColumnSet, Tree, Selection, Keyboard, declare, testStore){
+
+					var	columnSets2 = [
+							[
+								[Tree({label:'Name', field:'name', sortable: false})
+									]],
+								
+							[
+								[{label: 'Area', field: 'area', colSpan: 2}],
+								[{label: 'Type', field: 'type'},
+								{label: 'Population', field: 'population'}]
+							]],
+
+						subRows2 = [
+							[
+								Tree({label:'Name', field:'name', sortable: false, colSpan: 2})
+
+							], [
+								{label: 'Area', field: 'area', colSpan: 2},
+								{label: 'Type', field: 'type'},
+								{label: 'Population', field: 'population', sortable: false}
+							]];
+					
+					window.gridNoColumnSets = declare([Grid, Selection, Keyboard])({
+						store: testCountryStore,
+						subRows: subRows2
+					}, "gridNoColumnSets");
+
+					window.grid = declare([Grid, ColumnSet, Selection, Keyboard])({
+						store: testCountryStore,
+						columnSets: columnSets2
+					}, "grid");
+				});
+		</script>
+	</head>
+	<body class="claro">
+		<h2>A Tree Grid with subrows (no ColumnSets)</h2>
+		<div id="gridNoColumnSets" class="grid"></div>
+
+		<h2>A Tree Grid with ColumnSets</h2>
+		<div id="grid" class="grid"></div>
+	</body>
+</html>
