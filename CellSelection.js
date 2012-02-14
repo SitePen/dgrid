@@ -118,6 +118,11 @@ return declare([Selection], {
 		}
 
 		return this.selection[object.row.id] && !!this.selection[object.row.id][object.column.id];
- 	}
+ 	},
+	clearSelection: function(exceptId){
+		// disable exceptId in cell selection, since it would require double parameters
+		exceptId = false;
+		this.inherited(arguments);
+	},
 });
 });
