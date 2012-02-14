@@ -3,12 +3,12 @@ define(["dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put", "dojo/
 		// accept arguments as parameters to Selector function, or from column def
 		column.type = type = type || column.type;
 		column.sortable = false;
-
-		var grid;
+		
+		var grid, recentInput, recentTimeout;
 		function onSelect(event){
-			if(event.type == "dgrid-cellfocusin" && (event.parentType == "mousedown" || event.keyCode != 32)){
-				// ignore "dgrid-cellfocusin" from "mousedown" and any keystrokes other than spacebar
-				return;
+			if(recentInput == this){
+				// an event recently occurred on this input so we cancel it so we don't have the click undoing the selection
+				return event.preventDefault();
 			}
 			var row = grid.row(event), lastRow = grid._lastSelected && grid.row(grid._lastSelected);
 
@@ -22,7 +22,7 @@ define(["dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put", "dojo/
 				if(row){
 					lastRow = event.shiftKey ? lastRow : null;
 					grid.select(row, lastRow||null, lastRow ? undefined : null);
-					grid._lastSelected = row.element;
+					grid._lastSelected = grid.selectionMode != "single" && row.element;
 				}else{
 					put(this, (grid.allSelected ? "!" : ".") + "dgrid-select-all");
 					grid[grid.allSelected ? "clearSelection" : "selectAll"]();
@@ -33,40 +33,44 @@ define(["dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put", "dojo/
 		function setupSelectionEvents(){
 			// register one listener at the top level that receives events delegated
 			grid._hasSelectorInputListener = true;
-			aspect.around(grid, "_handleSelect", function(_handleSelect){
-				return function(event, currentTarget){
-					var target = event.target;
-					// work around iOS potentially reporting text node as target
-					if(target.nodeType == 3){ target = target.parentNode; }
-					
-					while(!query.matches(target, ".dgrid-selector-cell", grid.contentNode)){
-						if(target == grid.contentNode || !(target = target.parentNode)){
-							break;
-						}
+			aspect.before(grid, "_initSelectionEvents", function(){
+				this.on(".dgrid-selector-input:click", onSelect);
+			});
+			function changeInput(value){
+				// creates a function that modifies the input on an event
+				return function(event){
+					var element = grid.cell(event.row, column.id).element;
+					element = (element.contents || element).input;
+					if(!element.disabled){
+						// only change the value if it is disabled
+						element.checked = value;
 					}
-					if(!target || target == grid.contentNode){
-						_handleSelect.call(this, event, currentTarget);
-					}else{
-						onSelect.call(target, event);
+					if(value){
+						// we record the most recent event to avoid undoing it in the next event (click)
+						recentInput = element;
+						clearTimeout(recentTimeout);
+						recentTimeout = setTimeout(function(){
+							// the most intuitive way to determine if the next event should be 
+							// cancelled seems more to do with time than any sequence of events,
+							// after a short pause a user naturally beings to expect that their
+							// next action (releasing the mouse) will have an affect. 
+							recentInput = false;
+						}, 500);
 					}
 				};
-			});
-			aspect.before(grid, "_initSelectionEvents", function(){
-				on(this.headerNode, ".dgrid-selector-cell:mousedown,.dgrid-selector-cell:dgrid-cellfocusin", onSelect);
-			});
-			grid.on("dgrid-select", function(event){
-				grid.cell(event.row, column.id).element.input.checked = true;
-			});
-			grid.on("dgrid-deselect", function(event){
-				grid.cell(event.row, column.id).element.input.checked = false;
-			});
+			}
+			// register listeners to the select and deselect events to change the input checked value
+			grid.on("dgrid-select", changeInput(true));
+			grid.on("dgrid-deselect", changeInput(false));
 		}
 		
 		var disabled = column.disabled;
 		var renderInput = typeof type == "function" ? type : function(value, cell, object){
 			var input = cell.input || (cell.input = put(cell, "input.ui-icon.dgrid-selector-input[type="+type + "]", {
 				tabIndex: isNaN(column.tabIndex) ? -1 : column.tabIndex,
-				disabled: disabled && (typeof disabled == "function" ? disabled(object) : disabled)
+				disabled: disabled && (typeof disabled == "function" ? disabled(object) : disabled),
+				checked: value,
+				lastValue: true // signals to the Keyboard.js to focus on it
 			}));
 
 			if(!grid._hasSelectorInputListener){
@@ -97,9 +101,6 @@ define(["dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put", "dojo/
 		column.renderHeaderCell = function(th){
 			column.renderCell(column.label || {}, null, th, null, true);
 		};
-
-		var cn = column.className;
-		column.className = "dgrid-selector-cell" + (cn ? "." + cn : "");
 
 		return column;
 	};

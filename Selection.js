@@ -76,7 +76,7 @@ return declare([List], {
 			}else{
 				var value;
 				if(mode == "extended" && !ctrlKey){
-					this.clearSelection();
+					this.clearSelection(this.row(row).id);
 				}
 				if(!event.shiftKey){
 					// null == toggle; undefined == true;
@@ -201,10 +201,12 @@ return declare([List], {
 	deselect: function(row, toRow){
 		this.select(row, toRow, false);
 	},
-	clearSelection: function(){
+	clearSelection: function(exceptId){
 		this.allSelected = false;
 		for(var id in this.selection){
-			this.deselect(id);
+			if(exceptId != id){
+				this.deselect(id);
+			}
 		}
 	},
 	selectAll: function(){

@@ -186,7 +186,7 @@ return declare([List], {
 						var inputFocused;
 						for(var i = 0;i < inputs.length; i++){
 							var input = inputs[i];
-							if(input.tabIndex != -1 || "lastValue" in input){
+							if((input.tabIndex != -1 || "lastValue" in input) && !input.disabled){
 								// focusing here requires the same workaround for IE<8,
 								// though here we can get away with doing it all at once.
 								if(has("ie") < 8){ input.style.position = "relative"; }
