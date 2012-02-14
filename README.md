@@ -236,7 +236,7 @@ For example, you could define a grid and CSS like so:
     <script>
     define(["dgrid/Grid"], function(Grid){
         var grid = new Grid({
-                columns: { // define the columns
+                columns: {
                     age: "Age",
                     first: "First Name",
                     ...
@@ -302,7 +302,7 @@ For example:
     define(["dgrid/OnDemandGrid"], function(Grid){
         grid = new Grid({
                 store: myStore, // a Dojo object store
-                columns: [ // define the columns
+                columns: [
                     {label: "Column 1", field: "col1", editable: true, sortable: true},
                     {label: "Column 2", field: "col2"},
                     ...
@@ -311,12 +311,12 @@ For example:
         ...
     });
 
-# Plugins
+# Mixins
 
-The following modules can be used as plugins to add extra functionality to a Grid.
+The following modules can be used to add extra functionality to a Grid.
 To use these, simply add the module as a mixin in a `dojo.declare` inheritance chain.
 For example, to create a grid based on OnDemandGrid with the
-Selection and Keyboard handling plugins, we could do the following:
+Selection and Keyboard handling mixins, we could do the following:
 
     define(["dojo", "dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Keyboard"], function(dojo, Grid, Selection, Keyboard){
         // create a grid based on plugins
@@ -336,7 +336,7 @@ You can also perform inline mixin and instantiation:
         ...
     }, "grid");
 
-Below is a synopsis of available plugins.
+Below is a synopsis of currently available mixins.
 
 ## ColumnSet
 
@@ -441,8 +441,9 @@ operate at the individual cell level (`true`, the default) or at the row level
 # Column Plugins
 
 The following modules are plugins designed for specific columns of a Grid.
-These plugins are used by creating an instance and specifying it as a column in
-`columns` (or `subRows`).
+Column plugin modules return a function; they are used by calling the function,
+passing the column definition object (and possibly other arguments),
+and specifying the result of the call as an entry in `columns` (or `subRows`).
 
 For example, to create a column structure where the first column has a
 tree expander and the second column has a checkbox, we could do this:
@@ -450,7 +451,7 @@ tree expander and the second column has a checkbox, we could do this:
     define(["dgrid/OnDemandGrid", "dgrid/Tree", "dgrid/Editor"], function(Grid, Tree, Editor){
         grid = new Grid({
                 store: myHierarchicalStore, // a Dojo object store
-                columns: [ // define the columns
+                columns: [
                     // first column will have a tree expander:
                     Tree({label: "Name", field: "name"}),
                     // second column will render with a checkbox: 
@@ -481,7 +482,7 @@ for a column.  When used in conjunction with the OnDemandGrid module, edited
 fields are directly correlated with the dirty state of the grid;
 changes can then be saved back to the store based on edits performed in the grid.
 
-The Editor module supports both standard HTML input elements and widgets.
+The Editor module supports both standard HTML input elements and Dijit widgets.
 To create an Editor which uses a simple input element, simply specify the type
 of the input element as the second parameter.  For example, the following would
 result in an Editor which presents a text field for each value in the column:
@@ -500,37 +501,94 @@ initialization parameters may depend on context.  In the latter case,
 the function will be passed the data object for the current row,
 and should return an args object which will be passed to the widget constructor.
 
-By default, Editors will always be active.  However, a third argument may be
-specified to the Editor function, which indicates which event (or events,
+By default, Editors will always be active.  However, a third "editOn" argument
+may be specified to the Editor function, which indicates which event (or events,
 comma-delimited) should switch the cell into edit mode.  In this case, the
 cell's data will display as normal until that event is fired, at which point
 the editor will be rendered, replacing the cell's content.  When the editor
 loses focus, it will disappear, replaced by the updated content.
 
-**Please note:** if attempting to trigger an Editor on focus (to accommodate
-keyboard and mouse), it is highly recommended to use dgrid's custom event,
-`dgrid-cellfocusin` instead of `focus`, to avoid confusion of events.  Note
-that this requires also mixing the Keyboard module into the Grid.
-
 By default, changes made to items via Editors do not immediately propagate to
 the store.  However, this can be enabled for a particular Editor by
 specifying `autoSave: true` in the column definition.
 
-For examples of Editor in use, see the `editor.html` and `editor2.html` test pages.
+For examples of Editor in use, see the `Editor.html` and `GridFromHtml_Editors.html`
+test pages.
+
+### Recommendations for the editOn Argument
+
+If attempting to trigger an Editor on focus (to accommodate
+keyboard and mouse), it is highly recommended to use dgrid's custom event,
+`dgrid-cellfocusin` instead of `focus`, to avoid confusion of events.  Note
+that this requires also mixing the Keyboard module into the Grid.
+
+If touch input is a concern for activating Editors, the easiest solution is to
+use the `click` event, which browsers on touch devices tend to normalize to
+fire on taps as well.  If a different event is desired for desktop browsers,
+it is possible to do something like the following:
+
+    require(
+        ["dgrid/OnDemandGrid", "dgrid/Editor", "dojo/has" /*, ... */],
+        function(Grid, Editor, has /*, ... */){
+            var columns = [
+                /* ... more columns here ... */
+                Editor({ name: "name", label: "Editable Name" }, "text",
+                    has("touch") ? "click" : "dblclick")
+            ];
+            /* ... create grid here ... */
+        }
+    );
 
 # Extensions
 
-The following are additional plugins which dwell outside dgrid's core feature set.
+The following are additional mixins which dwell outside dgrid's core feature set.
 Extensions live in the `extensions` subdirectory; their tests and
 css/image resources also live under respective `css/extensions` and
 `test/extensions` subdirectories.
 
 ## ColumnResizer
 
-The ColumnResizer plugin can be used to add column resizing functionality
+The ColumnResizer extension can be used to add column resizing functionality
 (accessible via mouse drag).  Originally based on
 [the gridx ColumnResizer module](https://github.com/evanhw/gridx/blob/master/gridx/modules/ColumnResizer.js),
 the plugin has been further developed for better performance and integration with dgrid.
+
+## ColumnHider
+
+TODOC
+
+## Pagination
+
+In contrast to the OnDemandList and OnDemandGrid modules, the Pagination
+extension implements classic discrete paging controls.  It displays a certain
+number of results at a given time, and provides a footer area with controls
+to switch between pages.
+
+**Note:** the Pagination extension should be mixed into List or Grid, **not**
+one of the OnDemand constructors, since those contain their own virtual scrolling
+logic.  Internally, Pagination inherits from the same _StoreMixin module
+inherited by the OnDemand prototypes for common integration with `dojo/store`.
+
+### Properties
+
+The Pagination extension exposes the following properties, which can be specified
+in the arguments object passed to the constructor:
+
+* `rowsPerPage`: Number of items to show on a given page. Default: `10`
+* `previousNextArrows`: Whether to show arrows which go to the previous/next
+  pages when clicked. Default: `true`
+* `firstLastArrows`: Whether to show arrows which jump to the first/last pages
+  when clicked. Default: `false`
+* `pagingLinks`: If a positive number is specified, renders a sequence of
+  page numbers around the current page, and for the first and last pages.  The
+  number specified indicates how many "neighbors" of the current page are rendered
+  in *each* direction.  If `0` is specified, no page number sequence is rendered.
+  Default: `2`
+* `pagingTextBox`: Whether to show a textbox in place of the current page
+  indicator, to allow immediately jumping to a specific page. Default: `false`
+* `pageSizeOptions`: An optional array specifying choices to present for the
+  `rowsPerPage` property in a drop-down. If unspecified or empty, no drop-down
+  is displayed.
 
 ## DnD
 
@@ -538,8 +596,8 @@ The DnD plugin can be used to add row drag'n'drop functionality.
 
 ### Requirements
 
-The DnD module assumes usage of the OnDemandList or OnDemandGrid module; thus, it
-expects a store to be in use.
+The DnD extensions assumes usage of the OnDemandList or OnDemandGrid module;
+thus, it expects a store to be in use.
 
 The store should be order-aware, supporting the `options.before` parameter
 on `add()` and `put()` calls to properly respond to DnD operations.
