@@ -25,8 +25,8 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 		//		Set to 0 (or false) to disable page links.
 		pagingLinks: 2,
 		// pageSizeOptions: Array[Number]
-		// 		This provides options for different page sizes in a dropdown.
-		//		If it is empty (default), no page size dropdown will be displayed.
+		// 		This provides options for different page sizes in a drop-down.
+		//		If it is empty (default), no page size drop-down will be displayed.
 		pageSizeOptions: [],
 		
 		showFooter: true,
