@@ -3,42 +3,59 @@ function(declare, listen, query, lang, dom, put, geom, cls, touch, has){
 
 var hasPointFromNode = has("touch") && webkitConvertPointFromNodeToPage;
 
-function addRowSpan(grid, span, startRow, column, id){
+function addRowSpan(table, span, startRow, column, id){
+	// loop through the rows of the table and add this column's id to
+	// the rows' column
 	for(var i=1; i<span; i++){
-		grid[startRow+i][column] = id;
+		table[startRow+i][column] = id;
 	}
 }
 function subRowAssoc(subRows){
+	// Take a sub-row structure and output an object with key=>value pairs
+	// The keys will be the column id's; the values will be the first-row column
+	// that column's resizer should be associated with.
+
 	var i = subRows.length,
 		l = i,
 		numCols = subRows[0].length,
-		grid = new Array(i);
+		table = new Array(i);
 
+	// create table-like structure in an array so it can be populated
+	// with row-spans and col-spans
 	while(i--){
-		grid[i] = new Array(numCols);
+		table[i] = new Array(numCols);
 	}
 
 	var associations = {};
 
 	for(i=0; i<l; i++){
-		var row = grid[i],
+		var row = table[i],
 			subRow = subRows[i];
+
+		// j: counter for table columns
+		// js: counter for subrow structure columns
 		for(var j=0, js=0; j<numCols; j++){
 			var cell = subRow[js], k;
 
+			// if something already exists in the table (row-span), skip this
+			// spot and go to the next
 			if(typeof row[j] != "undefined"){
 				continue;
 			}
 			row[j] = cell.id;
 
 			if(cell.rowSpan && cell.rowSpan > 1){
-				addRowSpan(grid, cell.rowSpan, i, j, cell.id);
+				addRowSpan(table, cell.rowSpan, i, j, cell.id);
 			}
+
+			// colSpans are only applicable in the second or greater rows
+			// and only if the colSpan is greater than 1
 			if(i>0 && cell.colSpan && cell.colSpan > 1){
 				for(k=1; k<cell.colSpan; k++){
+					// increment j and assign the id since this is a span
 					row[++j] = cell.id;
 					if(cell.rowSpan && cell.rowSpan > 1){
-						addRowSpan(grid, cell.rowSpan, i, j, cell.id);
+						addRowSpan(table, cell.rowSpan, i, j, cell.id);
 					}
 				}
 			}
