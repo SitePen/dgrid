@@ -21,6 +21,9 @@
 			.grid .field-col1 {
 				width: 100px;
 			}
+			.grid .field-col2 {
+				width: 100px;
+			}
 			.grid .field-col4 {
 				width: 500px;
 			}
@@ -55,8 +58,11 @@
 							{label: 'Column 1', field: 'col1', rowSpan: 2},
 							{label: 'Column 4', field: 'col4'}
 						], [
-							{label: 'Column 3', field: 'col3', colSpan: 2},
+							{label: 'Column 3', field: 'col3', colSpan: 2, rowSpan: 2},
 							{label: 'Column 5', field: 'col5'}
+						], [
+							{label: 'Column 2', field: 'col5'},
+							{label: 'Column 1', field: 'col1'}
 						]]
 					}, "gridNoColumnSets");
 			});

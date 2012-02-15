@@ -1,7 +1,54 @@
-define(["dojo/_base/declare", "dojo/on", "dojo/query", "dojo/dom", "put-selector/put", "dojo/dom-geometry", "dojo/dom-class", "dojo/touch", "dojo/has", "dojo/_base/html", "xstyle/css!../css/extensions/ColumnResizer.css"],
-function(declare, listen, query, dom, put, geom, cls, touch, has){
+define(["dojo/_base/declare", "dojo/on", "dojo/query", "dojo/_base/lang", "dojo/dom", "put-selector/put", "dojo/dom-geometry", "dojo/dom-class", "dojo/touch", "dojo/has", "dojo/_base/html", "xstyle/css!../css/extensions/ColumnResizer.css"],
+function(declare, listen, query, lang, dom, put, geom, cls, touch, has){
 
 var hasPointFromNode = has("touch") && webkitConvertPointFromNodeToPage;
+
+function addRowSpan(grid, span, startRow, column, id){
+	for(var i=1; i<span; i++){
+		grid[startRow+i][column] = id;
+	}
+}
+function subRowAssoc(subRows){
+	var i = subRows.length,
+		l = i,
+		numCols = subRows[0].length,
+		grid = new Array(i);
+
+	while(i--){
+		grid[i] = new Array(numCols);
+	}
+
+	var associations = {};
+
+	for(i=0; i<l; i++){
+		var row = grid[i],
+			subRow = subRows[i];
+		for(var j=0, js=0; j<numCols; j++){
+			var cell = subRow[js], k;
+
+			if(typeof row[j] != "undefined"){
+				continue;
+			}
+			row[j] = cell.id;
+
+			if(cell.rowSpan && cell.rowSpan > 1){
+				addRowSpan(grid, cell.rowSpan, i, j, cell.id);
+			}
+			if(i>0 && cell.colSpan && cell.colSpan > 1){
+				for(k=1; k<cell.colSpan; k++){
+					row[++j] = cell.id;
+					if(cell.rowSpan && cell.rowSpan > 1){
+						addRowSpan(grid, cell.rowSpan, i, j, cell.id);
+					}
+				}
+			}
+			associations[cell.id] = subRows[0][j].id;
+			js++;
+		}
+	}
+
+	return associations;
+}
 
 return declare([], {
 	resizeNode: null,
@@ -44,9 +91,18 @@ return declare([], {
 		var grid = this;
 		grid.gridWidth = grid.headerNode.clientWidth - 1; //for some reason, total column width needs to be 1 less than this
 
+		var assoc;
+		if(this.columnSets && this.columnSets.length){
+			var csi = this.columnSets.length;
+			while(csi--){
+				assoc = dojo.mixin(assoc||{}, subRowAssoc(this.columnSets[csi]));
+			}
+		}else if(this.subRows && this.subRows.length > 1){
+			assoc = subRowAssoc(this.subRows);
+		}
+
 		var colNodes = query(".dgrid-cell", grid.headerNode),
 			i = colNodes.length;
-
 		while(i--){
 			var colNode = colNodes[i],
 				id = colNode.columnId,
@@ -63,7 +119,8 @@ return declare([], {
 				put(headerTextNode, childNodes[0]);
 			}
 
-			put(colNode, headerTextNode, "div.dgrid-resize-handler.resizeNode-"+id).columnId = id;
+			put(colNode, headerTextNode, "div.dgrid-resize-handler.resizeNode-"+id).columnId = 
+				assoc ? assoc[id] : id;
 		}
 
 		if(!grid.mouseMoveListen){
@@ -105,8 +162,8 @@ return declare([], {
 						webkitConvertPointFromNodeToPage(grid.bodyNode, new WebKitPoint(0, 0)).x : 
 						geom.position(grid.bodyNode).x;
 						
-		grid._targetCell = target.parentNode.parentNode;
-		
+		grid._targetCell = query(".column-" + target.columnId, grid.headerNode)[0];
+
 		// show resizer inlined
 		if(!grid._resizer){
 			grid._resizer = put(grid.domNode, "div.dgrid-column-resizer");
@@ -131,12 +188,21 @@ return declare([], {
 		if(!this._resizedColumns){
 			var colNodes = query(".dgrid-cell", this.headerNode);
 
-			for(var i=0, colNode; colNode = colNodes[i]; i++){
-				var id = colNode.columnId,
-					width = colNode.offsetWidth;
-
-				this.resizeColumnWidth(id, width);
+			if(this.columnSets && this.columnSets.length){
+				colNodes = colNodes.filter(function(node){
+					var idx = node.columnId.split("-");
+					return idx[0] == "0";
+				});
+			}else if(this.subRows && this.subRows.length > 1){
+				colNodes = colNodes.filter(function(node){
+					return node.columnId.charAt(0) == "0";
+				});
 			}
+
+			colNodes.forEach(function(colNode){
+				this.resizeColumnWidth(colNode.columnId, colNode.offsetWidth);
+			}, this);
+
 			this._resizedColumns = true;
 		}
 		dom.setSelectable(this.domNode, true);
@@ -147,7 +213,7 @@ return declare([], {
 			obj = this._getResizedColumnWidths(),//get current total column widths before resize
 			totalWidth = obj.totalWidth,
 			lastCol = obj.lastColId,
-			lastColWidth = query("#" + this.domNode.id + " .column-"+lastCol)[0].offsetWidth;
+			lastColWidth = query(".column-"+lastCol, this.headerNode)[0].offsetWidth;
 
 		if(cell.columnId != lastCol){
 			if(totalWidth + delta < this.gridWidth) {
@@ -197,8 +263,8 @@ return declare([], {
 		if(e.pageX){
 			posX = e.pageX;
 		}else if(e.clientX){
-			posX = e.clientX + document.body.scrollLeft
-				+ document.documentElement.scrollLeft;
+			posX = e.clientX + document.body.scrollLeft +
+				document.documentElement.scrollLeft;
 		}
 		return posX;
 	},
@@ -206,9 +272,21 @@ return declare([], {
 		//Summary:
 		//      returns object containing new column width and column id
 		var totalWidth = 0,
-			colNodes = query(".dgrid-cell", this.headerNode),
-			i = colNodes.length;
+			colNodes = query(".dgrid-cell", this.headerNode);
 
+		// For ColumnSets and subRows, only the top row of columns matters
+		if(this.columnSets && this.columnSets.length){
+			colNodes = colNodes.filter(function(node){
+				var idx = node.columnId.split("-");
+				return idx[1] == "0";
+			});
+		}else if(this.subRows && this.subRows.length > 1){
+			colNodes = colNodes.filter(function(node){
+				return node.columnId.charAt(0) == "0";
+			});
+		}
+
+		var i = colNodes.length;
 		if(!i){ return {}; }
 
 		var lastColId = colNodes[i-1].columnId;
