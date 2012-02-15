@@ -10,6 +10,12 @@ define([
 	"dojo/_base/sniff"
 ], function(declare, aspect, on, List, lang, has, put, Deferred){
 
+// Since Keyboard casues problems on Android devices, and keyboard doesn't play a role
+// on mobile devices, there's no reason to add any of this.
+if(has("touch")) {
+	return declare(null, {});
+}
+
 var delegatingInputTypes = {
 		checkbox: 1,
 		radio: 1,

@@ -16,6 +16,15 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 		cellNavigation: true,
 		tabableHeader: true,
 		showHeader: true,
+		// expandoMargin: Number
+		//		The margin increments for Trees
+		expandoMargin: 19,
+		// expandoMinimumStart: Number
+		//		The minimum margin to start the expando at, instead of 0
+		//		Helpful in use with Android devices and control "hit area" sizes
+		//		See the Tree.html test
+		expandoMinimumStart: 0,
+		
 		column: function(target){
 			// summary:
 			//		Get the column object by node, or event, or a columnId

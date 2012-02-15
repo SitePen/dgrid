@@ -18,7 +18,7 @@ return function(column){
 		// create the expando
 		var dir = grid.isRTL ? "right" : "left";
 		var expando = put(td, "div.dgrid-expando-icon" + (mayHaveChildren ? ".ui-icon.ui-icon-triangle-1-e" : "") +
-			"[style=margin-" + dir + ": " + (level * 19) + "px; float: " + dir + "]");
+			"[style=margin-" + dir + ": " + ((level * grid.expandoMargin) + grid.expandoMinimumStart) + "px; float: " + dir + "]");
 		expando.innerHTML = "&nbsp;"; // for opera to space things properly
 		originalRenderCell.call(this, object, value, td, options);
 		expando.level = level;
