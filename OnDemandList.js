@@ -274,7 +274,7 @@ return declare([List, _StoreMixin], {
 						preload.count -= count;
 						var beforeNode = preloadNode,
 							keepScrollTo, queryRowsOverlap = grid.queryRowsOverlap,
-							below = preloadNode.rowIndex > 0; 
+							below = preloadNode.rowIndex > 0 && preload; 
 						if(below){
 							// add new rows below
 							var previous = preload.previous;
@@ -340,6 +340,17 @@ return declare([List, _StoreMixin], {
 									// row height, we may need to adjust the scroll once they are filled in
 									// so we don't "jump" in the scrolling position
 									scrollNode.scrollTop += beforeNode.offsetTop - keepScrollTo;
+								}
+								if(below){
+									// if it is below, we will use the total from the results to update 
+									// the count in case the total changes as later pages are retrieved
+									// (not uncommon when total counts are estimated for db perf reasons)
+									Deferred.when(results.total || results.length, function(total){
+										// recalculate the count
+										below.count = total - below.node.rowIndex;
+										// readjust the height
+										adjustHeight(below);
+									});
 								}
 						});
 						preload = preload.previous;
