@@ -48,6 +48,9 @@
 					on(document.getElementById("add-country"), "click", function(){
 						testCountryStore.put({ id: 'GR', name:'Greece', type:'country', parent: 'EU'});
 					});
+					on(document.getElementById("remove-country"), "click", function(){
+						testCountryStore.remove('GR');
+					});
 					on(document.getElementById("add-continent"), "click", function(){
 						testCountryStore.put({ id: 'NE', name:'My New Europe', type:'continent'});
 	        			testCountryStore.put({ id: 'NI', name:'My New Italy', type:'country', parent: 'NE'});
@@ -72,6 +75,7 @@
 		<button id="save">Save</button>
 		<button id="add-continent">Add Continent</button>
 		<button id="add-country">Add Greece To Europe</button>
+		<button id="remove-country">Remove Greece</button>
 		<button id="delete">Delete Selected</button>
 		<button id="edit-continent">Edit Europe</button>
 	</body>

@@ -1,4 +1,6 @@
-define(["dojo/_base/declare", "dojo/on", "./List", "put-selector/put", "dojo/has", "dojo/query"], function(declare, on, List, put, has){
+define(["dojo/_base/declare", "dojo/_base/Deferred", "dojo/on", "./List", "put-selector/put", "dojo/has", "dojo/query"],
+function(declare, Deferred, on, List, put, has){
+
 var ctrlEquiv = has("mac") ? "metaKey" : "ctrlKey";
 return declare([List], {
 	// summary:
@@ -157,30 +159,28 @@ return declare([List], {
 			// indicates a toggle
 			value = !previousValue;
 		}
-		var element = row.element,
-			notPrevented = true;
-		if(value == previousValue ||
-			(!element || (notPrevented = on.emit(element, "dgrid-" + (value ? "select" : "deselect"), {
-			cancelable: true,
-			bubbles: true,
-			row: row,
-			grid: this
-		})))){
-			if(!value && !this.allSelected){
-				delete this.selection[row.id];
+		var element = row.element;
+		if(!value && !this.allSelected){
+			delete this.selection[row.id];
+		}else{
+			selection[row.id] = value;
+		}
+		if(element){
+			// add or remove classes as appropriate
+			if(value){
+				put(element, ".dgrid-selected.ui-state-active");
 			}else{
-				selection[row.id] = value;
-			}
-			if(element){
-				// add or remove classes as appropriate
-				if(value){
-					put(element, ".dgrid-selected.ui-state-active");
-				}else{
-					put(element, "!dgrid-selected!ui-state-active");
-				}
+				put(element, "!dgrid-selected!ui-state-active");
 			}
 		}
-		if(toRow && notPrevented){
+		if(value != previousValue && element){
+			on.emit(element, "dgrid-" + (value ? "select" : "deselect"), {
+				bubbles: true,
+				row: row,
+				grid: this
+			});
+		}
+		if(toRow){
 			if(!toRow.element){
 				toRow = this.row(toRow);
 			}
@@ -235,15 +235,20 @@ return declare([List], {
 	},
 	
 	renderArray: function(){
-		var rows = this.inherited(arguments);
-		var selection = this.selection;
-		for(var i = 0; i < rows.length; i++){
-			var row = this.row(rows[i]);
-			var selected = row.id in selection ? selection[row.id] : this.allSelected;
-			if(selected){
-				this.select(row, null, selected);
+		var grid = this,
+			rows = this.inherited(arguments);
+		
+		Deferred.when(rows, function(rows){
+			var selection = grid.selection,
+				i, row, selected;
+			for(i = 0; i < rows.length; i++){
+				row = grid.row(rows[i]);
+				selected = row.id in selection ? selection[row.id] : grid.allSelected;
+				if(selected){
+					grid.select(row, null, selected);
+				}
 			}
-		}
+		});
 		return rows;
 	}
 });

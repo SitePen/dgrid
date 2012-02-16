@@ -212,12 +212,7 @@
 						
 						artists.refresh();	//	clear contents
 						artists.renderArray(art);
-						
-						// need this in a setTimeout so that this selection event completes
-						// first (for genres.selection[0] check in artists select handler)
-						setTimeout(function(){
-							artists.select(0); //	reselect "all", triggering albums+grid refresh
-						});
+						artists.select(0); //	reselect "all", triggering albums+grid refresh
 					});
 
 					artists.on("dgrid-select", function(e){
