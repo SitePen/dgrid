@@ -67,7 +67,6 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 					// it's an element with the correct class name, counts as a real move
 					element = current;
 					steps += steps < 0 ? 1 : -1;
-					break;
 				}
 			}else if((current = current.parentNode) == this.domNode){ // intentional assignment
 				// we stepped all the way out of the grid, given up now
