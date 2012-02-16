@@ -12,9 +12,7 @@ define([
 
 // Since Keyboard casues problems on Android devices, and keyboard doesn't play a role
 // on mobile devices, there's no reason to add any of this.
-if(has("touch")) {
-	return declare(null, {});
-}
+
 
 var delegatingInputTypes = {
 		checkbox: 1,
@@ -134,7 +132,7 @@ return declare([List], {
 			
 			on(areaNode, "mousedown", function(event){
 				if(!handledEvent(event)){
-					focusOnCell(event.target, event);
+					focusOnCell(event.target, event, has("touch"));
 				}
 			});
 			
