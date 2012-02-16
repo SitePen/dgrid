@@ -156,6 +156,19 @@ return declare([List, _StoreMixin], {
 				var visibleBottom = scrollNode.offsetHeight + visibleTop;
 				var priorPreload, preloadNode, preload = grid.preload;
 				var lastScrollTop = grid.lastScrollTop;
+				
+				// XXX: I do not know why this happens.
+				// munging the actual location of the viewport relative to the preload node by a few pixels in either
+				// direction is necessary because at least WebKit on Windows seems to have an error that causes it to
+				// not quite get the entire element being focused in the viewport during keyboard navigation,
+				// which means it becomes impossible to load more data using keyboard navigation because there is
+				// no more data to scroll to to trigger the fetch.
+				// 1 is arbitrary and just gets it to work correctly with our current test cases; don’t wanna go
+				// crazy and set it to a big number without understanding more about what is going on.
+				// wondering if it has to do with border-box or something, but changing the border widths does not
+				// seem to make it break more or less, so I do not know…
+				var mungeAmount = 1;
+				
 				grid.lastScrollTop = visibleTop;
 				
 				function removeDistantNodes(preload, distanceOff, traversal, below){
@@ -226,10 +239,10 @@ return declare([List, _StoreMixin], {
 					var preloadTop = preloadNode.offsetTop;
 					var preloadHeight;
 					
-					if(visibleBottom < preloadTop){
+					if(visibleBottom + mungeAmount < preloadTop){
 						// the preload is below the line of sight
 						preload = preload.previous;
-					}else if(visibleTop > (preloadTop + (preloadHeight = preloadNode.offsetHeight))){
+					}else if(visibleTop - mungeAmount > (preloadTop + (preloadHeight = preloadNode.offsetHeight))){
 						// the preload is above the line of sight
 						preload = preload.next;
 					}else{
