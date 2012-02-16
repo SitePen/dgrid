@@ -29,9 +29,9 @@
 		<script type="text/javascript">
 			// callbacks for button clicks
 			function showDeclDialog(){ dlgDecl.show(); }
-			function showProgContentDialog(){ dlgProgContent.show(); }
 			
 			require(["dgrid/OnDemandGrid",
+				"dgrid/extensions/DijitRegistry",
 				"dijit/Dialog",
 				"dojo/_base/lang",
 				"dojo/_base/declare",
@@ -45,7 +45,7 @@
 				// non-returns
 				"dgrid/test/data/base",
 				"dojo/domReady!"
-			], function(Grid, Dialog, lang, declare, parser){
+			], function(Grid, DijitRegistry, Dialog, lang, declare, parser){
 			
 				var
 					gridCols = window.gridCols = {
@@ -54,19 +54,10 @@
 						col3: 'Column 3',
 						col4: 'Column 4'
 					},
-					//args to be passed to programmatic dgrid instances
-					gridArgs = {
-						store: testStore,
-						columns: gridCols
-					};
+					CustomGrid = declare([Grid, DijitRegistry]);
 				
 				// simply passing columns via data-dojo-props, don't want GridFromHtml
-				window.DGrid = Grid;
-				
-				// test setting a dgrid as content of a dialog programmatically
-				window.dlgProgContent = new Dialog({
-					content: new Grid(lang.mixin({id: "gridDlgProgContent"}, gridArgs))
-				});
+				window.dgrid = { Grid: CustomGrid };
 				
 				parser.parse();
 			});
@@ -77,10 +68,6 @@
 			<div data-dojo-type="dijit.Toolbar" class="bcTop"
 				data-dojo-props="id:'tbTop', region:'top'">
 				<span data-dojo-type="dijit.form.Button"
-					data-dojo-props="onClick: showProgContentDialog">
-					Show programmatic dialog w/ dgrid as content
-				</span>
-				<span data-dojo-type="dijit.form.Button"
 					data-dojo-props="onClick: showDeclDialog">
 					Show declarative dialog
 				</span>
@@ -88,39 +75,29 @@
 			<div data-dojo-type="dijit.layout.ContentPane"
 				data-dojo-props="id:'cpLeft', region:'left'">
 				<!-- left: dgrid inside contentpane -->
-				<div data-dojo-type="DGrid" id="gridBCCP" class="bcLeft"
+				<div data-dojo-type="dgrid.Grid" id="gridBCCP" class="bcLeft"
 					data-dojo-props="store: testStore, columns: gridCols"></div>
 			</div>
-			<!-- right: dgrid directly in bordercontainer region.
-				This doesn't seem to work at all.
-				NOTE: this won't work with legacy parser... (no region on dgrid)
-			<div data-dojo-type="DGrid" id="gridBC" class="bcRight"
-				data-dojo-props="store: testStore, columns: gridCols, region: 'right'"></div>
-			-->
 			<!-- center: tabcontainer -->
 			<div data-dojo-type="dijit.layout.TabContainer" class="bcCenter" id="tc"
 				data-dojo-props="region: 'center'">
 				<!-- initial tab: dgrid inside contentpane -->
 				<div data-dojo-type="dijit.layout.ContentPane"
 					data-dojo-props="id: 'tab1', title: 'Tab 1'">
-					<div data-dojo-type="DGrid" id="gridTab1" class="gridTab"
+					<div data-dojo-type="dgrid.Grid" id="gridTab1" class="gridTab"
 						data-dojo-props="store: testStore, columns: gridCols"></div>
 				</div>
 				<!-- tab 2: dgrid inside contentpane again, but not initially visible -->
 				<div data-dojo-type="dijit.layout.ContentPane"
 					data-dojo-props="id: 'tab2', title: 'Tab 2'">
-					<div data-dojo-type="DGrid" id="gridTab2" class="gridTab"
+					<div data-dojo-type="dgrid.Grid" id="gridTab2" class="gridTab"
 						data-dojo-props="store: testStore, columns: gridCols"></div>
 				</div>
-				<!-- tab 3: dgrid directly as tab child
-					Doesn't seem to work (tab doesn't appear) -->
-				<div data-dojo-type="DGrid" id="gridTab3" class="gridTab"
-					data-dojo-props="store: testStore, columns: gridCols, title: 'Tab 3'"></div>
 			</div>
 		</div>
 		<!-- declarative dialog w/ dgrid inside -->
 		<div data-dojo-type="dijit.Dialog" id="dlgDecl" data-dojo-id="dlgDecl">
-			<div data-dojo-type="DGrid" id="gridDlgDecl"
+			<div data-dojo-type="dgrid.Grid" id="gridDlgDecl"
 				data-dojo-props="store: testStore, columns: gridCols"></div>
 		</div>
 	</body>

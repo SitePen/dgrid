@@ -1,6 +1,6 @@
-define(["dojo/_base/declare", "dojo/on", "dojo/query", "dojo/dom", "put-selector/put", "dojo/dom-geometry", "dojo/dom-class", "dojo/_base/html", "xstyle/css!../css/extensions/ColumnResizer.css"],
-function(declare, listen, query, dom, put, geom, cls){
-	
+define(["dojo/_base/declare", "dojo/on", "dojo/query", "dojo/dom", "put-selector/put", "dojo/dom-geometry", "dojo/dom-class", "dojo/touch", "dojo/has", "dojo/_base/html", "xstyle/css!../css/extensions/ColumnResizer.css"],
+function(declare, listen, query, dom, put, geom, cls, touch, has){
+
 return declare([], {
 	resizeNode: null,
 	minWidth: 40,	//minimum column width in px
@@ -32,17 +32,18 @@ return declare([], {
 			while(childNodes.length > 0){
 				put(headerTextNode, childNodes[0]);
 			}
-			listen(put(colNode, headerTextNode, "div.dgrid-resize-handler.resizeNode-"+id), "mousedown", function(e){
+			listen(put(colNode, headerTextNode, "div.dgrid-resize-handler.resizeNode-"+id), touch.press, function(e){
+					e.preventDefault(); // Added for mobile
 					grid._resizeMouseDown(e);
 			});
 		}
 		if(!grid.mouseMoveListen){
-			grid.mouseMoveListen = listen.pausable(document.body, "mousemove", function(e){
+			grid.mouseMoveListen = listen.pausable(document.body, touch.move, function(e){
 				// while resizing, update the position of the resizer bar
 				if(!grid._resizing){return;}
 				grid._updateResizerPosition(e);
 			});
-			grid.mouseUpListen = listen.pausable(document.body, "mouseup", function(e){
+			grid.mouseUpListen = listen.pausable(document.body, touch.release, function(e){
 				if(!grid._resizing){return;}
 				grid._resizeMouseUp(e);
 				grid.mouseMoveListen.pause();
@@ -64,7 +65,15 @@ return declare([], {
 		var grid = this;
 		grid._resizing = true;
 		grid._startX = grid._getResizeMouseLocation(e); //position of the target
-		grid._gridX = geom.position(grid.bodyNode).x;//position of the grid in the body *not sure why we need this?*
+		
+		// Grab the position of the grid within the body;  will be used to place the resizer in the correct place
+		// Since geom.position returns an incorrect "x" value (due to mobile zoom and getBoundingClientRect()),
+		// webkitConvertPointFromNodeToPage and WebKitPoint will provide a more accurate point
+		var hasPointFromNode = has("touch") && webkitConvertPointFromNodeToPage;
+		grid._gridX = hasPointFromNode ? 
+						webkitConvertPointFromNodeToPage(grid.bodyNode, new WebKitPoint(0, 0)).x : 
+						geom.position(grid.bodyNode).x;
+						
 		grid._targetCell = grid._getResizeCell(e);
 		
 		// show resizer inlined

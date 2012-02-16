@@ -171,7 +171,9 @@ return function(column, editor, editOn){
 			aspect.before(grid, "removeRow", function(rowElement){
 				// destroy our widget during the row removal operation
 				var cellElement = grid.cell(rowElement, column.id).element;
-				(cellElement.contents || cellElement).widget.destroy();
+				var widget = (cellElement.contents || cellElement).widget;
+				// widget may not have been created if editOn is used
+				widget && widget.destroyRecursive();
 			});
 		}		
 		

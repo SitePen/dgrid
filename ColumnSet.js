@@ -12,10 +12,8 @@ function(styleSheet, has, put, declare, listen, aspect, query, Grid, hasClass){
 			var tr = put(row, "tbody tr");
 			for(var i = 0, l = this.columnSets.length; i < l; i++){
 				// iterate through the columnSets
-				var columnSet = this.columnSets[i];
 				var cell = put(tr, tag + ".dgrid-column-set-cell.column-set-" + i + " div.dgrid-column-set[colsetid=" + i + "]");
-				this.subRows = columnSet;
-				cell.appendChild(this.inherited(arguments));
+				cell.appendChild(this.inherited(arguments, [tag, each, this.columnSets[i]]));
 			}
 			return row;
 		},

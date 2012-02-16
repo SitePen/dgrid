@@ -21,34 +21,29 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dojo/on", "dojo/_base/window", "dgrid/OnDemandGrid", "dgrid/Editor","dgrid/Selection", "dgrid/CellSelection", "dgrid/Keyboard", "dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!"], 
-				function(on, win, Grid, Editor, Selection, CellSelection, Keyboard, declare, testStore){
+			require(["dojo/on", "dojo/_base/declare", "dojo/_base/window", "dojo/json",
+					"dgrid/OnDemandGrid", "dgrid/Editor","dgrid/Selection", "dgrid/CellSelection", "dgrid/Keyboard",
+					"dgrid/test/data/base", "dojo/domReady!"],
+				function(on, declare, win, json, Grid, Editor, Selection, CellSelection, Keyboard, testStore){
 					var columns = {
 							col1: 'Column 1',
 							col2: {label: 'Column 2', sortable: false},
 							col3: 'Column 3',
 							col4: Editor({label: 'Editable'}, "text")
-						},
-						prevent;
+						};
 					
 					on(win.body(), "dgrid-select,dgrid-deselect",
 						function(event){
-							var msg = (event.type == "dgrid-deselect" ? "de" : "");
-							msg += "selected" + (prevent ? " (prevented): " : ": ");
+							var msg = (event.type == "dgrid-deselect" ? "de" : "") + "selected: ";
 							if(event.cell){
 								console.log(msg + event.grid.id + ": row " + event.cell.row.id +
 									", col " + event.cell.column.field);
 							}else{
 								console.log(msg + event.grid.id + ": row " + event.row.id);
 							}
-							if(prevent){ event.preventDefault(); }
+							console.log("selection:", json.stringify(event.grid.selection, null, "  "));
 						}
 					);
-					
-					on(document.getElementById("btnPreventDefaultOn"), "click",
-						function(){ prevent = true; });
-					on(document.getElementById("btnPreventDefaultOff"), "click",
-						function(){ prevent = false; });
 					
 					gridRowNavigation = dojo.declare([Grid, Selection, Keyboard])({
 						store: testStore,
@@ -81,14 +76,16 @@
 						columns: columns2,
 						selectionMode: "none"
 					}, "grid-cell-navigation-none");
+					
+					// cell navigation + row selection
+					gridMixed = dojo.declare([Grid, Selection, Keyboard])({
+						store: testStore,
+						columns: columns
+					}, "grid-mixed");
 				});
 		</script>
 	</head>
 	<body class="nihilo">
-		<div>preventDefault on selection in all grids?
-			<button type="button" id="btnPreventDefaultOn">Yes</button>
-			<button type="button" id="btnPreventDefaultOff">No</button>
-		</div>
 		<h2>A grid with row-level selection (and row-level navigation)</h2>
 		<div>Set selectionMode:
 			<button type="button" onclick="gridRowNavigation.setSelectionMode('none');">None</button>
@@ -111,5 +108,7 @@
 			<button type="button" onclick="gridCellNavigationNone.setSelectionMode('extended');">Extended</button>
 		</div>
 		<div id="grid-cell-navigation-none"></div>
+		<h2>A grid with row-level selection and cell-level navigation</h2>
+		<div id="grid-mixed"></div>
 	</body>
 </html>
