@@ -19,6 +19,10 @@ return declare([List], {
 	// deselectOnRefresh: Boolean
 	//		If true, the selection object will be cleared when refresh is called.
 	deselectOnRefresh: true,
+
+	//selectAllKey: Boolean
+	//      if true, allow ctrl/cmd-a to select all rows
+	selectAllKey: false,
 	
 	create: function(){
 		this.selection = {};
@@ -142,6 +146,17 @@ return declare([List], {
 		}else{
 			// listen for actions that should cause selections
 			on(this.contentNode, on.selector(selector, this.selectionEvents), focus);
+		}
+
+		//if selectAllKey boolean property is true, allow ctrl/cmd-a to select all rows
+		if(this.selectAllKey){
+			on(this.contentNode, "keydown", function(event) {
+				if (!event[ctrlEquiv]) return;
+				if (event.keyCode == 65) {
+					event.preventDefault();
+					grid.selectAll();
+				}
+			});
 		}
 	},
 	
