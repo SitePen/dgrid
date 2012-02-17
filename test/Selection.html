@@ -49,7 +49,7 @@
 						store: testStore,
 						cellNavigation: false,
 						columns: columns,
-						selectAllKey: true
+						allowSelectAll: true
 					}, "grid-row-navigation");
 					
 					var columns2 = {
@@ -61,7 +61,7 @@
 					gridCellNavigation = declare([Grid, CellSelection, Keyboard])({
 						store: testStore,
 						columns: columns2,
-						selectAllKey: true
+						allowSelectAll: true
 					}, "grid-cell-navigation");
 					gridCellNavigationSingle = declare([Grid, CellSelection, Keyboard])({
 						store: testStore,

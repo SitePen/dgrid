@@ -20,9 +20,9 @@ return declare([List], {
 	//		If true, the selection object will be cleared when refresh is called.
 	deselectOnRefresh: true,
 
-	//selectAllKey: Boolean
+	//allowSelectAll: Boolean
 	//      if true, allow ctrl/cmd-a to select all rows
-	selectAllKey: false,
+	allowSelectAll: false,
 	
 	create: function(){
 		this.selection = {};
@@ -39,7 +39,7 @@ return declare([List], {
 	//		object ids and values are true or false depending on whether an item is selected
 	selection: {},
 	// selectionMode: String
-	//		The selection mode to use, can be "multiple", "single", or "extended".
+	//		The selection mode to use, can be "none", "multiple", "single", or "extended".
 	selectionMode: "extended",
 	
 	setSelectionMode: function(mode){
@@ -148,16 +148,17 @@ return declare([List], {
 			on(this.contentNode, on.selector(selector, this.selectionEvents), focus);
 		}
 
-		//if selectAllKey boolean property is true, allow ctrl/cmd-a to select all rows
-		if(this.selectAllKey){
-			on(this.contentNode, "keydown", function(event) {
-				if (!event[ctrlEquiv]) return;
-				if (event.keyCode == 65) {
+		//if allowSelectAll boolean property is true, allow ctrl/cmd-a to select all rows
+		//also checks if selectionMode is not none before selecting all
+		if(this.allowSelectAll){
+			var selectAllHandle = on(this.contentNode, "keydown", function(event) {
+				if (event[ctrlEquiv] && event.keyCode == 65 && grid.selectionMode != "none") {
 					event.preventDefault();
 					grid.selectAll();
 				}
 			});
 		}
+
 	},
 	
 	select: function(row, toRow, value){
