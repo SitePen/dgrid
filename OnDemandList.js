@@ -89,8 +89,8 @@ return declare([List, _StoreMixin], {
 				for(var i = 0; i < trCount; i++){
 					height += trs[i].offsetHeight;
 				}
-				// only update rowHeight if we actually got results
-				if(trCount){ self.rowHeight = height / trCount; }
+				// only update rowHeight if we actually got results and are visible
+				if(trCount && height){ self.rowHeight = height / trCount; }
 				
 				total -= trCount;
 				preload.count = total;
