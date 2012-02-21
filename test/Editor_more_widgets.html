@@ -32,8 +32,8 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Tree","dgrid/Selection", "dgrid/Keyboard", "dgrid/Editor", "dijit/form/ToggleButton", "dijit/form/TimeTextBox",  "dijit/form/Select","dojo/data/ObjectStore", "dijit/form/FilteringSelect", "dijit/Editor", "dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!"],
-				function(List, Grid, Tree, Selection, Keyboard, Editor, ToggleButton, TimeTextBox, Select, ObjectStore, FilteringSelect, DijitEditor, declare){
+			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Tree","dgrid/Selection", "dgrid/Keyboard", "dgrid/Editor", "dijit/form/CheckBox", "dijit/form/TimeTextBox",  "dijit/form/Select","dojo/data/ObjectStore", "dijit/form/FilteringSelect", "dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!"],
+				function(List, Grid, Tree, Selection, Keyboard, Editor, CheckBox, TimeTextBox, Select, ObjectStore, FilteringSelect, declare){
 
 					stateStore = new ObjectStore({
 						objectStore:testStateStore,
@@ -41,32 +41,37 @@
 					});
 
 					var columns2 = [
-						{field: 'id', label: 'id'},
-						Editor({label: 'Toggle', field: 'bool2', editorArgs: function(item){
-
-								return {checked: item.bool2, iconClass: "dijitCheckBoxIcon", label: "Toggle"};
-							}}, ToggleButton),
-						Editor({label: 'Time', field: 'time', editorArgs: {
-							timePattern: 'HH:mm:ss',
-							clickableIncrement: 'T00:15:00',
-							visibleIncrement: 'T00:15:00',
-							visibleRange: 'T01:00:00'}}, TimeTextBox),
+						{field: "id", label: "id"},
 						Editor({
-							label: 'Select Options',
-							field: 'bool',
-							editorArgs: function(item){
-								return {
-									style: "width:75px;",
-									options: [
-										{value:item.bool+"", label: item.bool+"", selected: true},
-										{value: !item.bool+"", label: !item.bool+""}
-									]
-								};
+							label: "CheckBox",
+							field: "bool2",
+							editorArgs: {
+								value: "checked"
 							}
-						}, Select),
-						Editor({label: 'Select Store', field: 'state', editorArgs: {store: stateStore, maxHeight: 150, style: "width:120px;"}}, Select, "click"),
-						Editor({label: 'FilteringSelect Store', field: 'state', editorArgs: {store: stateStore, maxHeight: 150, style: "width:120px;"}}, FilteringSelect),
-						Editor({label: 'Dijit/Editor', field: 'text', editorArgs: {style: "height: 150px;"}}, DijitEditor)
+						}, CheckBox),
+						Editor({label: "Time", field: "date2", editorArgs: {
+							timePattern: "HH:mm:ss",
+							clickableIncrement: "T00:15:00",
+							visibleIncrement: "T00:15:00",
+							visibleRange: "T01:00:00"}}, TimeTextBox),
+						Editor({
+							label: "Select Options",
+							field: "bool",
+							get: function(item){
+								// return as string to match option in list
+								console.log('in get', "" + item.bool);
+								return "" + item.bool;
+							},
+							editorArgs: {
+								style: "width:75px;",
+								options: [
+									{value: "true", label: "true"},
+									{value: "false", label: "false"}
+								]
+							}
+						}, Select, "dblclick"),
+						Editor({label: "Select Store", field: "state", editorArgs: {store: stateStore, maxHeight: 150, style: "width:120px;"}}, Select, "click"),
+						Editor({label: "FilteringSelect Store", field: "state2", editorArgs: {store: stateStore, maxHeight: 150, style: "width:120px;"}}, FilteringSelect)
 						//Note that widgets that have multiple focusable children aren't supported by editOn functionality, for example: dijit/Editor
 					];
 
@@ -76,7 +81,11 @@
 						columns: columns2,
 						selectionMode: "none"
 					}, "grid");
-
+					
+					grid.on("dgrid-datachange", function(evt){
+						console.log("data changed: ", evt.oldValue, " -> ", evt.value);
+						console.log("cell: ", evt.cell, evt.cell.row.id);
+					});
 				});
 				
 		</script>
@@ -85,5 +94,6 @@
 		<h2>Another basic grid with more editors</h2>
 		(Click fields to edit)
 		<div id="grid"></div>
+		<button type="button" id="save" onclick="grid.save()">Save</button>
 	</body>
 </html>
