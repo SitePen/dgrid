@@ -13,10 +13,26 @@ var ignoreChange = false, // used to ignore change on native input after esc/ent
 	activeCell; // tracks cell currently being edited
 
 function updateInputValue(input, value){
+	// common code for updating value of a standard input
 	input.value = value;
 	if(input.type == "radio" || input.type == "checkbox"){
 		input.checked = !!value;
 	}
+}
+
+function getProperty(column, cell){
+	// common code for retrieving a property's value either from existing
+	// dirty data, or from store data; used in showEditor.
+	var grid = column.grid,
+		row = grid.row(cell),
+		field = column.field,
+		dirty = grid.dirty && grid.dirty[row.id],
+		value;
+	
+	value = (dirty && column.field in dirty) ? dirty[column.field] :
+		column.get ? column.get(row.data) : row.data[column.field];
+	console.log('getProperty: ', column.field, dirty, value);
+	return value;
 }
 
 function setProperty(grid, cellElement, oldValue, value){
@@ -49,7 +65,9 @@ function setProperty(grid, cellElement, oldValue, value){
 				if (grid.setDirty){
 					// for OnDemandGrid: update dirty data, and save if autoSave is true
 					grid.setDirty(row.id, column.field, value);
-					column.autoSave && grid._trackError("save");
+					// perform auto-save (if applicable) in next tick to avoid
+					// unintentional mishaps due to order of handler execution
+					column.autoSave && setTimeout(function(){ grid._trackError("save"); }, 0);
 				}
 			}else{
 				// else keep the value the same
@@ -64,11 +82,8 @@ function setPropertyFromWidget(grid, widget, value) {
 	// This function serves as a window into setProperty for widget editors.
 	var cellElement = widget.domNode.parentNode;
 	if(!widget.isValid || widget.isValid()){ // only update if valid
-		// XXX: setTimeout avoids errors in IE for editOn + autoSave in onblur.
-		setTimeout(function(){
-			widget._dgridlastvalue = setProperty(
-				grid, cellElement, widget._dgridlastvalue, value);
-		}, 0);
+		widget._dgridlastvalue = setProperty(
+			grid, cellElement, widget._dgridlastvalue, value);
 	}
 }
 
@@ -206,13 +221,7 @@ function showEditor(cmp, column, cell, value){
 	
 	// if showEditor is called from the editOn branch (shared editor),
 	// need to grab latest value from data (dirty or otherwise)
-	if (column.editOn) {
-		row = grid.row(cell);
-		field = column.field;
-		dirty = grid.dirty && grid.dirty[row.id];
-		value = (dirty && column.field in dirty) ? dirty[column.field] :
-			column.get ? column.get(row.data) : row.data[column.field];
-	}
+	if(column.editOn){ value = getProperty(column, cell); }
 	
 	// for regular inputs, we can update the value before even showing it
 	if(!isWidget){ updateInputValue(cmp, value); }
