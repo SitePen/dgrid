@@ -38,7 +38,7 @@ return declare([List], {
 	//		The selection mode to use, can be "multiple", "single", or "extended".
 	selectionMode: "extended",
 	
-	setSelectionMode: function(mode){
+	_setSelectionMode: function(mode){
 		// summary:
 		//		Updates selectionMode, hooking up listener if necessary.
 		if(mode == this.selectionMode){ return; } // prevent unnecessary spinning
