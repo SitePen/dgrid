@@ -54,7 +54,10 @@
 							text: { generate: generateText },
 							checkbox: { generate: generateBool },
 							radio: { generate: generateBool },
-							textarea: { generate: generateText },
+							textarea: {
+								generate: generateText,
+								editorArgs: { rows: 3 }
+							},
 							// TODO: support select?
 							// Dijits
 							"dijit/form/TextBox": { generate: generateText },
