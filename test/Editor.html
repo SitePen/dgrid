@@ -42,6 +42,12 @@
 							labelProperty: "name"
 						}),
 						CustomGrid = declare([Grid, Selection, Keyboard]),
+						TestStore = declare(Memory, {
+							put: function(object, options){
+								console.log("put called for ID: ", object.id);
+								this.inherited(arguments);
+							}
+						}),
 						// define choices of component type which will be available in form
 						componentTypes = {
 							// native input types
@@ -125,7 +131,7 @@
 							domConstruct.create("div", { id: "grid" }, form, "after");
 							
 							window.grid = new CustomGrid({
-								store: Observable(new Memory({ data: data })),
+								store: Observable(new TestStore({ data: data })),
 								columns: {
 									"editor": Editor({
 											autoSave: form.elements.autoSave.checked,
