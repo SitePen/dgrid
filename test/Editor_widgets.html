@@ -37,11 +37,13 @@
 					var columns = [
 						Editor({label: 'A Date', field: 'date'}, DateTextBox),
 						Editor({label: 'Real Number', field: 'floatNum'}, Slider),
-						Editor({label: 'Integer', field: 'integer', editorArgs: {style: 'width: 5em;', constraints: {min:9,max:1550,places:0}}}, NumberSpinner),
+						Editor({label: 'Integer', field: 'integer',
+								editorArgs: {style: 'width: 5em;', constraints: {min:0, max:1550, places:0}}},
+							NumberSpinner),
 						Editor({label: 'Text editable if checkbox checked + saved', field: 'text', canEdit: function(object){
 							return object.bool;
 						}}, "text", "dblclick"),
-						{label: 'Non editable text', field: 'text', sortable: false},
+						{label: 'Non-editable text', field: 'text2', sortable: false},
 						Editor({label: 'Another Date', field: 'date2'}, DateTextBox, "dgrid-cellfocusin"),
 						Editor({label: 'CheckBox', field: 'bool'}, "checkbox")
 					];
@@ -53,14 +55,14 @@
 					}, "grid");
 					
 					grid.on("dgrid-datachange", function(evt){
-						console.log("data changed: " + evt.oldValue + " -> " + evt.value);
+						console.log("data changed: ", evt.oldValue, " -> ", evt.value);
 						console.log("cell: ", evt.cell, evt.cell.row.id);
 					});
 					
 					grid.on(".field-integer:dgrid-datachange", function(evt){
-						if(evt.value > 100){
+						if(evt.value > 1000){
 							evt.preventDefault();
-							alert("Values above 100 not allowed");
+							alert("Values above 1000 will be rejected");
 							// log data on a timeout to demonstrate that value wasn't changed
 							setTimeout(function(){
 								console.log("integer after prevented event:",

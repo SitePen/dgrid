@@ -135,11 +135,12 @@ function(lang, Deferred, Memory, Observable, QueryResults){
 			floatNum: Math.random() * 100,
 			date: new Date(new Date().getTime() * Math.random() * 2),
 			date2: new Date(new Date().getTime() - Math.random() * 1000000000),
-			time: "T08:45:00",
 			text: "A number in text " + Math.random(),
+			text2: "A number in text " + Math.random(),
 			bool: Math.random() > 0.5,
 			bool2: Math.random() > 0.5,
-			state: testStateStore.data[Math.floor(Math.random() * 50)].abbreviation
+			state: testStateStore.data[Math.floor(Math.random() * 50)].abbreviation,
+			state2: testStateStore.data[Math.floor(Math.random() * 50)].abbreviation
 		});
 	}
 	// global var testTypesStore
