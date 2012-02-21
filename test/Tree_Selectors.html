@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Test TreeGrid</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+		<meta name="viewport" />
+		<style type="text/css">
+			@import "../../dojo/resources/dojo.css";
+			@import "../css/skins/claro.css";
+			.dgrid {
+				width: 500px;
+			}
+			.dgrid .field-bool {
+				width: 20px;
+			}
+			.dgrid .field-type {
+				width: 80px;
+			}
+			.ui-widget{
+				margin: 10px;
+			}
+		</style>
+		<script>
+			var start= new Date().getTime();
+		</script>
+		<script type="text/javascript" src="../../dojo/dojo.js"
+			data-dojo-config="async: true"></script>
+		<script type="text/javascript">
+			require(["dojo/on", "dgrid/OnDemandGrid","dgrid/Tree","dgrid/Editor", "dgrid/Keyboard", "dgrid/Selector", "dgrid/Selection","dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!"],
+				function(on, Grid, Tree, Editor, Keyboard, Selector,Selection, declare, testStore){
+					var columns = [
+						Selector({type: "checkbox"}),
+						Tree({label:'Name', field:'name', sortable: false}),
+						{label:'Type', field:'type', sortable: false},
+						{label:'Population', field:'population'},
+						{label:'Timezone', field:'timezone'}
+					];
+					var columns2 = [
+						Selector({type: "radio", label: "Radio"}),
+						Tree({label:'Name', field:'name', sortable: false}),
+						{label:'Type', field:'type', sortable: false},
+						{label:'Population', field:'population'},
+						{label:'Timezone', field:'timezone'}
+					];
+					var columns3 = [
+						Selector({type: "checkbox"}),
+						Tree({label:'Name', field:'name', sortable: false}),
+						{label:'Type', field:'type', sortable: false},
+						{label:'Population', field:'population'},
+						{label:'Timezone', field:'timezone'}
+					];
+					var columns4 = [
+						Selector({type: "radio", label: "Radio"}),
+						Tree({label:'Name', field:'name', sortable: false}),
+						{label:'Type', field:'type', sortable: false},
+						{label:'Population', field:'population'},
+						{label:'Timezone', field:'timezone'}
+					];
+					var columns5 = [
+						Selector({type: "checkbox"}),
+						Tree({label:'Name', field:'name', sortable: false}),
+						{label:'Type', field:'type', sortable: false},
+						{label:'Population', field:'population'},
+						{label:'Timezone', field:'timezone'}
+					];
+					var columns6 = [
+						Selector({type: "radio", label: "Radio"}),
+						Tree({label:'Name', field:'name', sortable: false}),
+						{label:'Type', field:'type', sortable: false},
+						{label:'Population', field:'population'},
+						{label:'Timezone', field:'timezone'}
+					];
+					var columns7 = [
+						Selector({type: "checkbox"}),
+						Tree({label:'Name', field:'name', sortable: false}),
+						{label:'Type', field:'type', sortable: false},
+						{label:'Population', field:'population'},
+						{label:'Timezone', field:'timezone'}
+					];
+					var columns8 = [
+						Selector({type: "radio", label: "Radio"}),
+						Tree({label:'Name', field:'name', sortable: false}),
+						{label:'Type', field:'type', sortable: false},
+						{label:'Population', field:'population'},
+						{label:'Timezone', field:'timezone'}
+					];
+					
+					var count = 0;
+
+					window.tree = declare([Grid, Keyboard, Selection])({
+						store: testCountryStore,
+						query: {type: "continent"},
+						columns: columns,
+						selectionMode: "none"
+					}, "tree");
+
+
+
+					window.tree2 = declare([Grid, Keyboard, Selection])({
+						store: testCountryStore,
+						query: {type: "continent"},
+						columns: columns2,
+						selectionMode: "none"
+					}, "tree2");
+
+					window.tree3 = declare([Grid, Keyboard, Selection])({
+						store: testCountryStore,
+						query: {type: "continent"},
+						columns: columns3,
+						selectionMode: "multiple"
+					}, "tree3");
+					
+					window.tree4 = declare([Grid, Keyboard, Selection])({
+						store: testCountryStore,
+						query: {type: "continent"},
+						columns: columns4,
+						selectionMode: "multiple"
+					}, "tree4");
+
+					window.tree5 = declare([Grid, Keyboard, Selection])({
+						store: testCountryStore,
+						query: {type: "continent"},
+						columns: columns5,
+						selectionMode: "single"
+					}, "tree5");
+
+					window.tree6 = declare([Grid, Keyboard, Selection])({
+						store: testCountryStore,
+						query: {type: "continent"},
+						columns: columns6,
+						selectionMode: "single"
+					}, "tree6");
+
+					window.tree7 = declare([Grid, Keyboard, Selection])({
+						store: testCountryStore,
+						query: {type: "continent"},
+						columns: columns7,
+						selectionMode: "extended"
+					}, "tree7");
+
+					window.tree8 = declare([Grid, Keyboard, Selection])({
+						store: testCountryStore,
+						query: {type: "continent"},
+						columns: columns8,
+						selectionMode: "extended"
+					}, "tree8");
+
+				});
+		</script>
+</head>
+<body class="claro">
+	<div style="position:relative; width: 1100px;">
+		<div style="float:left;">
+			<h2>1. Lazy-loading tree grid with checkbox selector, selectionMode: none</h2>
+			<div id="tree"></div>
+		</div>
+		<div style="float:right;">
+			<h2>2. Lazy-loading tree grid with radio selector, selectionMode: none</h2>
+			<div id="tree2"></div>
+		</div>
+	</div>
+	<div style="position:relative; width: 1100px;">
+		<div style="float:left;">
+			<h2>3. Lazy-loading tree grid with checkbox selector, selectionMode: multiple</h2>
+			<div id="tree3"></div>
+		</div>
+		<div style="float:right; ">
+			<h2>4. Lazy-loading tree grid with radio selector, selectionMode: multiple</h2>
+			<div id="tree4"></div>
+		</div>
+	</div>
+	<div style="position:relative; width: 1100px;">
+		<div style="float:left;">
+			<h2>5. Lazy-loading tree grid with checkbox selector, selectionMode: single</h2>
+			<div id="tree5"></div>
+		</div>
+		<div style="float:right; ">
+			<h2>6. Lazy-loading tree grid with radio selector, selectionMode: single</h2>
+			<div id="tree6"></div>
+		</div>
+	</div>
+	<div style="position:relative; width: 1100px;">
+		<div style="float:left;">
+			<h2>7. Lazy-loading tree grid with checkbox selector, selectionMode: extended</h2>
+			<div id="tree7"></div>
+		</div>
+		<div style="float:right; ">
+			<h2>8. Lazy-loading tree grid with radio selector, selectionMode: extended</h2>
+			<div id="tree8"></div>
+		</div>
+	</div>
+</body>
+</html>
