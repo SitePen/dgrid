@@ -112,6 +112,81 @@ function(declare, on){
 			}
 		}
 	}
+
+	// Attempt to force hardware acceleration by adding a no-op translate3d
+	function calcGlide3DNOP( id ) {
+		// performs glide and decelerates according to widget's glideDecel method
+		var g = glide[id], x, y, node, widget,
+			nvx, nvy; // old and new velocities
+		
+		if(!g){ return; }
+		
+		node = g.node;
+		widget = g.widget;
+		x = node.scrollLeft;
+		y = node.scrollTop;
+		nvx = widget.glideDecel( g.velX );
+		nvy = widget.glideDecel( g.velY );
+		
+		if(Math.abs(nvx) >= glideThreshold || Math.abs(nvy) >= glideThreshold){
+			// still above stop threshold; update scroll positions
+			dojo.style( node, {
+				"transform": 'translate3d(0,0,0)',
+				"-webkit-transform": 'translate3d(0,0,0)'
+			});
+			node.scrollLeft += nvx;
+			node.scrollTop += nvy;
+			if(node.scrollLeft != x || node.scrollTop != y){
+				// still scrollable; update velocities and schedule next tick
+				g.velX = nvx;
+				g.velY = nvy;
+				g.timer = setTimeout(g.calcFunc, timerRes);
+			}
+		}
+		// necessary?
+		else {
+			dojo.style( node, {
+				"transform": '',
+				"-webkit-transform": ''
+			});
+		}
+	}
+
+	// Attempt to force hardware acceleration by animating using translate3d
+	function calcGlide3D( id ) {
+		// performs glide and decelerates according to widget's glideDecel method
+		var g = glide[id], x, y, node, widget,
+			nvx, nvy; // old and new velocities
+		
+		if(!g){ return; }
+		
+		node = g.node;
+		widget = g.widget;
+		x = node.scrollLeft;
+		y = node.scrollTop;
+		nvx = widget.glideDecel( g.velX );
+		nvy = widget.glideDecel( g.velY );
+		
+		if(Math.abs(nvx) >= glideThreshold || Math.abs(nvy) >= glideThreshold){
+			// still above stop threshold; update scroll positions
+			dojo.style( node, {
+				"transform": 'translate3d(' + nvx + 'px,' + nvy + 'px,0)',
+				"-webkit-transform": 'translate3d(' + nvx + 'px,' + nvy + 'px,0)'
+			});
+			if(node.scrollLeft != x || node.scrollTop != y){
+				// still scrollable; update velocities and schedule next tick
+				g.velX = nvx;
+				g.velY = nvy;
+				g.timer = setTimeout(g.calcFunc, timerRes);
+			}
+		}
+	}
+
+	// test lower (25) FPS animation for performance
+	function calcGlide25FPS( id ) {
+		timerRes = 40;
+		return calcGlide( id );
+	}
 	
 	return declare([], {
 		startup: function(){
