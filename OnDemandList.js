@@ -193,7 +193,8 @@ return declare([List, _StoreMixin], {
 							if(currentObserverIndex != lastObserverIndex && lastObserverIndex > -1){
 								// we have gathered a whole page of observed rows, we can delete them now
 								var observers = grid.observers; 
-								observers[lastObserverIndex].cancel();
+								var observer = observers[lastObserverIndex]; 
+								observer && observer.cancel();
 								observers[lastObserverIndex] = 0; // remove it so we don't call cancel twice
 							}
 							reclaimedHeight += rowHeight;
@@ -273,7 +274,7 @@ return declare([List, _StoreMixin], {
 						preload.count -= count;
 						var beforeNode = preloadNode,
 							keepScrollTo, queryRowsOverlap = grid.queryRowsOverlap,
-							below = preloadNode.rowIndex > 0; 
+							below = preloadNode.rowIndex > 0 && preload; 
 						if(below){
 							// add new rows below
 							var previous = preload.previous;
@@ -339,6 +340,17 @@ return declare([List, _StoreMixin], {
 									// row height, we may need to adjust the scroll once they are filled in
 									// so we don't "jump" in the scrolling position
 									scrollNode.scrollTop += beforeNode.offsetTop - keepScrollTo;
+								}
+								if(below){
+									// if it is below, we will use the total from the results to update 
+									// the count in case the total changes as later pages are retrieved
+									// (not uncommon when total counts are estimated for db perf reasons)
+									Deferred.when(results.total || results.length, function(total){
+										// recalculate the count
+										below.count = total - below.node.rowIndex;
+										// readjust the height
+										adjustHeight(below);
+									});
 								}
 						});
 						preload = preload.previous;
