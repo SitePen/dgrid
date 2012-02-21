@@ -20,19 +20,28 @@ function updateInputValue(input, value){
 	}
 }
 
-function getProperty(column, cell){
-	// common code for retrieving a property's value either from existing
-	// dirty data, or from store data; used in showEditor.
-	var grid = column.grid,
-		row = grid.row(cell),
-		field = column.field,
-		dirty = grid.dirty && grid.dirty[row.id],
-		value;
-	
-	value = (dirty && column.field in dirty) ? dirty[column.field] :
-		column.get ? column.get(row.data) : row.data[column.field];
-	console.log('getProperty: ', column.field, dirty, value);
+function dataFromValue(value, oldValue){
+	// Default logic for translating values from editors;
+	// tries to preserve type if possible.
+	if(typeof oldValue == "number"){
+		value = isNaN(value) ? value : parseFloat(value);
+	}else if(typeof oldValue == "boolean"){
+		value = value == "true" ? true : value == "false" ? false : value;
+	}else if(oldValue instanceof Date){
+		var asDate = new Date(value);
+		value = isNaN(asDate.getTime()) ? value : asDate;
+	}
 	return value;
+}
+
+// intermediary frontends to dataFromValue
+
+function dataFromInput(column, input){
+	var type = input.type;
+	return dataFromValue(input[type == "checkbox" || type == "radio"  ? "checked" : "value"]);
+}
+function dataFromWidget(column, widget){
+	return dataFromValue(widget.get("value"));
 }
 
 function setProperty(grid, cellElement, oldValue, value){
@@ -42,15 +51,6 @@ function setProperty(grid, cellElement, oldValue, value){
 		var row = cell.row;
 		var column = cell.column;
 		if(column.field && row){
-			// first try to keep the type the same if possible
-			if(typeof oldValue == "number"){
-				value = isNaN(value) ? value : parseFloat(value);
-			}else if(typeof oldValue == "boolean"){
-				value = value == "true" ? true : value == "false" ? false : value;
-			}else if(oldValue instanceof Date){
-				var asDate = new Date(value);
-				value = isNaN(asDate.getTime()) ? value : asDate;
-			}
 			// TODO: remove rowId in lieu of cell (or grid.row/grid.cell)
 			// (keeping for the moment for back-compat, but will note in changes)
 			if(on.emit(cellElement, "dgrid-datachange", {
@@ -78,12 +78,23 @@ function setProperty(grid, cellElement, oldValue, value){
 	return value;
 }
 
-function setPropertyFromWidget(grid, widget, value) {
-	// This function serves as a window into setProperty for widget editors.
-	var cellElement = widget.domNode.parentNode;
+// intermediary frontends to setProperty for HTML and widget editors
+
+function setPropertyFromInput(grid, column, input) {
+	var value = dataFromInput(column, input);
+	
+	// update value and store last value especially for case of always-on editor
+	input._dgridlastvalue = setProperty(grid, input.parentNode, input._dgridlastvalue,
+		value);
+}
+function setPropertyFromWidget(grid, column, widget) {
+	var value;
 	if(!widget.isValid || widget.isValid()){ // only update if valid
-		widget._dgridlastvalue = setProperty(
-			grid, cellElement, widget._dgridlastvalue, value);
+		value = dataFromWidget(column, widget);
+		
+		// update value and store last value especially for case of always-on editor
+		widget._dgridlastvalue = setProperty(grid, widget.domNode.parentNode,
+			widget._dgridlastvalue, value);
 	}
 }
 
@@ -112,7 +123,7 @@ function createEditor(column){
 		// connect to onBlur rather than watching value for changes, since
 		// the latter is delayed by setTimeouts and may also fire from our logic
 		cmp.connect(cmp, "onBlur", function(){
-			setPropertyFromWidget(grid, this, this.get("value"));
+			setPropertyFromWidget(grid, column, this);
 		});
 	}else{
 		handleChange = function(evt){
@@ -120,8 +131,7 @@ function createEditor(column){
 			if(ignoreChange){ return;	}
 			
 			if("_dgridlastvalue" in target && target.className.indexOf("dgrid-input") > -1){
-				target._dgridlastvalue = setProperty(grid, target.parentNode, target._dgridlastvalue,
-					target[target.type == "checkbox" || target.type == "radio"  ? "checked" : "value"]);
+				setPropertyFromInput(grid, column, target);
 			}
 		};
 
@@ -214,14 +224,11 @@ function createSharedEditor(column, originalRenderCell){
 
 function showEditor(cmp, column, cell, value){
 	// Places a shared editor into the newly-active cell in the column.
+	// Also called when rendering an editor in an "always-on" Editor column.
+	
 	var grid = column.grid,
 		editor = column.editor,
-		isWidget = cmp.domNode,
-		row, field, dirty;
-	
-	// if showEditor is called from the editOn branch (shared editor),
-	// need to grab latest value from data (dirty or otherwise)
-	if(column.editOn){ value = getProperty(column, cell); }
+		isWidget = cmp.domNode;
 	
 	// for regular inputs, we can update the value before even showing it
 	if(!isWidget){ updateInputValue(cmp, value); }
@@ -284,11 +291,21 @@ return function(column, editor, editOn){
 		// in IE<8, cell is the child of the td due to the extra padding node
 		on(cell.tagName == "TD" ? cell : cell.parentNode,
 				editOn, function(){
-			var cmp = column.editorInstance;
+			var cmp = column.editorInstance,
+				grid = column.grid,
+				field = column.field,
+				row, dirty, value;
+			
 			if(activeCell != this &&
 					(!column.canEdit || column.canEdit(object, value))){
 				activeCell = this;
-				showEditor(cmp, column, cell);
+				
+				// retrieve latest value; if retrieving from row, run through column.get
+				row = grid.row(cell);
+				dirty = grid.dirty && grid.dirty[row.id],
+				value = (dirty && field in dirty) ? dirty[field] :
+					column.get ? column.get(row.data) : row.data[field];
+				showEditor(cmp, column, cell, value);
 				
 				// focus / blur-handler-resume logic is surrounded in a setTimeout
 				// to play nice with Keyboard's dgrid-cellfocusin as an editOn event
