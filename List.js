@@ -26,7 +26,7 @@ function(kernel, declare, listen, aspect, has, TouchScroll, hasClass, put){
 			extraSheet.insertRule(selector + '{' + css + '}', extraRules[index]);
 		return {
 			remove: function(){ removeExtraRule(index); }
-		}
+		};
 	}
 	function removeExtraRule(index){
 		var
@@ -57,7 +57,8 @@ function(kernel, declare, listen, aspect, has, TouchScroll, hasClass, put){
 	};
 
 	function move(item, steps, targetClass){
-		var nextSibling, current, element = current = item.element;
+		var nextSibling, current, element;
+		element = current = item.element;
 		steps = steps || 1;
 		do{
 			// move in the correct direction
@@ -92,7 +93,7 @@ function(kernel, declare, listen, aspect, has, TouchScroll, hasClass, put){
 		//		in the footer area should set this to true.
 		showFooter: false,
 		// maintainOddEven: Boolean
-		// 		Indicates whether to maintain the odd/even classes when new rows are inserted.
+		//		Indicates whether to maintain the odd/even classes when new rows are inserted.
 		//		This can be disabled to improve insertion performance if odd/even styling is not employed.
 		maintainOddEven: true,
 		
@@ -106,7 +107,7 @@ function(kernel, declare, listen, aspect, has, TouchScroll, hasClass, put){
 				this.element = element;
 			}).prototype.remove = function(){
 				grid.removeRow(this.element);
-			} 
+			};
 			
 			if(srcNodeRef){
 				// normalize srcNodeRef and store on instance during create process.
@@ -379,8 +380,10 @@ function(kernel, declare, listen, aspect, has, TouchScroll, hasClass, put){
 			//		given node. This will listen for changes in the collection if an observe method
 			//		is available (as it should be if it comes from an Observable data store).
 			options = options || {};
-			var start = options.start || 0;
-			var self = this;
+			var self = this,
+				start = options.start || 0,
+				row, rows;
+			
 			if(!beforeNode){
 				this.lastCollection = results;
 			}
@@ -391,15 +394,14 @@ function(kernel, declare, listen, aspect, has, TouchScroll, hasClass, put){
 					// a change in the data took place
 					if(from > -1 && rows[from] && rows[from].parentNode){
 						// remove from old slot
-						var row = rows.splice(from, 1)[0];
+						row = rows.splice(from, 1)[0];
 						firstRow = row.nextSibling;
 						firstRow.rowIndex--;
 						self.removeRow(row);
-						rowIndex = from;
 					}
 					if(to > -1){						
 						// add to new slot (either before an existing row, or at the end)
-						var row = self.newRow(object, rows[to] || beforeNode, to, options);
+						row = self.newRow(object, rows[to] || beforeNode, to, options);
 						if(row){
 							row.observerIndex = observerIndex;
 							rows.splice(to, 0, row);
@@ -414,12 +416,12 @@ function(kernel, declare, listen, aspect, has, TouchScroll, hasClass, put){
 			var rowsFragment = document.createDocumentFragment();
 			// now render the results
 			if(results.map){
-				var rows = results.map(mapEach, console.error);
+				rows = results.map(mapEach, console.error);
 				if(rows.then){
 					return rows.then(whenDone);
 				}
 			}else{
-				var rows = [];
+				rows = [];
 				for(var i = 0, l = results.length; i < l; i++){
 					rows[i] = mapEach(results[i]);
 				}
@@ -434,7 +436,7 @@ function(kernel, declare, listen, aspect, has, TouchScroll, hasClass, put){
 				(beforeNode && beforeNode.parentNode || self.contentNode).insertBefore(rowsFragment, beforeNode || null);
 				lastRow = resolvedRows[resolvedRows.length - 1];
 				lastRow && self.adjustRowIndices(lastRow);
-				return rows = resolvedRows;
+				return (rows = resolvedRows);
 			}
 			return whenDone(rows);
 		},
@@ -471,6 +473,7 @@ function(kernel, declare, listen, aspect, has, TouchScroll, hasClass, put){
 		row: function(target){
 			// summary:
 			//		Get the row object by id, object, node, or event
+			var id;
 			if(target.target && target.target.nodeType){
 				// event
 				target = target.target;
@@ -479,7 +482,7 @@ function(kernel, declare, listen, aspect, has, TouchScroll, hasClass, put){
 				var object;
 				do{
 					var rowId = target.id;
-					if(object = this._rowIdToObject[rowId]){
+					if((object = this._rowIdToObject[rowId])){
 						return new this._Row(rowId.substring(this.id.length + 5), object, target); 
 					}
 					target = target.parentNode;
@@ -488,10 +491,10 @@ function(kernel, declare, listen, aspect, has, TouchScroll, hasClass, put){
 			}
 			if(typeof target == "object"){
 				// assume target represents a store item
-				var id = this.store.getIdentity(target);
+				id = this.store.getIdentity(target);
 			}else{
 				// assume target is a row ID
-				var id = target;
+				id = target;
 				target = this._rowIdToObject[this.id + "-row-" + id];
 			}
 			return new this._Row(id, target, byId(this.id + "-row-" + id));
@@ -536,9 +539,9 @@ function(kernel, declare, listen, aspect, has, TouchScroll, hasClass, put){
 				this.lastCollection.sort(function(a,b){
 					var aVal = a[property], bVal = b[property];
 					// fall back undefined values to "" for more consistent behavior
-					if (aVal === undefined) aVal = "";
-					if (bVal === undefined) bVal = "";
-					return aVal == bVal ? 0 : (aVal > bVal == !descending ? 1 : -1);
+					if(aVal === undefined){ aVal = ""; }
+					if(bVal === undefined){ bVal = ""; }
+					return aVal == bVal ? 0 : (aVal > bVal != descending ? 1 : -1);
 				});
 				this.renderArray(this.lastCollection);
 			}
@@ -554,7 +557,7 @@ function(kernel, declare, listen, aspect, has, TouchScroll, hasClass, put){
 			// description:
 			//		Get a named property on a List object. The property may
 			//		potentially be retrieved via a getter method in subclasses. In the base class
-			// 		this just retrieves the object's property.
+			//		this just retrieves the object's property.
 			
 			var fn = "_get" + name.charAt(0).toUpperCase() + name.slice(1);
 			
