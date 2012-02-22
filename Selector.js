@@ -91,7 +91,9 @@ define(["dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put"], funct
 		
 		var disabled = column.disabled;
 		var renderInput = typeof type == "function" ? type : function(value, cell, object){
-			var input = cell.input || (cell.input = put(cell, ".dgrid-selector input[type="+type + "]", {
+			var parent = cell.parentNode;
+			put(parent && parent.contents ? parent : cell, ".dgrid-selector"); // must set the class name on the outer cell in IE for keystrokes to be intercepted
+			var input = cell.input || (cell.input = put(cell, "input[type="+type + "]", {
 				tabIndex: isNaN(column.tabIndex) ? -1 : column.tabIndex,
 				disabled: disabled && (typeof disabled == "function" ? disabled(object) : disabled),
 				checked: value
