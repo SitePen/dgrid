@@ -24,8 +24,10 @@ define(["dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put"], funct
 						break;
 					}
 				}
-				headerCheckbox.indeterminate = mixed;
-				headerCheckbox.checked = grid.allSelected;
+				if(headerCheckbox.type == "checkbox"){
+					headerCheckbox.indeterminate = mixed;
+					headerCheckbox.checked = grid.allSelected;
+				}
 			};
 		}
 
