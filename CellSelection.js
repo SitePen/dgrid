@@ -1,13 +1,14 @@
 define(["dojo/_base/declare", "./Selection", "dojo/on", "put-selector/put", "dojo/has"], function(declare, Selection, listen, put, has){
 return declare([Selection], {
 	// summary:
-	// 		Add cell level selection capabilities to a grid. The grid will have a selection property and
+	//		Add cell level selection capabilities to a grid. The grid will have a selection property and
 	//		fire "dgrid-select" and "dgrid-deselect" events.
 	
 	// ensure we don't select when an individual cell is not identifiable
 	selectionDelegate: ".dgrid-cell",
 	
 	select: function(cell, toCell, value){
+		var i, id;
 		if(value === undefined){
 			// default to true
 			value = true;
@@ -16,17 +17,17 @@ return declare([Selection], {
 			cell = this.cell(cell);
 		}else if(!cell.row){
 			// it is row, with the value being a hash
-			for(var id in value){
+			for(id in value){
 				this.select(this.cell(cell.id, id), null, value[id]);
 			}
 			return;
 		}
 		if(this.allowSelect(cell)){
-			var selection = this.selection;
-			var rowId = cell.row.id;
-			var previousRow = selection[rowId];
+			var selection = this.selection,
+				rowId = cell.row.id,
+				previousRow = selection[rowId];
 			if(!cell.column){
-				for(var i in this.columns){
+				for(i in this.columns){
 					this.select(this.cell(rowId, i), null, value);
 				}
 				return;
@@ -44,7 +45,7 @@ return declare([Selection], {
 			// Check for all-false objects to see if it can be deleted.
 			// This prevents build-up of unnecessary iterations later.
 			var hasSelected = false;
-			for(var i in previousRow){
+			for(i in previousRow){
 				if(previousRow[i] === true){
 					hasSelected = true;
 					break;
@@ -80,7 +81,7 @@ return declare([Selection], {
 					toElement.sourceIndex > fromElement.sourceIndex)) ? "nextSibling" : "previousSibling";
 				// now we determine which columns are in the range 
 				var idFrom = cell.column.id, idTo = toCell.column.id, started, columnIds = [];
-				for(var id in this.columns){
+				for(id in this.columns){
 					if(started){
 						columnIds.push(id);				
 					}
@@ -100,14 +101,14 @@ return declare([Selection], {
 				do{
 					// looping through each row..
 					// and now loop through each column to be selected
-					for(var i = 0; i < columnIds.length; i++){
+					for(i = 0; i < columnIds.length; i++){
 						cell = this.cell(nextNode, columnIds[i]);
 						this.select(cell);
 					}
 					if(nextNode == toElement){
 						break;
 					}
-				}while(nextNode = cell.row.element[traverser]);
+				}while((nextNode = cell.row.element[traverser]));
 			}
 		}
 	},
@@ -120,11 +121,11 @@ return declare([Selection], {
 		}
 
 		return this.selection[object.row.id] && !!this.selection[object.row.id][object.column.id];
- 	},
+	},
 	clearSelection: function(exceptId){
 		// disable exceptId in cell selection, since it would require double parameters
 		exceptId = false;
 		this.inherited(arguments);
-	},
+	}
 });
 });

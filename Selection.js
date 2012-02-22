@@ -147,8 +147,8 @@ return declare([List], {
 	
 	allowSelect: function(row){
 		// summary:
-		// 		A method that can be overriden to determine whether or not a row (or 
-		// 		cell) can be selected. By default, all rows (or cells) are selectable.
+		//		A method that can be overriden to determine whether or not a row (or 
+		//		cell) can be selected. By default, all rows (or cells) are selectable.
 		return true;
 	},
 	select: function(row, toRow, value){
