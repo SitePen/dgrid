@@ -64,8 +64,6 @@
 						selectionMode: "single"
 					},
 					CustomGrid = declare([Grid, Selection, DijitRegistry]),
-					gridLeft = new CustomGrid(lang.mixin({id: "gridLeft"}, gridArgs)),
-					gridTab1 = new CustomGrid(lang.mixin({id: "gridTab1"}, gridArgs)),
 					gridTab2 = new CustomGrid(lang.mixin({id: "gridTab2"}, gridArgs));
 				
 				var bc = new BC({
@@ -94,7 +92,7 @@
 				tc.addChild(new CP({
 					id: "tab1",
 					title: "Tab 1",
-					content: gridTab1
+					content: "tab 1 content (see grid on tab 2)"
 				}));
 				tc.addChild(new CP({
 					id: "tab2",
@@ -106,7 +104,7 @@
 				bc.addChild(new CP({
 					id: "cpLeft",
 					region: "left",
-					content: gridLeft
+					content: "left content"
 				}));
 				bc.addChild(tc);
 				
