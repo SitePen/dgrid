@@ -110,7 +110,7 @@ return declare([List, _StoreMixin], {
 				return trs;
 			});
 		});
-		
+
 		// return results so that callers can handle potential of async error
 		return results;
 	},
@@ -249,10 +249,14 @@ return declare([List, _StoreMixin], {
 					
 					if(visibleBottom + mungeAmount < preloadTop){
 						// the preload is below the line of sight
-						preload = preload.previous;
+						do{
+							preload = preload.previous;
+						}while(preload && !preload.node.offsetParent); // skip past preloads that are not currently connected
 					}else if(visibleTop - mungeAmount > (preloadTop + (preloadHeight = preloadNode.offsetHeight))){
 						// the preload is above the line of sight
-						preload = preload.next;
+						do{
+							preload = preload.next;
+						}while(preload && !preload.node.offsetParent);// skip past preloads that are not currently connected
 					}else{
 						// the preload node is visible, or close to visible, better show it
 						var offset = ((preloadNode.rowIndex ? visibleTop : visibleBottom) - preloadTop) / grid.rowHeight;
@@ -329,7 +333,6 @@ return declare([List, _StoreMixin], {
 						put(loadingNode, "div.dgrid-" + (below ? "below" : "above"), grid.loadingMessage);
 						// use the query associated with the preload node to get the next "page"
 						options.query = preload.query;
-						
 						// Query now to fill in these rows.
 						// Keep _trackError-wrapped results separate, since if results is a
 						// promise, it will lose QueryResults functions when chained by `when`

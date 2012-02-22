@@ -30,7 +30,7 @@
 						query: function(query, options){
 							// have to manually adjust the query to get rid of the double ?? that trips php up
 							if(query.parent){
-								query = "parent=" + parent;
+								query = "parent=" + query.parent;
 							}
 							return JsonRest.prototype.query.call(this, query, options);
 						}
