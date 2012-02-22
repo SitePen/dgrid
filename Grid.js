@@ -1,4 +1,5 @@
-define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Editor", "./List", "dojo/_base/sniff"], function(has, put, declare, listen, Editor, List){
+define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/on", "dojo/has", "put-selector/put", "./Editor", "./List", "dojo/_base/sniff"],
+function(kernel, declare, listen, has, put, Editor, List){
 	var contentBoxSizing = has("ie") < 8 && !has("quirks");
 	
 	function appendIfNode(parent, subNode){
@@ -352,6 +353,15 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 			this.subRows = subrows;
 			this._updateColumns();
 		},
+		setColumns: function(columns){
+			kernel.deprecated("setColumns(...)", 'use set("columns", ...) instead', "dgrid 1.0");
+			this.set("columns", columns);
+		},
+		setSubRows: function(subrows){
+			kernel.deprecated("setSubRows(...)", 'use set("subRows", ...) instead', "dgrid 1.0");
+			this.set("subRows", subrows);
+		},
+		
 		_updateColumns: function(){
 			// summary:
 			//		Called after e.g. columns, subRows, columnSets are updated

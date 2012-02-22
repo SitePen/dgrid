@@ -1,5 +1,5 @@
-define(["dojo/_base/declare", "dojo/_base/Deferred", "dojo/on", "./List", "put-selector/put", "dojo/has", "dojo/query"],
-function(declare, Deferred, on, List, put, has){
+define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/Deferred", "dojo/on", "dojo/has", "./List", "put-selector/put", "dojo/query"],
+function(kernel, declare, Deferred, on, has, List, put){
 
 var ctrlEquiv = has("mac") ? "metaKey" : "ctrlKey";
 return declare([List], {
@@ -48,6 +48,10 @@ return declare([List], {
 		this._lastSelected = null;
 		
 		this.selectionMode = mode;
+	},
+	setSelectionMode: function(mode){
+		kernel.deprecated("setSelectionMode(...)", 'use set("selectionMode", ...) instead', "dgrid 1.0");
+		this.set("selectionMode", mode);
 	},
 	
 	_handleSelect: function(event, currentTarget){

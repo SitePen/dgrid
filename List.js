@@ -1,5 +1,5 @@
-define(["put-selector/put", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/has", "dojo/has!touch?./SimpleTouchScroll", "xstyle/has-class", "dojo/_base/sniff", "xstyle/css!./css/dgrid.css"], 
-function(put, declare, listen, aspect, has, TouchScroll, hasClass){
+define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/has", "dojo/has!touch?./SimpleTouchScroll", "xstyle/has-class", "put-selector/put", "dojo/_base/sniff", "xstyle/css!./css/dgrid.css"], 
+function(kernel, declare, listen, aspect, has, TouchScroll, hasClass, put){
 	// Add user agent/feature CSS classes 
 	hasClass("mozilla", "opera", "webkit", "ie", "ie-6", "ie-6-7", "quirks", "no-quirks", "touch");
 	
@@ -237,6 +237,10 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			
 			this.renderHeader();
 			this.resize(); // to account for (dis)appearance of header
+		},
+		setShowHeader: function(show){
+			kernel.deprecated("setShowHeader(...)", 'use set("showHeader", ...) instead', "dgrid 1.0");
+			this.set("showHeader", show);
 		},
 		
 		configStructure: function(){

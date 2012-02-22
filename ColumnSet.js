@@ -1,5 +1,5 @@
-define(["xstyle/css!./css/columnset.css", "dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/query", "./Grid", "xstyle/has-class", "dojo/_base/sniff"], 
-function(styleSheet, has, put, declare, listen, aspect, query, Grid, hasClass){
+define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/query", "dojo/has", "put-selector/put", "xstyle/has-class", "./Grid", "dojo/_base/sniff", "xstyle/css!./css/columnset.css"], 
+function(kernel, declare, listen, aspect, query, has, put, hasClass, Grid){
 		// summary:
 		//		This module provides column sets to isolate horizontal scroll of sets of 
 		//		columns from each other. This mainly serves the purpose of allowing for
@@ -96,6 +96,10 @@ function(styleSheet, has, put, declare, listen, aspect, query, Grid, hasClass){
 		_setColumnSets: function(columnSets){
 			this.columnSets = columnSets;
 			this._updateColumns();
+		},
+		setColumnSets: function(columnSets){
+			kernel.deprecated("setColumnSets(...)", 'use set("columnSets", ...) instead', "dgrid 1.0");
+			this.set("columnSets", columnSets);
 		}
 	});
 	function positionScrollers(grid, domNode){
