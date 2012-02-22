@@ -123,20 +123,20 @@
 					
 					// hook up buttons for testing setSubRows / setColumnSets
 					on(byId("btnSubRows1"), "click", function(){
-						gridNoColumnSets.setSubRows(subRows1);
+						gridNoColumnSets.set("subRows", subRows1);
 					});
 					on(byId("btnSubRows2"), "click", function(){
-						gridNoColumnSets.setSubRows(subRows2);
+						gridNoColumnSets.set("subRows", subRows2);
 					});
 					
 					on(byId("btnColumnSets1"), "click", function(){
-						grid.setColumnSets(columnSets1);
+						grid.set("columnSets", columnSets1);
 					});
 					on(byId("btnColumnSets2"), "click", function(){
-						grid.setColumnSets(columnSets2);
+						grid.set("columnSets", columnSets2);
 					});
 					on(byId("btnColumnSets3"), "click", function(){
-						grid.setColumnSets(columnSets3);
+						grid.set("columnSets", columnSets3);
 					});
 					
 					//NOTE: Grid == OnDemandGrid, GridFromHtml == ver w/ ColumnSet support

@@ -70,7 +70,7 @@ return declare([List, _StoreMixin], {
 		}
 		var loadingNode = put(preloadNode, "-div.dgrid-loading");
 		put(loadingNode, "div.dgrid-below", this.loadingMessage);
-		var options = this.getQueryOptions({start: 0, count: this.minRowsPerPage, query: query});
+		var options = this.get("queryOptions", {start: 0, count: this.minRowsPerPage, query: query});
 		// execute the query
 		var results = query(options);
 		var self = this;
@@ -110,7 +110,7 @@ return declare([List, _StoreMixin], {
 		// return results so that callers can handle potential of async error
 		return results;
 	},
-	getQueryOptions: function(mixin){
+	_getQueryOptions: function(mixin){
 		// summary:
 		//		Get a fresh queryOptions object with the current sort added to it and any mixin added in
 		options = this.queryOptions ? lang.delegate(this.queryOptions, mixin) : mixin || {};
@@ -136,7 +136,7 @@ return declare([List, _StoreMixin], {
 		}
 	},
 	
-	getRowHeight: function(rowElement){
+	_calcRowHeight: function(rowElement){
 		// summary:
 		//		Calculate the height of a row. This is a method so it can be overriden for
 		//		plugins that add connected elements to a row, like the tree
@@ -186,7 +186,7 @@ return declare([List, _StoreMixin], {
 						var count = 0;
 						var toDelete = [];
 						while(row = nextRow){ // intentional assignment
-							var rowHeight = grid.getRowHeight(row);
+							var rowHeight = grid._calcRowHeight(row);
 							if(reclaimedHeight + rowHeight + farOffRemoval > distanceOff || nextRow.className.indexOf("dgrid-row") < 0){
 								// we have reclaimed enough rows or we have gone beyond grid rows, let's call it good
 								break;
@@ -273,7 +273,7 @@ return declare([List, _StoreMixin], {
 						}
 						offset = Math.round(offset);
 						count = Math.round(count);
-						var options = grid.getQueryOptions();
+						var options = grid.get("queryOptions");
 						preload.count -= count;
 						var beforeNode = preloadNode,
 							keepScrollTo, queryRowsOverlap = grid.queryRowsOverlap,

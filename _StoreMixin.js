@@ -1,5 +1,5 @@
-define(["dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/on"],
-function(declare, lang, Deferred, listen){
+define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/on"],
+function(kernel, declare, lang, Deferred, listen){
 	// This module isolates the base logic required by store-aware list/grid
 	// components, e.g. OnDemandList/Grid and the Pagination extension.
 	
@@ -37,15 +37,15 @@ function(declare, lang, Deferred, listen){
 			this.dirty = {};
 		},
 
-		setStore: function(store, query, queryOptions){
+		_setStore: function(store, query, queryOptions){
 			// summary:
 			//		Assigns a new store (and optionally query/queryOptions) to the list,
 			//		and tells it to refresh.
 			this.store = store;
 			this.dirty = {}; // discard dirty map, as it applied to a previous store
-			this.setQuery(query, queryOptions);
+			this.set("query", query, queryOptions);
 		},
-		setQuery: function(query, queryOptions){
+		_setQuery: function(query, queryOptions){
 			// summary:
 			//		Assigns a new query (and optionally queryOptions) to the list,
 			//		and tells it to refresh.
@@ -59,6 +59,14 @@ function(declare, lang, Deferred, listen){
 			// (which will update sortOrder and call refresh in itself).
 			// Otherwise, just refresh.
 			sort ? this.sort(sort) : this.refresh();
+		},
+		setStore: function(store, query, queryOptions){
+			kernel.deprecated("setStore(...)", 'use set("store", ...) instead', "dgrid 1.0");
+			this.set("store", store, query, queryOptions);
+		},
+		setQuery: function(query, queryOptions){
+			kernel.deprecated("setQuery(...)", 'use set("query", ...) instead', "dgrid 1.0");
+			this.set("query", query, queryOptions);
 		},
 		
 		sort: function(property, descending){
@@ -85,7 +93,7 @@ function(declare, lang, Deferred, listen){
 			return this.inherited(arguments);
 		},
 		
-		setDirty: function(id, field, value){
+		updateDirty: function(id, field, value){
 			// summary:
 			//		Updates dirty data of a field for the item with the specified ID.
 			var dirty = this.dirty,
@@ -95,6 +103,10 @@ function(declare, lang, Deferred, listen){
 				dirtyObj = dirty[id] = {};
 			}
 			dirtyObj[field] = value;
+		},
+		setDirty: function(id, field, value){
+			kernel.deprecated("setDirty(...)", "use updateDirty() instead", "dgrid 1.0");
+			this.updateDirty(id, field, value);
 		},
 		
 		save: function() {
