@@ -54,7 +54,7 @@ define(["dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put"], funct
 						}
 						lastRow = event.shiftKey ? lastRow : null;
 						grid.select(lastRow|| row, row, lastRow ? undefined : null);
-						grid._lastSelected = grid.selectionMode != "single" && row.element;
+						grid._lastSelected = row.element;
 					}else{
 						put(this, (grid.allSelected ? "!" : ".") + "dgrid-select-all");
 						grid[grid.allSelected ? "clearSelection" : "selectAll"]();
