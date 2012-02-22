@@ -133,7 +133,7 @@ return declare([List, _StoreMixin], {
 		}
 	},
 	
-	_getRowHeight: function(rowElement){
+	_calcRowHeight: function(rowElement){
 		// summary:
 		//		Calculate the height of a row. This is a method so it can be overriden for
 		//		plugins that add connected elements to a row, like the tree
@@ -183,7 +183,7 @@ return declare([List, _StoreMixin], {
 						var count = 0;
 						var toDelete = [];
 						while(row = nextRow){ // intentional assignment
-							var rowHeight = grid.get("rowHeight", row);
+							var rowHeight = grid._calcRowHeight(row);
 							if(reclaimedHeight + rowHeight + farOffRemoval > distanceOff || nextRow.className.indexOf("dgrid-row") < 0){
 								// we have reclaimed enough rows or we have gone beyond grid rows, let's call it good
 								break;

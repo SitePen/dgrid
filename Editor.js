@@ -27,9 +27,9 @@ function setProperty(grid, cellElement, oldValue, value){
 						bubbles: true,
 						cancelable: true
 					})){
-				if (grid._setDirty){
+				if (grid.updateDirty){
 					// for OnDemandGrid: update dirty data, and save if autoSave is true
-					grid.set("dirty", row.id, column.field, value);
+					grid.updateDirty(row.id, column.field, value);
 					column.autoSave && grid._trackError("save");
 				}
 			}else{

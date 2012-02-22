@@ -117,9 +117,6 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			}
 			this.create(params, srcNodeRef);
 		},
-		_getCssClass: function(shortName){
-			return "dgrid-" + shortName;
-		},
 		listType: "list",
 		
 		create: function(params, srcNodeRef){

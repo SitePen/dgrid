@@ -85,7 +85,7 @@ function(declare, lang, Deferred, listen){
 			return this.inherited(arguments);
 		},
 		
-		_setDirty: function(id, field, value){
+		updateDirty: function(id, field, value){
 			// summary:
 			//		Updates dirty data of a field for the item with the specified ID.
 			var dirty = this.dirty,
