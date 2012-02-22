@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.6.1/dojo/resources/dojo.css">
+	<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.6.1/dijit/themes/claro/claro.css">
+	<style>
+		#main {
+			margin: 20px 0 0 20px;
+		}
+	</style>
+</head>
+
+<body>
+
+<div id="main" class="claro">
+	<div data-dojo-type="dijit.layout.TabContainer" style="width: 350px; height: 600px;">
+		<div data-dojo-type="dijit.layout.ContentPane" title="Tab1" selected="true">
+			Nothing of interest here, look at the dgrid in Tab2
+		</div>
+
+		<div data-dojo-type="dijit.layout.ContentPane" title="Tab2">
+			<div id="grid"></div>
+		</div>
+	</div>
+</div>
+
+<!--<script src="http://ajax.googleapis.com/ajax/libs/dojo/1.7.2/dojo/dojo.js" data-dojo-config="parseOnLoad: true"></script>-->
+<script src="../../dojo/dojo.js" data-dojo-config="parseOnLoad: true"></script>
+
+<script>
+var dependencies = [
+	'dojo',
+	'dijit/layout/TabContainer',
+	'dijit/layout/ContentPane',
+	'dojo/store/JsonRest',
+	'dgrid/OnDemandGrid',
+	'dojo/domReady'
+];
+
+require( dependencies, function( dojo, TabContainer, ContentPane, JsonStore, Grid ) {
+	var store;
+	var grid;
+
+	store = new JsonStore( {target: 'data/rest.php'} );
+
+	grid = new Grid({
+		columns: [
+			{ label: "ID", field: "id" },
+			{ label: "Name", field: "name" }
+		],
+		store: store,
+	}, "grid");
+});
+</script>
+
+</body>
+</html>
