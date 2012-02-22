@@ -27,7 +27,7 @@
 			require(["dojo/on", "dojo/_base/window", "dgrid/OnDemandGrid", "dgrid/Selector", "dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!"], 
 				function(on, win, Grid, Selector, Selection, Keyboard, declare, testStore){
 					var columns = { // you can declare columns as an object hash (key translates to field)
-							col1: Selector({ type: "checkbox"}),
+							col1: Selector({ type: "checkbox", disabled: function(object){ return object.col1 == "note"; }}),
 							id: "ID",
 							col2: {label: 'Column 2', sortable: false},
 							col3: {label: 'Column 3'}
@@ -47,7 +47,7 @@
 						allowSelectAll: true
 					}, "grid");
 					var columnsRadio = { // you can declare columns as an object hash (key translates to field)
-						col1: Selector({ label: 'Radio', type: "radio" }),
+						col1: Selector({ label: 'Radio', type: "radio", disabled: function(object){ return object.col3 == "read"; } }),
 						id: "ID",
 						col2: {label: 'Column 2', sortable: false},
 						col3: {label: 'Column 3'}
