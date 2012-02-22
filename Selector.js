@@ -78,7 +78,7 @@ define(["dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put"], funct
 				if(this.cell(event).column != column){
 					handleSelect.apply(this, arguments);
 				}
-			}
+			};
 			if(typeof column.disabled == "function"){
 				// we override this method to have selection's follow the disabled method for selectability
 				var originalAllowSelect = grid.allowSelect;
