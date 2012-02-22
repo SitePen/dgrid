@@ -60,8 +60,7 @@
 					};
 					gridCellNavigation = declare([Grid, CellSelection, Keyboard])({
 						store: testStore,
-						columns: columns2,
-						allowSelectAll: false
+						columns: columns2
 					}, "grid-cell-navigation");
 					gridCellNavigationSingle = declare([Grid, CellSelection, Keyboard])({
 						store: testStore,
@@ -76,7 +75,8 @@
 					gridCellNavigationNone = declare([Grid, CellSelection, Keyboard])({
 						store: testStore,
 						columns: columns2,
-						selectionMode: "none"
+						selectionMode: "none",
+						allowSelectAll: true
 					}, "grid-cell-navigation-none");
 					
 					// cell navigation + row selection
@@ -89,7 +89,7 @@
 	</head>
 	<body class="nihilo">
 		<h2>A grid with row-level selection (and row-level navigation)</h2>
-		<h3>Use ctrl/cmd-a to test keyboard select-all with different selectionModes</h3>
+		<h3>Use Ctrl/Cmd+A to test keyboard select-all with different selectionModes</h3>
 		<div>Set selectionMode:
 			<button type="button" onclick="gridRowNavigation.setSelectionMode('none');">None</button>
 			<button type="button" onclick="gridRowNavigation.setSelectionMode('single');">Single</button>
@@ -103,7 +103,9 @@
 		<div id="grid-cell-navigation-single"></div>
 		<h2>A grid with cell-level selection and selection mode of "multiple"</h2>
 		<div id="grid-cell-navigation-multiple"></div>
-		<h2>A grid with cell-level selection and selection mode of "none"</h2>
+		<h2>A grid with cell-level selection and selection mode of "none" initially</h2>
+		<h3>Use Ctrl/Cmd+A to test keyboard select-all with different selectionModes
+			(will be disabled when selectionMode is "none")</h3>
 		<div>Set selectionMode:
 			<button type="button" onclick="gridCellNavigationNone.setSelectionMode('none');">None</button>
 			<button type="button" onclick="gridCellNavigationNone.setSelectionMode('single');">Single</button>

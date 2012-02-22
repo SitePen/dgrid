@@ -111,6 +111,7 @@ define(["dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put"], funct
 		column.renderCell = function(object, value, cell, options, header){
 			if(!grid){
 				grid = column.grid;
+				grid._hasSelector = true;
 			}
 
 			var row = object && grid.row(object);

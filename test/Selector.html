@@ -74,7 +74,8 @@
 		</script>
 	</head>
 	<body class="claro">
-		<h2>A grid with checkbox selectors</h2>
+		<h2>A grid with checkbox selectors, with select-all enabled
+			(top checkbox, and Ctrl/Cmd+A)</h2>
 		<div>
 			<button type="button" onclick="grid.setSelectionMode('none');">
 				Set selection mode to "none"</button>
@@ -86,8 +87,6 @@
 				Set selection mode to "extended"</button>
 		</div>
 		<div id="grid"></div>
-		<h2>A grid with select all disabled</h2>
-		<div id="grid2"></div>
 		<h2>A grid with radio selectors</h2>
 		<div>
 			<button type="button" onclick="gridRadio.setSelectionMode('none');">
@@ -96,5 +95,7 @@
 				Set selection mode to "single" (to test sync)</button>
 		</div>
 		<div id="grid-radio"></div>
+		<h2>A grid with checkbox selectors, with select-all disabled</h2>
+		<div id="grid2"></div>
 	</body>
 </html>

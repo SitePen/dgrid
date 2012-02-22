@@ -21,7 +21,8 @@ return declare([List], {
 	deselectOnRefresh: true,
 
 	//allowSelectAll: Boolean
-	//      if true, allow ctrl/cmd-a to select all rows
+	//		If true, allow ctrl/cmd+A to select all rows.
+	//		Also consulted by Selector for showing select-all checkbox.
 	allowSelectAll: false,
 	
 	create: function(){
@@ -30,8 +31,12 @@ return declare([List], {
 	},
 	postCreate: function(){
 		this.inherited(arguments);
-
 		this._initSelectionEvents(); // first time; set up event hooks
+		
+		// set internal variable which determines whether select-all *should* be
+		// allowed, based also on selectionMode and presence of selector
+		this._allowSelectAll = this.allowSelectAll &&
+			(this.selectionMode != "none" || this._hasSelector);
 	},
 	
 	// selection:
@@ -44,12 +49,15 @@ return declare([List], {
 	
 	setSelectionMode: function(mode){
 		// summary:
-		//		Updates selectionMode, hooking up listener if necessary.
+		//		Updates selectionMode, resetting necessary variables.
 		if(mode == this.selectionMode){ return; } // prevent unnecessary spinning
 		
 		// Start selection fresh when switching mode.
 		this.clearSelection();
 		this._lastSelected = null;
+		
+		this._allowSelectAll = this.allowSelectAll &&
+			(mode != "none" || this._hasSelector);
 		
 		this.selectionMode = mode;
 	},
@@ -148,13 +156,16 @@ return declare([List], {
 			on(this.contentNode, on.selector(selector, this.selectionEvents), focus);
 		}
 
-		//if allowSelectAll boolean property is true, allow ctrl/cmd-a to select all rows
-		//also checks if selectionMode is not none before selecting all
+		// If allowSelectAll is true, allow ctrl/cmd+A to (de)select all rows.
+		// (Handler further checks against _allowSelectAll, which may be updated
+		// if selectionMode is changed post-init.)
 		if(this.allowSelectAll){
 			var selectAllHandle = on(this.contentNode, "keydown", function(event) {
-				if (event[ctrlEquiv] && event.keyCode == 65 && grid.selectionMode != "none") {
+				if (!grid._allowSelectAll){console.log('awww.');}
+				if (event[ctrlEquiv] && event.keyCode == 65 && grid._allowSelectAll) {
+					console.log('yaaaaay?!');
 					event.preventDefault();
-					grid.selectAll();
+					grid[grid.allSelected ? "clearSelection" : "selectAll"]();
 				}
 			});
 		}
@@ -167,6 +178,7 @@ return declare([List], {
 		//		cell) can be selected. By default, all rows (or cells) are selectable.
 		return true;
 	},
+	
 	select: function(row, toRow, value){
 		if(value === undefined){
 			// default to true
