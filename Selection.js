@@ -160,7 +160,7 @@ return declare([List], {
 		// (Handler further checks against _allowSelectAll, which may be updated
 		// if selectionMode is changed post-init.)
 		if(this.allowSelectAll){
-			var selectAllHandle = on(this.contentNode, "keydown", function(event) {
+			this.on("keydown", function(event) {
 				if (!grid._allowSelectAll){console.log('awww.');}
 				if (event[ctrlEquiv] && event.keyCode == 65 && grid._allowSelectAll) {
 					console.log('yaaaaay?!');
