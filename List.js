@@ -312,9 +312,11 @@ function(kernel, declare, listen, aspect, has, TouchScroll, hasClass, put){
 				this._listeners.push(signal);
 			}
 		},
-		cleanup: function(){		
-			var i;
-			// iterator through all the row elements and destroy them
+		
+		cleanup: function(){
+			var observers = this.observers,
+				i;
+			// iterate through all the row elements and destroy them
 			for(i in this._rowIdToObject){
 				if(this._rowIdToObject[i] != this.columns){
 					var rowElement = byId(i);
@@ -323,8 +325,7 @@ function(kernel, declare, listen, aspect, has, TouchScroll, hasClass, put){
 					}
 				}
 			}
-			// remove any listeners
-			var observers = this.observers;
+			// remove any store observers
 			for(i = 0;i < observers.length; i++){
 				var observer = observers[i];
 				observer && observer.cancel();
@@ -335,12 +336,13 @@ function(kernel, declare, listen, aspect, has, TouchScroll, hasClass, put){
 		destroy: function(){
 			// summary:
 			//		Destroys this grid
-			// cleanup listeners
+			
+			// remove any event listeners
 			for(var i = this._listeners.length; i--;){
 				this._listeners[i].remove();
 			}
 			delete this._listeners;
-
+			
 			this.cleanup();
 			// destroy DOM
 			put("!", this.domNode);
