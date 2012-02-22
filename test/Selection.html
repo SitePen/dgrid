@@ -48,7 +48,8 @@
 					gridRowNavigation = dojo.declare([Grid, Selection, Keyboard])({
 						store: testStore,
 						cellNavigation: false,
-						columns: columns
+						columns: columns,
+						allowSelectAll: true
 					}, "grid-row-navigation");
 					
 					var columns2 = {
@@ -59,7 +60,8 @@
 					};
 					gridCellNavigation = declare([Grid, CellSelection, Keyboard])({
 						store: testStore,
-						columns: columns2
+						columns: columns2,
+						allowSelectAll: false
 					}, "grid-cell-navigation");
 					gridCellNavigationSingle = declare([Grid, CellSelection, Keyboard])({
 						store: testStore,
@@ -87,6 +89,7 @@
 	</head>
 	<body class="nihilo">
 		<h2>A grid with row-level selection (and row-level navigation)</h2>
+		<h3>Use ctrl/cmd-a to test keyboard select-all with different selectionModes</h3>
 		<div>Set selectionMode:
 			<button type="button" onclick="gridRowNavigation.setSelectionMode('none');">None</button>
 			<button type="button" onclick="gridRowNavigation.setSelectionMode('single');">Single</button>

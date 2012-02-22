@@ -116,7 +116,7 @@ define(["dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put"], funct
 			var row = object && grid.row(object);
 			value = row && grid.selection[row.id];
 
-			if(header && (type == "radio" || typeof object == "string")){
+			if(header && (type == "radio" || typeof object == "string" || !grid.allowSelectAll)){
 				cell.appendChild(document.createTextNode(object||""));
 				if(!grid._hasSelectorInputListener){
 					setupSelectionEvents();

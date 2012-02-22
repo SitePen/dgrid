@@ -32,6 +32,12 @@
 							col2: {label: 'Column 2', sortable: false},
 							col3: {label: 'Column 3'}
 						};
+					var columns2 = { // you can declare columns as an object hash (key translates to field)
+							col1: Selector({ type: "checkbox", label:"Select"}),
+							id: "ID",
+							col2: {label: 'Column 2', sortable: false},
+							col3: {label: 'Column 3'}
+						};
 					
 					on(win.body(), "dgrid-select,dgrid-deselect",
 						function(event){
@@ -43,8 +49,15 @@
 					window.grid = dojo.declare([Grid, Selection, Keyboard])({
 						store: testStore,
 						selectionMode: "none",
-						columns: columns
+						columns: columns,
+						allowSelectAll: true
 					}, "grid");
+					window.grid2 = dojo.declare([Grid, Selection, Keyboard])({
+						store: testStore,
+						selectionMode: "none",
+						columns: columns2,
+						allowSelectAll: false
+					}, "grid2");
 					var columnsRadio = { // you can declare columns as an object hash (key translates to field)
 						col1: Selector({ label: 'Radio', type: "radio", disabled: function(object){ return object.col3 == "read"; } }),
 						id: "ID",
@@ -73,6 +86,8 @@
 				Set selection mode to "extended"</button>
 		</div>
 		<div id="grid"></div>
+		<h2>A grid with select all disabled</h2>
+		<div id="grid2"></div>
 		<h2>A grid with radio selectors</h2>
 		<div>
 			<button type="button" onclick="gridRadio.setSelectionMode('none');">
