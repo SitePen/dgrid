@@ -34,7 +34,7 @@ define(["dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put"], funct
 			// trigger a click, but the click event doesn't provide access to the shift key in firefox, so
 			// listen for keydown's as well to get an event in firefox that we can properly retrieve
 			// the shiftKey property from
-			if(event.type == "click" || event.keyCode == 32){ 
+			if(event.type == "click" || event.keyCode == 32 || event.keyCode == 0){ 
 				var row = grid.row(event), lastRow = grid._lastSelected && grid.row(grid._lastSelected);
 	
 				if(type == "radio"){
