@@ -59,8 +59,11 @@
 							field: "bool",
 							get: function(item){
 								// return as string to match option in list
-								console.log('in get', "" + item.bool);
 								return "" + item.bool;
+							},
+							set: function(item){
+								// convert back to boolean from string
+								return item.bool == "true";
 							},
 							editorArgs: {
 								style: "width:75px;",

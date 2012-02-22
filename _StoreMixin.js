@@ -36,7 +36,21 @@ function(declare, lang, Deferred, listen){
 			this.queryOptions || (this.queryOptions = {});
 			this.dirty = {};
 		},
-
+		
+		_configColumn: function(column){
+			// summary:
+			//		Implements extension point provided by Grid to store references to
+			//		any columns with `set` methods, for use during `save`.
+			if (column.set){ this._columnsWithSet[column.field] = column; }
+		},
+		
+		_configColumns: function(){
+			// summary:
+			//		Extends Grid to reset _StoreMixin's hash when columns are updated
+			this._columnsWithSet = {};
+			return this.inherited(arguments);
+		},
+		
 		setStore: function(store, query, queryOptions){
 			// summary:
 			//		Assigns a new store (and optionally query/queryOptions) to the list,
@@ -102,11 +116,13 @@ function(declare, lang, Deferred, listen){
 			var self = this,
 				store = this.store,
 				dirty = this.dirty,
+				getBeforePut = self.getBeforePut,
+				colsWithSet = self._columnsWithSet,
 				dfd = new Deferred(), promise = dfd.promise,
 				getFunc = function(id){
 					// returns a function to pass as a step in the promise chain,
 					// with the id variable closured
-					return self.getBeforePut ?
+					return getBeforePut ?
 						function(){ return store.get(id); } :
 						function(){ return self.row(id).data; };
 				};
@@ -116,8 +132,11 @@ function(declare, lang, Deferred, listen){
 				// Return a function handler
 				return function(object) {
 					var key;
-					// Copy dirty props to the original
-					for(key in dirtyObj){ object[key] = dirtyObj[key]; }
+					// Copy dirty props to the original, applying setters if applicable
+					for(key in dirtyObj){
+						object[key] = colsWithSet[key] ? colsWithSet[key].set(dirtyObj) :
+							dirtyObj[key];
+					}
 					// Put it in the store, returning the result/promise
 					return Deferred.when(store.put(object), function() {
 						// Delete the item now that it's been confirmed updated

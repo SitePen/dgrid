@@ -303,12 +303,22 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./List
 			// now add a rule to style the column
 			return this.addCssRule("#" + this.domNode.id + ' .column-' + colId, css);
 		},
+		
+		/*=====
+		_configColumn: function(column, columnId, rowColumns, prefix){
+			// summary:
+			//		Method called when normalizing base configuration of a single
+			//		column.  Can be used as an extension point for behavior requiring
+			//		access to columns when a new configuration is applied.
+		},=====*/
+		
 		_configColumns: function(prefix, rowColumns){
 			// configure the current column
-			var subRow = [];
-			var isArray = rowColumns instanceof Array; 
-			for(var columnId in rowColumns){
-				var column = rowColumns[columnId];
+			var subRow = [],
+				isArray = rowColumns instanceof Array,
+				columnId, column;
+			for(columnId in rowColumns){
+				column = rowColumns[columnId];
 				if(typeof column == "string"){
 					rowColumns[columnId] = column = {label:column};
 				}
@@ -316,14 +326,15 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./List
 					column.field = columnId;
 				}
 				columnId = column.id = column.id || (isNaN(columnId) ? columnId : (prefix + columnId));
-				if(prefix){
-					this.columns[columnId] = column;
+				if(prefix){ this.columns[columnId] = column; }
+				
+				// allow further base configuration in subclasses
+				if(this._configColumn){
+					this._configColumn(column, columnId, rowColumns, prefix);
 				}
 				
-				// add reference to this instance to each column object,
-				// for potential use by column plugins
+				// add grid reference to each column object for potential use by plugins
 				column.grid = this;
-				
 				subRow.push(column); // make sure it can be iterated on
 			}
 			return isArray ? rowColumns : subRow;
@@ -370,6 +381,6 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./List
 		if(data != null){
 			td.appendChild(document.createTextNode(data));
 		}
-	}
+	};
 	return Grid;
 });
