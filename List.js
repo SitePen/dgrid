@@ -310,42 +310,48 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 				this._listeners.push(signal);
 			}
 		},
-		destroy: function(){
+		cleanup: function(){		
 			var i;
-			
+			// iterator through all the row elements and destroy them
+			for(i in this._rowIdToObject){
+				if(this._rowIdToObject[i] != this.columns){
+					var rowElement = byId(i);
+					if(rowElement){
+						this.removeRow(rowElement);
+					}
+				}
+			}
+			// remove any listeners
+			var observers = this.observers;
+			for(i = 0;i < observers.length; i++){
+				var observer = observers[i];
+				observer && observer.cancel();
+			}
+			this.observers = [];
+			this.preload = null;
+		},
+		destroy: function(){
+			// summary:
+			//		Destroys this grid
 			// cleanup listeners
-			for(i = this._listeners.length; i--;){
+			for(var i = this._listeners.length; i--;){
 				this._listeners[i].remove();
 			}
 			delete this._listeners;
-			
-			// iterator through all the row elements and destroy them
-			for(i in this._rowIdToObject){
-				var rowElement = byId(i);
-				if(rowElement){
-					this.removeRow(rowElement);
-				}
-			}
-			
+
+			this.cleanup();
 			// destroy DOM
 			put("!", this.domNode);
 		},
 		refresh: function(){
 			// summary:
 			//		refreshes the contents of the grid
+			this.cleanup();
 			this._rowIdToObject = {};
 			this._autoId = 0;
 			
-			// remove the content so it can be recreated
-			// FIXME: this gives no opportunity for properly destroying widgets, etc.
+			// make sure all the content has been removed so it can be recreated
 			this.contentNode.innerHTML = "";
-			// remove any listeners
-			for(var i = 0;i < this.observers.length; i++){
-				var observer = this.observers[i];
-				observer && observer.cancel();
-			}
-			this.observers = [];
-			this.preloadNode = null;
 		},
 		newRow: function(object, before, to, options){
 			if(before.parentNode){
