@@ -26,25 +26,10 @@ define(["dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put"], funct
 				}
 				headerCheckbox.indeterminate = mixed;
 				headerCheckbox.checked = grid.allSelected;
-				
-				// we record the most recent event to avoid undoing it in the next event (click)
-				recentInput = element;
-				clearTimeout(recentTimeout);
-				recentTimeout = setTimeout(function(){
-					// the most intuitive way to determine if the next event should be 
-					// cancelled seems more to do with time than any sequence of events,
-					// after a short pause a user naturally beings to expect that their
-					// next action (releasing the mouse) will have an affect. 
-					recentInput = false;
-				}, 500);
 			};
 		}
 
 		function onSelect(event){
-			if(recentInput == this){
-				// an event recently occurred on this input so we cancel it so we don't have the click undoing the selection
-				return event.preventDefault();
-			}
 			// we would really only care about click, since other input sources, like spacebar
 			// trigger a click, but the click event doesn't provide access to the shift key in firefox, so
 			// listen for keydown's as well to get an event in firefox that we can properly retrieve
@@ -82,9 +67,18 @@ define(["dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put"], funct
 			// register one listener at the top level that receives events delegated
 			grid._hasSelectorInputListener = true;
 			aspect.before(grid, "_initSelectionEvents", function(){
-				this.on(".dgrid-selector-input:click,.dgrid-selector-input:keydown", onSelect);
+				// listen for clicks and keydown as the triggers
+				this.on(".dgrid-selector:click,.dgrid-selector:keydown", onSelect);
 			});
+			var handleSelect = grid._handleSelect;
+			grid._handleSelect = function(event){
+				// ignore the default select handler for events that originate from the selector column
+				if(this.cell(event).column != column){
+					handleSelect.apply(this, arguments);
+				}
+			}
 			if(typeof column.disabled == "function"){
+				// we override this method to have selection's follow the disabled method for selectability
 				var originalAllowSelect = grid.allowSelect;
 				grid.allowSelect = function(row){
 					return originalAllowSelect.call(this, row) && !column.disabled(row.data);
@@ -97,11 +91,10 @@ define(["dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put"], funct
 		
 		var disabled = column.disabled;
 		var renderInput = typeof type == "function" ? type : function(value, cell, object){
-			var input = cell.input || (cell.input = put(cell, "input.dgrid-selector-input[type="+type + "]", {
+			var input = cell.input || (cell.input = put(cell, ".dgrid-selector input[type="+type + "]", {
 				tabIndex: isNaN(column.tabIndex) ? -1 : column.tabIndex,
 				disabled: disabled && (typeof disabled == "function" ? disabled(object) : disabled),
-				checked: value,
-				lastValue: true // signals to the Keyboard.js to focus on it
+				checked: value
 			}));
 
 			if(!grid._hasSelectorInputListener){
