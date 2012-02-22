@@ -341,14 +341,14 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 				this.subRows = [this._configColumns("", this.columns)];
 			}
 		},
-		setColumns: function(columns){
+		_setColumns: function(columns){
 			// reset instance variables
 			this.subRows = null;
 			this.columns = columns;
 			// re-run logic
 			this._updateColumns();
 		},
-		setSubRows: function(subrows){
+		_setSubRows: function(subrows){
 			this.subRows = subrows;
 			this._updateColumns();
 		},

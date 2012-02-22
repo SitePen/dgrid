@@ -54,7 +54,7 @@
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
 			function toggleHeader(grid){
-				grid.setShowHeader(!grid.showHeader);
+				grid.set("showHeader", !grid.showHeader);
 			}
 			require(["dojo/on", "dgrid/List", "dgrid/OnDemandGrid", "dgrid/Tree", "dgrid/Editor", "dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dojo/_base/array", "dgrid/test/data/base", "dojo/domReady!"], 
 				function(on, List, Grid, Tree, Editor, Selection, Keyboard, declare, arrayUtil, testStore){

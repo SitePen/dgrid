@@ -117,7 +117,7 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			}
 			this.create(params, srcNodeRef);
 		},
-		getCSSClass: function(shortName){
+		_getCssClass: function(shortName){
 			return "dgrid-" + shortName;
 		},
 		listType: "list",
@@ -228,7 +228,7 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			this.refresh();
 		},
 		
-		setShowHeader: function(show){
+		_setShowHeader: function(show){
 			// this is in List rather than just in Grid, primarily for two reasons:
 			// (1) just in case someone *does* want to show a header in a List
 			// (2) helps address IE < 8 header display issue in List
@@ -541,6 +541,76 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 				});
 				this.renderArray(this.lastCollection);
 			}
+		},
+		
+		get: function(/*String*/ name /*, ... */){
+			// summary:
+			//		Get a property on a List instance.
+			//	name:
+			//		The property to get.
+			//	returns:
+			//		The property value on this List instance.
+			// description:
+			//		Get a named property on a List object. The property may
+			//		potentially be retrieved via a getter method in subclasses. In the base class
+			// 		this just retrieves the object's property.
+			
+			var fn = "_get" + name.charAt(0).toUpperCase() + name.slice(1);
+			
+			if(typeof this[fn] === "function"){
+				return this[fn].apply(this, [].slice.call(arguments, 1));
+			}
+			
+			// Alert users that try to use Dijit-style getter/setters so they don’t get confused
+			// if they try to use them and it does not work
+			if(!has("dojo-built") && typeof this[fn + "Attr"] === "function"){
+				console.warn("dgrid: Use " + fn + " instead of " + fn + "Attr for getting " + name);
+			}
+			
+			return this[name];
+		},
+		
+		set: function(/*String*/ name, /*Object*/ value /*, ... */){
+			//	summary:
+			//		Set a property on a List instance
+			//	name:
+			//		The property to set.
+			//	value:
+			//		The value to set in the property.
+			//	returns:
+			//		The function returns this List instance.
+			//	description:
+			//		Sets named properties on a List object.
+			//		A programmatic setter may be defined in subclasses.
+			//
+			//	set() may also be called with a hash of name/value pairs, ex:
+			//	|	myObj.set({
+			//	|		foo: "Howdy",
+			//	|		bar: 3
+			//	|	})
+			//	This is equivalent to calling set(foo, "Howdy") and set(bar, 3)
+			
+			if(typeof name === "object"){
+				for(var k in name){
+					this.set(k, name[k]);
+				}
+			}else{
+				var fn = "_set" + name.charAt(0).toUpperCase() + name.slice(1);
+				
+				if(typeof this[fn] === "function"){
+					this[fn].apply(this, [].slice.call(arguments, 1));
+				}else{
+					// Alert users that try to use Dijit-style getter/setters so they don’t get confused
+					// if they try to use them and it does not work
+					if(!has("dojo-built") && typeof this[fn + "Attr"] === "function"){
+						console.warn("dgrid: Use " + fn + " instead of " + fn + "Attr for setting " + name);
+					}
+					
+					this[name] = value;
+				}
+			}
+			
+			return this;
 		}
 	});
 });

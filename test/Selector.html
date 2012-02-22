@@ -63,21 +63,21 @@
 	<body class="claro">
 		<h2>A grid with checkbox selectors</h2>
 		<div>
-			<button type="button" onclick="grid.setSelectionMode('none');">
+			<button type="button" onclick="grid.set('selectionMode', 'none');">
 				Set selection mode to "none"</button>
-			<button type="button" onclick="grid.setSelectionMode('single');">
+			<button type="button" onclick="grid.set('selectionMode', 'single');">
 				Set selection mode to "single"</button>
-			<button type="button" onclick="grid.setSelectionMode('multiple');">
+			<button type="button" onclick="grid.set('selectionMode', 'multiple');">
 				Set selection mode to "multiple"</button>
-			<button type="button" onclick="grid.setSelectionMode('extended');">
+			<button type="button" onclick="grid.set('selectionMode', 'extended');">
 				Set selection mode to "extended"</button>
 		</div>
 		<div id="grid"></div>
 		<h2>A grid with radio selectors</h2>
 		<div>
-			<button type="button" onclick="gridRadio.setSelectionMode('none');">
+			<button type="button" onclick="gridRadio.set('selectionMode', 'none');">
 				Set selection mode to "none"</button>
-			<button type="button" onclick="gridRadio.setSelectionMode('single');">
+			<button type="button" onclick="gridRadio.set('selectionMode', 'single');">
 				Set selection mode to "single" (to test sync)</button>
 		</div>
 		<div id="grid-radio"></div>

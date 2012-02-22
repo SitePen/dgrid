@@ -37,15 +37,15 @@ function(declare, lang, Deferred, listen){
 			this.dirty = {};
 		},
 
-		setStore: function(store, query, queryOptions){
+		_setStore: function(store, query, queryOptions){
 			// summary:
 			//		Assigns a new store (and optionally query/queryOptions) to the list,
 			//		and tells it to refresh.
 			this.store = store;
 			this.dirty = {}; // discard dirty map, as it applied to a previous store
-			this.setQuery(query, queryOptions);
+			this.set("query", query, queryOptions);
 		},
-		setQuery: function(query, queryOptions){
+		_setQuery: function(query, queryOptions){
 			// summary:
 			//		Assigns a new query (and optionally queryOptions) to the list,
 			//		and tells it to refresh.
@@ -85,7 +85,7 @@ function(declare, lang, Deferred, listen){
 			return this.inherited(arguments);
 		},
 		
-		setDirty: function(id, field, value){
+		_setDirty: function(id, field, value){
 			// summary:
 			//		Updates dirty data of a field for the item with the specified ID.
 			var dirty = this.dirty,
