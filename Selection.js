@@ -1,5 +1,5 @@
-define(["dojo/_base/declare", "dojo/_base/Deferred", "dojo/on", "./List", "put-selector/put", "dojo/has", "dojo/query"],
-function(declare, Deferred, on, List, put, has){
+define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/Deferred", "dojo/on", "dojo/has", "./List", "put-selector/put", "dojo/query"],
+function(kernel, declare, Deferred, on, has, List, put){
 
 var ctrlEquiv = has("mac") ? "metaKey" : "ctrlKey";
 return declare([List], {
@@ -19,6 +19,11 @@ return declare([List], {
 	// deselectOnRefresh: Boolean
 	//		If true, the selection object will be cleared when refresh is called.
 	deselectOnRefresh: true,
+
+	//allowSelectAll: Boolean
+	//		If true, allow ctrl/cmd+A to select all rows.
+	//		Also consulted by Selector for showing select-all checkbox.
+	allowSelectAll: false,
 	
 	create: function(){
 		this.selection = {};
@@ -26,8 +31,12 @@ return declare([List], {
 	},
 	postCreate: function(){
 		this.inherited(arguments);
-
 		this._initSelectionEvents(); // first time; set up event hooks
+		
+		// set internal variable which determines whether select-all *should* be
+		// allowed, based also on selectionMode and presence of selector
+		this._allowSelectAll = this.allowSelectAll &&
+			(this.selectionMode != "none" || this._hasSelector);
 	},
 	
 	// selection:
@@ -35,19 +44,26 @@ return declare([List], {
 	//		object ids and values are true or false depending on whether an item is selected
 	selection: {},
 	// selectionMode: String
-	//		The selection mode to use, can be "multiple", "single", or "extended".
+	//		The selection mode to use, can be "none", "multiple", "single", or "extended".
 	selectionMode: "extended",
 	
-	setSelectionMode: function(mode){
+	_setSelectionMode: function(mode){
 		// summary:
-		//		Updates selectionMode, hooking up listener if necessary.
+		//		Updates selectionMode, resetting necessary variables.
 		if(mode == this.selectionMode){ return; } // prevent unnecessary spinning
 		
 		// Start selection fresh when switching mode.
 		this.clearSelection();
 		this._lastSelected = null;
 		
+		this._allowSelectAll = this.allowSelectAll &&
+			(mode != "none" || this._hasSelector);
+		
 		this.selectionMode = mode;
+	},
+	setSelectionMode: function(mode){
+		kernel.deprecated("setSelectionMode(...)", 'use set("selectionMode", ...) instead', "dgrid 1.0");
+		this.set("selectionMode", mode);
 	},
 	
 	_handleSelect: function(event, currentTarget){
@@ -76,7 +92,7 @@ return declare([List], {
 			}else{
 				var value;
 				if(mode == "extended" && !ctrlKey){
-					this.clearSelection();
+					this.clearSelection(this.row(row).id);
 				}
 				if(!event.shiftKey){
 					// null == toggle; undefined == true;
@@ -143,6 +159,28 @@ return declare([List], {
 			// listen for actions that should cause selections
 			on(this.contentNode, on.selector(selector, this.selectionEvents), focus);
 		}
+
+		// If allowSelectAll is true, allow ctrl/cmd+A to (de)select all rows.
+		// (Handler further checks against _allowSelectAll, which may be updated
+		// if selectionMode is changed post-init.)
+		if(this.allowSelectAll){
+			this.on("keydown", function(event) {
+				if (!grid._allowSelectAll){console.log('awww.');}
+				if (event[ctrlEquiv] && event.keyCode == 65 && grid._allowSelectAll) {
+					console.log('yaaaaay?!');
+					event.preventDefault();
+					grid[grid.allSelected ? "clearSelection" : "selectAll"]();
+				}
+			});
+		}
+
+	},
+	
+	allowSelect: function(row){
+		// summary:
+		//		A method that can be overriden to determine whether or not a row (or 
+		//		cell) can be selected. By default, all rows (or cells) are selectable.
+		return true;
 	},
 	
 	select: function(row, toRow, value){
@@ -153,47 +191,46 @@ return declare([List], {
 		if(!row.element){
 			row = this.row(row);
 		}
-		var selection = this.selection;
-		var previousValue = selection[row.id];
-		if(value === null){
-			// indicates a toggle
-			value = !previousValue;
-		}
-		var element = row.element;
-		if(!value && !this.allSelected){
-			delete this.selection[row.id];
-		}else{
-			selection[row.id] = value;
-		}
-		if(element){
-			// add or remove classes as appropriate
-			if(value){
-				put(element, ".dgrid-selected.ui-state-active");
+		if(this.allowSelect(row)){
+			var selection = this.selection;
+			var previousValue = selection[row.id];
+			if(value === null){
+				// indicates a toggle
+				value = !previousValue;
+			}
+			var element = row.element;
+			if(!value && !this.allSelected){
+				delete this.selection[row.id];
 			}else{
-				put(element, "!dgrid-selected!ui-state-active");
+				selection[row.id] = value;
 			}
-		}
-		if(value != previousValue && element){
-			on.emit(element, "dgrid-" + (value ? "select" : "deselect"), {
-				bubbles: true,
-				row: row,
-				grid: this
-			});
-		}
-		if(toRow){
-			if(!toRow.element){
-				toRow = this.row(toRow);
+			if(element){
+				// add or remove classes as appropriate
+				if(value){
+					put(element, ".dgrid-selected.ui-state-active");
+				}else{
+					put(element, "!dgrid-selected!ui-state-active");
+				}
 			}
-			var toElement = toRow.element;
-			var fromElement = row.element;
-			// find if it is earlier or later in the DOM
-			var traverser = (toElement && (toElement.compareDocumentPosition ? 
-				toElement.compareDocumentPosition(fromElement) == 2 :
-				toElement.sourceIndex > fromElement.sourceIndex)) ? "down" : "up";
-			while(row = this[traverser](row)){
-				this.select(row);
-				if(row.element == toElement){
-					break;
+			if(value != previousValue && element){
+				on.emit(element, "dgrid-" + (value ? "select" : "deselect"), {
+					bubbles: true,
+					row: row,
+					grid: this
+				});
+			}
+			if(toRow){
+				if(!toRow.element){
+					toRow = this.row(toRow);
+				}
+				var toElement = toRow.element;
+				var fromElement = row.element;
+				// find if it is earlier or later in the DOM
+				var traverser = (toElement && (toElement.compareDocumentPosition ? 
+					toElement.compareDocumentPosition(fromElement) == 2 :
+					toElement.sourceIndex > fromElement.sourceIndex)) ? "down" : "up";
+				while(row.element != toElement && (row = this[traverser](row))){
+					this.select(row);
 				}
 			}
 		}
@@ -201,10 +238,12 @@ return declare([List], {
 	deselect: function(row, toRow){
 		this.select(row, toRow, false);
 	},
-	clearSelection: function(){
+	clearSelection: function(exceptId){
 		this.allSelected = false;
 		for(var id in this.selection){
-			this.deselect(id);
+			if(exceptId !== id){
+				this.deselect(id);
+			}
 		}
 	},
 	selectAll: function(){

@@ -1,5 +1,5 @@
-define(["put-selector/put", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/has", "dojo/has!touch?./SimpleTouchScroll", "xstyle/has-class", "dojo/_base/sniff", "xstyle/css!./css/dgrid.css"], 
-function(put, declare, listen, aspect, has, TouchScroll, hasClass){
+define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/has", "dojo/has!touch?./SimpleTouchScroll", "xstyle/has-class", "put-selector/put", "dojo/_base/sniff", "xstyle/css!./css/dgrid.css"], 
+function(kernel, declare, listen, aspect, has, TouchScroll, hasClass, put){
 	// Add user agent/feature CSS classes 
 	hasClass("mozilla", "opera", "webkit", "ie", "ie-6", "ie-6-7", "quirks", "no-quirks", "touch");
 	
@@ -26,7 +26,7 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			extraSheet.insertRule(selector + '{' + css + '}', extraRules[index]);
 		return {
 			remove: function(){ removeExtraRule(index); }
-		}
+		};
 	}
 	function removeExtraRule(index){
 		var
@@ -57,7 +57,8 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 	};
 
 	function move(item, steps, targetClass){
-		var nextSibling, current, element = current = item.element;
+		var nextSibling, current, element;
+		element = current = item.element;
 		steps = steps || 1;
 		do{
 			// move in the correct direction
@@ -92,7 +93,7 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 		//		in the footer area should set this to true.
 		showFooter: false,
 		// maintainOddEven: Boolean
-		// 		Indicates whether to maintain the odd/even classes when new rows are inserted.
+		//		Indicates whether to maintain the odd/even classes when new rows are inserted.
 		//		This can be disabled to improve insertion performance if odd/even styling is not employed.
 		maintainOddEven: true,
 		
@@ -106,7 +107,7 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 				this.element = element;
 			}).prototype.remove = function(){
 				grid.removeRow(this.element);
-			} 
+			};
 			
 			if(srcNodeRef){
 				// normalize srcNodeRef and store on instance during create process.
@@ -116,9 +117,6 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 					srcNodeRef.nodeType ? srcNodeRef : byId(srcNodeRef);
 			}
 			this.create(params, srcNodeRef);
-		},
-		getCSSClass: function(shortName){
-			return "dgrid-" + shortName;
 		},
 		listType: "list",
 		
@@ -228,7 +226,7 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			this.refresh();
 		},
 		
-		setShowHeader: function(show){
+		_setShowHeader: function(show){
 			// this is in List rather than just in Grid, primarily for two reasons:
 			// (1) just in case someone *does* want to show a header in a List
 			// (2) helps address IE < 8 header display issue in List
@@ -240,6 +238,10 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			
 			this.renderHeader();
 			this.resize(); // to account for (dis)appearance of header
+		},
+		setShowHeader: function(show){
+			kernel.deprecated("setShowHeader(...)", 'use set("showHeader", ...) instead', "dgrid 1.0");
+			this.set("showHeader", show);
 		},
 		
 		configStructure: function(){
@@ -378,8 +380,10 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			//		given node. This will listen for changes in the collection if an observe method
 			//		is available (as it should be if it comes from an Observable data store).
 			options = options || {};
-			var start = options.start || 0;
-			var self = this;
+			var self = this,
+				start = options.start || 0,
+				row, rows;
+			
 			if(!beforeNode){
 				this.lastCollection = results;
 			}
@@ -390,15 +394,14 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 					// a change in the data took place
 					if(from > -1 && rows[from] && rows[from].parentNode){
 						// remove from old slot
-						var row = rows.splice(from, 1)[0];
+						row = rows.splice(from, 1)[0];
 						firstRow = row.nextSibling;
 						firstRow.rowIndex--;
 						self.removeRow(row);
-						rowIndex = from;
 					}
 					if(to > -1){						
 						// add to new slot (either before an existing row, or at the end)
-						var row = self.newRow(object, rows[to] || beforeNode, to, options);
+						row = self.newRow(object, rows[to] || beforeNode, to, options);
 						if(row){
 							row.observerIndex = observerIndex;
 							rows.splice(to, 0, row);
@@ -413,12 +416,12 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			var rowsFragment = document.createDocumentFragment();
 			// now render the results
 			if(results.map){
-				var rows = results.map(mapEach, console.error);
+				rows = results.map(mapEach, console.error);
 				if(rows.then){
 					return rows.then(whenDone);
 				}
 			}else{
-				var rows = [];
+				rows = [];
 				for(var i = 0, l = results.length; i < l; i++){
 					rows[i] = mapEach(results[i]);
 				}
@@ -433,7 +436,7 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 				(beforeNode && beforeNode.parentNode || self.contentNode).insertBefore(rowsFragment, beforeNode || null);
 				lastRow = resolvedRows[resolvedRows.length - 1];
 				lastRow && self.adjustRowIndices(lastRow);
-				return rows = resolvedRows;
+				return (rows = resolvedRows);
 			}
 			return whenDone(rows);
 		},
@@ -470,6 +473,7 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 		row: function(target){
 			// summary:
 			//		Get the row object by id, object, node, or event
+			var id;
 			if(target.target && target.target.nodeType){
 				// event
 				target = target.target;
@@ -478,7 +482,7 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 				var object;
 				do{
 					var rowId = target.id;
-					if(object = this._rowIdToObject[rowId]){
+					if((object = this._rowIdToObject[rowId])){
 						return new this._Row(rowId.substring(this.id.length + 5), object, target); 
 					}
 					target = target.parentNode;
@@ -487,10 +491,10 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 			}
 			if(typeof target == "object"){
 				// assume target represents a store item
-				var id = this.store.getIdentity(target);
+				id = this.store.getIdentity(target);
 			}else{
 				// assume target is a row ID
-				var id = target;
+				id = target;
 				target = this._rowIdToObject[this.id + "-row-" + id];
 			}
 			return new this._Row(id, target, byId(this.id + "-row-" + id));
@@ -535,12 +539,82 @@ function(put, declare, listen, aspect, has, TouchScroll, hasClass){
 				this.lastCollection.sort(function(a,b){
 					var aVal = a[property], bVal = b[property];
 					// fall back undefined values to "" for more consistent behavior
-					if (aVal === undefined) aVal = "";
-					if (bVal === undefined) bVal = "";
-					return aVal == bVal ? 0 : (aVal > bVal == !descending ? 1 : -1);
+					if(aVal === undefined){ aVal = ""; }
+					if(bVal === undefined){ bVal = ""; }
+					return aVal == bVal ? 0 : (aVal > bVal != descending ? 1 : -1);
 				});
 				this.renderArray(this.lastCollection);
 			}
+		},
+		
+		get: function(/*String*/ name /*, ... */){
+			// summary:
+			//		Get a property on a List instance.
+			//	name:
+			//		The property to get.
+			//	returns:
+			//		The property value on this List instance.
+			// description:
+			//		Get a named property on a List object. The property may
+			//		potentially be retrieved via a getter method in subclasses. In the base class
+			//		this just retrieves the object's property.
+			
+			var fn = "_get" + name.charAt(0).toUpperCase() + name.slice(1);
+			
+			if(typeof this[fn] === "function"){
+				return this[fn].apply(this, [].slice.call(arguments, 1));
+			}
+			
+			// Alert users that try to use Dijit-style getter/setters so they don’t get confused
+			// if they try to use them and it does not work
+			if(!has("dojo-built") && typeof this[fn + "Attr"] === "function"){
+				console.warn("dgrid: Use " + fn + " instead of " + fn + "Attr for getting " + name);
+			}
+			
+			return this[name];
+		},
+		
+		set: function(/*String*/ name, /*Object*/ value /*, ... */){
+			//	summary:
+			//		Set a property on a List instance
+			//	name:
+			//		The property to set.
+			//	value:
+			//		The value to set in the property.
+			//	returns:
+			//		The function returns this List instance.
+			//	description:
+			//		Sets named properties on a List object.
+			//		A programmatic setter may be defined in subclasses.
+			//
+			//	set() may also be called with a hash of name/value pairs, ex:
+			//	|	myObj.set({
+			//	|		foo: "Howdy",
+			//	|		bar: 3
+			//	|	})
+			//	This is equivalent to calling set(foo, "Howdy") and set(bar, 3)
+			
+			if(typeof name === "object"){
+				for(var k in name){
+					this.set(k, name[k]);
+				}
+			}else{
+				var fn = "_set" + name.charAt(0).toUpperCase() + name.slice(1);
+				
+				if(typeof this[fn] === "function"){
+					this[fn].apply(this, [].slice.call(arguments, 1));
+				}else{
+					// Alert users that try to use Dijit-style getter/setters so they don’t get confused
+					// if they try to use them and it does not work
+					if(!has("dojo-built") && typeof this[fn + "Attr"] === "function"){
+						console.warn("dgrid: Use " + fn + " instead of " + fn + "Attr for setting " + name);
+					}
+					
+					this[name] = value;
+				}
+			}
+			
+			return this;
 		}
 	});
 });

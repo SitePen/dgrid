@@ -74,7 +74,7 @@ return declare([List, _StoreMixin], {
 		}
 		var loadingNode = put(preloadNode, "-div.dgrid-loading");
 		put(loadingNode, "div.dgrid-below", this.loadingMessage);
-		var options = this.getQueryOptions({start: 0, count: this.minRowsPerPage, query: query});
+		var options = this.get("queryOptions", {start: 0, count: this.minRowsPerPage, query: query});
 		// execute the query
 		var results = query(options);
 		var self = this;
@@ -93,8 +93,8 @@ return declare([List, _StoreMixin], {
 				for(var i = 0; i < trCount; i++){
 					height += trs[i].offsetHeight;
 				}
-				// only update rowHeight if we actually got results
-				if(trCount){ self.rowHeight = height / trCount; }
+				// only update rowHeight if we actually got results and are visible
+				if(trCount && height){ self.rowHeight = height / trCount; }
 				
 				total -= trCount;
 				preload.count = total;
@@ -114,7 +114,7 @@ return declare([List, _StoreMixin], {
 		// return results so that callers can handle potential of async error
 		return results;
 	},
-	getQueryOptions: function(mixin){
+	_getQueryOptions: function(mixin){
 		// summary:
 		//		Get a fresh queryOptions object with the current sort added to it and any mixin added in
 		options = this.queryOptions ? lang.delegate(this.queryOptions, mixin) : mixin || {};
@@ -126,6 +126,9 @@ return declare([List, _StoreMixin], {
 	
 	refresh: function(){
 		this.inherited(arguments);
+		// clear any preload data as it might contain DOM elements that were
+		// removed from the DOM in the parent method (List#refresh)
+		this.preload = null;
 		if(this.store){
 			// render the query
 			var self = this;
@@ -137,7 +140,7 @@ return declare([List, _StoreMixin], {
 		}
 	},
 	
-	getRowHeight: function(rowElement){
+	_calcRowHeight: function(rowElement){
 		// summary:
 		//		Calculate the height of a row. This is a method so it can be overriden for
 		//		plugins that add connected elements to a row, like the tree
@@ -187,7 +190,7 @@ return declare([List, _StoreMixin], {
 						var count = 0;
 						var toDelete = [];
 						while(row = nextRow){ // intentional assignment
-							var rowHeight = grid.getRowHeight(row);
+							var rowHeight = grid._calcRowHeight(row);
 							if(reclaimedHeight + rowHeight + farOffRemoval > distanceOff || nextRow.className.indexOf("dgrid-row") < 0){
 								// we have reclaimed enough rows or we have gone beyond grid rows, let's call it good
 								break;
@@ -197,7 +200,8 @@ return declare([List, _StoreMixin], {
 							if(currentObserverIndex != lastObserverIndex && lastObserverIndex > -1){
 								// we have gathered a whole page of observed rows, we can delete them now
 								var observers = grid.observers; 
-								observers[lastObserverIndex].cancel();
+								var observer = observers[lastObserverIndex]; 
+								observer && observer.cancel();
 								observers[lastObserverIndex] = 0; // remove it so we don't call cancel twice
 							}
 							reclaimedHeight += rowHeight;
@@ -273,11 +277,11 @@ return declare([List, _StoreMixin], {
 						}
 						offset = Math.round(offset);
 						count = Math.round(count);
-						var options = grid.getQueryOptions();
+						var options = grid.get("queryOptions");
 						preload.count -= count;
 						var beforeNode = preloadNode,
 							keepScrollTo, queryRowsOverlap = grid.queryRowsOverlap,
-							below = preloadNode.rowIndex > 0; 
+							below = preloadNode.rowIndex > 0 && preload; 
 						if(below){
 							// add new rows below
 							var previous = preload.previous;
@@ -343,6 +347,17 @@ return declare([List, _StoreMixin], {
 									// row height, we may need to adjust the scroll once they are filled in
 									// so we don't "jump" in the scrolling position
 									scrollNode.scrollTop += beforeNode.offsetTop - keepScrollTo;
+								}
+								if(below){
+									// if it is below, we will use the total from the results to update 
+									// the count in case the total changes as later pages are retrieved
+									// (not uncommon when total counts are estimated for db perf reasons)
+									Deferred.when(results.total || results.length, function(total){
+										// recalculate the count
+										below.count = total - below.node.rowIndex;
+										// readjust the height
+										adjustHeight(below);
+									});
 								}
 						});
 						preload = preload.previous;

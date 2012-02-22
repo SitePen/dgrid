@@ -43,7 +43,7 @@ return function(column){
 					}
 				}
 			});
-			grid.getRowHeight = function(rowElement){
+			grid._calcRowHeight = function(rowElement){
 				// we override this method so we can provide row height measurements that
 				// include the children of a row
 				var connected = rowElement.connected;
