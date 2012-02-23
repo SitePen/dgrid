@@ -42,7 +42,7 @@
 					on(win.body(), "dgrid-select,dgrid-deselect",
 						function(event){
 							var msg = (event.type == "dgrid-deselect" ? "de" : "") + "selected: ";
-							console.log(msg, event.grid.id, event.row.id);
+							console.log(msg, event.grid.id, event.rows);
 						}
 					);
 					

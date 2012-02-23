@@ -8,11 +8,14 @@ define(["dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put"], funct
 		function changeInput(value){
 			// creates a function that modifies the input on an event
 			return function(event){
-				var element = grid.cell(event.row, column.id).element;
-				element = (element.contents || element).input;
-				if(!element.disabled){
-					// only change the value if it is not disabled
-					element.checked = value;
+				var rows = event.rows;
+				for(var i = 0; i < rows.length; i++){
+					var element = grid.cell(rows[i], column.id).element;
+					element = (element.contents || element).input;
+					if(!element.disabled){
+						// only change the value if it is not disabled
+						element.checked = value;
+					}
 				}
 				// see if the header checkbox needs to be indeterminate
 				var mixed = false;
@@ -49,7 +52,7 @@ define(["dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put"], funct
 					if(row){
 						if(event.shiftKey){
 							// make sure the last input always ends up checked for shift key 
-							changeInput(true)({row: row});
+							changeInput(true)({rows: [row]});
 						}else{
 							// no shift key, so no range selection
 							lastRow = null;

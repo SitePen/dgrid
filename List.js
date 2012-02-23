@@ -316,12 +316,12 @@ function(kernel, declare, listen, aspect, has, TouchScroll, hasClass, put){
 		cleanup: function(){
 			var observers = this.observers,
 				i;
-			// iterate through all the row elements and destroy them
+			// iterate through all the row elements and clean them up
 			for(i in this._rowIdToObject){
 				if(this._rowIdToObject[i] != this.columns){
 					var rowElement = byId(i);
 					if(rowElement){
-						this.removeRow(rowElement);
+						this.removeRow(rowElement, true);
 					}
 				}
 			}
