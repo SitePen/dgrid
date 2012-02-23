@@ -22,9 +22,10 @@
 			data-dojo-config="async: true, isDebug: true"></script>
 		<script type="text/javascript">
 			require(["dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Keyboard", "dgrid/Editor",
-					"dojo/_base/declare", "dojo/on", "dojo/dom-construct",
+					"dojo/_base/lang", "dojo/_base/declare", "dojo/on", "dojo/dom-construct",
 					"dojo/store/Memory", "dojo/store/Observable", "dojo/data/ObjectStore", "dojo/domReady!"],
-				function(Grid, Selection, Keyboard, Editor, declare, on, domConstruct, Memory, Observable, ObjectStore){
+				function(Grid, Selection, Keyboard, Editor,
+						lang, declare, on, domConstruct, Memory, Observable, ObjectStore){
 					var today = new Date(),
 						form = document.getElementById("editorForm"),
 						typesArea = document.getElementById("editorComponentTypes"),
@@ -56,38 +57,57 @@
 							radio: { generate: generateBool },
 							textarea: {
 								generate: generateText,
-								editorArgs: { rows: 3 }
+								column: { editorArgs: { rows: 3 } }
 							},
 							// TODO: support select?
 							// Dijits
 							"dijit/form/TextBox": { generate: generateText },
 							"dijit/form/SimpleTextarea": { generate: generateText },
-							"dijit/form/CheckBox": { generate: generateBool },
+							"dijit/form/CheckBox": {
+								// Dijit's CheckBox is a bit special, in that value reports
+								// a string value if checked, but false if unchecked.
+								generate: generateBool,
+								column: {
+									editorArgs: { value: "enabled" },
+									get: function(item){
+										// ensure initial rendering matches up with widget behavior
+										return item.editor ? "enabled" : false;
+									},
+									set: function(item){
+										// convert to boolean for save
+										item.editor = !!item.editor;
+										return item;
+									}
+								}
+							},
 							"dijit/form/ValidationTextBox": {
 								generate: generateText,
-								editorArgs: { required: true }
+								column: { editorArgs: { required: true } }
 							},
-							"dijit/form/NumberSpinner": { generate: generateNumber },
+							"dijit/form/NumberSpinner": {
+								generate: generateNumber,
+								column: { editorArgs: { constraints: { min: 0 } } }
+							},
 							"dijit/form/DateTextBox": { generate: generateDate },
 							"dijit/form/HorizontalSlider": {
 								generate: generateNumber,
-								editorArgs: { minimum: 0, maximum: 1000 }
+								column: { editorArgs: { minimum: 0, maximum: 1000 } }
 							},
 							"dijit/form/FilteringSelect": {
 								generate: generateOptionValue,
-								editorArgs: { store: optionsStore }
+								column: { editorArgs: { store: optionsStore } }
 							},
 							"dijit/form/Select": {
 								generate: generateOptionValue,
-								editorArgs: {
+								column: { editorArgs: {
 									store: optionsDataStore,
 									// need to set width directly for Select to size correctly
 									style: { width: "99%" }
-								}
+								} }
 							},
 							"dijit/Editor": {
 								generate: generateText,
-								editorArgs: { style: "height: 100px;" }
+								column: { editorArgs: { style: "height: 100px;" } }
 							}
 						},
 						optStr = "",
@@ -140,10 +160,11 @@
 							window.grid = new CustomGrid({
 								store: Observable(new TestStore({ data: data })),
 								columns: {
-									"editor": Editor({
+									"editor": Editor(lang.mixin({}, options.column, {
 											autoSave: form.elements.autoSave.checked,
-											editorArgs: options.editorArgs
-										}, ctor || editor, editOn || undefined)
+											editor: ctor || editor,
+											editOn: editOn || undefined
+										}))
 								}
 							}, "grid");
 						});
