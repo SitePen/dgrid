@@ -9,8 +9,7 @@ define([
 	"dojo/_base/sniff"
 ], function(kernel, lang, on, aspect, has, Grid, put){
 
-var ignoreChange = false, // used to ignore change on native input after esc/enter
-	activeCell; // tracks cell currently being edited
+var activeCell, activeValue; // tracks cell currently being edited, and its value
 
 function updateInputValue(input, value){
 	// common code for updating value of a standard input
@@ -34,14 +33,14 @@ function dataFromValue(value, oldValue){
 	return value;
 }
 
-// intermediary frontends to dataFromValue
-
-function dataFromInput(column, input){
-	var type = input.type;
-	return dataFromValue(input[type == "checkbox" || type == "radio"  ? "checked" : "value"]);
-}
-function dataFromWidget(column, widget){
-	return dataFromValue(widget.get("value"));
+// intermediary frontend to dataFromValue for HTML and widget editors
+function dataFromEditor(column, cmp){
+	if(typeof cmp.get == "function"){ // widget
+		return dataFromValue(cmp.get("value"));
+	}else{ // HTML input
+		return dataFromValue(
+			cmp[cmp.type == "checkbox" || cmp.type == "radio"  ? "checked" : "value"]);
+	}
 }
 
 function setProperty(grid, cellElement, oldValue, value){
@@ -78,23 +77,19 @@ function setProperty(grid, cellElement, oldValue, value){
 	return value;
 }
 
-// intermediary frontends to setProperty for HTML and widget editors
-
-function setPropertyFromInput(grid, column, input) {
-	var value = dataFromInput(column, input);
-	
-	// update value and store last value especially for case of always-on editor
-	input._dgridlastvalue = setProperty(grid, input.parentNode, input._dgridlastvalue,
-		value);
-}
-function setPropertyFromWidget(grid, column, widget) {
+// intermediary frontend to setProperty for HTML and widget editors
+function setPropertyFromEditor(grid, column, cmp) {
 	var value;
-	if(!widget.isValid || widget.isValid()){ // only update if valid
-		value = dataFromWidget(column, widget);
+	if(!cmp.isValid || cmp.isValid()){
+		value = setProperty(grid, (cmp.domNode || cmp).parentNode,
+			activeCell ? activeValue : cmp._dgridlastvalue,
+			dataFromEditor(column, cmp));
 		
-		// update value and store last value especially for case of always-on editor
-		widget._dgridlastvalue = setProperty(grid, widget.domNode.parentNode,
-			widget._dgridlastvalue, value);
+		if(activeCell){ // for Editors with editOn defined
+			activeValue = value;
+		}else{ // for always-on Editors, update _dgridlastvalue immediately
+			cmp._dgridlastvalue = value;
+		}
 	}
 }
 
@@ -123,15 +118,13 @@ function createEditor(column){
 		// connect to onBlur rather than watching value for changes, since
 		// the latter is delayed by setTimeouts and may also fire from our logic
 		cmp.connect(cmp, "onBlur", function(){
-			setPropertyFromWidget(grid, column, this);
+			setPropertyFromEditor(grid, column, this);
 		});
 	}else{
 		handleChange = function(evt){
 			var target = evt.target;
-			if(ignoreChange){ return;	}
-			
 			if("_dgridlastvalue" in target && target.className.indexOf("dgrid-input") > -1){
-				setPropertyFromInput(grid, column, target);
+				setPropertyFromEditor(grid, column, target);
 			}
 		};
 
@@ -180,20 +173,24 @@ function createSharedEditor(column, originalRenderCell){
 		focusNode = cmp.focusNode || node,
 		reset = isWidget ?
 			function(){ cmp.set("value", cmp._dgridlastvalue); } :
-			function(){ updateInputValue(cmp, cmp._dgridlastvalue); },
+			function(){
+				updateInputValue(cmp, cmp._dgridlastvalue);
+				// call setProperty again in case we need to revert a previous change
+				setPropertyFromEditor(column.grid, column, cmp);
+			},
 		keyHandle;
 	
 	function onblur(){
 		var parentNode = node.parentNode;
-		activeCell = null;
 		
 		// remove the editor from the cell
 		parentNode.removeChild(node);
 		
 		// pass new value to original renderCell implementation for this cell
-		originalRenderCell(column.grid.row(parentNode).data, cmp._dgridlastvalue,
-			parentNode);
+		originalRenderCell(column.grid.row(parentNode).data, activeValue, parentNode);
 		
+		// reset state now that editor is deactivated
+		activeCell = activeValue = null;
 		column._editorBlurHandle.pause();
 	}
 	
@@ -203,10 +200,9 @@ function createSharedEditor(column, originalRenderCell){
 		var key = evt.keyCode || evt.which;
 		
 		if(key == 27){ // escape: revert + dismiss
-			ignoreChange = true;
 			reset();
+			activeValue = cmp._dgridlastvalue;
 			focusNode.blur();
-			ignoreChange = false;
 		}else if(key == 13 && column.dismissOnEnter !== false){ // enter: dismiss
 			// FIXME: Opera is "reverting" even in this case
 			focusNode.blur();
@@ -244,6 +240,8 @@ function showEditor(cmp, column, cell, value){
 	}
 	// track previous value for short-circuiting or in case we need to revert
 	cmp._dgridlastvalue = value;
+	// if this is an Editor with editOn, also reset activeValue
+	if(activeCell){ activeValue = value; }
 }
 
 // Editor column plugin function
@@ -253,14 +251,15 @@ return function(column, editor, editOn){
 	//		Adds editing capability to a column's cells.
 	
 	var originalRenderCell = column.renderCell || Grid.defaultRenderCell,
-		isWidget = typeof editor != "string",
-		cleanupAdded;
+		isWidget, cleanupAdded;
 	
 	// accept arguments as parameters to Editor function, or from column def,
 	// but normalize to column def.
 	// (TODO: maybe should only accept from column def to begin with...)
 	column.editor = editor = editor || column.editor;
 	column.editOn = editOn = editOn || column.editOn;
+	
+	isWidget = typeof editor != "string";
 	
 	// warn for widgetArgs -> editorArgs; TODO: remove @ 1.0
 	if (column.widgetArgs) {
@@ -302,7 +301,7 @@ return function(column, editor, editOn){
 				
 				// retrieve latest value; if retrieving from row, run through column.get
 				row = grid.row(cell);
-				dirty = grid.dirty && grid.dirty[row.id],
+				dirty = grid.dirty && grid.dirty[row.id];
 				value = (dirty && field in dirty) ? dirty[field] :
 					column.get ? column.get(row.data) : row.data[field];
 				showEditor(cmp, column, cell, value);
