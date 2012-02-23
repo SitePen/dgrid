@@ -220,7 +220,7 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 				grid._rowIdToObject = {};
 				contentNode.innerHTML = "";
 				
-				loadingNode = put(contentNode, "div.dgrid-loading", this.loadingMessage);
+				loadingNode = put(contentNode, "div.dgrid-loading", grid.loadingMessage);
 				
 				// set flag to deactivate pagination event handlers until loaded
 				grid._isLoading = true;
