@@ -8,8 +8,11 @@ define(["dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put"], funct
 		function changeInput(value){
 			// creates a function that modifies the input on an event
 			return function(event){
-				var rows = event.rows;
-				for(var i = 0; i < rows.length; i++){
+				var rows = event.rows,
+					len = rows.length,
+					selection, mixed, i;
+				
+				for(i = 0; i < len; i++){
 					var element = grid.cell(rows[i], column.id).element;
 					element = (element.contents || element).input;
 					if(!element.disabled){
@@ -17,17 +20,17 @@ define(["dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put"], funct
 						element.checked = value;
 					}
 				}
-				// see if the header checkbox needs to be indeterminate
-				var mixed = false;
-				var selection = grid.selection; 
-				for(var i in selection){
-					// if there is anything in the selection, than it is indeterminate
-					if(selection[i] != grid.allSelected){
-						mixed = true;
-						break;
-					}
-				}
 				if(headerCheckbox.type == "checkbox"){
+					selection = grid.selection;
+					mixed = false;
+					// see if the header checkbox needs to be indeterminate
+					for(i in selection){
+						// if there is anything in the selection, than it is indeterminate
+						if(selection[i] != grid.allSelected){
+							mixed = true;
+							break;
+						}
+					}
 					headerCheckbox.indeterminate = mixed;
 					headerCheckbox.checked = grid.allSelected;
 				}

@@ -62,7 +62,7 @@ return declare([Selection], {
 				}
 			}
 			if(value != previous && element){
-				this.selectionEventQueue(value, "cells").push(cell);
+				this._selectionEventQueue(value, "cells").push(cell);
 			}
 			if(toCell){
 				// a range

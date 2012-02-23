@@ -179,29 +179,29 @@ return declare([List], {
 		return true;
 	},
 	
-	selectionEventQueue: function(value, type){
-		var event = "dgrid-" + (value ? "select" : "deselect");
-		// get the event queue
-		var rows = this[event];
-		if(!rows){
-			var grid = this;
-			// create a timeout to fire an event for the accumulated rows once everything is done
-			setTimeout(this.fireSelectionEvent = function(){ // we setup a method here in case the event needs to fired immediately
-				if(rows){
-					var eventObject = {
-						bubbles: true,
-						grid: grid
-					}
-					eventObject[type] = rows;
-					on.emit(grid.contentNode, event, eventObject);
-					rows = null;
-					// clear the queue, so we create a new one as needed
-					delete grid[event];
-				}
-			});
-			rows = this[event] = [];
-		}
-		return rows;	
+	_selectionEventQueue: function(value, type){
+		var grid = this,
+			event = "dgrid-" + (value ? "select" : "deselect"),
+			rows = this[event]; // current event queue (actually cells for CellSelection)
+		
+		if(rows){ return rows; } // return existing queue, allowing to push more
+		
+		// Create a timeout to fire an event for the accumulated rows once everything is done.
+		// We expose the callback in case the event needs to be fired immediately.
+		setTimeout(this._fireSelectionEvent = function(){
+			if(!rows){ return; } // rows will be set only the first time this is called
+			
+			var eventObject = {
+				bubbles: true,
+				grid: grid
+			};
+			eventObject[type] = rows;
+			on.emit(grid.contentNode, event, eventObject);
+			rows = null;
+			// clear the queue, so we create a new one as needed
+			delete grid[event];
+		}, 0);
+		return (rows = this[event] = []);
 	},
 	select: function(row, toRow, value){
 		if(value === undefined){
@@ -234,7 +234,7 @@ return declare([List], {
 			}
 			if(value != previousValue && element){
 				// add to the queue of row events
-				this.selectionEventQueue(value, "rows").push(row);
+				this._selectionEventQueue(value, "rows").push(row);
 			}
 			
 			if(toRow){
@@ -286,8 +286,9 @@ return declare([List], {
 	refresh: function(){
 		if(this.deselectOnRefresh){
 			this.clearSelection();
-			// need to fire the selection event now because after the refresh the nodes that we will fire for will be gone
-			this.fireSelectionEvent && this.fireSelectionEvent();
+			// Need to fire the selection event now because after the refresh,
+			// the nodes that we will fire for will be gone.
+			this._fireSelectionEvent && this._fireSelectionEvent();
 		}
 		this._lastSelected = null;
 		this.inherited(arguments);
