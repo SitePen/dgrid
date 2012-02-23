@@ -62,11 +62,7 @@ return declare([Selection], {
 				}
 			}
 			if(value != previous && element){
-				listen.emit(element, "dgrid-" + (value ? "select" : "deselect"), {
-					bubbles: true,
-					cell: cell,
-					grid: this
-				});
+				this.selectionEventQueue(value, "cells").push(cell);
 			}
 			if(toCell){
 				// a range
