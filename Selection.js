@@ -1,5 +1,5 @@
-define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/Deferred", "dojo/on", "dojo/has", "./List", "put-selector/put", "dojo/query"],
-function(kernel, declare, Deferred, on, has, List, put){
+define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/Deferred", "dojo/on", "dojo/has", "dojo/aspect", "./List", "put-selector/put", "dojo/query"],
+function(kernel, declare, Deferred, on, has, aspect, List, put){
 
 var ctrlEquiv = has("mac") ? "metaKey" : "ctrlKey";
 return declare([List], {
@@ -163,6 +163,13 @@ return declare([List], {
 				}
 			});
 		}
+		
+		aspect.before(this, "removeRow", function(rowElement, justCleanup){
+			if(!justCleanup){
+				// if it is a real row removal, we deselect the item
+				this.deselect(rowElement);
+			}
+		});
 	},
 	
 	allowSelect: function(row){
@@ -172,6 +179,30 @@ return declare([List], {
 		return true;
 	},
 	
+	selectionEventQueue: function(value, type){
+		var event = "dgrid-" + (value ? "select" : "deselect");
+		// get the event queue
+		var rows = this[event];
+		if(!rows){
+			var grid = this;
+			// create a timeout to fire an event for the accumulated rows once everything is done
+			setTimeout(this.fireSelectionEvent = function(){ // we setup a method here in case the event needs to fired immediately
+				if(rows){
+					var eventObject = {
+						bubbles: true,
+						grid: grid
+					}
+					eventObject[type] = rows;
+					on.emit(grid.contentNode, event, eventObject);
+					rows = null;
+					// clear the queue, so we create a new one as needed
+					delete grid[event];
+				}
+			});
+			rows = this[event] = [];
+		}
+		return rows;	
+	},
 	select: function(row, toRow, value){
 		if(value === undefined){
 			// default to true
@@ -202,12 +233,10 @@ return declare([List], {
 				}
 			}
 			if(value != previousValue && element){
-				on.emit(element, "dgrid-" + (value ? "select" : "deselect"), {
-					bubbles: true,
-					row: row,
-					grid: this
-				});
+				// add to the queue of row events
+				this.selectionEventQueue(value, "rows").push(row);
 			}
+			
 			if(toRow){
 				if(!toRow.element){
 					toRow = this.row(toRow);
@@ -256,7 +285,9 @@ return declare([List], {
 	
 	refresh: function(){
 		if(this.deselectOnRefresh){
-			this.selection = {};
+			this.clearSelection();
+			// need to fire the selection event now because after the refresh the nodes that we will fire for will be gone
+			this.fireSelectionEvent && this.fireSelectionEvent();
 		}
 		this._lastSelected = null;
 		this.inherited(arguments);
