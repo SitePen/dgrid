@@ -126,9 +126,6 @@ return declare([List, _StoreMixin], {
 	
 	refresh: function(){
 		this.inherited(arguments);
-		// clear any preload data as it might contain DOM elements that were
-		// removed from the DOM in the parent method (List#refresh)
-		this.preload = null;
 		if(this.store){
 			// render the query
 			var self = this;

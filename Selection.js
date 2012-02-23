@@ -32,11 +32,6 @@ return declare([List], {
 	postCreate: function(){
 		this.inherited(arguments);
 		this._initSelectionEvents(); // first time; set up event hooks
-		
-		// set internal variable which determines whether select-all *should* be
-		// allowed, based also on selectionMode and presence of selector
-		this._allowSelectAll = this.allowSelectAll &&
-			(this.selectionMode != "none" || this._hasSelector);
 	},
 	
 	// selection:
@@ -55,9 +50,6 @@ return declare([List], {
 		// Start selection fresh when switching mode.
 		this.clearSelection();
 		this._lastSelected = null;
-		
-		this._allowSelectAll = this.allowSelectAll &&
-			(mode != "none" || this._hasSelector);
 		
 		this.selectionMode = mode;
 	},
@@ -165,15 +157,12 @@ return declare([List], {
 		// if selectionMode is changed post-init.)
 		if(this.allowSelectAll){
 			this.on("keydown", function(event) {
-				if (!grid._allowSelectAll){console.log('awww.');}
-				if (event[ctrlEquiv] && event.keyCode == 65 && grid._allowSelectAll) {
-					console.log('yaaaaay?!');
+				if (event[ctrlEquiv] && event.keyCode == 65) {
 					event.preventDefault();
 					grid[grid.allSelected ? "clearSelection" : "selectAll"]();
 				}
 			});
 		}
-
 	},
 	
 	allowSelect: function(row){
