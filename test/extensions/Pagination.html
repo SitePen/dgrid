@@ -73,7 +73,7 @@
 					
 					function createGrid(args){
 						window.grid = new CustomGrid(
-							lang.mixin({ store: testStore, columns: columns }, args),
+							lang.mixin({ store: testAsyncStore, columns: columns }, args),
 							"grid");
 					}
 					createGrid();
@@ -113,8 +113,8 @@
 		</form>
 		<div id="grid"></div>
 		<div>Buttons to test changing column structure:
-			<button onclick="grid.setColumns(columns2);">New Structure</button>
-			<button onclick="grid.setColumns(columns);">Original</button>
+			<button onclick="grid.set('columns', columns2);">New Structure</button>
+			<button onclick="grid.set('columns', columns);">Original</button>
 			<button onclick="testStore.add({col1:'new', col2:true});">Add row</button>
 		</div>
 		<div id="grid2"></div>

@@ -25,8 +25,8 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 		//		Set to 0 (or false) to disable page links.
 		pagingLinks: 2,
 		// pageSizeOptions: Array[Number]
-		// 		This provides options for different page sizes in a dropdown.
-		//		If it is empty (default), no page size dropdown will be displayed.
+		// 		This provides options for different page sizes in a drop-down.
+		//		If it is empty (default), no page size drop-down will be displayed.
 		pageSizeOptions: [],
 		
 		showFooter: true,
@@ -220,7 +220,7 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 				grid._rowIdToObject = {};
 				contentNode.innerHTML = "";
 				
-				loadingNode = put(contentNode, "div.dgrid-loading");
+				loadingNode = put(contentNode, "div.dgrid-loading", grid.loadingMessage);
 				
 				// set flag to deactivate pagination event handlers until loaded
 				grid._isLoading = true;
