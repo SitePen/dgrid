@@ -17,6 +17,14 @@
 				height: 15em;
 				width: 500px;
 			}
+			
+			.outer {
+				border: 1px solid #333;
+				padding: 0 4px;
+			}
+			.inner {
+				background-color: #ccc;
+			}
 		</style>
 		<script type="text/javascript" src="../../dojo/dojo.js"
 			data-dojo-config="async: true, isDebug: true"></script>
@@ -140,6 +148,13 @@
 						}
 					}
 					
+					function customRenderCell(object, data) {
+						var container = domConstruct.create("div", { "class": "outer" });
+						domConstruct.place('<span class="inner">' +
+							data.replace(/</g, "&lt;") + "</span>", container);
+						return container;
+					}
+					
 					form.onsubmit = function(){
 						var
 							editor = getSelected(form.elements.editor),
@@ -154,17 +169,22 @@
 						}
 						
 						require(deps, function(ctor){
+							var columnArgs = {
+								autoSave: form.elements.autoSave.checked,
+								editor: ctor || editor
+							};
+							if(editOn){ columnArgs.editOn = editOn; }
+							if(form.elements.customRenderCell.checked){
+								columnArgs.renderCell = customRenderCell;
+							}
+							
 							window.grid && window.grid.destroy();
 							domConstruct.create("div", { id: "grid" }, form, "after");
 							
 							window.grid = new CustomGrid({
 								store: Observable(new TestStore({ data: data })),
 								columns: {
-									"editor": Editor(lang.mixin({}, options.column, {
-											autoSave: form.elements.autoSave.checked,
-											editor: ctor || editor,
-											editOn: editOn || undefined
-										}))
+									"editor": Editor(lang.mixin({}, options.column, columnArgs))
 								}
 							}, "grid");
 						});
@@ -200,6 +220,7 @@
 				</select>
 			</label></p>
 			<p><label><input type="checkbox" name="autoSave" value="true"> autoSave</label></p>
+			<p><label><input type="checkbox" name="customRenderCell" value="true"> use custom renderCell</label></p>
 			<div><button type="submit" id="editorFormSubmit">Recreate Grid</button></div>
 		</form>
 		<button type="button" id="save" onclick="grid.save()">Save</button>
