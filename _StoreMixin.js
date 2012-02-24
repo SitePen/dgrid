@@ -41,13 +41,16 @@ function(kernel, declare, lang, Deferred, listen){
 			// summary:
 			//		Implements extension point provided by Grid to store references to
 			//		any columns with `set` methods, for use during `save`.
-			if (column.set){ this._columnsWithSet[column.field] = column; }
+			if (column.set){
+				if(!this._columnsWithSet){ this._columnsWithSet = {}; }
+				this._columnsWithSet[column.field] = column;
+			}
 		},
 		
 		_configColumns: function(){
 			// summary:
 			//		Extends Grid to reset _StoreMixin's hash when columns are updated
-			this._columnsWithSet = {};
+			this._columnsWithSet = null;
 			return this.inherited(arguments);
 		},
 		
@@ -143,11 +146,20 @@ function(kernel, declare, lang, Deferred, listen){
 			function putter(id, dirtyObj) {
 				// Return a function handler
 				return function(object) {
-					var key;
+					var key, data;
 					// Copy dirty props to the original, applying setters if applicable
 					for(key in dirtyObj){
-						object[key] = colsWithSet[key] ? colsWithSet[key].set(dirtyObj) :
-							dirtyObj[key];
+						object[key] = dirtyObj[key];
+					}
+					if(colsWithSet){
+						// Apply any set methods in column definitions.
+						// Note that while in the most common cases column.set is intended
+						// to return transformed data for the key in question, it is also
+						// possible to directly modify the object to be saved.
+						for(key in colsWithSet){
+							data = colsWithSet[key].set(object);
+							if(data !== undefined){ object[key] = data; }
+						}
 					}
 					// Put it in the store, returning the result/promise
 					return Deferred.when(store.put(object), function() {

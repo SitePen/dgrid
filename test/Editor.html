@@ -53,7 +53,7 @@
 						CustomGrid = declare([Grid, Selection, Keyboard]),
 						TestStore = declare(Memory, {
 							put: function(object, options){
-								console.log("put called for ID: ", object.id);
+								console.log("put called for ID: ", object.id, object);
 								this.inherited(arguments);
 							}
 						}),
@@ -130,6 +130,33 @@
 									},
 									editorArgs: { style: "height: 100px;" }
 								}
+							},
+							{
+								label: "text input combining first/last name",
+								editor: "text",
+								generate: generateName,
+								column: {
+									get: function(object){
+										return object.firstName + " " + object.lastName;
+									},
+									set: function(object){
+										// Recombine to single field, and remove our combined field.
+										// Admittedly, this won't treat middle names very nicely.
+										var parts = object.editor.split(/ +/, 2);
+										object.firstName = parts[0];
+										object.lastName = parts[1];
+										delete object.editor;
+									}
+								}
+							},
+							{
+								label: "dijit/form/TextBox converting to uppercase on save",
+								editor: "dijit/form/TextBox",
+								generate: generateText,
+								column: {
+									get: function(object){ return object.editor.toUpperCase(); },
+									set: function(object){ return object.editor.toUpperCase(); }
+								}
 							}
 						],
 						optStr = "",
@@ -138,20 +165,28 @@
 					// data generation functions used for populating store data,
 					// used by different componentTypes
 					function generateText() {
-						return "generated text " + Math.floor(Math.random() * 1000);
+						return { editor: "generated text " + Math.floor(Math.random() * 1000) };
 					}
 					function generateNumber() {
-						return Math.floor(Math.random() * 1000);
+						return { editor: Math.floor(Math.random() * 1000) };
 					}
 					function generateBool() {
-						return Math.random() > 0.5 ? true : false;
+						return { editor: Math.random() > 0.5 ? true : false };
 					}
 					function generateDate() {
 						// return a date within the past year
-						return new Date(today - Math.random() * 31536000000);
+						return { editor: new Date(today - Math.random() * 31536000000) };
 					}
 					function generateOptionValue() {
-						return optionsData[Math.floor(Math.random() * optionsLength)].id;
+						return { editor: optionsData[Math.floor(Math.random() * optionsLength)].id };
+					}
+					function generateName() {
+						// returns an item with firstName and lastName fields,
+						// for testing a more complex scenario with a column.set function.
+						return {
+							firstName: ["John", "Jane"][Math.floor(Math.random() * 2)],
+							lastName: ["Doe", "Smith"][Math.floor(Math.random() * 2)]
+						};
 					}
 					
 					function getSelected(select){
@@ -180,7 +215,7 @@
 							i;
 						
 						for (i = 0; i < 100; i++){
-							data.push({ id: i, editor: options.generate() });
+							data.push(lang.mixin(options.generate(), { id: i}));
 						}
 						
 						require(deps, function(ctor){
