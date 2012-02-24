@@ -58,23 +58,25 @@
 							}
 						}),
 						// define choices of component type which will be available in form
-						componentTypes = {
+						componentTypes = [
 							// native input types
-							text: { generate: generateText },
-							checkbox: { generate: generateBool },
-							radio: { generate: generateBool },
-							textarea: {
+							{ label: "text", generate: generateText },
+							{ label: "checkbox", generate: generateBool },
+							{ label: "radio", generate: generateBool },
+							{
+								label: "textarea",
 								generate: generateText,
 								column: { editorArgs: { rows: 3 } }
 							},
 							// TODO: support select?
 							// Dijits
-							"dijit/form/TextBox": { generate: generateText },
-							"dijit/form/SimpleTextarea": { generate: generateText },
-							"dijit/form/CheckBox": {
+							{ label: "dijit/form/TextBox", generate: generateText },
+							{ label: "dijit/form/SimpleTextarea", generate: generateText },
+							{
+								label: "dijit/form/CheckBox",
+								generate: generateBool,
 								// Dijit's CheckBox is a bit special, in that value reports
 								// a string value if checked, but false if unchecked.
-								generate: generateBool,
 								column: {
 									editorArgs: { value: "enabled" },
 									get: function(item){
@@ -88,24 +90,29 @@
 									}
 								}
 							},
-							"dijit/form/ValidationTextBox": {
+							{
+								label: "dijit/form/ValidationTextBox",
 								generate: generateText,
 								column: { editorArgs: { required: true } }
 							},
-							"dijit/form/NumberSpinner": {
+							{
+								label: "dijit/form/NumberSpinner",
 								generate: generateNumber,
 								column: { editorArgs: { constraints: { min: 0 } } }
 							},
-							"dijit/form/DateTextBox": { generate: generateDate },
-							"dijit/form/HorizontalSlider": {
+							{ label: "dijit/form/DateTextBox", generate: generateDate },
+							{
+								label: "dijit/form/HorizontalSlider",
 								generate: generateNumber,
 								column: { editorArgs: { minimum: 0, maximum: 1000 } }
 							},
-							"dijit/form/FilteringSelect": {
+							{
+								label: "dijit/form/FilteringSelect",
 								generate: generateOptionValue,
 								column: { editorArgs: { store: optionsStore } }
 							},
-							"dijit/form/Select": {
+							{
+								label: "dijit/form/Select",
 								generate: generateOptionValue,
 								column: { editorArgs: {
 									store: optionsDataStore,
@@ -113,7 +120,8 @@
 									style: { width: "99%" }
 								} }
 							},
-							"dijit/Editor": {
+							{
+								label: "dijit/Editor",
 								generate: generateText,
 								column: {
 									renderCell: function(object, data){
@@ -123,7 +131,7 @@
 									editorArgs: { style: "height: 100px;" }
 								}
 							}
-						},
+						],
 						optStr = "",
 						i;
 					
@@ -163,10 +171,11 @@
 					
 					form.onsubmit = function(){
 						var
-							editor = getSelected(form.elements.editor),
+							choice = getSelected(form.elements.editor),
+							options = componentTypes[choice],
+							editor = options.editor || options.label,
 							editOn = getSelected(form.elements.editOn),
 							deps = editor.indexOf("/") > -1 ? [editor] : [],
-							options = componentTypes[editor],
 							data = [],
 							i;
 						
@@ -200,7 +209,7 @@
 					
 					// generate radios in editorComponentTypes div
 					for(i in componentTypes){
-						optStr += '<option value="' + i + '">' + i + "</option>";
+						optStr += '<option value="' + i + '">' + componentTypes[i].label + "</option>";
 					}
 					domConstruct.place('<select name="editor">' + optStr + "</select>", typesArea);
 					
