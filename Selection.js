@@ -1,5 +1,5 @@
-define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/Deferred", "dojo/on", "dojo/has", "dojo/aspect", "./List", "put-selector/put", "dojo/query"],
-function(kernel, declare, Deferred, on, has, aspect, List, put){
+define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/Deferred", "dojo/on", "dojo/mouse", "dojo/has", "dojo/aspect", "./List", "put-selector/put", "dojo/query"],
+function(kernel, declare, Deferred, on, mouse, has, aspect, List, put){
 
 var ctrlEquiv = has("mac") ? "metaKey" : "ctrlKey";
 return declare([List], {
@@ -83,7 +83,7 @@ return declare([List], {
 				this._lastSelected = row;
 			}else{
 				var value;
-				if(mode == "extended" && !ctrlKey){
+				if(mode == "extended" && !ctrlKey && !(this.selection[this.row(row).id] && mouse.isRight(event))){
 					this.clearSelection(this.row(row).id);
 				}
 				if(!event.shiftKey){
