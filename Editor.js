@@ -181,13 +181,15 @@ function createSharedEditor(column, originalRenderCell){
 		keyHandle;
 	
 	function onblur(){
-		var parentNode = node.parentNode;
+		var parentNode = node.parentNode,
+			renderedNode;
 		
 		// remove the editor from the cell
 		parentNode.removeChild(node);
 		
 		// pass new value to original renderCell implementation for this cell
-		originalRenderCell(column.grid.row(parentNode).data, activeValue, parentNode);
+		Grid.appendIfNode(parentNode, originalRenderCell(
+			column.grid.row(parentNode).data, activeValue, parentNode));
 		
 		// reset state now that editor is deactivated
 		activeCell = activeValue = null;

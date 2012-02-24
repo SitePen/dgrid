@@ -151,7 +151,7 @@
 					function customRenderCell(object, data) {
 						var container = domConstruct.create("div", { "class": "outer" });
 						domConstruct.place('<span class="inner">' +
-							data.replace(/</g, "&lt;") + "</span>", container);
+							("" + data).replace(/</g, "&lt;") + "</span>", container);
 						return container;
 					}
 					

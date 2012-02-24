@@ -386,11 +386,11 @@ function(kernel, declare, listen, has, put, List){
 		}
 	});
 	
-	// expose default implementation of renderCell e.g. for use by column plugins
+	// expose appendIfNode and default implementation of renderCell,
+	// e.g. for use by column plugins
+	Grid.appendIfNode = appendIfNode;
 	Grid.defaultRenderCell = function(object, data, td, options){
-		if(data != null){
-			td.appendChild(document.createTextNode(data));
-		}
+		if(data != null){ td.appendChild(document.createTextNode(data)); }
 	};
 	return Grid;
 });
