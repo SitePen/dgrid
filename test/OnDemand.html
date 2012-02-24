@@ -168,19 +168,19 @@
 					
 					on(document.getElementById("setstore"), "click", function(){
 						console.log("setting store to colorStore: ", colorStore);
-						window.grid.setStore(colorStore);//no query
+						window.grid.set("store", colorStore);//no query
 					});
 					on(document.getElementById("restore"), "click", function(){
 						console.log("setting store to testStore");
-						grid.setStore(testStore);//no query
+						grid.set("store", testStore);//no query
 					});
 					on(document.getElementById("colorQuery"), "click", function(){
 						console.log("setting store to colorStore and setting query to show only primary colors");
-						grid.setStore(colorStore, {col3: "Primary"});//query set to only show primary colors
+						grid.set("store", colorStore, {col3: "Primary"});//query set to only show primary colors
 					});
 					on(document.getElementById("resetQuery"), "click", function(){
 						console.log("reset query to show all");
-						grid.setQuery({});
+						grid.set("query", {});
 					});
 					
 					var sortDescending = true;
@@ -202,7 +202,7 @@
 							sortByCol1 = { attribute: "col1" };
 						}
 						sortByCol1.descending = sortDescending;
-						grid.setQuery(grid.query, { sort: [sortByCol1] });
+						grid.set("query", grid.query, { sort: [sortByCol1] });
 						
 						console.log("sortOrder after setQuery: ", grid.sortOrder, grid.queryOptions);
 					});
@@ -216,16 +216,16 @@
 
 					on(document.getElementById("empty"), "click", function(){
 						console.log("set store to emptyStore");
-						grid.setStore(emptyStore, {});
+						grid.set("store", emptyStore, {});
 					});
 					on(document.getElementById("error"), "click", function(){
 						console.log("set store to errorStore");
-						grid.setStore(errorStore,{});
+						grid.set("store", errorStore,{});
 					});
 					
 					on(document.getElementById("error2"), "click", function(){
 						console.log("set store to defErrorStore");
-						grid.setStore(defErrorStore,{});
+						grid.set("store", defErrorStore,{});
 					});
 					
 					// buttons / listeners for 2nd grid
@@ -252,17 +252,17 @@
 					});
 					
 					on(document.getElementById("setorigeditstore"), "click", function(){
-						grid2.setStore(testTypesStore, {});
+						grid2.set("store", testTypesStore, {});
 						updateDirty();
 					});
 					
 					on(document.getElementById("seterrorputstore"), "click", function(){
-						grid2.setStore(putErrorStore, {});
+						grid2.set("store", putErrorStore, {});
 						updateDirty();
 					});
 					
 					on(document.getElementById("setdeferrorputstore"), "click", function(){
-						grid2.setStore(defPutErrorStore, {});
+						grid2.set("store", defPutErrorStore, {});
 						updateDirty();
 					});
 					

@@ -17,17 +17,24 @@
 			.column-col1 {
 				width: 40px;
 			}
-			.ui-widget{
+			.ui-widget {
 				margin: 10px;
 			}
 		</style>
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dojo/on", "dojo/_base/window", "dgrid/OnDemandGrid", "dgrid/Selector", "dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!"], 
-				function(on, win, Grid, Selector, Selection, Keyboard, declare, testStore){
+			require(["dojo/on", "dojo/_base/window", "dgrid/OnDemandGrid", "dgrid/Selector", "dgrid/Selection", "dgrid/Keyboard",
+					"dojo/_base/declare", "dojo/_base/array", "dojo/json", "dgrid/test/data/base", "dojo/domReady!"], 
+				function(on, win, Grid, Selector, Selection, Keyboard, declare, arrayUtil, json, testStore){
 					var columns = { // you can declare columns as an object hash (key translates to field)
-							col1: Selector({ type: "checkbox" }),
+							col1: Selector({ type: "checkbox", disabled: function(object){ return object.col1 == "note"; }}),
+							id: "ID",
+							col2: {label: 'Column 2', sortable: false},
+							col3: {label: 'Column 3'}
+						};
+					var columns2 = { // you can declare columns as an object hash (key translates to field)
+							col1: Selector({ type: "checkbox", label:"Select"}),
 							id: "ID",
 							col2: {label: 'Column 2', sortable: false},
 							col3: {label: 'Column 3'}
@@ -36,17 +43,26 @@
 					on(win.body(), "dgrid-select,dgrid-deselect",
 						function(event){
 							var msg = (event.type == "dgrid-deselect" ? "de" : "") + "selected: ";
-							console.log(msg, event.grid.id, event.row.id);
+							console.log(msg, event.grid.id,
+								arrayUtil.map(event.rows, function(row){ return row.id; }).join(", "));
+							console.log("selection: ", json.stringify(event.grid.selection, null, "  "));
 						}
 					);
 					
 					window.grid = dojo.declare([Grid, Selection, Keyboard])({
 						store: testStore,
 						selectionMode: "none",
-						columns: columns
+						columns: columns,
+						allowSelectAll: true
 					}, "grid");
+					window.grid2 = dojo.declare([Grid, Selection, Keyboard])({
+						store: testStore,
+						selectionMode: "none",
+						columns: columns2,
+						allowSelectAll: false
+					}, "grid2");
 					var columnsRadio = { // you can declare columns as an object hash (key translates to field)
-						col1: Selector({ label: 'Radio', type: "radio" }),
+						col1: Selector({ label: 'Radio', type: "radio", disabled: function(object){ return object.col3 == "read"; } }),
 						id: "ID",
 						col2: {label: 'Column 2', sortable: false},
 						col3: {label: 'Column 3'}
@@ -61,25 +77,28 @@
 		</script>
 	</head>
 	<body class="claro">
-		<h2>A grid with checkbox selectors</h2>
+		<h2>A grid with checkbox selectors, with select-all enabled
+			(top checkbox, and Ctrl/Cmd+A)</h2>
 		<div>
-			<button type="button" onclick="grid.setSelectionMode('none');">
+			<button type="button" onclick="grid.set('selectionMode', 'none');">
 				Set selection mode to "none"</button>
-			<button type="button" onclick="grid.setSelectionMode('single');">
+			<button type="button" onclick="grid.set('selectionMode', 'single');">
 				Set selection mode to "single"</button>
-			<button type="button" onclick="grid.setSelectionMode('multiple');">
+			<button type="button" onclick="grid.set('selectionMode', 'multiple');">
 				Set selection mode to "multiple"</button>
-			<button type="button" onclick="grid.setSelectionMode('extended');">
+			<button type="button" onclick="grid.set('selectionMode', 'extended');">
 				Set selection mode to "extended"</button>
 		</div>
 		<div id="grid"></div>
 		<h2>A grid with radio selectors</h2>
 		<div>
-			<button type="button" onclick="gridRadio.setSelectionMode('none');">
+			<button type="button" onclick="gridRadio.set('selectionMode', 'none');">
 				Set selection mode to "none"</button>
-			<button type="button" onclick="gridRadio.setSelectionMode('single');">
+			<button type="button" onclick="gridRadio.set('selectionMode', 'single');">
 				Set selection mode to "single" (to test sync)</button>
 		</div>
 		<div id="grid-radio"></div>
+		<h2>A grid with checkbox selectors, with select-all disabled</h2>
+		<div id="grid2"></div>
 	</body>
 </html>

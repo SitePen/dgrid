@@ -56,9 +56,13 @@ return declare([List, _StoreMixin], {
 		var priorPreload = this.preload;
 		if(priorPreload){
 			// the preload nodes (if there are multiple) are represented as a linked list, need to insert it
-			if((preload.next = priorPreload.next)){
+			if((preload.next = priorPreload.next) && 
+					// check to make sure that the current scroll position is below this preload
+					this.bodyNode.scrollTop >= priorPreload.node.offsetTop){ 
+				// the prior preload is above/before in the linked list
 				preload.previous = priorPreload;
 			}else{
+				// the prior preload is below/after in the linked list
 				preload.next = priorPreload;
 				preload.previous = priorPreload.previous;
 			}
@@ -70,7 +74,7 @@ return declare([List, _StoreMixin], {
 		}
 		var loadingNode = put(preloadNode, "-div.dgrid-loading");
 		put(loadingNode, "div.dgrid-below", this.loadingMessage);
-		var options = this.getQueryOptions({start: 0, count: this.minRowsPerPage, query: query});
+		var options = this.get("queryOptions", {start: 0, count: this.minRowsPerPage, query: query});
 		// execute the query
 		var results = query(options);
 		var self = this;
@@ -89,8 +93,8 @@ return declare([List, _StoreMixin], {
 				for(var i = 0; i < trCount; i++){
 					height += trs[i].offsetHeight;
 				}
-				// only update rowHeight if we actually got results
-				if(trCount){ self.rowHeight = height / trCount; }
+				// only update rowHeight if we actually got results and are visible
+				if(trCount && height){ self.rowHeight = height / trCount; }
 				
 				total -= trCount;
 				preload.count = total;
@@ -106,11 +110,11 @@ return declare([List, _StoreMixin], {
 				return trs;
 			});
 		});
-		
+
 		// return results so that callers can handle potential of async error
 		return results;
 	},
-	getQueryOptions: function(mixin){
+	_getQueryOptions: function(mixin){
 		// summary:
 		//		Get a fresh queryOptions object with the current sort added to it and any mixin added in
 		options = this.queryOptions ? lang.delegate(this.queryOptions, mixin) : mixin || {};
@@ -133,7 +137,7 @@ return declare([List, _StoreMixin], {
 		}
 	},
 	
-	getRowHeight: function(rowElement){
+	_calcRowHeight: function(rowElement){
 		// summary:
 		//		Calculate the height of a row. This is a method so it can be overriden for
 		//		plugins that add connected elements to a row, like the tree
@@ -156,6 +160,19 @@ return declare([List, _StoreMixin], {
 				var visibleBottom = scrollNode.offsetHeight + visibleTop;
 				var priorPreload, preloadNode, preload = grid.preload;
 				var lastScrollTop = grid.lastScrollTop;
+				
+				// XXX: I do not know why this happens.
+				// munging the actual location of the viewport relative to the preload node by a few pixels in either
+				// direction is necessary because at least WebKit on Windows seems to have an error that causes it to
+				// not quite get the entire element being focused in the viewport during keyboard navigation,
+				// which means it becomes impossible to load more data using keyboard navigation because there is
+				// no more data to scroll to to trigger the fetch.
+				// 1 is arbitrary and just gets it to work correctly with our current test cases; don’t wanna go
+				// crazy and set it to a big number without understanding more about what is going on.
+				// wondering if it has to do with border-box or something, but changing the border widths does not
+				// seem to make it break more or less, so I do not know…
+				var mungeAmount = 1;
+				
 				grid.lastScrollTop = visibleTop;
 				
 				function removeDistantNodes(preload, distanceOff, traversal, below){
@@ -170,7 +187,7 @@ return declare([List, _StoreMixin], {
 						var count = 0;
 						var toDelete = [];
 						while(row = nextRow){ // intentional assignment
-							var rowHeight = grid.getRowHeight(row);
+							var rowHeight = grid._calcRowHeight(row);
 							if(reclaimedHeight + rowHeight + farOffRemoval > distanceOff || nextRow.className.indexOf("dgrid-row") < 0){
 								// we have reclaimed enough rows or we have gone beyond grid rows, let's call it good
 								break;
@@ -180,7 +197,8 @@ return declare([List, _StoreMixin], {
 							if(currentObserverIndex != lastObserverIndex && lastObserverIndex > -1){
 								// we have gathered a whole page of observed rows, we can delete them now
 								var observers = grid.observers; 
-								observers[lastObserverIndex].cancel();
+								var observer = observers[lastObserverIndex]; 
+								observer && observer.cancel();
 								observers[lastObserverIndex] = 0; // remove it so we don't call cancel twice
 							}
 							reclaimedHeight += rowHeight;
@@ -226,12 +244,16 @@ return declare([List, _StoreMixin], {
 					var preloadTop = preloadNode.offsetTop;
 					var preloadHeight;
 					
-					if(visibleBottom < preloadTop){
+					if(visibleBottom + mungeAmount < preloadTop){
 						// the preload is below the line of sight
-						preload = preload.previous;
-					}else if(visibleTop > (preloadTop + (preloadHeight = preloadNode.offsetHeight))){
+						do{
+							preload = preload.previous;
+						}while(preload && !preload.node.offsetParent); // skip past preloads that are not currently connected
+					}else if(visibleTop - mungeAmount > (preloadTop + (preloadHeight = preloadNode.offsetHeight))){
 						// the preload is above the line of sight
-						preload = preload.next;
+						do{
+							preload = preload.next;
+						}while(preload && !preload.node.offsetParent);// skip past preloads that are not currently connected
 					}else{
 						// the preload node is visible, or close to visible, better show it
 						var offset = ((preloadNode.rowIndex ? visibleTop : visibleBottom) - preloadTop) / grid.rowHeight;
@@ -256,11 +278,11 @@ return declare([List, _StoreMixin], {
 						}
 						offset = Math.round(offset);
 						count = Math.round(count);
-						var options = grid.getQueryOptions();
+						var options = grid.get("queryOptions");
 						preload.count -= count;
 						var beforeNode = preloadNode,
 							keepScrollTo, queryRowsOverlap = grid.queryRowsOverlap,
-							below = preloadNode.rowIndex > 0; 
+							below = preloadNode.rowIndex > 0 && preload; 
 						if(below){
 							// add new rows below
 							var previous = preload.previous;
@@ -308,7 +330,6 @@ return declare([List, _StoreMixin], {
 						put(loadingNode, "div.dgrid-" + (below ? "below" : "above"), grid.loadingMessage);
 						// use the query associated with the preload node to get the next "page"
 						options.query = preload.query;
-						
 						// Query now to fill in these rows.
 						// Keep _trackError-wrapped results separate, since if results is a
 						// promise, it will lose QueryResults functions when chained by `when`
@@ -326,6 +347,17 @@ return declare([List, _StoreMixin], {
 									// row height, we may need to adjust the scroll once they are filled in
 									// so we don't "jump" in the scrolling position
 									scrollNode.scrollTop += beforeNode.offsetTop - keepScrollTo;
+								}
+								if(below){
+									// if it is below, we will use the total from the results to update 
+									// the count in case the total changes as later pages are retrieved
+									// (not uncommon when total counts are estimated for db perf reasons)
+									Deferred.when(results.total || results.length, function(total){
+										// recalculate the count
+										below.count = total - below.node.rowIndex;
+										// readjust the height
+										adjustHeight(below);
+									});
 								}
 						});
 						preload = preload.previous;

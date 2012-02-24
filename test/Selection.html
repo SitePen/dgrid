@@ -14,17 +14,17 @@
 			.dgrid { 
 				width: 70%;
 			}
-			.ui-widget{
+			.ui-widget {
 				margin: 10px;
 			}
 		</style>
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dojo/on", "dojo/_base/declare", "dojo/_base/window", "dojo/json",
+			require(["dojo/on", "dojo/_base/declare", "dojo/_base/window", "dojo/_base/array", "dojo/json",
 					"dgrid/OnDemandGrid", "dgrid/Editor","dgrid/Selection", "dgrid/CellSelection", "dgrid/Keyboard",
 					"dgrid/test/data/base", "dojo/domReady!"],
-				function(on, declare, win, json, Grid, Editor, Selection, CellSelection, Keyboard, testStore){
+				function(on, declare, win, arrayUtil, json, Grid, Editor, Selection, CellSelection, Keyboard, testStore){
 					var columns = {
 							col1: 'Column 1',
 							col2: {label: 'Column 2', sortable: false},
@@ -35,12 +35,12 @@
 					on(win.body(), "dgrid-select,dgrid-deselect",
 						function(event){
 							var msg = (event.type == "dgrid-deselect" ? "de" : "") + "selected: ";
-							if(event.cell){
-								console.log(msg + event.grid.id + ": row " + event.cell.row.id +
-									", col " + event.cell.column.field);
-							}else{
-								console.log(msg + event.grid.id + ": row " + event.row.id);
-							}
+							console.log(msg + event.grid.id, event.cells ?
+								arrayUtil.map(event.cells, function(cell){
+									return cell.row.id + ":" + cell.column.id;
+								}).join(", ") :
+								arrayUtil.map(event.rows, function(row){ return row.id; }).join(", ")
+							);
 							console.log("selection:", json.stringify(event.grid.selection, null, "  "));
 						}
 					);
@@ -48,7 +48,8 @@
 					gridRowNavigation = dojo.declare([Grid, Selection, Keyboard])({
 						store: testStore,
 						cellNavigation: false,
-						columns: columns
+						columns: columns,
+						allowSelectAll: true
 					}, "grid-row-navigation");
 					
 					var columns2 = {
@@ -74,7 +75,8 @@
 					gridCellNavigationNone = declare([Grid, CellSelection, Keyboard])({
 						store: testStore,
 						columns: columns2,
-						selectionMode: "none"
+						selectionMode: "none",
+						allowSelectAll: true
 					}, "grid-cell-navigation-none");
 					
 					// cell navigation + row selection
@@ -87,11 +89,12 @@
 	</head>
 	<body class="nihilo">
 		<h2>A grid with row-level selection (and row-level navigation)</h2>
+		<h3>Use Ctrl/Cmd+A to test keyboard select-all with different selectionModes</h3>
 		<div>Set selectionMode:
-			<button type="button" onclick="gridRowNavigation.setSelectionMode('none');">None</button>
-			<button type="button" onclick="gridRowNavigation.setSelectionMode('single');">Single</button>
-			<button type="button" onclick="gridRowNavigation.setSelectionMode('multiple');">Multiple</button>
-			<button type="button" onclick="gridRowNavigation.setSelectionMode('extended');">Extended</button>
+			<button type="button" onclick="gridRowNavigation.set('selectionMode', 'none');">None</button>
+			<button type="button" onclick="gridRowNavigation.set('selectionMode', 'single');">Single</button>
+			<button type="button" onclick="gridRowNavigation.set('selectionMode', 'multiple');">Multiple</button>
+			<button type="button" onclick="gridRowNavigation.set('selectionMode', 'extended');">Extended</button>
 		</div>
 		<div id="grid-row-navigation"></div>
 		<h2>A grid with cell-level selection (default selection mode of "extended")</h2>
@@ -100,12 +103,13 @@
 		<div id="grid-cell-navigation-single"></div>
 		<h2>A grid with cell-level selection and selection mode of "multiple"</h2>
 		<div id="grid-cell-navigation-multiple"></div>
-		<h2>A grid with cell-level selection and selection mode of "none"</h2>
+		<h2>A grid with cell-level selection and selection mode of "none" initially</h2>
+		<h3>Use Ctrl/Cmd+A to test keyboard select-all with different selectionModes</h3>
 		<div>Set selectionMode:
-			<button type="button" onclick="gridCellNavigationNone.setSelectionMode('none');">None</button>
-			<button type="button" onclick="gridCellNavigationNone.setSelectionMode('single');">Single</button>
-			<button type="button" onclick="gridCellNavigationNone.setSelectionMode('multiple');">Multiple</button>
-			<button type="button" onclick="gridCellNavigationNone.setSelectionMode('extended');">Extended</button>
+			<button type="button" onclick="gridCellNavigationNone.set('selectionMode', 'none');">None</button>
+			<button type="button" onclick="gridCellNavigationNone.set('selectionMode', 'single');">Single</button>
+			<button type="button" onclick="gridCellNavigationNone.set('selectionMode', 'multiple');">Multiple</button>
+			<button type="button" onclick="gridCellNavigationNone.set('selectionMode', 'extended');">Extended</button>
 		</div>
 		<div id="grid-cell-navigation-none"></div>
 		<h2>A grid with row-level selection and cell-level navigation</h2>
