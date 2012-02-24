@@ -2,7 +2,7 @@
 
 ## General Changes
 
-### new: `get` and `set` methods
+### new: get and set methods
 
 Central `get` and `set` functions have been implemented, somewhat akin to the
 interfaces seen in `dojo/Stateful` and `dijit/_WidgetBase`.  However, there are
@@ -18,7 +18,7 @@ some key differences:
 
 ## Grid
 
-### `columndef.get` function now takes one parameter
+### columndef.get function now takes one parameter
 
 The `get` function on column definitions is now passed only one argument: the
 object for the row in question.
@@ -29,7 +29,7 @@ absolutely nothing in dgrid, and has now been removed.
 
 ## _StoreMixin (OnDemandList/OnDemandGrid, Pagination)
 
-### new: `columndef.set` function
+### new: columndef.set function
 
 Store-backed grids now support a `set` function on the column definition object.
 Like `get`, this function receives an object, which contains the updated item as
@@ -44,7 +44,7 @@ be used sparingly and carefully, since it is possible to do anything to the
 item, and complications may develop if multiple columns in the same grid take
 this approach.
 
-### new: `updateDirty`
+### new: updateDirty
 
 Store-backed grids also now have an `updateDirty(id, field, value)` method,
 which can be used to update dirty state of items represented in the grid.
@@ -52,7 +52,7 @@ which can be used to update dirty state of items represented in the grid.
 
 ## Selection / CellSelection / Selector
 
-### `dgrid-select` and `dgrid-deselect` events
+### dgrid-select and dgrid-deselect events
 
 The behavior and signature of selection events has changed significantly.
 
@@ -63,7 +63,7 @@ The behavior and signature of selection events has changed significantly.
 * Deselect events will now fire when rows are removed, or if a refresh occurs
   which resets the grid's selection.
 
-### new: `allowSelectAll` property, disabled by default
+### new: allowSelectAll property, disabled by default
 
 Previously, checkbox Selectors provided the ability to select all rows.
 This ability is still provided, but is now determined by the value of the
@@ -76,7 +76,7 @@ especially with regard to the lazy-loading nature of store-backed lists and grid
 Additionally, it is now possible to use Ctrl+A or Cmd+A to toggle between
 selecting all items and selecting no items.
 
-### new: `allowSelect` method
+### new: allowSelect method
 
 `Selection` now exposes an `allowSelect` method on the instance.  This method
 receives a row object (or a cell object in the case of `CellSelection`) and
@@ -86,7 +86,7 @@ row or cell should be permitted.
 This is particularly useful in conjunction with the `Selector` column plugin,
 which will display a disabled checkbox or radio button as appropriate.
 
-### new: `deselectOnRefresh` property
+### new: deselectOnRefresh property
 
 Previously, the `Selection` module would clear the selection whenever a list
 or grid is refreshed.  While this is still the default, the behavior can now
@@ -97,14 +97,14 @@ be disabled by setting `deselectOnRefresh` to `false`.
 Editor has been significantly refactored since v0.2.  The most notable changes
 in terms of API effects are noted below.
 
-### `widgetArgs` property is now `editorArgs`
+### widgetArgs property is now editorArgs
 
 The `widgetArgs` property supported in the column definition by the Editor
 plugin has been renamed to `editorArgs` to be agnostic as to whether the
 editor is a widget or a standard input, leaving the door open for usage with
 standard HTML input types.
 
-### `editorArgs` cannot be specified as a function
+### editorArgs cannot be specified as a function
 
 Previously, it was possible to specify `widgetArgs` as a function instead of an
 object.  The function would receive a store item and be expected to return an
@@ -119,7 +119,7 @@ the `editorArgs` property.  For more advanced cases where the value needs to be
 computed or transformed on a per-item basis, use the `get` function in the
 column definition object to return the appropriate data.
 
-### `dgrid-datachange` event properties
+### dgrid-datachange event properties
 
 The `dgrid-datachange` event emitted by the Editor column plugin now includes
 a `cell` property, which contains the same data retrievable via
@@ -136,7 +136,7 @@ reference to the Grid instance from which the event was fired.
 
 ## Tree
 
-### `expand` method added to grid instance
+### expand method added to grid instance
 
 Tree columns now add an `expand(target)` method, for programmatically expanding
 grid rows.  The `target` specified may be anything which will resolve to a row
