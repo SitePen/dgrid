@@ -115,7 +115,13 @@
 							},
 							"dijit/Editor": {
 								generate: generateText,
-								column: { editorArgs: { style: "height: 100px;" } }
+								column: {
+									renderCell: function(object, data){
+										// Editor supports rich text; don't escape HTML in view
+										return domConstruct.create("div", { innerHTML: data });
+									},
+									editorArgs: { style: "height: 100px;" }
+								}
 							}
 						},
 						optStr = "",
