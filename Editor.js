@@ -45,10 +45,11 @@ function dataFromEditor(column, cmp){
 
 function setProperty(grid, cellElement, oldValue, value){
 	// Updates dirty hash and fires dgrid-datachange event for a changed value.
-	if(oldValue != value){
-		var cell = grid.cell(cellElement);
-		var row = cell.row;
-		var column = cell.column;
+	var cell, row, column;
+	if(oldValue.valueOf() != value.valueOf()){
+		cell = grid.cell(cellElement);
+		row = cell.row;
+		column = cell.column;
 		if(column.field && row){
 			// TODO: remove rowId in lieu of cell (or grid.row/grid.cell)
 			// (keeping for the moment for back-compat, but will note in changes)
@@ -82,13 +83,13 @@ function setPropertyFromEditor(grid, column, cmp) {
 	var value;
 	if(!cmp.isValid || cmp.isValid()){
 		value = setProperty(grid, (cmp.domNode || cmp).parentNode,
-			activeCell ? activeValue : cmp._dgridlastvalue,
+			activeCell ? activeValue : cmp._dgridLastValue,
 			dataFromEditor(column, cmp));
 		
 		if(activeCell){ // for Editors with editOn defined
 			activeValue = value;
-		}else{ // for always-on Editors, update _dgridlastvalue immediately
-			cmp._dgridlastvalue = value;
+		}else{ // for always-on Editors, update _dgridLastValue immediately
+			cmp._dgridLastValue = value;
 		}
 	}
 }
@@ -115,15 +116,17 @@ function createEditor(column){
 		// (Can't do this using className argument to constructor; causes issues)
 		node.className += " dgrid-input";
 		
-		// connect to onBlur rather than watching value for changes, since
-		// the latter is delayed by setTimeouts and may also fire from our logic
-		cmp.connect(cmp, "onBlur", function(){
-			setPropertyFromEditor(grid, column, this);
+		// For editOn Editors, connect to onBlur rather than onChange, since
+		// the latter is delayed by setTimeouts in Dijit and will fire too late.
+		cmp.connect(cmp, editOn ? "onBlur" : "onChange", function(){
+			if(!cmp._dgridIgnoreChange){
+				setPropertyFromEditor(grid, column, this);
+			}
 		});
 	}else{
 		handleChange = function(evt){
 			var target = evt.target;
-			if("_dgridlastvalue" in target && target.className.indexOf("dgrid-input") > -1){
+			if("_dgridLastValue" in target && target.className.indexOf("dgrid-input") > -1){
 				setPropertyFromEditor(grid, column, target);
 			}
 		};
@@ -172,9 +175,9 @@ function createSharedEditor(column, originalRenderCell){
 		node = cmp.domNode || cmp,
 		focusNode = cmp.focusNode || node,
 		reset = isWidget ?
-			function(){ cmp.set("value", cmp._dgridlastvalue); } :
+			function(){ cmp.set("value", cmp._dgridLastValue); } :
 			function(){
-				updateInputValue(cmp, cmp._dgridlastvalue);
+				updateInputValue(cmp, cmp._dgridLastValue);
 				// call setProperty again in case we need to revert a previous change
 				setPropertyFromEditor(column.grid, column, cmp);
 			},
@@ -203,7 +206,7 @@ function createSharedEditor(column, originalRenderCell){
 		
 		if(key == 27){ // escape: revert + dismiss
 			reset();
-			activeValue = cmp._dgridlastvalue;
+			activeValue = cmp._dgridLastValue;
 			focusNode.blur();
 		}else if(key == 13 && column.dismissOnEnter !== false){ // enter: dismiss
 			// FIXME: Opera is "reverting" even in this case
@@ -235,13 +238,18 @@ function showEditor(cmp, column, cell, value){
 	put(cell, cmp.domNode || cmp);
 	
 	if(isWidget){
-		// for widgets, ensure startup is called before setting value,
-		// to maximize compatibility with flaky widgets like dijit/form/Select
+		// For widgets, ensure startup is called before setting value,
+		// to maximize compatibility with flaky widgets like dijit/form/Select.
 		if (!cmp._started){ cmp.startup(); }
+		
+		// Set value, but ensure it isn't processed as a user-generated change.
+		// (Clear flag on a timeout to wait for delayed onChange to fire first)
+		cmp._dgridIgnoreChange = true;
 		cmp.set("value", value);
+		setTimeout(function(){ cmp._dgridIgnoreChange = false; }, 0);
 	}
 	// track previous value for short-circuiting or in case we need to revert
-	cmp._dgridlastvalue = value;
+	cmp._dgridLastValue = value;
 	// if this is an Editor with editOn, also reset activeValue
 	if(activeCell){ activeValue = value; }
 }
