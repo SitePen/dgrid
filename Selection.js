@@ -19,7 +19,7 @@ return declare([List], {
 	// deselectOnRefresh: Boolean
 	//		If true, the selection object will be cleared when refresh is called.
 	deselectOnRefresh: true,
-
+	
 	//allowSelectAll: Boolean
 	//		If true, allow ctrl/cmd+A to select all rows.
 	//		Also consulted by Selector for showing select-all checkbox.
@@ -59,17 +59,20 @@ return declare([List], {
 	},
 	
 	_handleSelect: function(event, currentTarget){
-		if(this.selectionMode == "none" || (event.type == "dgrid-cellfocusin" && event.parentType == "mousedown")){
-			// don't run if selection mode is none or if coming from a dgrid-cellfocusin from a mousedown
+		// don't run if selection mode is none,
+		// or if coming from a dgrid-cellfocusin from a mousedown
+		if(this.selectionMode == "none" ||
+				(event.type == "dgrid-cellfocusin" && event.parentType == "mousedown")){
 			return;
 		}
 
-		var mode = this.selectionMode,
-			ctrlKey = event.type == "mousedown" ? event[ctrlEquiv] : event.ctrlKey;
+		var ctrlKey = event.type == "mousedown" ? event[ctrlEquiv] : event.ctrlKey;
 		if(event.type == "mousedown" || !event.ctrlKey || event.keyCode == 32){
-			var row = currentTarget,
+			var mode = this.selectionMode,
+				row = currentTarget,
+				rowObj = this.row(row),
 				lastRow = this._lastSelected;
-
+			
 			if(mode == "single"){
 				if(lastRow == row){
 					if(ctrlKey){
@@ -83,8 +86,11 @@ return declare([List], {
 				this._lastSelected = row;
 			}else{
 				var value;
-				if(mode == "extended" && !ctrlKey){
-					this.clearSelection(this.row(row).id);
+				// clear selection first for non-ctrl-clicks in extended mode,
+				// as well as for right-clicks on unselected targets
+				if((event.button != 2 && mode == "extended" && !ctrlKey) ||
+						(event.button == 2 && !(this.selection[rowObj.id]))){
+					this.clearSelection(rowObj.id);
 				}
 				if(!event.shiftKey){
 					// null == toggle; undefined == true;
