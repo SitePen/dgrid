@@ -35,6 +35,7 @@ function(kernel, declare, lang, Deferred, listen){
 			this.query || (this.query = {});
 			this.queryOptions || (this.queryOptions = {});
 			this.dirty = {};
+			this._updating = {}; // tracks rows that are mid-update
 		},
 		
 		_configColumn: function(column){
@@ -101,7 +102,7 @@ function(kernel, declare, lang, Deferred, listen){
 				id = store && store.getIdentity(object),
 				dirtyObj;
 			
-			if(id in dirty){ dirtyObj = dirty[id]; }
+			if(id in dirty && !(id in this._updating)){ dirtyObj = dirty[id]; }
 			if(dirtyObj){
 				// restore dirty object as delegate on top of original object,
 				// to provide protection for subsequent changes as well
@@ -131,7 +132,6 @@ function(kernel, declare, lang, Deferred, listen){
 			var self = this,
 				store = this.store,
 				dirty = this.dirty,
-				colsWithSet = self._columnsWithSet,
 				dfd = new Deferred(), promise = dfd.promise,
 				getFunc = function(id){
 					// returns a function to pass as a step in the promise chain,
@@ -146,7 +146,9 @@ function(kernel, declare, lang, Deferred, listen){
 			function putter(id, dirtyObj) {
 				// Return a function handler
 				return function(object) {
-					var key, data;
+					var colsWithSet = self._columnsWithSet,
+						updating = self._updating,
+						key, data;
 					// Copy dirty props to the original, applying setters if applicable
 					for(key in dirtyObj){
 						object[key] = dirtyObj[key];
@@ -161,16 +163,19 @@ function(kernel, declare, lang, Deferred, listen){
 							if(data !== undefined){ object[key] = data; }
 						}
 					}
+					
+					updating[id] = true;
 					// Put it in the store, returning the result/promise
 					return Deferred.when(store.put(object), function() {
-						// Delete the item now that it's been confirmed updated
+						// Clear the item now that it's been confirmed updated
 						delete dirty[id];
+						delete updating[id];
 					});
 				};
 			}
 			
 			// For every dirty item, grab the ID
-			for(var id in this.dirty) {
+			for(var id in dirty) {
 				// Create put function to handle the saving of the the item
 				var put = putter(id, dirty[id]);
 				

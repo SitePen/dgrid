@@ -152,9 +152,8 @@
 							{
 								label: "dijit/form/TextBox converting to uppercase on save",
 								editor: "dijit/form/TextBox",
-								generate: generateText,
+								generate: generateTextUC,
 								column: {
-									get: function(object){ return object.editor.toUpperCase(); },
 									set: function(object){ return object.editor.toUpperCase(); }
 								}
 							}
@@ -179,6 +178,9 @@
 					}
 					function generateOptionValue() {
 						return { editor: optionsData[Math.floor(Math.random() * optionsLength)].id };
+					}
+					function generateTextUC() {
+						return { editor: "GENERATED TEXT " + Math.floor(Math.random() * 1000) };
 					}
 					function generateName() {
 						// returns an item with firstName and lastName fields,
