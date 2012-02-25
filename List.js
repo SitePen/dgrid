@@ -441,9 +441,12 @@ function(kernel, declare, listen, aspect, has, TouchScroll, hasClass, put){
 				return lastRow;
 			}
 			function whenDone(resolvedRows){
-				(beforeNode && beforeNode.parentNode || self.contentNode).insertBefore(rowsFragment, beforeNode || null);
-				lastRow = resolvedRows[resolvedRows.length - 1];
-				lastRow && self.adjustRowIndices(lastRow);
+				var container = beforeNode ? beforeNode.parentNode : self.contentNode;
+				if(container){
+					container.insertBefore(rowsFragment, beforeNode || null);
+					lastRow = resolvedRows[resolvedRows.length - 1];
+					lastRow && self.adjustRowIndices(lastRow);
+				}
 				return (rows = resolvedRows);
 			}
 			return whenDone(rows);
