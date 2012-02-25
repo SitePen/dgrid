@@ -193,7 +193,7 @@ function(kernel, declare, lang, Deferred, listen){
 		
 		revert: function(){
 			// summary:
-			//		Revert the last changes
+			//		Reverts any changes since the previous save.
 			this.dirty = {};
 			this.refresh();
 		},
