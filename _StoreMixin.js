@@ -35,8 +35,26 @@ function(kernel, declare, lang, Deferred, listen){
 			this.query || (this.query = {});
 			this.queryOptions || (this.queryOptions = {});
 			this.dirty = {};
+			this._updating = {}; // tracks rows that are mid-update
 		},
-
+		
+		_configColumn: function(column){
+			// summary:
+			//		Implements extension point provided by Grid to store references to
+			//		any columns with `set` methods, for use during `save`.
+			if (column.set){
+				if(!this._columnsWithSet){ this._columnsWithSet = {}; }
+				this._columnsWithSet[column.field] = column;
+			}
+		},
+		
+		_configColumns: function(){
+			// summary:
+			//		Extends Grid to reset _StoreMixin's hash when columns are updated
+			this._columnsWithSet = null;
+			return this.inherited(arguments);
+		},
+		
 		_setStore: function(store, query, queryOptions){
 			// summary:
 			//		Assigns a new store (and optionally query/queryOptions) to the list,
@@ -84,7 +102,7 @@ function(kernel, declare, lang, Deferred, listen){
 				id = store && store.getIdentity(object),
 				dirtyObj;
 			
-			if(id in dirty){ dirtyObj = dirty[id]; }
+			if(id in dirty && !(id in this._updating)){ dirtyObj = dirty[id]; }
 			if(dirtyObj){
 				// restore dirty object as delegate on top of original object,
 				// to provide protection for subsequent changes as well
@@ -128,19 +146,36 @@ function(kernel, declare, lang, Deferred, listen){
 			function putter(id, dirtyObj) {
 				// Return a function handler
 				return function(object) {
-					var key;
-					// Copy dirty props to the original
-					for(key in dirtyObj){ object[key] = dirtyObj[key]; }
+					var colsWithSet = self._columnsWithSet,
+						updating = self._updating,
+						key, data;
+					// Copy dirty props to the original, applying setters if applicable
+					for(key in dirtyObj){
+						object[key] = dirtyObj[key];
+					}
+					if(colsWithSet){
+						// Apply any set methods in column definitions.
+						// Note that while in the most common cases column.set is intended
+						// to return transformed data for the key in question, it is also
+						// possible to directly modify the object to be saved.
+						for(key in colsWithSet){
+							data = colsWithSet[key].set(object);
+							if(data !== undefined){ object[key] = data; }
+						}
+					}
+					
+					updating[id] = true;
 					// Put it in the store, returning the result/promise
 					return Deferred.when(store.put(object), function() {
-						// Delete the item now that it's been confirmed updated
+						// Clear the item now that it's been confirmed updated
 						delete dirty[id];
+						delete updating[id];
 					});
 				};
 			}
 			
 			// For every dirty item, grab the ID
-			for(var id in this.dirty) {
+			for(var id in dirty) {
 				// Create put function to handle the saving of the the item
 				var put = putter(id, dirty[id]);
 				

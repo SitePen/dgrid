@@ -24,18 +24,30 @@
 		<script type="text/javascript">
 			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Editor", "dgrid/Keyboard", "dgrid/Tree", "dojo/_base/declare", "dojo/store/JsonRest", "dojo/store/Observable", "dojo/store/Cache", "dojo/store/Memory", "dojo/domReady!"], 
 				function(List, Grid, Selection, Editor, Keyboard, Tree, declare, JsonRest, Observable, Cache, Memory){
-					var testStore = Observable(Cache(JsonRest({target:"./data/rest.php", idProperty: "id"}), Memory()));
+					var testStore = Observable(Cache(JsonRest({
+						target:"./data/rest.php?", 
+						idProperty: "id",
+						query: function(query, options){
+							// have to manually adjust the query to get rid of the double ?? that trips php up
+							if(query.parent){
+								query = "parent=" + query.parent;
+							}
+							return JsonRest.prototype.query.call(this, query, options);
+						}
+					}), Memory()));
 					testStore.getChildren = function(parent, options){
 						return testStore.query({parent: parent.id}, options);
 					};
 					var columns = [
 						Tree({label:'Name', field:'name', sortable: false}),
 						{label:'Id', field:'id', sortable: false},
-						Editor({label:'Comment', field:'comment', sortable: false}, "text")
+						Editor({label:'Comment', field:'comment', sortable: false}, "text"),
+						Editor({label:'Boolean', field:'boo', sortable: false, autoSave: true}, "checkbox")
 					];
 
 					window.grid = new (declare([Grid, Selection, Keyboard]))({
 						store: testStore,
+						getBeforePut: false,
 						columns: columns
 					}, "grid");
 					deleteSelected = function(){

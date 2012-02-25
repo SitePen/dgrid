@@ -1,5 +1,5 @@
-define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/Deferred", "dojo/on", "dojo/has", "./List", "put-selector/put", "dojo/query"],
-function(kernel, declare, Deferred, on, has, List, put){
+define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/Deferred", "dojo/on", "dojo/has", "dojo/aspect", "./List", "put-selector/put", "dojo/query"],
+function(kernel, declare, Deferred, on, has, aspect, List, put){
 
 var ctrlEquiv = has("mac") ? "metaKey" : "ctrlKey";
 return declare([List], {
@@ -19,7 +19,7 @@ return declare([List], {
 	// deselectOnRefresh: Boolean
 	//		If true, the selection object will be cleared when refresh is called.
 	deselectOnRefresh: true,
-
+	
 	//allowSelectAll: Boolean
 	//		If true, allow ctrl/cmd+A to select all rows.
 	//		Also consulted by Selector for showing select-all checkbox.
@@ -59,17 +59,20 @@ return declare([List], {
 	},
 	
 	_handleSelect: function(event, currentTarget){
-		if(this.selectionMode == "none" || (event.type == "dgrid-cellfocusin" && event.parentType == "mousedown")){
-			// don't run if selection mode is none or if coming from a dgrid-cellfocusin from a mousedown
+		// don't run if selection mode is none,
+		// or if coming from a dgrid-cellfocusin from a mousedown
+		if(this.selectionMode == "none" ||
+				(event.type == "dgrid-cellfocusin" && event.parentType == "mousedown")){
 			return;
 		}
 
-		var mode = this.selectionMode,
-			ctrlKey = event.type == "mousedown" ? event[ctrlEquiv] : event.ctrlKey;
+		var ctrlKey = event.type == "mousedown" ? event[ctrlEquiv] : event.ctrlKey;
 		if(event.type == "mousedown" || !event.ctrlKey || event.keyCode == 32){
-			var row = currentTarget,
+			var mode = this.selectionMode,
+				row = currentTarget,
+				rowObj = this.row(row),
 				lastRow = this._lastSelected;
-
+			
 			if(mode == "single"){
 				if(lastRow == row){
 					if(ctrlKey){
@@ -83,8 +86,11 @@ return declare([List], {
 				this._lastSelected = row;
 			}else{
 				var value;
-				if(mode == "extended" && !ctrlKey){
-					this.clearSelection(this.row(row).id);
+				// clear selection first for non-ctrl-clicks in extended mode,
+				// as well as for right-clicks on unselected targets
+				if((event.button != 2 && mode == "extended" && !ctrlKey) ||
+						(event.button == 2 && !(this.selection[rowObj.id]))){
+					this.clearSelection(rowObj.id);
 				}
 				if(!event.shiftKey){
 					// null == toggle; undefined == true;
@@ -163,6 +169,13 @@ return declare([List], {
 				}
 			});
 		}
+		
+		aspect.before(this, "removeRow", function(rowElement, justCleanup){
+			if(!justCleanup){
+				// if it is a real row removal, we deselect the item
+				this.deselect(rowElement);
+			}
+		});
 	},
 	
 	allowSelect: function(row){
@@ -172,6 +185,30 @@ return declare([List], {
 		return true;
 	},
 	
+	_selectionEventQueue: function(value, type){
+		var grid = this,
+			event = "dgrid-" + (value ? "select" : "deselect"),
+			rows = this[event]; // current event queue (actually cells for CellSelection)
+		
+		if(rows){ return rows; } // return existing queue, allowing to push more
+		
+		// Create a timeout to fire an event for the accumulated rows once everything is done.
+		// We expose the callback in case the event needs to be fired immediately.
+		setTimeout(this._fireSelectionEvent = function(){
+			if(!rows){ return; } // rows will be set only the first time this is called
+			
+			var eventObject = {
+				bubbles: true,
+				grid: grid
+			};
+			eventObject[type] = rows;
+			on.emit(grid.contentNode, event, eventObject);
+			rows = null;
+			// clear the queue, so we create a new one as needed
+			delete grid[event];
+		}, 0);
+		return (rows = this[event] = []);
+	},
 	select: function(row, toRow, value){
 		if(value === undefined){
 			// default to true
@@ -202,12 +239,10 @@ return declare([List], {
 				}
 			}
 			if(value != previousValue && element){
-				on.emit(element, "dgrid-" + (value ? "select" : "deselect"), {
-					bubbles: true,
-					row: row,
-					grid: this
-				});
+				// add to the queue of row events
+				this._selectionEventQueue(value, "rows").push(row);
 			}
+			
 			if(toRow){
 				if(!toRow.element){
 					toRow = this.row(toRow);
@@ -256,7 +291,10 @@ return declare([List], {
 	
 	refresh: function(){
 		if(this.deselectOnRefresh){
-			this.selection = {};
+			this.clearSelection();
+			// Need to fire the selection event now because after the refresh,
+			// the nodes that we will fire for will be gone.
+			this._fireSelectionEvent && this._fireSelectionEvent();
 		}
 		this._lastSelected = null;
 		this.inherited(arguments);

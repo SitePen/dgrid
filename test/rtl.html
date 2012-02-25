@@ -57,8 +57,8 @@
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
 		
-			require(["dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dgrid/Tree", "dgrid/Editor", "dojo/_base/declare", "dojo/on", "dojo/data/ObjectStore", "dijit/form/ToggleButton", "dijit/form/TimeTextBox",  "dijit/form/Select", "dijit/form/FilteringSelect", "dijit/Editor", "dgrid/test/data/base", "dojo/domReady!", "xstyle/css!../css/dgrid_rtl.css"], 
-				function(Grid, Selection, Keyboard, Tree, Editor, declare, on, ObjectStore, ToggleButton, TimeTextBox, Select, FilteringSelect, DijitEditor, testStore){
+			require(["dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dgrid/Tree", "dgrid/Editor", "dojo/_base/declare", "dojo/on", "dojo/data/ObjectStore", "dijit/form/CheckBox", "dijit/form/TimeTextBox",  "dijit/form/Select", "dijit/form/FilteringSelect", "dgrid/test/data/base", "dojo/domReady!", "xstyle/css!../css/dgrid_rtl.css"], 
+				function(Grid, Selection, Keyboard, Tree, Editor, declare, on, ObjectStore, CheckBox, TimeTextBox, Select, FilteringSelect, testStore){
 					var columns = [
 						{label: 'Column 1', field: 'col1'},
 						{label: 'Column 2', field: 'col2', sortable: false},
@@ -111,33 +111,40 @@
 					});
 
 					var columnsEditor = [
-						{field: 'id', label: 'id'},
-						Editor({label: 'Toggle', field: 'bool2', widgetArgs: function(item){
-
-								return {checked: item.bool2, iconClass: "dijitCheckBoxIcon", label: "Toggle"};
-							}}, ToggleButton),
-						Editor({label: 'Time', field: 'time', widgetArgs: {
-							timePattern: 'HH:mm:ss',
-							clickableIncrement: 'T00:15:00',
-							visibleIncrement: 'T00:15:00',
-							visibleRange: 'T01:00:00'}}, TimeTextBox),
+						{field: "id", label: "id"},
 						Editor({
-							label: 'Select Options',
-							field: 'bool',
-							widgetArgs: function(item){
-								return {
-									style: "width:75px;",
-									options: [
-										{value:item.bool+"", label: item.bool+"", selected: true},
-										{value: !item.bool+"", label: !item.bool+""}
-									]
-								};
+							label: "CheckBox",
+							field: "bool2",
+							editorArgs: {
+								value: "checked"
 							}
-						}, Select),
-						Editor({label: 'Select Store', field: 'state', widgetArgs: {store: stateStore, maxHeight: 150, style: "width:120px;"}}, Select, "click"),
-						Editor({label: 'FilteringSelect Store', field: 'state', widgetArgs: {store: stateStore, maxHeight: 150, style: "width:120px;"}}, FilteringSelect),
-						Editor({label: 'Dijit/Editor', field: 'text', widgetArgs: {style: "height: 150px;"}}, DijitEditor)
-						//Note that widgets that have multiple focusable children aren't supported by editOn functionality, for example: dijit/Editor
+						}, CheckBox),
+						Editor({label: "Time", field: "date2", editorArgs: {
+							timePattern: "HH:mm:ss",
+							clickableIncrement: "T00:15:00",
+							visibleIncrement: "T00:15:00",
+							visibleRange: "T01:00:00"}}, TimeTextBox),
+						Editor({
+							label: "Select Options",
+							field: "bool",
+							get: function(item){
+								// return as string to match option in list
+								return "" + item.bool;
+							},
+							set: function(item){
+								// convert back to boolean from string
+								return item.bool == "true";
+							},
+							editorArgs: {
+								style: "width:75px;",
+								options: [
+									{value: "true", label: "true"},
+									{value: "false", label: "false"}
+								]
+							}
+						}, Select, "dblclick"),
+						Editor({label: "Select Store", field: "state", editorArgs: {store: stateStore, maxHeight: 150, style: "width:120px;"}}, Select, "click"),
+						Editor({label: "FilteringSelect Store", field: "state2", editorArgs: {store: stateStore, maxHeight: 150, style: "width:120px;"}}, FilteringSelect)
 					];
 					
 					window.moreeditors = new (declare([Grid, Selection, Keyboard]))({
@@ -165,5 +172,6 @@
 		
 		<h2>More Editors</h2>
 		<div id="moreeditors"></div>
+		<button type="button" id="save" onclick="moreeditors.save()">Save</button>
 	</body>
 </html>

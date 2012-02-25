@@ -27,18 +27,18 @@
 			require(["dgrid/GridFromHtml", "dojo/store/Memory", "dojo/store/Observable", "dojo/_base/declare", "dojo/parser", "dojo/query","dgrid/Keyboard","dijit/form/Select", "dgrid/Editor", "dijit/form/DateTextBox", "dijit/form/HorizontalSlider", "dijit/form/NumberSpinner", "dojo/data/ObjectStore","dgrid/test/data/base", "dojo/domReady!"],
 			function(GridFromHtml, Memory, Observable, declare, parser, query, Keyboard, Select, Editor, DateTextBox, Slider, NumberSpinner, ObjectStore){
 
-				window.dgrid = { GridFromHtml: GridFromHtml };
-				window.Editor = Editor;
-				window.DateTextBox = DateTextBox;
-				window.Select = Select;
+				window.dgrid = {
+					GridFromHtml: GridFromHtml,
+					Editor: Editor
+				};
 				window.stateStore = new ObjectStore({
 						objectStore:testStateStore,
 						labelProperty: "name"
 					});
 				// GridFromHtml tests
-				window.gridFromHtmlLegacyGet = new GridFromHtml({},
-					"gridFromHtmlLegacyGet");
-				gridFromHtmlLegacyGet.renderArray(testTypesStore.data);
+				window.gridProgrammatic = new GridFromHtml({},
+					"gridProgrammatic");
+				gridProgrammatic.renderArray(testTypesStore.data);
 				parser.parse();
 			});
 			
@@ -52,26 +52,31 @@
 
 		<h2>1: GridFromHtml instantiated programmatically,
 			with columns using Editor plugin</h2>
-		<table id="gridFromHtmlLegacyGet">
-			<tbody>
+		<table id="gridProgrammatic">
+			<thead>
 				<tr>
-					<th data-dgrid-column="Editor({field: 'date', label:'date'}, DateTextBox)">Date</th>
-					<th data-dgrid-column="{field:'text', sortable:false}">Text</th>
-					<th data-dgrid-column="Editor({label: 'Text editable', field: 'text'}, 'text', 'dblclick')">Text Editable</th>
+					<th data-dgrid-column="dgrid.Editor({field:'date'}, dijit.form.DateTextBox)">Date</th>
+					<th data-dgrid-column="dgrid.Editor({field: 'text'}, 'text', 'dblclick')">Text editable on dblclick</th>
+					<th data-dgrid-column="dgrid.Editor({
+							field: 'state',
+							editorArgs: {store: stateStore, style: 'width:120px;', maxHeight: -1}
+						}, dijit.form.Select)">State</th>
+					<th data-dgrid-column="{field:'text2', sortable:false}">Uneditable</th>
 				</tr>
-			</tbody>
+			</thead>
 		</table>
 	<h2>2: Fully declarative GridFromHtml,
 		with columns using Editor plugin</h2>
-	<table id="gridDeclarativeNew" data-dojo-id="gridDeclarativeNew"
+	<table id="gridDeclarative" data-dojo-id="gridDeclarative"
 			data-dojo-type="dgrid.GridFromHtml" data-dojo-props="store: testTypesStore">
 			<tr>
-				<th data-dgrid-column="Editor({field:'date', label:'date'}, DateTextBox)">Date</th>
-				<th data-dgrid-column="{field:'text', sortable:false}">Text</th>
-				<th data-dgrid-column="Editor({
-						label: 'State', field: 'state',
-						widgetArgs: {store: stateStore, style: 'width:120px;', maxHeight: -1}
-					}, Select)">State</th>
+				<th data-dgrid-column="dgrid.Editor({field:'date'}, dijit.form.DateTextBox)">Date</th>
+				<th data-dgrid-column="dgrid.Editor({field: 'text'}, 'text', 'dblclick')">Text editable on dblclick</th>
+				<th data-dgrid-column="dgrid.Editor({
+						field: 'state',
+						editorArgs: {store: stateStore, style: 'width:120px;', maxHeight: -1}
+					}, dijit.form.Select)">State</th>
+				<th data-dgrid-column="{field:'text2', sortable:false}">Uneditable</th>
 			</tr>
 		</table>
 	</body>

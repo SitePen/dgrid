@@ -17,15 +17,16 @@
 			.column-col1 {
 				width: 40px;
 			}
-			.ui-widget{
+			.ui-widget {
 				margin: 10px;
 			}
 		</style>
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dojo/on", "dojo/_base/window", "dgrid/OnDemandGrid", "dgrid/Selector", "dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!"], 
-				function(on, win, Grid, Selector, Selection, Keyboard, declare, testStore){
+			require(["dojo/on", "dojo/_base/window", "dgrid/OnDemandGrid", "dgrid/Selector", "dgrid/Selection", "dgrid/Keyboard",
+					"dojo/_base/declare", "dojo/_base/array", "dojo/json", "dgrid/test/data/base", "dojo/domReady!"], 
+				function(on, win, Grid, Selector, Selection, Keyboard, declare, arrayUtil, json, testStore){
 					var columns = { // you can declare columns as an object hash (key translates to field)
 							col1: Selector({ type: "checkbox", disabled: function(object){ return object.col1 == "note"; }}),
 							id: "ID",
@@ -42,7 +43,9 @@
 					on(win.body(), "dgrid-select,dgrid-deselect",
 						function(event){
 							var msg = (event.type == "dgrid-deselect" ? "de" : "") + "selected: ";
-							console.log(msg, event.grid.id, event.row.id);
+							console.log(msg, event.grid.id,
+								arrayUtil.map(event.rows, function(row){ return row.id; }).join(", "));
+							console.log("selection: ", json.stringify(event.grid.selection, null, "  "));
 						}
 					);
 					

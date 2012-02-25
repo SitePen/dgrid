@@ -8,23 +8,29 @@ define(["dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put"], funct
 		function changeInput(value){
 			// creates a function that modifies the input on an event
 			return function(event){
-				var element = grid.cell(event.row, column.id).element;
-				element = (element.contents || element).input;
-				if(!element.disabled){
-					// only change the value if it is not disabled
-					element.checked = value;
-				}
-				// see if the header checkbox needs to be indeterminate
-				var mixed = false;
-				var selection = grid.selection; 
-				for(var i in selection){
-					// if there is anything in the selection, than it is indeterminate
-					if(selection[i] != grid.allSelected){
-						mixed = true;
-						break;
+				var rows = event.rows,
+					len = rows.length,
+					selection, mixed, i;
+				
+				for(i = 0; i < len; i++){
+					var element = grid.cell(rows[i], column.id).element;
+					element = (element.contents || element).input;
+					if(!element.disabled){
+						// only change the value if it is not disabled
+						element.checked = value;
 					}
 				}
 				if(headerCheckbox.type == "checkbox"){
+					selection = grid.selection;
+					mixed = false;
+					// see if the header checkbox needs to be indeterminate
+					for(i in selection){
+						// if there is anything in the selection, than it is indeterminate
+						if(selection[i] != grid.allSelected){
+							mixed = true;
+							break;
+						}
+					}
 					headerCheckbox.indeterminate = mixed;
 					headerCheckbox.checked = grid.allSelected;
 				}
@@ -49,7 +55,7 @@ define(["dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put"], funct
 					if(row){
 						if(event.shiftKey){
 							// make sure the last input always ends up checked for shift key 
-							changeInput(true)({row: row});
+							changeInput(true)({rows: [row]});
 						}else{
 							// no shift key, so no range selection
 							lastRow = null;
@@ -100,7 +106,7 @@ define(["dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put"], funct
 				disabled: disabled && (typeof disabled == "function" ? disabled(object) : disabled),
 				checked: value
 			}));
-
+			
 			if(!grid._hasSelectorInputListener){
 				setupSelectionEvents();
 			}

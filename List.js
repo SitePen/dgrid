@@ -316,12 +316,12 @@ function(kernel, declare, listen, aspect, has, TouchScroll, hasClass, put){
 		cleanup: function(){
 			var observers = this.observers,
 				i;
-			// iterate through all the row elements and destroy them
+			// iterate through all the row elements and clean them up
 			for(i in this._rowIdToObject){
 				if(this._rowIdToObject[i] != this.columns){
 					var rowElement = byId(i);
 					if(rowElement){
-						this.removeRow(rowElement);
+						this.removeRow(rowElement, true);
 					}
 				}
 			}
@@ -441,9 +441,12 @@ function(kernel, declare, listen, aspect, has, TouchScroll, hasClass, put){
 				return lastRow;
 			}
 			function whenDone(resolvedRows){
-				(beforeNode && beforeNode.parentNode || self.contentNode).insertBefore(rowsFragment, beforeNode || null);
-				lastRow = resolvedRows[resolvedRows.length - 1];
-				lastRow && self.adjustRowIndices(lastRow);
+				var container = beforeNode ? beforeNode.parentNode : self.contentNode;
+				if(container){
+					container.insertBefore(rowsFragment, beforeNode || null);
+					lastRow = resolvedRows[resolvedRows.length - 1];
+					lastRow && self.adjustRowIndices(lastRow);
+				}
 				return (rows = resolvedRows);
 			}
 			return whenDone(rows);

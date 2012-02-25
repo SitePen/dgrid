@@ -14,17 +14,17 @@
 			.dgrid { 
 				width: 70%;
 			}
-			.ui-widget{
+			.ui-widget {
 				margin: 10px;
 			}
 		</style>
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dojo/on", "dojo/_base/declare", "dojo/_base/window", "dojo/json",
+			require(["dojo/on", "dojo/_base/declare", "dojo/_base/window", "dojo/_base/array", "dojo/json",
 					"dgrid/OnDemandGrid", "dgrid/Editor","dgrid/Selection", "dgrid/CellSelection", "dgrid/Keyboard",
 					"dgrid/test/data/base", "dojo/domReady!"],
-				function(on, declare, win, json, Grid, Editor, Selection, CellSelection, Keyboard, testStore){
+				function(on, declare, win, arrayUtil, json, Grid, Editor, Selection, CellSelection, Keyboard, testStore){
 					var columns = {
 							col1: 'Column 1',
 							col2: {label: 'Column 2', sortable: false},
@@ -35,12 +35,12 @@
 					on(win.body(), "dgrid-select,dgrid-deselect",
 						function(event){
 							var msg = (event.type == "dgrid-deselect" ? "de" : "") + "selected: ";
-							if(event.cell){
-								console.log(msg + event.grid.id + ": row " + event.cell.row.id +
-									", col " + event.cell.column.field);
-							}else{
-								console.log(msg + event.grid.id + ": row " + event.row.id);
-							}
+							console.log(msg + event.grid.id, event.cells ?
+								arrayUtil.map(event.cells, function(cell){
+									return cell.row.id + ":" + cell.column.id;
+								}).join(", ") :
+								arrayUtil.map(event.rows, function(row){ return row.id; }).join(", ")
+							);
 							console.log("selection:", json.stringify(event.grid.selection, null, "  "));
 						}
 					);
