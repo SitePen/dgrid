@@ -191,6 +191,13 @@ function(kernel, declare, lang, Deferred, listen){
 			return promise;
 		},
 		
+		revert: function(){
+			// summary:
+			//		Revert the last changes
+			this.dirty = {};
+			this.refresh();
+		},
+		
 		_trackError: function(func){
 			// summary:
 			//		Utility function to handle emitting of error events.
