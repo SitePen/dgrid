@@ -1,5 +1,5 @@
-define(["dojo/_base/declare", "dojo/on", "dojo/query", "dojo/_base/lang", "dojo/dom", "put-selector/put", "dojo/dom-geometry", "dojo/dom-class", "dojo/touch", "dojo/has", "dojo/_base/html", "xstyle/css!../css/extensions/ColumnResizer.css"],
-function(declare, listen, query, lang, dom, put, geom, cls, touch, has){
+define(["dojo/_base/declare", "dojo/on", "dojo/query", "dojo/_base/lang", "dojo/dom", "put-selector/put", "dojo/dom-geometry", "dojo/dom-class", "dojo/has", "dojo/_base/html", "xstyle/css!../css/extensions/ColumnResizer.css"],
+function(declare, listen, query, lang, dom, put, geom, cls, has){
 
 var hasPointFromNode = has("touch") && webkitConvertPointFromNodeToPage;
 
@@ -141,20 +141,28 @@ return declare([], {
 		}
 
 		if(!grid.mouseMoveListen){
-			listen(grid.headerNode, ".dgrid-resize-handler:mousedown", function(e){
-				grid._resizeMouseDown(e, this);
-			});
-			grid.mouseMoveListen = listen.pausable(document.body, touch.move, function(e){
-				// while resizing, update the position of the resizer bar
-				if(!grid._resizing){return;}
-				grid._updateResizerPosition(e);
-			});
-			grid.mouseUpListen = listen.pausable(document.body, touch.release, function(e){
-				if(!grid._resizing){return;}
-				grid._resizeMouseUp(e);
-				grid.mouseMoveListen.pause();
-				grid.mouseUpListen.pause();
-			});
+			listen(grid.headerNode,
+				".dgrid-resize-handler:mousedown" +
+					(has("touch") ? ",.dgrid-resize-handler:touchstart" : ""),
+				function(e){ grid._resizeMouseDown(e, this); }
+			);
+			grid.mouseMoveListen = listen.pausable(document.body,
+				"mousemove" + (has("touch") ? ",touchmove" : ""),
+				function(e){
+					// while resizing, update the position of the resizer bar
+					if(!grid._resizing){return;}
+					grid._updateResizerPosition(e);
+				}
+			);
+			grid.mouseUpListen = listen.pausable(document.body,
+				"mouseup" + (has("touch") ? ",touchend" : ""),
+				function(e){
+					if(!grid._resizing){return;}
+					grid._resizeMouseUp(e);
+					grid.mouseMoveListen.pause();
+					grid.mouseUpListen.pause();
+				}
+			);
 		}
 	}, // end renderHeader
 
