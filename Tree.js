@@ -1,4 +1,4 @@
-define(["dojo/_base/declare", "put-selector/put", "dojo/_base/Deferred", "dojo/query", "dojo/aspect"], function(declare, put, Deferred, querySelector, aspect){
+define(["dojo/_base/declare", "dojo/on", "put-selector/put", "dojo/_base/Deferred", "dojo/query", "dojo/aspect"], function(declare, on, put, Deferred, querySelector, aspect){
 
 return function(column){
 	// summary:
@@ -27,7 +27,19 @@ return function(column){
 
 		if(!grid.expand){
 			// just setup the event listener once and use event delegation for better memory use
-			grid.on(column.expandOn || ".dgrid-expando-icon:click,.dgrid-content .column-" + column.id + ":dblclick", function(){
+			grid.on(column.expandOn || function(target, listener){
+				var columnSelector = ".dgrid-content .column-" + column.id;
+				// listen for expando clicks and column cell double clicks 
+				grid.on(".dgrid-expando-icon:click," + columnSelector + ":dblclick", listener);
+				// we all listen for clicks on column cells after a touch start, to make it feasible to expand on mobile devices
+				grid.on(columnSelector + ":touchstart", function(){
+					var clickHandle = on(this, "click", listener);
+					setTimeout(function(){
+						// remove the click listener after 600 milliseconds
+						clickHandle.remove();
+					},600);
+				});
+			}, function(){ // event listener
 				grid.expand(this);
 			});
 			aspect.before(grid, "removeRow", function(rowElement, justCleanup){
