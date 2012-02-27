@@ -1,7 +1,13 @@
-define(["dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put"], function(on, aspect, has, put){
+define(["dojo/_base/kernel", "dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put"],
+function(kernel, on, aspect, has, put){
 	return function(column, type){
-		// accept arguments as parameters to Selector function, or from column def
-		column.type = type = type || column.type;
+		
+		if(column.type){
+			column.selectorType = column.type;
+			kernel.deprecated("columndef.type", "use columndef.selectorType instead", "dgrid 1.0");
+		}
+		// accept type as argument to Selector function, or from column def
+		column.selectorType = type = type || column.selectorType || "checkbox";
 		column.sortable = false;
 		
 		var grid, recentInput, recentTimeout, headerCheckbox;
@@ -100,7 +106,8 @@ define(["dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put"], funct
 		var disabled = column.disabled;
 		var renderInput = typeof type == "function" ? type : function(value, cell, object){
 			var parent = cell.parentNode;
-			put(parent && parent.contents ? parent : cell, ".dgrid-selector"); // must set the class name on the outer cell in IE for keystrokes to be intercepted
+			// must set the class name on the outer cell in IE for keystrokes to be intercepted
+			put(parent && parent.contents ? parent : cell, ".dgrid-selector");
 			var input = cell.input || (cell.input = put(cell, "input[type="+type + "]", {
 				tabIndex: isNaN(column.tabIndex) ? -1 : column.tabIndex,
 				disabled: disabled && (typeof disabled == "function" ? disabled(object) : disabled),

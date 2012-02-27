@@ -28,13 +28,13 @@
 					"dojo/_base/declare", "dojo/_base/array", "dojo/json", "dgrid/test/data/base", "dojo/domReady!"], 
 				function(on, win, Grid, Selector, Selection, Keyboard, declare, arrayUtil, json, testStore){
 					var columns = { // you can declare columns as an object hash (key translates to field)
-							col1: Selector({ type: "checkbox", disabled: function(object){ return object.col1 == "note"; }}),
+							col1: Selector({ disabled: function(object){ return object.col1 == "note"; }}),
 							id: "ID",
 							col2: {label: 'Column 2', sortable: false},
 							col3: {label: 'Column 3'}
 						};
-					var columns2 = { // you can declare columns as an object hash (key translates to field)
-							col1: Selector({ type: "checkbox", label:"Select"}),
+					var columns2 = {
+							col1: Selector({ label: "Select" }),
 							id: "ID",
 							col2: {label: 'Column 2', sortable: false},
 							col3: {label: 'Column 3'}
@@ -61,8 +61,8 @@
 						columns: columns2,
 						allowSelectAll: false
 					}, "grid2");
-					var columnsRadio = { // you can declare columns as an object hash (key translates to field)
-						col1: Selector({ label: 'Radio', type: "radio", disabled: function(object){ return object.col3 == "read"; } }),
+					var columnsRadio = {
+						col1: Selector({ label: 'Radio', disabled: function(object){ return object.col3 == "read"; } }, "radio"),
 						id: "ID",
 						col2: {label: 'Column 2', sortable: false},
 						col3: {label: 'Column 3'}

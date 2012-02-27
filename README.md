@@ -506,17 +506,33 @@ as well as the `GridFromHtml_Editors` test page for declarative examples.
 ## Tree
 
 The Tree plugin enables expansion of rows to display children.
-It expects to operate on an OnDemandGrid, whose store is expected to provide
-a `getChildren(object, options)` method to return the children for each object.
-Note that for best results, `getChildren` should return results with an `observe`
-function as well, so that changes to children can also be reflected as they occur.
+It expects to operate on a store-backed grid such as an OnDemandGrid, whose
+store is expected to provide a `getChildren(object, options)` method to return
+the children for each object.  Note that for best results, `getChildren` should
+return results with an `observe` function as well, so that changes to children
+can also be reflected as they occur.
 
 The store may also (optionally) provide a `mayHaveChildren(object)` method
 which returns a boolean indicating whether or not the row can be expanded.
 
 ## Selector
 
-TODOC
+Used in conjunction with the Selection mixin, the Selector plugin dedicates a
+column to the purpose of rendering a selector component, providing alternate
+means for selecting and deselecting rows in a grid.
+
+The Selector plugin supports the following additional column definition property:
+
+* `selectorType`: Specifies the type of selector component to use.  Defaults to
+  `checkbox`, but `radio` may also be specified, as a more appropriate choice for
+  grids in `single` selection mode.
+
+Alternatively, the `selectorType` may be specified as the second argument to
+the Selector function instead of including it within the column definition.
+
+Note that a Selector column can be used to allow selection even in a grid where
+`selectionMode` is set to `none`, in which case the controls in the Selector
+column will be the only means by which a user may select or deselect rows.
 
 ### Recommendations for the editOn property
 

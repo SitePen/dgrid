@@ -50,7 +50,7 @@ Store-backed grids also now have an `updateDirty(id, field, value)` method,
 which can be used to update dirty state of items represented in the grid.
 (On master this was previously known as `setDirty`, but did not exist in v0.2.)
 
-## Selection / CellSelection / Selector
+## Selection / CellSelection
 
 ### dgrid-select and dgrid-deselect events
 
@@ -92,6 +92,16 @@ Previously, the `Selection` module would clear the selection whenever a list
 or grid is refreshed.  While this is still the default, the behavior can now
 be disabled by setting `deselectOnRefresh` to `false`.
 
+## Selector
+
+### columndef.type is now columndef.selectorType
+
+In dgrid 0.2, the selector type (generally either `"checkbox"` or `"radio"`)
+could be specified within the column definition object via the `type` property.
+This has been changed to `selectorType` to avoid ambiguity.  The selector type
+can also be specified as the second argument to the `Selector` column plugin
+function instead, as before.
+
 ## Editor
 
 Editor has been significantly refactored since v0.2.  The most notable changes
@@ -129,7 +139,7 @@ to perform the same lookup again on the other end.
 
 Since it is possible to get cell and row information from this property,
 the previously-exposed `rowId` property of the `dgrid-datachange` event is
-now deprecated and will be removed in the beta release.
+now deprecated and will be removed in a future release.
 
 The `dgrid-datachange` event also now includes a `grid` property containing a
 reference to the Grid instance from which the event was fired.
