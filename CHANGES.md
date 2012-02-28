@@ -153,3 +153,34 @@ grid rows.  The `target` specified may be anything which will resolve to a row
 via the grid's `row` function.  An optional second boolean parameter may specify
 whether to expand (`true`) or collapse (`false`) the row in question; if
 unspecified, the method will toggle the target row's state.
+
+## DnD
+
+### dndTargetConfig improved; is now dndParams
+
+Previously, the DnD plugin defined a `dndTargetConfig` instance property, which
+was a params object to be passed to the DnD Source constructor. However,
+this was only used internally and did not consult any value provided via the
+constructor.
+
+This property has been renamed to `dndParams`, and now accepts an object value
+via the constructor's arguments object.
+
+### new: dndConstructor
+
+Previously, the DnD plugin would always create an instance of the `GridSource`
+constructor it defines and exposes.  A `dndConstructor` property has been added,
+which can be used to specify an alternative DnD implementation to instantiate.
+
+For best results, the constructor used should extend the `GridSource` constructor
+exposed by the DnD module.
+
+### default dndSourceType is now dgrid-row
+
+The default value for the `dndSourceType` property has been changed from `row`
+to `dgrid-row` to prevent ambiguity.
+
+### DnD Source instance now stored as grid.dndSource
+
+Previously, the DnD Source instance was stored on the grid instance under the
+`dndTarget` property; this has been renamed more appropriately to `dndSource`.

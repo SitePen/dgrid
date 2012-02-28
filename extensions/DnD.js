@@ -142,13 +142,13 @@ function(declare, lang, Deferred, DnDSource, DnDManager, put){
 	});
 	
 	function setupDnD(grid){
-		if(grid.dndTarget){
+		if(grid.dndSource){
 			return;
 		}
 		// make the contents a DnD source/target
-		grid.dndTarget = new GridDnDSource(
+		grid.dndSource = new (grid.dndConstructor || GridDnDSource)(
 			grid.bodyNode,
-			lang.delegate(grid.dndTargetConfig, {
+			lang.mixin(grid.dndParams, {
 				// add cross-reference to grid for potential use in inter-grid drop logic
 				grid: grid,
 				dropParent: grid.contentNode
@@ -157,26 +157,37 @@ function(declare, lang, Deferred, DnDSource, DnDManager, put){
 	}
 	
 	var DnD = declare([], {
-		dndSourceType: "row",
-		dndTargetConfig: null,
+		// dndSourceType: String
+		//		Specifies the type which will be set for DnD items in the grid,
+		//		as well as what will be accepted by it by default.
+		dndSourceType: "dgrid-row",
+		
+		// dndParams: Object
+		//		Object containing params to be passed to the DnD Source constructor.
+		dndParams: null,
+		
+		// dndConstructor: Function
+		//		Constructor from which to instantiate the DnD Source.
+		//		Defaults to the GridSource constructor defined/exposed by this module.
+		dndConstructor: GridDnDSource,
+		
 		postMixInProperties: function(){
 			this.inherited(arguments);
-			// initialize default dndTargetConfig
-			this.dndTargetConfig = {
-				accept: [this.dndSourceType]
-			};
+			// ensure dndParams is initialized
+			this.dndParams = lang.mixin({ accept: [this.dndSourceType] }, this.dndParams);
 		},
 		postCreate: function(){
 			this.inherited(arguments);
 			setupDnD(this);
 		},
+		
 		insertRow: function(object){
 			// override to add dojoDndItem class to make the rows draggable
 			var row = this.inherited(arguments);
 			put(row, ".dojoDndItem");
 			// setup the source if it hasn't been done yet
 			setupDnD(this);
-			this.dndTarget.setItem(row.id, {data: object, type: [this.dndSourceType]});
+			this.dndSource.setItem(row.id, {data: object, type: [this.dndSourceType]});
 			return row;
 		}
 	});

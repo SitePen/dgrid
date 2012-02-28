@@ -615,7 +615,7 @@ The DnD plugin can be used to add row drag'n'drop functionality.
 
 ### Requirements
 
-The DnD extensions assumes usage of the OnDemandList or OnDemandGrid module;
+The DnD extension assumes usage of the OnDemandList or OnDemandGrid module;
 thus, it expects a store to be in use.
 
 The store should be order-aware, supporting the `options.before` parameter
@@ -624,6 +624,21 @@ on `add()` and `put()` calls to properly respond to DnD operations.
 Additionally, if the store supports a `copy` method, it will be called for
 DnD copy operations within the same list/grid (since a `put` would normally
 relocate the item).
+
+### Properties
+
+The DnD extension exposes the following properties, which can be specified in
+the arguments object passed to the constructor:
+
+* `dndSourceType`: String specifying the type of DnD items to host and accept.
+  Defaults to `dgrid-row`.
+* `dndParams`: Object to be passed as the second argument to the DnD Source
+  constructor.  Note that the `accept` DnD parameter is set to match
+  `dndSourceType` by default, but this may be overridden.
+* `dndConstructor`: Constructor from which to instantiate the DnD Source for
+  the grid.  This defaults to the `GridSource` constructor defined and exposed
+  by the DnD module itself.  It is recommended to only override this value with
+  a constructor which extends `GridSource`.
 
 # Themes/Skins
 
