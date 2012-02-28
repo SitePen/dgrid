@@ -6,9 +6,6 @@
 	.dgrid-rtl-nonwebkit is also added to the domNode if
 		the grid's isRTL is true AND the client isn't WebKit
 */
-.dgrid-rtl, .dgrid-rtl .dgrid-scroller {
-	direction: rtl;
-}
 .dgrid-rtl-nonwebkit .dgrid-header {
 	right: 0;
 	left: 17px;

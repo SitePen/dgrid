@@ -183,7 +183,8 @@ function(kernel, declare, listen, aspect, has, TouchScroll, hasClass, put){
 			listen(bodyNode, "scroll", function(event){
 				// keep the header aligned with the body
 				headerNode.scrollLeft = bodyNode.scrollLeft;
-				event.stopPropagation(); // we will refire, since browsers are not consistent about propagation here
+				// re-fire, since browsers are not consistent about propagation here
+				event.stopPropagation();
 				listen.emit(domNode, "scroll", {scrollTarget: bodyNode});
 			});
 			this.configStructure();
