@@ -28,50 +28,62 @@ Should we still decorate events?
 
 ### sortInfo
 
-TODOC (probably won't be supported the same way, but we probably should have a way to initially set sort.)
+The way in which dgrid represents current sort order is significantly different
+than `dojox/grid`.  dgrid stores the current sort options, as they would be
+passed via a store's `queryOptions`, in the `sortOrder` property.
 
 ### rowSelector / indirect selection
 
-dgrid does not feature a direct analog for the `rowSelector` property.
+Indirect selection is available in dgrid via the Selector column plugin.  This
+achieves similar effects to the DataGrid's `_CheckBoxSelector` and
+`_RadioButtonSelector` view types, and EnhancedGrid's IndirectSelection plugin.
 
-However, it does have functional equivalents to the indirect selection
-features found in the `_CheckBoxSelector` / `_RadioButtonSelector` view types
-and the EnhancedGrid's IndirectSelection plugin.
-
-TODOC: details (IIRC this uses the `Editor` plugin)
+dgrid does not feature a direct analog to the `rowSelector` property.
 
 ### selectionMode
 
-dgrid supports this, with the same options, when the `Selection` grid plugin is in use.
+dgrid supports this property, with the same options as dojox grid, when a grid
+is constructed with the Selection mixin.
 
 ### columnReordering
 
-TODO: Column DnD plugin
+This is not yet available in dgrid, but a Column DnD extension is planned.
 
 ### headerMenu
 
-TODO: Context Menu plugin
+This is not yet directly available in dgrid, but a Context Menu plugin is planned.
+In the interim, it is possible to delegate to the `oncontextmenu` event of
+cells or rows in the grid's body or header, to perform custom logic.
 
 ### autoHeight
 
-Not supported.  TODO: Do we want to? (Is this a can of worms?)
+Automatic height can be achieved using `height: auto` in the CSS for a grid's
+main DOM node.  There is no direct programmatic support for this.  (This means
+there is no built-in support for automatically sizing to a certain number of rows.)
 
 ### autoWidth
 
-Not supported.  TODO: Do we want to? (Maybe as part of ColumnResizer?)
+Not supported.
 
 ### initialWidth
 
-Not supported.  Width (and height) should be dictated by CSS.
+Not supported.  Width (and height) should be dictated via CSS.
 
 ### singleClickEdit
 
-Supported via `Editor` cell plugin configuration.
-(TODO: confirm and add details)
+The effect of the `singleClickEdit` property can be achieved by specifying
+`editOn: "click"` in the column definition passed to an invocation of the
+Editor column plugin function.  (Alternatively, dojox grid's default double-click
+behavior can be achieved by specifying `editOn: "dblclick"` instead.)
 
-### loadingMessage, errorMessage
+### loadingMessage, noDataMessage, errorMessage
 
-These do not exist in dgrid.  TODO: plugin?
+Store-backed grid instances support `loadingMessage` and `noDataMessage`.
+There is currently no direct support for an error message, but when a
+store-related error occurs within dgrid's own logic, it will emit a `dgrid-error`
+event.  If an error occurs when `grid.save()` is called directly, it will throw
+an error or reject a promise, depending on whether the store in use is
+synchronous or asynchronous.
 
 ### selectable
 
@@ -82,107 +94,138 @@ Otherwise, selection operates as normal.
 
 ### formatterScope
 
-Not supported. (TODO: should it be?)
+dgrid does not directly support this.  If you need to set the context that a
+formatter function runs in, pass it through `hitch` before assigning it to the
+column definition object.
 
 ### updateDelay
 
-Not supported. (TODO: verify)
-
-TODO: assuming this is talking about debouncing update notifications, this
-sounds like a good idea and something we might want to consider supporting.
+Not supported, as it is generally not applicable, due to the difference
+in how dgrid components update from observed store changes.
 
 ### escapeHTMLInData
 
-Not supported.
+Not supported.  By default, dgrid components will escape HTML in data, as it
+should generally be devoid of HTML in most cases, and presence of HTML in data
+might suggest a cross-site scripting attempt.
 
-TODO: determine what dgrid's behavior should be in this regard.
-We are probably not escaping at all right now; should we be by default?
+The `formatter` or `renderCell` functions in the column definition may be
+overridden to explicitly render data as received, in cases where that is truly
+desired.
 
-## Cell Definition options
+## Cell Definitions
+
+Whereas dojox grid always specifies column definitions via a `structure`
+property, dgrid expects one of the following properties to be specified:
+
+* `columns`: for simple single-row grid configurations
+* `subRows`: for grid configurations with multiple sub-rows per item
+* `columnSets` (only when the ColumnSet mixin is in use): for grid configurations
+  containing distinct horizontal regions of one or more rows (analogous
+  to multiple views in a dojox grid instance)
 
 ### field
 
 Supported by dgrid, including the special `"_item"` value from 1.4+ dojox grid.
 
+Also note that dgrid also supports specifying `columns` as an object hash instead
+of an array, in which case the key of each property is interpreted as the `field`.
+
 ### fields
 
-Doesn't make much sense as implemented in dojox grid to begin with;
-not supported by dgrid.
-
-Recommendation: use `field: "_item"` instead.
+Not supported by dgrid.  If a compound value is desired, define a custom `get`
+function in a column definition.
 
 ### width
 
-Use CSS with `.field-<fieldname>` selectors.
+Use CSS with `.field-<fieldname>` selectors.  (Note that if any value is
+specified via the `className` property of the column definition object, it
+takes the place of `.field-<fieldname>`.)
 
-### cellType
+### cellType, widgetClass
 
-The `Editor` cell plugin provies a rough equivalent to this.
-Its `editor` property accepts either a widget constructor or a string indicating
-a native HTML input type.
+The Editor column plugin provies capabilities equivalent to these properties.
+It accepts an `editor` property, which can be either a widget constructor or a
+string indicating a native HTML input type.
 
 ### options
 
-N/A (specific to `cellType` when set to `dojox.grid.cells.Select`)
+Not directly applicable; in `dojox/grid` this applies only to cell definitions
+where `cellType` is set to `dojox.grid.cells.Select`.
 
-TODO: spell out equivalent
-(`Editor` with `dijit.form.Select` with `options` property?)
+The Editor column plugin does not currently offer support for native HTML
+select components; however, similar behavior can be achieved using the
+`dijit/form/Select` widget as the `editor`, and specifying `options` for the
+widget within the `editorArgs` property of the column definition object.
 
 ### editable
 
-N/A - "editability" is determined by usage (or lack thereof) of the `Editor`
-cell plugin.
+Not applicable; "editability" is determined by usage (or lack thereof) of the
+Editor column plugin.
 
 ### draggable
 
-TODO: I have no idea what this does in dojox grid.
+Not yet applicable until the Column DnD plugin is implemented.
 
 ### formatter
 
-dgrid supports formatter functions, but doesn't support returning a widget.
+dgrid supports formatter functions, but doesn't support returning a widget from
+them.
 
 dgrid also has `renderCell`, which is expected to return a DOM node.  This could
-ostensibly be used for displaying widgets.  For editing purposes, the
-`Editor` plugin should be used.
+ostensibly be used for displaying widgets (and the Editor column plugin does
+exactly this).
+
+Note that for cell editing purposes, use of the Editor column plugin is highly
+encouraged.
 
 ### get
 
-Supported by dgrid.
+dgrid supports the `get` function on column definitions; however, note that it
+only receives one parameter: the object for the item represented by the current
+row being rendered.  (dgrid generally has no concept of row index, since
+row identities are generally far more meaningful.)
 
 ### hidden
 
-There is currently no direct analog to this, short of resetting the layout
-of the grid and refreshing.
-
-(TODO: confirm this; also test what happens by simply using CSS display;
-if that doesn't work, this might be a low-priority enhancement...)
+The `hidden` property on column definitions is only supported by the
+ColumnHider extension.  Otherwise, columns would ordinarily be suppressed simply
+by excluding them from the `columns`, `subRows` or `columnSets` property outright.
 
 ## DataGrid methods
 
-### getItem(rowIndex)
+### getItem(rowIndex), getItemIndex(item)
 
-TODOC
+These are somewhat inapplicable, since again, dgrid components do not put any
+emphasis on index in terms of order of appearance in the component.
 
-### getItemIndex(item)
-
-TODOC (if we do or intend to support this)
+On the other hand, when dealing with events on nodes in a list or grid, it is
+possible to retrieve the associated item via the `data` property of the object
+returned by the `row` or `cell` functions.  These functions can look up based on
+a variety of argument types, including a child node of the target row/cell, or
+an event object which fired on such a node.
 
 ### setStore
 
-TODOC
+Store-backed dgrid components support this via
+`set("store", store[, query[, queryOptions]])`.
 
 ### setQuery
 
-TODOC
+Store-backed dgrid components support this via
+`set("query", query[, queryOptions])`.
 
 ### setItems
 
-This is arguably not meant to be publicly used on `dojox.grid` components.
-Regardless, it is probably analogous to `renderArray` in dgrid components.
+While it is unclear what exact purpose this serves in `dojox/grid/DataGrid`, and
+whether or not it is truly intended to be public, it is probably analogous to
+calling `renderArray` directly on a dgrid component.  Note, however, that
+generally `renderArray` is not expected to be called directly on store-backed
+instances.
 
 ### filter
 
-TODOC (need to be clear on what role this plays in DataGrid first)
+This is likely closest in behavior to the `refresh` method on dgrid components.
 
 ### sort
 
@@ -195,11 +238,15 @@ columns that ordinarily wouldn't be sortable via the UI.
 
 ### canSort
 
-`dojox.grid` components refer to this method when a sort request is initiated
+`dojox/grid` components refer to this method when a sort request is initiated
 via the UI.  dgrid does not have such a method; instead, it relies on the
-`sortable` property of the particular column.
+`sortable` property of each column definition (which defaults to `true`).
 
 ### removeSelectedRows
 
-TODOC (Probably not necessary to have a direct analog, but we should be able
-to document how to do this.)
+dgrid has no direct analog to this method, but the same effect can be achieved
+on a store-backed, Selection-enabled list or grid instance as follows:
+
+    for(var id in grid.selection){
+        grid.store.remove(id);
+    }
