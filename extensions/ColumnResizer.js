@@ -72,6 +72,7 @@ return declare([], {
 	minWidth: 40,	//minimum column width in px
 	gridWidth: null, //place holder for the grid width property
 	_resizedColumns: false, //flag that indicates if resizer has converted column widths to px
+	
 	resizeColumnWidth: function(colId, width){
 		// Summary:
 		//      calls grid's styleColumn function to add a style for the column
@@ -82,21 +83,18 @@ return declare([], {
 
 		// Keep track of old styles so we don't get a long list in the stylesheet
 		
-		if(!this._columnStyles){
-			this._columnStyles = {};
-		}
-		if(width > 0){
-		//width should always be greater than 0, technically on resize there is a minimum width of 40px
-		//but this fix catches anything else that may end up changing the width to 0
-			var old = this._columnStyles[colId],
-				x = this.styleColumn(colId, "width: " + width + "px;");
-
-			old && old.remove();
-
-			// keep a reference
-			this._columnStyles[colId] = x;
-		}
+		// don't react to widths <= 0, e.g. for hidden columns
+		if(width <= 0){ return; }
+		
+		var old = this._columnStyles[colId],
+			x = this.styleColumn(colId, "width: " + width + "px;");
+		
+		old && old.remove();
+		
+		// keep a reference for future removal
+		this._columnStyles[colId] = x;
 	},
+	
 	configStructure: function(){
 		// Reset and remove column styles when a new structure is set
 		this._resizedColumns = false;
