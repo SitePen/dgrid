@@ -36,9 +36,9 @@
 						labelProperty: "name"
 					});
 				// GridFromHtml tests
-				window.gridProgrammatic = new GridFromHtml({},
-					"gridProgrammatic");
-				gridProgrammatic.renderArray(testTypesStore.data);
+				window.gridProgrammatic = new GridFromHtml({
+					store: testTypesStore
+				}, "gridProgrammatic");
 				parser.parse();
 			});
 			
