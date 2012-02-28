@@ -154,6 +154,13 @@ via the grid's `row` function.  An optional second boolean parameter may specify
 whether to expand (`true`) or collapse (`false`) the row in question; if
 unspecified, the method will toggle the target row's state.
 
+## ColumnResizer
+
+### CSS class on handle nodes is now dgrid-resize-handle
+
+The class on the resize handle node in each header cell was formerly
+`dgrid-resize-handler`; this has been corrected to `dgrid-resize-handle`.
+
 ## DnD
 
 ### dndTargetConfig improved; is now dndParams
