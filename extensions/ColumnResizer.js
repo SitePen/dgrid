@@ -139,14 +139,14 @@ return declare([], {
 				put(headerTextNode, childNodes[0]);
 			}
 
-			put(colNode, headerTextNode, "div.dgrid-resize-handler.resizeNode-"+id).columnId = 
+			put(colNode, headerTextNode, "div.dgrid-resize-handle.resizeNode-"+id).columnId = 
 				assoc ? assoc[id] : id;
 		}
 
 		if(!grid.mouseMoveListen){
 			listen(grid.headerNode,
-				".dgrid-resize-handler:mousedown" +
-					(has("touch") ? ",.dgrid-resize-handler:touchstart" : ""),
+				".dgrid-resize-handle:mousedown" +
+					(has("touch") ? ",.dgrid-resize-handle:touchstart" : ""),
 				function(e){ grid._resizeMouseDown(e, this); }
 			);
 			grid.mouseMoveListen = listen.pausable(document.body,
