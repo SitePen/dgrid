@@ -81,16 +81,21 @@ return declare([], {
 		//      new width of the column
 
 		// Keep track of old styles so we don't get a long list in the stylesheet
+		
 		if(!this._columnStyles){
 			this._columnStyles = {};
 		}
-		var old = this._columnStyles[colId],
-			x = this.styleColumn(colId, "width: " + width + "px;");
+		if(width > 0){
+		//width should always be greater than 0, technically on resize there is a minimum width of 40px
+		//but this fix catches anything else that may end up changing the width to 0
+			var old = this._columnStyles[colId],
+				x = this.styleColumn(colId, "width: " + width + "px;");
 
-		old && old.remove();
+			old && old.remove();
 
-		// keep a reference
-		this._columnStyles[colId] = x;
+			// keep a reference
+			this._columnStyles[colId] = x;
+		}
 	},
 	configStructure: function(){
 		// Reset and remove column styles when a new structure is set
