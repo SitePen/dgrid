@@ -1,5 +1,5 @@
-define(["dojo/_base/declare", "dojo/on", "dojo/query", "dojo/_base/lang", "dojo/dom", "put-selector/put", "dojo/dom-geometry", "dojo/dom-class", "dojo/has", "dojo/_base/html", "xstyle/css!../css/extensions/ColumnResizer.css"],
-function(declare, listen, query, lang, dom, put, geom, cls, has){
+define(["dojo/_base/declare", "dojo/on", "dojo/query", "dojo/_base/lang", "dojo/dom", "dojo/dom-geometry", "dojo/has", "../util/misc", "put-selector/put", "dojo/_base/html", "xstyle/css!../css/extensions/ColumnResizer.css"],
+function(declare, listen, query, lang, dom, geom, has, miscUtil, put){
 
 var hasPointFromNode = has("touch") && webkitConvertPointFromNodeToPage;
 
@@ -144,28 +144,31 @@ return declare([], {
 		}
 
 		if(!grid.mouseMoveListen){
+			// establish listeners for initiating, dragging, and finishing resize
 			listen(grid.headerNode,
 				".dgrid-resize-handle:mousedown" +
 					(has("touch") ? ",.dgrid-resize-handle:touchstart" : ""),
-				function(e){ grid._resizeMouseDown(e, this); }
+				function(e){
+					grid._resizeMouseDown(e, this);
+					grid.mouseMoveListen.resume();
+					grid.mouseUpListen.resume();
+				}
 			);
 			grid.mouseMoveListen = listen.pausable(document.body,
 				"mousemove" + (has("touch") ? ",touchmove" : ""),
-				function(e){
-					// while resizing, update the position of the resizer bar
-					if(!grid._resizing){return;}
-					grid._updateResizerPosition(e);
-				}
+				miscUtil.throttle(function(e){ grid._updateResizerPosition(e); }, 15)
 			);
 			grid.mouseUpListen = listen.pausable(document.body,
 				"mouseup" + (has("touch") ? ",touchend" : ""),
 				function(e){
-					if(!grid._resizing){return;}
 					grid._resizeMouseUp(e);
 					grid.mouseMoveListen.pause();
 					grid.mouseUpListen.pause();
 				}
 			);
+			// initially pause the move/up listeners until a drag happens
+			grid.mouseMoveListen.pause();
+			grid.mouseUpListen.pause();
 		}
 	}, // end renderHeader
 
@@ -180,7 +183,6 @@ return declare([], {
 		e.preventDefault();
 		dom.setSelectable(this.domNode, false);
 		var grid = this;
-		grid._resizing = true;
 		grid._startX = grid._getResizeMouseLocation(e); //position of the target
 		
 		// Grab the position of the grid within the body;  will be used to place the resizer in the correct place
@@ -192,12 +194,9 @@ return declare([], {
 						
 		grid._targetCell = query(".column-" + target.columnId, grid.headerNode)[0];
 
-		// show resizer inlined
+		// show resizer
 		if(!grid._resizer){
 			grid._resizer = put(grid.domNode, "div.dgrid-column-resizer");
-		}else{
-			grid.mouseMoveListen.resume();
-			grid.mouseUpListen.resume();
 		}
 
 		grid._resizer.style.display = "block";
@@ -209,7 +208,6 @@ return declare([], {
 		// e: Object
 		//      mouseup event object
 
-		this._resizing = false;
 		this._readyToResize = false;
 
 		//This is used to set all the column widths to a static size
