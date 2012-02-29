@@ -197,8 +197,6 @@ function(kernel, declare, listen, has, put, List){
 				}
 			});
 			this._rowIdToObject[row.id = this.id + "-header"] = this.columns;
-			//put(headerNode, "div.dgrid-header-columns>", row, ".dgrid-row<+div.dgrid-header-scroll.ui-widget-header");
-			//row = put("div.dgrid-row[role=columnheader]>", row);
 			headerNode.appendChild(row);
 			// if it columns are sortable, resort on clicks
 			listen(row, "click,keydown", function(event){

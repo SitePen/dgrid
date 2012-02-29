@@ -3,8 +3,7 @@ function(kernel, declare, listen, aspect, has, TouchScroll, hasClass, put){
 	// Add user agent/feature CSS classes 
 	hasClass("mozilla", "opera", "webkit", "ie", "ie-6", "ie-6-7", "quirks", "no-quirks", "touch");
 	
-	// Am I webkit? (for RTL)
-	var isWebkit = has("webkit");
+	var scrollbarWidth;
 
 	// establish an extra stylesheet which addCssRule calls will use,
 	// plus an array to track actual indices in stylesheet for removal
@@ -51,10 +50,9 @@ function(kernel, declare, listen, aspect, has, TouchScroll, hasClass, put){
 		}
 	}
 	
-	var scrollbarWidth;
-	var byId = function(id){
+	function byId(id){
 		return document.getElementById(id);
-	};
+	}
 
 	function move(item, steps, targetClass){
 		var nextSibling, current, element;
@@ -176,8 +174,8 @@ function(kernel, declare, listen, aspect, has, TouchScroll, hasClass, put){
 			if (!this.showFooter) { footerNode.style.display = "none"; }
 			put(domNode, footerNode);
 			
-			if(isRTL) {
-				domNode.className += " dgrid-rtl" + (isWebkit ? "" : " dgrid-rtl-nonwebkit");
+			if(isRTL){
+				domNode.className += " dgrid-rtl" + (has("webkit") ? "" : " dgrid-rtl-nonwebkit");
 			}
 			
 			listen(bodyNode, "scroll", function(event){
