@@ -156,7 +156,7 @@ return declare([], {
 			);
 			grid.mouseMoveListen = listen.pausable(document.body,
 				"mousemove" + (has("touch") ? ",touchmove" : ""),
-				miscUtil.throttle(function(e){ grid._updateResizerPosition(e); }, 15)
+				miscUtil.throttleDelayed(function(e){ grid._updateResizerPosition(e); })
 			);
 			grid.mouseUpListen = listen.pausable(document.body,
 				"mouseup" + (has("touch") ? ",touchend" : ""),
