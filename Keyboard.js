@@ -10,6 +10,10 @@ define([
 	"dojo/_base/sniff"
 ], function(declare, aspect, on, List, lang, has, put, Deferred){
 
+// Since Keyboard casues problems on Android devices, and keyboard doesn't play a role
+// on mobile devices, there's no reason to add any of this.
+
+
 var delegatingInputTypes = {
 		checkbox: 1,
 		radio: 1,
@@ -128,7 +132,7 @@ return declare([List], {
 			
 			on(areaNode, "mousedown", function(event){
 				if(!handledEvent(event)){
-					focusOnCell(event.target, event);
+					focusOnCell(event.target, event, has("touch"));
 				}
 			});
 			

@@ -30,7 +30,7 @@
 				function(on, Grid, Tree, Editor, Keyboard, Selection, declare, testStore){
 					var columns = [
 						Editor({label: ' ', field: 'bool', sortable: false}, "checkbox"),
-						Tree({label:'Name', field:'name', sortable: false}),
+						Tree({label:'Name', field:'name', sortable: false, expandoMinimumStart: 10 }),
 						{label:'Type', field:'type', sortable: false},
 						{label:'Population', field:'population'},
 						{label:'Timezone', field:'timezone'}

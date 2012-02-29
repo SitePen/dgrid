@@ -2,6 +2,15 @@ define(["dojo/_base/declare", "dojo/_base/Deferred", "dojo/query", "dojo/on", "d
 function(declare, Deferred, querySelector, on, aspect, touchUtil, put){
 
 return function(column){
+	
+	// column.expandoMargin: Number
+	//		The margin increments for Trees
+	
+	// column.expandoMinimumStart: Number
+	//		The minimum margin to start the expando at, instead of 0
+	//		Helpful in use with Android devices and control "hit area" sizes
+	//		See the Tree.html test
+	
 	// summary:
 	//      Add a editing capability
 	var originalRenderCell = column.renderCell || function(object, value, td){
@@ -19,7 +28,7 @@ return function(column){
 		// create the expando
 		var dir = grid.isRTL ? "right" : "left";
 		var expando = put(td, "div.dgrid-expando-icon" + (mayHaveChildren ? ".ui-icon.ui-icon-triangle-1-e" : "") +
-			"[style=margin-" + dir + ": " + (level * 19) + "px; float: " + dir + "]");
+			"[style=margin-" + dir + ": " + (level * (column.expandoMargin || 19) + (column.expandoMinimumStart || 0)) + "px; float: " + dir + "]");
 		expando.innerHTML = "&nbsp;"; // for opera to space things properly
 		originalRenderCell.call(this, object, value, td, options);
 		expando.level = level;
