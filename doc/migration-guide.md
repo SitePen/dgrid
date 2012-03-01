@@ -4,27 +4,37 @@ definitive or nearly final.
 
 # Comparison of Basic Setup
 
-TODOC (incl. usage of `GridFromHtml` or `GridWithColumnSetsFromHtml` for declarative)
+## Simple programmatic usage
 
-# API Mappings / Equivalents
+TODOC
 
-The following sections enumerate dojox grid features
-(compiled mainly from the DataGrid reference guide page),
-with explanations on how `dgrid` implements equivalents.
+## Specifying column layout via HTML
 
-## "View" -> "ColumnSet"
+TODOC
 
-## Events
+## Using views / columnsets
 
-TODO: document how one can easily listen for row/header mouse events.
-(Also, can we come up with equivalents to on...ContextMenu events?)
+The `dojox/grid` components implement a concept known as "views", which are
+represented as separate horizontal regions within a single grid.  This feature
+is generally useful for situations where many fields are to be shown, and some
+should remain visible while others are able to scroll horizontally.
 
-TODO: consider alternatives to how dojox grid decorates events - for simple
-stuff like the `grid` property, I suppose hitching or even the scope chain
-may be enough, but what about e.g. which cell/row was clicked/hovered/etc?
-Should we still decorate events?
+This capability is also made available in `dgrid` via the ColumnSet mixin.
 
-## dojox.grid properties
+TODOC: example
+
+# Working with Events
+
+TODOC: grid.on, use w/ dojo/on, etc.
+
+TODOC: row and cell methods
+
+# API Equivalents
+
+The following sections enumerate `dojox/grid` features, and provide information
+on equivalent functionality available in dgrid.
+
+## dojox/grid properties
 
 ### sortInfo
 
@@ -32,7 +42,7 @@ The way in which dgrid represents current sort order is significantly different
 than `dojox/grid`.  dgrid stores the current sort options, as they would be
 passed via a store's `queryOptions`, in the `sortOrder` property.
 
-### rowSelector / indirect selection
+### rowSelector and indirect selection
 
 Indirect selection is available in dgrid via the Selector column plugin.  This
 achieves similar effects to the DataGrid's `_CheckBoxSelector` and
@@ -42,12 +52,14 @@ dgrid does not feature a direct analog to the `rowSelector` property.
 
 ### selectionMode
 
-dgrid supports this property, with the same options as dojox grid, when a grid
-is constructed with the Selection mixin.
+dgrid supports this property via the Selection mixin.  It recognizes the same
+values supported by `dojox/grid` components (`none`, `single`, `multiple`, and
+`extended`, the latter being the default).
 
 ### columnReordering
 
-This is not yet available in dgrid, but a Column DnD extension is planned.
+This is not yet available in dgrid, but an extension implementing this for
+basic grids with single-row layouts should be coming soon.
 
 ### headerMenu
 
@@ -72,9 +84,9 @@ Not supported.  Width (and height) should be dictated via CSS.
 ### singleClickEdit
 
 The effect of the `singleClickEdit` property can be achieved by specifying
-`editOn: "click"` in the column definition passed to an invocation of the
-Editor column plugin function.  (Alternatively, dojox grid's default double-click
-behavior can be achieved by specifying `editOn: "dblclick"` instead.)
+`editOn: "click"` in a column definition passed to the Editor column plugin
+function.  (Alternatively, `dojox/grid`'s default double-click behavior can be
+achieved by specifying `editOn: "dblclick"` instead.)
 
 ### loadingMessage, noDataMessage, errorMessage
 
@@ -90,7 +102,7 @@ synchronous or asynchronous.
 This is not exposed as a distinct option, but is automatically managed
 by the `Selection` plugin.  Standard browser selection is disabled when a
 `selectionMode` other than `none` is in use.
-Otherwise, selection operates as normal.
+Otherwise, text selection operates as normal.
 
 ### formatterScope
 
@@ -100,8 +112,8 @@ column definition object.
 
 ### updateDelay
 
-Not supported, as it is generally not applicable, due to the difference
-in how dgrid components update from observed store changes.
+dgrid does not support this, as it is generally not applicable, due to the
+difference in how dgrid components update from observed store changes.
 
 ### escapeHTMLInData
 
@@ -113,20 +125,24 @@ The `formatter` or `renderCell` functions in the column definition may be
 overridden to explicitly render data as received, in cases where that is truly
 desired.
 
-## Cell Definitions
+## Column Definitions
 
-Whereas dojox grid always specifies column definitions via a `structure`
-property, dgrid expects one of the following properties to be specified:
+Whereas `dojox/grid` always expects cell definitions to be specified via a
+`structure` property, dgrid expects one of the following properties to be specified:
 
-* `columns`: for simple single-row grid configurations
-* `subRows`: for grid configurations with multiple sub-rows per item
-* `columnSets` (only when the ColumnSet mixin is in use): for grid configurations
-  containing distinct horizontal regions of one or more rows (analogous
-  to multiple views in a dojox grid instance)
+* `columns`: an array or object hash, for simple single-row grid configurations
+* `subRows`: an array of arrays, for grid configurations with multiple sub-rows per item
+* `columnSets` (only when the ColumnSet mixin is in use): a nested array for
+  grid configurations containing distinct horizontal regions of one or more rows
+  (analogous to multiple views in a `dojox/grid` instance)
+
+The following subsections outline how features of `dojox/grid` cell definitions
+are available in dgrid column definitions.
 
 ### field
 
-Supported by dgrid, including the special `"_item"` value from 1.4+ dojox grid.
+Supported by dgrid, including the special `"_item"` value supported by
+`dojox/grid` in Dojo >= 1.4.
 
 Also note that dgrid also supports specifying `columns` as an object hash instead
 of an array, in which case the key of each property is interpreted as the `field`.
@@ -153,7 +169,7 @@ string indicating a native HTML input type.
 Not directly applicable; in `dojox/grid` this applies only to cell definitions
 where `cellType` is set to `dojox.grid.cells.Select`.
 
-The Editor column plugin does not currently offer support for native HTML
+The Editor column plugin does not currently offer support for standard HTML
 select components; however, similar behavior can be achieved using the
 `dijit/form/Select` widget as the `editor`, and specifying `options` for the
 widget within the `editorArgs` property of the column definition object.
@@ -165,7 +181,7 @@ Editor column plugin.
 
 ### draggable
 
-Not yet applicable until the Column DnD plugin is implemented.
+Not yet applicable, at least until the Column Reordering extension is implemented.
 
 ### formatter
 
@@ -233,7 +249,7 @@ dgrid components have a `sort` method which takes two arguments:
 the name of the field to sort by, and a flag as to whether to sort descending
 (defaults to `false`).
 
-Like the `sort` method in `dojox.grid` components, this can even be called to sort
+Like the `sort` method in `dojox/grid` components, this can even be called to sort
 columns that ordinarily wouldn't be sortable via the UI.
 
 ### canSort
