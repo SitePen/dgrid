@@ -4,7 +4,8 @@ define([
 	"dojo/_base/array",
 	"dojo/query",
 	"dojo/dnd/Source",
-	"put-selector/put"
+	"put-selector/put",
+	"xstyle/css!../css/extensions/columnReorder.css"
 ], function(lang, declare, arrayUtil, query, DndSource, put){
 	var ColumnDndSource = declare(DndSource, {
 		copyState: function(){ return false; }, // never copy
