@@ -20,11 +20,11 @@
 			#grid {
 				height: 20em;
 			}
-			#grid .column-order {
-				width: 7%;
+			.column-order {
+				width: 3em;
 			}
-			#grid .column-name {
-				width: 18%;
+			.column-name {
+				width: 10em;
 			}
 		</style>
 
@@ -42,7 +42,7 @@
 				{order: 8, name:"remove", description:"Using a spatula, lift cookies off onto wax paper or a cooling rack"},
 				{order: 9, name:"eat", description:"Eat and enjoy!"}
 			];
-			var columns3 = {
+			var columns1 = {
 				order: "step", // give column a custom name
 				name: {},
 				description: { label: "what to do", sortable: false }
@@ -56,11 +56,19 @@
 					"dojo/_base/declare", "dojo/domReady!"],
 				function(Grid, ColumnReorder, ColumnResizer, declare){
 					window.grid = declare([Grid, ColumnReorder])({
-						columns: columns3
+						columns: columns1
 					}, "grid");
 					grid.renderArray(data);
 					
 					//TODO: second grid w/ both Reorder and Resizer to see what happens
+					window.grid2 = declare([Grid, ColumnReorder, ColumnResizer])({
+						columns: {
+							order: "step",
+							name: {},
+							description: { label: "what to do", sortable: false }
+						}
+					}, "grid2");
+					grid2.renderArray(data);
 				});
 				
 		</script>
@@ -69,8 +77,10 @@
 		<h2>A basic grid with column re-ordering</h2>
 		<div id="grid"></div>
 		<div>Buttons to test resetting columns:
-			<button onclick="grid.set('columns', columns3);">order, name, description</button>
+			<button onclick="grid.set('columns', columns1);">order, name, description</button>
 			<button onclick="grid.set('columns', columns2);">name, description</button>
 		</div>
+		<h2>A grid with column re-ordering and resizing</h2>
+		<div id="grid2"></div>
 	</body>
 </html>

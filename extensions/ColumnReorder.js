@@ -14,6 +14,13 @@ define([
 			return source == this; // self-accept only
 		},
 		
+		_legalMouseDown: function(evt){
+			// summary:
+			//		Overridden to prevent blocking ColumnResizer resize handles.
+			return evt.target.className.indexOf("dgrid-resize-handle") > -1 ? false :
+				this.inherited(arguments);
+		},
+		
 		onDropInternal: function(){
 			var grid = this.grid,
 				oldColumns = grid.get("columns"),
@@ -24,10 +31,13 @@ define([
 			
 			// Then, iterate through the header cells in their new order,
 			// to populate a new row array to assign as a new sub-row to the grid.
-			arrayUtil.forEach(grid.headerNode.firstChild.childNodes, function(col) {
-				newRow.push(oldColumns[col.columnId]);
-			});
-			grid.set("subRows", [newRow]);
+			// (Wait until the next turn to avoid errors in Opera.)
+			setTimeout(function(){
+				arrayUtil.forEach(grid.headerNode.firstChild.childNodes, function(col) {
+					newRow.push(oldColumns[col.columnId]);
+				});
+				grid.set("subRows", [newRow]);
+			}, 0);
 		}
 	});
 	
