@@ -192,7 +192,7 @@ return declare([], {
 						webkitConvertPointFromNodeToPage(grid.bodyNode, new WebKitPoint(0, 0)).x : 
 						geom.position(grid.bodyNode).x;
 						
-		grid._targetCell = query(".column-" + target.columnId, grid.headerNode)[0];
+		grid._targetCell = query(".dgrid-column-" + target.columnId, grid.headerNode)[0];
 
 		// show resizer
 		if(!grid._resizer){
@@ -239,7 +239,7 @@ return declare([], {
 			obj = this._getResizedColumnWidths(),//get current total column widths before resize
 			totalWidth = obj.totalWidth,
 			lastCol = obj.lastColId,
-			lastColWidth = query(".column-"+lastCol, this.headerNode)[0].offsetWidth;
+			lastColWidth = query(".dgrid-column-"+lastCol, this.headerNode)[0].offsetWidth;
 
 		if(cell.columnId != lastCol){
 			if(totalWidth + delta < this.gridWidth) {

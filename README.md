@@ -226,10 +226,10 @@ based on the column ids and field names with the convention of
 For example, you could define a grid and CSS like so:
 
     <style>
-    .column-age {
+    .field-age {
         width: 80px;
     }
-    .column-first {
+    .field-first {
         font-weight: bold;
     }
     </style>

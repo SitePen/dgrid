@@ -27,7 +27,7 @@ return function(column){
 		var tr, query;
 		
 		if(!grid.expand){
-			var colSelector = ".dgrid-content .column-" + column.id;
+			var colSelector = ".dgrid-content .dgrid-column-" + column.id;
 			// Set up the event listener once and use event delegation for better memory use.
 			grid.on(column.expandOn || ".dgrid-expando-icon:click," + colSelector + ":dblclick",
 				function(){ grid.expand(this); });

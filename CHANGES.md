@@ -1,6 +1,6 @@
 # master (post-0.2.0)
 
-## General Changes
+## General
 
 ### new: get and set methods
 
@@ -15,6 +15,28 @@ some key differences:
   For example, `setQuery(...)` is now `set("query", ...)`.  Deprecation stubs
   are currently in place for the old APIs, but will be removed in the future.
 * `watch` is not implemented.
+
+## CSS
+
+### column-<id> and columnset-* classes now prefixed with dgrid-
+
+The `column-<id>` classes added by the Grid module, and the `columnset-*`
+classes added by the ColumnSet mixin, have been renamed to include the `dgrid-`
+prefix like most other classes automatically added by dgrid components.
+
+The main exception is the `field-<field>` classes, which are intentionally not
+namespaced in this fashion, as they are thought to be more applicable to the
+particular use-case and less applicable to the dgrid components themselves.
+
+In the overwhelming majority of cases, it is recommended to style using the
+`.field-<field>` classes (or, if a `className` is specified in the column
+definition, use that as it overrides the `.field-<field>` class).
+
+### ColumnResizer: handle node class is now dgrid-resize-handle
+
+The class on the resize handle node added to each header cell by the
+ColumnResizer extension was formerly `dgrid-resize-handler`; this has been
+corrected to `dgrid-resize-handle`.
 
 ## Grid
 
@@ -153,13 +175,6 @@ grid rows.  The `target` specified may be anything which will resolve to a row
 via the grid's `row` function.  An optional second boolean parameter may specify
 whether to expand (`true`) or collapse (`false`) the row in question; if
 unspecified, the method will toggle the target row's state.
-
-## ColumnResizer
-
-### CSS class on handle nodes is now dgrid-resize-handle
-
-The class on the resize handle node in each header cell was formerly
-`dgrid-resize-handler`; this has been corrected to `dgrid-resize-handle`.
 
 ## DnD
 

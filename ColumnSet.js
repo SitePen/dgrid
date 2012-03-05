@@ -12,7 +12,7 @@ function(kernel, declare, listen, aspect, query, has, put, hasClass, Grid){
 			var tr = put(row, "tbody tr");
 			for(var i = 0, l = this.columnSets.length; i < l; i++){
 				// iterate through the columnSets
-				var cell = put(tr, tag + ".dgrid-column-set-cell.column-set-" + i + " div.dgrid-column-set[colsetid=" + i + "]");
+				var cell = put(tr, tag + ".dgrid-column-set-cell.dgrid-column-set-" + i + " div.dgrid-column-set[colsetid=" + i + "]");
 				cell.appendChild(this.inherited(arguments, [tag, each, this.columnSets[i]]));
 			}
 			return row;
@@ -53,7 +53,7 @@ function(kernel, declare, listen, aspect, query, has, put, hasClass, Grid){
 			function putScroller(columnSet, i){
 				// function called for each columnSet
 				var scroller = scrollers[i] =
-					put(domNode, "div.dgrid-column-set-scroller.dgrid-scrollbar-height.column-set-scroller-" + i + "[colsetid=" + i +"]");
+					put(domNode, "div.dgrid-column-set-scroller.dgrid-scrollbar-height.dgrid-column-set-scroller-" + i + "[colsetid=" + i +"]");
 				scrollerContents[i] = put(scroller, "div.dgrid-column-set-scroller-content");
 				listen(scroller, "scroll", onScroll);
 			}
