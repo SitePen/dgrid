@@ -7,7 +7,13 @@ define([
 	"put-selector/put"
 ], function(lang, declare, arrayUtil, query, DndSource, put){
 	var ColumnDndSource = declare(DndSource, {
-		onDropInternal: function() {
+		copyState: function(){ return false; }, // never copy
+		
+		checkAcceptance: function(source, nodes){
+			return source == this; // self-accept only
+		},
+		
+		onDropInternal: function(){
 			var grid = this.grid,
 				oldColumns = grid.get("columns"),
 				newRow = [];
@@ -25,10 +31,11 @@ define([
 	});
 	
 	var ColumnReorder = declare([], {
-		renderHeader: function() {
-			this.inherited( arguments );
+		columnDndConstructor: ColumnDndSource,
+		renderHeader: function(){
+			this.inherited(arguments);
 			
-			var dndType = "dgrid-" + this.id + "-column",
+			var dndType = this._columnDndType = "dgrid-" + this.id + "-column",
 				thead = this.headerNode.firstChild;
 			
 			// enable column reordering for simple single-row structures only
@@ -37,9 +44,8 @@ define([
 				query("th", thead).forEach(function(th){
 					put(th, ".dojoDndItem[dndType=" + dndType + "]");
 				});
-				this.columnDndSource = new ColumnDndSource(thead, {
+				this.columnDndSource = new this.columnDndConstructor(thead, {
 					horizontal: true,
-					accept: [dndType],
 					grid: this
 				});
 			}
