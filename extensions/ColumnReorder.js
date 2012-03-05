@@ -33,6 +33,11 @@ define([
 	var ColumnReorder = declare([], {
 		columnDndConstructor: ColumnDndSource,
 		renderHeader: function(){
+			if(this.columnDndSource){
+				// destroy old source before re-rendering header
+				this.columnDndSource.destroy();
+			}
+			
 			this.inherited(arguments);
 			
 			var dndType = this._columnDndType = "dgrid-" + this.id + "-column",
