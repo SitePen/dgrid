@@ -58,8 +58,10 @@ values supported by `dojox/grid` components (`none`, `single`, `multiple`, and
 
 ### columnReordering
 
-This is not yet available in dgrid, but an extension implementing this for
-basic grids with single-row layouts should be coming soon.
+Setting this `dojox/grid` property to `true` allows reordering of columns
+in grids with basic structures via drag'n'drop operations on column header cells.
+
+This feature is available in dgrid via the ColumnReorder extension.
 
 ### headerMenu
 
@@ -72,6 +74,8 @@ cells or rows in the grid's body or header, to perform custom logic.
 Automatic height can be achieved using `height: auto` in the CSS for a grid's
 main DOM node.  There is no direct programmatic support for this.  (This means
 there is no built-in support for automatically sizing to a certain number of rows.)
+
+An example of an auto-height grid can be found in the `autoheight.html` test page.
 
 ### autoWidth
 
@@ -181,7 +185,13 @@ Editor column plugin.
 
 ### draggable
 
-Not yet applicable, at least until the Column Reordering extension is implemented.
+Only applicable to `dojox/grid` instances with `columnReordering` set to `true`,
+the `draggable` property determines whether a particular column can be
+reordered via drag'n'drop.
+
+The ColumnReorder dgrid extension provides an equivalent via the `reorderable`
+column definition property.  It defaults to `true`, but if set explicitly to
+`false`, the given column's header node will not be registered as a DnD item.
 
 ### formatter
 
