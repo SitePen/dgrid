@@ -21,7 +21,7 @@ define([
 				this.inherited(arguments);
 		},
 		
-		onDropInternal: function(){
+		onDropInternal: function(nodes){
 			var grid = this.grid,
 				oldColumns = grid.get("columns"),
 				newRow = [];
@@ -33,7 +33,7 @@ define([
 			// to populate a new row array to assign as a new sub-row to the grid.
 			// (Wait until the next turn to avoid errors in Opera.)
 			setTimeout(function(){
-				arrayUtil.forEach(grid.headerNode.firstChild.childNodes, function(col) {
+				arrayUtil.forEach(nodes[0].parentNode.childNodes, function(col) {
 					newRow.push(oldColumns[col.columnId]);
 				});
 				grid.set("subRows", [newRow]);
@@ -52,15 +52,16 @@ define([
 			this.inherited(arguments);
 			
 			var dndType = this._columnDndType = "dgrid-" + this.id + "-column",
-				thead = this.headerNode.firstChild;
+				dndParent;
 			
 			// enable column reordering for simple single-row structures only
 			if(this.subRows.length == 1 && !this.columnSets){
 				// TODO: filter out nodes that have an attribute/class that indicates they should not be re-orderable?
-				query("th", thead).forEach(function(th){
+				query("th", this.headerNode).forEach(function(th){
+					if(!dndParent){ dndParent = th.parentNode; }
 					put(th, ".dojoDndItem[dndType=" + dndType + "]");
 				});
-				this.columnDndSource = new this.columnDndConstructor(thead, {
+				this.columnDndSource = new this.columnDndConstructor(dndParent, {
 					horizontal: true,
 					grid: this
 				});
