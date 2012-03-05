@@ -565,6 +565,17 @@ Extensions live in the `extensions` subdirectory; their tests and
 css/image resources also live under respective `css/extensions` and
 `test/extensions` subdirectories.
 
+## ColumnReorder
+
+The ColumnReorder extension adds the ability to reorder the columns of a grid
+via drag'n'drop operations on column headers.  Note that currently this is
+only supported for simple column layouts involving a single sub-row and no
+columnsets.
+
+This extension supports an additional `reorderable` property on column definitions;
+if explicitly set to `false`, that particular column's header node will not be
+treated as a viable DnD item.
+
 ## ColumnResizer
 
 The ColumnResizer extension can be used to add column resizing functionality
