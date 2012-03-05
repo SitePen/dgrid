@@ -5,7 +5,7 @@ define([
 	"dojo/query",
 	"dojo/dnd/Source",
 	"put-selector/put",
-	"xstyle/css!../css/extensions/columnReorder.css"
+	"xstyle/css!../css/extensions/ColumnReorder.css"
 ], function(lang, declare, arrayUtil, query, DndSource, put){
 	var ColumnDndSource = declare(DndSource, {
 		copyState: function(){ return false; }, // never copy
