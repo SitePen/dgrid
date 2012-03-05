@@ -60,10 +60,9 @@
 					}, "grid");
 					grid.renderArray(data);
 					
-					//TODO: second grid w/ both Reorder and Resizer to see what happens
 					window.grid2 = declare([Grid, ColumnReorder, ColumnResizer])({
 						columns: {
-							order: "step",
+							order: { label: "step", reorderable: false },
 							name: {},
 							description: { label: "what to do", sortable: false }
 						}
@@ -80,7 +79,7 @@
 			<button onclick="grid.set('columns', columns1);">order, name, description</button>
 			<button onclick="grid.set('columns', columns2);">name, description</button>
 		</div>
-		<h2>A grid with column re-ordering and resizing</h2>
+		<h2>A grid with column re-ordering and resizing, and a non-reorderable Step field</h2>
 		<div id="grid2"></div>
 	</body>
 </html>

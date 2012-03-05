@@ -56,15 +56,24 @@ define([
 			
 			// enable column reordering for simple single-row structures only
 			if(this.subRows.length == 1 && !this.columnSets){
-				// TODO: filter out nodes that have an attribute/class that indicates they should not be re-orderable?
-				query("th", this.headerNode).forEach(function(th){
-					if(!dndParent){ dndParent = th.parentNode; }
+				arrayUtil.forEach(this.subRows[0], function(col){
+					if(col.reorderable === false){ return; }
+					
+					var th = col.headerNode;
+					if(th.tagName != "TH"){ th = th.parentNode; } // from IE < 8 padding
 					put(th, ".dojoDndItem[dndType=" + dndType + "]");
+					
+					if(!dndParent){ dndParent = th.parentNode; }
 				});
-				this.columnDndSource = new this.columnDndConstructor(dndParent, {
-					horizontal: true,
-					grid: this
-				});
+				
+				if(dndParent){ // (if dndParent wasn't set, no columns are draggable!)
+					this.columnDndSource = new this.columnDndConstructor(dndParent, {
+						horizontal: true,
+						grid: this
+					});
+				}else{
+					delete this.columnDndSource; // remove any previous leftovers
+				}
 			}
 		}
 	});
