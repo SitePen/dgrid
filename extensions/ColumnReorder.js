@@ -8,18 +8,19 @@ define([
 ], function(lang, declare, arrayUtil, query, DndSource, put){
 	var ColumnDndSource = declare(DndSource, {
 		onDropInternal: function() {
-			var grid = this.grid;
+			var grid = this.grid,
+				oldColumns = grid.get("columns"),
+				newRow = [];
+			
+			// First, allow original DnD logic to place node in new location.
 			this.inherited(arguments);
 			
-			var oldColumns = grid.get("columns");
-			var newColumns = {};
-			
-			// TODO: populate subRows instead
-			arrayUtil.forEach(grid.headerNode.firstChild.childNodes, function(currentColumn) {
-				newColumns[currentColumn.columnId] = oldColumns[currentColumn.columnId];
+			// Then, iterate through the header cells in their new order,
+			// to populate a new row array to assign as a new sub-row to the grid.
+			arrayUtil.forEach(grid.headerNode.firstChild.childNodes, function(col) {
+				newRow.push(oldColumns[col.columnId]);
 			});
-			
-			grid.set("columns", newColumns);
+			grid.set("subRows", [newRow]);
 		}
 	});
 	
@@ -30,12 +31,12 @@ define([
 			var dndType = "dgrid-" + this.id + "-column",
 				thead = this.headerNode.firstChild;
 			
+			// enable column reordering for simple single-row structures only
 			if(this.subRows.length == 1 && !this.columnSets){
 				// TODO: filter out nodes that have an attribute/class that indicates they should not be re-orderable?
 				query("th", thead).forEach(function(th){
 					put(th, ".dojoDndItem[dndType=" + dndType + "]");
 				});
-				//.addClass("dojoDndItem").attr("dndType", "dgrid-" + this.id + "-column");
 				this.columnDndSource = new ColumnDndSource(thead, {
 					horizontal: true,
 					accept: [dndType],
