@@ -345,7 +345,7 @@ function(kernel, declare, listen, has, put, List){
 				// we have subRows, but no columns yet, need to create the columns
 				this.columns = {};
 				for(var i = 0; i < subRows.length; i++){
-					subRows[i] = this._configColumns(i + '-', subRows[i]);
+					subRows[i] = this._configColumns(i + "-", subRows[i]);
 				}
 			}else{
 				this.subRows = [this._configColumns("", this.columns)];
