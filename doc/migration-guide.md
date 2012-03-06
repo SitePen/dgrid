@@ -198,7 +198,131 @@ sections, the following `dojox/grid` structure with multiple views...
 
 ## Specifying column layout via HTML
 
-TODOC
+While programmatic creation of grids is highly encouraged, dgrid does allow for
+declarative specification of grid layouts via a `table` element, somewhat along
+the same lines of `dojox/grid`.
+
+In the case of dgrid, this ability is not baked in by default, but is instead
+exposed primarily by the GridFromHtml module, which adds table-scanning
+capabilities atop the OnDemandGrid constructor.
+
+Note that unlike `dojox/grid`, which is *only* capable of reading declarative
+layouts through the use of `dojo/parser`, dgrid is also capable of creating
+instances programmatically while referencing a `table` node from which to read
+a declarative layout.  For the purposes of the examples below, use of parser
+will be assumed, in order to allow comparison between `dojox/grid` and dgrid
+usage.
+
+For instance, the following declarative `dojox/grid` layout...
+
+    <table id="grid" data-dojo-type="dojox.grid.DataGrid"
+        data-dojo-props="store: objectStore">
+        <thead>
+            <tr>
+                <th field="id" width="10%">ID</th>
+                <th field="name" width="20%">Name</th>
+                <th field="description" width="70%">Description</th>
+            </tr>
+        </thead>
+    </table>
+
+...could be achieved declaratively using dgrid as follows...
+
+    <table id="grid" data-dojo-type="dgrid.CustomGrid"
+        data-dojo-props="store: memoryStore">
+        <thead>
+            <tr>
+                <th data-dgrid-column="{ field: 'id' }">ID</th>
+                <th data-dgrid-column="{ field: 'name' }">Name</th>
+                <th data-dgrid-column="{ field: 'description' }">Description</th>
+            </tr>
+        </thead>
+    </table>
+
+...provided the following script is used...
+
+    require(["dgrid/GridFromHtml", "dgrid/Keyboard", "dgrid/Selection",
+        "dojo/store/Memory", "dojo/_base/declare", "dojo/parser", "dojo/domReady!"],
+    function(GridFromHtml, Keyboard, Selection, Memory, declare, parser){
+        var memoryStore = window.memoryStore = new Memory({data: [
+            // ... data here ...
+        ]});
+        
+        // Globally expose a Grid constructor including the mixins we want.
+        window.dgrid = {
+            CustomGrid: declare([GridFromHtml, Keyboard, Selection])
+        };
+        
+        // Parse the markup after exposing the global.
+        parser.parse();
+    });
+
+Notice that rather than specifying individual non-standard attributes inside the
+`th` elements, declarative layout specification with dgrid centers primarily
+around a data-attribute named `data-dgrid-column`.  This attribute receives a
+string representation of a JavaScript object, which will ultimately become the
+basis for the column definition.  (It operates much like `data-dojo-props`,
+except that the surrounding curly braces must be included.)
+
+Note that some properties which have standard equivalents, such as `colspan` and
+`rowspan`, can be specified directly as HTML attributes in the element instead.
+Additionally, the innerHTML of the `th` becomes the column's label.
+
+The script block above demonstrates the main catch to using dgrid declaratively
+with `dojo/parser`: since the modules in the dgrid package are written to be
+pure AMD, they do not expose globals, which means whatever constructors are to
+be used need to be exposed manually.  Furthermore, rather than simply exposing
+the GridFromHtml constructor, the above example exposes a custom-declared
+constructor which mixes in desired functionality.
+
+Note that if column plugins are to be employed, these will also need to be
+similarly globally exposed.  Column plugins may be specified in the column
+definitions of declarative grid layouts within the `data-dgrid-column` attribute;
+for example:
+
+    <th data-dgrid-column="dgrid.Editor({ field: 'name', editOn: 'dblclick' })">Name</th>
+
+### Column Layout via HTML with views / columnsets
+    
+While both `dojox/grid` and dgrid also enable declarative creation
+of grids with multiple views/columnsets, in dgrid's case this is again separated
+to its own module, GridWithColumnSetsFromHtml.  This separation exists due to
+the significant amount of additional code necessary to resolve columnsets from
+the representative markup, combined with the relative rarity of cases calling
+for the additional functionality.
+
+As a quick example, here is what a simple declarative grid with two views could
+look like with `dojox/grid`...
+
+    <table id="grid" data-dojo-type="dojox.grid.DataGrid"
+        data-dojo-props="store: objectStore">
+        <colgroup span="1" width="10%"></colgroup>
+        <colgroup span="2"></colgroup>
+        <thead>
+            <tr>
+                <th field="id" width="auto">ID</th>
+                <th field="name" width="20%">Name</th>
+                <th field="description" width="80%">Description</th>
+            </tr>
+        </thead>
+    </table>
+
+...and here is the equivalent, using dgrid...
+(this assumes the same styles are in play as the earlier programmatic ColumnSet
+example)
+
+    <table id="grid" data-dojo-type="dgrid.CustomGrid"
+        data-dojo-props="store: memoryStore">
+        <colgroup span="1"></colgroup>
+        <colgroup span="2"></colgroup>
+        <thead>
+            <tr>
+                <th data-dgrid-column="{ field: 'id' }">ID</th>
+                <th data-dgrid-column="{ field: 'name' }">Name</th>
+                <th data-dgrid-column="{ field: 'description' }">Description</th>
+            </tr>
+        </thead>
+    </table>
 
 # Working with Events
 
@@ -229,9 +353,15 @@ dgrid does not feature a direct analog to the `rowSelector` property.
 
 ### selectionMode
 
-dgrid supports this property via the Selection mixin.  It recognizes the same
-values supported by `dojox/grid` components (`none`, `single`, `multiple`, and
-`extended`, the latter being the default).
+dgrid supports this property via the Selection and CellSelection mixins.
+It recognizes the same values supported by `dojox/grid` components
+(`none`, `single`, `multiple`, and `extended`, the latter being the default).
+
+## keepSelection
+
+This is roughly the inverse equivalent to the `deselectOnRefresh` property
+supported by dgrid's Selection (and CellSelection) mixin.  Both `dojox/grid`
+and dgrid default to *not* maintaining selection between refreshes, sorts, etc.
 
 ### columnReordering
 
@@ -280,7 +410,7 @@ synchronous or asynchronous.
 
 ### selectable
 
-This is not exposed as a distinct option, but is automatically managed
+This is not exposed as a distinct option in dgrid, but is automatically managed
 by the `Selection` plugin.  Standard browser selection is disabled when a
 `selectionMode` other than `none` is in use.
 Otherwise, text selection operates as normal.
