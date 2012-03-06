@@ -421,7 +421,7 @@ dgrid supports this property via the Selection and CellSelection mixins.
 It recognizes the same values supported by `dojox/grid` components
 (`none`, `single`, `multiple`, and `extended`, the latter being the default).
 
-## keepSelection
+### keepSelection
 
 This is roughly the inverse equivalent to the `deselectOnRefresh` property
 supported by dgrid's Selection (and CellSelection) mixin.  Both `dojox/grid`
