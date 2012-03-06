@@ -53,6 +53,14 @@
 	background-image: url("../images/ui-icons_222222_256x240_white.png");
 }
 
+/* for ColumnReorder */
+.slate .dgrid-header .dojoDndItemBefore {
+	border-left: 2px dotted #fff !important;
+}
+.slate .dgrid-header .dojoDndItemAfter {
+	border-right: 2px dotted #fff !important;
+}
+
 /* for pagination in IE < 8 + quirks, need additional rule to override link color */
 .has-ie-6-7 .slate .dgrid-navigation a,
 .has-ie.has-quirks .slate .dgrid-navigation a {

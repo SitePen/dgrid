@@ -85,42 +85,42 @@ function(kernel, declare, listen, has, put, List){
 		createRowCells: function(tag, each, subRows){
 			// summary:
 			//		Generates the grid for each row (used by renderHeader and and renderRow)
-			var tr, row = put("table.dgrid-row-table[role=presentation]"),
-				cellNavigation = this.cellNavigation;
-			if(has("ie") < 9 || has("quirks")){
-				// this is the only browser that needs a tbody
-				var tbody = put(row, "tbody");
-			}else{
-				var tbody = row;
-			}
+			var row = put("table.dgrid-row-table[role=presentation]"),
+				cellNavigation = this.cellNavigation,
+				// IE < 9 needs an explicit tbody; other browsers do not
+				tbody = (has("ie") < 9 || has("quirks")) ? put(row, "tbody") : row,
+				tr,
+				si, sl, i, l, // iterators
+				subRow, column, id, extraClassName, cell, innerCell, colSpan, rowSpan; // used inside loops
+			
+			// Allow specification of custom/specific subRows, falling back to
+			// those defined on the instance.
 			subRows = subRows || this.subRows;
-			for(var si = 0, sl = subRows.length; si < sl; si++){
-				var subRow = subRows[si];
-				if(sl == 1 && !has("ie")){
-					// shortcut for modern browsers
-					tr = tbody;
-				}else{
-					tr = put(tbody, "tr");
-				}				
-				for(var i = 0, l = subRow.length; i < l; i++){
+			
+			for(si = 0, sl = subRows.length; si < sl; si++){
+				subRow = subRows[si];
+				// for single-subrow cases in modern browsers, TR can be skipped
+				tr = (sl == 1 && !has("ie")) ? tbody : put(tbody, "tr");
+				
+				for(i = 0, l = subRow.length; i < l; i++){
 					// iterate through the columns
-					var column = subRow[i];
-					var id = column.id;
-					var extraClassName = column.className || (column.field && "field-" + column.field);
-					var cell = put(tag + ".dgrid-cell.dgrid-cell-padding.column-" + id + (extraClassName ? '.' + extraClassName : ''));
+					column = subRow[i];
+					id = column.id;
+					extraClassName = column.className || (column.field && "field-" + column.field);
+					cell = put(tag + ".dgrid-cell.dgrid-cell-padding.column-" + id + (extraClassName ? '.' + extraClassName : ''));
 					cell.columnId = id;
 					if(contentBoxSizing){
 						// The browser (IE7-) does not support box-sizing: border-box, so we emulate it with a padding div
-						var innerCell = put(cell, "!dgrid-cell-padding div.dgrid-cell-padding");// remove the dgrid-cell-padding, and create a child with that class
+						innerCell = put(cell, "!dgrid-cell-padding div.dgrid-cell-padding");// remove the dgrid-cell-padding, and create a child with that class
 						cell.contents = innerCell;
 					}else{
 						innerCell = cell;
 					}
-					var colSpan = column.colSpan;
+					colSpan = column.colSpan;
 					if(colSpan){
 						cell.colSpan = colSpan;
 					}
-					var rowSpan = column.rowSpan;
+					rowSpan = column.rowSpan;
 					if(rowSpan){
 						cell.rowSpan = rowSpan;
 					}
@@ -197,8 +197,6 @@ function(kernel, declare, listen, has, put, List){
 				}
 			});
 			this._rowIdToObject[row.id = this.id + "-header"] = this.columns;
-			//put(headerNode, "div.dgrid-header-columns>", row, ".dgrid-row<+div.dgrid-header-scroll.ui-widget-header");
-			//row = put("div.dgrid-row[role=columnheader]>", row);
 			headerNode.appendChild(row);
 			// if it columns are sortable, resort on clicks
 			listen(row, "click,keydown", function(event){

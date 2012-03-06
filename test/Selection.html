@@ -35,13 +35,13 @@
 					on(win.body(), "dgrid-select,dgrid-deselect",
 						function(event){
 							var msg = (event.type == "dgrid-deselect" ? "de" : "") + "selected: ";
-							console.log(msg + event.grid.id, event.cells ?
+							console.log(event.grid.id + ": " + msg + (event.cells ?
 								arrayUtil.map(event.cells, function(cell){
 									return cell.row.id + ":" + cell.column.id;
 								}).join(", ") :
-								arrayUtil.map(event.rows, function(row){ return row.id; }).join(", ")
+								arrayUtil.map(event.rows, function(row){ return row.id; }).join(", "))
 							);
-							console.log("selection:", json.stringify(event.grid.selection, null, "  "));
+							console.log("selection: " + json.stringify(event.grid.selection, null, "  "));
 						}
 					);
 					

@@ -1,10 +1,9 @@
-define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/has", "dojo/has!touch?./SimpleTouchScroll", "xstyle/has-class", "put-selector/put", "dojo/_base/sniff", "xstyle/css!./css/dgrid.css"], 
-function(kernel, declare, listen, aspect, has, TouchScroll, hasClass, put){
+define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/has", "./util/misc", "dojo/has!touch?./SimpleTouchScroll", "xstyle/has-class", "put-selector/put", "dojo/_base/sniff", "xstyle/css!./css/dgrid.css"], 
+function(kernel, declare, listen, aspect, has, miscUtil, TouchScroll, hasClass, put){
 	// Add user agent/feature CSS classes 
 	hasClass("mozilla", "opera", "webkit", "ie", "ie-6", "ie-6-7", "quirks", "no-quirks", "touch");
 	
-	// Am I webkit? (for RTL)
-	var isWebkit = has("webkit");
+	var scrollbarWidth;
 
 	// establish an extra stylesheet which addCssRule calls will use,
 	// plus an array to track actual indices in stylesheet for removal
@@ -51,10 +50,9 @@ function(kernel, declare, listen, aspect, has, TouchScroll, hasClass, put){
 		}
 	}
 	
-	var scrollbarWidth;
-	var byId = function(id){
+	function byId(id){
 		return document.getElementById(id);
-	};
+	}
 
 	function move(item, steps, targetClass){
 		var nextSibling, current, element;
@@ -82,6 +80,28 @@ function(kernel, declare, listen, aspect, has, TouchScroll, hasClass, put){
 	function generateId(){
 		return "dgrid_" + autogen++;
 	}
+	
+	// window resize event handler
+	var winResizeHandler = has("ie") < 7 && !has("quirks") ? function(grid){
+		// IE6 triggers window.resize on any element resize;
+		// avoid useless calls (and infinite loop if height: auto).
+		// The measurement logic here is based on dojo/window logic.
+		var root, w, h, dims;
+		
+		if(!grid._started){ return; } // no sense calling resize yet
+		
+		root = document.documentElement;
+		w = root.clientWidth;
+		h = root.clientHeight;
+		dims = grid._prevWinDims || [];
+		if(dims[0] !== w || dims[1] !== h){
+			grid.resize();
+			grid._prevWinDims = [w, h];
+		}
+	} :
+	function(grid){
+		grid._started && grid.resize();
+	};
 	
 	return declare(TouchScroll ? [TouchScroll] : [], {
 		tabableHeader: false,
@@ -176,8 +196,8 @@ function(kernel, declare, listen, aspect, has, TouchScroll, hasClass, put){
 			if (!this.showFooter) { footerNode.style.display = "none"; }
 			put(domNode, footerNode);
 			
-			if(isRTL) {
-				domNode.className += " dgrid-rtl" + (isWebkit ? "" : " dgrid-rtl-nonwebkit");
+			if(isRTL){
+				domNode.className += " dgrid-rtl" + (has("webkit") ? "" : " dgrid-rtl-nonwebkit");
 			}
 			
 			listen(bodyNode, "scroll", function(event){
@@ -193,27 +213,7 @@ function(kernel, declare, listen, aspect, has, TouchScroll, hasClass, put){
 			this.contentNode = put(this.bodyNode, "div.dgrid-content.ui-widget-content");
 			// add window resize handler, with reference for later removal if needed
 			this._listeners.push(this._resizeHandle = listen(window, "resize",
-				has("ie") < 7 && !has("quirks") ? function(evt){
-					// IE6 triggers window.resize on any element resize;
-					// avoid useless calls (and infinite loop if height: auto).
-					// The measurement logic here is based on dojo/window logic.
-					var root, w, h, dims;
-					
-					if(!grid._started){ return; } // no sense calling resize yet
-					
-					root = document.documentElement;
-					w = root.clientWidth;
-					h = root.clientHeight;
-					dims = grid._prevWinDims || [];
-					if(dims[0] !== w || dims[1] !== h){
-						grid.resize();
-						grid._prevWinDims = [w, h];
-					}
-				} :
-				function(evt){
-					grid._started && grid.resize();
-				}
-			));
+				miscUtil.debounce(winResizeHandler)));
 		},
 		startup: function(){
 			// summary:

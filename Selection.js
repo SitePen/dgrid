@@ -1,5 +1,5 @@
-define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/Deferred", "dojo/on", "dojo/has", "dojo/aspect", "./List", "put-selector/put", "dojo/query"],
-function(kernel, declare, Deferred, on, has, aspect, List, put){
+define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/Deferred", "dojo/on", "dojo/has", "dojo/aspect", "./List", "dojo/has!touch?./util/touch", "put-selector/put", "dojo/query"],
+function(kernel, declare, Deferred, on, has, aspect, List, touchUtil, put){
 
 var ctrlEquiv = has("mac") ? "metaKey" : "ctrlKey";
 return declare([List], {
@@ -134,24 +134,10 @@ return declare([List], {
 			grid._handleSelect(event, this);
 		}
 		
-		if(has("touch")){
-			// first listen for touch taps if available
-			var lastTouch, lastTouchX, lastTouchY, lastTouchEvent, isTap;
-			on(this.contentNode, on.selector(selector, "touchstart"), function(event){
-				lastTouch = event.touches[0];
-				lastTouchX = lastTouch.pageX;
-				lastTouchY = lastTouch.pageY;
-				lastTouchEvent = event;
-				isTap = true;
-			});
-			on(this.contentNode, on.selector(selector, "touchmove"), function(event){
-				var thisTouch = event.touches[0];
-				isTap = Math.pow(lastTouchX - thisTouch.pageX, 2) + Math.pow(lastTouchY - thisTouch.pageY, 2) < 100; // 10 pixel radius sound good?
-			});
-			on(this.contentNode, on.selector(selector, "touchend"), function(event){
-				if(isTap){
-					grid._handleSelect(lastTouchEvent, this);
-				}
+		if(touchUtil){
+			// listen for touch taps if available
+			on(this.contentNode, touchUtil.selector(selector, touchUtil.tap), function(evt){
+				grid._handleSelect(evt, this);
 			});
 		}else{
 			// listen for actions that should cause selections

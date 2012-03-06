@@ -1,4 +1,5 @@
-define(["dojo/_base/declare", "put-selector/put", "dojo/_base/Deferred", "dojo/query", "dojo/aspect"], function(declare, put, Deferred, querySelector, aspect){
+define(["dojo/_base/declare", "dojo/_base/Deferred", "dojo/query", "dojo/on", "dojo/aspect", "dojo/has!touch?./util/touch", "put-selector/put"],
+function(declare, Deferred, querySelector, on, aspect, touchUtil, put){
 
 return function(column){
 	// summary:
@@ -24,12 +25,19 @@ return function(column){
 		expando.level = level;
 		expando.mayHaveChildren = mayHaveChildren;
 		var tr, query;
-
+		
 		if(!grid.expand){
-			// just setup the event listener once and use event delegation for better memory use
-			grid.on(column.expandOn || ".dgrid-expando-icon:click,.dgrid-content .column-" + column.id + ":dblclick", function(){
-				grid.expand(this);
-			});
+			var colSelector = ".dgrid-content .column-" + column.id;
+			// Set up the event listener once and use event delegation for better memory use.
+			grid.on(column.expandOn || ".dgrid-expando-icon:click," + colSelector + ":dblclick",
+				function(){ grid.expand(this); });
+			
+			if(touchUtil){
+				// Also listen on double-taps of the cell.
+				grid.on(touchUtil.selector(colSelector, touchUtil.dbltap),
+					function(){ grid.expand(this); });
+			}
+			
 			aspect.before(grid, "removeRow", function(rowElement, justCleanup){
 				var connected = rowElement.connected;
 				if(connected){
