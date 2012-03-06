@@ -62,20 +62,20 @@
 					// Create error store
 					errorStore = new Memory();
 					errorStore.query = function() {
-						throw new Error("Some Error");
+						throw new Error("Error on sync query");
 					};
 					
 					// Create error store with PUT
 					putErrorStore = new Memory({ data: lang.clone(testTypesStore.data) });
 					putErrorStore.put = function() {
-						throw new Error("PUT ERROR");
+						throw new Error("Error on sync put");
 					};
 					
 					// Create error store that has its deferred rejected
 					defErrorStore = new Memory();
 					defErrorStore.query = function() {
 						var def = new Deferred();
-						setTimeout(function() { def.reject("Homie don't play that"); }, 200);
+						setTimeout(function() { def.reject("Error on async query"); }, 200);
 						return def.promise;
 					};
 					
@@ -83,7 +83,7 @@
 					defPutErrorStore = new Memory({ data: lang.clone(testTypesStore.data) });
 					defPutErrorStore.put = function() {
 						var def = new Deferred();
-						setTimeout(function() { def.reject("Watch where you put things!"); }, 200);
+						setTimeout(function() { def.reject("Error on async put"); }, 200);
 						return def.promise;
 					};
 					

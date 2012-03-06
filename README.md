@@ -626,8 +626,8 @@ The DnD plugin can be used to add row drag'n'drop functionality.
 
 ### Requirements
 
-The DnD extension assumes usage of the OnDemandList or OnDemandGrid module;
-thus, it expects a store to be in use.
+The DnD extension assumes usage of a store-backed component, most commonly an
+OnDemandGrid instance.
 
 The store should be order-aware, supporting the `options.before` parameter
 on `add()` and `put()` calls to properly respond to DnD operations.

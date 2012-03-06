@@ -1,6 +1,6 @@
 define(["dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/dnd/Source", "dojo/dnd/Manager", "put-selector/put", "xstyle/css!dojo/resources/dnd.css"],
 function(declare, lang, Deferred, DnDSource, DnDManager, put){
-	// TODOC: store requirements
+	// Requirements:
 	// * requires a store (sounds obvious, but not all Lists/Grids have stores...)
 	// * must support options.before in put calls
 	//   (if undefined, put at end)

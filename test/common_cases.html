@@ -66,7 +66,7 @@
 		<script type="text/javascript">
 			require(["dojo/on", "dgrid/List", "dgrid/OnDemandGrid", "dgrid/Tree", "dgrid/Editor", "dgrid/Selection", "dgrid/Keyboard", "dgrid/test/data/base", "dojo/_base/declare", "dojo/_base/array", "dojo/domReady!"], 
 				function(on, List, Grid, Tree, Editor, Selection, Keyboard, testStore, declare, arrayUtil){
-					console.log("loaded in " + (new Date().getTime() - start) + testStore);
+					console.log("loaded in " + (new Date().getTime() - start));
 					var columns = { // you can declare columns as an object hash (key translates to field)
 						col1: Editor({label: 'Column 1 column 1 column 1'}, "text", "dblclick"),
 						col2: {label: 'Column 2', sortable: false},
