@@ -326,9 +326,73 @@ example)
 
 # Working with Events
 
-TODOC: grid.on, use w/ dojo/on, etc.
+`dojox/grid` and dgrid take significantly different approaches to hooking up
+events.  `dojox/grid` provides a wide selection of stub methods which
+can be connected to in order to react to many common events on cells, or
+specifically on only header or body cells.  The
+[Working with Grids](http://dojotoolkit.org/documentation/tutorials/1.7/working_grid/)
+tutorial gives an idea of what kinds of events are supported by `dojox/grid`.
 
-TODOC: row and cell methods
+On the other hand, dgrid leaves it up to the developer as to which events are
+at all worth listening for.  This results in generally far less overhead, since
+listeners are hooked up only for events of interest; at the same time, it
+still allows for the same range of event listeners as `dojox/grid`.
+
+## Listening for events with dojo/on and grid.on
+
+The [`dojo/on`](http://dojotoolkit.org/reference-guide/dojo/on.html) module,
+new to Dojo 1.7, provides a concise yet powerful API for registering listeners,
+especially for DOM events.  Listening for events of interest on a dgrid component
+is very straightforward using `dojo/on`; furthermore, dgrid components possess
+an `on` method, which is equivalent to calling `dojo/on` passing the
+component's top-level DOM node as the target.
+
+Using the event delegation features of `dojo/on`, it is possible to listen for
+all manner of events.  For example, to listen for right-clicks on rows in the
+grid's body (equivalent to `onRowContextMenu` in `dojox/grid`):
+
+    grid.on(".dgrid-row:contextmenu", function(evt){ /* ... */ });
+
+Or, to listen to clicks on individual header cells (equivalent to
+`onHeaderCellClick` in `dojox/grid`):
+
+    grid.on(".dgrid-header .dgrid-cell:click", function(evt){ /* ... */ });
+
+In summary, pretty much any combination desired can be achieved by using
+event delegation with selectors based on the `dgrid-header`, `dgrid-row`, and
+`dgrid-cell` CSS classes as necessary.
+
+## Getting information from events
+
+Hooking up a handler to events of interest is only half the battle; naturally,
+the intent is to then do something interesting within the handler.  Generally
+this requires information about the row or cell from which the event was triggered.
+
+`dojox/grid` components generally attach any useful information directly to
+the event object received by the handler callback.  While dgrid does this in
+some cases, the most commonly-sought information is retrievable by passing the
+event object itself to the instance's `row` or `cell` method.  These methods
+are particularly powerful, in that they are capable of returning information
+about a row or cell, simply given a row/cell node or any child thereof, or an
+event which originated from such a node.  The `row` method is also capable
+of looking up via a store item or ID.
+
+As a quick example, here is a comparison logging the name property
+of an item whose row was clicked, using `dojox/grid`...
+
+    grid.connect(grid, "onRowClick", function(evt){
+        var item = grid.getItem(evt.rowIndex);
+        // don't forget to use store.getValue, since dojox/grid uses a dojo/data store
+        console.log("Clicked item with name: " +
+            grid.store.getValue(item, "name"));
+    });
+
+...and using dgrid...
+
+    grid.on(".dgrid-row:click", function(evt){
+        var item = grid.row(evt).data;
+        console.log("Clicked item with name: " + item.name);
+    });
 
 # API Equivalents
 
