@@ -1,16 +1,131 @@
-NOTE: this document is in a very early stage, and thus has many gaps.
-While some information may be accurate, it should not yet be treated as
-definitive or nearly final.
+This guide aims to detail functionality in dgrid primarily from the perspective
+of `dojox/grid` features.  While the contents of this guide will thus be of
+greatest interest to existing users of `dojox/grid`, the information presented
+herein should be generally helpful to all dgrid users.
 
 # Comparison of Basic Setup
 
 ## Simple programmatic usage
 
-TODOC
+Given the following programmatic example using `dojox/grid`...
 
-## Specifying column layout via HTML
+    require(["dojox/grid/DataGrid", "dojo/store/Memory", "dojo/data/ObjectStore",
+        "dojo/domReady!"],
+    function(DataGrid, Memory, ObjectStore){
+        var memoryStore = new Memory({data: [
+            // data here...
+        ]});
+        var objectStore = new ObjectStore({ objectStore: memoryStore });
+        
+        var grid = new DataGrid({
+            structure: [
+                { field: "id", name: "ID", width: "10%" },
+                { field: "name", name: "Name", width: "20%" },
+                { field: "description", name: "Description", width: "70%" }
+            ],
+            store: objectStore
+        }, "grid");
+        grid.startup();
+    });
 
-TODOC
+A result similar to the above example could be achieved using dgrid with the
+following styles...
+
+    #dgrid .field-id {
+        width: 10%;
+    }
+    #dgrid .field-name {
+        width: 20%;
+    }
+    #dgrid .field-description {
+        width: 70%;
+    }
+
+...and the following JavaScript...
+
+    require(["dgrid/OnDemandGrid", "dgrid/Keyboard", "dgrid/Selection",
+        "dojo/_base/declare", "dojo/store/Memory", "dojo/domReady!"],
+    function(OnDemandGrid, Keyboard, Selection, declare, Memory){
+        var memoryStore = new Memory({data: [
+            // data here...
+        ]});
+        
+        var grid = new declare([OnDemandGrid, Keyboard, Selection])({
+            columns: {
+                id: { label: "ID" },
+                name: { label: "Name" },
+                description: { label: "Description" }
+            },
+            store: memoryStore
+        }, "grid");
+        // dgrid will call startup for you if the node appears to be in flow
+    });
+
+There are a few key differences worth pointing out:
+
+* Whereas `dojox/grid` expects styles to be specified within the column definition
+  to be eventually applied inline to all cells in the column, dgrid lets CSS do
+  the talking whenever possible for purposes of layout and appearance.  This
+  allows for better separation between visual and functional concerns.
+* `dojox/grid` operates with stores implementing the earlier `dojo/data` APIs;
+  in order to use it with a store instance implementing the `dojo/store` APIs,
+  the store must first be wrapped using the `dojo/data/ObjectStore` module.
+  On the other hand, dgrid communicates with `dojo/store` APIs out of the box.
+  (Conversely, however, if you *do* need to work with a `dojo/data` store, you
+  would then have to pass it through the `dojo/store/DataStore` wrapper in order
+  for dgrid to work with it.)
+* Note that in the dgrid version of the example, the Selection and Keyboard
+  modules are required and mixed into the constructor to be instantiated, in
+  order to enable those pieces of functionality which are baked-in by default
+  in `dojox/grid` components.
+* Also note that the dgrid example's structure is a bit more concise, taking
+  advantage of the ability to provide simple column arrangements via an object
+  hash instead of an array, in which case the object's keys double as the
+  columns' `field` values (i.e., which store item properties the columns represent).
+
+## Programmatic usage, with sub-rows
+
+Assuming the same context as the examples in the previous section, here is a
+contrived example demonstrating use of sub-rows in `dojox/grid`...
+
+    var grid = new DataGrid({
+        structure: [
+            [
+                { field: "id", name: "ID", width: "10%" },
+                { field: "name", name: "Name", width: "20%" }
+            ],
+            [
+                { field: "description", name: "Description", width: "70%", colSpan: 2 }
+            ]
+        ],
+        store: objectStore
+    }, "grid");
+    grid.startup();
+
+...and the equivalent, using dgrid...
+(again assuming the same context as the previous example)
+
+    var grid = new declare([OnDemandGrid, Keyboard, Selection])({
+        subRows: [
+            [
+                { field: "id", label: "ID" },
+                { field: "name", label: "Name" }
+            ],
+            [
+                { field: "description", label: "Description", colSpan: 2 }
+            ]
+        ],
+        store: memoryStore
+    }, "grid");
+
+Notice that `subRows` is now defined instead of `columns`.  The `columns`
+property of dgrid components is usable *only* for simple cases involving a
+single sub-row.
+
+Also notice that each item in the top-level `subRows` array is itself another
+array, containing an object for each column.  In this case, `field` must be
+specified in each column definition object, since there is no longer an
+object hash in order to infer field names from keys.
 
 ## Using views / columnsets
 
@@ -19,9 +134,71 @@ represented as separate horizontal regions within a single grid.  This feature
 is generally useful for situations where many fields are to be shown, and some
 should remain visible while others are able to scroll horizontally.
 
-This capability is also made available in `dgrid` via the ColumnSet mixin.
+This capability is also available in dgrid, via the ColumnSet mixin.
 
-TODOC: example
+For instance, continuing in the vein of the examples in the previous two
+sections, the following `dojox/grid` structure with multiple views...
+
+    var grid = new DataGrid({
+        structure: [
+            { // first view
+                width: "10%",
+                cells: [
+                    { field: "id", name: "ID", width: "auto" }
+                ]
+            },
+            [ // second view
+                [
+                    { field: "name", name: "Name", width: "20%" },
+                    { field: "description", name: "Description", width: "80%" }
+                ]
+            ]
+        ],
+        store: objectStore
+    }, "grid");
+    grid.startup();
+
+...could be represented in dgrid, using the following CSS...
+
+    #dgrid .dgrid-column-set-0 {
+        width: 10%;
+    }
+    #dgrid .field-name {
+        width: 20%;
+    }
+    #dgrid .field-description {
+        width: 80%;
+    }
+
+...and the following JavaScript...
+(require call included, to demonstrate additional dependency)
+
+    require(["dgrid/OnDemandGrid", "dgrid/ColumnSet", "dgrid/Keyboard", "dgrid/Selection",
+        "dojo/_base/declare", "dojo/store/Memory", "dojo/domReady!"],
+    function(OnDemandGrid, ColumnSet, Keyboard, Selection, declare, Memory){
+        // ... create memoryStore here ...
+        
+        var grid = new declare([OnDemandGrid, ColumnSet, Keyboard, Selection])({
+            columnSets: [
+                [ // first columnSet
+                    [
+                        { field: "id", label: "ID" }
+                    ]
+                ],
+                [ // second columnSet
+                    [
+                        { field: "name", label: "Name" },
+                        { field: "description", label: "Description" }
+                    ]
+                ]
+            ],
+            store: memoryStore
+        }, "grid");
+    });
+
+## Specifying column layout via HTML
+
+TODOC
 
 # Working with Events
 
