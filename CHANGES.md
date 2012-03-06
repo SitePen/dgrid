@@ -148,11 +148,9 @@ reference to the Grid instance from which the event was fired.
 
 ### expand method added to grid instance
 
-Tree columns now add an `expand(target)` method, for programmatically expanding
-grid rows.  The `target` specified may be anything which will resolve to a row
-via the grid's `row` function.  An optional second boolean parameter may specify
-whether to expand (`true`) or collapse (`false`) the row in question; if
-unspecified, the method will toggle the target row's state.
+Tree columns now add an `expand(row, expand)` method to their parent grid,
+for programmatically expanding or collapsing grid rows.  See the documentation
+for details.
 
 ## ColumnResizer
 
