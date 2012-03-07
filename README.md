@@ -61,7 +61,8 @@ The List can be used to render an array of data. For example:
 
 ### List APIs
 
-The base List class (inherited by all other classes) also has the following methods:
+The base List class (inherited by all other classes) exposes the following
+methods:
 
 * `get(property)`: Returns the value of a given property. Supports custom getter
   implementations via the pattern `_getProperty` (which would map to `get("property")`).
@@ -77,9 +78,11 @@ The base List class (inherited by all other classes) also has the following meth
     * `element`: the row's DOM element
 * `on(event, listener)`: Basic event listener functionality;
   simply delegates to the top-level DOM element of the List, using standard `dojo/on` behavior.
-* `renderArray(array, beforeNode)`: This can be called to render an array.
-  The `beforeNode` parameter can be used to render at a specific place in the List.
-* `renderRow(value, options)`: This method can be overridden to provide
+* `renderArray(array, beforeNode, options)`: This can be called to render an
+  array directly into the list.  The `beforeNode` parameter can be used to render
+  at a specific point in the list.  Note that when using store-backed components,
+  this is called automatically.
+* `renderRow(item, options)`: This method can be overridden to provide
   custom rendering logic for rows.  (The Grid module, introduced next, actually
   overrides this method.)
 * `removeRow(rowElement, justCleanup)`: This method can be extended/aspected to
@@ -87,6 +90,25 @@ The base List class (inherited by all other classes) also has the following meth
 * `sort(property, descending)`: This can be called to sort the List by a given
   property; if the second parameter is passed `true`, the sort will be in descending order.
   The Grid and OnDemandList modules further extend this functionality.
+* `showHeader`: Whether to display the header area; normally `false` for lists
+  and `true` for grids.
+* `showFooter`: Whether to display the footer area; `false` by default, but
+  enabled and used by some extensions (e.g. Pagination).
+
+Lists, as well as all other dgrid components, maintain the following DOM
+references:
+
+* `domNode`: The top-level DOM node of the component (much like the `domNode`
+  property of Dijit widgets).
+* `headerNode`: The DOM node representing the header region; mainly applicable
+  to grid components.
+* `bodyNode`: The DOM node representing the body region (the area which will
+  show rows for each item).
+* `contentNode`: The DOM node immediately under the `bodyNode`, which may
+  potentially be scrolled to accommodate more content than the component's height
+  will allow to fit.
+* `footerNode`: A DOM node appearing below the `bodyNode`; initially empty and
+  not displayed by default.
 
 ## Grid
 
@@ -171,7 +193,7 @@ The column definition object may have the following properties (all are optional
   the column's header cell. Like `renderCell`, this may either operate on the
   node directly, or return a node to be placed within it.
 
-Alternatively, the column definition may simply be a string, in which case
+Alternatively, a column definition may simply be a string, in which case
 the value of the string is interpreted as the label of the column.
 Thus, the simplest column structures can be more succinctly written:
 
@@ -299,14 +321,32 @@ the necessary objects needed to render the visible rows. As the list or grid is
 scrolled, more `query` calls will be made to retrieve additional rows,
 and previous rows will be pruned from the DOM as they are scrolled well out of view.
 
-When working with a writable store, for best results, the specified store should
+When working with a writable store, for best results, the store should
 return query results with an `observe` method, which enables the list to keep
 its display up to date with any changes that occur in the store after the items
 are rendered.  The [`dojo/store/Observable`](http://dojotoolkit.org/reference-guide/dojo/store/Observable.html)
 module can prove useful for adding this functionality.
 
-OnDemandList provides the following properties/methods:
+OnDemandList inherits the following properties and methods from \_StoreMixin:
 
+* `noDataMessage`: An optional message to be displayed when no results are
+  returned by a query.
+* `loadingMessage`: An optional message to be displayed in the loading node
+  which appears when a new page of results is requested.
+* `getBeforePut`: if true (the default), any `save` operations will re-fetch
+  the item from the store via a `get` call, before applying changes represented by
+  dirty data.
+* `query`: An object to be passed when issuing store queries, which may contain
+  filter criteria.
+* `queryOptions`: An object to be passed along with `query` when issuing store
+  queries.  Note that the standard `start`, `count`, and `sort` properties
+  are already managed by OnDemandList itself.
+* `store`: An instance of a `dojo/store` implementation, from which to fetch data.
+* `set("query", query[, queryOptions])`: Specifies a new `query` object
+  (and optionally, also `queryOptions`) to be used by the list when
+  issuing queries to the store.
+* `set("store", store[, query[, queryOptions]])`: Specifies a new store
+  (and optionally, also `query` and `queryOptions`) for the list to reference.
 * `refresh()`: Clears the component and re-requests the initial page of data.
 * `renderQuery(query)`: Renders the given query into the list.  Called
   automatically upon refresh.
@@ -314,18 +354,13 @@ OnDemandList provides the following properties/methods:
   defers sorting to the store.
 * `sortOrder`: Initially managed by List's `sort()` method,
   this stores the current sort order.
-* `save()`: Instructs the list to relay any dirty data (e.g. populated by
-  editor columns) back to the store.  Returns a promise which resolves when all
-  necessary put operations have completed successfully (even if the store
-  operates synchronously).
-* `getBeforePut`: if true (the default), any `save` operations will re-fetch
-  the item from the store via a `get` call, before applying changes represented by
-  dirty data.
-* `set("query", query[, queryOptions])`: Specifies a new `query` object
-  (and optionally, also `queryOptions`) to be used by the list when
-  issuing queries to the store.
-* `set("store", store[, query[, queryOptions]])`: Specifies a new store
-  (and optionally, also `query` and `queryOptions`) for the list to reference.
+* `updateDirty(id, field, value)`: Updates an entry in the component's dirty
+  data hash, to be persisted to the store on the next call to `save()`.
+* `save()`: Instructs the list to relay any dirty data back to the store.
+  Returns a promise which resolves when all necessary put operations have
+  completed successfully (even if the store operates synchronously).
+* `revert()`: Clears the dirty data hash without updating the store, and
+  refreshes the component.
 
 ## OnDemandGrid
 
@@ -456,11 +491,18 @@ The following properties and methods are added by the Selection plugin:
 * `allowSelectAll`: Determines whether the "select-all" action should be
   permitted via a checkbox selector column or the Ctrl/Cmd+A keyboard shortcut;
   defaults to `false`.
-* `select(id)`: Programmatically selects a row.
-* `deselect(id)`: Programmatically deselects a row.
+* `allowSelect(row)`: Returns a boolean indicating whether the given `row` should
+  be selectable; designed to be overridden.
+* `select(row[, toRow])`: Programmatically selects a row or range of rows.
+* `deselect(row[, toRow])`: Programmatically deselects a row or range of rows.
+* `selectAll()`: Programmatically selects all rows in the component. Note that
+  only rows that have actually been loaded will be represented in the `selection`
+  object.
+* `clearSelection()`: Programmatically deselects all rows in the component.
+* `isSelected(row)`: Returns `true` if the given row is selected.
 
-The `select` and `deselect` methods can be passed an object id, or anything else
-acceptable by List's `row` method.
+The `select`, `deselect`, and `isSelected` methods can be passed any type of
+argument acceptable to List's `row` method.
 
 ### CellSelection
 
@@ -472,15 +514,18 @@ to provide celection at the cell level instead.  Some key differences include:
 * The `dgrid-selected` and `dgrid-deselected` events still fire, but include a
   `cells` property containing an array of cell objects, rather than a `rows`
   property.
-* Whereas Selection's `select` and `deselect` methods look up the passed argument
-  via List's `row` method, CellSelection looks it up via Grid's `cell` method.
+* Whereas Selection's `select`, `deselect`, and `isSelected` methods look up the
+  passed argument via List's `row` method, CellSelection looks it up via Grid's
+  `cell` method.
 * The `allowSelect` method is passed a cell object instead of a row object.
 
 ## Keyboard
 
 This mixin adds keyboard handling functionality.
 The arrow keys can be used to navigate the focus across cells and rows,
-providing accessibility and ease of use.
+providing accessibility and ease of use.  The page up and page down keys
+may also be used for faster navigation, traversing the number of rows specified
+in the `pageSkip` property of the instance.
 
 When used with grids, this mixin references the `cellNavigation` property of
 the grid instance, to determine whether keyboard navigation and focus should
@@ -621,6 +666,9 @@ the Selector function instead of including it within the column definition.
 Note that a Selector column can be used to allow selection even in a grid where
 `selectionMode` is set to `none`, in which case the controls in the Selector
 column will be the only means by which a user may select or deselect rows.
+
+Also note that selector inputs will be disabled for rows for which `allowSelect`
+returns `false`.
 
 # Extensions
 
