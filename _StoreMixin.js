@@ -11,8 +11,18 @@ function(kernel, declare, lang, Deferred, listen){
 	}
 	
 	return declare(null, {
+		// store: Object
+		//		The object store (implementing the dojo/store API) from which data is
+		//		to be fetched.
 		store: null,
+		
+		// query: Object
+		//		Specifies query parameter(s) to pass to store.query calls.
 		query: null,
+		
+		// queryOptions: Object
+		//		Specifies additional query options to mix in when calling store.query;
+		//		sort, start, and count are already handled.
 		queryOptions: null,
 		
 		// getBeforePut: boolean

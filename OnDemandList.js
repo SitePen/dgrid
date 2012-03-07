@@ -2,18 +2,36 @@ define(["./List", "./_StoreMixin", "dojo/_base/declare", "dojo/_base/lang", "doj
 function(List, _StoreMixin, declare, lang, Deferred, listen, miscUtil, put){
 
 return declare([List, _StoreMixin], {
+	// minRowsPerPage: Integer
+	//		The minimum number of rows to request at one time.
 	minRowsPerPage: 25,
+	// maxRowsPerPage: Integer
+	//		The maximum number of rows to request at one time.
 	maxRowsPerPage: 100,
+	
+	// maxEmptySpace: Integer
+	//		Defines the maximum size (in pixels) of unrendered space below the
+	//		currently-rendered rows.
 	maxEmptySpace: 10000,
-	// rows can be removed if they are this distance in pixels from the visible viewing area.
-	// set this to infinity if you never want rows removed
+	
+	// farOffRemoval: Integer
+	//		Defines the minimum distance (in pixels) from the visible viewport area
+	//		rows must be in order to be removed.  Setting to Infinity causes rows
+	//		to never be removed.
 	farOffRemoval: 1000,
+	
 	rowHeight: 22,
-	// This indicates the number of rows to overlap queries. This helps keep continuous
-	// data when underlying data changes (and thus pages don't exactly align)
+	
+	// queryRowsOverlap: Integer
+	//		Indicates the number of rows to overlap queries. This helps keep
+	//		continuous data when underlying data changes (and thus pages don't
+	//		exactly align)
 	queryRowsOverlap: 1,
-	// this indicates the delay to use before paging in more data on scroll. You may want
-	// to increase this for low-bandwidth clients, or to reduce the number of requests against a server 
+	
+	// pagingDelay: Integer
+	//		Indicates the delay (in milliseconds) to wait before paging in more data
+	//		on scroll. This can be increased for low-bandwidth clients, or to
+	//		reduce the number of requests against a server 
 	pagingDelay: miscUtil.defaultDelay,
 	
 	postCreate: function(){
