@@ -1,12 +1,40 @@
-define(["dojo/_base/declare", "dojo/on"],
-function(declare, on){
+define(["dojo/_base/declare", "dojo/on", "dojo/has", "./util/touch", "xstyle/css!./css/touchscroll.css"],
+function(declare, on, has, touchUtil){
 	var
 		bodyTouchListener, // stores handle to body touch handler once connected
 		timerRes = 15, // ms between drag velocity measurements and animation "ticks"
 		touches = 0, // records number of touches on document
 		current = {}, // records info for widget currently being scrolled
 		glide = {}, // records info for widgets that are in "gliding" state
-		glideThreshold = 1; // speed (in px) below which to stop glide
+		glideThreshold = 1, // speed (in px) below which to stop glide
+		transitionDuration = 250, // duration (ms) to be set for CSS transitions
+		// store has-features we need, for computing property/function names
+		hasTransitions = has("css-transitions"),
+		hasTransitionEnd = has("transitionend"),
+		hasTransforms = has("css-transforms"),
+		hasTransforms3d = has("css-transforms3d"),
+		// and declare vars to store info on the properties/functions we'll need
+		cssPrefix, transitionPrefix, translatePrefix, translateSuffix, transitionend;
+	
+	if(hasTransforms3d){
+		translatePrefix = "translate3d(";
+		translateSuffix = ",0)";
+	}else if(hasTransforms){
+		translatePrefix = "translate(";
+		translateSuffix = ")";
+	}
+	
+	if(!hasTransitions || !translatePrefix){
+		console.warn("CSS3 features unavailable for touch scroll effects.");
+		return;
+	}
+	
+	transitionend = hasTransitionEnd === true ? "transitionend" :
+		hasTransitionEnd + "TransitionEnd";
+	transitionPrefix = hasTransitions === true ? "transition" :
+		hasTransitions + "Transition";
+	cssPrefix = hasTransforms === true ? "" :
+		"-" + hasTransforms.toLowerCase() + "-";
 	
 	function updatetouchcount(evt){
 		touches = evt.touches.length;
@@ -17,7 +45,7 @@ function(declare, on){
 	function ontouchstart(evt){
 		var t, id = evt.widget.id, g = glide[id];
 		
-		// stop any active glide on this widget since it's been re-touched
+		// stop any active glide on this widget, since it's been re-touched
 		if(g){
 			clearTimeout(g.timer);
 			delete glide[id];
@@ -115,8 +143,15 @@ function(declare, on){
 	
 	return declare([], {
 		startup: function(){
+			!this._started && this._initTouch();
+		},
+		_initTouch: function(){
 			var node = this.touchNode || this.containerNode || this.domNode,
 				widget = this;
+			
+			node.style[transitionPrefix + "Property"] = cssPrefix + "transform";
+			
+			// add touch event handlers
 			on(node, "touchstart", function(evt){
 				evt.widget = widget;
 				ontouchstart.call(this, evt);
@@ -125,7 +160,7 @@ function(declare, on){
 			on(node, "touchend,touchcancel", ontouchend);
 			
 			if(!bodyTouchListener){
-				// first time: hook up touch listeners to entire body,
+				// first call ever: hook up touch listeners to entire body,
 				// to track number of active touches
 				bodyTouchListener = on(document.body,
 					"touchstart,touchend,touchcancel", updatetouchcount);
