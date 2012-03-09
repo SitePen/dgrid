@@ -606,7 +606,6 @@ function(arrayUtil, kernel, declare, listen, aspect, has, miscUtil, TouchScroll,
 					property = property[0].attribute;
 				}
 				
-				alert('before: ' + arrayUtil.map(this._lastCollection, function(x){return x[property];}));
 				this._lastCollection.sort(function(a,b){
 					var aVal = a[property], bVal = b[property];
 					// fall back undefined values to "" for more consistent behavior
@@ -614,7 +613,6 @@ function(arrayUtil, kernel, declare, listen, aspect, has, miscUtil, TouchScroll,
 					if(bVal === undefined){ bVal = ""; }
 					return aVal == bVal ? 0 : (aVal > bVal != descending ? 1 : -1);
 				});
-				alert('after: ' + arrayUtil.map(this._lastCollection, function(x){return x[property];}));
 				this.renderArray(this._lastCollection);
 			}
 		},
