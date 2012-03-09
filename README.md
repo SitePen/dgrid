@@ -227,7 +227,7 @@ in the arguments object to the Grid; it can also be changed later using
 dgrid components are designed to be highly CSS-driven for optimal performance and organization,
 so visual styling should be controlled through CSS. The Grid creates classes
 based on the column ids and field names with the convention of
-`column-<column-id>` and `field-<field-name>`.
+`dgrid-column-<column-id>` and `field-<field-name>`.
 (If a `className` is specified in the column definition, it is used in place of
 `field-<field-name>`.)
 
@@ -789,7 +789,7 @@ to skin the dgrid to a particular look and feel.
 dgrid's appearance is designed to be styled and customized via CSS.
 Many of the classes involved can be discovered by simply looking at elements in
 your browser developer tools of choice.
-Perhaps the most important classes are the `column-<id>` and `field-<fieldname>`
+Perhaps the most important classes are the `field-<fieldname>` and `dgrid-column-<id>`
 classes assigned to each cell in grids, which allow for per-column styling.
 
 The following class names are used by dgrid and can be referenced from CSS:
