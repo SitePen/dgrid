@@ -611,7 +611,7 @@ function(arrayUtil, kernel, declare, listen, aspect, has, miscUtil, TouchScroll,
 					// fall back undefined values to "" for more consistent behavior
 					if(aVal === undefined){ aVal = ""; }
 					if(bVal === undefined){ bVal = ""; }
-					return aVal == bVal ? 0 : (aVal > bVal != descending ? 1 : -1);
+					return aVal == bVal ? 0 : (aVal > bVal == !descending ? 1 : -1);
 				});
 				this.renderArray(this._lastCollection);
 			}
