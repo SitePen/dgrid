@@ -434,11 +434,33 @@ in grids with basic structures via drag'n'drop operations on column header cells
 
 This feature is available in dgrid via the ColumnReorder extension.
 
-### headerMenu
+### headerMenu and other context menu scenarios
 
-This is not yet directly available in dgrid, but a Context Menu plugin is planned.
-In the interim, it is possible to delegate to the `oncontextmenu` event of
-cells or rows in the grid's body or header, to perform custom logic.
+dgrid does not directly offer context menu functionality via an extension, but
+it is easily possible to delegate to the `contextmenu` event of
+cells or rows in the grid's body or header, to perform custom logic.  Here are
+the basic steps one would need to follow:
+
+* An event handler listening for `contextmenu` events against a particular selector;
+  for example:
+    * `.dgrid-header:contextmenu` for a general header context menu
+    * `.dgrid-row:contextmenu` for a general body context menu
+    * `.dgrid-header .field-foo:contextmenu` for a context menu for a specific header cell
+    * `.dgrid-content .field-foo:contextmenu` for a context menu for body cells in
+      a particular column
+* within the event handler:
+    * A call to `preventDefault` on the event object, to stop the default
+      browser context menu from displaying.
+    * A call to `grid.row()` or `grid.cell()` to retrieve information on the
+      pertinent row or cell.  If the menu is intended to apply to selected items,
+      `grid.selection` can be checked for entries, and then `grid.row()` can be
+      called with the IDs found.
+    * If `dijit/Menu` is being used, it unfortunately does not provide any
+      directly-accessible public API for simply opening the menu around the mouse,
+      as it is normally expected to be pre-attached to nodes; however, depending
+      on use-case, attaching it to an entire section of the grid may be inappropriate.
+      In such a case, the menu can be directly opened within a `contextmenu`
+      event handler, by calling `_scheduleOpen(this, null, { x: evt.pageX, y: evt.pageY }`.
 
 ### autoHeight
 
@@ -446,7 +468,8 @@ Automatic height can be achieved using `height: auto` in the CSS for a grid's
 main DOM node.  There is no direct programmatic support for this.  (This means
 there is no built-in support for automatically sizing to a certain number of rows.)
 
-An example of an auto-height grid can be found in the `autoheight.html` test page.
+Examples of an auto-height grid can be found in the `autoheight.html` and
+`extensions/Pagination.html` test pages.
 
 ### autoWidth
 
