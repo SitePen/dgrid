@@ -64,7 +64,7 @@ return declare([List, _StoreMixin], {
 				count: 0,
 				next: preload
 			};
-			preload.node = preloadNode = put(this.contentNode, "div.dgrid-preload")
+			preload.node = preloadNode = put(this.contentNode, "div.dgrid-preload");
 			preload.previous = topPreload;
 		}
 		// this preload node is used to represent the area of the grid that hasn't been
@@ -92,7 +92,10 @@ return declare([List, _StoreMixin], {
 		}
 		var loadingNode = put(preloadNode, "-div.dgrid-loading");
 		put(loadingNode, "div.dgrid-below", this.loadingMessage);
-		var options = this.get("queryOptions", {start: 0, count: this.minRowsPerPage, query: query});
+		// Establish query options, mixing in our own.
+		// (The getter returns a delegated object, so simply using mixin is safe.)
+		var options = lang.mixin(this.get("queryOptions"),
+			{start: 0, count: this.minRowsPerPage, query: query});
 		// execute the query
 		var results = query(options);
 		var self = this;
@@ -131,15 +134,6 @@ return declare([List, _StoreMixin], {
 
 		// return results so that callers can handle potential of async error
 		return results;
-	},
-	_getQueryOptions: function(mixin){
-		// summary:
-		//		Get a fresh queryOptions object with the current sort added to it and any mixin added in
-		options = this.queryOptions ? lang.delegate(this.queryOptions, mixin) : mixin || {};
-		if(this.sortOrder){
-			options.sort = this.sortOrder;
-		}
-		return options;
 	},
 	
 	refresh: function(){
@@ -200,7 +194,7 @@ return declare([List, _StoreMixin], {
 				var reclaimedHeight = 0;
 				var count = 0;
 				var toDelete = [];
-				while(row = nextRow){ // intentional assignment
+				while((row = nextRow)){
 					var rowHeight = grid._calcRowHeight(row);
 					if(reclaimedHeight + rowHeight + farOffRemoval > distanceOff || nextRow.className.indexOf("dgrid-row") < 0){
 						// we have reclaimed enough rows or we have gone beyond grid rows, let's call it good

@@ -16,6 +16,12 @@ some key differences:
   are currently in place for the old APIs, but will be removed in the future.
 * `watch` is not implemented.
 
+### sortOrder property removed; replaced by get("sort")
+
+Previously, `sortOrder` was the (arguably internal) instance property used to
+store the current sort options.  Sort code has since been rearranged; the new
+recommended way to retrieve existing sort options is to call `get("sort")`.
+
 ## Grid
 
 ### columndef.get function now takes one parameter

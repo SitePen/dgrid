@@ -126,6 +126,7 @@
 					window.grid = declare([Grid])({
 						store: testStore,
 						columns: columns,
+						sort: "col3", // initially sort by col3 ascending
 						noDataMessage: "Nobody here but us chickens!"
 					}, "grid");
 
@@ -186,12 +187,12 @@
 					var sortDescending = true;
 					
 					on(document.getElementById("setQueryWithOptions"), "click", function(){
-						// set sortOrder for the col1 field
-						sortDescending ^= 1; // toggle true/false
-					
-						// get an existing sortOrder
+						// set sort for the col1 field
+						sortDescending = !sortDescending;
+						
+						// get existing sort order
 						var sortByCol1 = arrayUtil.filter(
-								grid.sortOrder || [], 
+								grid.get("sort") || [], 
 								function(sortBy){
 									return sortBy.attribute == "col1";
 								}
@@ -204,13 +205,14 @@
 						sortByCol1.descending = sortDescending;
 						grid.set("query", grid.query, { sort: [sortByCol1] });
 						
-						console.log("sortOrder after setQuery: ", grid.sortOrder, grid.queryOptions);
+						console.log("sort after setting query + queryOptions w/ sort: ",
+							grid.get("sort"), grid.queryOptions);
 					});
 					on(document.getElementById("sort"), "click", function(){
-						sortDescending ^= 1; // toggle true/false
-						grid.sort("col1", sortDescending);
+						sortDescending = !sortDescending;
+						grid.set("sort", "col1", sortDescending);
 						
-						console.log("sortOrder after sort: ", grid.sortOrder);
+						console.log("sort after setting sort: ", grid.get("sort"));
 					});
 
 
