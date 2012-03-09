@@ -16,11 +16,15 @@ some key differences:
   are currently in place for the old APIs, but will be removed in the future.
 * `watch` is not implemented.
 
-### sortOrder property removed; replaced by get("sort")
+### sortOrder property and sort function replaced by getter/setter
 
 Previously, `sortOrder` was the (arguably internal) instance property used to
 store the current sort options.  Sort code has since been rearranged; the new
 recommended way to retrieve existing sort options is to call `get("sort")`.
+
+Meanwhile, the `sort` method has been deprecated in favor of `set("sort", ...)`.
+Sort order can also now be initially defined when creating a list or grid by
+specifying a `sort` property in the object passed to the constructor.
 
 ## Grid
 
