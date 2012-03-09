@@ -205,7 +205,7 @@ function(kernel, declare, listen, has, put, List){
 				if(event.type == "click" || event.keyCode == 32){
 					var
 						target = event.target,
-						field, descending, parentNode;
+						field, descending, parentNode, sort;
 					do{
 						if(target.sortable){
 							// stash node subject to DOM manipulations,
@@ -216,10 +216,10 @@ function(kernel, declare, listen, has, put, List){
 							
 							// if the click is on the same column as the active sort,
 							// reverse sort direction
-							descending = grid.sortOrder && grid.sortOrder[0].attribute == field &&
-								!grid.sortOrder[0].descending;
+							descending = (sort = grid._sort[0]) && sort.attribute == field &&
+								!sort.descending;
 							
-							return grid.sort(field, descending);
+							return grid.set("sort", field, descending);
 						}
 					}while((target = target.parentNode) && target != headerNode);
 				}
@@ -252,49 +252,50 @@ function(kernel, declare, listen, has, put, List){
 			}
 		},
 		
-		sort: function(property, descending){
+		_setSort: function(property, descending){
 			// summary:
 			//		Extension of List.js sort to update sort arrow in UI
 			
-			var prop = property, desc = descending;
+			this.inherited(arguments); // normalize sortOrder first
 			
-			// If a full-on sort array was passed, only handle the first criteria
-			if(typeof property != "string"){
-				prop = property[0].attribute;
-				desc = property[0].descending;
+			// clean up UI from any previous sort
+			if(this._lastSortedArrow){
+				// remove the sort classes from parent node
+				put(this._lastSortedArrow, "<!dgrid-sort-up!dgrid-sort-down");
+				// destroy the lastSortedArrow node
+				put(this._lastSortedArrow, "!");
+				delete this._lastSortedArrow;
 			}
 			
-			// if we were invoked from a header cell click handler, grab
-			// stashed target node; otherwise (e.g. direct sort call) need to look up
-			var target = this._sortNode, columns, column, i;
+			if(!this._sort[0]){ return; } // nothing to do if no sort is specified
+			
+			var prop = this._sort[0].attribute,
+				desc = this._sort[0].descending,
+				target = this._sortNode, // stashed if invoked from header click
+				columns, column, i;
+			
+			delete this._sortNode;
+			
 			if(!target){
 				columns = this.columns;
 				for(i in columns){
 					column = columns[i];
 					if(column.field == prop){
 						target = column.headerNode;
+						break;
 					}
 				}
 			}
 			// skip this logic if field being sorted isn't actually displayed
 			if(target){
 				target = target.contents || target;
-				if(this._lastSortedArrow){
-					// remove the sort classes from parent node
-					put(this._lastSortedArrow, "<!dgrid-sort-up!dgrid-sort-down");
-					// destroy the lastSortedArrow node
-					put(this._lastSortedArrow, "!");
-				}
 				// place sort arrow under clicked node, and add up/down sort class
 				this._lastSortedArrow = put(target.firstChild, "-div.dgrid-sort-arrow.ui-icon[role=presentation]");
 				this._lastSortedArrow.innerHTML = "&nbsp;";
 				put(target, desc ? ".dgrid-sort-down" : ".dgrid-sort-up");
 				// call resize in case relocation of sort arrow caused any height changes
 				this.resize();
-				
-				delete this._sortNode;
 			}
-			this.inherited(arguments);
 		},
 		styleColumn: function(colId, css){
 			// summary:
@@ -346,7 +347,7 @@ function(kernel, declare, listen, has, put, List){
 				// we have subRows, but no columns yet, need to create the columns
 				this.columns = {};
 				for(var i = 0; i < subRows.length; i++){
-					subRows[i] = this._configColumns(i + '-', subRows[i]);
+					subRows[i] = this._configColumns(i + "-", subRows[i]);
 				}
 			}else{
 				this.subRows = [this._configColumns("", this.columns)];
@@ -380,7 +381,7 @@ function(kernel, declare, listen, has, put, List){
 			this.renderHeader();
 			this.refresh();
 			// re-render last collection if present
-			this.lastCollection && this.renderArray(this.lastCollection);
+			this._lastCollection && this.renderArray(this._lastCollection);
 			this.resize();
 		}
 	});

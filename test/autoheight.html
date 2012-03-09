@@ -16,12 +16,20 @@
 			#grid {
 				width: 400px;
 			}
-			#grid.dgrid {
+			
+			/* styles for autoheight */
+			#grid {
 				height: auto;
 			}
-			#grid.dgrid .dgrid-scroller {
+			#grid .dgrid-scroller {
 				position: relative;
-				overflow: visible;
+				overflow-y: hidden;
+			}
+			#grid .dgrid-header-scroll {
+				display: none;
+			}
+			#grid .dgrid-header {
+				right: 0;
 			}
 		</style>
 		<script type="text/javascript" src="../../dojo/dojo.js" 

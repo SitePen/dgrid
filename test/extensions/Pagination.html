@@ -14,6 +14,7 @@
 				width: 750px;
 				margin: 10px;
 			}
+			
 			#grid2 .dgrid-row {
 				height: 22px;
 			}
@@ -21,11 +22,19 @@
 				text-overflow: ellipsis;
 				white-space: nowrap;
 			}
+			/* styles for establishing automatic height on the 2nd grid */
 			#grid2.dgrid {
 				height: auto;
 			}
 			#grid2.dgrid .dgrid-scroller {
 				position: relative;
+				overflow-y: hidden;
+			}
+			#grid2 .dgrid-header-scroll {
+				display: none;
+			}
+			#grid2 .dgrid-header {
+				right: 0;
 			}
 			
 		</style>

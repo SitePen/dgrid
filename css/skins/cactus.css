@@ -93,6 +93,14 @@
 	background-image: url("../images/ui-icons_222222_256x240_white.png");
 }
 
+/* for ColumnReorder */
+.cactus .dgrid-header .dojoDndItemBefore {
+	border-left: 2px dotted #fff !important;
+}
+.cactus .dgrid-header .dojoDndItemAfter {
+	border-right: 2px dotted #fff !important;
+}
+
 /* for pagination in IE < 8 + quirks, need additional rule to override link color */
 .has-ie-6-7 .cactus .dgrid-navigation a,
 .has-ie.has-quirks .cactus .dgrid-navigation a {

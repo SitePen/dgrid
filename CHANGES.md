@@ -16,6 +16,16 @@ some key differences:
   are currently in place for the old APIs, but will be removed in the future.
 * `watch` is not implemented.
 
+### sortOrder property and sort function replaced by getter/setter
+
+Previously, `sortOrder` was the (arguably internal) instance property used to
+store the current sort options.  Sort code has since been rearranged; the new
+recommended way to retrieve existing sort options is to call `get("sort")`.
+
+Meanwhile, the `sort` method has been deprecated in favor of `set("sort", ...)`.
+Sort order can also now be initially defined when creating a list or grid by
+specifying a `sort` property in the object passed to the constructor.
+
 ## CSS
 
 ### column-<id> and columnset-* classes now prefixed with dgrid-
@@ -170,11 +180,9 @@ reference to the Grid instance from which the event was fired.
 
 ### expand method added to grid instance
 
-Tree columns now add an `expand(target)` method, for programmatically expanding
-grid rows.  The `target` specified may be anything which will resolve to a row
-via the grid's `row` function.  An optional second boolean parameter may specify
-whether to expand (`true`) or collapse (`false`) the row in question; if
-unspecified, the method will toggle the target row's state.
+Tree columns now add an `expand(row, expand)` method to their parent grid,
+for programmatically expanding or collapsing grid rows.  See the documentation
+for details.
 
 ## DnD
 

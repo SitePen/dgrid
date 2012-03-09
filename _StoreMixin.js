@@ -11,8 +11,18 @@ function(kernel, declare, lang, Deferred, listen){
 	}
 	
 	return declare(null, {
+		// store: Object
+		//		The object store (implementing the dojo/store API) from which data is
+		//		to be fetched.
 		store: null,
+		
+		// query: Object
+		//		Specifies query parameter(s) to pass to store.query calls.
 		query: null,
+		
+		// queryOptions: Object
+		//		Specifies additional query options to mix in when calling store.query;
+		//		sort, start, and count are already handled.
 		queryOptions: null,
 		
 		// getBeforePut: boolean
@@ -32,8 +42,8 @@ function(kernel, declare, lang, Deferred, listen){
 		
 		constructor: function(){
 			// Create empty objects on each instance, not the prototype
-			this.query || (this.query = {});
-			this.queryOptions || (this.queryOptions = {});
+			this.query = {};
+			this.queryOptions = {};
 			this.dirty = {};
 			this._updating = {}; // tracks rows that are mid-update
 		},
@@ -74,7 +84,7 @@ function(kernel, declare, lang, Deferred, listen){
 			this.queryOptions = queryOptions || this.queryOptions;
 			
 			// If we have new sort criteria, pass them through sort
-			// (which will update sortOrder and call refresh in itself).
+			// (which will update _sort and call refresh in itself).
 			// Otherwise, just refresh.
 			sort ? this.sort(sort) : this.refresh();
 		},
@@ -87,12 +97,29 @@ function(kernel, declare, lang, Deferred, listen){
 			this.set("query", query, queryOptions);
 		},
 		
-		sort: function(property, descending){
+		_getQueryOptions: function(){
+			// summary:
+			//		Get a fresh queryOptions object, also including the current sort
+			var options = lang.delegate(this.queryOptions, {});
+			if(this._sort){
+				options.sort = this._sort;
+			}
+			return options;
+		},
+		_getQuery: function(){
+			// summary:
+			//		Implemented consistent with _getQueryOptions so that if query is
+			//		an object, this returns a protected (delegated) object instead of
+			//		the original.
+			return lang.delegate(this.query, {});
+		},
+		
+		_setSort: function(property, descending){
 			// summary:
 			//		Sort the content
 			
 			// prevent default storeless sort logic as long as we have a store
-			if(this.store){ this.lastCollection = null; }
+			if(this.store){ this._lastCollection = null; }
 			this.inherited(arguments);
 		},
 		
