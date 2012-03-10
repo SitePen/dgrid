@@ -86,29 +86,52 @@
 			}
 		</style>
 	</head>
-	<body class="slate">
+	<body class="slate claro">
 
 		<div style="height:40px; width:1000px;">
 			<div style="float:left; padding: 10px;">dMarket - Demo for the Web-5 Conference</div>
-			<div style="float:right; padding: 10px;" id="shopping">Shopping Cart</div>
+			<div id="shopping" class="claro"></div>
 		</div>
 		<div class="marketContainer">
-			
 			<div id="market" class="gallery"></div>
 			<div id="descContainer" class="desc"></div>
 			<div id="shoppingCart">
 				<div id="purchases" class="table"></div>
-				<div id="deleteBtn" class="delete">Delete</div>
+				<div id="deleteBtn" class="delete"></div>
 				<div id="totalNode" style="float:right; margin-top:10px;">Total: </div>
 			</div>
 		</div>
 		<script src="../../../dojo/dojo.js" data-dojo-config="async:1"></script>
 		<script>
-require(["dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dojo/on", "dojo/dom-style", "dojo/store/Memory", "dojo/store/Observable", "put-selector/put", "dgrid/Selector", "dgrid/extensions/ColumnResizer", "dgrid/extensions/ColumnHider", "dgrid/Editor","dijit/form/NumberSpinner","dgrid/extensions/DnD"],
-function(Grid, Selection, Keyboard, declare, on, domStyle, Memory, Observable, put, Selector, Resizer, Hider, Editor, NumberSpinner, DnD){
+require(["dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Keyboard", "dijit/form/Button", "dojo/_base/declare", "dojo/on", "dojo/dom-style", "dojo/store/Memory", "dojo/store/Observable", "put-selector/put", "dgrid/Selector", "dgrid/extensions/ColumnResizer", "dgrid/extensions/ColumnHider", "dgrid/Editor","dijit/form/NumberSpinner","dgrid/extensions/DnD", "dojo/aspect","dojo/_base/lang"],
+function(Grid, Selection, Keyboard, Button, declare, on, domStyle, Memory, Observable, put, Selector, Resizer, Hider, Editor, NumberSpinner, DnD, aspect,lang){
 	var marketGrid, purchasesGrid, total=0;
 	
 	function byId(id) { return document.getElementById(id); }
+	var button = new Button({
+        label: "Shopping Cart",
+		style: "float:right; padding: 10px;",
+        onClick: function(){
+            domStyle.set(byId('descContainer'), "display", "none");
+			domStyle.set(byId('shoppingCart'), "display", "block");
+			purchasesGrid.refresh();
+        }
+    }, "shopping");
+
+	var button = new Button({
+        label: "Delete",
+		class: "delete",
+        onClick: function(){
+			var selection = purchasesGrid.get("selection");
+			for (var id in selection) {
+				if (selection.hasOwnProperty(id)) {
+					if(item = cartStore.get(id)){
+						cartStore.remove(id);
+					}
+				}
+			}
+        }
+    }, "deleteBtn");
 
 	var cartStore = Observable(new Memory({data: []}));
 	var marketStore = new Memory({ data: [
@@ -174,7 +197,8 @@ function(Grid, Selection, Keyboard, declare, on, domStyle, Memory, Observable, p
 		store: marketStore,
 		renderRow: galleryRender,
 		showHeader: false,
-		selectionMode: "single"
+		selectionMode: "single",
+		dndParams: {copy: true}
 	}, "market");
 
 	purchasesGrid = new Cart({
@@ -182,13 +206,14 @@ function(Grid, Selection, Keyboard, declare, on, domStyle, Memory, Observable, p
 			Selector({ label: " " }),
 			{ label: "Artist", field: "artist" },
 			{ label: "Album", field: "album" },
-			Editor({label: '#', field: 'quantity',
-								editorArgs: {style: 'width: 5em;', constraints: {min:0, max:10, places:0}}},
+			Editor({label: '#', field: 'quantity', autoSave:true,
+								editorArgs: {style: 'width: 5em;', constraints: {min:1, max:10, places:0}}},
 							NumberSpinner, "focus"),
 			{label: "Price", field: "price", formatter: function(price){ return "$"+price}}
 		],
 		store: cartStore,
-		selectionMode: "multiple"
+		selectionMode: "multiple",
+		dndParams: {copy: true}
 	}, "purchases");
 
 	marketGrid.on("dgrid-select", function(e){
@@ -200,45 +225,57 @@ function(Grid, Selection, Keyboard, declare, on, domStyle, Memory, Observable, p
 		byId('descContainer').innerHTML = html;
 	});
 
+	purchasesGrid.on("dgrid-datachange", function(e){
+		//for when the quantity is changed via editor
+		tallyTotal();
+	});
+
+	aspect.before(purchasesGrid.dndSource, "onDrop", function(source, nodes, copy){
+		//updating copy manually because I'm a dnd noob and can't figure it out
+		return [source,nodes, true];
+	});
+
+	aspect.before(cartStore, "put", function(item, options){
+		var cartItem = cartStore.get(item.id);
+		if(cartItem){
+			cartItem.quantity++;
+			return [cartItem, options];
+		}
+		cartItem = lang.clone(item);
+		return [cartItem, options];
+	});
+
+	aspect.after(cartStore, "put", function(){
+		tallyTotal();
+	});
+
+	aspect.after(cartStore, "remove", function(obj){
+		//need to tally totalPrice
+		tallyTotal();
+	});
+
+	tallyTotal = function() {
+		//loop through store prices
+		total = 0;
+		for(var i=cartStore.data.length-1; item=cartStore.data[i], i>=0; i--) {
+			total+=(parseFloat(item.price)*item.quantity);
+		}
+		byId("totalNode").innerHTML="Total: $" + total;
+	}
+
 	buyAlbum = function() {
-		var overWrite = false;
 		var selection = marketGrid.get("selection");
 		for (var id in selection) {
 			  if (selection.hasOwnProperty(id)) {
 				if(item = marketStore.get(id)){
-					if(cartStore.get(id)){
-						overWrite = true;
-						item.quantity++;
-					}
-					cartStore.put(item);
-					total+=parseFloat(item.price);
+					cartStore.put(item, {});
 				}
 			  }
 		}
 		domStyle.set(byId('descContainer'), "display", "none");
 		domStyle.set(byId('shoppingCart'), "display", "block");
-		byId("totalNode").innerHTML="Total: $" + total;
 		purchasesGrid.refresh();
 	}
-
-	on(byId("shopping"), "click", function() {
-		domStyle.set(byId('descContainer'), "display", "none");
-		domStyle.set(byId('shoppingCart'), "display", "block");
-	});
-
-	on(byId("deleteBtn"), "click", function(){
-		var selection = purchasesGrid.get("selection");
-		for (var id in selection) {
-			  if (selection.hasOwnProperty(id)) {
-				if(item = cartStore.get(id)){
-					cartStore.remove(id);
-					total-=(item.price * item.quantity);
-					byId("totalNode").innerHTML="Total: $" + total;
-				}
-			  }
-		}
-
-	});
 });
 		</script>
 	</body>
