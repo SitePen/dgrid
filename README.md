@@ -87,8 +87,10 @@ methods:
   overrides this method.)
 * `removeRow(rowElement, justCleanup)`: This method can be extended/aspected to
   perform cleanup logic when an individual row is removed.
-* `sort(property, descending)`: This can be called to sort the List by a given
+* `set("sort", property, descending)`: This can be called to sort the List by a given
   property; if the second parameter is passed `true`, the sort will be in descending order.
+  `get("sort")` can be used to retrieve the current sort options normalized into
+  an array of sort criteria (the format expected by stores' `queryOptions`).
   The Grid and OnDemandList modules further extend this functionality.
 * `showHeader`: Whether to display the header area; normally `false` for lists
   and `true` for grids.
@@ -179,8 +181,8 @@ The column definition object may have the following properties (all are optional
   values in this field, by clicking on the column's header cell.
   Defaults to `true`.
     * Note that it is always possible to programmatically sort a Grid by a given
-      column using the `sort(property, descending)` method, regardless of whether
-      that column's `sortable` status or even presence in the Grid altogether.
+      field by calling `set("sort", property, descending)` regardless of
+      `sortable` status or even visible presence in the Grid altogether.
 * `get(item)`: An optional function that, given a data item, will return the
   value to render in the cell.
 * `formatter(value)`: An optional function that, given the value to be displayed,
@@ -225,7 +227,7 @@ in the arguments object to the Grid; it can also be changed later using
 dgrid components are designed to be highly CSS-driven for optimal performance and organization,
 so visual styling should be controlled through CSS. The Grid creates classes
 based on the column ids and field names with the convention of
-`column-<column-id>` and `field-<field-name>`.
+`dgrid-column-<column-id>` and `field-<field-name>`.
 (If a `className` is specified in the column definition, it is used in place of
 `field-<field-name>`.)
 
@@ -350,10 +352,8 @@ OnDemandList inherits the following properties and methods from \_StoreMixin:
 * `refresh()`: Clears the component and re-requests the initial page of data.
 * `renderQuery(query)`: Renders the given query into the list.  Called
   automatically upon refresh.
-* `sort(property, descending)`: OnDemandList's version of this method
-  defers sorting to the store.
-* `sortOrder`: Initially managed by List's `sort()` method,
-  this stores the current sort order.
+* `set("sort", property, descending)`: \_StoreMixin's version of this defers
+  sorting to the store.
 * `updateDirty(id, field, value)`: Updates an entry in the component's dirty
   data hash, to be persisted to the store on the next call to `save()`.
 * `save()`: Instructs the list to relay any dirty data back to the store.
@@ -789,7 +789,7 @@ to skin the dgrid to a particular look and feel.
 dgrid's appearance is designed to be styled and customized via CSS.
 Many of the classes involved can be discovered by simply looking at elements in
 your browser developer tools of choice.
-Perhaps the most important classes are the `column-<id>` and `field-<fieldname>`
+Perhaps the most important classes are the `field-<fieldname>` and `dgrid-column-<id>`
 classes assigned to each cell in grids, which allow for per-column styling.
 
 The following class names are used by dgrid and can be referenced from CSS:
