@@ -8,7 +8,12 @@
 		
 		<style>
 			@import "../../../dijit/themes/claro/claro.css";
-
+			.marketHeading {
+				float:left;
+				padding: 10px;
+				font-size: 3em;
+				color: #555;
+			}
 			.marketContainer {
 				width: 1000px;
 				height: 700px;
@@ -33,6 +38,23 @@
 			.icon {
 				font-size: 0;
 				background-repeat: no-repeat;
+			}
+			.name {
+				color: #8e8e8e;
+				font-size: 10px;
+				line-height: 1;
+				overflow: hidden;
+				text-transform: uppercase;
+			}
+			.album {
+				color: #414242;
+				font-weight: bold;
+				
+			}
+			.genre {
+				color: #8e8e8e;
+				margin-left: 0;
+				text-transform: none;
 			}
 			.galleryCell {
 				width: 180px;
@@ -73,6 +95,36 @@
 				height: 460px;
 				float:right;
 			}
+			.buyBtn {
+				background-color: #555;
+				border: 1px solid #fff;
+				display: block;
+				padding: 3px 7px;
+				color: #fff;
+				cursor: pointer;
+				font-size: 11px;
+				line-height: 1em;
+				text-transform: uppercase;
+				width:40px;
+			}
+			.buyBtn:hover {
+				background-color: #CCC;
+			}
+			.summary {
+				line-height: 1.5em;
+				font-size: 1em;
+				color: #555;
+				padding-bottom: 10px;
+			}
+			.albumLarge {
+				font-size: 2em;
+				font-weight: bold;
+				padding-bottom: 5px;
+			}
+			.artist {
+				font-size: 1.5em;
+				padding-bottom: 10px;
+			}
 			#shoppingCart {
 				width: 402px;
 				margin-top: 20px;
@@ -89,7 +141,7 @@
 	<body class="slate claro">
 
 		<div style="height:40px; width:1000px;">
-			<div style="float:left; padding: 10px;">dMarket - Demo for the Web-5 Conference</div>
+			<div class="marketHeading">dMarket - Demo for the Web-5 Conference</div>
 			<div id="shopping" class="claro"></div>
 		</div>
 		<div class="marketContainer">
@@ -218,7 +270,7 @@ function(Grid, Selection, Keyboard, Button, declare, on, domStyle, Memory, Obser
 
 	marketGrid.on("dgrid-select", function(e){
 		var item = e.rows[0].data;
-		var html = '<div class="albumDesc"><div class="album">' + item.album + '</div><div class="artist">' + item.artist + '</div>' +
+		var html = '<div class="albumDesc"><div class="albumLarge">' + item.album + '</div><div class="artist">' + item.artist + '</div>' +
 					'<div class="summary">'+item.summary+'</div><div class="price">$' + item.price +'</div><div class="buyBtn" onclick="buyAlbum()" id="buy">Buy</div></div>';
 		domStyle.set(byId('shoppingCart'), "display", "none");
 		domStyle.set(byId('descContainer'), "display", "block");
@@ -266,11 +318,11 @@ function(Grid, Selection, Keyboard, Button, declare, on, domStyle, Memory, Obser
 	buyAlbum = function() {
 		var selection = marketGrid.get("selection");
 		for (var id in selection) {
-			  if (selection.hasOwnProperty(id)) {
+			if (selection.hasOwnProperty(id)) {
 				if(item = marketStore.get(id)){
 					cartStore.put(item, {});
 				}
-			  }
+			}
 		}
 		domStyle.set(byId('descContainer'), "display", "none");
 		domStyle.set(byId('shoppingCart'), "display", "block");
