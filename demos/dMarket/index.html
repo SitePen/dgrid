@@ -142,7 +142,7 @@
 
 		<div style="height:40px; width:1000px;">
 			<div class="marketHeading">dMarket - Demo for the Web-5 Conference</div>
-			<div id="shopping" class="claro"></div>
+			<div id="shopping"></div>
 		</div>
 		<div class="marketContainer">
 			<div id="market" class="gallery"></div>
@@ -228,7 +228,7 @@ function(Grid, Selection, Keyboard, Button, declare, on, domStyle, Memory, Obser
 		// function used for renderRow for gallery view (large tiled thumbnails)
 		var div = put("div");
 		div.innerHTML = '<div class="galleryCell">' +
-							'<div class="icon" style="background-image:url(resources/' + obj.icon + '.jpg);">&nbsp;</div>' +
+							'<div class="icon" style="background-image:url(resources/' + obj.icon + '_128.png);">&nbsp;</div>' +
 							'<div class="info">' +
 								'<div class="album">'+obj.album+'</div>' +
 								'<div class="name">' + obj.artist + '</div>' +
@@ -255,16 +255,16 @@ function(Grid, Selection, Keyboard, Button, declare, on, domStyle, Memory, Obser
 
 	purchasesGrid = new Cart({
 		columns: [
-			Selector({ label: " " }),
+			Selector({ label: " ", unhidable:true }),
 			{ label: "Artist", field: "artist" },
 			{ label: "Album", field: "album" },
 			Editor({label: '#', field: 'quantity', autoSave:true,
 								editorArgs: {style: 'width: 5em;', constraints: {min:1, max:10, places:0}}},
-							NumberSpinner, "focus"),
+							NumberSpinner, "dgrid-cellfocusin"),
 			{label: "Price", field: "price", formatter: function(price){ return "$"+price}}
 		],
 		store: cartStore,
-		selectionMode: "multiple",
+		selectionMode: "none",
 		dndParams: {copy: true}
 	}, "purchases");
 
