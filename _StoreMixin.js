@@ -101,7 +101,9 @@ function(kernel, declare, lang, Deferred, listen){
 			// summary:
 			//		Get a fresh queryOptions object, also including the current sort
 			var options = lang.delegate(this.queryOptions, {});
-			if(this._sort){
+			// Prevents SimpleQueryEngine from doing unnecessary "null" sorts (which can
+			// change the ordering in browsers that don't use a stable sort algorithm, eg Chrome)
+			if(this._sort && this._sort.length){
 				options.sort = this._sort;
 			}
 			return options;
