@@ -14,6 +14,7 @@
 				width: 750px;
 				margin: 10px;
 			}
+			
 			#grid2 .dgrid-row {
 				height: 22px;
 			}
@@ -21,11 +22,19 @@
 				text-overflow: ellipsis;
 				white-space: nowrap;
 			}
+			/* styles for establishing automatic height on the 2nd grid */
 			#grid2.dgrid {
 				height: auto;
 			}
 			#grid2.dgrid .dgrid-scroller {
 				position: relative;
+				overflow-y: hidden;
+			}
+			#grid2 .dgrid-header-scroll {
+				display: none;
+			}
+			#grid2 .dgrid-header {
+				right: 0;
 			}
 			
 		</style>
@@ -51,13 +60,13 @@
 						col2: {label: 'Column2', sortable: false},
 						col3: 'Column 3',
 						col4: 'Column 4',
-						"last-col": {label: 'Column 5', field: 'col5'}
+						col5: 'Column 5'
 					};
 					columns2 = {
 						col2: 'Col2',
 						col4: {label: 'Col4', sortable: false},
 						col1: 'Col1',
-						"last-col": {label: 'Column 5', field: 'col5'}
+						col5: 'Column 5'
 					};
 					
 					document.body.className = skin;

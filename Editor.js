@@ -146,10 +146,9 @@ function createEditor(column){
 			tabIndex: isNaN(column.tabIndex) ? -1 : column.tabIndex
 		}, args));
 		
-		if(has("ie") < 9){
-			// IE<9 doesn't fire change events for all the right things,
+		if(has("ie") < 9 || (has("ie") && has("quirks"))){
+			// IE<9 / quirks doesn't fire change events for all the right things,
 			// and it doesn't bubble.
-			// TODO: test IE9 quirks
 			if(editor == "radio" || editor == "checkbox"){
 				// listen for clicks since IE doesn't fire change events properly for checks/radios
 				on(cmp, "click", function(evt){ handleChange(evt); });
@@ -265,7 +264,6 @@ return function(column, editor, editOn){
 	
 	// accept arguments as parameters to Editor function, or from column def,
 	// but normalize to column def.
-	// (TODO: maybe should only accept from column def to begin with...)
 	column.editor = editor = editor || column.editor;
 	column.editOn = editOn = editOn || column.editOn;
 	

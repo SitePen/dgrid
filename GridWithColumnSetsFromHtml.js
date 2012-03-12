@@ -1,6 +1,9 @@
-define(["./GridFromHtml", "./ColumnSet", "dojo/_base/declare"], function(GridFromHtml, ColumnSet, declare){
-	//Possible TODO: make more resilient for cases of bad markup?
-	//(e.g. cases where rowspans/colspans don't always break even / add up)
+define(["./GridFromHtml", "./ColumnSet", "dojo/_base/declare"],
+function(GridFromHtml, ColumnSet, declare){
+	// summary:
+	//		This module augments GridFromHtml with additional support for interpreting
+	//		ColumnSets from colgroups in table markup.
+	
 	function getColumnSetsFromDom(domNode){
 		// summary:
 		//		Generates ColumnSets from DOM.

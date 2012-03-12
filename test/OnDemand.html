@@ -62,20 +62,20 @@
 					// Create error store
 					errorStore = new Memory();
 					errorStore.query = function() {
-						throw new Error("Some Error");
+						throw new Error("Error on sync query");
 					};
 					
 					// Create error store with PUT
 					putErrorStore = new Memory({ data: lang.clone(testTypesStore.data) });
 					putErrorStore.put = function() {
-						throw new Error("PUT ERROR");
+						throw new Error("Error on sync put");
 					};
 					
 					// Create error store that has its deferred rejected
 					defErrorStore = new Memory();
 					defErrorStore.query = function() {
 						var def = new Deferred();
-						setTimeout(function() { def.reject("Homie don't play that"); }, 200);
+						setTimeout(function() { def.reject("Error on async query"); }, 200);
 						return def.promise;
 					};
 					
@@ -83,7 +83,7 @@
 					defPutErrorStore = new Memory({ data: lang.clone(testTypesStore.data) });
 					defPutErrorStore.put = function() {
 						var def = new Deferred();
-						setTimeout(function() { def.reject("Watch where you put things!"); }, 200);
+						setTimeout(function() { def.reject("Error on async put"); }, 200);
 						return def.promise;
 					};
 					
@@ -94,7 +94,7 @@
 						col4: 'Column 4',
 						col5: 'Column 5',
 						col6: 'Column 6',
-						"last-col": {label: 'Column 7', field: 'col7'}
+						col7: 'Column 7'
 					};
 
 					var columns2 = [
@@ -121,11 +121,12 @@
 						col4: 'Description',
 						col5: 'R',
 						col6: 'G',
-						"last-col": {label: 'B', field: 'col7'}
+						col7: 'B'
 					};
 					window.grid = declare([Grid])({
 						store: testStore,
 						columns: columns,
+						sort: "col3", // initially sort by col3 ascending
 						noDataMessage: "Nobody here but us chickens!"
 					}, "grid");
 
@@ -142,7 +143,7 @@
 
 					window.gridAddDel = declare([Grid, Keyboard, Selection])({
 						store: smallColorStore,
-						columns: columns4,
+						columns: lang.clone(columns4),
 						selectionMode: "multiple"
 					}, "gridAddDel");
 					
@@ -150,7 +151,7 @@
 					// (so additions/deletions should show up in both)
 					window.listAddDel = declare([List, Keyboard, Selection])({
 						store: smallColorStore,
-						columns: columns4,
+						columns: lang.clone(columns4),
 						selectionMode: "multiple",
 						renderRow: function(object, options){
 							// need to define renderRow to accommodate store items
@@ -186,12 +187,12 @@
 					var sortDescending = true;
 					
 					on(document.getElementById("setQueryWithOptions"), "click", function(){
-						// set sortOrder for the col1 field
-						sortDescending ^= 1; // toggle true/false
-					
-						// get an existing sortOrder
+						// set sort for the col1 field
+						sortDescending = !sortDescending;
+						
+						// get existing sort order
 						var sortByCol1 = arrayUtil.filter(
-								grid.sortOrder || [], 
+								grid.get("sort") || [], 
 								function(sortBy){
 									return sortBy.attribute == "col1";
 								}
@@ -204,13 +205,14 @@
 						sortByCol1.descending = sortDescending;
 						grid.set("query", grid.query, { sort: [sortByCol1] });
 						
-						console.log("sortOrder after setQuery: ", grid.sortOrder, grid.queryOptions);
+						console.log("sort after setting query + queryOptions w/ sort: ",
+							grid.get("sort"), grid.queryOptions);
 					});
 					on(document.getElementById("sort"), "click", function(){
-						sortDescending ^= 1; // toggle true/false
-						grid.sort("col1", sortDescending);
+						sortDescending = !sortDescending;
+						grid.set("sort", "col1", sortDescending);
 						
-						console.log("sortOrder after sort: ", grid.sortOrder);
+						console.log("sort after setting sort: ", grid.get("sort"));
 					});
 
 

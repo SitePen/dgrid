@@ -36,16 +36,13 @@ directory structure like the following:
 * `xstyle`
 * `util` (optional, e.g. if pursuing a custom build)
 
-dgrid v0.2.0 requires at least Dojo 1.7 RC2.  As of this writing,
-[Dojo 1.7.1](http://download.dojotoolkit.org/release-1.7.1/) is highly
+dgrid works best with Dojo 1.7.1 or higher.  As of this writing,
+[Dojo 1.7.2](http://download.dojotoolkit.org/release-1.7.2/) is
 recommended.
 
 # Components
 
 dgrid's primary components fall into the following top-level modules.
-
-Further information on these modules may be available via the API viewer,
-accessible via `doc/api.html` in the downloaded package.
 
 ## List
 
@@ -55,38 +52,90 @@ of HTML in a scrollable area. This will automatically include touch scrolling ca
 
 The List can be used to render an array of data. For example:
 
-    define(["dgrid/List"], function(List){
-        // attach to a DOM id
+    require(["dgrid/List"], function(List){
+        // attach to a DOM element indicated by its ID
         var list = new List({}, "list");
         // render some data
         list.renderArray(arrayOfData);
-        ...
     });
 
-### More List APIs
+### List APIs
 
-The base List class (inherited by all other classes) also has the following methods:
+The base List class (inherited by all other classes) exposes the following
+methods:
 
+* `get(property)`: Returns the value of a given property. Supports custom getter
+  implementations via the pattern `_getProperty` (which would map to `get("property")`).
+* `set(property, value)`: Sets the value of a given property. Supports custom
+  setter implementations via the pattern `_setProperty` (which would map to
+  `set("property", ...)`).
 * `row(target)`: This will look up the requested row and return a Row object.
-  The single parameter may be a DOM event, DOM node, data object id, or data object.
+  The single parameter may be a DOM event, DOM node, or in the case of store-backed
+  components, a data object or its ID.
   The returned Row object has the following properties:
-    * `id`: The data object's id
-    * `element`: The row's DOM element
-    * `data`: The data object represented by the row
+    * `id`: the data object's id
+    * `data`: the data object represented by the row
+    * `element`: the row's DOM element
 * `on(event, listener)`: Basic event listener functionality;
   simply delegates to the top-level DOM element of the List, using standard `dojo/on` behavior.
-* `renderArray(array, beforeNode)`: This can be called to render an array.
-  The `beforeNode` parameter can be used to render at a specific place in the List.
-* `renderRow(value, options)`: This can be overridden to provide
-  custom rendering logic for rows.
-* `sort(property, descending)`: This can be called to sort the List by a given
+* `renderArray(array, beforeNode, options)`: This can be called to render an
+  array directly into the list.  The `beforeNode` parameter can be used to render
+  at a specific point in the list.  Note that when using store-backed components,
+  this is called automatically.
+* `renderRow(item, options)`: This method can be overridden to provide
+  custom rendering logic for rows.  (The Grid module, introduced next, actually
+  overrides this method.)
+* `removeRow(rowElement, justCleanup)`: This method can be extended/aspected to
+  perform cleanup logic when an individual row is removed.
+* `set("sort", property, descending)`: This can be called to sort the List by a given
   property; if the second parameter is passed `true`, the sort will be in descending order.
+  `get("sort")` can be used to retrieve the current sort options normalized into
+  an array of sort criteria (the format expected by stores' `queryOptions`).
   The Grid and OnDemandList modules further extend this functionality.
+* `showHeader`: Whether to display the header area; normally `false` for lists
+  and `true` for grids.
+* `showFooter`: Whether to display the footer area; `false` by default, but
+  enabled and used by some extensions (e.g. Pagination).
+
+Lists, as well as all other dgrid components, maintain the following DOM
+references:
+
+* `domNode`: The top-level DOM node of the component (much like the `domNode`
+  property of Dijit widgets).
+* `headerNode`: The DOM node representing the header region; mainly applicable
+  to grid components.
+* `bodyNode`: The DOM node representing the body region (the area which will
+  show rows for each item).
+* `contentNode`: The DOM node immediately under the `bodyNode`, which may
+  potentially be scrolled to accommodate more content than the component's height
+  will allow to fit.
+* `footerNode`: A DOM node appearing below the `bodyNode`; initially empty and
+  not displayed by default.
 
 ## Grid
 
-Grid extends List to provide tabular display of data in columns.
-The columns of the grid are typically defined via the `columns` property.
+Grid extends List to provide tabular display of data items, with different fields
+arranged into columns.
+
+In addition to the List methods outlined above, Grid also exposes the following:
+
+* `cell(target[, columnId])`: Analogous to the `row` method, but at the `cell`
+  level instead.  The `cell` method can look up based on an event or DOM element,
+  or alternatively, a data item (or ID thereof) and the ID of a column.
+  Returns an object containing the following properties:
+    * `row`: a Row object (as would be obtained from the `row` method) for the
+      row the cell is within
+    * `column`: the column definition object for the column the cell is within
+    * `element`: the cell's DOM element
+* `column(target)`: Typically analogous to `cell(target).column`, but can
+  alternatively accept a column ID directly.
+* `styleColumn(columnId, css)`: Programmatically adds styles to a column, by
+  injecting a rule into a stylesheet in the document.  Returns a handle with a
+  `remove` function, which can be called to later remove the added style rule.
+
+### Specifying grid columns
+
+In the simplest cases, the columns of the grid are defined via the `columns` property.
 This property can be a hash (object) or array, containing column definition objects.
 When `columns` is an object, each property's key is used as the id of the column, and
 each value is the column definition object. When `columns` is an array,
@@ -94,7 +143,7 @@ the numeric indices become the column IDs.
 
 For example, we could create a grid like so:
 
-    define(["dgrid/Grid"], function(List){
+    require(["dgrid/Grid"], function(Grid){
         var grid = new Grid({
             columns: {
                 first: {
@@ -117,27 +166,38 @@ For example, we could create a grid like so:
 
 The column definition object may have the following properties (all are optional):
 
-* `field`: This is the property from the object in the list to display in the body of the grid. 
-  Defaults to the id of the column (if no `get()` function is provided).
-* `label`: This is the label to show in the header of the grid.
-  Defaults to the id of the column.
-* `className` - A DOM/CSS class to assign to the cells in the column. 
-* `id` - This is the id of the column; normally this is determined automatically
+* `field`: The property from the object in the list to display in the
+  body of the grid (unless otherwise overridden via the `get` function, explained below).
+  In cases where `columns` is passed an object, the key of each property
+  represents the field name, and thus this property is normally ommitted.
+* `label`: The label to show in the header of the grid.
+  Defaults to the value of `field`.
+* `className`: A CSS class to assign to the cells in the column.  If unspecified,
+  a default class name of the form `field-<field>` is used, where `<field>` is the
+  value of the `field` property.
+* `id`: The id of the column; normally this is determined automatically
   from the keys or indices in the `columns` object or array.
-* `sortable`: This indicates whether or not you can sort on this column/field.
+* `sortable`: Indicates whether or not the grid should allow sorting by
+  values in this field, by clicking on the column's header cell.
   Defaults to `true`.
-    * Note that you can always programmatically sort a Grid by a given column using the
-      `sort(property, descending)` method, regardless of whether that column's `sortable` status
-      or even presence in the Grid altogether.
-* `get`: This can be a function that will retrieve the value to render from the object in the list.
-* `formatter`: This can be a function that will convert the value to an HTML string for rendering.
-* `renderCell`: This can be a function that will be called to render the value into the target &lt;td> for each cell.
-  (If `formatter` is specified, `renderCell` is ignored.)
-* `renderHeaderCell` - This can be a function that will be called to render the value into the target &lt;th> for the columns header.
+    * Note that it is always possible to programmatically sort a Grid by a given
+      field by calling `set("sort", property, descending)` regardless of
+      `sortable` status or even visible presence in the Grid altogether.
+* `get(item)`: An optional function that, given a data item, will return the
+  value to render in the cell.
+* `formatter(value)`: An optional function that, given the value to be displayed,
+  will return a string of HTML for rendering.
+* `renderCell(object, value, node, options)`: An optional function that will be
+  called to render the value into the target cell.  It may either
+  operate on the passed node directly, or return a node to be placed within it.
+  (Note: if `formatter` is specified, `renderCell` is ignored.)
+* `renderHeaderCell(node)`: An optional function that will be called to render
+  the column's header cell. Like `renderCell`, this may either operate on the
+  node directly, or return a node to be placed within it.
 
-Alternatively, the column definition may simply be a string, in which case
+Alternatively, a column definition may simply be a string, in which case
 the value of the string is interpreted as the label of the column.
-Thus, we can more succinctly write simple columns:
+Thus, the simplest column structures can be more succinctly written:
 
     var grid = new Grid({
         columns: {
@@ -148,22 +208,52 @@ Thus, we can more succinctly write simple columns:
         ...
     }, ...);
 
-Note that the Grid component also supports structures with multiple "sub-rows";
-that is, it supports the idea of rendering multiple rows for each item.
+The Grid component also supports structures with multiple "sub-rows";
+that is, it supports the idea of rendering multiple rows for each data item.
 Specification of multiple subrows is very much like specifying columns, except
 that one uses the `subRows` property instead of `columns`, and it receives an
 array of columns objects/arrays.
 
-Both the `columns` and `subRows` properties have respective setters,
-`setColumns` and `setSubRows`, which allow resetting the structure of the Grid
-at a later time.
+Both the `columns` and `subRows` properties can be later reset by using the
+central `set` method.
 
 By default, the Grid renders a header, containing cells which display the
 label of each column.  This can be disabled by setting `showHeader: false`
-in the arguments object to the Grid; it can also be changed later using the
-`setShowHeader` method.
+in the arguments object to the Grid; it can also be changed later using
+`set("showHeader", ...)`.
 
-### Specifying Columns via HTML: GridFromHtml
+### Grid Styling
+
+dgrid components are designed to be highly CSS-driven for optimal performance and organization,
+so visual styling should be controlled through CSS. The Grid creates classes
+based on the column ids and field names with the convention of
+`dgrid-column-<column-id>` and `field-<field-name>`.
+(If a `className` is specified in the column definition, it is used in place of
+`field-<field-name>`.)
+
+For example, you could define a grid and CSS for it like so:
+
+    <style>
+        .field-age {
+            width: 80px;
+        }
+        .field-first {
+            font-weight: bold;
+        }
+    </style>
+    <script>
+        require(["dgrid/Grid"], function(Grid){
+            var grid = new Grid({
+                columns: {
+                    age: "Age",
+                    first: "First Name",
+                    ...
+                }}, ...);
+            grid.renderArray(someData);
+        });
+    </script>
+
+## Specifying Columns via HTML: GridFromHtml
 
 Some developers prefer specifying column layouts in an actual table structure
 because it is more convenient or semantically clearer.  dgrid supports this
@@ -186,19 +276,20 @@ in the global scope, perhaps under a namespace.)
 Examples of creating grids from HTML can be found in the
 `GridFromHtml.html` and `complex_columns.html` test pages.
 
-It is also possible to specify columnsets (for the `ColumnSet` module) via
+It is also possible to specify columnsets (for the `ColumnSet` mixin) via
 HTML tables by using the `GridWithColumnSetsFromHtml` module.  ColumnSets are
 expressed in HTML via `colgroup` tags.  See the `complex_columns.html` test
 page for an example of this as well.
 
-#### Using GridFromHtml with the Dojo Parser
+### Using GridFromHtml with the Dojo Parser
 
 Using the parser in Dojo 1.7 with modules designed purely in the AMD format can
 be a bit unwieldy, since at this time the parser still expects `data-dojo-type`
 values to reference variables accessible from the global context.  While existing
 Dojo 1.x components currently continue to expose globals, dgrid does not do so
-by default.  Thus, when intending to parse over dgrid components, it is necessary
-to expose the components via a global namespace first.  For example:
+by default, since it is written purely in AMD format.  Thus, when intending to
+parse over dgrid components, it is necessary to expose the components via a
+global namespace first.  For example:
 
     require(["dgrid/GridFromHtml", "dojo/parser", ..., "dojo/domReady!"],
     function(GridFromHtml, parser, ...) {
@@ -214,85 +305,62 @@ Dojo 1.8, which plans to introduce some level of module ID support to the
 `data-dojo-type` attribute; see
 [Dojo ticket #13778](http://bugs.dojotoolkit.org/ticket/13778).
 
-### Grid Styling
-
-dgrid components are designed to be highly CSS-driven for optimal performance and organization,
-so visual styling should be controlled through CSS. The Grid creates classes
-based on the column ids and field names with the convention of
-`column-<column-id>` and `field-<field-name>`.
-(If a `className` is specified in the column definition, it is used in place of
-`field-<field-name>`.)
-
-For example, you could define a grid and CSS like so:
-
-    <style>
-    .column-age {
-        width: 80px;
-    }
-    .column-first {
-        font-weight: bold;
-    }
-    </style>
-    <script>
-    define(["dgrid/Grid"], function(Grid){
-        var grid = new Grid({
-                columns: {
-                    age: "Age",
-                    first: "First Name",
-                    ...
-                }}, ...);
-        grid.renderArray(someData);
-        ...
-    });
-    </script>
-
-The Grid class also provides a `styleColumn(colId, css)` method to programmatically
-add styles to a column, by injecting a rule into a stylesheet in the document.
-This method returns a handle with a `remove` function, which can be called to
-later remove the style rule that was added.
-
 ## OnDemandList
 
-OnDemandList extends List to provide on-demand lazy loading or paging of data as the user
-scrolls through the list, and interacts with a
-[Dojo object store](http://dojotoolkit.org/reference-guide/dojo/store.html) for
-querying of data. This provides a seamless, intuitive interface for viewing
-large sets of data in scalable manner. This also provides sorting delegation to the store.
+OnDemandList extends List to provide on-demand lazy loading of data as the user
+scrolls through the list.  This provides a seamless, intuitive interface for viewing
+large sets of data in scalable manner.
+
+OnDemandList inherits the \_StoreMixin module, which implements a basis for
+interacting with a [Dojo object store](http://dojotoolkit.org/reference-guide/dojo/store.html)
+for querying of data.  At minimum, this implementation expects a store supporting
+the `get`, `getIdentity`, and `query` methods.
 
 OnDemandList requires that a store be specified via the `store` property,
-and will call the `query()` method on the store to retrieve the data to be rendered.
-OnDemandList can `query()` with start and count properties so as to only retrieve
+and will call the `query` method on the store to retrieve the data to be rendered.
+OnDemandList will call `query` with start and count options so as to only retrieve
 the necessary objects needed to render the visible rows. As the list or grid is
-scrolled, more `query()` calls will be made to retrieve additional rows,
+scrolled, more `query` calls will be made to retrieve additional rows,
 and previous rows will be pruned from the DOM as they are scrolled well out of view.
 
-For best results, the specified store should return query results with an `observe`
-method, which enables the list to keep its display up to date with any changes
-that occur in the store after the items are rendered.
-The [`dojo/store/Observable`](http://dojotoolkit.org/reference-guide/dojo/store/Observable.html)
+When working with a writable store, for best results, the store should
+return query results with an `observe` method, which enables the list to keep
+its display up to date with any changes that occur in the store after the items
+are rendered.  The [`dojo/store/Observable`](http://dojotoolkit.org/reference-guide/dojo/store/Observable.html)
 module can prove useful for adding this functionality.
 
-The given store should also support the `get` and `getIdentity` functions.
+OnDemandList inherits the following properties and methods from \_StoreMixin:
 
-OnDemandList provides the following properties/methods:
-
-* `renderQuery(query)`: Renders the given query into the list.
-* `sort(property, descending)`: OnDemandList's version of this method
-  defers sorting to the store.
-* `sortOrder`: Initially managed by List's `sort()` method,
-  this stores the current sort order.
-* `save()`: Instructs the list to relay any dirty data (e.g. populated by
-  instances of the Editor column plugin) back to the store.  Returns a promise
-  which resolves when all necessary put operations have completed successfully
-  (even if the store operates synchronously).
+* `noDataMessage`: An optional message to be displayed when no results are
+  returned by a query.
+* `loadingMessage`: An optional message to be displayed in the loading node
+  which appears when a new page of results is requested.
 * `getBeforePut`: if true (the default), any `save` operations will re-fetch
   the item from the store via a `get` call, before applying changes represented by
   dirty data.
-* `setQuery(query, queryOptions)`: Allows specifying a new `query` object
-  (and optionally, also `queryOptions`) that the list will use when
+* `query`: An object to be passed when issuing store queries, which may contain
+  filter criteria.
+* `queryOptions`: An object to be passed along with `query` when issuing store
+  queries.  Note that the standard `start`, `count`, and `sort` properties
+  are already managed by OnDemandList itself.
+* `store`: An instance of a `dojo/store` implementation, from which to fetch data.
+* `set("query", query[, queryOptions])`: Specifies a new `query` object
+  (and optionally, also `queryOptions`) to be used by the list when
   issuing queries to the store.
-* `setStore(store, query, queryOptions)`: Allows specifying a new store
+* `set("store", store[, query[, queryOptions]])`: Specifies a new store
   (and optionally, also `query` and `queryOptions`) for the list to reference.
+* `refresh()`: Clears the component and re-requests the initial page of data.
+* `renderQuery(query)`: Renders the given query into the list.  Called
+  automatically upon refresh.
+* `set("sort", property, descending)`: \_StoreMixin's version of this defers
+  sorting to the store.
+* `updateDirty(id, field, value)`: Updates an entry in the component's dirty
+  data hash, to be persisted to the store on the next call to `save()`.
+* `save()`: Instructs the list to relay any dirty data back to the store.
+  Returns a promise which resolves when all necessary put operations have
+  completed successfully (even if the store operates synchronously).
+* `revert()`: Clears the dirty data hash without updating the store, and
+  refreshes the component.
 
 ## OnDemandGrid
 
@@ -303,7 +371,7 @@ For example:
         grid = new Grid({
                 store: myStore, // a Dojo object store
                 columns: [
-                    {label: "Column 1", field: "col1", editable: true, sortable: true},
+                    {label: "Column 1", field: "col1", sortable: false},
                     {label: "Column 2", field: "col2"},
                     ...
                 ]
@@ -313,14 +381,15 @@ For example:
 
 # Mixins
 
-The following modules can be used to add extra functionality to a Grid.
+Mixin modules can be used to add extra functionality to a list or grid.
 To use these, simply add the module as a mixin in a `dojo.declare` inheritance chain.
 For example, to create a grid based on OnDemandGrid with the
 Selection and Keyboard handling mixins, we could do the following:
 
-    define(["dojo", "dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Keyboard"], function(dojo, Grid, Selection, Keyboard){
-        // create a grid based on plugins
-        var MyGrid = dojo.declare([Grid, Selection, Keyboard]);
+    define(["dojo/_base/declare", "dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Keyboard"],
+    function(declare, OnDemandGrid, Selection, Keyboard){
+        // create a new Grid constructor including some mixins
+        var MyGrid = declare([OnDemandGrid, Selection, Keyboard]);
         // instantiate it
         var grid = new MyGrid({
             store: myStore,
@@ -331,16 +400,16 @@ Selection and Keyboard handling mixins, we could do the following:
 
 You can also perform inline mixin and instantiation:
 
-    var grid = new (dojo.declare([Grid, Selection, Keyboard]))({
+    var grid = new (declare([OnDemandGrid, Selection, Keyboard]))({
         store: myStore,
         ...
     }, "grid");
 
-Below is a synopsis of currently available mixins.
+A synopsis of currently available mixins follows.
 
 ## ColumnSet
 
-The ColumnSet module provides functionality which divides a Grid's columns into
+The ColumnSet module provides functionality which divides a grid's columns into
 multiple distinct sets, each of which manage their columns' horizontal scrolling
 independently.  This makes it possible to keep certain columns in view even while
 others are scrolled out of viewing range.
@@ -349,7 +418,7 @@ When mixing in ColumnSet, instead of specifying `columns` or `subRows`, one
 specifies `columnSets`, which is essentially an array of `subRows`.  For example,
 in pseudocode:
 
-    var grid = new (dojo.declare([Grid, ColumnSet]))({
+    var grid = new (declare([Grid, ColumnSet]))({
         columnSets: [
             // left columnset
             [
@@ -381,88 +450,115 @@ More concrete examples can be found in the `complex_column.html` test page.
 
 ## Selection
 
-Adds selection capability to a List/Grid. The list instance will include a
-`selection` property representing the selected items.  This plugin will also
-fire `dgrid-select` and `dgrid-deselect` events. For example:
+Adds selection capability to a list or grid. The resulting instance(s) will include
+a `selection` property representing the selected items.  This plugin will also
+fire batched `dgrid-select` and `dgrid-deselect` events, which will possess a
+`rows` property containing an array of Row objects (with `id`, `data`, and
+`element`). For example:
 
-    grid = dojo.declare([Grid, Selection])({
+    grid = declare([Grid, Selection])({
         selectionMode: "single",
-        ...});
+    ...});
     grid.on("dgrid-select", function(event){
-        // get the row that was just selected
-        var row = grid.row(event);
+        // get the rows that were just selected
+        var rows = event.rows;
+        // ...
+        
+        // iterate through all currently-selected items
         for(var id in grid.selection){
-            if(grid.selection[id] === true){
-                // iterate through all selected items
-            }
+            // ...
         }
     });
     grid.on("dgrid-deselect", function(event){
-        var row = grid.row(event);
-        // row was just deselected 
+        // get the rows that were just deselected
+        var rows = event.rows;
+        // ...
     });
 
 The following properties and methods are added by the Selection plugin:
 
-* `selection`: The object containing the ids of the selected objects.
+* `selection`: The object containing the IDs of the selected objects.
 * `selectionMode`: A string indicating the mode of selection.
   The following values are acceptable:
     * `extended`: The default setting; follows common ctrl and shift key practices for selection
     * `single`: Only allows one row to be selected at a time
-    * `multiple`: Similar to `extended`,
-      but normal clicks add selection without removing previous selections
+    * `multiple`: Similar to `extended`, but normal clicks add selection without
+      removing previous selections
     * `none`: Nothing can be selected by user interaction;
       only programmatic selection (or selection via selectors) is allowed
-* `select(id)`: Programmatically select a row
-* `deselect(id)`: Programmatically deselect a row
+* `deselectOnRefresh`: Determines whether calls to `refresh`
+  (including sorts) also clear the current selection; `true` by default.
+* `allowSelectAll`: Determines whether the "select-all" action should be
+  permitted via a checkbox selector column or the Ctrl/Cmd+A keyboard shortcut;
+  defaults to `false`.
+* `allowSelect(row)`: Returns a boolean indicating whether the given `row` should
+  be selectable; designed to be overridden.
+* `select(row[, toRow])`: Programmatically selects a row or range of rows.
+* `deselect(row[, toRow])`: Programmatically deselects a row or range of rows.
+* `selectAll()`: Programmatically selects all rows in the component. Note that
+  only rows that have actually been loaded will be represented in the `selection`
+  object.
+* `clearSelection()`: Programmatically deselects all rows in the component.
+* `isSelected(row)`: Returns `true` if the given row is selected.
 
-The `select` and `deselect` methods can be passed an object id, or anything else
-acceptable by List's `row` method.
+The `select`, `deselect`, and `isSelected` methods can be passed any type of
+argument acceptable to List's `row` method.
 
 ### CellSelection
 
 The CellSelection plugin extends upon the functionality of the Selection plugin
-to provide celection at the cell level.
+to provide celection at the cell level instead.  Some key differences include:
 
-Whereas Selection's `select` and `deselect` methods look up the passed argument
-via List's `row` method, CellSelection looks it up via Grid's `cell` method.
+* The `selection` object now stores a hash of hashes, where the outer hash is
+  keyed by item ID and the inner hash is keyed by column ID.
+* The `dgrid-selected` and `dgrid-deselected` events still fire, but include a
+  `cells` property containing an array of cell objects, rather than a `rows`
+  property.
+* Whereas Selection's `select`, `deselect`, and `isSelected` methods look up the
+  passed argument via List's `row` method, CellSelection looks it up via Grid's
+  `cell` method.
+* The `allowSelect` method is passed a cell object instead of a row object.
 
 ## Keyboard
 
-This plugin adds keyboard handling functionality.
+This mixin adds keyboard handling functionality.
 The arrow keys can be used to navigate the focus across cells and rows,
-providing accessibility and ease of use.
+providing accessibility and ease of use.  The page up and page down keys
+may also be used for faster navigation, traversing the number of rows specified
+in the `pageSkip` property of the instance.
 
-When used with grids, this plugin references the `cellNavigation` property of
+When used with grids, this mixin references the `cellNavigation` property of
 the grid instance, to determine whether keyboard navigation and focus should
 operate at the individual cell level (`true`, the default) or at the row level
 (`false`).
 
 # Column Plugins
 
-The following modules are plugins designed for specific columns of a Grid.
-Column plugin modules return a function; they are used by calling the function,
-passing the column definition object (and possibly other arguments),
-and specifying the result of the call as an entry in `columns` (or `subRows`).
+Column plugin modules define plugins designed for individual columns of a grid.
+Each of these modules returns a function (*not* a constructor); the function is
+designed to be passed a column definition object (and possibly other arguments),
+yielding a (modified) column definition object.
 
 For example, to create a column structure where the first column has a
 tree expander and the second column has a checkbox editor, we could do this:
 
-    define(["dgrid/OnDemandGrid", "dgrid/Tree", "dgrid/Editor"], function(Grid, Tree, Editor){
-        grid = new Grid({
-                store: myHierarchicalStore, // a Dojo object store
-                columns: [
-                    // first column will have a tree expander:
-                    Tree({label: "Name", field: "name"}),
-                    // second column will render with a checkbox: 
-                    Editor({label: "A CheckBox", field: "bool"}, "checkbox"),
-                    // just a normal column:
-                    {label: "Type", field: "type"},
-                    ...
-                ]
-            }, "grid");
-        ...
+    require(["dgrid/OnDemandGrid", "dgrid/Tree", "dgrid/Editor"],
+    function(Grid, Tree, Editor){
+        var grid = new Grid({
+            store: myHierarchicalStore, // a Dojo object store
+            columns: [
+                // first column will have a tree expander:
+                Tree({label: "Name", field: "name"}),
+                // second column will render with a checkbox: 
+                Editor({label: "A CheckBox", field: "bool"}, "checkbox"),
+                // just a normal column:
+                {label: "Type", field: "type"},
+                ...
+            ]
+        }, "grid");
     });
+
+A synopsis of currently available column plugins follows.
 
 ## Editor
 
@@ -484,6 +580,9 @@ definition object:
   via `put-selector`; for widgets, the object will be passed to the widget constructor.
 * `autoSave`: If `true`, the grid's `save` method will be called as soon as a
   change is detected in an editor in this column.  Defaults to `false`.
+* `dismissOnEnter`: By default, pressing enter will store the current
+  value in the grid's dirty data hash.  This can be undesirable particularly for
+  textarea editors; setting this property to `false` will disable the behavior.
 
 For convenience, the `editor` and `editOn` properties may also be specified as
 the second and third arguments to the `Editor` column plugin function.
@@ -502,37 +601,6 @@ text field when a cell in the column is double-clicked:
 
 For examples of Editor in use, see the various `Editor` test pages,
 as well as the `GridFromHtml_Editors` test page for declarative examples.
-
-## Tree
-
-The Tree plugin enables expansion of rows to display children.
-It expects to operate on a store-backed grid such as an OnDemandGrid, whose
-store is expected to provide a `getChildren(object, options)` method to return
-the children for each object.  Note that for best results, `getChildren` should
-return results with an `observe` function as well, so that changes to children
-can also be reflected as they occur.
-
-The store may also (optionally) provide a `mayHaveChildren(object)` method
-which returns a boolean indicating whether or not the row can be expanded.
-
-## Selector
-
-Used in conjunction with the Selection mixin, the Selector plugin dedicates a
-column to the purpose of rendering a selector component, providing alternate
-means for selecting and deselecting rows in a grid.
-
-The Selector plugin supports the following additional column definition property:
-
-* `selectorType`: Specifies the type of selector component to use.  Defaults to
-  `checkbox`, but `radio` may also be specified, as a more appropriate choice for
-  grids in `single` selection mode.
-
-Alternatively, the `selectorType` may be specified as the second argument to
-the Selector function instead of including it within the column definition.
-
-Note that a Selector column can be used to allow selection even in a grid where
-`selectionMode` is set to `none`, in which case the controls in the Selector
-column will be the only means by which a user may select or deselect rows.
 
 ### Recommendations for the editOn property
 
@@ -558,12 +626,56 @@ it is possible to do something like the following:
         }
     );
 
+There are also a couple of useful simple gesture implementations available in the
+`util/touch` module, namely `tap` and `dbltap`.
+
+## Tree
+
+The Tree plugin enables expansion of rows to display children.
+It expects to operate on a store-backed grid such as an OnDemandGrid, whose
+store is expected to provide a `getChildren(object, options)` method to return
+the children for each object.  Note that for best results, `getChildren` should
+return results with an `observe` function as well, so that changes to children
+can also be reflected as they occur.
+
+The store may also (optionally) provide a `mayHaveChildren(object)` method
+which returns a boolean indicating whether or not the row can be expanded.
+
+When the tree plugin is applied to a column, the parent grid is augmented with
+an `expand(row, expand)` method, which can be used to programmatically expand or
+collapse a row, given a row object (from `grid.row(target)`) or a `dgrid-row`
+element.  The optional second parameter specifies whether the row should be
+expanded (`true`) or collapsed (`false`); if unspecified, the method toggles
+the current expanded state of the row.
+
+## Selector
+
+Used in conjunction with the Selection mixin, the Selector plugin dedicates a
+column to the purpose of rendering a selector component, providing alternate
+means for selecting and deselecting rows in a grid.
+
+The Selector plugin supports the following additional column definition property:
+
+* `selectorType`: Specifies the type of selector component to use.  Defaults to
+  `checkbox`, but `radio` may also be specified, as a more appropriate choice for
+  grids in `single` selection mode.
+
+Alternatively, `selectorType` may be specified as the second argument to
+the Selector function instead of including it within the column definition.
+
+Note that a Selector column can be used to allow selection even in a grid where
+`selectionMode` is set to `none`, in which case the controls in the Selector
+column will be the only means by which a user may select or deselect rows.
+
+Also note that selector inputs will be disabled for rows for which `allowSelect`
+returns `false`.
+
 # Extensions
 
 The following are additional mixins which dwell outside dgrid's core feature set.
 Extensions live in the `extensions` subdirectory; their tests and
-css/image resources also live under respective `css/extensions` and
-`test/extensions` subdirectories.
+css/image resources also live under respective `test/extensions` and
+`css/extensions` subdirectories.
 
 ## ColumnReorder
 
@@ -572,20 +684,33 @@ via drag'n'drop operations on column headers.  Note that currently this is
 only supported for simple column layouts involving a single sub-row and no
 columnsets.
 
-This extension supports an additional `reorderable` property on column definitions;
+This extension supports an additional `reorderable` property in column definitions;
 if explicitly set to `false`, that particular column's header node will not be
 treated as a viable DnD item.
 
 ## ColumnResizer
 
 The ColumnResizer extension can be used to add column resizing functionality
-(accessible via mouse drag).  Originally based on
-[the gridx ColumnResizer module](https://github.com/evanhw/gridx/blob/master/gridx/modules/ColumnResizer.js),
-the plugin has been further developed for better performance and integration with dgrid.
+(accessible via mouse or touch drag).
 
 ## ColumnHider
 
-TODOC
+The ColumnHider extension adds the ability to dynamically hide or show columns
+in a grid without the need to fully reset its layout.  Note, however, that
+this is only fully supported for cases of simple, single-row column layouts.
+
+This extension adds a menu accessible from the top right corner of the grid
+(represented by a "+" mark); it will open on click, presenting checkboxes for
+each column in the grid.  These can be checked or unchecked to show or hide
+individual columns, respectively.
+
+The ColumnHider module adds support for the following column definition properties:
+
+* `hidden`: If `true`, the column in question will be initially hidden, but can
+  be shown by opening the menu and checking its box.
+* `unhidable`: If `true`, the column in question will not be listed in the
+  menu, denying access to toggle its appearance.  This can be particularly
+  useful for a selector column which should always be shown, for example.
 
 ## Pagination
 
@@ -596,7 +721,7 @@ to switch between pages.
 
 **Note:** the Pagination extension should be mixed into List or Grid, **not**
 one of the OnDemand constructors, since those contain their own virtual scrolling
-logic.  Internally, Pagination inherits from the same _StoreMixin module
+logic.  Internally, Pagination inherits from the same \_StoreMixin module
 inherited by the OnDemand prototypes for common integration with `dojo/store`.
 
 ### Properties
@@ -626,8 +751,8 @@ The DnD plugin can be used to add row drag'n'drop functionality.
 
 ### Requirements
 
-The DnD extension assumes usage of the OnDemandList or OnDemandGrid module;
-thus, it expects a store to be in use.
+The DnD extension assumes usage of a store-backed component, most commonly an
+OnDemandGrid instance.
 
 The store should be order-aware, supporting the `options.before` parameter
 on `add()` and `put()` calls to properly respond to DnD operations.
@@ -653,18 +778,18 @@ the arguments object passed to the constructor:
 
 # Themes/Skins
 
-dgrid automatically loads the necessary structural CSS to work properly.
-However, to make the component far more visually attractive and interesting,
-it is common to also apply one of the the included skins. There are various CSS
-files under the `css/skins` directory which can be used to skin the dgrid to a
-particular look and feel.
+dgrid automatically loads the necessary structural CSS to work properly using
+xstyle's css module.  However, to make the component far more visually attractive
+and interesting, it is common to also apply one of the the included skins.
+There are various CSS files under the `css/skins` directory which can be used
+to skin the dgrid to a particular look and feel.
 
 ## Grid Structure for custom CSS Styling
 
 dgrid's appearance is designed to be styled and customized via CSS.
 Many of the classes involved can be discovered by simply looking at elements in
 your browser developer tools of choice.
-Perhaps the most important classes are the `column-<id>` and `field-<fieldname>`
+Perhaps the most important classes are the `field-<fieldname>` and `dgrid-column-<id>`
 classes assigned to each cell in grids, which allow for per-column styling.
 
 The following class names are used by dgrid and can be referenced from CSS:
@@ -698,9 +823,9 @@ The following generic class names are also available for generic skinning
 * `ui-state-active`: Applied to selected rows or cells
 * `ui-state-highlight`: Applied to a row for a short time when the contents are change (or it is newly created)
 
-## Limitations
+# Limitations
 
-### Use with the Legacy Loader API
+## Use with the Legacy Loader API
 
 Using `dgrid/List` without first loading `dgrid.css` will not work when using the
 legacy `dojo.require` method due to an asynchronously-resolving plugin dependency.
@@ -710,9 +835,9 @@ To use `dgrid/List` with `dojo.require`, make sure you have
 This also applies for stylesheets loaded by specific mixins (such as `dgrid/ColumnSet`)
 or extensions (such as `dgrid/extensions/ColumnResizer`).
 
-### Reuse of Column Definitions
+## Reuse of Column Definitions
 
 Reusing a single column definition object between multiple grids (e.g.
 `var cols = {}, gridA = new Grid({ columns: cols }), gridB = new Grid({ columns: cols })`)
-is not supported and will not function properly. Always create a fresh `columns`
+is *not* supported, and will not function properly. Always create a fresh `columns`
 object for every grid you instantiate.

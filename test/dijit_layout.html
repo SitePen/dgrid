@@ -30,6 +30,16 @@
 			// callbacks for button clicks
 			function showDeclDialog(){ dlgDecl.show(); }
 			
+			// function to get a unique set of column definitions for each grid
+			function getGridCols(){
+				return {
+					col1: 'Column 1',
+					col2: {name: 'Column 2', sortable: false},
+					col3: 'Column 3',
+					col4: 'Column 4'
+				};
+			}
+			
 			require(["dgrid/OnDemandGrid",
 				"dgrid/extensions/DijitRegistry",
 				"dijit/Dialog",
@@ -47,14 +57,7 @@
 				"dojo/domReady!"
 			], function(Grid, DijitRegistry, Dialog, lang, declare, parser){
 			
-				var
-					gridCols = window.gridCols = {
-						col1: 'Column 1',
-						col2: {name: 'Column 2', sortable: false},
-						col3: 'Column 3',
-						col4: 'Column 4'
-					},
-					CustomGrid = declare([Grid, DijitRegistry]);
+				var CustomGrid = declare([Grid, DijitRegistry]);
 				
 				// simply passing columns via data-dojo-props, don't want GridFromHtml
 				window.dgrid = { Grid: CustomGrid };
@@ -76,7 +79,7 @@
 				data-dojo-props="id:'cpLeft', region:'left'">
 				<!-- left: dgrid inside contentpane -->
 				<div data-dojo-type="dgrid.Grid" id="gridBCCP" class="bcLeft"
-					data-dojo-props="store: testStore, columns: gridCols"></div>
+					data-dojo-props="store: testStore, columns: getGridCols()"></div>
 			</div>
 			<!-- center: tabcontainer -->
 			<div data-dojo-type="dijit.layout.TabContainer" class="bcCenter" id="tc"
@@ -85,20 +88,20 @@
 				<div data-dojo-type="dijit.layout.ContentPane"
 					data-dojo-props="id: 'tab1', title: 'Tab 1'">
 					<div data-dojo-type="dgrid.Grid" id="gridTab1" class="gridTab"
-						data-dojo-props="store: testStore, columns: gridCols"></div>
+						data-dojo-props="store: testStore, columns: getGridCols()"></div>
 				</div>
 				<!-- tab 2: dgrid inside contentpane again, but not initially visible -->
 				<div data-dojo-type="dijit.layout.ContentPane"
 					data-dojo-props="id: 'tab2', title: 'Tab 2'">
 					<div data-dojo-type="dgrid.Grid" id="gridTab2" class="gridTab"
-						data-dojo-props="store: testStore, columns: gridCols"></div>
+						data-dojo-props="store: testStore, columns: getGridCols()"></div>
 				</div>
 			</div>
 		</div>
 		<!-- declarative dialog w/ dgrid inside -->
 		<div data-dojo-type="dijit.Dialog" id="dlgDecl" data-dojo-id="dlgDecl">
 			<div data-dojo-type="dgrid.Grid" id="gridDlgDecl"
-				data-dojo-props="store: testStore, columns: gridCols"></div>
+				data-dojo-props="store: testStore, columns: getGridCols()"></div>
 		</div>
 	</body>
 </html>

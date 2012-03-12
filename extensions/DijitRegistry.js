@@ -35,7 +35,6 @@ function(declare, registry){
 		getChildren: function(){
 			// provide hollow implementation for logic which assumes its existence
 			// (e.g. dijit/form/_FormMixin)
-			// TODO: maybe it's desirable (but expensive) to call findWidgets here?
 			return [];
 		}
 	});

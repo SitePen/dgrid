@@ -25,10 +25,10 @@
 				width: 70%;
 				float: left;
 			}
-			#grid .column-order {
+			#grid .field-order {
 				width: 7%;
 			}
-			#grid .column-name {
+			#grid .field-name {
 				width: 18%;
 			}
 			
@@ -55,16 +55,11 @@
 			require(["dgrid/List", "dgrid/Grid", "dojo/_base/array", "dgrid/Editor",
 					"dijit/form/TextBox", "dijit/form/DateTextBox", "dojo/domReady!"],
 				function(List, Grid, arrayUtil, Editor, TextBox, DateTextBox){
-					var columns3 = {
+					var columns = {
 						order: "step", // give column a custom name
 						name: Editor({}, TextBox, "dblclick"),
 						description: {label: "what to do", sortable: false},
-						date: Editor({label: 'Date', field: 'date'}, DateTextBox),
-						
-					};
-					var columns2 = {
-						name: {},
-						description: {label: "what to do", sortable: false}
+						date: Editor({label: 'Date'}, DateTextBox)
 					};
 					window.list = new List({}, "list");
 					list.renderArray(arrayUtil.map(data, function(item){
@@ -72,7 +67,7 @@
 					}));
 					
 					window.grid = new Grid({
-						columns: columns3
+						columns: columns
 					}, "grid");
 					grid.renderArray(data);
 				});
