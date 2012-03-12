@@ -649,12 +649,14 @@ This is likely closest in behavior to the `refresh` method on dgrid components.
 
 ### sort
 
-dgrid components have a `sort` method which takes two arguments:
-the name of the field to sort by, and a flag as to whether to sort descending
-(defaults to `false`).
+dgrid components have a sort setter (e.g. `grid.set("sort", ...)` which takes
+two arguments:
 
-Like the `sort` method in `dojox/grid` components, this can even be called to sort
-columns that ordinarily wouldn't be sortable via the UI.
+* the name of the field to sort by
+* optionally, a flag as to whether to sort descending (defaults to `false`)
+
+Like the `sort` method in `dojox/grid` components, this can even be called to
+sort columns that ordinarily wouldn't be sortable via the UI.
 
 ### canSort
 
