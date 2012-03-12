@@ -97,7 +97,8 @@ function(kernel, declare, listen, has, put, List){
 			for(var si = 0, sl = subRows.length; si < sl; si++){
 				var subRow = subRows[si];
 				if(sl == 1 && !has("ie")){
-					// shortcut for modern browsers
+					// shortcut for modern browsers, avoiding trs is faster and lighter:
+					// http://jsperf.com/table-without-trs
 					tr = tbody;
 				}else{
 					tr = put(tbody, "tr");
