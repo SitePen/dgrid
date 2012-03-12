@@ -37,13 +37,12 @@
 		<script type="text/javascript">
 			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!"], 
 				function(List, Grid, Selection, Keyboard, declare){
-					var columns = [
-						{label: 'Column 1', field: 'name'},
-						{label: 'Column 2', field: 'type'}
-					];
 					window.grid = new (declare([Grid, Selection, Keyboard]))({
 						store: testCountryStore,
-						columns: columns,
+						columns: {
+							name: "Name",
+							type: "Type"
+						},
 						query: {type:"continent"}
 					}, "grid");
 				});

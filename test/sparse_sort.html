@@ -39,12 +39,12 @@
 				];
 				
 				window.gridArray = new Grid({
-					columns: columns
+					columns: lang.clone(columns)
 				}, "gridArray");
 				gridArray.renderArray(lang.clone(data));
 				
 				window.gridStore = new OnDemandGrid({
-					columns: columns,
+					columns: lang.clone(columns),
 					store: store
 				}, "gridStore");
 			});

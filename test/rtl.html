@@ -47,8 +47,8 @@
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
 		
-			require(["dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dgrid/Tree", "dgrid/Editor", "dojo/_base/declare", "dojo/on", "dojo/data/ObjectStore", "dijit/form/CheckBox", "dijit/form/TimeTextBox",  "dijit/form/Select", "dijit/form/FilteringSelect", "dgrid/test/data/base", "dojo/domReady!", "xstyle/css!../css/dgrid_rtl.css"], 
-				function(Grid, Selection, Keyboard, Tree, Editor, declare, on, ObjectStore, CheckBox, TimeTextBox, Select, FilteringSelect, testStore){
+			require(["dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dgrid/Tree", "dgrid/Editor", "dojo/_base/lang", "dojo/_base/declare", "dojo/on", "dojo/data/ObjectStore", "dijit/form/CheckBox", "dijit/form/TimeTextBox",  "dijit/form/Select", "dijit/form/FilteringSelect", "dgrid/test/data/base", "dojo/domReady!", "xstyle/css!../css/dgrid_rtl.css"], 
+				function(Grid, Selection, Keyboard, Tree, Editor, lang, declare, on, ObjectStore, CheckBox, TimeTextBox, Select, FilteringSelect, testStore){
 					var columns = [
 						{label: 'Column 1', field: 'col1'},
 						{label: 'Column 2', field: 'col2', sortable: false},
@@ -58,12 +58,12 @@
 					];
 					window.grid = new (declare([Grid, Selection, Keyboard]))({
 						store: testStore,
-						columns: columns
+						columns: lang.clone(columns)
 					}, "grid");
 					
 					window.scrollgrid = declare([Grid, Selection, Keyboard])({
 						store: testStore,
-						columns: columns
+						columns: lang.clone(columns)
 					}, "scrollgrid");
 					
 					var columnsTree = [

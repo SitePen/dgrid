@@ -143,7 +143,7 @@
 
 					window.gridAddDel = declare([Grid, Keyboard, Selection])({
 						store: smallColorStore,
-						columns: columns4,
+						columns: lang.clone(columns4),
 						selectionMode: "multiple"
 					}, "gridAddDel");
 					
@@ -151,7 +151,7 @@
 					// (so additions/deletions should show up in both)
 					window.listAddDel = declare([List, Keyboard, Selection])({
 						store: smallColorStore,
-						columns: columns4,
+						columns: lang.clone(columns4),
 						selectionMode: "multiple",
 						renderRow: function(object, options){
 							// need to define renderRow to accommodate store items
