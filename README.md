@@ -143,7 +143,7 @@ the numeric indices become the column IDs.
 
 For example, we could create a grid like so:
 
-    require(["dgrid/Grid"], function(List){
+    require(["dgrid/Grid"], function(Grid){
         var grid = new Grid({
             columns: {
                 first: {
