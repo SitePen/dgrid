@@ -404,8 +404,13 @@ on equivalent functionality available in dgrid.
 ### sortInfo
 
 The way in which dgrid represents current sort order is significantly different
-than `dojox/grid`.  dgrid stores the current sort options, as they would be
-passed via a store's `queryOptions`, in the `sortOrder` property.
+than `dojox/grid`.  dgrid stores the current sort options, as they would be passed
+via a store's `queryOptions`; these options are retrievable via the sort getter
+(e.g. `grid.get("sort")`).
+
+Additionally, store-backed components will reflect any currently-applied sort
+information in the object returned by `get("queryOptions")`, since `sort`
+becomes part of these options when queries are issued.
 
 ### rowSelector and indirect selection
 
