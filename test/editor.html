@@ -29,10 +29,10 @@
 		<script type="text/javascript" src="../../dojo/dojo.js"
 			data-dojo-config="async: true, isDebug: true"></script>
 		<script type="text/javascript">
-			require(["dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Keyboard", "dgrid/Editor",
+			require(["dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Keyboard", "dgrid/editor",
 					"dojo/_base/lang", "dojo/_base/declare", "dojo/on", "dojo/dom-construct",
 					"dojo/store/Memory", "dojo/store/Observable", "dojo/data/ObjectStore", "dojo/domReady!"],
-				function(Grid, Selection, Keyboard, Editor,
+				function(Grid, Selection, Keyboard, editor,
 						lang, declare, on, domConstruct, Memory, Observable, ObjectStore){
 					var today = new Date(),
 						form = document.getElementById("editorForm"),
@@ -121,11 +121,11 @@
 								} }
 							},
 							{
-								label: "dijit/Editor",
+								label: "dijit/editor",
 								generate: generateText,
 								column: {
 									renderCell: function(object, data){
-										// Editor supports rich text; don't escape HTML in view
+										// this editor supports rich text; don't escape HTML in view
 										return domConstruct.create("div", { innerHTML: data });
 									},
 									editorArgs: { style: "height: 100px;" }
@@ -210,9 +210,9 @@
 						var
 							choice = getSelected(form.elements.editor),
 							options = componentTypes[choice],
-							editor = options.editor || options.label,
+							editorType = options.editor || options.label,
 							editOn = getSelected(form.elements.editOn),
-							deps = editor.indexOf("/") > -1 ? [editor] : [],
+							deps = editorType.indexOf("/") > -1 ? [editorType] : [],
 							data = [],
 							i;
 						
@@ -223,7 +223,7 @@
 						require(deps, function(ctor){
 							var columnArgs = {
 								autoSave: form.elements.autoSave.checked,
-								editor: ctor || editor
+								editor: ctor || editorType
 							};
 							if(editOn){ columnArgs.editOn = editOn; }
 							if(form.elements.customRenderCell.checked){
@@ -236,7 +236,7 @@
 							window.grid = new CustomGrid({
 								store: Observable(new TestStore({ data: data })),
 								columns: {
-									"editor": Editor(lang.mixin({}, options.column, columnArgs))
+									"editor": editor(lang.mixin({}, options.column, columnArgs))
 								}
 							}, "grid");
 						});

@@ -542,15 +542,15 @@ yielding a (modified) column definition object.
 For example, to create a column structure where the first column has a
 tree expander and the second column has a checkbox editor, we could do this:
 
-    require(["dgrid/OnDemandGrid", "dgrid/Tree", "dgrid/Editor"],
-    function(Grid, Tree, Editor){
+    require(["dgrid/OnDemandGrid", "dgrid/tree", "dgrid/editor"],
+    function(Grid, tree, editor){
         var grid = new Grid({
             store: myHierarchicalStore, // a Dojo object store
             columns: [
                 // first column will have a tree expander:
-                Tree({label: "Name", field: "name"}),
+                tree({label: "Name", field: "name"}),
                 // second column will render with a checkbox: 
-                Editor({label: "A CheckBox", field: "bool"}, "checkbox"),
+                editor({label: "A CheckBox", field: "bool"}, "checkbox"),
                 // just a normal column:
                 {label: "Type", field: "type"},
                 ...
@@ -560,14 +560,14 @@ tree expander and the second column has a checkbox editor, we could do this:
 
 A synopsis of currently available column plugins follows.
 
-## Editor
+## editor
 
-The Editor plugin provides the ability to render editor controls within cells
+The editor plugin provides the ability to render editor controls within cells
 for a column.  When used in conjunction with a store-backed grid such as an
 OnDemandGrid, edited fields are directly correlated with the dirty state of the grid;
 changes can then be saved back to the store based on edits performed in the grid.
 
-The Editor plugin recognizes the following additional properties on the column
+The editor plugin recognizes the following additional properties on the column
 definition object:
 
 * `editor`: Either a string or a Dijit widget constructor, specifying what type
@@ -585,41 +585,41 @@ definition object:
   textarea editors; setting this property to `false` will disable the behavior.
 
 For convenience, the `editor` and `editOn` properties may also be specified as
-the second and third arguments to the `Editor` column plugin function.
-For example, both of the following would result in an Editor which presents a
+the second and third arguments to the `editor` column plugin function.
+For example, both of the following would result in an editor which presents a
 text field when a cell in the column is double-clicked:
 
     // long version, everything in column def object
-    Editor({
+    editor({
         editor: "text",
         editOn: "dblclick",
         /* rest of column definition here... */
     })
     
     // shorthand version, editor and editOn as arguments
-    Editor({ /* rest of column definition here... */ }, "text", "dblclick")
+    editor({ /* rest of column definition here... */ }, "text", "dblclick")
 
-For examples of Editor in use, see the various `Editor` test pages,
-as well as the `GridFromHtml_Editors` test page for declarative examples.
+For examples of editor in use, see the various `editor` test pages,
+as well as the `GridFromHtml_editors` test page for declarative examples.
 
 ### Recommendations for the editOn property
 
-If attempting to trigger an Editor on focus (to accommodate
+If attempting to trigger an editor on focus (to accommodate
 keyboard and mouse), it is highly recommended to use dgrid's custom event,
 `dgrid-cellfocusin` instead of `focus`, to avoid confusion of events.  Note
 that this requires also mixing the Keyboard module into the Grid constructor.
 
-If touch input is a concern for activating Editors, the easiest solution is to
+If touch input is a concern for activating editors, the easiest solution is to
 use the `click` event, which browsers on touch devices tend to normalize to
 fire on taps as well.  If a different event is desired for desktop browsers,
 it is possible to do something like the following:
 
     require(
-        ["dgrid/OnDemandGrid", "dgrid/Editor", "dojo/has" /*, ... */],
-        function(Grid, Editor, has /*, ... */){
+        ["dgrid/OnDemandGrid", "dgrid/editor", "dojo/has" /*, ... */],
+        function(Grid, editor, has /*, ... */){
             var columns = [
                 /* ... more columns here ... */
-                Editor({ name: "name", label: "Editable Name" }, "text",
+                editor({ name: "name", label: "Editable Name" }, "text",
                     has("touch") ? "click" : "dblclick")
             ];
             /* ... create grid here ... */
@@ -629,9 +629,9 @@ it is possible to do something like the following:
 There are also a couple of useful simple gesture implementations available in the
 `util/touch` module, namely `tap` and `dbltap`.
 
-## Tree
+## tree
 
-The Tree plugin enables expansion of rows to display children.
+The tree plugin enables expansion of rows to display children.
 It expects to operate on a store-backed grid such as an OnDemandGrid, whose
 store is expected to provide a `getChildren(object, options)` method to return
 the children for each object.  Note that for best results, `getChildren` should
@@ -648,23 +648,23 @@ element.  The optional second parameter specifies whether the row should be
 expanded (`true`) or collapsed (`false`); if unspecified, the method toggles
 the current expanded state of the row.
 
-## Selector
+## selector
 
-Used in conjunction with the Selection mixin, the Selector plugin dedicates a
+Used in conjunction with the Selection mixin, the selector plugin dedicates a
 column to the purpose of rendering a selector component, providing alternate
 means for selecting and deselecting rows in a grid.
 
-The Selector plugin supports the following additional column definition property:
+The selector plugin supports the following additional column definition property:
 
 * `selectorType`: Specifies the type of selector component to use.  Defaults to
   `checkbox`, but `radio` may also be specified, as a more appropriate choice for
   grids in `single` selection mode.
 
 Alternatively, `selectorType` may be specified as the second argument to
-the Selector function instead of including it within the column definition.
+the `selector` function instead of including it within the column definition.
 
-Note that a Selector column can be used to allow selection even in a grid where
-`selectionMode` is set to `none`, in which case the controls in the Selector
+Note that a selector column can be used to allow selection even in a grid where
+`selectionMode` is set to `none`, in which case the controls in the selector
 column will be the only means by which a user may select or deselect rows.
 
 Also note that selector inputs will be disabled for rows for which `allowSelect`

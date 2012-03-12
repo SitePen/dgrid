@@ -27,23 +27,23 @@
 		<script src="../../dojo/dojo.js" data-dojo-config="async: true"></script>
 		<script>
 			var countWidgets; // function, defined within require callback
-			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dgrid/Editor", "dijit/form/TextBox", "dijit/registry", "dojo/aspect", "dojo/_base/declare", "dgrid/test/data/perf", "dojo/domReady!"], 
-				function(List, Grid, Selection, Keyboard, Editor, TextBox, registry, aspect, declare, testPerfStore){
+			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dgrid/editor", "dijit/form/TextBox", "dijit/registry", "dojo/aspect", "dojo/_base/declare", "dgrid/test/data/perf", "dojo/domReady!"], 
+				function(List, Grid, Selection, Keyboard, editor, TextBox, registry, aspect, declare, testPerfStore){
 					var
 						columns = [
 							{ name: 'Column 0', field: 'id', width: '10%' },
 							// always-on text input editor
-							Editor({ name: 'Column 1', field: 'integer', width: '10%' }, 'text'),
+							editor({ name: 'Column 1', field: 'integer', width: '10%' }, 'text'),
 							// text input editor activated on double-click
-							Editor({ name: 'Column 2', field: 'floatNum', width: '10%', editOn: 'dblclick' }, 'text'),
+							editor({ name: 'Column 2', field: 'floatNum', width: '10%', editOn: 'dblclick' }, 'text'),
 							{ name: 'Column 3', field: 'date', width: '10%' },
 							{ name: 'Column 4', field: 'date2', width: '10%' },
 							// always-on TextBox widget editor
-							Editor({ name: 'Column 5', field: 'text', label: 'text', width: '10%' }, TextBox),
+							editor({ name: 'Column 5', field: 'text', label: 'text', width: '10%' }, TextBox),
 							{ name: 'Column 6', field: 'bool', width: '10%' },
 							{ name: 'Column 7', field: 'bool2', width: '10%' },
 							// TextBox widget editor activated on double-click
-							Editor({ name: 'Column 8', field: 'price', label: 'price', width: '10%', editOn: 'dblclick' }, TextBox),
+							editor({ name: 'Column 8', field: 'price', label: 'price', width: '10%', editOn: 'dblclick' }, TextBox),
 							{ name: 'Column 9', field: 'today', width: '10%' }
 						];
 					

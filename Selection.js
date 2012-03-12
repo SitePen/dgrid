@@ -22,7 +22,7 @@ return declare([List], {
 	
 	//allowSelectAll: Boolean
 	//		If true, allow ctrl/cmd+A to select all rows.
-	//		Also consulted by Selector for showing select-all checkbox.
+	//		Also consulted by the selector plugin for showing select-all checkbox.
 	allowSelectAll: false,
 	
 	create: function(){
