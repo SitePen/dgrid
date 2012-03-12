@@ -64,13 +64,13 @@
 				require(deps, 
 				function(css1, css2, css3, List, Grid, Tree, Selection, Keyboard, Editor, declare, domConstruct, testStore){
 					var
-						columns = [
-							{label: 'Column 1', field: 'col1'},
-							Editor({label: 'Column 2', field: 'col2', sortable: false, editor: "checkbox"}),
-							{label: 'Column 3', field: 'col3'},
-							{label: 'Column 4', field: 'col4'},
-							{label: 'Column 5', field: 'col5'}
-						],
+						columns = {
+							col1: "Column 1",
+							col2: Editor({label: 'Column 2', sortable: false, editor: "checkbox"}),
+							col3: "Column 3",
+							col4: "Column 4",
+							col5: "Column 5"
+						},
 						skins = ["claro", "tundra", "nihilo", "soria",
 							"slate", "sage", "cactus", "squid"],
 						i, l = skins.length,

@@ -59,7 +59,7 @@
 						order: "step", // give column a custom name
 						name: Editor({}, TextBox, "dblclick"),
 						description: {label: "what to do", sortable: false},
-						date: Editor({label: 'Date', field: 'date'}, DateTextBox)
+						date: Editor({label: 'Date'}, DateTextBox)
 					};
 					window.list = new List({}, "list");
 					list.renderArray(arrayUtil.map(data, function(item){

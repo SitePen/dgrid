@@ -371,7 +371,7 @@ For example:
         grid = new Grid({
                 store: myStore, // a Dojo object store
                 columns: [
-                    {label: "Column 1", field: "col1", editable: true, sortable: true},
+                    {label: "Column 1", field: "col1", sortable: false},
                     {label: "Column 2", field: "col2"},
                     ...
                 ]

@@ -26,7 +26,7 @@
 			#grid .field-col4 {
 				width: 100px;
 			}
-			#grid .field-last-col {
+			#grid .field-col5 {
 				width: 150px;
 			}
 			
@@ -55,7 +55,7 @@
 						col2: {label: 'Column2222222222222222222222222', sortable: false},
 						col3: 'Column3333333333333333333',
 						col4: 'Column 4',
-						"last-col": {label: 'Column 5', field: 'col5'}
+						col5: 'Column 5'
 					};
 					columns1 = lang.clone(columns);
 
@@ -63,7 +63,7 @@
 						col2: 'Col2',
 						col4: {label: 'Col4', sortable: false},
 						col1: 'Col1',
-						"last-col": {label: 'Column 5', field: 'col5'}
+						col5: 'Column 5'
 					};
 					
 					window.grid = declare([Grid, Selection, ColumnResizer])({
