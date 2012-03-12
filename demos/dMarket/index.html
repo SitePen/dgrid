@@ -24,19 +24,19 @@
 		</div>
 		<script src="../../../dojo/dojo.js" data-dojo-config="async:1"></script>
 		<script>
-require(["dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Keyboard",
+require(["dgrid/OnDemandList", "dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Keyboard",
 	"dgrid/Editor", "dgrid/Selector",
 	"dgrid/extensions/ColumnResizer", "dgrid/extensions/ColumnHider", "dgrid/extensions/DnD",
 	"dojo/_base/lang", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/dom",
 	"dojo/store/Memory", "dojo/store/Observable", "put-selector/put",
 	"dijit/form/Button", "dijit/form/NumberSpinner", "dojo/domReady!"],
-function(Grid, Selection, Keyboard, Editor, Selector, ColumnResizer, ColumnHider, DnD,
+function(List, Grid, Selection, Keyboard, Editor, Selector, ColumnResizer, ColumnHider, DnD,
 		lang, declare, on, aspect, dom, Memory, Observable, put, Button, NumberSpinner){
 	
 	var descContainer = dom.byId("descContainer"),
 		shoppingCart = dom.byId("shoppingCart"),
 		totalNode = dom.byId("total"),
-		button, marketGrid, purchasesGrid;
+		button, marketList, purchasesGrid;
 	
 	var cartStore = Observable(new Memory({data: []}));
 	var marketStore = new Memory({ data: [
@@ -111,14 +111,9 @@ function(Grid, Selection, Keyboard, Editor, Selector, ColumnResizer, ColumnHider
 		return div;
 	};
 	
-	var MarketGrid = declare([Grid, Selection, Keyboard, DnD]);
+	var MarketList = declare([List, Selection, Keyboard, DnD]);
 	var CartGrid = declare([Grid,Selection, Keyboard, ColumnResizer, ColumnHider, DnD]);
-	marketGrid = new MarketGrid({
-		columns: {
-			icon: { label: " ", sortable: false },
-			artist: "Artist",
-			album: "Album"
-		},
+	marketList = new MarketList({
 		store: marketStore,
 		renderRow: galleryRender,
 		showHeader: false,
@@ -149,8 +144,8 @@ function(Grid, Selection, Keyboard, Editor, Selector, ColumnResizer, ColumnHider
 		dndParams: { isSource: false }
 	}, "purchases");
 	
-	marketGrid.on(".dgrid-row:click", function(e){
-		var item = marketGrid.row(e).data;
+	marketList.on(".dgrid-row:click", function(e){
+		var item = marketList.row(e).data;
 		var html = '<div class="albumDesc"><div class="albumLarge">' + item.album + '</div><div class="artist">' + item.artist + '</div>' +
 			'<div class="summary">'+item.summary+'</div><div class="price">$' + item.price +'</div><div class="buyBtn" id="buy">Buy</div></div>';
 		shoppingCart.style.display = "none";
@@ -191,7 +186,7 @@ function(Grid, Selection, Keyboard, Editor, Selector, ColumnResizer, ColumnHider
 	
 	// hook up "buy" click handler
 	on(descContainer, ".buyBtn:click", function() {
-		var selection = marketGrid.get("selection"), id, item;
+		var selection = marketList.get("selection"), id, item;
 		for (id in selection) {
 			cartStore.put(marketStore.get(id));
 		}
