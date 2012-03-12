@@ -25,6 +25,10 @@
 				position: relative;
 				overflow-y: hidden;
 			}
+			.has-ie-6 #grid .dgrid-scroller {
+				/* IE6 doesn't react properly to hidden on this page for some reason */
+				overflow-y: visible;
+			}
 			#grid .dgrid-header-scroll {
 				display: none;
 			}
