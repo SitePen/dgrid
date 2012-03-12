@@ -201,17 +201,16 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 			this._trackError(function(){
 				var count = grid.rowsPerPage,
 					start = (page - 1) * count,
-					options = lang.delegate(grid.queryOptions || {}, {
+					options = lang.mixin(grid.get("queryOptions"), {
 						start: start,
 						count: count
+						// current sort is also included by get("queryOptions")
 					}),
 					results,
 					contentNode = grid.contentNode,
 					rows = grid._rowIdToObject,
 					substrLen = 5 + grid.id.length, // trimmed from front of row IDs
 					r, loadingNode;
-				
-				if(grid.sortOrder){ options.sort = grid.sortOrder; }
 				
 				// remove any currently-rendered rows
 				for(r in rows){

@@ -85,43 +85,44 @@ function(kernel, declare, listen, has, put, List){
 		createRowCells: function(tag, each, subRows){
 			// summary:
 			//		Generates the grid for each row (used by renderHeader and and renderRow)
-			var tr, row = put("table.dgrid-row-table[role=presentation]"),
-				cellNavigation = this.cellNavigation;
-			if(has("ie") < 9 || has("quirks")){
-				// this is the only browser that needs a tbody
-				var tbody = put(row, "tbody");
-			}else{
-				var tbody = row;
-			}
+			var row = put("table.dgrid-row-table[role=presentation]"),
+				cellNavigation = this.cellNavigation,
+				// IE < 9 needs an explicit tbody; other browsers do not
+				tbody = (has("ie") < 9 || has("quirks")) ? put(row, "tbody") : row,
+				tr,
+				si, sl, i, l, // iterators
+				subRow, column, id, extraClassName, cell, innerCell, colSpan, rowSpan; // used inside loops
+			
+			// Allow specification of custom/specific subRows, falling back to
+			// those defined on the instance.
 			subRows = subRows || this.subRows;
-			for(var si = 0, sl = subRows.length; si < sl; si++){
-				var subRow = subRows[si];
-				if(sl == 1 && !has("ie")){
-					// shortcut for modern browsers, avoiding trs is faster and lighter:
-					// http://jsperf.com/table-without-trs
-					tr = tbody;
-				}else{
-					tr = put(tbody, "tr");
-				}				
-				for(var i = 0, l = subRow.length; i < l; i++){
+			
+			for(si = 0, sl = subRows.length; si < sl; si++){
+				subRow = subRows[si];
+				// for single-subrow cases in modern browsers, TR can be skipped
+				// http://jsperf.com/table-without-trs
+				tr = (sl == 1 && !has("ie")) ? tbody : put(tbody, "tr");
+				
+				for(i = 0, l = subRow.length; i < l; i++){
 					// iterate through the columns
-					var column = subRow[i];
-					var id = column.id;
-					var extraClassName = column.className || (column.field && "field-" + column.field);
-					var cell = put(tag + ".dgrid-cell.dgrid-cell-padding.column-" + id + (extraClassName ? '.' + extraClassName : ''));
+					column = subRow[i];
+					id = column.id;
+					extraClassName = column.className || (column.field && "field-" + column.field);
+					cell = put(tag + ".dgrid-cell.dgrid-cell-padding.dgrid-column-" + id +
+						(extraClassName ? '.' + extraClassName : ''));
 					cell.columnId = id;
 					if(contentBoxSizing){
 						// The browser (IE7-) does not support box-sizing: border-box, so we emulate it with a padding div
-						var innerCell = put(cell, "!dgrid-cell-padding div.dgrid-cell-padding");// remove the dgrid-cell-padding, and create a child with that class
+						innerCell = put(cell, "!dgrid-cell-padding div.dgrid-cell-padding");// remove the dgrid-cell-padding, and create a child with that class
 						cell.contents = innerCell;
 					}else{
 						innerCell = cell;
 					}
-					var colSpan = column.colSpan;
+					colSpan = column.colSpan;
 					if(colSpan){
 						cell.colSpan = colSpan;
 					}
-					var rowSpan = column.rowSpan;
+					rowSpan = column.rowSpan;
 					if(rowSpan){
 						cell.rowSpan = rowSpan;
 					}
@@ -198,8 +199,6 @@ function(kernel, declare, listen, has, put, List){
 				}
 			});
 			this._rowIdToObject[row.id = this.id + "-header"] = this.columns;
-			//put(headerNode, "div.dgrid-header-columns>", row, ".dgrid-row<+div.dgrid-header-scroll.ui-widget-header");
-			//row = put("div.dgrid-row[role=columnheader]>", row);
 			headerNode.appendChild(row);
 			// if it columns are sortable, resort on clicks
 			listen(row, "click,keydown", function(event){
@@ -207,7 +206,7 @@ function(kernel, declare, listen, has, put, List){
 				if(event.type == "click" || event.keyCode == 32){
 					var
 						target = event.target,
-						field, descending, parentNode;
+						field, descending, parentNode, sort;
 					do{
 						if(target.sortable){
 							// stash node subject to DOM manipulations,
@@ -218,10 +217,10 @@ function(kernel, declare, listen, has, put, List){
 							
 							// if the click is on the same column as the active sort,
 							// reverse sort direction
-							descending = grid.sortOrder && grid.sortOrder[0].attribute == field &&
-								!grid.sortOrder[0].descending;
+							descending = (sort = grid._sort[0]) && sort.attribute == field &&
+								!sort.descending;
 							
-							return grid.sort(field, descending);
+							return grid.set("sort", field, descending);
 						}
 					}while((target = target.parentNode) && target != headerNode);
 				}
@@ -254,56 +253,57 @@ function(kernel, declare, listen, has, put, List){
 			}
 		},
 		
-		sort: function(property, descending){
+		_setSort: function(property, descending){
 			// summary:
 			//		Extension of List.js sort to update sort arrow in UI
 			
-			var prop = property, desc = descending;
+			this.inherited(arguments); // normalize sortOrder first
 			
-			// If a full-on sort array was passed, only handle the first criteria
-			if(typeof property != "string"){
-				prop = property[0].attribute;
-				desc = property[0].descending;
+			// clean up UI from any previous sort
+			if(this._lastSortedArrow){
+				// remove the sort classes from parent node
+				put(this._lastSortedArrow, "<!dgrid-sort-up!dgrid-sort-down");
+				// destroy the lastSortedArrow node
+				put(this._lastSortedArrow, "!");
+				delete this._lastSortedArrow;
 			}
 			
-			// if we were invoked from a header cell click handler, grab
-			// stashed target node; otherwise (e.g. direct sort call) need to look up
-			var target = this._sortNode, columns, column, i;
+			if(!this._sort[0]){ return; } // nothing to do if no sort is specified
+			
+			var prop = this._sort[0].attribute,
+				desc = this._sort[0].descending,
+				target = this._sortNode, // stashed if invoked from header click
+				columns, column, i;
+			
+			delete this._sortNode;
+			
 			if(!target){
 				columns = this.columns;
 				for(i in columns){
 					column = columns[i];
 					if(column.field == prop){
 						target = column.headerNode;
+						break;
 					}
 				}
 			}
 			// skip this logic if field being sorted isn't actually displayed
 			if(target){
 				target = target.contents || target;
-				if(this._lastSortedArrow){
-					// remove the sort classes from parent node
-					put(this._lastSortedArrow, "<!dgrid-sort-up!dgrid-sort-down");
-					// destroy the lastSortedArrow node
-					put(this._lastSortedArrow, "!");
-				}
 				// place sort arrow under clicked node, and add up/down sort class
 				this._lastSortedArrow = put(target.firstChild, "-div.dgrid-sort-arrow.ui-icon[role=presentation]");
 				this._lastSortedArrow.innerHTML = "&nbsp;";
 				put(target, desc ? ".dgrid-sort-down" : ".dgrid-sort-up");
 				// call resize in case relocation of sort arrow caused any height changes
 				this.resize();
-				
-				delete this._sortNode;
 			}
-			this.inherited(arguments);
 		},
 		styleColumn: function(colId, css){
 			// summary:
-			//		Changes the column width by creating a dynamic stylesheet
+			//		Dynamically creates a stylesheet rule to alter a column's style.
 			
 			// now add a rule to style the column
-			return this.addCssRule("#" + this.domNode.id + ' .column-' + colId, css);
+			return this.addCssRule("#" + this.domNode.id + ' .dgrid-column-' + colId, css);
 		},
 		
 		/*=====
@@ -348,7 +348,7 @@ function(kernel, declare, listen, has, put, List){
 				// we have subRows, but no columns yet, need to create the columns
 				this.columns = {};
 				for(var i = 0; i < subRows.length; i++){
-					subRows[i] = this._configColumns(i + '-', subRows[i]);
+					subRows[i] = this._configColumns(i + "-", subRows[i]);
 				}
 			}else{
 				this.subRows = [this._configColumns("", this.columns)];
@@ -382,7 +382,7 @@ function(kernel, declare, listen, has, put, List){
 			this.renderHeader();
 			this.refresh();
 			// re-render last collection if present
-			this.lastCollection && this.renderArray(this.lastCollection);
+			this._lastCollection && this.renderArray(this._lastCollection);
 			this.resize();
 		}
 	});

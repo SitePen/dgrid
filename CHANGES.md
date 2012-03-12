@@ -1,6 +1,6 @@
 # master (post-0.2.0)
 
-## General Changes
+## General
 
 ### new: get and set methods
 
@@ -15,6 +15,38 @@ some key differences:
   For example, `setQuery(...)` is now `set("query", ...)`.  Deprecation stubs
   are currently in place for the old APIs, but will be removed in the future.
 * `watch` is not implemented.
+
+### sortOrder property and sort function replaced by getter/setter
+
+Previously, `sortOrder` was the (arguably internal) instance property used to
+store the current sort options.  Sort code has since been rearranged; the new
+recommended way to retrieve existing sort options is to call `get("sort")`.
+
+Meanwhile, the `sort` method has been deprecated in favor of `set("sort", ...)`.
+Sort order can also now be initially defined when creating a list or grid by
+specifying a `sort` property in the object passed to the constructor.
+
+## CSS
+
+### column-<id> and columnset-* classes now prefixed with dgrid-
+
+The `column-<id>` classes added by the Grid module, and the `columnset-*`
+classes added by the ColumnSet mixin, have been renamed to include the `dgrid-`
+prefix like most other classes automatically added by dgrid components.
+
+The main exception is the `field-<field>` classes, which are intentionally not
+namespaced in this fashion, as they are thought to be more applicable to the
+particular use-case and less applicable to the dgrid components themselves.
+
+In the overwhelming majority of cases, it is recommended to style using the
+`.field-<field>` classes (or, if a `className` is specified in the column
+definition, use that as it overrides the `.field-<field>` class).
+
+### ColumnResizer: handle node class is now dgrid-resize-handle
+
+The class on the resize handle node added to each header cell by the
+ColumnResizer extension was formerly `dgrid-resize-handler`; this has been
+corrected to `dgrid-resize-handle`.
 
 ## Grid
 
@@ -148,8 +180,37 @@ reference to the Grid instance from which the event was fired.
 
 ### expand method added to grid instance
 
-Tree columns now add an `expand(target)` method, for programmatically expanding
-grid rows.  The `target` specified may be anything which will resolve to a row
-via the grid's `row` function.  An optional second boolean parameter may specify
-whether to expand (`true`) or collapse (`false`) the row in question; if
-unspecified, the method will toggle the target row's state.
+Tree columns now add an `expand(row, expand)` method to their parent grid,
+for programmatically expanding or collapsing grid rows.  See the documentation
+for details.
+
+## DnD
+
+### dndTargetConfig improved; is now dndParams
+
+Previously, the DnD plugin defined a `dndTargetConfig` instance property, which
+was a params object to be passed to the DnD Source constructor. However,
+this was only used internally and did not consult any value provided via the
+constructor.
+
+This property has been renamed to `dndParams`, and now accepts an object value
+via the constructor's arguments object.
+
+### new: dndConstructor
+
+Previously, the DnD plugin would always create an instance of the `GridSource`
+constructor it defines and exposes.  A `dndConstructor` property has been added,
+which can be used to specify an alternative DnD implementation to instantiate.
+
+For best results, the constructor used should extend the `GridSource` constructor
+exposed by the DnD module.
+
+### default dndSourceType is now dgrid-row
+
+The default value for the `dndSourceType` property has been changed from `row`
+to `dgrid-row` to prevent ambiguity.
+
+### DnD Source instance now stored as grid.dndSource
+
+Previously, the DnD Source instance was stored on the grid instance under the
+`dndTarget` property; this has been renamed more appropriately to `dndSource`.

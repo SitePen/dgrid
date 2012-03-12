@@ -7,7 +7,7 @@
 	top: 0;
 }
 
-.dgrid-resize-handler {
+.dgrid-resize-handle {
 	height: 100px;
 	width: 0;
 	position: absolute;
@@ -16,8 +16,9 @@
 	cursor: col-resize;
 	z-index: 999;
 	border-left: 5px solid transparent;
+	outline: none;
 }
-html.has-ie-6 .dgrid-resize-handler {
+html.has-ie-6 .dgrid-resize-handle {
 	border-color: pink;
 	filter: chroma(color=pink);
 }
@@ -26,7 +27,7 @@ html.has-ie-6 .dgrid-resize-handler {
 }
 
 /* make the resize handles larger on touch-capable devices */
-html.has-touch .dgrid-resize-handler {
+html.has-touch .dgrid-resize-handle {
 	border-left: 20px solid transparent;
 }
 html.has-touch .dgrid-column-resizer {

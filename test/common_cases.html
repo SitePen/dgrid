@@ -16,13 +16,13 @@
 			#grid { 
 				width: 70%;
 			}
-			#grid .column-col1 {
+			#grid .field-col1 {
 				width: 100px;
 			}
-			#grid .column-col2 {
+			#grid .field-col2 {
 				width: 30%;
 			}
-			#grid .column-col4 {
+			#grid .field-col4 {
 				width: 180px;
 			}
 			
@@ -32,10 +32,10 @@
 			#scrollgrid .dgrid-cell {
 				width: 100px; /* force all columns to have SOME width */
 			}
-			#scrollgrid .column-col1 {
+			#scrollgrid .field-col1 {
 				width: 500px;
 			}
-			#scrollgrid .column-col4 {
+			#scrollgrid .field-col4 {
 				width: 300px;
 			}
 			
@@ -66,7 +66,7 @@
 		<script type="text/javascript">
 			require(["dojo/on", "dgrid/List", "dgrid/OnDemandGrid", "dgrid/Tree", "dgrid/Editor", "dgrid/Selection", "dgrid/Keyboard", "dgrid/test/data/base", "dojo/_base/declare", "dojo/_base/array", "dojo/domReady!"], 
 				function(on, List, Grid, Tree, Editor, Selection, Keyboard, testStore, declare, arrayUtil){
-					console.log("loaded in " + (new Date().getTime() - start) + testStore);
+					console.log("loaded in " + (new Date().getTime() - start));
 					var columns = { // you can declare columns as an object hash (key translates to field)
 						col1: Editor({label: 'Column 1 column 1 column 1'}, "text", "dblclick"),
 						col2: {label: 'Column 2', sortable: false},
