@@ -15,6 +15,7 @@ return function(column){
 		var level = Number(options.query.level) + 1;
 		level = isNaN(level) ? 0 : level;
 		var grid = this.grid;
+		var transitionEventSupported;
 		var mayHaveChildren = !grid.store.mayHaveChildren || grid.store.mayHaveChildren(object);
 		// create the expando
 		var dir = grid.isRTL ? "right" : "left";
@@ -88,41 +89,66 @@ return function(column){
 								}) :
 								grid.renderArray(query({}), preloadNode),
 									function(){
-										console.log("container.scrollHeight render", container.scrollHeight);
-										container.style.height =container.scrollHeight + "px";
+										container.style.height = container.scrollHeight + "px";
 									});
-						on(container, "transitionend,webkitTransitionEnd", function(event){
+						var transitionend = function(event){
 							var height = this.style.height;
 							if(height){
 								// after expansion, ensure display is correct, and we set it to none for hidden containers to improve performance
 								this.style.display = height == "0px" ? "none" : "block";
 							}
-							// now we need to reset the height to be auto, so future height changes 
-							// (from children expansions, for example), will expand to the right height
-							// However setting the height to auto or "" will cause an animation to zero height for some
-							// reason, so we set the transition to be zero duration for the time being
-							put(this, ".dgrid-tree-resetting");
+							if(event){
+								// now we need to reset the height to be auto, so future height changes 
+								// (from children expansions, for example), will expand to the right height
+								// However setting the height to auto or "" will cause an animation to zero height for some
+								// reason, so we set the transition to be zero duration for the time being
+								put(this, ".dgrid-tree-resetting");
+								setTimeout(function(){
+									// now we can turn off the zero duration transition after we have let it render
+									put(container, "!dgrid-tree-resetting");
+								});
+								// this was triggered as a real event, we remember that so we don't fire the setTimeout's in the future
+								transitionEventSupported = true;
+							}else if(!transitionEventSupported){
+								// if this was not triggered as a real event, we remember that so we shortcut animations
+								transitionEventSupported = false;
+							}
+							// now set the height to auto
 							this.style.height = "";
+						};
+						on(container, "transitionend,webkitTransitionEnd,oTransitionEnd,MSTransitionEnd", transitionend);
+						if(!transitionEventSupported){
 							setTimeout(function(){
-								// now we can turn off the zero duration transition after we have let it render
-								put(container, "!dgrid-tree-resetting");
-							});
-						});
+								transitionend.call(container);
+							}, 1400);
+						}
 					}
 					// show or hide all the children
 					
 					container = rowElement.connected;
+					var containerStyle = container.style;
+					container.hidden = !expanded;
 					// make sure it is visible so we can measure it
-					container.style.display = "block";
-					if(!expanded){
-						// if it will be hidden we need to be able to give a full height without animating it, so it has the right starting point to animate to zero
-						put(container, ".dgrid-tree-resetting");
-					}
-					container.style.height = container.scrollHeight + "px";
-					if(container.scrollHeight && !expanded){
-						// if it is hidden, we now allow a transition to zero						
-						put(container, "!dgrid-tree-resetting");
-						container.style.height = "0px";
+					if(transitionEventSupported === false){
+						containerStyle.display = expanded ? "block" : "none";
+					}else{
+						if(expanded){
+							containerStyle.display = "block";
+							var scrollHeight = container.scrollHeight;
+							containerStyle.height = "0px";
+						}
+						else{
+							// if it will be hidden we need to be able to give a full height without animating it, so it has the right starting point to animate to zero
+							put(container, ".dgrid-tree-resetting");
+							containerStyle.height = container.scrollHeight + "px";
+						}
+						// we now allow a transitioning						
+						if(!expanded || scrollHeight){
+							setTimeout(function(){
+								put(container, "!dgrid-tree-resetting");
+								containerStyle.height = (expanded ? scrollHeight : 0) + "px";
+							});
+						}
 					}
 				}
 			};

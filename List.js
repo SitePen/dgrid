@@ -70,7 +70,7 @@ function(arrayUtil, kernel, declare, listen, aspect, has, miscUtil, TouchScroll,
 						break;
 					}
 					// if the next sibling isn't a match, drill down to search
-				}while(nextSibling = (!visible || current.style && current.style.display != "none") && current[steps < 0 ? 'lastChild' : 'firstChild']);
+				}while(nextSibling = (!visible || !current.hidden) && current[steps < 0 ? 'lastChild' : 'firstChild']);
 			}else if((current = current.parentNode) == this.domNode || (current.className + ' ').indexOf("dgrid-row ") > -1){ // intentional assignment
 				// we stepped all the way out of the grid, given up now
 				break;
