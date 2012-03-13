@@ -146,6 +146,12 @@ function(arrayUtil, kernel, declare, listen, aspect, has, miscUtil, TouchScroll,
 			if(params){
 				this.params = params;
 				declare.safeMixin(this, params);
+				
+				// handle sort param - TODO: revise @ 1.0 when _sort -> sort
+				this._sort = params.sort || [];
+				delete this.sort; // ensure back-compat method isn't shadowed
+			}else{
+				this._sort = [];
 			}
 			var domNode = this.domNode = srcNodeRef || put("div");
 			
@@ -153,9 +159,6 @@ function(arrayUtil, kernel, declare, listen, aspect, has, miscUtil, TouchScroll,
 			this.observers = [];
 			this._listeners = [];
 			this._rowIdToObject = {};
-			// handle sort param - TODO: revise @ 1.0 when _sort -> sort
-			this._sort = params.sort || [];
-			delete this.sort; // ensure back-compat method isn't shadowed
 			
 			this.postMixInProperties && this.postMixInProperties();
 			
