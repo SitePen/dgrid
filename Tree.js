@@ -30,8 +30,12 @@ return function(column){
 		if(!grid.expand){
 			var colSelector = ".dgrid-content .dgrid-column-" + column.id;
 			// Set up the event listener once and use event delegation for better memory use.
-			grid.on(column.expandOn || ".dgrid-expando-icon:click," + colSelector + ":dblclick",
-				function(){ grid.expand(this); });
+			grid.on(column.expandOn || ".dgrid-expando-icon:click," + colSelector + ":dblclick," + colSelector + ":keydown",
+				function(event){
+					if(event.type != "keydown" || event.keyCode == 32){ 
+						grid.expand(this); 
+					}
+				});
 			
 			if(touchUtil){
 				// Also listen on double-taps of the cell.
