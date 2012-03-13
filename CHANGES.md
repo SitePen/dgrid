@@ -10,11 +10,12 @@ some key differences:
 
 * dgrid supports custom getters and setters, but they are named following the
   pattern of `_getFoo` and `_setFoo`, unlike Dijit's `_getFooAttr` and `_setFooAttr`.
-* Most `set*` functions found throughout dgrid components are now implemented
-  as custom setters, and should thus be accessed via the central `set` method.
-  For example, `setQuery(...)` is now `set("query", ...)`.  Deprecation stubs
-  are currently in place for the old APIs, but will be removed in the future.
 * `watch` is not implemented.
+
+Most `set*` functions found throughout dgrid components are now implemented
+as custom setters, and should thus be accessed via the central `set` method.
+For example, `setQuery(...)` is now `set("query", ...)`.  Deprecation stubs
+are currently in place for the old APIs, but will be removed in the future.
 
 ### sortOrder property and sort function replaced by getter/setter
 
