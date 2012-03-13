@@ -76,25 +76,53 @@ return function(column){
 						// if the children have not been created, create a container, a preload node and do the 
 						// query for the children
 						container = rowElement.connected = put('div.dgrid-tree-container');//put(rowElement, '+...
-						preloadNode = target.preloadNode = put(container, 'div.dgrid-preload');
+						preloadNode = target.preloadNode = put(rowElement, '+', container, 'div.dgrid-preload');
 						var query = function(options){
 							return grid.store.getChildren(row.data, options);
 						};
 						query.level = target.level;
-						grid.renderQuery ?
-							grid._trackError(function(){
-								return grid.renderQuery(query, preloadNode);
-							}) :
-							grid.renderArray(query({}), preloadNode);
+						Deferred.when(
+							grid.renderQuery ?
+								grid._trackError(function(){
+									return grid.renderQuery(query, preloadNode);
+								}) :
+								grid.renderArray(query({}), preloadNode),
+									function(){
+										console.log("container.scrollHeight render", container.scrollHeight);
+										container.style.height =container.scrollHeight + "px";
+									});
+						on(container, "transitionend,webkitTransitionEnd", function(event){
+							var height = this.style.height;
+							if(height){
+								// after expansion, ensure display is correct, and we set it to none for hidden containers to improve performance
+								this.style.display = height == "0px" ? "none" : "block";
+							}
+							// now we need to reset the height to be auto, so future height changes 
+							// (from children expansions, for example), will expand to the right height
+							// However setting the height to auto or "" will cause an animation to zero height for some
+							// reason, so we set the transition to be zero duration for the time being
+							put(this, ".dgrid-tree-resetting");
+							this.style.height = "";
+							setTimeout(function(){
+								// now we can turn off the zero duration transition after we have let it render
+								put(container, "!dgrid-tree-resetting");
+							});
+						});
 					}
 					// show or hide all the children
-					var styleDisplay = expanded ? "" : "none";
+					
 					container = rowElement.connected;
-					// TODO: see if want to use a CSS class and a transition (must coordinate with keynav so hidden elements aren't included in nav) 
-					if(expanded){
-						put(rowElement, '+', container);
-					}else if(container.parentNode){
-						container.parentNode.removeChild(container);
+					// make sure it is visible so we can measure it
+					container.style.display = "block";
+					if(!expanded){
+						// if it will be hidden we need to be able to give a full height without animating it, so it has the right starting point to animate to zero
+						put(container, ".dgrid-tree-resetting");
+					}
+					container.style.height = container.scrollHeight + "px";
+					if(container.scrollHeight && !expanded){
+						// if it is hidden, we now allow a transition to zero						
+						put(container, "!dgrid-tree-resetting");
+						container.style.height = "0px";
 					}
 				}
 			};

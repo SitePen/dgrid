@@ -120,14 +120,17 @@ html.has-quirks .dgrid-header-hidden .dgrid-cell {
 	height: 16px;
 }
 .dgrid-tree-container {
-	-webkit-transition-duration: 1s;
-	-moz-transition-duration: 1s;
-	-o-transition-duration: 1s;
-	transition-duration: 1s;
-}
-.dgrid-tree-contracted {
-	height: 0px;
+	-webkit-transition-duration: 0.3s;
+	-moz-transition-duration: 0.3s;
+	-o-transition-duration: 0.3s;
+	transition-duration: 0.3s;
 	overflow: hidden;
+}
+.dgrid-tree-container.dgrid-tree-resetting {
+	-webkit-transition-duration: 0;
+	-moz-transition-duration: 0;
+	-o-transition-duration: 0;
+	transition-duration: 0;
 }
 
 /* Single Sort */
