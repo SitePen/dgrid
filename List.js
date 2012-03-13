@@ -600,20 +600,22 @@ function(arrayUtil, kernel, declare, listen, aspect, has, miscUtil, TouchScroll,
 			this.refresh();
 			
 			if(this._lastCollection){
-				// if an array was passed in, flatten to just first sort attribute
-				// for default array sort logic
-				if(typeof property != "string"){
-					descending = property[0].descending;
-					property = property[0].attribute;
+				if(property.length){
+					// if an array was passed in, flatten to just first sort attribute
+					// for default array sort logic
+					if(typeof property != "string"){
+						descending = property[0].descending;
+						property = property[0].attribute;
+					}
+					
+					this._lastCollection.sort(function(a,b){
+						var aVal = a[property], bVal = b[property];
+						// fall back undefined values to "" for more consistent behavior
+						if(aVal === undefined){ aVal = ""; }
+						if(bVal === undefined){ bVal = ""; }
+						return aVal == bVal ? 0 : (aVal > bVal == !descending ? 1 : -1);
+					});
 				}
-				
-				this._lastCollection.sort(function(a,b){
-					var aVal = a[property], bVal = b[property];
-					// fall back undefined values to "" for more consistent behavior
-					if(aVal === undefined){ aVal = ""; }
-					if(bVal === undefined){ bVal = ""; }
-					return aVal == bVal ? 0 : (aVal > bVal == !descending ? 1 : -1);
-				});
 				this.renderArray(this._lastCollection);
 			}
 		},
