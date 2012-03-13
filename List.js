@@ -454,8 +454,8 @@ function(arrayUtil, kernel, declare, listen, aspect, has, miscUtil, TouchScroll,
 				row.className = (row.className || "") + " ui-state-default dgrid-row " + (i% 2 == 1 ? oddClass : evenClass);
 				// get the row id for easy retrieval
 				this._rowIdToObject[row.id = id] = object;
-				parent.insertBefore(row, beforeNode);
 			}
+			parent.insertBefore(row, beforeNode);
 			row.rowIndex = i;
 			return row;
 		},
