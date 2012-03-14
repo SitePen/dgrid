@@ -32,7 +32,7 @@ return function(column){
 			// Set up the event listener once and use event delegation for better memory use.
 			grid.on(column.expandOn || ".dgrid-expando-icon:click," + colSelector + ":dblclick," + colSelector + ":keydown",
 				function(event){
-					if(event.type != "keydown" || event.keyCode == 32){ 
+					if(event.type != "keydown" || event.keyCode == 32){
 						grid.expand(this); 
 					}
 				});
@@ -124,7 +124,7 @@ return function(column){
 						if(!transitionEventSupported){
 							setTimeout(function(){
 								transitionend.call(container);
-							}, 1400);
+							}, 400);
 						}
 					}
 					// show or hide all the children
@@ -135,6 +135,7 @@ return function(column){
 					// make sure it is visible so we can measure it
 					if(transitionEventSupported === false){
 						containerStyle.display = expanded ? "block" : "none";
+						containerStyle.height = "";
 					}else{
 						if(expanded){
 							containerStyle.display = "block";
