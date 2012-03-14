@@ -174,7 +174,7 @@ return declare([List], {
 					cell = grid.row(cellFocusedElement);
 				}
 				if(move){
-					cell = cell && grid[orientation](cell, move);
+					cell = cell && grid[orientation](cell, move, true);
 				}
 				var nextFocus = cell && cell.element;
 				if(nextFocus){

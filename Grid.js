@@ -100,6 +100,7 @@ function(kernel, declare, listen, has, put, List){
 			for(si = 0, sl = subRows.length; si < sl; si++){
 				subRow = subRows[si];
 				// for single-subrow cases in modern browsers, TR can be skipped
+				// http://jsperf.com/table-without-trs
 				tr = (sl == 1 && !has("ie")) ? tbody : put(tbody, "tr");
 				
 				for(i = 0, l = subRow.length; i < l; i++){
