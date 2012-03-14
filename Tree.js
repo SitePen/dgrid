@@ -124,7 +124,7 @@ return function(column){
 						if(!transitionEventSupported){
 							setTimeout(function(){
 								transitionend.call(container);
-							}, 400);
+							}, 600);
 						}
 					}
 					// show or hide all the children
