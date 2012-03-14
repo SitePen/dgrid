@@ -20,6 +20,7 @@ function(kernel, on, aspect, has, put){
 				
 				for(i = 0; i < len; i++){
 					var element = grid.cell(rows[i], column.id).element;
+					if(!element){ continue; } // skip if row has been entirely removed
 					element = (element.contents || element).input;
 					if(!element.disabled){
 						// only change the value if it is not disabled
