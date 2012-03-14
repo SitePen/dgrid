@@ -482,6 +482,9 @@ function(arrayUtil, kernel, declare, listen, aspect, has, miscUtil, TouchScroll,
 			// summary:
 			//		Get the row object by id, object, node, or event
 			var id;
+			
+			if(target instanceof this._Row){ return target; } // no-op; already a row
+			
 			if(target.target && target.target.nodeType){
 				// event
 				target = target.target;

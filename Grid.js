@@ -30,6 +30,9 @@ function(kernel, declare, listen, has, put, List){
 		cell: function(target, columnId){
 			// summary:
 			//		Get the cell object by node, or event, id, plus a columnId
+			
+			if(target.row && target.row instanceof this._Row){ return target; }
+			
 			if(target.target && target.target.nodeType){
 				// event
 				target = target.target;
