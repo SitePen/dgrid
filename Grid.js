@@ -260,7 +260,7 @@ function(kernel, declare, listen, has, put, List){
 			// summary:
 			//		Extension of List.js sort to update sort arrow in UI
 			
-			this.inherited(arguments); // normalize sortOrder first
+			this.inherited(arguments); // normalize _sort first
 			
 			// clean up UI from any previous sort
 			if(this._lastSortedArrow){
