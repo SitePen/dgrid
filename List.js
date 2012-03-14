@@ -54,20 +54,24 @@ function(arrayUtil, kernel, declare, listen, aspect, has, miscUtil, TouchScroll,
 		return document.getElementById(id);
 	}
 
-	function move(item, steps, targetClass){
+	function move(item, steps, targetClass, visible){
 		var nextSibling, current, element;
 		element = current = item.element;
 		steps = steps || 1;
 		do{
 			// move in the correct direction
-			if((nextSibling = current[steps < 0 ? 'previousSibling' : 'nextSibling'])){
-				current = nextSibling;
-				if(((current && current.className) + ' ').indexOf(targetClass + ' ') > -1){
-					// it's an element with the correct class name, counts as a real move
-					element = current;
-					steps += steps < 0 ? 1 : -1;
-				}
-			}else if((current = current.parentNode) == this.domNode){ // intentional assignment
+			if(nextSibling = current[steps < 0 ? 'previousSibling' : 'nextSibling']){
+				do{
+					current = nextSibling;
+					if(((current && current.className) + ' ').indexOf(targetClass + ' ') > -1){
+						// it's an element with the correct class name, counts as a real move
+						element = current;
+						steps += steps < 0 ? 1 : -1;
+						break;
+					}
+					// if the next sibling isn't a match, drill down to search
+				}while(nextSibling = (!visible || !current.hidden) && current[steps < 0 ? 'lastChild' : 'firstChild']);
+			}else if((current = current.parentNode) == this.domNode || (current.className + ' ').indexOf("dgrid-row ") > -1){ // intentional assignment
 				// we stepped all the way out of the grid, given up now
 				break;
 			}
@@ -510,11 +514,11 @@ function(arrayUtil, kernel, declare, listen, aspect, has, miscUtil, TouchScroll,
 			};
 		},
 		_move: move,
-		up: function(row, steps){
-			return this.row(move(row, -(steps || 1), "dgrid-row"));
+		up: function(row, steps, visible){
+			return this.row(move(row, -(steps || 1), "dgrid-row", visible));
 		},
-		down: function(row, steps){
-			return this.row(move(row, steps || 1, "dgrid-row"));
+		down: function(row, steps, visible){
+			return this.row(move(row, steps || 1, "dgrid-row", visible));
 		},
 		
 		get: function(/*String*/ name /*, ... */){
