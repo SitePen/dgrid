@@ -78,6 +78,11 @@
 						item.name = "Europe Edit " + (++count);
 						testCountryStore.put(item);
 					});
+					on(document.getElementById("move-italy-na"), "click", function(){
+						var item = testCountryStore.get("IT");
+						item.parent = "NA";
+						testCountryStore.put(item);
+					});
 					
 					window.treeSelector = declare([Grid, Keyboard, Selection])({
 						store: testCountryStore,
@@ -136,6 +141,7 @@
 		<button id="remove-country">Remove Greece</button>
 		<button id="delete">Delete Selected</button>
 		<button id="edit-continent">Edit Europe</button>
+		<button id="move-italy-na">Move Italy to North America</button>
 		
 		<h2>Tree grid with checkbox selector to test select-all on children</h2>
 		<div id="treeSelector"></div>
