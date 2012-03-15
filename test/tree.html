@@ -42,7 +42,7 @@
 						return value === undefined || value === "" ? "&nbsp;" : value;
 					}
 					
-					window.tree = declare([Grid, Keyboard, Selection])({
+					var treeGrid = window.treeGrid = declare([Grid, Keyboard, Selection])({
 						store: testCountryStore,
 						query: {type: "continent"},
 						columns: [
@@ -52,10 +52,10 @@
 							{label:"Population", field:"population"},
 							{label:"Timezone", field:"timezone"}
 						]
-					}, "tree");
+					}, "treeGrid");
 					
 					on(document.getElementById("save"), "click", function(){
-						tree.save();
+						treeGrid.save();
 					});
 					on(document.getElementById("add-country"), "click", function(){
 						testCountryStore.put({ id: 'GR', name:'Greece', type:'country', parent: 'EU'});
@@ -68,7 +68,7 @@
 	        			testCountryStore.put({ id: 'NI', name:'My New Italy', type:'country', parent: 'NE'});
 					});
 					on(document.getElementById("delete"), "click", function(){
-						for(var id in tree.selection){
+						for(var id in treeGrid.selection){
 							console.log("id: ", id);
 							testCountryStore.remove(id);
 						}
@@ -129,7 +129,7 @@
 	</head>
 	<body class="claro">
 		<h2>Lazy-loading tree grid, with store functionality</h2>
-		<div id="tree"></div>
+		<div id="treeGrid"></div>
 		<button id="save">Save</button>
 		<button id="add-continent">Add Continent</button>
 		<button id="add-country">Add Greece To Europe</button>
