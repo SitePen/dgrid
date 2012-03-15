@@ -16,6 +16,16 @@ default), this change likely won't have any immediate visible effect on
 existing code which requests the module with an initial capital letter.
 However, revising code to reference the all-lowercase module ID is encouraged.
 
+### new TouchScroll implementation
+
+The TouchScroll module provides touch-event-based scrolling for dgrid
+components on touch devices.  Originally this module was borrowed from a
+snapshot of a dojox/mobile module, but this implementation blocked several
+dgrid features from working correctly on touch devices.
+
+That module has been replaced by a new barebones implementation written from the
+ground up.  Further development on this module is likely to occur.
+
 ### additional extensions
 
 The following extensions have been added since v0.2:
