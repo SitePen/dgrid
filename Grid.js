@@ -112,7 +112,7 @@ function(kernel, declare, listen, has, put, List){
 					id = column.id;
 					extraClassName = column.className || (column.field && "field-" + column.field);
 					cell = put(tag + (".dgrid-cell.dgrid-cell-padding.dgrid-column-" + id +
-						(extraClassName ? '.' + extraClassName : '')).replace(invalidClassChars,'-'));
+						(extraClassName ? "." + extraClassName : "")).replace(invalidClassChars,"-"));
 					cell.columnId = id;
 					if(contentBoxSizing){
 						// The browser (IE7-) does not support box-sizing: border-box, so we emulate it with a padding div
@@ -306,7 +306,7 @@ function(kernel, declare, listen, has, put, List){
 			//		Dynamically creates a stylesheet rule to alter a column's style.
 			
 			// now add a rule to style the column
-			return this.addCssRule("#" + this.domNode.id + ' .dgrid-column-' + colId, css);
+			return this.addCssRule("#" + this.domNode.id + " .dgrid-column-" + colId, css);
 		},
 		
 		/*=====
