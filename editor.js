@@ -46,7 +46,8 @@ function dataFromEditor(column, cmp){
 function setProperty(grid, cellElement, oldValue, value){
 	// Updates dirty hash and fires dgrid-datachange event for a changed value.
 	var cell, row, column;
-	if(oldValue.valueOf() != value.valueOf()){
+	// test whether old and new values are inequal, with coercion (e.g. for Dates)
+	if(!(oldValue >= value && oldValue <= value)){
 		cell = grid.cell(cellElement);
 		row = cell.row;
 		column = cell.column;
