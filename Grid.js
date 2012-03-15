@@ -1,7 +1,7 @@
 define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/on", "dojo/has", "put-selector/put", "./List", "dojo/_base/sniff"],
 function(kernel, declare, listen, has, put, List){
 	var contentBoxSizing = has("ie") < 8 && !has("quirks");
-	
+	var invalidClassChars = /[^\._a-zA-Z0-9-]/g;	
 	function appendIfNode(parent, subNode){
 		if(subNode && subNode.nodeType){
 			parent.appendChild(subNode);
@@ -111,8 +111,8 @@ function(kernel, declare, listen, has, put, List){
 					column = subRow[i];
 					id = column.id;
 					extraClassName = column.className || (column.field && "field-" + column.field);
-					cell = put(tag + ".dgrid-cell.dgrid-cell-padding.dgrid-column-" + id +
-						(extraClassName ? '.' + extraClassName : ''));
+					cell = put(tag + (".dgrid-cell.dgrid-cell-padding.dgrid-column-" + id +
+						(extraClassName ? '.' + extraClassName : '')).replace(invalidClassChars,'-'));
 					cell.columnId = id;
 					if(contentBoxSizing){
 						// The browser (IE7-) does not support box-sizing: border-box, so we emulate it with a padding div
