@@ -7,6 +7,7 @@
 		<meta name="viewport" content="width=570" />
 		<style type="text/css">
 			@import "../../dojo/resources/dojo.css";
+			@import "../../dijit/themes/tundra/tundra.css";
 			@import "../css/dgrid.css";
 			@import "../css/skins/tundra.css";
 			.heading {
@@ -31,8 +32,8 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dgrid/test/data/perf", "dgrid/test/data/DeferredWrapper", "dojo/domReady!"],
-				function(List, Grid, Selection, Keyboard, declare, testPerfStore, DeferredWrapper){
+			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dgrid/test/data/perf", "dgrid/test/data/DeferredWrapper", "dgrid/test/NodeChecker", "dijit/form/CheckBox", "dojo/domReady!"],
+				function(List, Grid, Selection, Keyboard, declare, testPerfStore, DeferredWrapper, NodeChecker, CheckBox){
 					var columns = [
 						{ name: 'Column 0', field: 'id', width: '10%' },
 						{ name: 'Column 1', field: 'integer', width: '10%' },
@@ -50,15 +51,22 @@
 					for(var i = 0; i < 20000; i += 10)
 						selection[i] = true;
 
+					var latency = 500;
 					var start = new Date().getTime();
-					window.grid = new (declare([Grid, Selection, Keyboard]))({
-						store: DeferredWrapper(testPerfStore, 500),
+					window.grid = new (declare([Grid, Selection, Keyboard, NodeChecker]))({
+						store: DeferredWrapper(testPerfStore, latency),
 						columns: columns,
 						selection: selection,
-						deselectOnRefresh: false,
-						farOffRemoval: Number.POSITIVE_INFINITY
+						deselectOnRefresh: false
 					}, "grid");
 					console.log(new Date().getTime() - start);
+					new CheckBox({checked: window.grid.farOffRemoval < Infinity, onChange: function(){
+						window.grid.farOffRemoval = this.get("checked") ? Grid.prototype.farOffRemoval : Infinity;
+						// Temporarily disable checking so we don't report false alarms caused by stale responses coming back
+						window.grid.nodeCheckerEnabled = false;
+						window.grid.refresh();
+						setTimeout(function() { window.grid.nodeCheckerEnabled = true; }, latency * 2);
+					}}, "farOffRowRemoval").startup();
 				});
 				
 		</script>
@@ -67,6 +75,7 @@
 		<h2 class="heading">Tests handling of large data sets on a (simulated) slow network, with results being returned
 			after a delay and out of order, and the total number of rows being returned at a different
 			time to the result set.</h2>
+		<div class="ui-widget"><label for="farOffRowRemoval"><span id="farOffRowRemoval"></span> Remove far off rows</label></div>
 		<div id="grid"></div>
 	</body>
 </html>
