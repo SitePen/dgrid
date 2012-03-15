@@ -2,6 +2,59 @@
 
 ## General
 
+### column plugin names are now lowercase
+
+Formerly, column plugins and the named arguments storing their module return values
+had their first letter capitalized.  However, given that these plugins are in
+fact simply functions which modify (and return) their first passed argument,
+and are not in fact constructors, their nomenclature has been amended to
+all-lowercase to avoid confusion, and to further convey that they are intended
+to be run without the `new` keyword.
+
+When running on a case-insensitive filesystem (e.g. Windows, or Mac OS X by
+default), this change likely won't have any immediate visible effect on
+existing code which requests the module with an initial capital letter.
+However, revising code to reference the all-lowercase module ID is encouraged.
+
+### additional extensions
+
+The following extensions have been added since v0.2:
+
+* ColumnReorder: allows reordering columns in simple grids via DnD
+* ColumnHider: allows dynamically hiding/showing grid columns from a simple menu
+* Pagination: adds controls for discrete pagination
+
+More information on these extensions can be found on the
+[Extensions](https://github.com/SitePen/dgrid/wiki/Components-Extensions) page of the wiki.
+
+## CSS
+
+### column-<id> and columnset-* classes now prefixed with dgrid-
+
+The `column-<id>` classes added by the Grid module, and the `columnset-*`
+classes added by the ColumnSet mixin, have been renamed to include the `dgrid-`
+prefix like most other classes automatically added by dgrid components.
+
+The main exception is the `field-<field>` classes, which are intentionally not
+namespaced in this fashion, as they are thought to be more applicable to the
+particular use-case and less applicable to the dgrid components themselves.
+
+In the overwhelming majority of cases, it is recommended to style using the
+`.field-<field>` classes (or, if a `className` is specified in the column
+definition, use that as it overrides the `.field-<field>` class).
+
+### ColumnResizer: handle node class is now dgrid-resize-handle
+
+The class on the resize handle node added to each header cell by the
+ColumnResizer extension was formerly `dgrid-resize-handler`; this has been
+corrected to `dgrid-resize-handle`.
+
+## List
+
+While these changes relate particularly to code in List.js, note that the changes
+essentially affect all dgrid components, since all components extend from or
+mix into List.
+
 ### new: get and set methods
 
 Central `get` and `set` functions have been implemented, somewhat akin to the
@@ -26,42 +79,6 @@ recommended way to retrieve existing sort options is to call `get("sort")`.
 Meanwhile, the `sort` method has been deprecated in favor of `set("sort", ...)`.
 Sort order can also now be initially defined when creating a list or grid by
 specifying a `sort` property in the object passed to the constructor.
-
-### column plugin names are now lowercase
-
-Formerly, column plugins and the named arguments storing their module return values
-had their first letter capitalized.  However, given that these plugins are in
-fact simply functions which modify (and return) their first passed argument,
-and are not in fact constructors, their nomenclature has been amended to
-all-lowercase to avoid confusion, and to further convey that they are intended
-to be run without the `new` keyword.
-
-When running on a case-insensitive filesystem (e.g. Windows, or Mac OS X by
-default), this change likely won't have any immediate visible effect on
-existing code which requests the module with an initial capital letter.
-However, revising code to reference the all-lowercase module ID is encouraged.
-
-## CSS
-
-### column-<id> and columnset-* classes now prefixed with dgrid-
-
-The `column-<id>` classes added by the Grid module, and the `columnset-*`
-classes added by the ColumnSet mixin, have been renamed to include the `dgrid-`
-prefix like most other classes automatically added by dgrid components.
-
-The main exception is the `field-<field>` classes, which are intentionally not
-namespaced in this fashion, as they are thought to be more applicable to the
-particular use-case and less applicable to the dgrid components themselves.
-
-In the overwhelming majority of cases, it is recommended to style using the
-`.field-<field>` classes (or, if a `className` is specified in the column
-definition, use that as it overrides the `.field-<field>` class).
-
-### ColumnResizer: handle node class is now dgrid-resize-handle
-
-The class on the resize handle node added to each header cell by the
-ColumnResizer extension was formerly `dgrid-resize-handler`; this has been
-corrected to `dgrid-resize-handle`.
 
 ## Grid
 
