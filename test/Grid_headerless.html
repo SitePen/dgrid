@@ -50,16 +50,16 @@
 				width: 80px;
 			}
 			
-			#editorgrid {
+			#editgrid {
 				width: 90%;
 			}
-			#editorgrid .field-date, #editorgrid .field-date2 {
+			#editgrid .field-date, #editgrid .field-date2 {
 				width: 16em;
 			}
-			#editorgrid .field-integer {
+			#editgrid .field-integer {
 				width: 6em;
 			}
-			#editorgrid .field-bool {
+			#editgrid .field-bool {
 				width: 6em;
 			}
 		</style>
@@ -68,7 +68,9 @@
 		<script type="text/javascript">
 			require(["dojo/on", "dgrid/List", "dgrid/OnDemandGrid", "dgrid/Tree", "dgrid/Editor", "dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dijit/form/DateTextBox", "dijit/form/HorizontalSlider", "dijit/form/NumberSpinner", "dgrid/test/data/base", "dojo/domReady!"], 
 				function(on, List, Grid, Tree, Editor, Selection, Keyboard, declare, DateTextBox, Slider, NumberSpinner, testStore){
-					window.grid = declare([Grid, Selection, Keyboard])({
+					var EditorGrid = declare([Grid, Selection, Keyboard]);
+
+					window.grid = new EditorGrid({
 						store: testStore,
 						columns: { // you can declare columns as an object hash (key translates to field)
 							col1: Editor({label: 'Column 1 column 1 column 1'}, "text", "dblclick"),
@@ -80,7 +82,7 @@
 						showHeader: false
 					}, "grid");
 					
-					window.scrollgrid = declare([Grid, Selection, Keyboard])({
+					window.scrollgrid = new EditorGrid({
 						store: testStore,
 						columns: { // same as previous, repeated to keep objects/plugins unique
 							col1: Editor({label: 'Column 1 column 1 column 1'}, "text", "dblclick"),
@@ -92,7 +94,7 @@
 						showHeader: false
 					}, "scrollgrid");
 					
-					window.tree = declare([Grid, Selection, Keyboard])({
+					window.tree = new EditorGrid({
 						store: testCountryStore,
 						query: {type: "continent"},
 						selectionMode: "single",
@@ -106,7 +108,7 @@
 						showHeader: false
 					}, "tree");
 					
-					window.editorgrid = new (declare([Grid, Selection, Keyboard]))({
+					window.editGrid = new EditorGrid({
 						store: testTypesStore,
 						columns: [ // columns specified as array, with field in each item
 							Editor({label: 'A Date', field: 'date'}, DateTextBox),
@@ -121,7 +123,7 @@
 						],
 						selectionMode: "single",
 						showHeader: false
-					}, "editorgrid");
+					}, "editgrid");
 				});
 		</script>
 	</head>
@@ -136,6 +138,6 @@
 		<p>(for testing that nodes occupy correct widths - pay attention to hover/selection style)</p>
 		<div id="scrollgrid"></div>
 		<h2>Editor Grid</h2>
-		<div id="editorgrid"></div>
+		<div id="editgrid"></div><br/>
 	</body>
 </html>

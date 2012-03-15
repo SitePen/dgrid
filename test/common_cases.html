@@ -67,7 +67,9 @@
 			require(["dojo/on", "dgrid/List", "dgrid/OnDemandGrid", "dgrid/Tree", "dgrid/Editor", "dgrid/Selection", "dgrid/Keyboard", "dgrid/test/data/base", "dojo/_base/declare", "dojo/_base/array", "dojo/domReady!"], 
 				function(on, List, Grid, Tree, Editor, Selection, Keyboard, testStore, declare, arrayUtil){
 					console.log("loaded in " + (new Date().getTime() - start));
-					window.grid = declare([Grid, Selection, Keyboard])({
+					var StandardGrid = declare([Grid, Selection, Keyboard]);
+
+					window.grid = new StandardGrid({
 						store: testStore,
 						columns: { // you can declare columns as an object hash (key translates to field)
 							col1: Editor({label: 'Column 1 column 1 column 1'}, "text", "dblclick"),
@@ -78,7 +80,7 @@
 						}
 					}, "grid");
 					
-					window.scrollgrid = declare([Grid, Selection, Keyboard])({
+					window.scrollgrid = new StandardGrid({
 						store: testStore,
 						columns: { // same as previous, repeated to keep objects/plugins unique
 							col1: Editor({label: 'Column 1 column 1 column 1'}, "text", "dblclick"),
@@ -89,7 +91,7 @@
 						}
 					}, "scrollgrid");
 					
-					window.tree = declare([Grid, Selection, Keyboard])({
+					window.tree = new StandardGrid({
 						tabIndex: 2,
 						store: testCountryStore,
 						query: {type: "continent"},
@@ -102,7 +104,7 @@
 							timezone: 'Timezone'
 						}
 					}, "tree");
-					window.list = declare([List, Selection, Keyboard])({
+					window.list = new (declare([List, Selection, Keyboard]))({
 						tabIndex: 1
 					}, "list");
 					list.renderArray(arrayUtil.map(testCountryStore.data, function(country){

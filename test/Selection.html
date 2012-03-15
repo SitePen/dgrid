@@ -37,8 +37,10 @@
 							console.log("selection: " + json.stringify(event.grid.selection, null, "  "));
 						}
 					);
+					var SelectionGrid = declare([Grid, Selection, Keyboard]);
+					var CellSelectionGrid = declare([Grid, CellSelection, Keyboard]);
 					
-					gridRowNavigation = dojo.declare([Grid, Selection, Keyboard])({
+					gridRowNavigation = new SelectionGrid({
 						store: testStore,
 						cellNavigation: false,
 						columns: {
@@ -56,21 +58,21 @@
 						col3: 'Column 3',
 						col4: 'Column 4'
 					};
-					gridCellNavigation = declare([Grid, CellSelection, Keyboard])({
+					gridCellNavigation = new CellSelectionGrid({
 						store: testStore,
 						columns: lang.clone(columns2)
 					}, "grid-cell-navigation");
-					gridCellNavigationSingle = declare([Grid, CellSelection, Keyboard])({
+					gridCellNavigationSingle = new CellSelectionGrid({
 						store: testStore,
 						columns: lang.clone(columns2),
 						selectionMode: "single"
 					}, "grid-cell-navigation-single");
-					gridCellNavigationMultiple = declare([Grid, CellSelection, Keyboard])({
+					gridCellNavigationMultiple = new CellSelectionGrid({
 						store: testStore,
 						columns: lang.clone(columns2),
 						selectionMode: "multiple"
 					}, "grid-cell-navigation-multiple");
-					gridCellNavigationNone = declare([Grid, CellSelection, Keyboard])({
+					gridCellNavigationNone = new CellSelectionGrid({
 						store: testStore,
 						columns: lang.clone(columns2),
 						selectionMode: "none",
@@ -78,7 +80,7 @@
 					}, "grid-cell-navigation-none");
 					
 					// cell navigation + row selection
-					gridMixed = dojo.declare([Grid, Selection, Keyboard])({
+					gridMixed = new SelectionGrid({
 						store: testStore,
 						columns: { // same as columns in very first grid
 							col1: 'Column 1',

@@ -52,7 +52,7 @@
 						col5: "Column 5"
 					};
 					
-					window.grid = declare([Grid, Selection, ColumnHider])({
+					window.grid = new (declare([Grid, Selection, ColumnHider]))({
 						store: testStore,
 						columns: columns1
 					}, "grid");
@@ -62,7 +62,7 @@
 							(evt.hidden ? "hidden" : "shown"));
 					});
 					
-					window.gridresize = declare([Grid, Selection, ColumnHider, ColumnResizer])({
+					window.gridresize = new (declare([Grid, Selection, ColumnHider, ColumnResizer]))({
 						store: testStore,
 						columns: lang.clone(columns)
 					}, "gridresize");

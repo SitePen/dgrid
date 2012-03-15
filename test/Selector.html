@@ -39,6 +39,12 @@
 							col2: {label: 'Column 2', sortable: false},
 							col3: {label: 'Column 3'}
 						};
+					var columnsRadio = {
+						col1: Selector({ label: 'Radio', disabled: function(object){ return object.col3 == "read"; } }, "radio"),
+						id: "ID",
+						col2: {label: 'Column 2', sortable: false},
+						col3: {label: 'Column 3'}
+					};
 					
 					on(document.body, "dgrid-select,dgrid-deselect",
 						function(event){
@@ -48,26 +54,23 @@
 							console.log("selection: ", json.stringify(event.grid.selection, null, "  "));
 						}
 					);
+
+					var SelectionGrid = declare([Grid, Selection, Keyboard]);
 					
-					window.grid = dojo.declare([Grid, Selection, Keyboard])({
+					window.grid = new SelectionGrid({
 						store: testStore,
 						selectionMode: "none",
 						columns: columns,
 						allowSelectAll: true
 					}, "grid");
-					window.grid2 = dojo.declare([Grid, Selection, Keyboard])({
+					window.grid2 = new SelectionGrid({
 						store: testStore,
 						selectionMode: "none",
 						columns: columns2,
 						allowSelectAll: false
 					}, "grid2");
-					var columnsRadio = {
-						col1: Selector({ label: 'Radio', disabled: function(object){ return object.col3 == "read"; } }, "radio"),
-						id: "ID",
-						col2: {label: 'Column 2', sortable: false},
-						col3: {label: 'Column 3'}
-					};
-					window.gridRadio = declare([Grid, Selection, Keyboard])({
+
+					window.gridRadio = new SelectionGrid({
 						store: testStore,
 						selectionMode: "none",
 						columns: columnsRadio

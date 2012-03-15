@@ -56,12 +56,14 @@
 						{label: 'Column 4', field: 'col4'},
 						{label: 'Column 5', field: 'col5'}
 					];
-					window.grid = new (declare([Grid, Selection, Keyboard]))({
+					var StandardGrid = declare([Grid, Selection, Keyboard]);
+
+					window.grid = new StandardGrid({
 						store: testStore,
 						columns: lang.clone(columns)
 					}, "grid");
 					
-					window.scrollgrid = declare([Grid, Selection, Keyboard])({
+					window.scrollgrid = new StandardGrid({
 						store: testStore,
 						columns: lang.clone(columns)
 					}, "scrollgrid");
@@ -74,7 +76,7 @@
 						{label:'Timezone', field:'timezone'}
 					];
 					
-					window.tree = declare([Grid, Keyboard, Selection])({
+					window.tree = new StandardGrid({
 						store: testCountryStore,
 						query: {type: "continent"},
 						columns: columnsTree
@@ -88,7 +90,7 @@
 						col5: Editor({label: 'Column 5'}, "text", "dblclick")
 					};
 
-					window.headerless = declare([Grid, Selection, Keyboard])({
+					window.headerless = new StandardGrid({
 						store: testStore,
 						columns: columnsHeaderless,
 						showHeader: false
@@ -137,7 +139,7 @@
 						Editor({label: "FilteringSelect Store", field: "state2", editorArgs: {store: stateStore, maxHeight: 150, style: "width:120px;"}}, FilteringSelect)
 					];
 					
-					window.moreeditors = new (declare([Grid, Selection, Keyboard]))({
+					window.moreeditors = new StandardGrid({
 						store: testTypesStore,
 						columns: columnsEditor,
 						selectionMode: "none"
