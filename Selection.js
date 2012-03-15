@@ -158,8 +158,8 @@ return declare([List], {
 		
 		aspect.before(this, "removeRow", function(rowElement, justCleanup){
 			if(!justCleanup){
-				// if it is a real row removal, we deselect the item
-				this.deselect(rowElement);
+				// if it is a real row removal for a selected item, deselect it
+				if(this.row(rowElement).id in this.selection){ this.deselect(rowElement); }
 			}
 		});
 	},

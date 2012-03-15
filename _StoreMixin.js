@@ -101,7 +101,7 @@ function(kernel, declare, lang, Deferred, listen){
 			// summary:
 			//		Get a fresh queryOptions object, also including the current sort
 			var options = lang.delegate(this.queryOptions, {});
-			if(this._sort){
+			if(this._sort.length){
 				options.sort = this._sort;
 			}
 			return options;
@@ -111,7 +111,8 @@ function(kernel, declare, lang, Deferred, listen){
 			//		Implemented consistent with _getQueryOptions so that if query is
 			//		an object, this returns a protected (delegated) object instead of
 			//		the original.
-			return lang.delegate(this.query, {});
+			var q = this.query;
+			return typeof q == "object" && q != null ? lang.delegate(q, {}) : q;
 		},
 		
 		_setSort: function(property, descending){

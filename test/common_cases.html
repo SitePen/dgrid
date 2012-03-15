@@ -67,21 +67,24 @@
 			require(["dojo/on", "dgrid/List", "dgrid/OnDemandGrid", "dgrid/tree", "dgrid/editor", "dgrid/Selection", "dgrid/Keyboard", "dgrid/test/data/base", "dojo/_base/declare", "dojo/_base/array", "dojo/domReady!"], 
 				function(on, List, Grid, tree, editor, Selection, Keyboard, testStore, declare, arrayUtil){
 					console.log("loaded in " + (new Date().getTime() - start));
-					var columns = { // you can declare columns as an object hash (key translates to field)
-						col1: editor({label: 'Column 1 column 1 column 1'}, "text", "dblclick"),
-						col2: {label: 'Column 2', sortable: false},
-						col3: editor({label: 'Column 3'}, "text", "dblclick"),
-						col4: 'Column444444444444444444',
-						"last-col": editor({label: 'Column 5', field: 'col5'}, "text", "dblclick")
-					};
+					
+					function getColumns(){
+						return { // you can declare columns as an object hash (key translates to field)
+							col1: editor({label: 'Column 1 column 1 column 1'}, "text", "dblclick"),
+							col2: {label: 'Column 2', sortable: false},
+							col3: editor({label: 'Column 3'}, "text", "dblclick"),
+							col4: 'Column444444444444444444',
+							col5: editor({label: 'Column 5'}, "text", "dblclick")
+						};
+					}
 					window.grid = declare([Grid, Selection, Keyboard])({
 						store: testStore,
-						columns: columns
+						columns: getColumns()
 					}, "grid");
 					
 					window.scrollgrid = declare([Grid, Selection, Keyboard])({
 						store: testStore,
-						columns: columns
+						columns: getColumns()
 					}, "scrollgrid");
 					
 					window.tree = declare([Grid, Selection, Keyboard])({

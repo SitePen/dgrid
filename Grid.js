@@ -30,6 +30,9 @@ function(kernel, declare, listen, has, put, List){
 		cell: function(target, columnId){
 			// summary:
 			//		Get the cell object by node, or event, id, plus a columnId
+			
+			if(target.row && target.row instanceof this._Row){ return target; }
+			
 			if(target.target && target.target.nodeType){
 				// event
 				target = target.target;
@@ -100,6 +103,7 @@ function(kernel, declare, listen, has, put, List){
 			for(si = 0, sl = subRows.length; si < sl; si++){
 				subRow = subRows[si];
 				// for single-subrow cases in modern browsers, TR can be skipped
+				// http://jsperf.com/table-without-trs
 				tr = (sl == 1 && !has("ie")) ? tbody : put(tbody, "tr");
 				
 				for(i = 0, l = subRow.length; i < l; i++){
@@ -256,7 +260,7 @@ function(kernel, declare, listen, has, put, List){
 			// summary:
 			//		Extension of List.js sort to update sort arrow in UI
 			
-			this.inherited(arguments); // normalize sortOrder first
+			this.inherited(arguments); // normalize _sort first
 			
 			// clean up UI from any previous sort
 			if(this._lastSortedArrow){

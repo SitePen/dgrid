@@ -47,8 +47,8 @@
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
 		
-			require(["dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dgrid/tree", "dgrid/editor", "dojo/_base/declare", "dojo/on", "dojo/data/ObjectStore", "dijit/form/CheckBox", "dijit/form/TimeTextBox",  "dijit/form/Select", "dijit/form/FilteringSelect", "dgrid/test/data/base", "dojo/domReady!", "xstyle/css!../css/dgrid_rtl.css"], 
-				function(Grid, Selection, Keyboard, tree, editor, declare, on, ObjectStore, CheckBox, TimeTextBox, Select, FilteringSelect, testStore){
+			require(["dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dgrid/tree", "dgrid/editor", "dojo/_base/lang", "dojo/_base/declare", "dojo/on", "dojo/data/ObjectStore", "dijit/form/CheckBox", "dijit/form/TimeTextBox",  "dijit/form/Select", "dijit/form/FilteringSelect", "dgrid/test/data/base", "dojo/domReady!", "xstyle/css!../css/dgrid_rtl.css"], 
+				function(Grid, Selection, Keyboard, tree, editor, lang, declare, on, ObjectStore, CheckBox, TimeTextBox, Select, FilteringSelect, testStore){
 					var columns = [
 						{label: 'Column 1', field: 'col1'},
 						{label: 'Column 2', field: 'col2', sortable: false},
@@ -58,12 +58,12 @@
 					];
 					window.grid = new (declare([Grid, Selection, Keyboard]))({
 						store: testStore,
-						columns: columns
+						columns: lang.clone(columns)
 					}, "grid");
 					
 					window.scrollgrid = declare([Grid, Selection, Keyboard])({
 						store: testStore,
-						columns: columns
+						columns: lang.clone(columns)
 					}, "scrollgrid");
 					
 					var columnsTree = [
@@ -85,7 +85,7 @@
 						col2: {label: 'Column 2', sortable: false},
 						col3: editor({label: 'Column 3'}, "text", "dblclick"),
 						col4: 'Column444444444444444444',
-						"last-col": editor({label: 'Column 5', field: 'col5'}, "text", "dblclick")
+						col5: editor({label: 'Column 5'}, "text", "dblclick")
 					};
 
 					window.headerless = declare([Grid, Selection, Keyboard])({
@@ -160,7 +160,7 @@
 		<h2>Headerless grid</h2>
 		<div id="headerless"></div>
 		
-		<h2>More Editors</h2>
+		<h2>Grid with editors</h2>
 		<div id="moreeditors"></div>
 		<button type="button" id="save" onclick="moreeditors.save()">Save</button>
 	</body>

@@ -37,7 +37,7 @@
 						labelProperty: "name"
 					});
 
-					var columns2 = [
+					var columns = [
 						{field: "id", label: "id"},
 						editor({
 							label: "CheckBox",
@@ -78,7 +78,7 @@
 
 					window.grid = new (declare([Grid, Selection, Keyboard]))({
 						store: testTypesStore,
-						columns: columns2,
+						columns: columns,
 						selectionMode: "none"
 					}, "grid");
 					

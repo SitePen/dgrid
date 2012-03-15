@@ -60,15 +60,24 @@ function(declare, lang, Deferred, DnDSource, DnDManager, put){
 			});
 		},
 		onDropInternal: function(nodes, copy, targetItem){
-			var targetSource = this,
+			var store = this.grid.store,
+				targetSource = this,
+				grid = this.grid,
 				anchor = targetSource._targetAnchor,
-				targetRow = this.before ? anchor.previousSibling : anchor.nextSibling,
-				store = this.grid.store;
+				targetRow;
+			
+			if(anchor){ // (falsy if drop occurred in empty space after rows)
+				targetRow = this.before ? anchor.previousSibling : anchor.nextSibling;
+			}
 			
 			// Don't bother continuing if the drop is really not moving anything.
-			// (Don't need to worry about edge first/last cases since
-			// dropping directly on self doesn't fire onDrop)
-			if(!copy && targetRow === nodes[0]){ return; }
+			// (Don't need to worry about edge first/last cases since dropping
+			// directly on self doesn't fire onDrop, but we do have to worry about
+			// dropping last node into empty space beyond rendered rows.)
+			if(!copy && (targetRow === nodes[0] ||
+					(!targetItem && grid.down(grid.row(nodes[0])).element == nodes[0]))){
+				return;
+			}
 			
 			nodes.forEach(function(node){
 				Deferred.when(targetSource.getObject(node), function(object){

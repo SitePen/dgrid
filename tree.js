@@ -15,6 +15,7 @@ return function(column){
 		var level = Number(options.query.level) + 1;
 		level = isNaN(level) ? 0 : level;
 		var grid = this.grid;
+		var transitionEventSupported;
 		var mayHaveChildren = !grid.store.mayHaveChildren || grid.store.mayHaveChildren(object);
 		// create the expando
 		var dir = grid.isRTL ? "right" : "left";
@@ -29,8 +30,12 @@ return function(column){
 		if(!grid.expand){
 			var colSelector = ".dgrid-content .dgrid-column-" + column.id;
 			// Set up the event listener once and use event delegation for better memory use.
-			grid.on(column.expandOn || ".dgrid-expando-icon:click," + colSelector + ":dblclick",
-				function(){ grid.expand(this); });
+			grid.on(column.expandOn || ".dgrid-expando-icon:click," + colSelector + ":dblclick," + colSelector + ":keydown",
+				function(event){
+					if(event.type != "keydown" || event.keyCode == 32){
+						grid.expand(this); 
+					}
+				});
 			
 			if(touchUtil){
 				// Also listen on double-taps of the cell.
@@ -76,25 +81,79 @@ return function(column){
 						// if the children have not been created, create a container, a preload node and do the 
 						// query for the children
 						container = rowElement.connected = put('div.dgrid-tree-container');//put(rowElement, '+...
-						preloadNode = target.preloadNode = put(container, 'div.dgrid-preload');
+						preloadNode = target.preloadNode = put(rowElement, '+', container, 'div.dgrid-preload');
 						var query = function(options){
 							return grid.store.getChildren(row.data, options);
 						};
 						query.level = target.level;
-						grid.renderQuery ?
-							grid._trackError(function(){
-								return grid.renderQuery(query, preloadNode);
-							}) :
-							grid.renderArray(query({}), preloadNode);
+						Deferred.when(
+							grid.renderQuery ?
+								grid._trackError(function(){
+									return grid.renderQuery(query, preloadNode);
+								}) :
+								grid.renderArray(query({}), preloadNode),
+									function(){
+										container.style.height = container.scrollHeight + "px";
+									});
+						var transitionend = function(event){
+							var height = this.style.height;
+							if(height){
+								// after expansion, ensure display is correct, and we set it to none for hidden containers to improve performance
+								this.style.display = height == "0px" ? "none" : "block";
+							}
+							if(event){
+								// now we need to reset the height to be auto, so future height changes 
+								// (from children expansions, for example), will expand to the right height
+								// However setting the height to auto or "" will cause an animation to zero height for some
+								// reason, so we set the transition to be zero duration for the time being
+								put(this, ".dgrid-tree-resetting");
+								setTimeout(function(){
+									// now we can turn off the zero duration transition after we have let it render
+									put(container, "!dgrid-tree-resetting");
+								});
+								// this was triggered as a real event, we remember that so we don't fire the setTimeout's in the future
+								transitionEventSupported = true;
+							}else if(!transitionEventSupported){
+								// if this was not triggered as a real event, we remember that so we shortcut animations
+								transitionEventSupported = false;
+							}
+							// now set the height to auto
+							this.style.height = "";
+						};
+						on(container, "transitionend,webkitTransitionEnd,oTransitionEnd,MSTransitionEnd", transitionend);
+						if(!transitionEventSupported){
+							setTimeout(function(){
+								transitionend.call(container);
+							}, 600);
+						}
 					}
 					// show or hide all the children
-					var styleDisplay = expanded ? "" : "none";
+					
 					container = rowElement.connected;
-					// TODO: see if want to use a CSS class and a transition (must coordinate with keynav so hidden elements aren't included in nav) 
-					if(expanded){
-						put(rowElement, '+', container);
-					}else if(container.parentNode){
-						container.parentNode.removeChild(container);
+					var containerStyle = container.style;
+					container.hidden = !expanded;
+					// make sure it is visible so we can measure it
+					if(transitionEventSupported === false){
+						containerStyle.display = expanded ? "block" : "none";
+						containerStyle.height = "";
+					}else{
+						if(expanded){
+							containerStyle.display = "block";
+							var scrollHeight = container.scrollHeight;
+							containerStyle.height = "0px";
+						}
+						else{
+							// if it will be hidden we need to be able to give a full height without animating it, so it has the right starting point to animate to zero
+							put(container, ".dgrid-tree-resetting");
+							containerStyle.height = container.scrollHeight + "px";
+						}
+						// we now allow a transitioning						
+						if(!expanded || scrollHeight){
+							setTimeout(function(){
+								put(container, "!dgrid-tree-resetting");
+								containerStyle.height = (expanded ? scrollHeight : 0) + "px";
+							});
+						}
 					}
 				}
 			};
