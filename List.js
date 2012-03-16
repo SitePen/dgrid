@@ -397,14 +397,17 @@ function(arrayUtil, kernel, declare, listen, aspect, has, miscUtil, TouchScroll,
 				var observerIndex = this.observers.push(results.observe(function(object, from, to){
 					var firstRow;
 					// a change in the data took place
-					if(from > -1 && rows[from] && rows[from].parentNode){
+					if(from > -1 && rows[from]){
 						// remove from old slot
 						row = rows.splice(from, 1)[0];
-						firstRow = row.nextSibling;
-						firstRow.rowIndex--;
-						self.removeRow(row);
+						// check to make the sure the node is still there before we try to remove it, (in case it was moved to a different place in the DOM)
+						if(row.parentNode == (beforeNode ? beforeNode.parentNode : self.contentNode)){
+							firstRow = row.nextSibling;
+							firstRow.rowIndex--; // adjust the rowIndex so adjustRowIndices has the right starting point
+							self.removeRow(row); // now remove
+						}
 					}
-					if(to > -1){						
+					if(to > -1){
 						// add to new slot (either before an existing row, or at the end)
 						row = self.newRow(object, rows[to] || beforeNode, to, options);
 						if(row){
@@ -457,13 +460,17 @@ function(arrayUtil, kernel, declare, listen, aspect, has, miscUtil, TouchScroll,
 			//		Renders a single row in the grid
 			var id = this.id + "-row-" + ((this.store && this.store.getIdentity) ? this.store.getIdentity(object) : this._autoId++);
 			var row = byId(id);
-			if(!row){
+			if(!row || // we must create a row if it doesn't exist, or if it previously belonged to a different container 
+					(beforeNode && row.parentNode != beforeNode.parentNode)){
+				if(row){// if it existed elsewhere in the DOM, we will remove it, so we can recreate it
+					this.removeRow(row);
+				}
 				row = this.renderRow(object, options);
 				row.className = (row.className || "") + " ui-state-default dgrid-row " + (i% 2 == 1 ? oddClass : evenClass);
 				// get the row id for easy retrieval
 				this._rowIdToObject[row.id = id] = object;
-				parent.insertBefore(row, beforeNode);
 			}
+			parent.insertBefore(row, beforeNode);
 			row.rowIndex = i;
 			return row;
 		},
