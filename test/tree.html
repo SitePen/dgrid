@@ -41,8 +41,10 @@
 						// returns "&nbsp;" for blank content, to prevent cell collapsing
 						return value === undefined || value === "" ? "&nbsp;" : value;
 					}
+
+					var StandardGrid = declare([Grid, Keyboard, Selection]);
 					
-					var treeGrid = window.treeGrid = declare([Grid, Keyboard, Selection])({
+					var treeGrid = window.treeGrid = new StandardGrid({
 						store: testCountryStore,
 						query: {type: "continent"},
 						columns: [
@@ -84,7 +86,7 @@
 						testCountryStore.put(item);
 					});
 					
-					window.treeSelector = declare([Grid, Keyboard, Selection])({
+					window.treeSelector = new StandardGrid({
 						store: testCountryStore,
 						query: {type: "continent"},
 						selectionMode: "none",
@@ -98,7 +100,7 @@
 						]
 					}, "treeSelector");
 					
-					window.treeSubRows = declare([Grid, Keyboard, Selection])({
+					window.treeSubRows = new StandardGrid({
 						store: testCountryStore,
 						query: {type: "continent"},
 						selectionMode: "none",
@@ -112,7 +114,7 @@
 						]]
 					}, "treeSubRows");
 					
-					window.treeColumnSets = declare([Grid, Keyboard, Selection, ColumnSet])({
+					window.treeColumnSets = new (declare([Grid, Keyboard, Selection, ColumnSet]))({
 						store: testCountryStore,
 						query: {type: "continent"},
 						selectionMode: "none",

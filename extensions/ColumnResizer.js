@@ -115,7 +115,7 @@ return declare([], {
 		if(this.columnSets && this.columnSets.length){
 			var csi = this.columnSets.length;
 			while(csi--){
-				assoc = dojo.mixin(assoc||{}, subRowAssoc(this.columnSets[csi]));
+				assoc = lang.mixin(assoc||{}, subRowAssoc(this.columnSets[csi]));
 			}
 		}else if(this.subRows && this.subRows.length > 1){
 			assoc = subRowAssoc(this.subRows);
