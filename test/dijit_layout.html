@@ -57,7 +57,7 @@
 				"dojo/domReady!"
 			], function(Grid, DijitRegistry, Dialog, lang, declare, parser){
 			
-				var CustomGrid = new (declare([Grid, DijitRegistry]));
+				var CustomGrid = declare([Grid, DijitRegistry]);
 				
 				// simply passing columns via data-dojo-props, don't want GridFromHtml
 				window.dgrid = { Grid: CustomGrid };

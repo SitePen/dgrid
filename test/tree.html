@@ -103,8 +103,6 @@
 					window.treeSubRows = new StandardGrid({
 						store: testCountryStore,
 						query: {type: "continent"},
-						selectionMode: "none",
-						allowSelectAll: true,
 						subRows: [[
 							tree({label:"Name", field:"name", sortable: false}),
 							{label:"Type", field:"type", sortable: false}
@@ -117,8 +115,6 @@
 					window.treeColumnSets = new (declare([Grid, Keyboard, Selection, ColumnSet]))({
 						store: testCountryStore,
 						query: {type: "continent"},
-						selectionMode: "none",
-						allowSelectAll: true,
 						columnSets: [[
 							[ tree({label:"Name", field:"name", sortable: false}) ],
 							[ {label:"Type", field:"type", sortable: false} ]
