@@ -29,8 +29,8 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Tree","dgrid/Selection", "dgrid/Keyboard", "dgrid/Editor", "dijit/form/CheckBox", "dijit/form/TimeTextBox",  "dijit/form/Select","dojo/data/ObjectStore", "dijit/form/FilteringSelect", "dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!"],
-				function(List, Grid, Tree, Selection, Keyboard, Editor, CheckBox, TimeTextBox, Select, ObjectStore, FilteringSelect, declare){
+			require(["dgrid/List", "dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Keyboard", "dgrid/editor", "dijit/form/CheckBox", "dijit/form/TimeTextBox",  "dijit/form/Select","dojo/data/ObjectStore", "dijit/form/FilteringSelect", "dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!"],
+				function(List, Grid, Selection, Keyboard, editor, CheckBox, TimeTextBox, Select, ObjectStore, FilteringSelect, declare){
 
 					stateStore = new ObjectStore({
 						objectStore:testStateStore,
@@ -39,19 +39,19 @@
 
 					var columns = [
 						{field: "id", label: "id"},
-						Editor({
+						editor({
 							label: "CheckBox",
 							field: "bool2",
 							editorArgs: {
 								value: "checked"
 							}
 						}, CheckBox),
-						Editor({label: "Time", field: "date2", editorArgs: {
+						editor({label: "Time", field: "date2", editorArgs: {
 							timePattern: "HH:mm:ss",
 							clickableIncrement: "T00:15:00",
 							visibleIncrement: "T00:15:00",
 							visibleRange: "T01:00:00"}}, TimeTextBox),
-						Editor({
+						editor({
 							label: "Select Options",
 							field: "bool",
 							get: function(item){
@@ -70,9 +70,9 @@
 								]
 							}
 						}, Select, "dblclick"),
-						Editor({label: "Select Store", field: "state", editorArgs: {store: stateStore, maxHeight: 150, style: "width:120px;"}}, Select, "click"),
-						Editor({label: "FilteringSelect Store", field: "state2", editorArgs: {store: stateStore, maxHeight: 150, style: "width:120px;"}}, FilteringSelect)
-						// Note that mileage may vary with editOn + widgets wit multiple focusable children, e.g. dijit/Editor
+						editor({label: "Select Store", field: "state", editorArgs: {store: stateStore, maxHeight: 150, style: "width:120px;"}}, Select, "click"),
+						editor({label: "FilteringSelect Store", field: "state2", editorArgs: {store: stateStore, maxHeight: 150, style: "width:120px;"}}, FilteringSelect)
+						// Note that mileage may vary with editOn + widgets with multiple focusable children, e.g. dijit/Editor
 					];
 
 

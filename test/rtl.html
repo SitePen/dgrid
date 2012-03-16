@@ -47,8 +47,8 @@
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
 		
-			require(["dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dgrid/Tree", "dgrid/Editor", "dojo/_base/lang", "dojo/_base/declare", "dojo/on", "dojo/data/ObjectStore", "dijit/form/CheckBox", "dijit/form/TimeTextBox",  "dijit/form/Select", "dijit/form/FilteringSelect", "dgrid/test/data/base", "dojo/domReady!", "xstyle/css!../css/dgrid_rtl.css"], 
-				function(Grid, Selection, Keyboard, Tree, Editor, lang, declare, on, ObjectStore, CheckBox, TimeTextBox, Select, FilteringSelect, testStore){
+			require(["dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dgrid/tree", "dgrid/editor", "dojo/_base/lang", "dojo/_base/declare", "dojo/on", "dojo/data/ObjectStore", "dijit/form/CheckBox", "dijit/form/TimeTextBox",  "dijit/form/Select", "dijit/form/FilteringSelect", "dgrid/test/data/base", "dojo/domReady!", "xstyle/css!../css/dgrid_rtl.css"], 
+				function(Grid, Selection, Keyboard, tree, editor, lang, declare, on, ObjectStore, CheckBox, TimeTextBox, Select, FilteringSelect, testStore){
 					var columns = [
 						{label: 'Column 1', field: 'col1'},
 						{label: 'Column 2', field: 'col2', sortable: false},
@@ -69,8 +69,8 @@
 					}, "scrollgrid");
 					
 					var columnsTree = [
-						Editor({label: ' ', field: 'bool', sortable: false}, "checkbox"),
-						Tree({label:'Name', field:'name', sortable: false}),
+						editor({label: ' ', field: 'bool', sortable: false}, "checkbox"),
+						tree({label:'Name', field:'name', sortable: false}),
 						{label:'Type', field:'type', sortable: false},
 						{label:'Population', field:'population'},
 						{label:'Timezone', field:'timezone'}
@@ -83,11 +83,11 @@
 					}, "tree");
 					
 					var columnsHeaderless = { // you can declare columns as an object hash (key translates to field)
-						col1: Editor({label: 'Column 1 column 1 column 1'}, "text", "dblclick"),
+						col1: editor({label: 'Column 1 column 1 column 1'}, "text", "dblclick"),
 						col2: {label: 'Column 2', sortable: false},
-						col3: Editor({label: 'Column 3'}, "text", "dblclick"),
+						col3: editor({label: 'Column 3'}, "text", "dblclick"),
 						col4: 'Column444444444444444444',
-						col5: Editor({label: 'Column 5'}, "text", "dblclick")
+						col5: editor({label: 'Column 5'}, "text", "dblclick")
 					};
 
 					window.headerless = new StandardGrid({
@@ -104,19 +104,19 @@
 
 					var columnsEditor = [
 						{field: "id", label: "id"},
-						Editor({
+						editor({
 							label: "CheckBox",
 							field: "bool2",
 							editorArgs: {
 								value: "checked"
 							}
 						}, CheckBox),
-						Editor({label: "Time", field: "date2", editorArgs: {
+						editor({label: "Time", field: "date2", editorArgs: {
 							timePattern: "HH:mm:ss",
 							clickableIncrement: "T00:15:00",
 							visibleIncrement: "T00:15:00",
 							visibleRange: "T01:00:00"}}, TimeTextBox),
-						Editor({
+						editor({
 							label: "Select Options",
 							field: "bool",
 							get: function(item){
@@ -135,8 +135,8 @@
 								]
 							}
 						}, Select, "dblclick"),
-						Editor({label: "Select Store", field: "state", editorArgs: {store: stateStore, maxHeight: 150, style: "width:120px;"}}, Select, "click"),
-						Editor({label: "FilteringSelect Store", field: "state2", editorArgs: {store: stateStore, maxHeight: 150, style: "width:120px;"}}, FilteringSelect)
+						editor({label: "Select Store", field: "state", editorArgs: {store: stateStore, maxHeight: 150, style: "width:120px;"}}, Select, "click"),
+						editor({label: "FilteringSelect Store", field: "state2", editorArgs: {store: stateStore, maxHeight: 150, style: "width:120px;"}}, FilteringSelect)
 					];
 					
 					window.moreeditors = new StandardGrid({
@@ -162,7 +162,7 @@
 		<h2>Headerless grid</h2>
 		<div id="headerless"></div>
 		
-		<h2>More Editors</h2>
+		<h2>Grid with editors</h2>
 		<div id="moreeditors"></div>
 		<button type="button" id="save" onclick="moreeditors.save()">Save</button>
 	</body>

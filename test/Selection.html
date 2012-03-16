@@ -22,9 +22,9 @@
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
 			require(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array", "dojo/json", "dojo/on",
-					"dgrid/OnDemandGrid", "dgrid/Editor","dgrid/Selection", "dgrid/CellSelection", "dgrid/Keyboard",
+					"dgrid/OnDemandGrid", "dgrid/editor","dgrid/Selection", "dgrid/CellSelection", "dgrid/Keyboard",
 					"dgrid/test/data/base", "dojo/domReady!"],
-				function(lang, declare, arrayUtil, json, on, Grid, Editor, Selection, CellSelection, Keyboard, testStore){
+				function(lang, declare, arrayUtil, json, on, Grid, editor, Selection, CellSelection, Keyboard, testStore){
 					on(document.body, "dgrid-select,dgrid-deselect",
 						function(event){
 							var msg = (event.type == "dgrid-deselect" ? "de" : "") + "selected: ";
@@ -39,7 +39,7 @@
 					);
 					var SelectionGrid = declare([Grid, Selection, Keyboard]);
 					var CellSelectionGrid = declare([Grid, CellSelection, Keyboard]);
-					
+
 					gridRowNavigation = new SelectionGrid({
 						store: testStore,
 						cellNavigation: false,
@@ -47,7 +47,7 @@
 							col1: 'Column 1',
 							col2: {label: 'Column 2', sortable: false},
 							col3: 'Column 3',
-							col4: Editor({label: 'Editable'}, "text")
+							col4: editor({label: 'Editable'}, "text")
 						},
 						allowSelectAll: true
 					}, "grid-row-navigation");
@@ -86,7 +86,7 @@
 							col1: 'Column 1',
 							col2: {label: 'Column 2', sortable: false},
 							col3: 'Column 3',
-							col4: Editor({label: 'Editable'}, "text")
+							col4: editor({label: 'Editable'}, "text")
 						}
 					}, "grid-mixed");
 				});

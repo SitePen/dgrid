@@ -22,8 +22,8 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Editor", "dgrid/Keyboard", "dgrid/Tree", "dojo/_base/declare", "dojo/store/JsonRest", "dojo/store/Observable", "dojo/store/Cache", "dojo/store/Memory", "dojo/domReady!"], 
-				function(List, Grid, Selection, Editor, Keyboard, Tree, declare, JsonRest, Observable, Cache, Memory){
+			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/editor", "dgrid/Keyboard", "dgrid/tree", "dojo/_base/declare", "dojo/store/JsonRest", "dojo/store/Observable", "dojo/store/Cache", "dojo/store/Memory", "dojo/domReady!"], 
+				function(List, Grid, Selection, editor, Keyboard, tree, declare, JsonRest, Observable, Cache, Memory){
 					var testStore = Observable(Cache(JsonRest({
 						target:"./data/rest.php?", 
 						idProperty: "id",
@@ -39,10 +39,10 @@
 						return testStore.query({parent: parent.id}, options);
 					};
 					var columns = [
-						Tree({label:'Name', field:'name', sortable: false}),
+						tree({label:'Name', field:'name', sortable: false}),
 						{label:'Id', field:'id', sortable: false},
-						Editor({label:'Comment', field:'comment', sortable: false}, "text"),
-						Editor({label:'Boolean', field:'boo', sortable: false, autoSave: true}, "checkbox")
+						editor({label:'Comment', field:'comment', sortable: false}, "text"),
+						editor({label:'Boolean', field:'boo', sortable: false, autoSave: true}, "checkbox")
 					];
 
 					window.grid = new (declare([Grid, Selection, Keyboard]))({

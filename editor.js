@@ -86,9 +86,9 @@ function setPropertyFromEditor(grid, column, cmp) {
 			activeCell ? activeValue : cmp._dgridLastValue,
 			dataFromEditor(column, cmp));
 		
-		if(activeCell){ // for Editors with editOn defined
+		if(activeCell){ // for editors with editOn defined
 			activeValue = value;
-		}else{ // for always-on Editors, update _dgridLastValue immediately
+		}else{ // for always-on editors, update _dgridLastValue immediately
 			cmp._dgridLastValue = value;
 		}
 	}
@@ -116,7 +116,7 @@ function createEditor(column){
 		// (Can't do this using className argument to constructor; causes issues)
 		node.className += " dgrid-input";
 		
-		// For editOn Editors, connect to onBlur rather than onChange, since
+		// For editOn editors, connect to onBlur rather than onChange, since
 		// the latter is delayed by setTimeouts in Dijit and will fire too late.
 		cmp.connect(cmp, editOn ? "onBlur" : "onChange", function(){
 			if(!cmp._dgridIgnoreChange){
@@ -224,7 +224,7 @@ function createSharedEditor(column, originalRenderCell){
 
 function showEditor(cmp, column, cell, value){
 	// Places a shared editor into the newly-active cell in the column.
-	// Also called when rendering an editor in an "always-on" Editor column.
+	// Also called when rendering an editor in an "always-on" editor column.
 	
 	var grid = column.grid,
 		editor = column.editor,
@@ -249,11 +249,11 @@ function showEditor(cmp, column, cell, value){
 	}
 	// track previous value for short-circuiting or in case we need to revert
 	cmp._dgridLastValue = value;
-	// if this is an Editor with editOn, also reset activeValue
+	// if this is an editor with editOn, also reset activeValue
 	if(activeCell){ activeValue = value; }
 }
 
-// Editor column plugin function
+// editor column plugin function
 
 return function(column, editor, editOn){
 	// summary:
@@ -262,7 +262,7 @@ return function(column, editor, editOn){
 	var originalRenderCell = column.renderCell || Grid.defaultRenderCell,
 		isWidget, cleanupAdded;
 	
-	// accept arguments as parameters to Editor function, or from column def,
+	// accept arguments as parameters to editor function, or from column def,
 	// but normalize to column def.
 	column.editor = editor = editor || column.editor;
 	column.editOn = editOn = editOn || column.editOn;

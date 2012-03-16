@@ -2,6 +2,59 @@
 
 ## General
 
+### column plugin names are now lowercase
+
+Formerly, column plugins and the named arguments storing their module return values
+had their first letter capitalized.  However, given that these plugins are in
+fact simply functions which modify (and return) their first passed argument,
+and are not in fact constructors, their nomenclature has been amended to
+all-lowercase to avoid confusion, and to further convey that they are intended
+to be run without the `new` keyword.
+
+When running on a case-insensitive filesystem (e.g. Windows, or Mac OS X by
+default), this change likely won't have any immediate visible effect on
+existing code which requests the module with an initial capital letter.
+However, revising code to reference the all-lowercase module ID is encouraged.
+
+### additional extensions
+
+The following extensions have been added since v0.2:
+
+* ColumnReorder: allows reordering columns in simple grids via DnD
+* ColumnHider: allows dynamically hiding/showing grid columns from a simple menu
+* Pagination: adds controls for discrete pagination
+
+More information on these extensions can be found on the
+[Extensions](https://github.com/SitePen/dgrid/wiki/Components-Extensions) page of the wiki.
+
+## CSS
+
+### column-<id> and columnset-* classes now prefixed with dgrid-
+
+The `column-<id>` classes added by the Grid module, and the `columnset-*`
+classes added by the ColumnSet mixin, have been renamed to include the `dgrid-`
+prefix like most other classes automatically added by dgrid components.
+
+The main exception is the `field-<field>` classes, which are intentionally not
+namespaced in this fashion, as they are thought to be more applicable to the
+particular use-case and less applicable to the dgrid components themselves.
+
+In the overwhelming majority of cases, it is recommended to style using the
+`.field-<field>` classes (or, if a `className` is specified in the column
+definition, use that as it overrides the `.field-<field>` class).
+
+### ColumnResizer: handle node class is now dgrid-resize-handle
+
+The class on the resize handle node added to each header cell by the
+ColumnResizer extension was formerly `dgrid-resize-handler`; this has been
+corrected to `dgrid-resize-handle`.
+
+## List
+
+While these changes relate particularly to code in List.js, note that the changes
+essentially affect all dgrid components, since all components extend from or
+mix into List.
+
 ### new: get and set methods
 
 Central `get` and `set` functions have been implemented, somewhat akin to the
@@ -26,28 +79,6 @@ recommended way to retrieve existing sort options is to call `get("sort")`.
 Meanwhile, the `sort` method has been deprecated in favor of `set("sort", ...)`.
 Sort order can also now be initially defined when creating a list or grid by
 specifying a `sort` property in the object passed to the constructor.
-
-## CSS
-
-### column-<id> and columnset-* classes now prefixed with dgrid-
-
-The `column-<id>` classes added by the Grid module, and the `columnset-*`
-classes added by the ColumnSet mixin, have been renamed to include the `dgrid-`
-prefix like most other classes automatically added by dgrid components.
-
-The main exception is the `field-<field>` classes, which are intentionally not
-namespaced in this fashion, as they are thought to be more applicable to the
-particular use-case and less applicable to the dgrid components themselves.
-
-In the overwhelming majority of cases, it is recommended to style using the
-`.field-<field>` classes (or, if a `className` is specified in the column
-definition, use that as it overrides the `.field-<field>` class).
-
-### ColumnResizer: handle node class is now dgrid-resize-handle
-
-The class on the resize handle node added to each header cell by the
-ColumnResizer extension was formerly `dgrid-resize-handler`; this has been
-corrected to `dgrid-resize-handle`.
 
 ## Grid
 
@@ -98,7 +129,7 @@ The behavior and signature of selection events has changed significantly.
 
 ### new: allowSelectAll property, disabled by default
 
-Previously, checkbox Selectors provided the ability to select all rows.
+Previously, checkbox selectors provided the ability to select all rows.
 This ability is still provided, but is now determined by the value of the
 `allowSelectAll` property.
 
@@ -116,7 +147,7 @@ receives a row object (or a cell object in the case of `CellSelection`) and
 is expected to return `true` or `false`, reflecting whether selection of this
 row or cell should be permitted.
 
-This is particularly useful in conjunction with the `Selector` column plugin,
+This is particularly useful in conjunction with the selector column plugin,
 which will display a disabled checkbox or radio button as appropriate.
 
 ### new: deselectOnRefresh property
@@ -125,24 +156,24 @@ Previously, the `Selection` module would clear the selection whenever a list
 or grid is refreshed.  While this is still the default, the behavior can now
 be disabled by setting `deselectOnRefresh` to `false`.
 
-## Selector
+## selector
 
 ### columndef.type is now columndef.selectorType
 
 In dgrid 0.2, the selector type (generally either `"checkbox"` or `"radio"`)
 could be specified within the column definition object via the `type` property.
 This has been changed to `selectorType` to avoid ambiguity.  The selector type
-can also be specified as the second argument to the `Selector` column plugin
+can also be specified as the second argument to the `selector` column plugin
 function instead, as before.
 
-## Editor
+## editor
 
-Editor has been significantly refactored since v0.2.  The most notable changes
-in terms of API effects are noted below.
+The editor column plugin has been significantly refactored since v0.2.
+The most notable changes in terms of API effects are noted below.
 
 ### widgetArgs property is now editorArgs
 
-The `widgetArgs` property supported in the column definition by the Editor
+The `widgetArgs` property supported in the column definition by the editor
 plugin has been renamed to `editorArgs` to be agnostic as to whether the
 editor is a widget or a standard input, leaving the door open for usage with
 standard HTML input types.
@@ -164,10 +195,10 @@ column definition object to return the appropriate data.
 
 ### dgrid-datachange event properties
 
-The `dgrid-datachange` event emitted by the Editor column plugin now includes
+The `dgrid-datachange` event emitted by the editor column plugin now includes
 a `cell` property, which contains the same data retrievable via
 `grid.cell(event)`.  Since `grid.cell` is already called in the relevant
-Editor code, it is exposed directly on the event to avoid forcing developers
+editor code, it is exposed directly on the event to avoid forcing developers
 to perform the same lookup again on the other end.
 
 Since it is possible to get cell and row information from this property,
@@ -177,7 +208,7 @@ now deprecated and will be removed in a future release.
 The `dgrid-datachange` event also now includes a `grid` property containing a
 reference to the Grid instance from which the event was fired.
 
-## Tree
+## tree
 
 ### expand method added to grid instance
 

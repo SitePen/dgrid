@@ -52,14 +52,14 @@
 				{order: 9, name:"eat", description:"Eat and enjoy!"}
 			];
 			
-			require(["dgrid/List", "dgrid/Grid", "dojo/_base/array", "dgrid/Editor",
+			require(["dgrid/List", "dgrid/Grid", "dojo/_base/array", "dgrid/editor",
 					"dijit/form/TextBox", "dijit/form/DateTextBox", "dojo/domReady!"],
-				function(List, Grid, arrayUtil, Editor, TextBox, DateTextBox){
+				function(List, Grid, arrayUtil, editor, TextBox, DateTextBox){
 					var columns = {
 						order: "step", // give column a custom name
-						name: Editor({}, TextBox, "dblclick"),
+						name: editor({}, TextBox, "dblclick"),
 						description: {label: "what to do", sortable: false},
-						date: Editor({label: 'Date'}, DateTextBox)
+						date: editor({label: 'Date'}, DateTextBox)
 					};
 					window.list = new List({}, "list");
 					list.renderArray(arrayUtil.map(data, function(item){
