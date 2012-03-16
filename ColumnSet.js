@@ -1,5 +1,5 @@
-define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/query", "dojo/has", "put-selector/put", "xstyle/has-class", "./Grid", "dojo/_base/sniff", "xstyle/css!./css/columnset.css"], 
-function(kernel, declare, listen, aspect, query, has, put, hasClass, Grid){
+define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/Deferred", "dojo/on", "dojo/aspect", "dojo/query", "dojo/has", "put-selector/put", "xstyle/has-class", "./Grid", "dojo/_base/sniff", "xstyle/css!./css/columnset.css"],
+function(kernel, declare, Deferred, listen, aspect, query, has, put, hasClass, Grid){
 		// summary:
 		//		This module provides column sets to isolate horizontal scroll of sets of 
 		//		columns from each other. This mainly serves the purpose of allowing for
@@ -18,10 +18,14 @@ function(kernel, declare, listen, aspect, query, has, put, hasClass, Grid){
 			return row;
 		},
 		renderArray: function(){
-			var rows = this.inherited(arguments);
-			for(var i = 0; i < rows.length; i++){
-				adjustScrollLeft(this, rows[i]);
-			}
+			var grid = this,
+				rows = this.inherited(arguments);
+
+			Deferred.when(rows, function(rows){
+				for(var i = 0; i < rows.length; i++){
+					adjustScrollLeft(grid, rows[i]);
+				}
+			});
 			return rows;
 		},
 		renderHeader: function(){
