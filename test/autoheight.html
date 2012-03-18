@@ -25,6 +25,10 @@
 				position: relative;
 				overflow-y: hidden;
 			}
+			.has-ie-6 #grid .dgrid-scroller {
+				/* IE6 doesn't react properly to hidden on this page for some reason */
+				overflow-y: visible;
+			}
 			#grid .dgrid-header-scroll {
 				display: none;
 			}
@@ -37,13 +41,12 @@
 		<script type="text/javascript">
 			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!"], 
 				function(List, Grid, Selection, Keyboard, declare){
-					var columns = [
-						{label: 'Column 1', field: 'name'},
-						{label: 'Column 2', field: 'type'}
-					];
 					window.grid = new (declare([Grid, Selection, Keyboard]))({
 						store: testCountryStore,
-						columns: columns,
+						columns: {
+							name: "Name",
+							type: "Type"
+						},
 						query: {type:"continent"}
 					}, "grid");
 				});

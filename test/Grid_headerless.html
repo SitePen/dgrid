@@ -50,51 +50,58 @@
 				width: 80px;
 			}
 			
-			#editorgrid {
+			#editgrid {
 				width: 90%;
 			}
-			#editorgrid .field-date, #editorgrid .field-date2 {
+			#editgrid .field-date, #editgrid .field-date2 {
 				width: 16em;
 			}
-			#editorgrid .field-integer {
+			#editgrid .field-integer {
 				width: 6em;
 			}
-			#editorgrid .field-bool {
+			#editgrid .field-bool {
 				width: 6em;
 			}
 		</style>
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dojo/on", "dgrid/List", "dgrid/OnDemandGrid", "dgrid/Tree", "dgrid/Editor", "dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dijit/form/DateTextBox", "dijit/form/HorizontalSlider", "dijit/form/NumberSpinner", "dgrid/test/data/base", "dojo/domReady!"], 
-				function(on, List, Grid, Tree, Editor, Selection, Keyboard, declare, DateTextBox, Slider, NumberSpinner, testStore){
-					var columns = { // you can declare columns as an object hash (key translates to field)
-						col1: Editor({label: 'Column 1 column 1 column 1'}, "text", "dblclick"),
-						col2: {label: 'Column 2', sortable: false},
-						col3: Editor({label: 'Column 3'}, "text", "dblclick"),
-						col4: 'Column444444444444444444',
-						"last-col": Editor({label: 'Column 5', field: 'col5'}, "text", "dblclick")
-					};
-					
-					window.grid = declare([Grid, Selection, Keyboard])({
+			require(["dojo/on", "dgrid/List", "dgrid/OnDemandGrid", "dgrid/tree", "dgrid/editor", "dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dijit/form/DateTextBox", "dijit/form/HorizontalSlider", "dijit/form/NumberSpinner", "dgrid/test/data/base", "dojo/domReady!"],
+				function(on, List, Grid, tree, editor, Selection, Keyboard, declare, DateTextBox, Slider, NumberSpinner, testStore){
+
+					var StandardGrid = declare([Grid, Selection, Keyboard]);
+
+					window.grid = new StandardGrid({
 						store: testStore,
-						columns: columns,
+						columns: { // you can declare columns as an object hash (key translates to field)
+							col1: editor({label: 'Column 1 column 1 column 1'}, "text", "dblclick"),
+							col2: {label: 'Column 2', sortable: false},
+							col3: editor({label: 'Column 3'}, "text", "dblclick"),
+							col4: 'Column444444444444444444',
+							col5: editor({label: 'Column 5'}, "text", "dblclick")
+						},
 						showHeader: false
 					}, "grid");
 					
-					window.scrollgrid = declare([Grid, Selection, Keyboard])({
+					window.scrollgrid = new StandardGrid({
 						store: testStore,
-						columns: columns,
+						columns: { // same as previous, repeated to keep objects/plugins unique
+							col1: editor({label: 'Column 1 column 1 column 1'}, "text", "dblclick"),
+							col2: {label: 'Column 2', sortable: false},
+							col3: editor({label: 'Column 3'}, "text", "dblclick"),
+							col4: 'Column444444444444444444',
+							col5: editor({label: 'Column 5'}, "text", "dblclick")
+						},
 						showHeader: false
 					}, "scrollgrid");
 					
-					window.tree = declare([Grid, Selection, Keyboard])({
+					window.tree = new StandardGrid({
 						store: testCountryStore,
 						query: {type: "continent"},
 						selectionMode: "single",
 						columns: {
-							name: new Tree({label:'Name', sortable: false}),
-							bool: new Editor({label: 'A CheckBox', sortable: false}, "checkbox"),
+							name: tree({label:'Name', sortable: false}),
+							bool: editor({label: 'A CheckBox', sortable: false}, "checkbox"),
 							type: {label: 'Type', sortable: false},
 							population: 'Population',
 							timezone: 'Timezone'
@@ -102,24 +109,22 @@
 						showHeader: false
 					}, "tree");
 					
-					var editorColumns = [
-						Editor({label: 'A Date', field: 'date'}, DateTextBox),
-						Editor({label: 'Real Number', field: 'floatNum'}, Slider),
-						Editor({label: 'Integer', field: 'integer', editorArgs: {style: 'width: 5em;', constraints: {min:9,max:1550,places:0}}}, NumberSpinner),
-						Editor({label: 'Text editable if checkbox checked + saved', field: 'text', canEdit: function(object){
-							return object.bool;
-						}}, "text", "dblclick"),
-						{label: 'Non editable text', field: 'text', sortable: false},
-						Editor({label: 'Another Date', field: 'date2'}, DateTextBox, "focus"),
-						Editor({label: 'CheckBox', field: 'bool'}, "checkbox")
-					];
-					
-					window.editorgrid = new (declare([Grid, Selection, Keyboard]))({
+					window.editGrid = new StandardGrid({
 						store: testTypesStore,
-						columns: editorColumns,
+						columns: [ // columns specified as array, with field in each item
+							editor({label: 'A Date', field: 'date'}, DateTextBox),
+							editor({label: 'Real Number', field: 'floatNum'}, Slider),
+							editor({label: 'Integer', field: 'integer', editorArgs: {style: 'width: 5em;', constraints: {min:9,max:1550,places:0}}}, NumberSpinner),
+							editor({label: 'Text editable if checkbox checked + saved', field: 'text', canEdit: function(object){
+								return object.bool;
+							}}, "text", "dblclick"),
+							{label: 'Non editable text', field: 'text', sortable: false},
+							editor({label: 'Another Date', field: 'date2'}, DateTextBox, "focus"),
+							editor({label: 'CheckBox', field: 'bool'}, "checkbox")
+						],
 						selectionMode: "single",
 						showHeader: false
-					}, "editorgrid");
+					}, "editgrid");
 				});
 		</script>
 	</head>
@@ -127,13 +132,13 @@
 		<h1>Headerless Grid Tests</h1>
 		<h2>A basic grid</h2>
 		<div id="grid"></div>
-		<h2>A grid with a Tree column</h2>
+		<h2>A grid with a tree column</h2>
 		<div tabIndex="2" id="tree"></div>
 		<div tabIndex="1" id="list"></div>
 		<h2>Same as basic grid, but with column widths exceeding grid width</h2>
 		<p>(for testing that nodes occupy correct widths - pay attention to hover/selection style)</p>
 		<div id="scrollgrid"></div>
 		<h2>Editor Grid</h2>
-		<div id="editorgrid"></div>
+		<div id="editgrid"></div><br>
 	</body>
 </html>

@@ -38,8 +38,8 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dgrid/OnDemandGrid", "dgrid/GridWithColumnSetsFromHtml", "dgrid/ColumnSet", "dgrid/Tree", "dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dojo/on", "dojo/parser", "dgrid/test/data/base", "dojo/domReady!"],
-				function(Grid, GridFromHtml, ColumnSet, Tree, Selection, Keyboard, declare, on, parser, testStore){
+			require(["dgrid/OnDemandGrid", "dgrid/GridWithColumnSetsFromHtml", "dgrid/ColumnSet", "dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dojo/on", "dojo/parser", "dgrid/test/data/base", "dojo/domReady!"],
+				function(Grid, GridFromHtml, ColumnSet, Selection, Keyboard, declare, on, parser, testStore){
 					var columnSets1 = [
 							[
 								[{label: 'Column 1', field: 'col1'},
@@ -105,18 +105,20 @@
 							]];
 					
 					function byId(id){ return document.getElementById(id); }
-					
-					window.gridNoColumnSets = declare([Grid, Selection, Keyboard])({
+
+					var ComplexGrid = declare([Grid, ColumnSet, Selection, Keyboard]);
+
+					window.gridNoColumnSets = new (declare([Grid, Selection, Keyboard]))({
 						store: testStore,
 						subRows: subRows1
 					}, "gridNoColumnSets");
 					
-					window.gridSingleRow = declare([Grid, ColumnSet, Selection, Keyboard])({
+					window.gridSingleRow = new ComplexGrid({
 						store: testStore,
 						columnSets: columnSetsSingleRow
 					}, "gridSingleRow");
 					
-					window.grid = declare([Grid, ColumnSet, Selection, Keyboard])({
+					window.grid = new ComplexGrid({
 						store: testStore,
 						columnSets: columnSets1
 					}, "grid");
@@ -138,12 +140,14 @@
 					on(byId("btnColumnSets3"), "click", function(){
 						grid.set("columnSets", columnSets3);
 					});
-					
+
+					var HtmlGrid = declare([Grid, GridFromHtml, Selection, Keyboard]);
+
 					//NOTE: Grid == OnDemandGrid, GridFromHtml == ver w/ ColumnSet support
-					window.gridFromHtml = declare([Grid, GridFromHtml, Selection, Keyboard])({
+					window.gridFromHtml = new HtmlGrid({
 						store: testStore
 					}, "gridFromHtml");
-					window.gridFromHtml2 = declare([Grid, GridFromHtml, Selection, Keyboard])({
+					window.gridFromHtml2 = new HtmlGrid({
 						store: testStore
 					}, "gridFromHtml2");
 					

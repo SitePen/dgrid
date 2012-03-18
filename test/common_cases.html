@@ -64,40 +64,45 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dojo/on", "dgrid/List", "dgrid/OnDemandGrid", "dgrid/Tree", "dgrid/Editor", "dgrid/Selection", "dgrid/Keyboard", "dgrid/test/data/base", "dojo/_base/declare", "dojo/_base/array", "dojo/domReady!"], 
-				function(on, List, Grid, Tree, Editor, Selection, Keyboard, testStore, declare, arrayUtil){
+			require(["dojo/on", "dgrid/List", "dgrid/OnDemandGrid", "dgrid/tree", "dgrid/editor", "dgrid/Selection", "dgrid/Keyboard", "dgrid/test/data/base", "dojo/_base/declare", "dojo/_base/array", "dojo/domReady!"], 
+				function(on, List, Grid, tree, editor, Selection, Keyboard, testStore, declare, arrayUtil){
 					console.log("loaded in " + (new Date().getTime() - start));
-					var columns = { // you can declare columns as an object hash (key translates to field)
-						col1: Editor({label: 'Column 1 column 1 column 1'}, "text", "dblclick"),
-						col2: {label: 'Column 2', sortable: false},
-						col3: Editor({label: 'Column 3'}, "text", "dblclick"),
-						col4: 'Column444444444444444444',
-						"last-col": Editor({label: 'Column 5', field: 'col5'}, "text", "dblclick")
-					};
-					window.grid = declare([Grid, Selection, Keyboard])({
+
+					var StandardGrid = declare([Grid, Selection, Keyboard]);
+					
+					function getColumns(){
+						return { // you can declare columns as an object hash (key translates to field)
+							col1: editor({label: 'Column 1 column 1 column 1'}, "text", "dblclick"),
+							col2: {label: 'Column 2', sortable: false},
+							col3: editor({label: 'Column 3'}, "text", "dblclick"),
+							col4: 'Column444444444444444444',
+							col5: editor({label: 'Column 5'}, "text", "dblclick")
+						};
+					}
+					window.grid = new StandardGrid({
 						store: testStore,
-						columns: columns
+						columns: getColumns()
 					}, "grid");
 					
-					window.scrollgrid = declare([Grid, Selection, Keyboard])({
+					window.scrollgrid = new StandardGrid({
 						store: testStore,
-						columns: columns
+						columns: getColumns()
 					}, "scrollgrid");
 					
-					window.tree = declare([Grid, Selection, Keyboard])({
+					window.tree = new StandardGrid({
 						tabIndex: 2,
 						store: testCountryStore,
 						query: {type: "continent"},
 						selectionMode: "single",
 						columns: {
-							name: new Tree({label:'Name', sortable: false}),
-							bool: new Editor({label: 'A CheckBox', sortable: false}, "checkbox"),
+							name: tree({label:'Name', sortable: false}),
+							bool: editor({label: 'A CheckBox', sortable: false}, "checkbox"),
 							type: {label: 'Type', sortable: false},
 							population: 'Population',
 							timezone: 'Timezone'
 						}
 					}, "tree");
-					window.list = declare([List, Selection, Keyboard])({
+					window.list = new (declare([List, Selection, Keyboard]))({
 						tabIndex: 1
 					}, "list");
 					list.renderArray(arrayUtil.map(testCountryStore.data, function(country){

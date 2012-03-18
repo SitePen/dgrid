@@ -59,16 +59,25 @@
 						col3: "Column 3",
 						col4: "Column 4"
 					},
-					//args to be passed to programmatic dgrid instances
-					gridArgs = {
-						store: testStore,
-						columns: gridCols,
-						selectionMode: "single"
-					},
 					CustomGrid = declare([Grid, Selection, DijitRegistry]),
-					gridLeft = new CustomGrid(lang.mixin({id: "gridLeft"}, gridArgs)),
-					gridTab1 = new CustomGrid(lang.mixin({id: "gridTab1"}, gridArgs)),
-					gridTab2 = new CustomGrid(lang.mixin({id: "gridTab2"}, gridArgs));
+					gridLeft = new CustomGrid({
+						id: "gridLeft",
+						store: testStore,
+						columns: lang.clone(gridCols),
+						selectionMode: "single"
+					}),
+					gridTab1 = new CustomGrid({
+						id: "gridTab1",
+						store: testStore,
+						columns: lang.clone(gridCols),
+						selectionMode: "single"
+					}),
+					gridTab2 = new CustomGrid({
+						id: "gridTab2",
+						store: testStore,
+						columns: lang.clone(gridCols),
+						selectionMode: "single"
+					});
 				
 				var bc = new BC({
 					design: "headline"
@@ -116,7 +125,12 @@
 				
 				// test setting a dgrid as content of a dialog programmatically
 				window.dlgProgContent = new Dialog({
-					content: new CustomGrid(lang.mixin({id: "gridDlgProgContent"}, gridArgs))
+					content: new CustomGrid({
+						id: "gridDlgProgContent",
+						store: testStore,
+						columns: lang.clone(gridCols),
+						selectionMode: "single"
+					})
 				});
 			});
 		</script>
