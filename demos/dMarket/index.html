@@ -25,12 +25,12 @@
 		<script src="../../../dojo/dojo.js" data-dojo-config="async:1"></script>
 		<script>
 require(["dgrid/OnDemandList", "dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Keyboard",
-	"dgrid/Editor", "dgrid/Selector",
+	"dgrid/editor", "dgrid/selector",
 	"dgrid/extensions/ColumnResizer", "dgrid/extensions/ColumnHider", "dgrid/extensions/DnD",
 	"dojo/_base/lang", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/dom",
 	"dojo/store/Memory", "dojo/store/Observable", "put-selector/put",
 	"dijit/form/Button", "dijit/form/NumberSpinner", "dojo/domReady!"],
-function(List, Grid, Selection, Keyboard, Editor, Selector, ColumnResizer, ColumnHider, DnD,
+function(List, Grid, Selection, Keyboard, editor, selector, ColumnResizer, ColumnHider, DnD,
 		lang, declare, on, aspect, dom, Memory, Observable, put, Button, NumberSpinner){
 	
 	var descContainer = dom.byId("descContainer"),
@@ -123,10 +123,10 @@ function(List, Grid, Selection, Keyboard, Editor, Selector, ColumnResizer, Colum
 	
 	purchasesGrid = new CartGrid({
 		columns: {
-			selector: Selector({ label: " ", unhidable: true }),
+			selector: selector({ label: " ", unhidable: true }),
 			artist: "Artist",
 			album: "Album",
-			quantity: Editor({
+			quantity: editor({
 				label: "#",
 				autoSave: true,
 				editor: NumberSpinner,
