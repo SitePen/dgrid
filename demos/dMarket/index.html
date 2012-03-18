@@ -111,14 +111,14 @@ function(List, Grid, Selection, Keyboard, editor, selector, ColumnResizer, Colum
 		return div;
 	};
 	
-	var MarketList = declare([List, Selection, Keyboard, DnD]);
-	var CartGrid = declare([Grid,Selection, Keyboard, ColumnResizer, ColumnHider, DnD]);
+	var MarketList = declare([List, Selection, Keyboard/*, DnD*/]);
+	var CartGrid = declare([Grid,Selection, Keyboard, ColumnResizer, ColumnHider/*, DnD*/]);
 	marketList = new MarketList({
 		store: marketStore,
 		renderRow: galleryRender,
-		selectionMode: "single",
+		selectionMode: "single"/*,
 		dndSourceType: "marketItem",
-		dndParams: { copyOnly: true, selfAccept: false }
+		dndParams: { copyOnly: true, selfAccept: false }*/
 	}, "market");
 	
 	purchasesGrid = new CartGrid({
@@ -138,9 +138,9 @@ function(List, Grid, Selection, Keyboard, editor, selector, ColumnResizer, Colum
 			price: { label: "Price", formatter: function(price){ return "$" + price; } }
 		},
 		store: cartStore,
-		selectionMode: "none",
+		selectionMode: "none"/*,
 		dndSourceType: "marketItem",
-		dndParams: { isSource: false }
+		dndParams: { isSource: false }*/
 	}, "purchases");
 	
 	marketList.on(".dgrid-row:click", function(e){
