@@ -201,7 +201,7 @@ function createSharedEditor(column, originalRenderCell){
 		// after editing is focus lost somewhere outside of the cell
 		// and its not possible to continue with navigation by keys
 		setTimeout(function(){
-			try{ parentNode.focus(); }catch(e){/** no exception please */}
+			try{ parentNode.focus(); }catch(e){/** no exception here */}
 		},1);
 	}
 	
