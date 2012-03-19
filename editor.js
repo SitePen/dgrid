@@ -244,6 +244,8 @@ function showEditor(cmp, column, cell, value){
 	if(!isWidget){ updateInputValue(cmp, value); }
 	
 	cell.innerHTML = "";
+	//special css attribute for cell with editor
+	put(cell, '.dgrid-cell-inedit');
 	put(cell, cmp.domNode || cmp);
 	
 	if(isWidget){
