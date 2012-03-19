@@ -37,7 +37,7 @@
 		<script type="text/javascript">
 			require(["dgrid/OnDemandGrid", "dgrid/GridWithColumnSetsFromHtml", "dgrid/ColumnSet", "dgrid/Selection", "dgrid/Keyboard", "dgrid/extensions/ColumnResizer", "dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!"],
 				function(Grid, GridFromHtml, ColumnSet, Selection, Keyboard, ColumnResizer, declare, testStore){
-					window.grid = declare([Grid, ColumnSet, Selection, Keyboard, ColumnResizer])({
+					window.grid = new (declare([Grid, ColumnSet, Selection, Keyboard, ColumnResizer]))({
 						store: testStore,
 						columnSets: [
 							[
@@ -50,7 +50,7 @@
 									[{label: 'Column 5', field: 'col5'}]]]
 					}, "grid");
 					// same structure as above, without being split into ColumnSets
-					window.gridNoColumnSets = declare([Grid, Selection, Keyboard, ColumnResizer])({
+					window.gridNoColumnSets = new (declare([Grid, Selection, Keyboard, ColumnResizer]))({
 						store: testStore,
 						subRows: [[
 							{label: 'Column 1', field: 'col1'},

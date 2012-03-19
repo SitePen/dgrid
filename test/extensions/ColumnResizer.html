@@ -65,12 +65,12 @@
 						col1: 'Col1',
 						col5: 'Column 5'
 					};
-					
-					window.grid = declare([Grid, Selection, ColumnResizer])({
+					var ResizeGrid = declare([Grid, Selection, ColumnResizer]);
+					window.grid = new ResizeGrid({
 						store: testStore,
 						columns: columns1
 					}, "grid");
-					window.gridWide = declare([Grid, Selection, ColumnResizer])({
+					window.gridWide = new ResizeGrid({
 						store: testStore,
 						columns: lang.clone(columns)
 					}, "gridWide");

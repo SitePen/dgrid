@@ -263,12 +263,12 @@ return declare([List, _StoreMixin], {
 				// the preload is below the line of sight
 				do{
 					preload = preload.previous;
-				}while(preload && !preload.node.offsetParent); // skip past preloads that are not currently connected
+				}while(preload && !preload.node.offsetWidth); // skip past preloads that are not currently connected
 			}else if(visibleTop - mungeAmount - searchBuffer > (preloadTop + (preloadHeight = preloadNode.offsetHeight))){
 				// the preload is above the line of sight
 				do{
 					preload = preload.next;
-				}while(preload && !preload.node.offsetParent);// skip past preloads that are not currently connected
+				}while(preload && !preload.node.offsetWidth);// skip past preloads that are not currently connected
 			}else{
 				// the preload node is visible, or close to visible, better show it
 				var offset = ((preloadNode.rowIndex ? visibleTop - requestBuffer : visibleBottom) - preloadTop) / grid.rowHeight;

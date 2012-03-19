@@ -75,30 +75,34 @@
 							col5: editor({label: 'Column 5'}, "text", "dblclick")
 						};
 					}
+
+					var StandardGrid = declare([Grid, Selection, Keyboard]);
 					
-					window.grid = declare([Grid, Selection, Keyboard])({
+					window.grid = new StandardGrid({
 						store: testStore,
 						columns: getColumns()
 					}, "grid");
 					
-					window.scrollgrid = declare([Grid, Selection, Keyboard])({
+					window.scrollgrid = new StandardGrid({
 						store: testStore,
 						columns: getColumns()
 					}, "scrollgrid");
 					
-					window.headerlessgrid = declare([Grid, Selection, Keyboard])({
+					window.headerlessgrid = new StandardGrid({
 						store: testStore,
 						columns: getColumns(),
 						showHeader: false
 					}, "headerlessgrid");
+
+					var StandardList = declare([List, Selection, Keyboard]);
 					
-					window.list = declare([List, Selection, Keyboard])({}, "list");
+					window.list = new StandardList({}, "list");
 					list.renderArray(countries);
 					
-					window.widelist = declare([List, Selection, Keyboard])({}, "widelist");
+					window.widelist = new StandardList({}, "widelist");
 					widelist.renderArray(countries);
 					
-					window.narrowlist = declare([List, Selection, Keyboard])({}, "narrowlist");
+					window.narrowlist = new StandardList({}, "narrowlist");
 					narrowlist.renderArray(longCountries);
 				});
 		</script>

@@ -123,36 +123,35 @@
 						col6: 'G',
 						col7: 'B'
 					};
-					window.grid = declare([Grid])({
+					var StandardGrid = declare([Grid, Selection, Keyboard]);
+					window.grid = new StandardGrid({
 						store: testStore,
 						columns: columns,
 						sort: "col3", // initially sort by col3 ascending
 						noDataMessage: "Nobody here but us chickens!"
 					}, "grid");
 
-					window.grid2 = declare([Grid, Selection, Keyboard])({
+					window.grid2 = new StandardGrid({
 						store: testTypesStore,
 						columns: columns2,
 						selectionMode: "single"
 					},"grid2");
 
-					window.grid3 = declare([Grid, Keyboard])({
+					window.grid3 = new StandardGrid({
 						store: testTypesStore,
 						columns: columns3
 					}, "grid3");
 
-					window.gridAddDel = declare([Grid, Keyboard, Selection])({
+					window.gridAddDel = new StandardGrid({
 						store: smallColorStore,
-						columns: lang.clone(columns4),
-						selectionMode: "multiple"
+						columns: lang.clone(columns4)
 					}, "gridAddDel");
 					
 					// also throw in a List connected to the same store
 					// (so additions/deletions should show up in both)
-					window.listAddDel = declare([List, Keyboard, Selection])({
+					window.listAddDel = new (declare([List, Keyboard, Selection]))({
 						store: smallColorStore,
 						columns: lang.clone(columns4),
-						selectionMode: "multiple",
 						renderRow: function(object, options){
 							// need to define renderRow to accommodate store items
 							return domConstruct.create("div", {

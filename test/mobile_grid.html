@@ -17,7 +17,7 @@
 		<script type="text/javascript">
 			require(["dojo/on", "dgrid/OnDemandGrid", "dgrid/extensions/ColumnResizer", "dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!"],
 				function(on, Grid, ColumnResizer, declare, testStore){
-					window.grid = declare([Grid, ColumnResizer])({
+					window.grid = new (declare([Grid, ColumnResizer]))({
 						store: testStore,
 						columns: { // you can declare columns as an object hash (key translates to field)
 							col1: "Status",
