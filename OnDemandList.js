@@ -63,7 +63,7 @@ return declare([List, _StoreMixin], {
 			var rootQuery = true;
 			var topPreload = {
 				node: put(this.contentNode, "div.dgrid-preload", {
-					rowIndex: 0,
+					rowIndex: 0
 				}),
 				count: 0,
 				//topPreloadNode.preload = true;
