@@ -374,8 +374,7 @@ function(arrayUtil, kernel, declare, listen, aspect, has, miscUtil, TouchScroll,
 					if(next.rowIndex > -1){
 						// skip non-numeric, non-rows
 						put(next, '.' + (rowIndex % 2 == 1 ? oddClass : evenClass) + '!' + (rowIndex % 2 == 0 ? oddClass : evenClass));
-						next.rowIndex = rowIndex;
-						rowIndex += "rowCount" in next ? next.rowCount : 1;
+						next.rowIndex = rowIndex++;
 					}
 				}while((next = next.nextSibling) && next.rowIndex != rowIndex);
 			}
