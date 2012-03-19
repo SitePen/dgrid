@@ -190,6 +190,9 @@ function createSharedEditor(column, originalRenderCell){
 		// remove the editor from the cell
 		parentNode.removeChild(node);
 		
+		// remove the special css attribute for cell with editor
+		put(parentNode, '!dgrid-cell-inedit');
+		
 		// pass new value to original renderCell implementation for this cell
 		Grid.appendIfNode(parentNode, originalRenderCell(
 			column.grid.row(parentNode).data, activeValue, parentNode));
