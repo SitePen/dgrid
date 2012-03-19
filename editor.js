@@ -197,6 +197,12 @@ function createSharedEditor(column, originalRenderCell){
 		// reset state now that editor is deactivated
 		activeCell = activeValue = null;
 		column._editorBlurHandle.pause();
+		
+		// after editing is focus lost somewhere outside of the cell
+		// and its not possible to continue with navigation by keys
+		setTimeout(function(){
+			try{ parentNode.focus(); }catch(e){/** no exception please */}
+		},1);
 	}
 	
 	function dismissOnKey(evt){
