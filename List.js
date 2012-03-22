@@ -387,7 +387,7 @@ function(arrayUtil, kernel, declare, listen, aspect, has, miscUtil, TouchScroll,
 			options = options || {};
 			var self = this,
 				start = options.start || 0,
-				row, rows;
+				row, rows, container;
 			
 			if(!beforeNode){
 				this._lastCollection = results;
@@ -401,10 +401,16 @@ function(arrayUtil, kernel, declare, listen, aspect, has, miscUtil, TouchScroll,
 						// remove from old slot
 						row = rows.splice(from, 1)[0];
 						// check to make the sure the node is still there before we try to remove it, (in case it was moved to a different place in the DOM)
-						if(row.parentNode == (beforeNode ? beforeNode.parentNode : self.contentNode)){
+						if(row.parentNode == container){
 							firstRow = row.nextSibling;
-							firstRow.rowIndex--; // adjust the rowIndex so adjustRowIndices has the right starting point
-							self.removeRow(row); // now remove
+							if(firstRow){ // it's possible for this to have been already removed if it is in overlapping query results
+								firstRow.rowIndex--; // adjust the rowIndex so adjustRowIndices has the right starting point
+								self.removeRow(row); // now remove
+							}
+						}
+						// the removal of rows could cause us to need to page in more items
+						if(self._processScroll){
+							self._processScroll();
 						}
 					}
 					if(to > -1){
@@ -441,7 +447,7 @@ function(arrayUtil, kernel, declare, listen, aspect, has, miscUtil, TouchScroll,
 				return lastRow;
 			}
 			function whenDone(resolvedRows){
-				var container = beforeNode ? beforeNode.parentNode : self.contentNode;
+				container = beforeNode ? beforeNode.parentNode : self.contentNode;
 				if(container){
 					container.insertBefore(rowsFragment, beforeNode || null);
 					lastRow = resolvedRows[resolvedRows.length - 1];
