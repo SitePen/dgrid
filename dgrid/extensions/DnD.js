@@ -1,6 +1,6 @@
 define(["dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/dnd/Source", "dojo/dnd/Manager", "put-selector/put", "xstyle/css!dojo/resources/dnd.css"],
 function(declare, lang, Deferred, DnDSource, DnDManager, put){
-	// TODOC: store requirements
+	// Requirements:
 	// * requires a store (sounds obvious, but not all Lists/Grids have stores...)
 	// * must support options.before in put calls
 	//   (if undefined, put at end)
@@ -60,15 +60,24 @@ function(declare, lang, Deferred, DnDSource, DnDManager, put){
 			});
 		},
 		onDropInternal: function(nodes, copy, targetItem){
-			var targetSource = this,
+			var store = this.grid.store,
+				targetSource = this,
+				grid = this.grid,
 				anchor = targetSource._targetAnchor,
-				targetRow = this.before ? anchor.previousSibling : anchor.nextSibling,
-				store = this.grid.store;
+				targetRow;
+			
+			if(anchor){ // (falsy if drop occurred in empty space after rows)
+				targetRow = this.before ? anchor.previousSibling : anchor.nextSibling;
+			}
 			
 			// Don't bother continuing if the drop is really not moving anything.
-			// (Don't need to worry about edge first/last cases since
-			// dropping directly on self doesn't fire onDrop)
-			if(!copy && targetRow === nodes[0]){ return; }
+			// (Don't need to worry about edge first/last cases since dropping
+			// directly on self doesn't fire onDrop, but we do have to worry about
+			// dropping last node into empty space beyond rendered rows.)
+			if(!copy && (targetRow === nodes[0] ||
+					(!targetItem && grid.down(grid.row(nodes[0])).element == nodes[0]))){
+				return;
+			}
 			
 			nodes.forEach(function(node){
 				Deferred.when(targetSource.getObject(node), function(object){
@@ -142,13 +151,13 @@ function(declare, lang, Deferred, DnDSource, DnDManager, put){
 	});
 	
 	function setupDnD(grid){
-		if(grid.dndTarget){
+		if(grid.dndSource){
 			return;
 		}
 		// make the contents a DnD source/target
-		grid.dndTarget = new GridDnDSource(
+		grid.dndSource = new (grid.dndConstructor || GridDnDSource)(
 			grid.bodyNode,
-			lang.delegate(grid.dndTargetConfig, {
+			lang.mixin(grid.dndParams, {
 				// add cross-reference to grid for potential use in inter-grid drop logic
 				grid: grid,
 				dropParent: grid.contentNode
@@ -157,26 +166,37 @@ function(declare, lang, Deferred, DnDSource, DnDManager, put){
 	}
 	
 	var DnD = declare([], {
-		dndSourceType: "row",
-		dndTargetConfig: null,
+		// dndSourceType: String
+		//		Specifies the type which will be set for DnD items in the grid,
+		//		as well as what will be accepted by it by default.
+		dndSourceType: "dgrid-row",
+		
+		// dndParams: Object
+		//		Object containing params to be passed to the DnD Source constructor.
+		dndParams: null,
+		
+		// dndConstructor: Function
+		//		Constructor from which to instantiate the DnD Source.
+		//		Defaults to the GridSource constructor defined/exposed by this module.
+		dndConstructor: GridDnDSource,
+		
 		postMixInProperties: function(){
 			this.inherited(arguments);
-			// initialize default dndTargetConfig
-			this.dndTargetConfig = {
-				accept: [this.dndSourceType]
-			};
+			// ensure dndParams is initialized
+			this.dndParams = lang.mixin({ accept: [this.dndSourceType] }, this.dndParams);
 		},
 		postCreate: function(){
 			this.inherited(arguments);
 			setupDnD(this);
 		},
+		
 		insertRow: function(object){
 			// override to add dojoDndItem class to make the rows draggable
 			var row = this.inherited(arguments);
 			put(row, ".dojoDndItem");
 			// setup the source if it hasn't been done yet
 			setupDnD(this);
-			this.dndTarget.setItem(row.id, {data: object, type: [this.dndSourceType]});
+			this.dndSource.setItem(row.id, {data: object, type: [this.dndSourceType]});
 			return row;
 		}
 	});

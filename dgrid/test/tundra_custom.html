@@ -32,12 +32,6 @@
 			#grid {
 				height: 20em;
 			}
-			#grid .column-order {
-				width: 7%;
-			}
-			#grid .column-name {
-				width: 18%;
-			}
 			#grid .dgrid-row {
 				height: 22px;
 			}
@@ -51,23 +45,22 @@
 		<script type="text/javascript">
 			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!"], 
 				function(List, Grid, Selection, Keyboard, declare){
-					var columns = [
-						{label: 'Column 1', field: 'col1'},
-						{label: 'Column 2', field: 'col2', sortable: false},
-						{label: 'Column 3', field: 'col3'},
-						{label: 'Column 4', field: 'col4'},
-						{label: 'Column 5', field: 'col5'}
-					];
 					window.grid = new (declare([Grid, Selection, Keyboard]))({
 						store: testStore,
-						columns: columns
+						columns: {
+							col1: "Column 1",
+							col2: { label: "Column 2", sortable: false },
+							col3: "Column 3",
+							col4: "Column 4",
+							col5: "Column 5"
+						}
 					}, "grid");
 				});
 				
 		</script>
 	</head>
 	<body class="tundra">
-		<h2>A basic grid tundra theme</h2>
+		<h2>A basic grid customized based on the tundra theme</h2>
 		<div id="grid"></div>
 	</body>
 </html>

@@ -10,14 +10,20 @@
 .dgrid-header {
 	background-color: #eee;
 	position: absolute;
-	right: 17px; /*scrollbar width; */
-	left: 0px;
+	right: 17px; /* scrollbar width; revised in List.js if necessary */
+	left: 0;
 }
 
 .dgrid-header-scroll {
 	position: absolute;
-	top: 0px;
-	right: 0px;
+	top: 0;
+	right: 0;
+}
+
+.dgrid-footer {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
 }
 
 .dgrid-header-hidden,
@@ -74,6 +80,7 @@ html.has-quirks .dgrid-header-hidden .dgrid-cell {
 
 .dgrid-content {
 	position: relative;
+	height: 99%;
 }
 
 .dgrid-scroller {
@@ -84,6 +91,15 @@ html.has-quirks .dgrid-header-hidden .dgrid-cell {
 	margin-top: 25px; /* this will be adjusted programmatically to fit below the header*/
 	bottom: 0px;
 	width: 100%;
+}
+
+.dgrid-loading {
+	position: relative;
+	height: 100%;
+}
+.dgrid-above {
+	position: absolute;
+	bottom: 0;
 }
 
 .ui-icon {
@@ -104,14 +120,19 @@ html.has-quirks .dgrid-header-hidden .dgrid-cell {
 	height: 16px;
 }
 .dgrid-tree-container {
-	-webkit-transition-duration: 1s;
-	-moz-transition-duration: 1s;
-	-o-transition-duration: 1s;
-	transition-duration: 1s;
-}
-.dgrid-tree-contracted {
-	height: 0px;
+	-webkit-transition-duration: 0.3s;
+	-moz-transition-duration: 0.3s;
+	-ms-transition-duration: 0.3s;
+	-o-transition-duration: 0.3s;
+	transition-duration: 0.3s;
 	overflow: hidden;
+}
+.dgrid-tree-container.dgrid-tree-resetting {
+	-webkit-transition-duration: 0;
+	-moz-transition-duration: 0;
+	-ms-transition-duration: 0;
+	-o-transition-duration: 0;
+	transition-duration: 0;
 }
 
 /* Single Sort */
@@ -131,28 +152,10 @@ html.has-quirks .dgrid-header-hidden .dgrid-cell {
 	background-color: #bfd6eb;
 }
 
-/* selectors */
-.dgrid-selector-checkbox {
-	border: 1px solid black;
-	width: 14px;
-	height: 14px;
-	background-position: -160px -144px;
-}
-.dgrid-selector-radio {
-	background-position: -97px -144px;
-}
-.dgrid-selected .dgrid-selector-checkbox,
-.dgrid-select-all .dgrid-selector-checkbox {
-	background-position: -65px -146px;
-}
-.dgrid-selected .dgrid-selector-radio,
-.dgrid-select-all .dgrid-selector-radio {
-	background-position: -80px -144px;
-}
-
 .dgrid-input {
 	width: 99%;
 }
+
 /* UA-specific hacks*/
 html.has-mozilla .dgrid *:focus, html.has-opera .dgrid *:focus {
 	/* firefox's focus doesn't work by default for divs prior to actually tabbing into it. This fixes that

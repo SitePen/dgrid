@@ -1,14 +1,12 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" 
-	"http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html>
 <html>
 	<head>
 		<title>dTuned</title>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-		<meta name="viewport" content="width=570" />
-		<style type="text/css">
-			@import "../../../dojo/resources/dojo.css";
-			@import "resources/dTuned.css";
-			@import "../../css/extensions/ColumnHider.css";
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta name="viewport" content="width=570">
+		<link rel="stylesheet" href="../../../dojo/resources/dojo.css">
+		<link rel="stylesheet" href="resources/dTuned.css">
+		<style>
 			html, body {
 				width: 100%;
 				height: 100%;
@@ -96,16 +94,15 @@
 			#grid .dgrid-header th:last-child {
 				border: 0;
 			}
-			#grid div.dgrid-row-even {
+			#grid .dgrid-row-even {
 				background-color: #f2f6fa;
 			}
-			#grid div.dgrid-row-even.dgrid-selected {
+			#grid .dgrid-row-even.dgrid-selected {
 				background-color: #bfd6eb;
 			}
 
-			.ui-widget{ }
-			.dgrid-cell.field-Time, 
-			.dgrid-cell.field-Year{ 
+			#grid .field-Time,
+			#grid .field-Year { 
 				text-align: right; 
 			}
 		</style>
@@ -156,19 +153,17 @@
 						return "" + min + ":" + (sec < 10 ? "0" : "") + sec;
 					};
 
-					//	define the column structure on the main grid, and create it.
-					var columns = [
-						{label: 'Name', field: 'Name'},
-						{label: 'Duration', field: 'Time', formatter: timeFormatter},
-						{label: 'Year', field: 'Year'},
-						{label: 'Artist', field: 'Artist'},
-						{label: 'Album', field: 'Album'},
-						{label: 'Genre', field: 'Genre'}
-					];
-
+					// Create the main grid to appear below the genre/artist/album lists.
 					window.grid = new (declare([Grid, Selection, Keyboard, Hider]))({
 						store: songStore,
-						columns: columns
+						columns: {
+							Name: "Name",
+							Time: { label: "Duration", formatter: timeFormatter },
+							Year: "Year",
+							Artist: "Artist",
+							Album: "Album",
+							Genre: "Genre"
+						}
 					}, "grid");
 
 					// define a List constructor with the features we want mixed in,
@@ -197,9 +192,10 @@
 					genres.on("dgrid-select", function(e){
 						//	filter the albums, artists and grid
 						var
-							filter = currentGenre = e.row.data,
+							row = e.rows[0],
+							filter = currentGenre = row.data,
 							art;
-						if(e.row.id == "0"){
+						if(row.id == "0"){
 							//	remove filtering
 							art = unique(arrayUtil.map(songStore.data, function(item){ return item.Artist; }));
 							grid.query = {};
@@ -212,18 +208,14 @@
 						
 						artists.refresh();	//	clear contents
 						artists.renderArray(art);
-						
-						// need this in a setTimeout so that this selection event completes
-						// first (for genres.selection[0] check in artists select handler)
-						setTimeout(function(){
-							artists.select(0); //	reselect "all", triggering albums+grid refresh
-						});
+						artists.select(0); //	reselect "all", triggering albums+grid refresh
 					});
 
 					artists.on("dgrid-select", function(e){
 						//	filter the albums, grid
-						var filter = e.row.data, alb;
-						if(e.row.id == "0"){
+						var row = e.rows[0],
+							filter = row.data, alb;
+						if(row.id == "0"){
 							if(genres.selection[0]){
 								//	remove filtering entirely
 								alb = unique(arrayUtil.map(songStore.data, function(item){ return item.Album; }));
@@ -246,8 +238,9 @@
 
 					albums.on("dgrid-select", function(e){
 						//	filter the grid
-						var filter = e.row.data;
-						if(e.row.id == "0"){
+						var row = e.rows[0],
+							filter = row.data;
+						if(row.id == "0"){
 							// show all albums
 							delete grid.query.Album;
 						} else {

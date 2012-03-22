@@ -1,13 +1,14 @@
-define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Editor", "./List", "dojo/_base/sniff"], function(has, put, declare, listen, Editor, List){
+define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/on", "dojo/has", "put-selector/put", "./List", "dojo/_base/sniff"],
+function(kernel, declare, listen, has, put, List){
 	var contentBoxSizing = has("ie") < 8 && !has("quirks");
-	
+	var invalidClassChars = /[^\._a-zA-Z0-9-]/g;	
 	function appendIfNode(parent, subNode){
 		if(subNode && subNode.nodeType){
 			parent.appendChild(subNode);
 		}
 	}
 	
-	return declare([List], {
+	var Grid = declare([List], {
 		columns: null,
 		// cellNavigation: Boolean
 		//		This indicates that focus is at the cell level. This may be set to false to cause
@@ -29,6 +30,9 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 		cell: function(target, columnId){
 			// summary:
 			//		Get the cell object by node, or event, id, plus a columnId
+			
+			if(target.row && target.row instanceof this._Row){ return target; }
+			
 			if(target.target && target.target.nodeType){
 				// event
 				target = target.target;
@@ -81,45 +85,47 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 			}
 			return rule.children;
 		},
-		createRowCells: function(tag, each){
+		createRowCells: function(tag, each, subRows){
 			// summary:
 			//		Generates the grid for each row (used by renderHeader and and renderRow)
-			var tr, row = put("table.dgrid-row-table[role=presentation]"),
-				cellNavigation = this.cellNavigation;
-			if(has("ie") < 9 || has("quirks")){
-				// this is the only browser that needs a tbody
-				var tbody = put(row, "tbody");
-			}else{
-				var tbody = row;
-			}
-			var subRows = this.subRows;
-			for(var si = 0, sl = subRows.length; si < sl; si++){
-				var subRow = subRows[si];
-				if(sl == 1 && !has("ie")){
-					// shortcut for modern browsers
-					tr = tbody;
-				}else{
-					tr = put(tbody, "tr");
-				}				
-				for(var i = 0, l = subRow.length; i < l; i++){
+			var row = put("table.dgrid-row-table[role=presentation]"),
+				cellNavigation = this.cellNavigation,
+				// IE < 9 needs an explicit tbody; other browsers do not
+				tbody = (has("ie") < 9 || has("quirks")) ? put(row, "tbody") : row,
+				tr,
+				si, sl, i, l, // iterators
+				subRow, column, id, extraClassName, cell, innerCell, colSpan, rowSpan; // used inside loops
+			
+			// Allow specification of custom/specific subRows, falling back to
+			// those defined on the instance.
+			subRows = subRows || this.subRows;
+			
+			for(si = 0, sl = subRows.length; si < sl; si++){
+				subRow = subRows[si];
+				// for single-subrow cases in modern browsers, TR can be skipped
+				// http://jsperf.com/table-without-trs
+				tr = (sl == 1 && !has("ie")) ? tbody : put(tbody, "tr");
+				
+				for(i = 0, l = subRow.length; i < l; i++){
 					// iterate through the columns
-					var column = subRow[i];
-					var id = column.id;
-					var extraClassName = column.className || (column.field && "field-" + column.field);
-					var cell = put(tag + ".dgrid-cell.dgrid-cell-padding.column-" + id + (extraClassName ? '.' + extraClassName : ''));
+					column = subRow[i];
+					id = column.id;
+					extraClassName = column.className || (column.field && "field-" + column.field);
+					cell = put(tag + (".dgrid-cell.dgrid-cell-padding.dgrid-column-" + id +
+						(extraClassName ? "." + extraClassName : "")).replace(invalidClassChars,"-"));
 					cell.columnId = id;
 					if(contentBoxSizing){
 						// The browser (IE7-) does not support box-sizing: border-box, so we emulate it with a padding div
-						var innerCell = put(cell, "!dgrid-cell-padding div.dgrid-cell-padding");// remove the dgrid-cell-padding, and create a child with that class
+						innerCell = put(cell, "!dgrid-cell-padding div.dgrid-cell-padding");// remove the dgrid-cell-padding, and create a child with that class
 						cell.contents = innerCell;
 					}else{
 						innerCell = cell;
 					}
-					var colSpan = column.colSpan;
+					colSpan = column.colSpan;
 					if(colSpan){
 						cell.colSpan = colSpan;
 					}
-					var rowSpan = column.rowSpan;
+					rowSpan = column.rowSpan;
 					if(rowSpan){
 						cell.rowSpan = rowSpan;
 					}
@@ -141,9 +147,7 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 				var data = object;
 				// we support the field, get, and formatter properties like the DataGrid
 				if(column.get){
-					// FIXME: signature of get is (inRowIndex, inItem)
-					// Is it possible for us to produce row index here for first arg?
-					data = column.get(0, object);
+					data = column.get(object);
 				}else if("field" in column && column.field != "_item"){
 					data = data[column.field];
 				}
@@ -156,7 +160,7 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 				}else if(data != null){
 					td.appendChild(document.createTextNode(data));
 				}
-			});
+			}, options && options.subRows);
 			// row gets a wrapper div for a couple reasons:
 			//	1. So that one can set a fixed height on rows (heights can't be set on <table>'s AFAICT)
 			// 2. So that outline style can be set on a row when it is focused, and Safari's outline style is broken on <table>
@@ -198,8 +202,6 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 				}
 			});
 			this._rowIdToObject[row.id = this.id + "-header"] = this.columns;
-			//put(headerNode, "div.dgrid-header-columns>", row, ".dgrid-row<+div.dgrid-header-scroll.ui-widget-header");
-			//row = put("div.dgrid-row[role=columnheader]>", row);
 			headerNode.appendChild(row);
 			// if it columns are sortable, resort on clicks
 			listen(row, "click,keydown", function(event){
@@ -207,7 +209,7 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 				if(event.type == "click" || event.keyCode == 32){
 					var
 						target = event.target,
-						field, descending, parentNode;
+						field, descending, parentNode, sort;
 					do{
 						if(target.sortable){
 							// stash node subject to DOM manipulations,
@@ -218,10 +220,10 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 							
 							// if the click is on the same column as the active sort,
 							// reverse sort direction
-							descending = grid.sortOrder && grid.sortOrder[0].attribute == field &&
-								!grid.sortOrder[0].descending;
+							descending = (sort = grid._sort[0]) && sort.attribute == field &&
+								!sort.descending;
 							
-							return grid.sort(field, descending);
+							return grid.set("sort", field, descending);
 						}
 					}while((target = target.parentNode) && target != headerNode);
 				}
@@ -254,63 +256,74 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 			}
 		},
 		
-		sort: function(property, descending){
+		_setSort: function(property, descending){
 			// summary:
 			//		Extension of List.js sort to update sort arrow in UI
 			
-			var prop = property, desc = descending;
+			this.inherited(arguments); // normalize _sort first
 			
-			// If a full-on sort array was passed, only handle the first criteria
-			if(typeof property != "string"){
-				prop = property[0].attribute;
-				desc = property[0].descending;
+			// clean up UI from any previous sort
+			if(this._lastSortedArrow){
+				// remove the sort classes from parent node
+				put(this._lastSortedArrow, "<!dgrid-sort-up!dgrid-sort-down");
+				// destroy the lastSortedArrow node
+				put(this._lastSortedArrow, "!");
+				delete this._lastSortedArrow;
 			}
 			
-			// if we were invoked from a header cell click handler, grab
-			// stashed target node; otherwise (e.g. direct sort call) need to look up
-			var target = this._sortNode, columns, column, i;
+			if(!this._sort[0]){ return; } // nothing to do if no sort is specified
+			
+			var prop = this._sort[0].attribute,
+				desc = this._sort[0].descending,
+				target = this._sortNode, // stashed if invoked from header click
+				columns, column, i;
+			
+			delete this._sortNode;
+			
 			if(!target){
 				columns = this.columns;
 				for(i in columns){
 					column = columns[i];
 					if(column.field == prop){
 						target = column.headerNode;
+						break;
 					}
 				}
 			}
 			// skip this logic if field being sorted isn't actually displayed
 			if(target){
 				target = target.contents || target;
-				if(this._lastSortedArrow){
-					// remove the sort classes from parent node
-					put(this._lastSortedArrow, "<!dgrid-sort-up!dgrid-sort-down");
-					// destroy the lastSortedArrow node
-					put(this._lastSortedArrow, "!");
-				}
 				// place sort arrow under clicked node, and add up/down sort class
 				this._lastSortedArrow = put(target.firstChild, "-div.dgrid-sort-arrow.ui-icon[role=presentation]");
 				this._lastSortedArrow.innerHTML = "&nbsp;";
 				put(target, desc ? ".dgrid-sort-down" : ".dgrid-sort-up");
 				// call resize in case relocation of sort arrow caused any height changes
 				this.resize();
-				
-				delete this._sortNode;
 			}
-			this.inherited(arguments);
 		},
 		styleColumn: function(colId, css){
 			// summary:
-			//		Changes the column width by creating a dynamic stylesheet
+			//		Dynamically creates a stylesheet rule to alter a column's style.
 			
 			// now add a rule to style the column
-			return this.addCssRule("#" + this.domNode.id + ' .column-' + colId, css);
+			return this.addCssRule("#" + this.domNode.id + " .dgrid-column-" + colId, css);
 		},
+		
+		/*=====
+		_configColumn: function(column, columnId, rowColumns, prefix){
+			// summary:
+			//		Method called when normalizing base configuration of a single
+			//		column.  Can be used as an extension point for behavior requiring
+			//		access to columns when a new configuration is applied.
+		},=====*/
+		
 		_configColumns: function(prefix, rowColumns){
 			// configure the current column
-			var subRow = [];
-			var isArray = rowColumns instanceof Array; 
-			for(var columnId in rowColumns){
-				var column = rowColumns[columnId];
+			var subRow = [],
+				isArray = rowColumns instanceof Array,
+				columnId, column;
+			for(columnId in rowColumns){
+				column = rowColumns[columnId];
 				if(typeof column == "string"){
 					rowColumns[columnId] = column = {label:column};
 				}
@@ -318,14 +331,15 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 					column.field = columnId;
 				}
 				columnId = column.id = column.id || (isNaN(columnId) ? columnId : (prefix + columnId));
-				if(prefix){
-					this.columns[columnId] = column;
+				if(prefix){ this.columns[columnId] = column; }
+				
+				// allow further base configuration in subclasses
+				if(this._configColumn){
+					this._configColumn(column, columnId, rowColumns, prefix);
 				}
 				
-				// add reference to this instance to each column object,
-				// for potential use by column plugins
+				// add grid reference to each column object for potential use by plugins
 				column.grid = this;
-				
 				subRow.push(column); // make sure it can be iterated on
 			}
 			return isArray ? rowColumns : subRow;
@@ -337,23 +351,32 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 				// we have subRows, but no columns yet, need to create the columns
 				this.columns = {};
 				for(var i = 0; i < subRows.length; i++){
-					subRows[i] = this._configColumns(i + '-', subRows[i]);
+					subRows[i] = this._configColumns(i + "-", subRows[i]);
 				}
 			}else{
 				this.subRows = [this._configColumns("", this.columns)];
 			}
 		},
-		setColumns: function(columns){
+		_setColumns: function(columns){
 			// reset instance variables
 			this.subRows = null;
 			this.columns = columns;
 			// re-run logic
 			this._updateColumns();
 		},
-		setSubRows: function(subrows){
+		_setSubRows: function(subrows){
 			this.subRows = subrows;
 			this._updateColumns();
 		},
+		setColumns: function(columns){
+			kernel.deprecated("setColumns(...)", 'use set("columns", ...) instead', "dgrid 1.0");
+			this.set("columns", columns);
+		},
+		setSubRows: function(subrows){
+			kernel.deprecated("setSubRows(...)", 'use set("subRows", ...) instead', "dgrid 1.0");
+			this.set("subRows", subrows);
+		},
+		
 		_updateColumns: function(){
 			// summary:
 			//		Called after e.g. columns, subRows, columnSets are updated
@@ -362,8 +385,16 @@ define(["dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "./Edit
 			this.renderHeader();
 			this.refresh();
 			// re-render last collection if present
-			this.lastCollection && this.renderArray(this.lastCollection);
+			this._lastCollection && this.renderArray(this._lastCollection);
 			this.resize();
 		}
 	});
+	
+	// expose appendIfNode and default implementation of renderCell,
+	// e.g. for use by column plugins
+	Grid.appendIfNode = appendIfNode;
+	Grid.defaultRenderCell = function(object, data, td, options){
+		if(data != null){ td.appendChild(document.createTextNode(data)); }
+	};
+	return Grid;
 });

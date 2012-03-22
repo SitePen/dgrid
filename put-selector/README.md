@@ -287,3 +287,15 @@ object after the selector string. For example, this input creation will properly
 on all browsers, including IE:
 
 	newInput = put("input[type=checkbox]", {name: "works"});
+
+Using on Different document
+-------------------------
+
+If you are using multiple frames in your web page, you may encounter a situation where
+you want to use put-selector to make DOM changes on a different HTML document.
+You can create a separate instance of the put() function for a separate document by
+calling the put.forDocument(document) function. For example:
+
+	put2 = put.forDocument(frames[1].document);
+	put2("div") <- creates a div element that belongs to the document in the second frame.
+	put("div") <- the original put still functions on the main document for this window/context 

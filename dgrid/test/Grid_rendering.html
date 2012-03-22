@@ -47,8 +47,8 @@
 					item.description + "</p>";
 			}
 			
-			function testGet(inRowIndex, inItem){
-				return getOrdinal(inItem.order);
+			function testGet(item){
+				return getOrdinal(item.order);
 			}
 			
 			function testRenderHeaderCell(th){
@@ -65,14 +65,14 @@
 				return div;
 			}
 			
-			var columnsLegacyFormatter = {
-				order: {
+			var columnsLegacyFormatter = [
+				{
 					label: "Step",
 					sortable: false,
 					field: "_item",
 					formatter: testFormatter
 				}
-			};
+			];
 			var columnsLegacyGet = {
 				order: {
 					label: "Step",
@@ -90,8 +90,8 @@
 				name: {},
 				description: {label: "what to do", sortable: false}
 			};
-			require(["dgrid/Grid", "dgrid/OnDemandGrid", "dgrid/GridFromHtml", "dojo/store/Memory", "dojo/store/Observable", "dojo/_base/declare", "dojo/parser", "dojo/query", "dgrid/test/data/base", "dojo/domReady!"],
-			function(Grid, OnDemandGrid, GridFromHtml, Memory, Observable, declare, parser, query){
+			require(["dgrid/Grid", "dgrid/OnDemandGrid", "dgrid/GridFromHtml", "dojo/store/Memory", "dojo/store/Observable", "dojo/_base/declare", "dojo/_base/lang", "dojo/parser", "dojo/query", "dgrid/test/data/base", "dojo/domReady!"],
+			function(Grid, OnDemandGrid, GridFromHtml, Memory, Observable, declare, lang, parser, query){
 				
 				// fully-programmatic tests
 				
@@ -106,7 +106,7 @@
 				gridLegacyGet.renderArray(testOrderedData);
 				
 				window.gridNew = new Grid({
-					columns: columnsNew
+					columns: lang.clone(columnsNew)
 				}, "gridNew");
 				gridNew.renderArray(testOrderedData);
 
@@ -116,37 +116,37 @@
 				store = Observable(Memory({data: testOrderedData}));
 				parser.parse();
 				
-				// Test 4x: testing dgrid w/o srcNodeRef, or w/ srcNodeRef w/o id
+				// Test 2x: testing dgrid w/o srcNodeRef, or w/ srcNodeRef w/o id
 				// Purposely testing with store to see how init is handled.
 				// (works fine if you renderArray after node placement)
 				
-				// Test 4a: srcNodeRef + no id, specify id to dgrid
+				// Test 2a: srcNodeRef + no id, specify id to dgrid
 				window.grid2a = new OnDemandGrid({
 					store: store,
-					columns: columnsNew,
+					columns: lang.clone(columnsNew),
 					id: "test2a"
 				}, query(".test2a")[0]);
 				
-				// Test 4b: srcNodeRef + no id - should end up with id=dgrid_0
+				// Test 2b: srcNodeRef + no id - should end up with id=dgrid_0
 				window.grid2b = new OnDemandGrid({
 					store: store,
-					columns: columnsNew
+					columns: lang.clone(columnsNew)
 				}, query(".test2b")[0]);
 				
-				// Test 4c: no srcNodeRef, specify id to dgrid
+				// Test 2c: no srcNodeRef, specify id to dgrid
 				window.grid2c = new OnDemandGrid({
 					store: store,
-					columns: columnsNew,
+					columns: lang.clone(columnsNew),
 					id: "test2c"
 				});
 				query(".test2c")[0].appendChild(grid2c.domNode);
 				// need to call startup after node is placed manually
 				grid2c.startup();
 				
-				// Test 4d: no srcNodeRef, no id - should end up with id=dgrid_1
+				// Test 2d: no srcNodeRef, no id - should end up with id=dgrid_1
 				window.grid2d = new OnDemandGrid({
 					store: store,
-					columns: columnsNew
+					columns: lang.clone(columnsNew)
 				});
 				query(".test2d")[0].appendChild(grid2d.domNode);
 				// need to call startup after node is placed manually

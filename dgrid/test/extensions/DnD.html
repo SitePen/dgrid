@@ -52,14 +52,9 @@
 		<script type="text/javascript" src="../../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dojo", "dgrid/List", "dgrid/OnDemandGrid","dgrid/Tree","dgrid/Selection", "dgrid/extensions/DnD", "dgrid/Keyboard", "dojo/dnd/Source", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/Deferred",  "dgrid/test/data/base", "dojo/domReady!"],
-				function(dojo, List, Grid, Tree, Selection, DndRow, Keyboard, DnDSource, declare, lang, arrayUtil, Deferred){
-					var
-						DnDGrid = declare([Grid, Selection, DndRow, Keyboard]),
-						columns = [
-							{label:'Name', field:'name', sortable: false},
-							{label:'Description', field:'description', sortable: false}
-						];
+			require(["dgrid/OnDemandGrid", "dgrid/tree", "dgrid/Selection", "dgrid/extensions/DnD", "dgrid/Keyboard", "dojo/dnd/Source", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/Deferred",  "dgrid/test/data/base", "dojo/domReady!"],
+				function(Grid, tree, Selection, DnD, Keyboard, DnDSource, declare, lang, arrayUtil, Deferred){
+					var DnDGrid = declare([Grid, Selection, DnD, Keyboard]);
 					
 					function byId(id){ return document.getElementById(id); }
 					
@@ -67,18 +62,21 @@
 					// so leaving sort disabled on columns in this grid.
 					window.grid1 = new DnDGrid({
 						store: testOrderedStore,
-						columns: columns
+						columns: [
+							{label:"Name", field:"name", sortable: false},
+							{label:"Description", field:"description", sortable: false}
+						]
 					}, "grid1");
 					window.grid2 = new DnDGrid({
 						store: createOrderedStore([]),
 						columns: [
-							{label:'Name', field:'name', sortable: false}
+							{label:"Name", field:"name", sortable: false}
 						]
 					}, "grid2");
 					
 					// set up other targets
 					var anotherTargetDiv = byId("another-target");
-					var target = new DnDSource(anotherTargetDiv, {accept:["row"], isSource:false});
+					var target = new DnDSource(anotherTargetDiv, {accept:["dgrid-row"], isSource:false});
 					target.onDrop = function(source, nodes){
 						nodes.forEach(function(node){
 							anotherTargetDiv.innerHTML = "Dropped " + source.getItem(node.id).data.name;
@@ -88,7 +86,7 @@
 					// Set up a dnd source with items that can drag into the grid.
 					// This is one way of doing it; there are likely several...
 					var source = new DnDSource(byId("another-source"), {
-						accept: ["row"]
+						accept: ["dgrid-row"]
 					});
 					function nameObj(args){
 						lang.mixin(this, args);
@@ -99,12 +97,12 @@
 						}
 					};
 					source.insertNodes(false, [
-						{ type: ["row"], data: new nameObj({
+						{ type: ["dgrid-row"], data: new nameObj({
 							order: 10,
 							name: "do a dance",
 							description: "Dance like nobody's watching."
 						})},
-						{ type: ["row"], data: new nameObj({
+						{ type: ["dgrid-row"], data: new nameObj({
 							order: 11,
 							name: "genuflect",
 							description: "Take a knee."
@@ -132,39 +130,39 @@
 					
 					
 					// Set up 2 more grids sharing the same store, to DnD between.
-					// Again, there are many ways to spin this, this is just one way.
+					// Again, there are potentially many ways to accomplish this;
+					// here, we declare an extension to the DnD Source constructor defined
+					// and exposed by the DnD plugin module, then instruct our grid
+					// instances to use that.
+					var SharedDndGridSource = declare(DnD.GridSource, {
+						copyState: function(){
+							return false; // never copy, only swap
+						},
+						onDropExternal: function(source, nodes, copy, targetItem){
+							// Re-implement to simply swap flag on store item
+							var grid = this.grid;
+							arrayUtil.forEach(nodes, function(node){
+								Deferred.when(source.getObject(node), function(object){
+									object.added = grid.addedSide;
+									// If we wanted to support copy, we would probably want
+									// to check the copy flag and call copy instead of put here.
+									grid.store.put(object, { before: targetItem });
+								});
+							});
+						}
+					});
 					var SharedDnDGrid = declare(DnDGrid, {
 						// addedSide: undefined | true
 						//		Indicates whether this grid represents the "added" side, i.e.
 						//		items initially start on the other side then get moved here.
 						addedSide: undefined,
 						
-						// TODO: Should probably think harder about code flow necessitated,
-						// at a broader level.
+						dndConstructor: SharedDndGridSource, // use extension defined above
 						
 						postMixInProperties: function(){
 							this.inherited(arguments);
 							// Filter according to which "side" is represented
 							this.query.added = this.addedSide;
-						},
-						
-						postCreate: function(){
-							var grid = this;
-							this.inherited(arguments);
-							
-							// Don't allow copy on these grids, only move back and forth
-							this.dndTarget.copyState = function(){ return false; }
-							// Re-implement onDropExternal to simply swap flag on store item
-							this.dndTarget.onDropExternal = function(source, nodes, copy, targetItem){
-								arrayUtil.forEach(nodes, function(node){
-									Deferred.when(source.getObject(node), function(object){
-										object.added = grid.addedSide;
-										// If we wanted to support copy, we would probably want
-										// to check the copy flag and call copy instead of put here.
-										grid.store.put(object, { before: targetItem });
-									});
-								});
-							};
 						}
 					});
 					
@@ -172,22 +170,28 @@
 					var sharedStore = createOrderedStore(lang.clone(testOrderedData));
 					
 					window.grid3 = new SharedDnDGrid({
-						dndSourceType: "row-swap",
+						dndSourceType: "dgrid-row-swap",
 						store: sharedStore,
-						columns: columns
+						columns: [
+							{label:"Name", field:"name", sortable: false},
+							{label:"Description", field:"description", sortable: false}
+						]
 					}, "grid3");
 					window.grid4 = new SharedDnDGrid({
-						dndSourceType: "row-swap", // same as grid3
+						dndSourceType: "dgrid-row-swap", // same as grid3
 						addedSide: true, // flag to extension above
 						store: sharedStore,
-						columns: columns
+						columns: [
+							{label:"Name", field:"name", sortable: false},
+							{label:"Description", field:"description", sortable: false}
+						]
 					}, "grid4");
 				});
 				
 		</script>
 	</head>
 	<body class="tundra">
-		<h2>Drag n' drop</h2>
+		<h2>Drag 'n' Drop</h2>
 		<div id="grid1"></div>
 		<div id="grid2"></div>
 		<div id="another-target">Another Target</div>

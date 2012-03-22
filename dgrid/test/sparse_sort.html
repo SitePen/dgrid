@@ -32,19 +32,19 @@
 				
 				var store = Observable(Memory({data: data}));
 				
-				var columns = [
-					{name:"Name", field:"name"},
-					{name:"Description", field:"description"},
-					{name:"Empty Column", field:"idontexist"}
-				];
+				var columns = {
+					name: "Name",
+					description: "Description",
+					idontexist: "Empty Column"
+				};
 				
 				window.gridArray = new Grid({
-					columns: columns
+					columns: lang.clone(columns)
 				}, "gridArray");
 				gridArray.renderArray(lang.clone(data));
 				
 				window.gridStore = new OnDemandGrid({
-					columns: columns,
+					columns: lang.clone(columns),
 					store: store
 				}, "gridStore");
 			});

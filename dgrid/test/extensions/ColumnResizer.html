@@ -14,27 +14,27 @@
 			#grid, #gridWide { 
 				width: 750px;
 			}
-			#grid .column-col1 {
+			#grid .field-col1 {
 				width: 100px;
 			}
-			#grid .column-col2 {
+			#grid .field-col2 {
 				width: 100px;
 			}
-			#grid .column-col3 {
+			#grid .field-col3 {
 				width: auto;
 			}
-			#grid .column-col4 {
+			#grid .field-col4 {
 				width: 100px;
 			}
-			#grid .column-last-col {
+			#grid .field-col5 {
 				width: 150px;
 			}
 			
-			#gridWide .column-col1,
-			#gridWide .column-col2,
-			#gridWide .column-col3,
-			#gridWide .column-col4,
-			#gridWide .column-col5 {
+			#gridWide .field-col1,
+			#gridWide .field-col2,
+			#gridWide .field-col3,
+			#gridWide .field-col4,
+			#gridWide .field-col5 {
 				width: 200px;
 			}
 			
@@ -48,29 +48,31 @@
 		<script type="text/javascript" src="../../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dgrid/OnDemandGrid", "dgrid/extensions/ColumnResizer", "dgrid/Selection", "dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!"],
-				function(Grid, ColumnResizer, Selection, declare, testStore){
-					columns = { // you can declare columns as an object hash (key translates to field)
+			require(["dgrid/OnDemandGrid", "dgrid/extensions/ColumnResizer", "dgrid/Selection", "dojo/_base/declare", "dojo/_base/lang", "dgrid/test/data/base", "dojo/domReady!"],
+				function(Grid, ColumnResizer, Selection, declare, lang, testStore){
+					var columns = { // you can declare columns as an object hash (key translates to field)
 						col1: 'Column 1Column1Column 1 Column 1',
 						col2: {label: 'Column2222222222222222222222222', sortable: false},
 						col3: 'Column3333333333333333333',
 						col4: 'Column 4',
-						"last-col": {label: 'Column 5', field: 'col5'}
+						col5: 'Column 5'
 					};
+					columns1 = lang.clone(columns);
 
 					columns2 = { // you can declare columns as an object hash (key translates to field)
 						col2: 'Col2',
 						col4: {label: 'Col4', sortable: false},
 						col1: 'Col1',
-						"last-col": {label: 'Column 5', field: 'col5'}
+						col5: 'Column 5'
 					};
-					window.grid = declare([Grid, Selection, ColumnResizer])({
+					var ResizeGrid = declare([Grid, Selection, ColumnResizer]);
+					window.grid = new ResizeGrid({
 						store: testStore,
-						columns: columns
+						columns: columns1
 					}, "grid");
-					window.gridWide = declare([Grid, Selection, ColumnResizer])({
+					window.gridWide = new ResizeGrid({
 						store: testStore,
-						columns: columns
+						columns: lang.clone(columns)
 					}, "gridWide");
 				});
 		</script>
@@ -79,8 +81,8 @@
 		<h2>A basic grid with column resizing</h2>
 		<div id="grid"></div>
 		<div>Buttons to test changing column structure:
-			<button onclick="grid.setColumns(columns2);">New Structure</button>
-			<button onclick="grid.setColumns(columns);">Original</button>
+			<button onclick="grid.set('columns', columns2);">New Structure</button>
+			<button onclick="grid.set('columns', columns1);">Original</button>
 		</div>
 		<h2>Another grid w/ columns whose width initially exceed the table's width</h2>
 		<div id="gridWide"></div>

@@ -1,4 +1,6 @@
-define(["dojo/_base/declare", "dojo/on", "./List", "put-selector/put", "dojo/has", "dojo/query"], function(declare, on, List, put, has){
+define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/Deferred", "dojo/on", "dojo/has", "dojo/aspect", "./List", "dojo/has!touch?./util/touch", "put-selector/put", "dojo/query"],
+function(kernel, declare, Deferred, on, has, aspect, List, touchUtil, put){
+
 var ctrlEquiv = has("mac") ? "metaKey" : "ctrlKey";
 return declare([List], {
 	// summary:
@@ -18,13 +20,17 @@ return declare([List], {
 	//		If true, the selection object will be cleared when refresh is called.
 	deselectOnRefresh: true,
 	
+	//allowSelectAll: Boolean
+	//		If true, allow ctrl/cmd+A to select all rows.
+	//		Also consulted by the selector plugin for showing select-all checkbox.
+	allowSelectAll: false,
+	
 	create: function(){
 		this.selection = {};
 		return this.inherited(arguments);
 	},
 	postCreate: function(){
 		this.inherited(arguments);
-
 		this._initSelectionEvents(); // first time; set up event hooks
 	},
 	
@@ -33,12 +39,12 @@ return declare([List], {
 	//		object ids and values are true or false depending on whether an item is selected
 	selection: {},
 	// selectionMode: String
-	//		The selection mode to use, can be "multiple", "single", or "extended".
+	//		The selection mode to use, can be "none", "multiple", "single", or "extended".
 	selectionMode: "extended",
 	
-	setSelectionMode: function(mode){
+	_setSelectionMode: function(mode){
 		// summary:
-		//		Updates selectionMode, hooking up listener if necessary.
+		//		Updates selectionMode, resetting necessary variables.
 		if(mode == this.selectionMode){ return; } // prevent unnecessary spinning
 		
 		// Start selection fresh when switching mode.
@@ -47,19 +53,26 @@ return declare([List], {
 		
 		this.selectionMode = mode;
 	},
+	setSelectionMode: function(mode){
+		kernel.deprecated("setSelectionMode(...)", 'use set("selectionMode", ...) instead', "dgrid 1.0");
+		this.set("selectionMode", mode);
+	},
 	
 	_handleSelect: function(event, currentTarget){
-		if(this.selectionMode == "none" || (event.type == "dgrid-cellfocusin" && event.parentType == "mousedown")){
-			// don't run if selection mode is none or if coming from a dgrid-cellfocusin from a mousedown
+		// don't run if selection mode is none,
+		// or if coming from a dgrid-cellfocusin from a mousedown
+		if(this.selectionMode == "none" ||
+				(event.type == "dgrid-cellfocusin" && event.parentType == "mousedown")){
 			return;
 		}
 
-		var mode = this.selectionMode,
-			ctrlKey = event.type == "mousedown" ? event[ctrlEquiv] : event.ctrlKey;
+		var ctrlKey = event.type == "mousedown" ? event[ctrlEquiv] : event.ctrlKey;
 		if(event.type == "mousedown" || !event.ctrlKey || event.keyCode == 32){
-			var row = currentTarget,
+			var mode = this.selectionMode,
+				row = currentTarget,
+				rowObj = this.row(row),
 				lastRow = this._lastSelected;
-
+			
 			if(mode == "single"){
 				if(lastRow == row){
 					if(ctrlKey){
@@ -73,8 +86,11 @@ return declare([List], {
 				this._lastSelected = row;
 			}else{
 				var value;
-				if(mode == "extended" && !ctrlKey){
-					this.clearSelection();
+				// clear selection first for non-ctrl-clicks in extended mode,
+				// as well as for right-clicks on unselected targets
+				if((event.button != 2 && mode == "extended" && !ctrlKey) ||
+						(event.button == 2 && !(this.selection[rowObj.id]))){
+					this.clearSelection(rowObj.id);
 				}
 				if(!event.shiftKey){
 					// null == toggle; undefined == true;
@@ -118,31 +134,67 @@ return declare([List], {
 			grid._handleSelect(event, this);
 		}
 		
-		if(has("touch")){
-			// first listen for touch taps if available
-			var lastTouch, lastTouchX, lastTouchY, lastTouchEvent, isTap;
-			on(this.contentNode, on.selector(selector, "touchstart"), function(event){
-				lastTouch = event.touches[0];
-				lastTouchX = lastTouch.pageX;
-				lastTouchY = lastTouch.pageY;
-				lastTouchEvent = event;
-				isTap = true;
-			});
-			on(this.contentNode, on.selector(selector, "touchmove"), function(event){
-				var thisTouch = event.touches[0];
-				isTap = Math.pow(lastTouchX - thisTouch.pageX, 2) + Math.pow(lastTouchY - thisTouch.pageY, 2) < 100; // 10 pixel radius sound good?
-			});
-			on(this.contentNode, on.selector(selector, "touchend"), function(event){
-				if(isTap){
-					grid._handleSelect(lastTouchEvent, this);
-				}
+		if(touchUtil){
+			// listen for touch taps if available
+			on(this.contentNode, touchUtil.selector(selector, touchUtil.tap), function(evt){
+				grid._handleSelect(evt, this);
 			});
 		}else{
 			// listen for actions that should cause selections
 			on(this.contentNode, on.selector(selector, this.selectionEvents), focus);
 		}
+
+		// If allowSelectAll is true, allow ctrl/cmd+A to (de)select all rows.
+		// (Handler further checks against _allowSelectAll, which may be updated
+		// if selectionMode is changed post-init.)
+		if(this.allowSelectAll){
+			this.on("keydown", function(event) {
+				if (event[ctrlEquiv] && event.keyCode == 65) {
+					event.preventDefault();
+					grid[grid.allSelected ? "clearSelection" : "selectAll"]();
+				}
+			});
+		}
+		
+		aspect.before(this, "removeRow", function(rowElement, justCleanup){
+			if(!justCleanup){
+				// if it is a real row removal for a selected item, deselect it
+				if(this.row(rowElement).id in this.selection){ this.deselect(rowElement); }
+			}
+		});
 	},
 	
+	allowSelect: function(row){
+		// summary:
+		//		A method that can be overriden to determine whether or not a row (or 
+		//		cell) can be selected. By default, all rows (or cells) are selectable.
+		return true;
+	},
+	
+	_selectionEventQueue: function(value, type){
+		var grid = this,
+			event = "dgrid-" + (value ? "select" : "deselect"),
+			rows = this[event]; // current event queue (actually cells for CellSelection)
+		
+		if(rows){ return rows; } // return existing queue, allowing to push more
+		
+		// Create a timeout to fire an event for the accumulated rows once everything is done.
+		// We expose the callback in case the event needs to be fired immediately.
+		setTimeout(this._fireSelectionEvent = function(){
+			if(!rows){ return; } // rows will be set only the first time this is called
+			
+			var eventObject = {
+				bubbles: true,
+				grid: grid
+			};
+			eventObject[type] = rows;
+			on.emit(grid.contentNode, event, eventObject);
+			rows = null;
+			// clear the queue, so we create a new one as needed
+			delete grid[event];
+		}, 0);
+		return (rows = this[event] = []);
+	},
 	select: function(row, toRow, value){
 		if(value === undefined){
 			// default to true
@@ -151,21 +203,14 @@ return declare([List], {
 		if(!row.element){
 			row = this.row(row);
 		}
-		var selection = this.selection;
-		var previousValue = selection[row.id];
-		if(value === null){
-			// indicates a toggle
-			value = !previousValue;
-		}
-		var element = row.element,
-			notPrevented = true;
-		if(value == previousValue ||
-			(!element || (notPrevented = on.emit(element, "dgrid-" + (value ? "select" : "deselect"), {
-			cancelable: true,
-			bubbles: true,
-			row: row,
-			grid: this
-		})))){
+		if(this.allowSelect(row)){
+			var selection = this.selection;
+			var previousValue = selection[row.id];
+			if(value === null){
+				// indicates a toggle
+				value = !previousValue;
+			}
+			var element = row.element;
 			if(!value && !this.allSelected){
 				delete this.selection[row.id];
 			}else{
@@ -179,21 +224,23 @@ return declare([List], {
 					put(element, "!dgrid-selected!ui-state-active");
 				}
 			}
-		}
-		if(toRow && notPrevented){
-			if(!toRow.element){
-				toRow = this.row(toRow);
+			if(value != previousValue && element){
+				// add to the queue of row events
+				this._selectionEventQueue(value, "rows").push(row);
 			}
-			var toElement = toRow.element;
-			var fromElement = row.element;
-			// find if it is earlier or later in the DOM
-			var traverser = (toElement && (toElement.compareDocumentPosition ? 
-				toElement.compareDocumentPosition(fromElement) == 2 :
-				toElement.sourceIndex > fromElement.sourceIndex)) ? "down" : "up";
-			while(row = this[traverser](row)){
-				this.select(row);
-				if(row.element == toElement){
-					break;
+			
+			if(toRow){
+				if(!toRow.element){
+					toRow = this.row(toRow);
+				}
+				var toElement = toRow.element;
+				var fromElement = row.element;
+				// find if it is earlier or later in the DOM
+				var traverser = (toElement && (toElement.compareDocumentPosition ? 
+					toElement.compareDocumentPosition(fromElement) == 2 :
+					toElement.sourceIndex > fromElement.sourceIndex)) ? "down" : "up";
+				while(row.element != toElement && (row = this[traverser](row))){
+					this.select(row);
 				}
 			}
 		}
@@ -201,10 +248,12 @@ return declare([List], {
 	deselect: function(row, toRow){
 		this.select(row, toRow, false);
 	},
-	clearSelection: function(){
+	clearSelection: function(exceptId){
 		this.allSelected = false;
 		for(var id in this.selection){
-			this.deselect(id);
+			if(exceptId !== id){
+				this.deselect(id);
+			}
 		}
 	},
 	selectAll: function(){
@@ -228,22 +277,30 @@ return declare([List], {
 	
 	refresh: function(){
 		if(this.deselectOnRefresh){
-			this.selection = {};
+			this.clearSelection();
+			// Need to fire the selection event now because after the refresh,
+			// the nodes that we will fire for will be gone.
+			this._fireSelectionEvent && this._fireSelectionEvent();
 		}
 		this._lastSelected = null;
 		this.inherited(arguments);
 	},
 	
 	renderArray: function(){
-		var rows = this.inherited(arguments);
-		var selection = this.selection;
-		for(var i = 0; i < rows.length; i++){
-			var row = this.row(rows[i]);
-			var selected = row.id in selection ? selection[row.id] : this.allSelected;
-			if(selected){
-				this.select(row, null, selected);
+		var grid = this,
+			rows = this.inherited(arguments);
+		
+		Deferred.when(rows, function(rows){
+			var selection = grid.selection,
+				i, row, selected;
+			for(i = 0; i < rows.length; i++){
+				row = grid.row(rows[i]);
+				selected = row.id in selection ? selection[row.id] : grid.allSelected;
+				if(selected){
+					grid.select(row, null, selected);
+				}
 			}
-		}
+		});
 		return rows;
 	}
 });

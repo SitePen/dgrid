@@ -1,7 +1,8 @@
 define(["./OnDemandGrid", "dojo/_base/declare", "put-selector/put"],
 function(OnDemandGrid, declare, put){
-	// This module supports parsing grid structure information from an HTML table.
-	// This module does NOT support ColumnSets; see GridWithColumnSetsFromHtml
+	// summary:
+	//		This module supports parsing grid structure information from an HTML table.
+	//		This module does NOT support ColumnSets; see GridWithColumnSetsFromHtml
 	
 	// name of data attribute to check for column properties
 	var bagName = "data-dgrid-column";
@@ -25,9 +26,8 @@ function(OnDemandGrid, declare, put){
 			}
 		}
 		if(tr){
-			// FIXME: this assumes that applicable TRs were ONLY found under one
-			// grouping element!  Maybe should limit to thead like dojox grid?
-			// (Especially if we ever want to support tbody>tr>td -> renderArray)
+			// NOTE: this assumes that applicable TRs were ONLY found under one
+			// grouping element (e.g. thead)
 			domNode.removeChild(tr.parentNode);
 		}
 		

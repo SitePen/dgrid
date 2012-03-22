@@ -1,5 +1,6 @@
 (function(define){
-define([], function(){
+var forDocument, fragmentFasterHeuristic = /[-+,> ]/; // if it has any of these combinators, it is probably going to be faster with a document fragment 
+define([], forDocument = function(doc, newFragmentFasterHeuristic){
 "use strict";
 	// module:
 	//		put-selector/put
@@ -10,13 +11,12 @@ define([], function(){
 	//	examples:
 	//		To create a simple div with a class name of "foo":
 	//		|	put("div.foo");
-					
-	var selectorParse = /(?:\s*([-+ ,<>]))?\s*(\.|!|#)?([-\w$]+)?(?:\[([^\]=]+)=?['"]?([^\]'"]*)['"]?\])?/g,
-		fragmentFasterHeuristic = /[-+,> ]/, // if it has any of these combinators, it is probably going to be faster with a document fragment 	
-		doc, undefined;
+	fragmentFasterHeuristic = newFragmentFasterHeuristic || fragmentFasterHeuristic;
 	try{
-		doc = document;
-		var ieCreateElement = 1;
+		var selectorParse = /(?:\s*([-+ ,<>]))?\s*(\.|!\.?|#)?([-\w$]+)?(?:\[([^\]=]+)=?['"]?([^\]'"]*)['"]?\])?/g,
+			undefined, 
+			doc = doc || document,
+			ieCreateElement = 1;
 		put('i', {name:'a'});
 	}catch(e){
 		ieCreateElement = 0;
@@ -48,6 +48,7 @@ define([], function(){
 		for(var i = 0; i < args.length; i++){
 			var argument = args[i];
 			if(typeof argument == "object"){
+				lastSelectorArg = false;
 				if(argument.nodeType){
 					current = argument;
 					insertLastElement();
@@ -59,17 +60,18 @@ define([], function(){
 						current[key] = argument[key];
 					}				
 				}
-			}else if(lastSelectorArg === i - 1){
+			}else if(lastSelectorArg){
 				// a text node should be created
 				// take a scalar value, use createTextNode so it is properly escaped
 				// createTextNode is generally several times faster than doing an escaped innerHTML insertion: http://jsperf.com/createtextnode-vs-innerhtml/2
+				lastSelectorArg = false;
 				insertTextNode(current, argument);
 			}else{
 				if(i < 1){
 					// if we are starting with a selector, there is no top element
 					topReferenceElement = null;
 				}
-				lastSelectorArg = i;
+				lastSelectorArg = true;
 				var leftoverCharacters = argument.replace(selectorParse, function(t, combinator, prefix, value, attrName, attrValue){
 					if(combinator){
 						// insert the last current object
@@ -180,17 +182,13 @@ define([], function(){
 		return returnValue;
 	}
 	put.defaultTag = "div";
-	put.setDocument = function(document, newFragmentHeuristic){
-		doc = document;
-		fragmentFasterHeuristic = newFragmentHeuristic || fragmentFasterHeuristic;
-	}
+	put.forDocument = forDocument;
 	return put;
 });
 })(typeof define == "undefined" ? function(deps, factory){
 	if(typeof window == "undefined"){
 		// server side JavaScript, probably (hopefully) NodeJS
 		require("./node-html")(module, factory);
-//		module.exports = factory();
 	}else{
 		// plain script in a browser
 		put = factory();

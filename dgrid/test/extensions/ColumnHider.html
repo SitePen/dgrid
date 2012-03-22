@@ -15,44 +15,46 @@
 				width: 750px;
 				margin: 10px;
 			}
-			.column-col1 {
+			.field-col1 {
 				width: 100px;
 			}
-			.column-col2 {
+			.field-col2 {
 				width: 100px;
 			}
-			.column-col3 {
+			.field-col3 {
 				width: auto;
 			}
-			.column-col4 {
+			.field-col4 {
 				width: 100px;
 			}
-			.column-last-col {
+			.field-col5 {
 				width: 150px;
 			}
 		</style>
 		<script type="text/javascript" src="../../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dgrid/OnDemandGrid", "dgrid/extensions/ColumnHider", "dgrid/extensions/ColumnResizer", "dgrid/Selection", "dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!"],
-				function(Grid, ColumnHider, ColumnResizer, Selection, declare, testStore){
-					columns = {
-						col1: 'Column 1Column1Column 1 Column 1',
-						col2: {label: 'Column2 (unhidable)', sortable: false, unhidable: true},
-						col3: 'Column3333333333333333333',
-						col4: 'Column 4',
-						"last-col": {label: 'Column 5', field: 'col5'}
+			var columns1, columns2;
+			require(["dojo/_base/lang", "dgrid/OnDemandGrid", "dgrid/extensions/ColumnHider", "dgrid/extensions/ColumnResizer", "dgrid/Selection", "dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!"],
+				function(lang, Grid, ColumnHider, ColumnResizer, Selection, declare, testStore){
+					var columns = {
+						col1: "Column 1Column1Column 1 Column 1",
+						col2: {label: "Column2 (unhidable)", sortable: false, unhidable: true},
+						col3: "Column3333333333333333333",
+						col4: "Column 4",
+						col5: "Column 5"
 					};
-					columns2 = { // you can declare columns as an object hash (key translates to field)
-						col2: 'Col2',
-						col4: {label: 'Col4', sortable: false},
-						col1: 'Col1',
-						"last-col": {label: 'Column 5', field: 'col5'}
+					columns1 = lang.clone(columns);
+					columns2 = {
+						col2: "Col2",
+						col4: {label: "Col4", sortable: false},
+						col1: "Col1",
+						col5: "Column 5"
 					};
 					
-					window.grid = declare([Grid, Selection, ColumnHider])({
+					window.grid = new (declare([Grid, Selection, ColumnHider]))({
 						store: testStore,
-						columns: columns
+						columns: columns1
 					}, "grid");
 					
 					grid.on("dgrid-columnstatechange", function(evt){
@@ -60,9 +62,9 @@
 							(evt.hidden ? "hidden" : "shown"));
 					});
 					
-					window.gridresize = declare([Grid, Selection, ColumnHider, ColumnResizer])({
+					window.gridresize = new (declare([Grid, Selection, ColumnHider, ColumnResizer]))({
 						store: testStore,
-						columns: columns
+						columns: lang.clone(columns)
 					}, "gridresize");
 				});
 		</script>
@@ -71,8 +73,8 @@
 		<h2>A basic grid with the column hider plugin</h2>
 		<div id="grid"></div>
 		<div>Buttons to test changing column structure:
-			<button onclick="grid.setColumns(columns2);">New Structure</button>
-			<button onclick="grid.setColumns(columns);">Original</button>
+			<button onclick="grid.set('columns', columns2);">New Structure</button>
+			<button onclick="grid.set('columns', columns1);">Original</button>
 		</div>
 		<h2>Another grid w/ ColumnHider and ColumnResizer</h2>
 		<div id="gridresize"></div>

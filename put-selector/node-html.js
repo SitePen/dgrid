@@ -169,10 +169,8 @@ Object.defineProperties(prototype, {
 });
 var lessThanRegex = /</g, ampersandRegex = /&/g;
 module.exports = function(putModule, putFactory){
-	put = putModule.exports = putFactory();
-	put.indentation = '  ';
+	put = putModule.exports = putFactory().forDocument({
 	// setup a document for string-based HTML creation, using our classes 
-	put.setDocument({
 		createElement: function(tag){
 			return new Element(tag);
 		},
@@ -184,6 +182,7 @@ module.exports = function(putModule, putFactory){
 			return false;
 		}
 	});
+	put.indentation = '  ';
 	put.Page = function(stream){
 		return put('html').sendTo(stream);
 	};

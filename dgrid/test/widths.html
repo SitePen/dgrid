@@ -24,10 +24,10 @@
 			.wideCols .dgrid-cell {
 				width: 100px; /* force all columns to have SOME width */
 			}
-			.wideCols .column-col1 {
+			.wideCols .field-col1 {
 				width: 500px;
 			}
-			.wideCols .column-col4 {
+			.wideCols .field-col4 {
 				width: 300px;
 			}
 			
@@ -54,18 +54,11 @@
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
 			function toggleHeader(grid){
-				grid.setShowHeader(!grid.showHeader);
+				grid.set("showHeader", !grid.showHeader);
 			}
-			require(["dojo/on", "dgrid/List", "dgrid/OnDemandGrid", "dgrid/Tree", "dgrid/Editor", "dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dojo/_base/array", "dgrid/test/data/base", "dojo/domReady!"], 
-				function(on, List, Grid, Tree, Editor, Selection, Keyboard, declare, arrayUtil, testStore){
-					var columns = { // you can declare columns as an object hash (key translates to field)
-							col1: Editor({label: 'Column 1 column 1 column 1'}, "text", "dblclick"),
-							col2: {label: 'Column 2', sortable: false},
-							col3: Editor({label: 'Column 3'}, "text", "dblclick"),
-							col4: 'Column444444444444444444',
-							"last-col": Editor({label: 'Column 5', field: 'col5'}, "text", "dblclick")
-						},
-						countries = arrayUtil.map(testCountryStore.data, function(country){
+			require(["dojo/on", "dgrid/List", "dgrid/OnDemandGrid", "dgrid/editor", "dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dojo/_base/array", "dgrid/test/data/base", "dojo/domReady!"], 
+				function(on, List, Grid, editor, Selection, Keyboard, declare, arrayUtil, testStore){
+					var countries = arrayUtil.map(testCountryStore.data, function(country){
 							return country.name;
 						}),
 						// longer version to test horizontal scrolling in List
@@ -73,29 +66,43 @@
 							return country + country + country;
 						});
 					
-					window.grid = declare([Grid, Selection, Keyboard])({
+					function getColumns(){
+						return { // you can declare columns as an object hash (key translates to field)
+							col1: editor({label: 'Column 1 column 1 column 1'}, "text", "dblclick"),
+							col2: {label: 'Column 2', sortable: false},
+							col3: editor({label: 'Column 3'}, "text", "dblclick"),
+							col4: 'Column444444444444444444',
+							col5: editor({label: 'Column 5'}, "text", "dblclick")
+						};
+					}
+
+					var StandardGrid = declare([Grid, Selection, Keyboard]);
+					
+					window.grid = new StandardGrid({
 						store: testStore,
-						columns: columns
+						columns: getColumns()
 					}, "grid");
 					
-					window.scrollgrid = declare([Grid, Selection, Keyboard])({
+					window.scrollgrid = new StandardGrid({
 						store: testStore,
-						columns: columns
+						columns: getColumns()
 					}, "scrollgrid");
 					
-					window.headerlessgrid = declare([Grid, Selection, Keyboard])({
+					window.headerlessgrid = new StandardGrid({
 						store: testStore,
-						columns: columns,
+						columns: getColumns(),
 						showHeader: false
 					}, "headerlessgrid");
+
+					var StandardList = declare([List, Selection, Keyboard]);
 					
-					window.list = declare([List, Selection, Keyboard])({}, "list");
+					window.list = new StandardList({}, "list");
 					list.renderArray(countries);
 					
-					window.widelist = declare([List, Selection, Keyboard])({}, "widelist");
+					window.widelist = new StandardList({}, "widelist");
 					widelist.renderArray(countries);
 					
-					window.narrowlist = declare([List, Selection, Keyboard])({}, "narrowlist");
+					window.narrowlist = new StandardList({}, "narrowlist");
 					narrowlist.renderArray(longCountries);
 				});
 		</script>

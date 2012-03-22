@@ -146,7 +146,7 @@ function(Grid, Selection, Keyboard, declare, on, query, Memory, Observable, put)
 			// update class on grid domNode
 			put(grid.domNode, "!table!gallery!details." + view);
 			// only show headers if we're in "table" view
-			grid.setShowHeader(view == "table");
+			grid.set("showHeader", view == "table");
 			// force redraw of rows
 			grid.refresh();
 		}

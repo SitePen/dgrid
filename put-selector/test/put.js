@@ -12,6 +12,8 @@ console.assert(span1.getAttribute("name") == "span1");
 console.assert(span1.parentNode == div);
 put(span1, "!class-name-1.class-name-3[!name]");
 console.assert(span1.className == "class-name-2 class-name-3");
+put(span1, "!.class-name-3");
+console.assert(span1.className == "class-name-2");
 console.assert(span1.getAttribute("name") == null);
 put(span1, "[name=span1]"); // readd the attribute
 

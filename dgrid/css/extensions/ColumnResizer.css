@@ -7,7 +7,7 @@
 	top: 0;
 }
 
-.dgrid-resize-handler {
+.dgrid-resize-handle {
 	height: 100px;
 	width: 0;
 	position: absolute;
@@ -16,13 +16,22 @@
 	cursor: col-resize;
 	z-index: 999;
 	border-left: 5px solid transparent;
+	outline: none;
 }
-html.has-ie-6 .dgrid-resize-handler {
+html.has-ie-6 .dgrid-resize-handle {
 	border-color: pink;
 	filter: chroma(color=pink);
 }
 .dgrid-resize-header-container {
 	height:100%;
+}
+
+/* make the resize handles larger on touch-capable devices */
+html.has-touch .dgrid-resize-handle {
+	border-left: 20px solid transparent;
+}
+html.has-touch .dgrid-column-resizer {
+	width: 2px;
 }
 
 html.has-no-quirks .dgrid-resize-header-container {
@@ -45,4 +54,8 @@ html.has-ie-6 .dgrid-header .dgrid-sort-arrow {
 }
 html.has-quirks .dgrid-header .dgrid-cell-padding, html.has-ie-6 .dgrid-header .dgrid-cell {
 	position:relative;
+}
+
+#dgrid-css-extensions-ColumnResizer-loaded {
+	display: none;
 }

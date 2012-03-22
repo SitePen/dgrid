@@ -1,5 +1,5 @@
-define(["xstyle/css!./css/columnset.css", "dojo/has", "put-selector/put", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/query", "./Grid", "xstyle/has-class", "dojo/_base/sniff"], 
-function(styleSheet, has, put, declare, listen, aspect, query, Grid, hasClass){
+define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/query", "dojo/has", "put-selector/put", "xstyle/has-class", "./Grid", "dojo/_base/sniff", "xstyle/css!./css/columnset.css"], 
+function(kernel, declare, listen, aspect, query, has, put, hasClass, Grid){
 		// summary:
 		//		This module provides column sets to isolate horizontal scroll of sets of 
 		//		columns from each other. This mainly serves the purpose of allowing for
@@ -12,10 +12,8 @@ function(styleSheet, has, put, declare, listen, aspect, query, Grid, hasClass){
 			var tr = put(row, "tbody tr");
 			for(var i = 0, l = this.columnSets.length; i < l; i++){
 				// iterate through the columnSets
-				var columnSet = this.columnSets[i];
-				var cell = put(tr, tag + ".dgrid-column-set-cell.column-set-" + i + " div.dgrid-column-set[colsetid=" + i + "]");
-				this.subRows = columnSet;
-				cell.appendChild(this.inherited(arguments));
+				var cell = put(tr, tag + ".dgrid-column-set-cell.dgrid-column-set-" + i + " div.dgrid-column-set[colsetid=" + i + "]");
+				cell.appendChild(this.inherited(arguments, [tag, each, this.columnSets[i]]));
 			}
 			return row;
 		},
@@ -55,7 +53,7 @@ function(styleSheet, has, put, declare, listen, aspect, query, Grid, hasClass){
 			function putScroller(columnSet, i){
 				// function called for each columnSet
 				var scroller = scrollers[i] =
-					put(domNode, "div.dgrid-column-set-scroller.dgrid-scrollbar-height.column-set-scroller-" + i + "[colsetid=" + i +"]");
+					put(domNode, "div.dgrid-column-set-scroller.dgrid-scrollbar-height.dgrid-column-set-scroller-" + i + "[colsetid=" + i +"]");
 				scrollerContents[i] = put(scroller, "div.dgrid-column-set-scroller-content");
 				listen(scroller, "scroll", onScroll);
 			}
@@ -95,9 +93,13 @@ function(styleSheet, has, put, declare, listen, aspect, query, Grid, hasClass){
 				}
 			}
 		},
-		setColumnSets: function(columnSets){
+		_setColumnSets: function(columnSets){
 			this.columnSets = columnSets;
 			this._updateColumns();
+		},
+		setColumnSets: function(columnSets){
+			kernel.deprecated("setColumnSets(...)", 'use set("columnSets", ...) instead', "dgrid 1.0");
+			this.set("columnSets", columnSets);
 		}
 	});
 	function positionScrollers(grid, domNode){
