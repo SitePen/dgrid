@@ -408,6 +408,10 @@ function(arrayUtil, kernel, declare, listen, aspect, has, miscUtil, TouchScroll,
 								self.removeRow(row); // now remove
 							}
 						}
+						// the removal of rows could cause us to need to page in more items
+						if(self._processScroll){
+							self._processScroll();
+						}
 					}
 					if(to > -1){
 						// add to new slot (either before an existing row, or at the end)
