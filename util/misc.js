@@ -48,6 +48,12 @@ define([], function(){
 					cb.apply(context, a);
 				}, delay);
 			}
+		},
+		isDataRow: function(row){
+			// summary:
+			//      Returns true if the given DOM node represents an actual data row,
+			//      as opposed to a preload or loading node (or something else)
+			return row && /(^| )dgrid-row( |$)/.test(row.className);
 		}
 	};
 	return util;
