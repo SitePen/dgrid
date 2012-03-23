@@ -21,17 +21,10 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dojo/on", "dojo/_base/declare", "dojo/_base/array", "dojo/json",
-					"dgrid/OnDemandGrid", "dgrid/Editor","dgrid/Selection", "dgrid/CellSelection", "dgrid/Keyboard",
+			require(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array", "dojo/json", "dojo/on",
+					"dgrid/OnDemandGrid", "dgrid/editor","dgrid/Selection", "dgrid/CellSelection", "dgrid/Keyboard",
 					"dgrid/test/data/base", "dojo/domReady!"],
-				function(on, declare, arrayUtil, json, Grid, Editor, Selection, CellSelection, Keyboard, testStore){
-					var columns = {
-							col1: 'Column 1',
-							col2: {label: 'Column 2', sortable: false},
-							col3: 'Column 3',
-							col4: Editor({label: 'Editable'}, "text")
-						};
-					
+				function(lang, declare, arrayUtil, json, on, Grid, editor, Selection, CellSelection, Keyboard, testStore){
 					on(document.body, "dgrid-select,dgrid-deselect",
 						function(event){
 							var msg = (event.type == "dgrid-deselect" ? "de" : "") + "selected: ";
@@ -44,11 +37,18 @@
 							console.log("selection: " + json.stringify(event.grid.selection, null, "  "));
 						}
 					);
-					
-					gridRowNavigation = dojo.declare([Grid, Selection, Keyboard])({
+					var SelectionGrid = declare([Grid, Selection, Keyboard]);
+					var CellSelectionGrid = declare([Grid, CellSelection, Keyboard]);
+
+					gridRowNavigation = new SelectionGrid({
 						store: testStore,
 						cellNavigation: false,
-						columns: columns,
+						columns: {
+							col1: 'Column 1',
+							col2: {label: 'Column 2', sortable: false},
+							col3: 'Column 3',
+							col4: editor({label: 'Editable'}, "text")
+						},
 						allowSelectAll: true
 					}, "grid-row-navigation");
 					
@@ -58,31 +58,36 @@
 						col3: 'Column 3',
 						col4: 'Column 4'
 					};
-					gridCellNavigation = declare([Grid, CellSelection, Keyboard])({
+					gridCellNavigation = new CellSelectionGrid({
 						store: testStore,
-						columns: columns2
+						columns: lang.clone(columns2)
 					}, "grid-cell-navigation");
-					gridCellNavigationSingle = declare([Grid, CellSelection, Keyboard])({
+					gridCellNavigationSingle = new CellSelectionGrid({
 						store: testStore,
-						columns: columns2,
+						columns: lang.clone(columns2),
 						selectionMode: "single"
 					}, "grid-cell-navigation-single");
-					gridCellNavigationMultiple = declare([Grid, CellSelection, Keyboard])({
+					gridCellNavigationMultiple = new CellSelectionGrid({
 						store: testStore,
-						columns: columns2,
+						columns: lang.clone(columns2),
 						selectionMode: "multiple"
 					}, "grid-cell-navigation-multiple");
-					gridCellNavigationNone = declare([Grid, CellSelection, Keyboard])({
+					gridCellNavigationNone = new CellSelectionGrid({
 						store: testStore,
-						columns: columns2,
+						columns: lang.clone(columns2),
 						selectionMode: "none",
 						allowSelectAll: true
 					}, "grid-cell-navigation-none");
 					
 					// cell navigation + row selection
-					gridMixed = dojo.declare([Grid, Selection, Keyboard])({
+					gridMixed = new SelectionGrid({
 						store: testStore,
-						columns: columns
+						columns: { // same as columns in very first grid
+							col1: 'Column 1',
+							col2: {label: 'Column 2', sortable: false},
+							col3: 'Column 3',
+							col4: editor({label: 'Editable'}, "text")
+						}
 					}, "grid-mixed");
 				});
 		</script>

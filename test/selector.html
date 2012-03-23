@@ -24,21 +24,27 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dojo/on", "dgrid/OnDemandGrid", "dgrid/Selector", "dgrid/Selection", "dgrid/Keyboard",
+			require(["dojo/on", "dgrid/OnDemandGrid", "dgrid/selector", "dgrid/Selection", "dgrid/Keyboard",
 					"dojo/_base/declare", "dojo/_base/array", "dojo/json", "dgrid/test/data/base", "dojo/domReady!"], 
-				function(on, Grid, Selector, Selection, Keyboard, declare, arrayUtil, json, testStore){
+				function(on, Grid, selector, Selection, Keyboard, declare, arrayUtil, json, testStore){
 					var columns = { // you can declare columns as an object hash (key translates to field)
-							col1: Selector({ disabled: function(object){ return object.col1 == "note"; }}),
+							col1: selector({ disabled: function(object){ return object.col1 == "note"; }}),
 							id: "ID",
 							col2: {label: 'Column 2', sortable: false},
 							col3: {label: 'Column 3'}
 						};
 					var columns2 = {
-							col1: Selector({ label: "Select" }),
+							col1: selector({ label: "Select" }),
 							id: "ID",
 							col2: {label: 'Column 2', sortable: false},
 							col3: {label: 'Column 3'}
 						};
+					var columnsRadio = {
+						col1: selector({ label: 'Radio', disabled: function(object){ return object.col3 == "read"; } }, "radio"),
+						id: "ID",
+						col2: {label: 'Column 2', sortable: false},
+						col3: {label: 'Column 3'}
+					};
 					
 					on(document.body, "dgrid-select,dgrid-deselect",
 						function(event){
@@ -48,26 +54,23 @@
 							console.log("selection: ", json.stringify(event.grid.selection, null, "  "));
 						}
 					);
+
+					var SelectionGrid = declare([Grid, Selection, Keyboard]);
 					
-					window.grid = dojo.declare([Grid, Selection, Keyboard])({
+					window.grid = new SelectionGrid({
 						store: testStore,
 						selectionMode: "none",
 						columns: columns,
 						allowSelectAll: true
 					}, "grid");
-					window.grid2 = dojo.declare([Grid, Selection, Keyboard])({
+					window.grid2 = new SelectionGrid({
 						store: testStore,
 						selectionMode: "none",
 						columns: columns2,
 						allowSelectAll: false
 					}, "grid2");
-					var columnsRadio = {
-						col1: Selector({ label: 'Radio', disabled: function(object){ return object.col3 == "read"; } }, "radio"),
-						id: "ID",
-						col2: {label: 'Column 2', sortable: false},
-						col3: {label: 'Column 3'}
-					};
-					window.gridRadio = declare([Grid, Selection, Keyboard])({
+
+					window.gridRadio = new SelectionGrid({
 						store: testStore,
 						selectionMode: "none",
 						columns: columnsRadio

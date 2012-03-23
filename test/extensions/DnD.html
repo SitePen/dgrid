@@ -52,8 +52,8 @@
 		<script type="text/javascript" src="../../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dgrid/OnDemandGrid","dgrid/Tree","dgrid/Selection", "dgrid/extensions/DnD", "dgrid/Keyboard", "dojo/dnd/Source", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/Deferred",  "dgrid/test/data/base", "dojo/domReady!"],
-				function(Grid, Tree, Selection, DnD, Keyboard, DnDSource, declare, lang, arrayUtil, Deferred){
+			require(["dgrid/OnDemandGrid", "dgrid/tree", "dgrid/Selection", "dgrid/extensions/DnD", "dgrid/Keyboard", "dojo/dnd/Source", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/Deferred",  "dgrid/test/data/base", "dojo/domReady!"],
+				function(Grid, tree, Selection, DnD, Keyboard, DnDSource, declare, lang, arrayUtil, Deferred){
 					var DnDGrid = declare([Grid, Selection, DnD, Keyboard]);
 					
 					function byId(id){ return document.getElementById(id); }

@@ -45,22 +45,26 @@
 						col3: "Column 3",
 						col4: "Column 4"
 					},
-					//args to be passed to programmatic dgrid instances
-					gridArgs = {
-						store: testStore,
-						columns: gridCols,
-						selectionMode: "single"
-					};
-					var CustomGrid = declare([Grid, Selection, DijitRegistry]);
+					CustomGrid = declare([Grid, Selection, DijitRegistry]);
 					
-					parser.parse();
-					
-					// add grids as content to ContentPanes parsed within page
-					grid1 = new CustomGrid(lang.mixin({id: "grid1"}, gridArgs)),
-					registry.byId("cp1").set("content", grid1);
-					grid2 = new CustomGrid(lang.mixin({id: "grid2"}, gridArgs), "grid2");
-					registry.byId("cp2").set("content", grid2);
-
+				parser.parse();
+				
+				// add grids as content to ContentPanes parsed within page
+				window.grid1 = new CustomGrid({
+					id: "grid1",
+					store: testStore,
+					columns: lang.clone(gridCols),
+					selectionMode: "single"
+				});
+				registry.byId("cp1").set("content", grid1);
+				
+				window.grid2 = new CustomGrid({
+					id: "grid2",
+					store: testStore,
+					columns: lang.clone(gridCols),
+					selectionMode: "single"
+				});
+				registry.byId("cp2").set("content", grid2);
 			});
 		</script>
 	</head>

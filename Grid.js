@@ -1,7 +1,7 @@
 define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/on", "dojo/has", "put-selector/put", "./List", "dojo/_base/sniff"],
 function(kernel, declare, listen, has, put, List){
 	var contentBoxSizing = has("ie") < 8 && !has("quirks");
-	
+	var invalidClassChars = /[^\._a-zA-Z0-9-]/g;	
 	function appendIfNode(parent, subNode){
 		if(subNode && subNode.nodeType){
 			parent.appendChild(subNode);
@@ -30,6 +30,9 @@ function(kernel, declare, listen, has, put, List){
 		cell: function(target, columnId){
 			// summary:
 			//		Get the cell object by node, or event, id, plus a columnId
+			
+			if(target.row && target.row instanceof this._Row){ return target; }
+			
 			if(target.target && target.target.nodeType){
 				// event
 				target = target.target;
@@ -100,6 +103,7 @@ function(kernel, declare, listen, has, put, List){
 			for(si = 0, sl = subRows.length; si < sl; si++){
 				subRow = subRows[si];
 				// for single-subrow cases in modern browsers, TR can be skipped
+				// http://jsperf.com/table-without-trs
 				tr = (sl == 1 && !has("ie")) ? tbody : put(tbody, "tr");
 				
 				for(i = 0, l = subRow.length; i < l; i++){
@@ -107,8 +111,8 @@ function(kernel, declare, listen, has, put, List){
 					column = subRow[i];
 					id = column.id;
 					extraClassName = column.className || (column.field && "field-" + column.field);
-					cell = put(tag + ".dgrid-cell.dgrid-cell-padding.dgrid-column-" + id +
-						(extraClassName ? '.' + extraClassName : ''));
+					cell = put(tag + (".dgrid-cell.dgrid-cell-padding.dgrid-column-" + id +
+						(extraClassName ? "." + extraClassName : "")).replace(invalidClassChars,"-"));
 					cell.columnId = id;
 					if(contentBoxSizing){
 						// The browser (IE7-) does not support box-sizing: border-box, so we emulate it with a padding div
@@ -256,7 +260,7 @@ function(kernel, declare, listen, has, put, List){
 			// summary:
 			//		Extension of List.js sort to update sort arrow in UI
 			
-			this.inherited(arguments); // normalize sortOrder first
+			this.inherited(arguments); // normalize _sort first
 			
 			// clean up UI from any previous sort
 			if(this._lastSortedArrow){
@@ -302,7 +306,7 @@ function(kernel, declare, listen, has, put, List){
 			//		Dynamically creates a stylesheet rule to alter a column's style.
 			
 			// now add a rule to style the column
-			return this.addCssRule("#" + this.domNode.id + ' .dgrid-column-' + colId, css);
+			return this.addCssRule("#" + this.domNode.id + " .dgrid-column-" + colId, css);
 		},
 		
 		/*=====

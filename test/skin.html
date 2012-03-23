@@ -57,20 +57,20 @@
 				rtl && (document.body.dir = "rtl");
 				
 				// then add the rest of the dependencies for the test...
-				deps = deps.concat("dgrid/List", "dgrid/OnDemandGrid", "dgrid/Tree",
-					"dgrid/Selection", "dgrid/Keyboard", "dgrid/Editor",
+				deps = deps.concat("dgrid/List", "dgrid/OnDemandGrid", "dgrid/tree",
+					"dgrid/Selection", "dgrid/Keyboard", "dgrid/editor",
 					"dojo/_base/declare", "dojo/dom-construct", "dgrid/test/data/base", "dojo/domReady!");
 				
 				require(deps, 
-				function(css1, css2, css3, List, Grid, Tree, Selection, Keyboard, Editor, declare, domConstruct, testStore){
+				function(css1, css2, css3, List, Grid, tree, Selection, Keyboard, editor, declare, domConstruct, testStore){
 					var
-						columns = [
-							{label: 'Column 1', field: 'col1'},
-							Editor({label: 'Column 2', field: 'col2', sortable: false, editor: "checkbox"}),
-							{label: 'Column 3', field: 'col3'},
-							{label: 'Column 4', field: 'col4'},
-							{label: 'Column 5', field: 'col5'}
-						],
+						columns = {
+							col1: "Column 1",
+							col2: editor({label: 'Column 2', sortable: false, editor: "checkbox"}),
+							col3: "Column 3",
+							col4: "Column 4",
+							col5: "Column 5"
+						},
 						skins = ["claro", "tundra", "nihilo", "soria",
 							"slate", "sage", "cactus", "squid"],
 						i, l = skins.length,
