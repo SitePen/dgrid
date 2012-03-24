@@ -415,7 +415,7 @@ function(arrayUtil, kernel, declare, listen, aspect, has, miscUtil, TouchScroll,
 					}
 					if(to > -1){
 						// add to new slot (either before an existing row, or at the end)
-						row = self.newRow(object, rows[to] || beforeNode, to, options);
+						row = self.newRow(object, rows[to] || (rows[to-1] && rows[to-1].nextSibling) || beforeNode, to, options);
 						if(row){
 							row.observerIndex = observerIndex;
 							rows.splice(to, 0, row);
@@ -423,6 +423,7 @@ function(arrayUtil, kernel, declare, listen, aspect, has, miscUtil, TouchScroll,
 								firstRow = row;
 							}
 						}
+						options.count++;
 					}
 					from != to && firstRow && self.adjustRowIndices(firstRow);
 				}, true)) - 1;
