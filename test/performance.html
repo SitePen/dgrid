@@ -50,7 +50,13 @@
 						store: testPerfStore,
 						columns: columns
 					}, "grid");
-					console.log(new Date().getTime() - start);
+					console.log("startup time", new Date().getTime() - start);
+					var processScroll = grid._processScroll;
+					grid._processScroll = function(){
+						var start = new Date().getTime();
+						processScroll.call(this);
+						console.log("scroll time", new Date().getTime() - start);
+					};
 				});
 				
 		</script>
