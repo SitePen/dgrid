@@ -1,12 +1,16 @@
-define(["dojo/_base/declare", "dojo/on"],
-function(declare, on){
+define(["dojo/_base/declare", "dojo/on", "dojo/has", "put-selector/put"],
+function(declare, on, has, put){
+	var userAgent = navigator.userAgent;
+	// have you some sniffing to guess if it has touch scrolling and accelerated transforms
+	has.add("touch-scrolling", document.documentElement.style.WebkitOverflowScrolling !== undefined || parseFloat(userAgent.split("Android ")[1]) >= 4);
+	has.add("accelerated-transform", !!userAgent.match(/like Mac/));
 	var
 		bodyTouchListener, // stores handle to body touch handler once connected
-		timerRes = 15, // ms between drag velocity measurements and animation "ticks"
+		timerRes = 25, // ms between drag velocity measurements and animation "ticks"
 		touches = 0, // records number of touches on document
 		current = {}, // records info for widget currently being scrolled
 		glide = {}, // records info for widgets that are in "gliding" state
-		glideThreshold = 1; // speed (in px) below which to stop glide
+		glideThreshold = 0.021; // speed (in px) below which to stop glide
 	
 	function updatetouchcount(evt){
 		touches = evt.touches.length;
@@ -22,7 +26,6 @@ function(declare, on){
 			clearTimeout(g.timer);
 			delete glide[id];
 		}
-		
 		// check "global" touches count (which hasn't counted this touch yet)
 		if(touches > 0){ return; } // ignore multitouch gestures
 		
@@ -31,8 +34,7 @@ function(declare, on){
 			widget: evt.widget,
 			node: this,
 			startX: this.scrollLeft + t.pageX,
-			startY: this.scrollTop + t.pageY,
-			timer: setTimeout(calcTick, timerRes)
+			startY: this.scrollTop + t.pageY
 		};
 	}
 	function ontouchmove(evt){
@@ -41,38 +43,88 @@ function(declare, on){
 		
 		t = evt.touches[0];
 		// snuff event and scroll the area
-		evt.preventDefault();
-		evt.stopPropagation();
-		this.scrollLeft = current.startX - t.pageX;
-		this.scrollTop = current.startY - t.pageY;
+		if(!has("touch-scrolling")){
+			evt.preventDefault();
+			evt.stopPropagation();
+		}		
+		scroll(this, current.startX - t.pageX, current.startY - t.pageY);
+		calcVelocity();
 	}
 	function ontouchend(evt){
 		if(touches != 1 || !current){ return; }
-		current.timer && clearTimeout(current.timer);
 		startGlide(current);
 		current = null;
 	}
-	
+
+	function scroll(node, x, y){
+		// do the actual scrolling
+		var hasTouchScrolling = has("touch-scrolling");
+		if(!hasTouchScrolling && has("accelerated-transform")){
+			// we have hardward acceleration of transforms, so we will do the fast scrolling
+			// by setting the transform style with a translate3d
+			var transformNode = node.firstChild;
+			var lastScrollLeft = node.scrollLeft;
+			var lastScrollTop = node.scrollTop;
+			// store the current scroll position
+			node.instantScrollLeft = x;
+			node.instantScrollTop = y;
+			// set the style transform
+			transformNode.style.WebkitTransform = "translate3d(" + (Math.max(Math.min(0, -x), node.offsetWidth - node.scrollWidth) + node.scrollLeft) + "px," 
+				+ (Math.max(Math.min(0, -y), node.offsetHeight - node.scrollHeight) + node.scrollTop) + "px,0)";
+			// now every half a second actually update the scroll position so that the scroll
+			// monitors (like OnDemandList) receive events and scroll positions to work with
+			if(!node._scrollWaiting){
+				node._scrollWaiting = true;
+				setTimeout(function(){
+					node._scrollWaiting = false;
+					// reset the transform since we are updating the actual scroll position
+					transformNode.style.WebkitTransform = "translate3d(0,0,0)";
+					// get the latest effective scroll position
+					node.scrollLeft = node.instantScrollLeft;
+					node.scrollTop = node.instantScrollTop;
+					// reset these so they aren't used anymore
+					node.instantScrollLeft = 0;
+					node.instantScrollTop = 0;
+				}, 500);
+			}
+		}else{
+			// update scroll position immediately (note we may be using browser's touch scroll
+			var scrollPrefix = hasTouchScrolling ? "instantScroll" : "scroll";
+			node[scrollPrefix + "Left"] = x;
+			node[scrollPrefix + "Top"] = y;
+			if(hasTouchScrolling){
+				// if we are using browser's touch scroll, we fire our own scroll events
+				on.emit(node, "touch-scroll", {});
+			}	
+		}
+		
+		
+	}	
 	// glide-related functions
 	
-	function calcTick(){
+	function calcVelocity(){
 		// Calculates current speed of touch drag
-		var node, x, y;
+		var node, x, y, now;
 		if(!current){ return; } // no currently-scrolling widget; abort
 		
 		node = current.node;
-		x = node.scrollLeft;
-		y = node.scrollTop;
+		x = node.instantScrollLeft || node.scrollLeft;
+		y = node.instantScrollTop || node.scrollTop;
+		now = new Date().getTime();
 		
 		if("prevX" in current){
 			// calculate velocity using previous reference point
-			current.velX = x - current.prevX;
-			current.velY = y - current.prevY;
+			var duration = now - current.prevTime;
+			current.velX = (x - current.prevX) / duration;
+			current.velY = (y - current.prevY) / duration;
+			
 		}
-		// set previous reference point for next iteration
-		current.prevX = x;
-		current.prevY = y;
-		current.timer = setTimeout(calcTick, timerRes);
+		if(!(current.prevTime - now > -150)){ // make sure it is far enough back that we can get a good estimate
+			// set previous reference point for next iteration
+			current.prevX = x;
+			current.prevY = y;
+			current.prevTime = now;
+		}
 	}
 	
 	function startGlide(info){
@@ -88,13 +140,13 @@ function(declare, on){
 		// performs glide and decelerates according to widget's glideDecel method
 		var g = glide[id], x, y, node, widget,
 			vx, vy, nvx, nvy; // old and new velocities
-		
 		if(!g){ return; }
 		
 		node = g.node;
 		widget = g.widget;
-		x = node.scrollLeft;
-		y = node.scrollTop;
+		// we use instantScroll... so that OnDemandList has something to pull from to get the current value (needed for ios5 with touch scrolling) 
+		x = node.instantScrollLeft || node.scrollLeft;
+		y = node.instantScrollTop || node.scrollTop;
 		vx = g.velX;
 		vy = g.velY;
 		nvx = widget.glideDecel(vx);
@@ -102,9 +154,8 @@ function(declare, on){
 		
 		if(Math.abs(nvx) >= glideThreshold || Math.abs(nvy) >= glideThreshold){
 			// still above stop threshold; update scroll positions
-			node.scrollLeft += nvx;
-			node.scrollTop += nvy;
-			if(node.scrollLeft != x || node.scrollTop != y){
+			scroll(node, x + nvx / timerRes * 1000, y + nvy / timerRes * 1000);
+			if((node.instantScrollLeft || node.scrollLeft) != x || (node.instantScrollTop || node.scrollTop) != y){
 				// still scrollable; update velocities and schedule next tick
 				g.velX = nvx;
 				g.velY = nvy;
@@ -114,6 +165,7 @@ function(declare, on){
 	}
 	
 	return declare([], {
+		pagingDelay: 500,
 		startup: function(){
 			var node = this.touchNode || this.containerNode || this.domNode,
 				widget = this;
@@ -136,7 +188,7 @@ function(declare, on){
 			//		Deceleration algorithm. Given a number representing velocity,
 			//		returns a new velocity to impose for the next "tick".
 			//		(Don't forget that velocity can be positive or negative!)
-			return n * 0.9; // Number
+			return n + (n > 0 ? -0.02 : 0.02); // Number
 		}
 	});
 });

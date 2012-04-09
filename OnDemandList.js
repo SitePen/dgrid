@@ -38,8 +38,7 @@ return declare([List, _StoreMixin], {
 		this.inherited(arguments);
 		var self = this;
 		// check visibility on scroll events
-		listen(this.bodyNode, "scroll",
-			miscUtil.throttleDelayed(function(event){ self._processScroll(event); },
+		listen(this.bodyNode, "scroll,touch-scroll", miscUtil.throttleDelayed(function(event){ self._processScroll(event); },
 				null, this.pagingDelay));
 	},
 	
@@ -159,12 +158,12 @@ return declare([List, _StoreMixin], {
 	lastScrollTop: 0,
 	_processScroll: function(){
 		// summary:
-		//		Checks to make sure that everything in the viewable area has been
+		//		Checks to make sure that everything in te viewable area has been
 		//		downloaded, and triggering a request for the necessary data when needed.
 		var grid = this,
 			scrollNode = grid.bodyNode,
 			transform = grid.contentNode.style.webkitTransform,
-			visibleTop = scrollNode.scrollTop + (transform ? -transform.match(/translate[\w]*\(.*?,(.*?)px/)[1] : 0),
+			visibleTop = scrollNode.instantScrollTop || scrollNode.scrollTop,
 			visibleBottom = scrollNode.offsetHeight + visibleTop,
 			priorPreload, preloadNode, preload = grid.preload,
 			lastScrollTop = grid.lastScrollTop;

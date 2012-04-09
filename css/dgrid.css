@@ -79,20 +79,20 @@ html.has-quirks .dgrid-header-hidden .dgrid-cell {
 }
 
 .dgrid-content {
-	position: relative;
+	/*position: relative;*/
 	height: 99%;
 }
 
 .dgrid-scroller {
 	overflow-x: auto;
 	overflow-y: scroll;
+	-webkit-overflow-scrolling: touch;
 	position: absolute;
 	top: 0px;
 	margin-top: 25px; /* this will be adjusted programmatically to fit below the header*/
 	bottom: 0px;
 	width: 100%;
 }
-
 .dgrid-loading {
 	position: relative;
 	height: 100%;
