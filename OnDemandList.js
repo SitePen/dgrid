@@ -246,8 +246,8 @@ return declare([List, _StoreMixin], {
 			}
 		}
 		
-		function adjustHeight(preload){
-			preload.node.style.height = Math.min(preload.count * grid.rowHeight, grid.maxEmptySpace) + "px";
+		function adjustHeight(preload, noMax){
+			preload.node.style.height = Math.min(preload.count * grid.rowHeight, noMax ? Infinity : grid.maxEmptySpace) + "px";
 		}
 		// there can be multiple preloadNodes (if they split, or multiple queries are created),
 		//	so we can traverse them until we find whatever is in the current viewport, making
@@ -307,7 +307,7 @@ return declare([List, _StoreMixin], {
 							// all of the nodes above were removed
 							offset = Math.min(preload.count, offset);
 							preload.previous.count += offset;
-							adjustHeight(preload.previous);
+							adjustHeight(preload.previous, true);
 							preload.count -= offset;
 							preloadNode.rowIndex += offset;
 							queryRowsOverlap = 0;
