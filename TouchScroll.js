@@ -29,6 +29,10 @@ function(declare, on, has, put){
 		// check "global" touches count (which hasn't counted this touch yet)
 		if(touches > 0){ return; } // ignore multitouch gestures
 		
+		if(!this.scrollbarYNode && !has("touch-scrolling")){
+			var scrollbarYNode = this.scrollbarYNode = put(this.parentNode, "div.dgrid-touch-scrollbar-y");
+			scrollbarYNode.style.height = this.offsetHeight * this.offsetHeight  / this.scrollHeight + "px";  
+		}
 		t = evt.touches[0];
 		current = {
 			widget: evt.widget,
@@ -59,6 +63,8 @@ function(declare, on, has, put){
 	function scroll(node, x, y){
 		// do the actual scrolling
 		var hasTouchScrolling = has("touch-scrolling");
+		x = Math.min(Math.max(0, x), node.scrollWidth - node.offsetWidth);
+		y = Math.min(Math.max(0, y), node.scrollHeight - node.offsetHeight);
 		if(!hasTouchScrolling && has("accelerated-transform")){
 			// we have hardward acceleration of transforms, so we will do the fast scrolling
 			// by setting the transform style with a translate3d
@@ -69,8 +75,8 @@ function(declare, on, has, put){
 			node.instantScrollLeft = x;
 			node.instantScrollTop = y;
 			// set the style transform
-			transformNode.style.WebkitTransform = "translate3d(" + (Math.max(Math.min(0, -x), node.offsetWidth - node.scrollWidth) + node.scrollLeft) + "px," 
-				+ (Math.max(Math.min(0, -y), node.offsetHeight - node.scrollHeight) + node.scrollTop) + "px,0)";
+			transformNode.style.WebkitTransform = "translate3d(" + (node.scrollLeft - x) + "px," 
+				+ (node.scrollTop - y) + "px,0)";
 			// now every half a second actually update the scroll position so that the scroll
 			// monitors (like OnDemandList) receive events and scroll positions to work with
 			if(!node._scrollWaiting){
@@ -97,8 +103,7 @@ function(declare, on, has, put){
 				on.emit(node, "touch-scroll", {});
 			}	
 		}
-		
-		
+		node.scrollbarYNode.style.top = (y * node.offsetHeight / node.scrollHeight + node.offsetTop) + "px";
 	}	
 	// glide-related functions
 	

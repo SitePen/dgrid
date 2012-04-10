@@ -93,6 +93,16 @@ html.has-quirks .dgrid-header-hidden .dgrid-cell {
 	bottom: 0px;
 	width: 100%;
 }
+.dgrid-touch-scrollbar-y {
+	position: absolute;
+	right: 0px;
+	width: 4px;
+	background-color: #888;
+	border: 1px solid #333;
+	border-radius: 3px;
+	-webkit-box-shadow: 0 0 1px #888;
+	-webkit-transition: opacity 1s ease-out;
+}
 .dgrid-loading {
 	position: relative;
 	height: 100%;
