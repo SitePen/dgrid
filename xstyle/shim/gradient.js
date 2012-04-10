@@ -1,7 +1,7 @@
 /*
     Handles gradients
 */
-define(["./vendorize"],function(vendor){
+define([],function(vendor){
 	var colorString = /#(\w{6})/;
 	var createGradient = {
 		"-webkit-": function(type, position, from, to){

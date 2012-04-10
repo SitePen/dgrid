@@ -4,9 +4,9 @@ console.assert(div.tagName.toLowerCase() == "div");
 var body = document.body;
 put(body, "h1 $", "Running put() tests");
 
-var parent = div;
+var parentDiv = div;
 
-var span1 = put(parent, "span.class-name-1.class-name-2[name=span1]");
+var span1 = put(parentDiv, "span.class-name-1.class-name-2[name=span1]");
 console.assert(span1.className == "class-name-1 class-name-2");
 console.assert(span1.getAttribute("name") == "span1");
 console.assert(span1.parentNode == div);
@@ -17,7 +17,7 @@ console.assert(span1.className == "class-name-2");
 console.assert(span1.getAttribute("name") == null);
 put(span1, "[name=span1]"); // readd the attribute
 
-var defaultTag = put(parent, " .class");
+var defaultTag = put(parentDiv, " .class");
 console.assert(defaultTag.tagName.toLowerCase() == "div");
 var span2, span3 = put(span1, "+span[name=span2] + span[name=span3]");
 console.assert(span3.getAttribute("name") == "span3");
@@ -32,9 +32,9 @@ put(span2, "+", span3, "+", span4);
 console.assert(span2.nextSibling == span3);
 console.assert(span3.nextSibling == span4);
 
-var parent = put("div.parent span.first $ + span.second $<", "inside first", "inside second");
-console.assert(parent.firstChild.innerHTML, "inside first");
-console.assert(parent.lastChild.innerHTML, "inside second");
+var parentDiv = put("div.parent span.first $ + span.second $<", "inside first", "inside second");
+console.assert(parentDiv.firstChild.innerHTML, "inside first");
+console.assert(parentDiv.lastChild.innerHTML, "inside second");
 
 put(span3, "!"); // destroy span3
 console.assert(span2.nextSibling != span3); // make sure span3 is gone
@@ -46,10 +46,10 @@ var spanMinusTwo = put(span0, "-span -span");
 console.assert(spanMinusTwo.nextSibling.nextSibling == span0);
 
 
-var spanWithId = put(parent, "span#with-id");
+var spanWithId = put(parentDiv, "span#with-id");
 console.assert(spanWithId.id == "with-id");
 
-var table = put(parent, "table.class-name#id tr.class-name td[colSpan=2]<<tr.class-name td+td<<");
+var table = put(parentDiv, "table.class-name#id tr.class-name td[colSpan=2]<<tr.class-name td+td<<");
 console.assert(table.tagName.toLowerCase() == "table");
 console.assert(table.childNodes.length == 2);
 console.assert(table.firstChild.className == "class-name");

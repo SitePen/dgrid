@@ -52,7 +52,19 @@
 				store: store
 			},"grid");
 			grid.startup();
-			console.log(new Date().getTime() - start);
+			console.log("startup time", new Date().getTime() - start);
+			var fetch = grid._fetch;
+			grid._fetch = function(){
+				var start = new Date().getTime();
+				fetch.apply(this, arguments);
+				console.log("fetch time", new Date().getTime() - start);
+			};
+			var finishScrollJob = grid.finishScrollJob;
+			grid.finishScrollJob = function(){
+				var start = new Date().getTime();
+				finishScrollJob.call(this);
+				console.log("finishScrollJob time", new Date().getTime() - start);
+			};
 		});
 	</script>
 </head>
