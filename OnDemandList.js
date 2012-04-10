@@ -24,8 +24,8 @@ return declare([List, _StoreMixin], {
 	//		Defines the minimum distance (in pixels) from the visible viewport area
 	//		rows must be in order to be removed.  Setting to Infinity causes rows
 	//		to never be removed.
-	farOffRemoval: 4000,
-
+	farOffRemoval: 10000,
+	
 	rowHeight: 22,
 	
 	// queryRowsOverlap: Integer
