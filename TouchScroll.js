@@ -1,16 +1,16 @@
 define(["dojo/_base/declare", "dojo/on", "dojo/has", "put-selector/put"],
 function(declare, on, has, put){
 	var userAgent = navigator.userAgent;
-	// have you some sniffing to guess if it has touch scrolling and accelerated transforms
+	// have to do some sniffing to guess if it has native overflow touch scrolling and accelerated transforms
 	has.add("touch-scrolling", document.documentElement.style.WebkitOverflowScrolling !== undefined || parseFloat(userAgent.split("Android ")[1]) >= 4);
 	has.add("accelerated-transform", !!userAgent.match(/like Mac/));
 	var
 		bodyTouchListener, // stores handle to body touch handler once connected
-		timerRes = 25, // ms between drag velocity measurements and animation "ticks"
+		timerRes = 10, // ms between drag velocity measurements and animation "ticks"
 		touches = 0, // records number of touches on document
 		current = {}, // records info for widget currently being scrolled
 		glide = {}, // records info for widgets that are in "gliding" state
-		glideThreshold = 0.021; // speed (in px) below which to stop glide
+		glideThreshold = 0.021; // speed (in px/ms) below which to stop glide
 	
 	function updatetouchcount(evt){
 		touches = evt.touches.length;
@@ -29,6 +29,7 @@ function(declare, on, has, put){
 		// check "global" touches count (which hasn't counted this touch yet)
 		if(touches > 0){ return; } // ignore multitouch gestures
 		if(!has("touch-scrolling")){
+			// if the scrolling height and width is bigger than the area, than we add scrollbars in each direction
 			if(this.scrollHeight > this.offsetHeight){
 				var scrollbarYNode = this.scrollbarYNode;
 				if(!scrollbarYNode){
@@ -45,6 +46,7 @@ function(declare, on, has, put){
 					scrollbarXNode.style.left = this.offsetLeft + "px";
 				}
 			}
+			// remove the fade class if we are reusing the scrollbar
 			put(this.parentNode, '!dgrid-touch-scrollbar-fade');
 		}
 		t = evt.touches[0];
@@ -177,6 +179,7 @@ function(declare, on, has, put){
 		// we use instantScroll... so that OnDemandList has something to pull from to get the current value (needed for ios5 with touch scrolling) 
 		x = node.instantScrollLeft || node.scrollLeft;
 		y = node.instantScrollTop || node.scrollTop;
+		// note that velocity is measured in pixels per millisecond
 		vx = g.velX;
 		vy = g.velY;
 		nvx = widget.glideDecel(vx, sinceLastGlide);
@@ -185,7 +188,7 @@ function(declare, on, has, put){
 		var continueGlide;
 		if(Math.abs(nvx) >= glideThreshold || Math.abs(nvy) >= glideThreshold){
 			// still above stop threshold; update scroll positions
-			scroll(node, x + nvx * sinceLastGlide, y + nvy * sinceLastGlide);
+			scroll(node, x + nvx * sinceLastGlide, y + nvy * sinceLastGlide); // for each dimension multiply the velocity (px/ms) by the ms elapsed
 			if((node.instantScrollLeft || node.scrollLeft) != x || (node.instantScrollTop || node.scrollTop) != y){
 				// still scrollable; update velocities and schedule next tick
 				continueGlide = true;
@@ -200,6 +203,7 @@ function(declare, on, has, put){
 		lastGlideTime = now;
 	}
 	function fadeScrollBars(node){
+		// add the fade class so that scrollbar fades to transparent
 		put(node.parentNode, '.dgrid-touch-scrollbar-fade');
 	}
 	
@@ -222,6 +226,8 @@ function(declare, on, has, put){
 					"touchstart,touchend,touchcancel", updatetouchcount);
 			}
 		},
+		// friction: Float
+		// 		This is the friction deceleration measured in pixels/milliseconds^2
 		friction: 0.0006,
 		glideDecel: function(n, sinceLastGlide){
 			// summary:
