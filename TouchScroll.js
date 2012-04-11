@@ -28,17 +28,31 @@ function(declare, on, has, put){
 		}
 		// check "global" touches count (which hasn't counted this touch yet)
 		if(touches > 0){ return; } // ignore multitouch gestures
-		
-		if(!this.scrollbarYNode && !has("touch-scrolling")){
-			var scrollbarYNode = this.scrollbarYNode = put(this.parentNode, "div.dgrid-touch-scrollbar-y");
-			scrollbarYNode.style.height = this.offsetHeight * this.offsetHeight  / this.scrollHeight + "px";  
+		if(!has("touch-scrolling")){
+			if(this.scrollHeight > this.offsetHeight){
+				var scrollbarYNode = this.scrollbarYNode;
+				if(!scrollbarYNode){
+					scrollbarYNode = this.scrollbarYNode = put(this.parentNode, "div.dgrid-touch-scrollbar-y");
+					scrollbarYNode.style.height = this.offsetHeight * this.offsetHeight  / this.scrollHeight + "px";
+					scrollbarYNode.style.top = this.offsetTop + "px";
+				}
+			}
+			if(this.scrollWidth > this.offsetWidth){
+				var scrollbarXNode = this.scrollbarXNode;
+				if(!scrollbarXNode){
+					scrollbarXNode = this.scrollbarXNode = put(this.parentNode, "div.dgrid-touch-scrollbar-x");
+					scrollbarXNode.style.width = this.offsetWidth * this.offsetWidth  / this.scrollWidth + "px";
+					scrollbarXNode.style.left = this.offsetLeft + "px";
+				}
+			}
+			put(this.parentNode, '!dgrid-touch-scrollbar-fade');
 		}
 		t = evt.touches[0];
 		current = {
 			widget: evt.widget,
 			node: this,
-			startX: this.scrollLeft + t.pageX,
-			startY: this.scrollTop + t.pageY
+			startX: (this.instantScrollLeft || this.scrollLeft) + t.pageX,
+			startY: (this.instantScrollTop || this.scrollTop) + t.pageY
 		};
 	}
 	function ontouchmove(evt){
@@ -59,12 +73,11 @@ function(declare, on, has, put){
 		startGlide(current);
 		current = null;
 	}
-
 	function scroll(node, x, y){
 		// do the actual scrolling
 		var hasTouchScrolling = has("touch-scrolling");
-		x = Math.min(Math.max(0, x), node.scrollWidth - node.offsetWidth);
-		y = Math.min(Math.max(0, y), node.scrollHeight - node.offsetHeight);
+		x = Math.min(Math.max(0.01, x), node.scrollWidth - node.offsetWidth);
+		y = Math.min(Math.max(0.01, y), node.scrollHeight - node.offsetHeight);
 		if(!hasTouchScrolling && has("accelerated-transform")){
 			// we have hardward acceleration of transforms, so we will do the fast scrolling
 			// by setting the transform style with a translate3d
@@ -98,12 +111,19 @@ function(declare, on, has, put){
 			var scrollPrefix = hasTouchScrolling ? "instantScroll" : "scroll";
 			node[scrollPrefix + "Left"] = x;
 			node[scrollPrefix + "Top"] = y;
+			
 			if(hasTouchScrolling){
 				// if we are using browser's touch scroll, we fire our own scroll events
-				on.emit(node, "touch-scroll", {});
+				on.emit(node, "scroll", {});
 			}	
 		}
-		node.scrollbarYNode.style.top = (y * node.offsetHeight / node.scrollHeight + node.offsetTop) + "px";
+		if(!hasTouchScrolling){
+			// move the scrollbar
+			var scrollbarXNode = node.scrollbarXNode;
+			var scrollbarYNode = node.scrollbarYNode;
+			scrollbarXNode && (scrollbarXNode.style.WebkitTransform = "translate3d(" + (x * node.offsetWidth / node.scrollWidth) + "px,0,0)");
+			scrollbarYNode && (scrollbarYNode.style.WebkitTransform = "translate3d(0," + (y * node.offsetHeight / node.scrollHeight) + "px,0)");
+		}
 	}	
 	// glide-related functions
 	
@@ -131,22 +151,27 @@ function(declare, on, has, put){
 			current.prevTime = now;
 		}
 	}
-	
+	var lastGlideTime;
 	function startGlide(info){
 		// starts glide operation when drag ends
 		var id = info.widget.id, g;
-		if(!info.velX && !info.velY){ return; } // no glide to perform
+		if(!info.velX && !info.velY){ 
+			fadeScrollBars(info.node);
+			return; 
+		} // no glide to perform
 		
 		g = glide[id] = info; // reuse object for widget/node/vel properties
 		g.calcFunc = function(){ calcGlide(id); }
+		lastGlideTime = new Date().getTime();
 		g.timer = setTimeout(g.calcFunc, timerRes);
 	}
 	function calcGlide(id){
 		// performs glide and decelerates according to widget's glideDecel method
 		var g = glide[id], x, y, node, widget,
-			vx, vy, nvx, nvy; // old and new velocities
+			vx, vy, nvx, nvy, // old and new velocities
+			now = new Date().getTime(),
+			sinceLastGlide = now - lastGlideTime;
 		if(!g){ return; }
-		
 		node = g.node;
 		widget = g.widget;
 		// we use instantScroll... so that OnDemandList has something to pull from to get the current value (needed for ios5 with touch scrolling) 
@@ -154,19 +179,28 @@ function(declare, on, has, put){
 		y = node.instantScrollTop || node.scrollTop;
 		vx = g.velX;
 		vy = g.velY;
-		nvx = widget.glideDecel(vx);
-		nvy = widget.glideDecel(vy);
+		nvx = widget.glideDecel(vx, sinceLastGlide);
+		nvy = widget.glideDecel(vy, sinceLastGlide);
 		
+		var continueGlide;
 		if(Math.abs(nvx) >= glideThreshold || Math.abs(nvy) >= glideThreshold){
 			// still above stop threshold; update scroll positions
-			scroll(node, x + nvx / timerRes * 1000, y + nvy / timerRes * 1000);
+			scroll(node, x + nvx * sinceLastGlide, y + nvy * sinceLastGlide);
 			if((node.instantScrollLeft || node.scrollLeft) != x || (node.instantScrollTop || node.scrollTop) != y){
 				// still scrollable; update velocities and schedule next tick
+				continueGlide = true;
 				g.velX = nvx;
 				g.velY = nvy;
 				g.timer = setTimeout(g.calcFunc, timerRes);
 			}
 		}
+		if(!continueGlide){
+			fadeScrollBars(node);
+		}
+		lastGlideTime = now;
+	}
+	function fadeScrollBars(node){
+		put(node.parentNode, '.dgrid-touch-scrollbar-fade');
 	}
 	
 	return declare([], {
@@ -188,12 +222,13 @@ function(declare, on, has, put){
 					"touchstart,touchend,touchcancel", updatetouchcount);
 			}
 		},
-		glideDecel: function(n){
+		friction: 0.0006,
+		glideDecel: function(n, sinceLastGlide){
 			// summary:
 			//		Deceleration algorithm. Given a number representing velocity,
 			//		returns a new velocity to impose for the next "tick".
 			//		(Don't forget that velocity can be positive or negative!)
-			return n + (n > 0 ? -0.02 : 0.02); // Number
+			return n + (n > 0 ? -sinceLastGlide : sinceLastGlide) * this.friction; // Number
 		}
 	});
 });

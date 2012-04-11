@@ -38,7 +38,7 @@ return declare([List, _StoreMixin], {
 		this.inherited(arguments);
 		var self = this;
 		// check visibility on scroll events
-		listen(this.bodyNode, "scroll,touch-scroll", miscUtil.throttleDelayed(function(event){ self._processScroll(event); },
+		listen(this.bodyNode, "scroll", miscUtil.throttleDelayed(function(event){ self._processScroll(event); },
 				null, this.pagingDelay));
 	},
 	
@@ -167,7 +167,6 @@ return declare([List, _StoreMixin], {
 			visibleBottom = scrollNode.offsetHeight + visibleTop,
 			priorPreload, preloadNode, preload = grid.preload,
 			lastScrollTop = grid.lastScrollTop;
-		
 		// XXX: I do not know why this happens.
 		// munging the actual location of the viewport relative to the preload node by a few pixels in either
 		// direction is necessary because at least WebKit on Windows seems to have an error that causes it to
