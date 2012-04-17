@@ -28,7 +28,11 @@ function(declare, on, has, put){
 		}
 		// check "global" touches count (which hasn't counted this touch yet)
 		if(touches > 0){ return; } // ignore multitouch gestures
-		if(!has("touch-scrolling")){
+		if(has("touch-scrolling")){
+			// reset these prior to measurements
+			this.instantScrollLeft = 0;
+			this.instantScrollTop = 0;
+		}else{
 			// if the scrolling height and width is bigger than the area, than we add scrollbars in each direction
 			if(this.scrollHeight > this.offsetHeight){
 				var scrollbarYNode = this.scrollbarYNode;
@@ -66,7 +70,8 @@ function(declare, on, has, put){
 		if(!has("touch-scrolling")){
 			evt.preventDefault();
 			evt.stopPropagation();
-		}		
+		}
+		
 		scroll(this, current.startX - t.pageX, current.startY - t.pageY);
 		calcVelocity();
 	}
@@ -116,7 +121,9 @@ function(declare, on, has, put){
 			
 			if(hasTouchScrolling){
 				// if we are using browser's touch scroll, we fire our own scroll events
-				on.emit(node, "scroll", {});
+				on.emit(node, "scroll", {
+					pseudoTouch: true
+				});
 			}	
 		}
 		if(!hasTouchScrolling){
@@ -199,6 +206,7 @@ function(declare, on, has, put){
 		}
 		if(!continueGlide){
 			fadeScrollBars(node);
+			
 		}
 		lastGlideTime = now;
 	}
