@@ -26,10 +26,14 @@ function(declare, registry){
 				this._resizeHandle.remove();
 			}
 		},
+
+		destroyRecursive: function() {
+			this.destroy();
+		},
 		
 		destroy: function(){
 			this.inherited(arguments);
-			registry.remove(this);
+			registry.remove(this.id);
 		},
 		
 		getChildren: function(){
