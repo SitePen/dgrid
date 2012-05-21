@@ -1,13 +1,14 @@
 define([
 	"dojo/_base/kernel",
 	"dojo/_base/lang",
+	"dojo/_base/Deferred",
 	"dojo/on",
 	"dojo/aspect",
 	"dojo/has",
 	"./Grid",
 	"put-selector/put",
 	"dojo/_base/sniff"
-], function(kernel, lang, on, aspect, has, Grid, put){
+], function(kernel, lang, Deferred, on, aspect, has, Grid, put){
 
 var activeCell, activeValue; // tracks cell currently being edited, and its value
 
@@ -63,7 +64,7 @@ function setProperty(grid, cellElement, oldValue, value){
 						bubbles: true,
 						cancelable: true
 					})){
-				if (grid.updateDirty){
+				if(grid.updateDirty){
 					// for OnDemandGrid: update dirty data, and save if autoSave is true
 					grid.updateDirty(row.id, column.field, value);
 					// perform auto-save (if applicable) in next tick to avoid
@@ -114,7 +115,6 @@ function createEditor(column){
 		node = cmp.focusNode || cmp.domNode;
 		
 		// Add dgrid-input to className to make consistent with HTML inputs.
-		// (Can't do this using className argument to constructor; causes issues)
 		node.className += " dgrid-input";
 		
 		// For editOn editors, connect to onBlur rather than onChange, since
@@ -240,7 +240,7 @@ function showEditor(cmp, column, cell, value){
 	if(isWidget){
 		// For widgets, ensure startup is called before setting value,
 		// to maximize compatibility with flaky widgets like dijit/form/Select.
-		if (!cmp._started){ cmp.startup(); }
+		if(!cmp._started){ cmp.startup(); }
 		
 		// Set value, but ensure it isn't processed as a user-generated change.
 		// (Clear flag on a timeout to wait for delayed onChange to fire first)
@@ -254,6 +254,60 @@ function showEditor(cmp, column, cell, value){
 	if(activeCell){ activeValue = value; }
 }
 
+function edit(cell) {
+	// summary:
+	//		Method to be mixed into grid instances, which will show/focus the
+	//		editor for a given grid cell.  Also used by renderCell.
+	// cell: Object
+	//		Cell (or something resolvable by grid.cell) to activate editor on.
+	// returns:
+	//		If the cell is editable, returns a promise resolving to the editor
+	//		input/widget when the cell editor is focused.
+	//		If the cell is not editable, returns null.
+	
+	var row, column, cellElement, dirty, field, value, cmp, dfd;
+	
+	if(!cell.column){ cell = this.cell(cell); }
+	column = cell.column;
+	field = column.field;
+	cellElement = cell.element.contents || cell.element;
+	
+	if((cmp = column.editorInstance)){ // shared editor (editOn used)
+		if(activeCell != cellElement &&
+				(!column.canEdit || column.canEdit(cell.row.data, value))){
+			activeCell = cellElement;
+			row = cell.row;
+			dirty = this.dirty && this.dirty[row.id];
+			value = (dirty && field in dirty) ? dirty[field] :
+				column.get ? column.get(row.data) : row.data[field];
+			
+			showEditor(column.editorInstance, column, cellElement, value);
+			
+			// focus / blur-handler-resume logic is surrounded in a setTimeout
+			// to play nice with Keyboard's dgrid-cellfocusin as an editOn event
+			dfd = new Deferred();
+			setTimeout(function(){
+				// focus the newly-placed control (supported by form widgets and HTML inputs)
+				if(cmp.focus){ cmp.focus(); }
+				// resume blur handler once editor is focused
+				if(column._editorBlurHandle){ column._editorBlurHandle.resume(); }
+				dfd.resolve(cmp);
+			}, 0);
+			
+			return dfd.promise;
+		}
+	}else if(column.editor){ // editor but not shared; always-on
+		cmp = cellElement.widget || cellElement.input;
+		if(cmp){
+			dfd = new Deferred();
+			if(cmp.focus){ cmp.focus(); }
+			dfd.resolve(cmp);
+			return dfd.promise;
+		}
+	}
+	return null;
+}
+
 // editor column plugin function
 
 return function(column, editor, editOn){
@@ -265,29 +319,35 @@ return function(column, editor, editOn){
 	
 	// accept arguments as parameters to editor function, or from column def,
 	// but normalize to column def.
-	column.editor = editor = editor || column.editor;
+	column.editor = editor = editor || column.editor || "text";
 	column.editOn = editOn = editOn || column.editOn;
 	
 	isWidget = typeof editor != "string";
 	
 	// warn for widgetArgs -> editorArgs; TODO: remove @ 1.0
-	if (column.widgetArgs) {
+	if(column.widgetArgs){
 		kernel.deprecated("column.widgetArgs", "use column.editorArgs instead",
 			"dgrid 1.0");
 		column.editorArgs = column.widgetArgs;
 	}
 	
 	column.renderCell = editOn ? function(object, value, cell, options){
+		var grid = column.grid;
+		
 		// On first run, create one shared widget/input which will be swapped into
 		// the active cell.
 		if(!column.editorInstance){
 			column.editorInstance = createSharedEditor(column, originalRenderCell);
 		}
 		
-		if (!cleanupAdded && isWidget) {
+		if(!grid.edit){
+			grid.edit = edit; // add edit method on first render
+		}
+		
+		if(!cleanupAdded && isWidget){
 			cleanupAdded = true;
 			// clean up shared widget instance when the grid is destroyed
-			aspect.before(column.grid, "destroy", function(){
+			aspect.before(grid, "destroy", function(){
 				column.editorInstance.destroyRecursive();
 			});
 		}
@@ -297,46 +357,26 @@ return function(column, editor, editOn){
 		// which we already advocate in README for optimal use)
 		
 		// in IE<8, cell is the child of the td due to the extra padding node
-		on(cell.tagName == "TD" ? cell : cell.parentNode,
-				editOn, function(){
-			var cmp = column.editorInstance,
-				grid = column.grid,
-				field = column.field,
-				row, dirty, value;
-			
-			if(activeCell != this &&
-					(!column.canEdit || column.canEdit(object, value))){
-				activeCell = this;
-				
-				// retrieve latest value; if retrieving from row, run through column.get
-				row = grid.row(cell);
-				dirty = grid.dirty && grid.dirty[row.id];
-				value = (dirty && field in dirty) ? dirty[field] :
-					column.get ? column.get(row.data) : row.data[field];
-				showEditor(cmp, column, cell, value);
-				
-				// focus / blur-handler-resume logic is surrounded in a setTimeout
-				// to play nice with Keyboard's dgrid-cellfocusin as an editOn event
-				setTimeout(function(){
-					// focus the newly-placed control
-					cmp.focus && cmp.focus(); // supported by form widgets and HTML inputs
-					// resume blur handler once editor is focused
-					column._editorBlurHandle && column._editorBlurHandle.resume();
-				}, 0);
-			}
-		});
+		on(cell.tagName == "TD" ? cell : cell.parentNode, editOn,
+			function(){ grid.edit(this); });
+		
 		// initially render content in non-edit mode
 		return originalRenderCell(object, value, cell, options);
 	} : function(object, value, cell, options){
 		// always-on: create editor immediately upon rendering each cell
 		var grid = column.grid,
 			cmp = createEditor(column);
+		
+		if(!grid.edit){
+			grid.edit = edit; // add edit method on first render
+		}
+		
 		showEditor(cmp, column, cell, value);
 		
+		// Maintain reference for later use.
+		cell[isWidget ? "widget" : "input"] = cmp;
+		
 		if(isWidget){
-			// maintain reference for later cleanup
-			cell.widget = cmp;
-			
 			if(!cleanupAdded){
 				cleanupAdded = true;
 				
@@ -345,7 +385,7 @@ return function(column, editor, editOn){
 					// destroy our widget during the row removal operation
 					var cellElement = grid.cell(rowElement, column.id).element,
 						widget = (cellElement.contents || cellElement).widget;
-					widget && widget.destroyRecursive();
+					if(widget){ widget.destroyRecursive(); }
 				});
 			}
 		}

@@ -29,6 +29,8 @@
 		<script type="text/javascript" src="../../dojo/dojo.js"
 			data-dojo-config="async: true, isDebug: true"></script>
 		<script type="text/javascript">
+			var editFirst; // function defined within require callback
+			
 			require(["dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Keyboard", "dgrid/editor",
 					"dojo/_base/lang", "dojo/_base/declare", "dojo/on", "dojo/dom-construct",
 					"dojo/store/Memory", "dojo/store/Observable", "dojo/data/ObjectStore", "dojo/domReady!"],
@@ -217,7 +219,7 @@
 							i;
 						
 						for (i = 0; i < 100; i++){
-							data.push(lang.mixin(options.generate(), { id: i}));
+							data.push(lang.mixin(options.generate(), { id: i }));
 						}
 						
 						require(deps, function(ctor){
@@ -253,6 +255,11 @@
 					on(document.body, "dgrid-datachange", function(evt){
 						console.log(evt.cell.row.id, " data changed: ", evt.oldValue, " -> ", evt.value);
 					});
+					
+					editFirst = function() {
+						var grid = window.grid;
+						window.grid.edit(window.grid.cell(0, "editor"));
+					};
 				});
 		</script>
 	</head>
@@ -277,5 +284,6 @@
 		</form>
 		<button type="button" onclick="grid.save();">Save</button>
 		<button type="button" onclick="grid.revert();">Revert</button>
+		<button type="button" onclick="editFirst();">Edit first cell</button>
 	</body>
 </html>
