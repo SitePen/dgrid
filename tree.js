@@ -12,7 +12,7 @@ return function(column){
 		//		Renders a cell that can be expanded, creating more rows
 		
 		var grid = column.grid,
-			level = Number(options.query.level) + 1,
+			level = Number((options && options.query && options.query.level) || 0) + 1,
 			mayHaveChildren = !grid.store.mayHaveChildren || grid.store.mayHaveChildren(object),
 			dir = grid.isRTL ? "right" : "left",
 			expando = put("div.dgrid-expando-icon" + (mayHaveChildren ? ".ui-icon.ui-icon-triangle-1-e" : "") +
