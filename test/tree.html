@@ -2,9 +2,9 @@
 <html>
 	<head>
 		<title>Test Tree Grid</title>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-		<meta name="viewport" content="width=570" />
-		<style type="text/css">
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=570">
+		<style>
 			@import "../../dojo/resources/dojo.css";
 			@import "../css/skins/claro.css";
 			.dgrid {
@@ -25,12 +25,9 @@
 				margin: 10px;
 			}
 		</style>
-		<script>
-			var start= new Date().getTime();
-		</script>
-		<script type="text/javascript" src="../../dojo/dojo.js" 
+		<script src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
-		<script type="text/javascript">
+		<script>
 			require(["dojo/on", "dgrid/OnDemandGrid","dgrid/tree","dgrid/editor", "dgrid/Keyboard",
 					"dgrid/Selection", "dgrid/selector", "dgrid/ColumnSet",
 					"dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!"], 

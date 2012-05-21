@@ -1,30 +1,37 @@
-define(["dojo/_base/declare", "dojo/_base/Deferred", "dojo/query", "dojo/on", "dojo/aspect", "dojo/has!touch?./util/touch", "put-selector/put"],
-function(declare, Deferred, querySelector, on, aspect, touchUtil, put){
+define(["dojo/_base/declare", "dojo/_base/Deferred", "dojo/query", "dojo/on", "dojo/aspect", "./Grid", "dojo/has!touch?./util/touch", "put-selector/put"],
+function(declare, Deferred, querySelector, on, aspect, Grid, touchUtil, put){
 
 return function(column){
 	// summary:
-	//      Add a editing capability
-	var originalRenderCell = column.renderCell || function(object, value, td){
-		if(value != null){
-			put(td, "span.dgrid-expando-text", value);
-		}
-	};
+	//		Adds tree navigation capability to a column.
+	
+	var originalRenderCell = column.renderCell || Grid.defaultRenderCell;
+	
 	column.renderCell = function(object, value, td, options){
 		// summary:
 		//		Renders a cell that can be expanded, creating more rows
-		var level = Number(options.query.level) + 1;
-		level = isNaN(level) ? 0 : level;
-		var grid = this.grid;
-		var transitionEventSupported;
-		var mayHaveChildren = !grid.store.mayHaveChildren || grid.store.mayHaveChildren(object);
-		// create the expando
-		var dir = grid.isRTL ? "right" : "left";
-		var expando = put(td, "div.dgrid-expando-icon" + (mayHaveChildren ? ".ui-icon.ui-icon-triangle-1-e" : "") +
-			"[style=margin-" + dir + ": " + (level * 19) + "px; float: " + dir + "]");
+		
+		var grid = column.grid,
+			level = Number(options.query.level) + 1,
+			mayHaveChildren = !grid.store.mayHaveChildren || grid.store.mayHaveChildren(object),
+			dir = grid.isRTL ? "right" : "left",
+			expando = put("div.dgrid-expando-icon" + (mayHaveChildren ? ".ui-icon.ui-icon-triangle-1-e" : "") +
+				"[style=margin-" + dir + ": " + (level * 19) + "px; float: " + dir + "]"),
+			node, transitionEventSupported;
+		
 		expando.innerHTML = "&nbsp;"; // for opera to space things properly
-		originalRenderCell.call(this, object, value, td, options);
+		level = isNaN(level) ? 0 : level;
 		expando.level = level;
 		expando.mayHaveChildren = mayHaveChildren;
+		
+		node = originalRenderCell.call(column, object, value, td, options);
+		if(node && node.nodeType){
+			put(td, expando);
+			put(td, node);
+		}else{
+			td.insertBefore(expando, td.firstChild);
+		}
+		
 		var tr, query;
 		
 		if(!grid.expand){
@@ -65,16 +72,27 @@ return function(column){
 			};
 			
 			grid.expand = function(target, expand){
+				// summary:
+				//		Expands the row corresponding to the given target.
+				// target: Object
+				//		Row object (or something resolvable to one) to expand/collapse.
+				// expand: Boolean?
+				//		If specified, designates whether to expand or collapse the row;
+				//		if unspecified, toggles the current state.
+				
+				var row = target.element ? target : grid.row(target);
+				
 				target = target.element || target; // if a row object was passed in, get the element first 
 				target = target.className.indexOf("dgrid-expando-icon") > -1 ? target :
 					querySelector(".dgrid-expando-icon", target)[0];
-				if(target.mayHaveChildren){
-					// on click we toggle expanding and collapsing
+				
+				if(target && target.mayHaveChildren){
+					// toggle or set expand/collapsed state based on optional 2nd argument
 					var expanded = target.expanded = expand === undefined ? !target.expanded : expand;
+					
 					// update the expando display
 					target.className = "dgrid-expando-icon ui-icon ui-icon-triangle-1-" + (expanded ? "se" : "e"); 
 					var preloadNode = target.preloadNode,
-						row = grid.row(target),
 						rowElement = row.element,
 						container;
 					if(!preloadNode){
@@ -96,6 +114,7 @@ return function(column){
 										container.style.height = container.scrollHeight + "px";
 									});
 						var transitionend = function(event){
+							// NOTE: this == container
 							var height = this.style.height;
 							if(height){
 								// after expansion, ensure display is correct, and we set it to none for hidden containers to improve performance
@@ -156,8 +175,8 @@ return function(column){
 						}
 					}
 				}
-			};
-		}
+			}; // end function grid.expand
+		} // end if (!grid.expand)
 	};
 	return column;
 };

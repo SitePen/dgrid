@@ -361,7 +361,7 @@ return function(column, editor, editOn){
 			function(){ grid.edit(this); });
 		
 		// initially render content in non-edit mode
-		return originalRenderCell(object, value, cell, options);
+		return originalRenderCell.call(column, object, value, cell, options);
 	} : function(object, value, cell, options){
 		// always-on: create editor immediately upon rendering each cell
 		var grid = column.grid,
