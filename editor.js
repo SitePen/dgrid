@@ -322,7 +322,7 @@ return function(column, editor, editOn){
 	//		Adds editing capability to a column's cells.
 	
 	var originalRenderCell = column.renderCell || Grid.defaultRenderCell,
-		isWidget, ran;
+		isWidget;
 	
 	// accept arguments as parameters to editor function, or from column def,
 	// but normalize to column def.
@@ -338,24 +338,35 @@ return function(column, editor, editOn){
 		column.editorArgs = column.widgetArgs;
 	}
 	
-	column.renderCell = editOn ? function(object, value, cell, options){
+	aspect.after(column, "init", editOn ? function(){
 		var grid = column.grid;
+		if(!grid.edit){ grid.edit = edit; }
 		
-		if(!ran){ // first-run logic
-			// Create one shared widget/input to be swapped into the active cell.
-			column.editorInstance = createSharedEditor(column, originalRenderCell);
-			// Add the edit method to the grid instance.
-			grid.edit = edit;
-			
-			if(isWidget){
-				// Clean up shared widget instance when the grid is destroyed.
-				aspect.before(grid, "destroy", function(){
-					column.editorInstance.destroyRecursive();
-				});
-			}
-			ran = true;
+		// Create one shared widget/input to be swapped into the active cell.
+		column.editorInstance = createSharedEditor(column, originalRenderCell);
+		
+		if(isWidget){
+			// Clean up shared widget instance when the grid is destroyed.
+			aspect.before(grid, "destroy", function(){
+				column.editorInstance.destroyRecursive();
+			});
 		}
+	} : function(){
+		var grid = column.grid;
+		if(!grid.edit){ grid.edit = edit; }
 		
+		if(isWidget){
+			// add advice for cleaning up widgets in this column
+			aspect.before(grid, "removeRow", function(rowElement){
+				// destroy our widget during the row removal operation
+				var cellElement = grid.cell(rowElement, column.id).element,
+					widget = (cellElement.contents || cellElement).widget;
+				if(widget){ widget.destroyRecursive(); }
+			});
+		}
+	});
+	
+	column.renderCell = editOn ? function(object, value, cell, options){
 		// TODO: Consider using event delegation
 		// (Would require using dgrid's focus events for activating on focus,
 		// which we already advocate in README for optimal use)
@@ -364,39 +375,21 @@ return function(column, editor, editOn){
 			// in IE<8, cell is the child of the td due to the extra padding node
 			on(cell.tagName == "TD" ? cell : cell.parentNode, editOn, function(){
 				activeOptions = options;
-				grid.edit(this);
+				column.grid.edit(this);
 			});
 		}
 		
 		// initially render content in non-edit mode
 		return originalRenderCell.call(column, object, value, cell, options);
+		
 	} : function(object, value, cell, options){
 		// always-on: create editor immediately upon rendering each cell
-		var grid = column.grid,
-			cmp = createEditor(column);
-		
-		if(!grid.edit){
-			grid.edit = edit; // add edit method on first render
-		}
+		var cmp = createEditor(column);
 		
 		showEditor(cmp, column, cell, value);
 		
 		// Maintain reference for later use.
 		cell[isWidget ? "widget" : "input"] = cmp;
-		
-		if(isWidget){
-			if(!cleanupAdded){
-				cleanupAdded = true;
-				
-				// add advice for cleaning up widgets in this column
-				aspect.before(grid, "removeRow", function(rowElement){
-					// destroy our widget during the row removal operation
-					var cellElement = grid.cell(rowElement, column.id).element,
-						widget = (cellElement.contents || cellElement).widget;
-					if(widget){ widget.destroyRecursive(); }
-				});
-			}
-		}
 	};
 	
 	return column;
