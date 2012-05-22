@@ -9,11 +9,26 @@ return function(column){
 			put(td, "span.dgrid-expando-text", value);
 		}
 	};
+	
+	// Variable to track item level on last renderCell call(s)
+	// (for transferring information between renderCell and aspected insertRow).
+	var currentLevel;
+	
+	column.shouldExpand = column.shouldExpand || function(row, level, previouslyExpanded){
+		// summary:
+		//		Function called after each row is inserted to determine whether
+		//		expand(rowElement, true) should be automatically called.
+		//		The default implementation re-expands any rows that were expanded
+		//		the last time they were rendered (if applicable).
+		
+		return previouslyExpanded;
+	};
+	
 	column.renderCell = function(object, value, td, options){
 		// summary:
 		//		Renders a cell that can be expanded, creating more rows
 		var level = Number(options.query.level) + 1;
-		level = isNaN(level) ? 0 : level;
+		level = currentLevel = isNaN(level) ? 0 : level;
 		var grid = this.grid;
 		var transitionEventSupported;
 		var mayHaveChildren = !grid.store.mayHaveChildren || grid.store.mayHaveChildren(object);
@@ -43,7 +58,29 @@ return function(column){
 					function(){ grid.expand(this); });
 			}
 			
+			grid._expanded = {}; // Stores IDs of expanded rows
+			
+			// FIXME: this code is currently a bit obtuse, due to the fact that we
+			// can't aspect something on insertRow within renderCell and have it
+			// apply to the first insertRow call (which this aspect is added within).
+			// This could be simplified e.g. by adding a dedicated optional `init`
+			// method to column definitions (to be added by column plugins).
+			function autoExpandHandler(rowElement){
+				// Auto-expand (expandIf) considerations
+				var row = this.row(rowElement),
+					expanded = column.shouldExpand(row, currentLevel, this._expanded[row.id]);
+				
+				if(expanded){ this.expand(rowElement, true); }
+				return rowElement; // pass return value through
+			}
+			aspect.after(grid, "insertRow", autoExpandHandler);
+			// ensure handler runs on first rendered row
+			setTimeout(function() {
+				autoExpandHandler.call(grid, grid.row(td));
+			}, 0);
+			
 			aspect.before(grid, "removeRow", function(rowElement, justCleanup){
+				// Extra cleanup considerations
 				var connected = rowElement.connected;
 				if(connected){
 					// if it has a connected expando node, we process the children
@@ -56,6 +93,7 @@ return function(column){
 					}
 				}
 			});
+			
 			grid._calcRowHeight = function(rowElement){
 				// we override this method so we can provide row height measurements that
 				// include the children of a row
@@ -71,6 +109,7 @@ return function(column){
 				if(target.mayHaveChildren){
 					// on click we toggle expanding and collapsing
 					var expanded = target.expanded = expand === undefined ? !target.expanded : expand;
+					
 					// update the expando display
 					target.className = "dgrid-expando-icon ui-icon ui-icon-triangle-1-" + (expanded ? "se" : "e"); 
 					var preloadNode = target.preloadNode,
@@ -154,6 +193,13 @@ return function(column){
 								containerStyle.height = (expanded ? scrollHeight : 0) + "px";
 							});
 						}
+					}
+					
+					// Update _expanded map
+					if(expanded){
+						this._expanded[row.id] = true;
+					}else{
+						delete this._expanded[row.id];
 					}
 				}
 			};
