@@ -39,7 +39,8 @@ define(["dojo/_base/declare", "dojo/has", "dojo/on", "dojo/query", "dojo/dom", "
 			var grid = this,
 				hiderMenuNode = this.hiderMenuNode,
 				hiderToggleNode = this.hiderToggleNode,
-				id, col, div, checkId;
+				subRowsLength = this.subRows.length,
+				i, j, len, id, col, div, checkId;
 			
 			this.inherited(arguments);
 			
@@ -63,7 +64,7 @@ define(["dojo/_base/declare", "dojo/has", "dojo/on", "dojo/query", "dojo/dom", "
 				
 				// hook up delegated listener for modifications to checkboxes
 				this._listeners.push(listen(hiderMenuNode,
-					".dgrid-hider-menu-check:" + (has("ie") < 9 ? "click" : "change"),
+						".dgrid-hider-menu-check:" + (has("ie") < 9 ? "click" : "change"),
 					function(e){
 						grid._toggleColumnState(e);
 					}
@@ -94,27 +95,30 @@ define(["dojo/_base/declare", "dojo/has", "dojo/on", "dojo/query", "dojo/dom", "
 			this._columnStyleRules = {};
 
 			// populate menu with checkboxes/labels based on current columns
-			for(id in this.columns){
-				col = this.columns[id];
-				// allow cols to opt out of the hider (specifically for selector col)
-				if (col.unhidable) continue;
-				
-				// create the HTML for each column selector.
-				div = put(hiderMenuNode, "div.dgrid-hider-menu-row");
-				checkId = grid.domNode.id + "-hider-menu-check-" + id;
-				// create label and checkbox via innerHTML to make old IEs behave
-				div.innerHTML = '<input type="checkbox" id="' + checkId +
-					'" class="dgrid-hider-menu-check hider-menu-check-' + id +
-					'"><label class="dgrid-hider-menu-label hider-menu-label-' + id +
-					'" for="' + checkId + '">' + col.label.replace(/</g, "&lt;") +
-					'</label>';
-				
-				if(col.hidden){
-					// hidden state is true; hide the column
-					this._columnStyleRules[id] = grid.styleColumn(id, "display: none");
-				}else{
-					// hidden state is false; checkbox should be initially checked
-					div.firstChild.checked = true;
+			for(i = 0; i < subRowsLength; i++){
+				for(j = 0, len = this.subRows[i].length; j < len; j++){
+					col = this.subRows[i][j];
+					id = col.id;
+					// allow cols to opt out of the hider (specifically for selector col)
+					if (col.unhidable) continue;
+					
+					// create the HTML for each column selector.
+					div = put(hiderMenuNode, "div.dgrid-hider-menu-row");
+					checkId = this.domNode.id + "-hider-menu-check-" + id;
+					// create label and checkbox via innerHTML to make old IEs behave
+					div.innerHTML = '<input type="checkbox" id="' + checkId +
+						'" class="dgrid-hider-menu-check hider-menu-check-' + id +
+						'"><label class="dgrid-hider-menu-label hider-menu-label-' + id +
+						'" for="' + checkId + '">' + col.label.replace(/</g, "&lt;") +
+						'</label>';
+					
+					if(col.hidden){
+						// hidden state is true; hide the column
+						this._columnStyleRules[id] = this.styleColumn(id, "display: none");
+					}else{
+						// hidden state is false; checkbox should be initially checked
+						div.firstChild.checked = true;
+					}
 				}
 			}
 		},

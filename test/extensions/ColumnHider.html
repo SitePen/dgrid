@@ -45,12 +45,12 @@
 						col5: "Column 5"
 					};
 					columns1 = lang.clone(columns);
-					columns2 = {
-						col2: "Col2",
-						col4: {label: "Col4", sortable: false},
-						col1: "Col1",
-						col5: "Column 5"
-					};
+					columns2 = [
+						{ field: "col2", label: "Col2" },
+						{ field: "col4", label: "Col4", sortable: false },
+						{ field: "col1", label: "Col1" },
+						{ field: "col5", label: "Column 5" }
+					];
 					
 					window.grid = new (declare([Grid, Selection, ColumnHider]))({
 						store: testStore,
