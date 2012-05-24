@@ -14,7 +14,9 @@ return function(column){
 		//		Renders a cell that can be expanded, creating more rows
 		var level = Number(options.query.level) + 1;
 		level = isNaN(level) ? 0 : level;
-		var grid = this.grid;
+      // 'this' might not be the column object, if this is called from editor's renderCell function, so
+      // in which case use column's grid member
+		var grid = this.grid || column.grid;
 		var transitionEventSupported;
 		var mayHaveChildren = !grid.store.mayHaveChildren || grid.store.mayHaveChildren(object);
 		// create the expando
