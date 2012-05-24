@@ -7,8 +7,9 @@ define([
 	"dojo/has",
 	"./Grid",
 	"put-selector/put",
-	"dojo/_base/sniff"
-], function(kernel, lang, Deferred, on, aspect, has, Grid, put){
+    "dojo/query",
+	"dojo/_base/sniff",
+], function(kernel, lang, Deferred, on, aspect, has, Grid, put, query){
 
 var activeCell, activeValue; // tracks cell currently being edited, and its value
 
@@ -351,17 +352,27 @@ return function(column, editor, editOn){
 				column.editorInstance.destroyRecursive();
 			});
 		}
-		
-		// TODO: Consider using event delegation
-		// (Would require using dgrid's focus events for activating on focus,
-		// which we already advocate in README for optimal use)
-		
-		// in IE<8, cell is the child of the td due to the extra padding node
-		on(cell.tagName == "TD" ? cell : cell.parentNode, editOn,
-			function(){ grid.edit(this); });
-		
-		// initially render content in non-edit mode
-		return originalRenderCell(object, value, cell, options);
+
+        // initially render content in non-edit mode
+        var nonEditNode = originalRenderCell(object, value, cell, options);
+        
+        if (!column._evtHandlerAdded) {
+            var colSelector = ".dgrid-content .dgrid-column-" + column.id;
+            // Does the editor wrap a tree? If so, get the content node
+            var treeExpandoClass = ".dgrid-expando-text";
+            var nl = query(treeExpandoClass, cell);
+            if (nl.length > 0) {
+                // TODO: This doesn't work with event dgrid-cellfocusin so event
+                // click needs to be used when you wrap a tree within an editor
+                colSelector += " " + treeExpandoClass;
+		    }
+            var eventType = colSelector + ":" + editOn;
+            grid.on(eventType, function(evt) {
+                grid.edit(this);
+            });
+            column._evtHandlerAdded = true;
+        };
+        return nonEditNode;
 	} : function(object, value, cell, options){
 		// always-on: create editor immediately upon rendering each cell
 		var grid = column.grid,
