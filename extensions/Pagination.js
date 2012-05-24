@@ -151,23 +151,22 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 				}
 			}
 			
-			// Remove the old handler if it has been created.
 			if(pagingTextBoxHandle){ pagingTextBoxHandle.remove(); }
 			linksNode.innerHTML = "";
 			query(".dgrid-first, .dgrid-previous", paginationNavigationNode).forEach(function(link){
 				put(link, (currentPage == 1 ? "." : "!") + "dgrid-page-disabled");
 			});
 			query(".dgrid-last, .dgrid-next", paginationNavigationNode).forEach(function(link){
-				put(link, (currentPage == end ? "." : "!") + "dgrid-page-disabled");
+				put(link, (currentPage >= end ? "." : "!") + "dgrid-page-disabled");
 			});
 			
-			if(pagingLinks){
+			if(pagingLinks && end > 0){
 				// always include the first page (back to the beginning)
 				pageLink(1);
 				var start = currentPage - pagingLinks;
 				if(start > 2) {
 					// visual indication of skipped page links
-					put(linksNode, 'span.dgrid-page-skip', '...');
+					put(linksNode, "span.dgrid-page-skip", "...");
 				}else{
 					start = 2;
 				}
@@ -176,12 +175,12 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 					pageLink(i);
 				}
 				if(currentPage + pagingLinks + 1 < end){
-					put(linksNode, 'span.dgrid-page-skip', '...');
+					put(linksNode, "span.dgrid-page-skip", "...");
 				}
 				// last link
 				pageLink(end);
 			}else if(grid.pagingTextBox){
-				// the pageLink will create our textbox for us
+				// The pageLink function is also used to create the paging textbox.
 				pageLink(currentPage);
 			}
 		},
@@ -237,7 +236,7 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 					Deferred.when(results.total, function(total){
 						// update status text based on now-current page and total
 						grid.paginationStatusNode.innerHTML = string.substitute(i18n.status, {
-							start: start + 1,
+							start: Math.min(start + 1, total),
 							end: Math.min(total, start + count),
 							total: total
 						});
