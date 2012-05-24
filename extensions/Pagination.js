@@ -11,21 +11,21 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 		rowsPerPage: 10,
 		
 		// pagingTextBox: Boolean
-		// 		Indicates whether or not to show a textbox for paging.
+		//		Indicates whether or not to show a textbox for paging.
 		pagingTextBox: false,
 		// previousNextArrows: Boolean
-		// 		Indicates whether or not to show the previous and next arrow links.
+		//		Indicates whether or not to show the previous and next arrow links.
 		previousNextArrows: true,
 		// firstLastArrows: Boolean
-		// 		Indicates whether or not to show the first and last arrow links.
+		//		Indicates whether or not to show the first and last arrow links.
 		firstLastArrows: false,
 		
 		// pagingLinks: Number
-		// 		The number of page links to show on each side of the current page
+		//		The number of page links to show on each side of the current page
 		//		Set to 0 (or false) to disable page links.
 		pagingLinks: 2,
 		// pageSizeOptions: Array[Number]
-		// 		This provides options for different page sizes in a drop-down.
+		//		This provides options for different page sizes in a drop-down.
 		//		If it is empty (default), no page size drop-down will be displayed.
 		pageSizeOptions: [],
 		
@@ -44,9 +44,11 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 				statusNode = this.paginationStatusNode =
 					put(paginationNode, "div.dgrid-status"),
 				pageSizeOptions = this.pageSizeOptions;
+			
 			if(pageSizeOptions.length){
-				var sizeSelect = put(paginationNode, 'select.dgrid-page-size');
-				for(var i = 0; i < pageSizeOptions.length; i++){
+				var sizeSelect = put(paginationNode, 'select.dgrid-page-size'),
+					i;
+				for(i = 0; i < pageSizeOptions.length; i++){
 					put(sizeSelect, 'option', pageSizeOptions[i], {value: pageSizeOptions[i]});
 				}
 				on(sizeSelect, "change", function(){
@@ -61,33 +63,31 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 				{ start: 1, end: 1, total: 0 });
 			
 			var navigationNode = this.paginationNavigationNode =
-					put(paginationNode, "div.dgrid-navigation");
-
-			var navigationNode = this.paginationNavigationNode,
+					put(paginationNode, "div.dgrid-navigation"),
 				currentPage = this._currentPage,
 				previousNextLinks = this.previousNextLinks,
 				pagingLinks = this.pagingLinks,
 				end = this._total / this.rowsPerPage,
 				pagingTextBoxHandle = this._pagingTextBoxHandle;
+			
 			if(this.firstLastArrows){
 				// create a first-page link
-				put(navigationNode,  'a[href=javascript:].dgrid-first', '«');
+				put(navigationNode,  "a[href=javascript:].dgrid-first", "«");
 			}
 			if(this.previousNextArrows){
 				// create a previous link
-				put(navigationNode,  'a[href=javascript:].dgrid-previous', '‹');
+				put(navigationNode,  "a[href=javascript:].dgrid-previous", "‹");
 			}
-			var grid = this;
+			
 			this.paginationLinksNode = put(navigationNode, "span.dgrid-pagination-links");
 			if(this.previousNextArrows){
 				// create a next link
-				put(navigationNode, 'a[href=javascript:].dgrid-next', '›');	
+				put(navigationNode, "a[href=javascript:].dgrid-next", "›");	
 			}
 			if(this.firstLastArrows){
 				// create a last-page link
-				put(navigationNode,  'a[href=javascript:].dgrid-last', '»');
+				put(navigationNode,  "a[href=javascript:].dgrid-last", "»");
 			}
-			
 			
 			on(navigationNode, "a:click", function(evt){
 				var cls = this.className,
@@ -151,7 +151,8 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 				}
 			}
 			
-			pagingTextBoxHandle && pagingTextBoxHandle.remove(); // remove the old handler if it has been created
+			// Remove the old handler if it has been created.
+			if(pagingTextBoxHandle){ pagingTextBoxHandle.remove(); }
 			linksNode.innerHTML = "";
 			query(".dgrid-first, .dgrid-previous", paginationNavigationNode).forEach(function(link){
 				put(link, (currentPage == 1 ? "." : "!") + "dgrid-page-disabled");
