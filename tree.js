@@ -12,7 +12,7 @@ return function(column){
 	column.renderCell = function(object, value, td, options){
 		// summary:
 		//		Renders a cell that can be expanded, creating more rows
-		var level = Number(options.query.level) + 1;
+		var level = options ? Number(options.query.level) + 1 : 0;
 		level = isNaN(level) ? 0 : level;
       // 'this' might not be the column object, if this is called from editor's renderCell function, so
       // in which case use column's grid member
