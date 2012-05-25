@@ -193,7 +193,9 @@ function createSharedEditor(column, originalRenderCell){
 		
 		// pass new value to original renderCell implementation for this cell
 		Grid.appendIfNode(parentNode, originalRenderCell(
-			column.grid.row(parentNode).data, activeValue, parentNode));
+			column.grid.row(parentNode).data, activeValue, parentNode,
+            cmp._optionsForCell));
+        delete cmp._optionsForCell;
 		
 		// reset state now that editor is deactivated
 		activeCell = activeValue = null;
@@ -255,12 +257,14 @@ function showEditor(cmp, column, cell, value){
 	if(activeCell){ activeValue = value; }
 }
 
-function edit(cell) {
+function edit(cell, options) {
 	// summary:
 	//		Method to be mixed into grid instances, which will show/focus the
 	//		editor for a given grid cell.  Also used by renderCell.
 	// cell: Object
 	//		Cell (or something resolvable by grid.cell) to activate editor on.
+    // options: Object (optional)
+    //      options used to render original cell
 	// returns:
 	//		If the cell is editable, returns a promise resolving to the editor
 	//		input/widget when the cell editor is focused.
@@ -281,7 +285,11 @@ function edit(cell) {
 			dirty = this.dirty && this.dirty[row.id];
 			value = (dirty && field in dirty) ? dirty[field] :
 				column.get ? column.get(row.data) : row.data[field];
-			
+
+            // Smuggle in options so that onblur() above (which is within createSharedEditor())
+            // can use the correct options when calling originalRenderCell(). This is needed
+            // if editor wraps a tree plugin.
+            cmp._optionsForCell = options;
 			showEditor(column.editorInstance, column, cellElement, value);
 			
 			// focus / blur-handler-resume logic is surrounded in a setTimeout
@@ -335,6 +343,10 @@ return function(column, editor, editOn){
 	column.renderCell = editOn ? function(object, value, cell, options){
 		var grid = column.grid;
 		
+        if (!(grid.store && grid.store.getIdentity)) {
+            throw new Error("Editor currently only works for store-backed grids");
+        }
+
 		// On first run, create one shared widget/input which will be swapped into
 		// the active cell.
 		if(!column.editorInstance){
@@ -355,23 +367,22 @@ return function(column, editor, editOn){
 
         // initially render content in non-edit mode
         var nonEditNode = originalRenderCell(object, value, cell, options);
-        
-        if (!column._evtHandlerAdded) {
-            var colSelector = ".dgrid-content .dgrid-column-" + column.id;
-            // Does the editor wrap a tree? If so, get the content node
-            var treeExpandoClass = ".dgrid-expando-text";
-            var nl = query(treeExpandoClass, cell);
-            if (nl.length > 0) {
-                // TODO: This doesn't work with event dgrid-cellfocusin so event
-                // click needs to be used when you wrap a tree within an editor
-                colSelector += " " + treeExpandoClass;
-		    }
-            var eventType = colSelector + ":" + editOn;
-            grid.on(eventType, function(evt) {
-                grid.edit(this);
-            });
-            column._evtHandlerAdded = true;
-        };
+
+        // Use grid.on to target exact element for event handling
+        var rowSel = ".dgrid-row#" + grid._rowIdForObject(object);
+        var colSelector = ".dgrid-content " + rowSel + " .dgrid-column-" + column.id;
+        // Does the editor wrap a tree? If so, get the content node
+        var treeExpandoClass = ".dgrid-expando-text";
+        var nl = query(treeExpandoClass, cell);
+        if (nl.length > 0) {
+            // TODO: This doesn't work with event dgrid-cellfocusin so event
+            // click needs to be used when you wrap a tree within an editor
+            colSelector += " " + treeExpandoClass;
+		}
+        var eventType = colSelector + ":" + editOn;
+        grid.on(eventType, function(evt) {
+            grid.edit(this, options);
+        });
         return nonEditNode;
 	} : function(object, value, cell, options){
 		// always-on: create editor immediately upon rendering each cell

@@ -462,6 +462,17 @@ function(arrayUtil, kernel, declare, listen, aspect, has, miscUtil, TouchScroll,
 		renderHeader: function(){
 			// no-op in a plain list
 		},
+        _rowIdForObject: function(object) {
+			// summary:
+			//      Returns the row dom id for the row that represents passed object
+            // description:
+            //      Useful to code which needs row ID before row has finished
+            //      being created (see editor for example).
+            //
+            //      A side-effect of calling this function is that this._autoId
+            //      will be incremented if this List doesn't use a store
+            return this.id + "-row-" + ((this.store && this.store.getIdentity) ? this.store.getIdentity(object) : this._autoId++);
+        },
 		insertRow: function(object, parent, beforeNode, i, options){
 			// summary:
 			//		Renders a single row in the grid
