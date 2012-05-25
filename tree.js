@@ -167,6 +167,13 @@ return function(column){
 						});
 					}
 				}
+				
+				// Update _expanded map.
+				if(expanded){
+					this._expanded[row.id] = true;
+				}else{
+					delete this._expanded[row.id];
+				}
 			}
 		};
 	});
