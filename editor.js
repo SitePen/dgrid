@@ -190,6 +190,9 @@ function createSharedEditor(column, originalRenderCell){
 		// remove the editor from the cell
 		parentNode.removeChild(node);
 		
+		// remove the special css attribute for cell with editor
+		put(parentNode, '!dgrid-cell-inedit');
+		
 		// pass new value to original renderCell implementation for this cell
 		Grid.appendIfNode(parentNode, originalRenderCell(
 			column.grid.row(parentNode).data, activeValue, parentNode));
@@ -197,6 +200,12 @@ function createSharedEditor(column, originalRenderCell){
 		// reset state now that editor is deactivated
 		activeCell = activeValue = null;
 		column._editorBlurHandle.pause();
+		
+		// after editing is focus lost somewhere outside of the cell
+		// and its not possible to continue with navigation by keys
+		setTimeout(function(){
+			try{ parentNode.focus(); }catch(e){/** no exception here */}
+		},1);
 	}
 	
 	function dismissOnKey(evt){
@@ -235,6 +244,8 @@ function showEditor(cmp, column, cell, value){
 	if(!isWidget){ updateInputValue(cmp, value); }
 	
 	cell.innerHTML = "";
+	//special css attribute for cell with editor
+	put(cell, '.dgrid-cell-inedit');
 	put(cell, cmp.domNode || cmp);
 	
 	if(isWidget){
