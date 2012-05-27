@@ -169,7 +169,7 @@ return declare([List, _StoreMixin], {
 		var grid = this,
 			scrollNode = grid.bodyNode,
 			transform = grid.contentNode.style.webkitTransform,
-			visibleTop = event.pseudoTouch ? scrollNode.instantScrollTop : scrollNode.scrollTop,
+			visibleTop = event && event.pseudoTouch ? scrollNode.instantScrollTop : scrollNode.scrollTop,
 			visibleBottom = scrollNode.offsetHeight + visibleTop,
 			priorPreload, preloadNode, preload = grid.preload,
 			lastScrollTop = grid.lastScrollTop,
