@@ -249,6 +249,10 @@ function showEditor(cmp, column, cell, value){
 		// (Clear flag on a timeout to wait for delayed onChange to fire first)
 		cmp._dgridIgnoreChange = true;
 		cmp.set("value", value);
+        if (column.onEdit) {
+            var obj = grid.cell(cell).row.data;
+            column.onEdit(obj, cmp);
+        }
 		setTimeout(function(){ cmp._dgridIgnoreChange = false; }, 0);
 	}
 	// track previous value for short-circuiting or in case we need to revert
