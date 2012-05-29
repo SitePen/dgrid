@@ -390,18 +390,16 @@ return function(column, editor, editOn){
         return nonEditNode;
 	} : function(object, value, cell, options){
 		// always-on: create editor immediately upon rendering each cell
-		var grid = column.grid,
-			cmp = createEditor(column);
-		
+		var grid = column.grid;
 		if(!grid.edit){
 			grid.edit = edit; // add edit method on first render
 		}
-		
-		showEditor(cmp, column, cell, value);
-		
-		// Maintain reference for later use.
-		cell[isWidget ? "widget" : "input"] = cmp;
-		
+		if (!column.canEdit || column.canEdit(object, value)) {
+		    var cmp = createEditor(column);
+		    showEditor(cmp, column, cell, value);
+		    // Maintain reference for later use.
+		    cell[isWidget ? "widget" : "input"] = cmp;
+        }
 		if(isWidget){
 			if(!cleanupAdded){
 				cleanupAdded = true;
