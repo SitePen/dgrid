@@ -1,13 +1,10 @@
-define(["dojo/_base/declare","dijit/registry"],
+define(["dojo/_base/declare", "dijit/registry"],
 function(declare, registry){
-/*
- *	Dijit registry extension for dgrid
- */
 	return declare([], {
 		// summary:
-		//		A dgrid extension which will add the grid to the dijit registry
+		//		A dgrid extension which will add the grid to the dijit registry,
 		//		so that startup() will be successfully called by dijit layout widgets
-		//		with dgrid children via registry.add(this).
+		//		with dgrid children.
 		
 		buildRendering: function(){
 			registry.add(this);
@@ -20,9 +17,10 @@ function(declare, registry){
 			if(this._started){ return; }
 			this.inherited(arguments);
 			
-			// if parent is a widget, assume it will handle resize events, and
-			// remove the window resize listener added by List
-			if(registry.getEnclosingWidget(this.domNode.parentNode)){
+			var widget = registry.getEnclosingWidget(this.domNode.parentNode);
+			// If we have a parent layout container widget, it will handle resize,
+			// so remove the window resize listener added by List.
+			if(widget && widget.isLayoutContainer){
 				this._resizeHandle.remove();
 			}
 		},
