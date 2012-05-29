@@ -93,7 +93,8 @@ return function(column){
 								}) :
 								grid.renderArray(query({}), preloadNode),
 									function(){
-										container.style.height = container.scrollHeight + "px";
+										var scrollHeight = container.scrollHeight;
+										container.style.height = scrollHeight ? scrollHeight + "px" : "auto";
 									});
 						var transitionend = function(event){
 							var height = this.style.height;
