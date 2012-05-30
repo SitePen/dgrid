@@ -33,8 +33,8 @@
 		<script type="text/javascript">
 			require(["dojo/on", "dgrid/OnDemandGrid","dgrid/tree","dgrid/editor", "dgrid/Keyboard",
 					"dgrid/Selection", "dgrid/selector", "dgrid/ColumnSet",
-					"dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!"], 
-				function(on, Grid, tree, editor, Keyboard, Selection, selector, ColumnSet, declare, testStore){
+					"dojo/_base/declare", "dgrid/test/data/base", "dgrid/test/data/NestedFilter", "dojo/domReady!"], 
+				function(on, Grid, tree, editor, Keyboard, Selection, selector, ColumnSet, declare, testStore, NestedFilter){
 					var count = 0; // for incrementing edits from button under 1st grid
 					
 					function nbspFormatter(value){
@@ -87,8 +87,8 @@
 					});
 					
 					window.treeSelector = new StandardGrid({
-						store: testCountryStore,
-						query: {type: "continent"},
+						store: new NestedFilter(testCountryStore),
+						query: {},
 						selectionMode: "none",
 						allowSelectAll: true,
 						columns: [
@@ -99,6 +99,9 @@
 							{label:"Timezone", field:"timezone"}
 						]
 					}, "treeSelector");
+					on(document.getElementById("doFilter"), "click", function(){
+						treeSelector.setQuery({name:new RegExp("^" + document.getElementById("filter").value + ".*")});
+					});
 					
 					window.treeSubRows = new StandardGrid({
 						store: testCountryStore,
@@ -142,6 +145,7 @@
 		<button id="move-rome-na">Move Rome to North America</button>
 		
 		<h2>Tree grid with checkbox selector to test select-all on children</h2>
+		<input type="text" id="filter" /><button id="doFilter">Filter</button>
 		<div id="treeSelector"></div>
 		<h2>Tree grid with subRows</h2>
 		<div id="treeSubRows"></div>

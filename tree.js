@@ -94,10 +94,11 @@ return function(column){
 								grid.renderArray(query({}), preloadNode),
 									function(){
 										container.style.height = container.scrollHeight + "px";
+										container._loaded = true;
 									});
 						var transitionend = function(event){
 							var height = this.style.height;
-							if(height){
+							if(height && this._loaded){
 								// after expansion, ensure display is correct, and we set it to none for hidden containers to improve performance
 								this.style.display = height == "0px" ? "none" : "block";
 							}
