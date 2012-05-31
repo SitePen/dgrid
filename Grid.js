@@ -196,7 +196,7 @@ function(kernel, declare, listen, has, put, List){
 				}else if(column.label || column.field){
 					contentNode.appendChild(document.createTextNode(column.label || column.field));
 				}
-				if(column.sortable !== false){
+				if(column.sortable !== false && field && field != "_item"){
 					th.sortable = true;
 					th.className += " dgrid-sortable";
 				}
