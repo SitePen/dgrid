@@ -1,5 +1,5 @@
-define(["dojo/_base/array","dojo/_base/kernel", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/has", "./util/misc", "dojo/has!touch?./TouchScroll", "xstyle/has-class", "put-selector/put", "dojo/_base/sniff", "xstyle/css!./css/dgrid.css"], 
-function(arrayUtil, kernel, declare, listen, aspect, has, miscUtil, TouchScroll, hasClass, put){
+define(["dojo/_base/array","dojo/_base/kernel", "dojo/_base/declare", "dojo/on", "dojo/_base/lang", "dojo/aspect", "dojo/has", "./util/misc", "dojo/has!touch?./TouchScroll", "xstyle/has-class", "put-selector/put", "dojo/_base/sniff", "xstyle/css!./css/dgrid.css"], 
+function(arrayUtil, kernel, declare, listen, lang, aspect, has, miscUtil, TouchScroll, hasClass, put){
 	// Add user agent/feature CSS classes 
 	hasClass("mozilla", "opera", "webkit", "ie", "ie-6", "ie-6-7", "quirks", "no-quirks", "touch");
 	
@@ -536,6 +536,61 @@ function(arrayUtil, kernel, declare, listen, aspect, has, miscUtil, TouchScroll,
 		},
 		down: function(row, steps, visible){
 			return this.row(move(row, steps || 1, "dgrid-row", visible));
+		},
+
+		focusOnCell: function(element, dontFocus){
+			// summary:
+			//		Focus on a cell, as if it had been clicked on with the mouse or selected with the keyboard.
+			// element:
+			//		A cell, child element in the DOM, or id specifying the cell to focus on.
+			// dontFocus:
+			//		Optional, default=false. If true, the focus() method of the cell's DOM element will not be called
+			//		and its tabIndex will not be set.
+			// Events:
+			//		dgrid-cellfocusout: event.cell = the previously focused cell
+			//		dgrid-cellfocusin: event.cell = the newly focused cell
+
+			var cell = this[this.cellNavigation ? "cell" : "row"](element);
+			var event = {
+				bubbles: true,
+				cancelable: false
+			};
+
+			if(!cell || !cell.element){
+				return;
+			}
+
+			element = cell.element;
+
+			if(this._cellFocusedElement){
+				// clean up previously-focused element
+				// remove the class name and the tabIndex attribute
+				put(this._cellFocusedElement, "!dgrid-focus[!tabIndex]");
+
+				if(has("ie") < 8){
+					// clean up after workaround below (for non-input cases)
+					this._cellFocusedElement.style.position = "";
+				}
+				event.cell = this._cellFocusedElement;
+				listen.emit(element, "dgrid-cellfocusout", event);
+			}
+
+			this._cellFocusedElement = element;
+			event.cell = element;
+
+			if(!dontFocus){
+				if(has("ie") < 8){
+					// setting the position to relative magically makes the outline
+					// work properly for focusing later on with old IE.
+					// (can't be done a priori with CSS or screws up the entire table)
+					element.style.position = "relative";
+				}
+				element.tabIndex = this.tabIndex;
+				element.focus();
+			}
+
+			put(element, ".dgrid-focus");
+			listen.emit(this._cellFocusedElement, "dgrid-cellfocusin", lang.mixin({ parentType: event.type }, event));
 		},
 		
 		get: function(/*String*/ name /*, ... */){

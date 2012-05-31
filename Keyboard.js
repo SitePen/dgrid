@@ -49,52 +49,17 @@ return declare([List], {
 		}
 		
 		function navigateArea(areaNode){
-			function focusOnCell(element, event, dontFocus){
-				var cell = grid[grid.cellNavigation ? "cell" : "row"](element);
-				if(cell){
-					element = cell.element;
-					if(element){
-						if(!event.bubbles){
-							// IE doesn't always have a bubbles property already true, Opera will throw an error if you try to set it to true if it is already true
-							event.bubbles = true;
-						}
-						// clean up previously-focused element
-						// remove the class name and the tabIndex attribute
-						put(cellFocusedElement, "!dgrid-focus[!tabIndex]");
-						if(cellFocusedElement){
-							if(has("ie") < 8){
-								// clean up after workaround below (for non-input cases)
-								cellFocusedElement.style.position = "";
-							}
-							event.cell = cellFocusedElement;
-							on.emit(element, "dgrid-cellfocusout", event);
-						}
-						cellFocusedElement = element;
-						event.cell = element;
-						if(!dontFocus){
-							if(has("ie") < 8){
-								// setting the position to relative magically makes the outline
-								// work properly for focusing later on with old IE.
-								// (can't be done a priori with CSS or screws up the entire table)
-								element.style.position = "relative";
-							}
-							element.tabIndex = grid.tabIndex;
-							element.focus();
-						}
-						put(element, ".dgrid-focus");
-						on.emit(cellFocusedElement, "dgrid-cellfocusin", lang.mixin({ parentType: event.type }, event));
-					}
+			var isFocusableClass = grid.cellNavigation ? hasGridCellClass : hasGridRowClass,
+				next;
+
+			if(!grid._cellFocusedElement){
+				grid._cellFocusedElement = areaNode;
+
+				while((next = grid._cellFocusedElement.firstChild) && next.tagName){
+					grid._cellFocusedElement = next;
 				}
 			}
 
-			var isFocusableClass = grid.cellNavigation ? hasGridCellClass : hasGridRowClass,
-				cellFocusedElement = areaNode,
-				next;
-			
-			while((next = cellFocusedElement.firstChild) && next.tagName){
-				cellFocusedElement = next;
-			}
-			
 			if(areaNode === grid.contentNode){
 				aspect.after(grid, "renderArray", function(ret){
 					// summary:
@@ -103,7 +68,7 @@ return declare([List], {
 
 					return Deferred.when(ret, function(ret){
 						// do not update the focused element if we already have a valid one
-						if(isFocusableClass.test(cellFocusedElement.className) && contains(areaNode, cellFocusedElement)){
+						if(isFocusableClass.test(grid._cellFocusedElement.className) && contains(areaNode, grid._cellFocusedElement)){
 							return ret;
 						}
 
@@ -112,23 +77,24 @@ return declare([List], {
 						// even when data is loaded asynchronously
 						for(var i = 0, elements = areaNode.getElementsByTagName("*"), element; (element = elements[i]); ++i){
 							if(isFocusableClass.test(element.className)){
-								cellFocusedElement = element;
+								grid._cellFocusedElement = element;
 								break;
 							}
 						}
 
-						cellFocusedElement.tabIndex = grid.tabIndex;
+						grid._cellFocusedElement.tabIndex = grid.tabIndex;
 
 						return ret;
 					});
 				});
-			}else if(isFocusableClass.test(cellFocusedElement.className)){
-				cellFocusedElement.tabIndex = grid.tabIndex;
+			}else if(isFocusableClass.test(grid._cellFocusedElement.className)){
+				grid._cellFocusedElement.tabIndex = grid.tabIndex;
 			}
 			
 			on(areaNode, "mousedown", function(event){
 				if(!handledEvent(event)){
-					focusOnCell(event.target, event);
+					if(!event.bubbles){ event.bubbles = true; }
+					grid.focusOnCell(event.target);
 				}
 			});
 			
@@ -159,7 +125,7 @@ return declare([List], {
 				if(isNaN(move)){
 					return;
 				}
-				var nextSibling, columnId, cell = grid.cell(cellFocusedElement);
+				var nextSibling, columnId, cell = grid.cell(grid._cellFocusedElement);
 				var orientation;
 				if(keyCode == 37 || keyCode == 39){
 					// horizontal movement (left and right keys)
@@ -171,7 +137,7 @@ return declare([List], {
 					// other keys are vertical
 					orientation = "down";
 					columnId = cell && cell.column && cell.column.id;
-					cell = grid.row(cellFocusedElement);
+					cell = grid.row(grid._cellFocusedElement);
 				}
 				if(move){
 					cell = cell && grid[orientation](cell, move, true);
@@ -197,7 +163,8 @@ return declare([List], {
 							}
 						}
 					}
-					focusOnCell(nextFocus, event, inputFocused);
+					if(!event.bubbles){ event.bubbles = true; }
+					grid.focusOnCell(nextFocus, inputFocused);
 				}
 				event.preventDefault();
 			});
