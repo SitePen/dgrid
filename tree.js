@@ -32,6 +32,10 @@ return function(column){
 			// Set up the event listener once and use event delegation for better memory use.
 			grid.on(column.expandOn || ".dgrid-expando-icon:click," + colSelector + ":dblclick," + colSelector + ":keydown",
 				function(event){
+					if(event.type === 'dblclick' && event.target.className.indexOf("dgrid-expando-icon") !== -1){
+						return;
+					}
+
 					if(event.type != "keydown" || event.keyCode == 32){
 						grid.expand(this); 
 					}
