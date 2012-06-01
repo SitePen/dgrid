@@ -51,7 +51,7 @@ return function(column){
 			var row = this.row(rowElement),
 				expanded = column.shouldExpand(row, currentLevel, this._expanded[row.id]);
 			
-			if(expanded){ this.expand(rowElement, true); }
+			if(expanded){ this.expand(rowElement, true, true); }
 			return rowElement; // pass return value through
 		});
 		
@@ -76,7 +76,7 @@ return function(column){
 			return rowElement.offsetHeight + (connected ? connected.offsetHeight : 0); 
 		};
 		
-		grid.expand = function(target, expand){
+		grid.expand = function(target, expand, noTransition){
 			target = target.element || target; // if a row object was passed in, get the element first 
 			target = target.className.indexOf("dgrid-expando-icon") > -1 ? target :
 				querySelector(".dgrid-expando-icon", target)[0];
@@ -104,9 +104,10 @@ return function(column){
 								return grid.renderQuery(query, preloadNode);
 							}) :
 							grid.renderArray(query({}), preloadNode),
-								function(){
-									container.style.height = container.scrollHeight + "px";
-								});
+						function(){
+							container.style.height = container.scrollHeight + "px";
+						}
+					);
 					var transitionend = function(event){
 						var height = this.style.height;
 						if(height){
@@ -145,7 +146,7 @@ return function(column){
 				var containerStyle = container.style;
 				container.hidden = !expanded;
 				// make sure it is visible so we can measure it
-				if(transitionEventSupported === false){
+				if(transitionEventSupported === false || noTransition){
 					containerStyle.display = expanded ? "block" : "none";
 					containerStyle.height = "";
 				}else{
