@@ -13,7 +13,6 @@ var profile = {
 		},
 
 		miniExclude: function(filename, mid){
-			console.log(mid);
 			return /\/(?:test|demos)\//.test(filename) || mid in miniExcludes;
 		},
 
