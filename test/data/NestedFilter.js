@@ -1,6 +1,6 @@
 // example sample data and code
-define(["dojo/_base/lang", "dojo/store/util/QueryResults", "dojo/_base/Deferred", "dojo/DeferredList"],
-function(lang, QueryResults, Deferred, DeferredList){
+define(["dojo/_base/lang", "dojo/_base/array", "dojo/store/util/QueryResults", "dojo/_base/Deferred", "dojo/DeferredList"],
+function(lang, array, QueryResults, Deferred, DeferredList){
 	return function(store){
 		// summary:
 		//		Creates a store that applies a query to a hierarchical data structure,
@@ -42,6 +42,9 @@ function(lang, QueryResults, Deferred, DeferredList){
 						}
 					}));
 				}), function(){
+					deferreds = array.filter(deferreds, function(deferred){
+						return deferred && deferred.then;
+					});
 					// once done we return the new results as a query results
 					return new DeferredList(deferreds).then(function(){
 						return newResults;
