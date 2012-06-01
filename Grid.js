@@ -340,6 +340,8 @@ function(kernel, declare, listen, has, put, List){
 				
 				// add grid reference to each column object for potential use by plugins
 				column.grid = this;
+				if(typeof column.init === "function"){ column.init(); }
+				
 				subRow.push(column); // make sure it can be iterated on
 			}
 			return isArray ? rowColumns : subRow;

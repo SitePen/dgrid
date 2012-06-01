@@ -121,12 +121,12 @@ function(kernel, on, aspect, has, put){
 
 			return input;
 		};
-
+		
+		column.init = function(){
+			grid = column.grid;
+		};
+		
 		column.renderCell = function(object, value, cell, options, header){
-			if(!grid){
-				grid = column.grid;
-			}
-
 			var row = object && grid.row(object);
 			value = row && grid.selection[row.id];
 
