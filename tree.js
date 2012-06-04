@@ -10,9 +10,8 @@ return function(column){
 		}
 	};
 	
-	// Variable to track item level on last renderCell call(s)
-	// (for transferring information between renderCell and aspected insertRow).
-	var currentLevel;
+	var currentLevel, // tracks last rendered item level (for aspected insertRow)
+		clicked; // tracks row that was clicked (for expand dblclick event handling)
 	
 	column.shouldExpand = column.shouldExpand || function(row, level, previouslyExpanded){
 		// summary:
@@ -33,8 +32,22 @@ return function(column){
 		// Set up the event listener once and use event delegation for better memory use.
 		grid.on(column.expandOn || ".dgrid-expando-icon:click," + colSelector + ":dblclick," + colSelector + ":keydown",
 			function(event){
-				if(event.type != "keydown" || event.keyCode == 32){
-					grid.expand(this); 
+				if((event.type != "keydown" || event.keyCode == 32) &&
+						!(event.type == "dblclick" && clicked && clicked.count > 1 && grid.row(event).id == clicked.id)){
+					grid.expand(this);
+				}
+				
+				// If the expando icon was clicked, update clicked object to prevent
+				// potential over-triggering on dblclick (all tested browsers but IE < 9).
+				if(event.target.className.indexOf("dgrid-expando-icon") > -1){
+					if(clicked && clicked.id == grid.row(event).id){
+						clicked.count++;
+					}else{
+						clicked = {
+							id: grid.row(event).id,
+							count: 1
+						};
+					}
 				}
 			});
 		
@@ -105,7 +118,10 @@ return function(column){
 							}) :
 							grid.renderArray(query({}), preloadNode),
 						function(){
-							container.style.height = container.scrollHeight + "px";
+							// Expand once results are retrieved, if the row is still expanded.
+							if(grid._expanded[row.id]){
+								container.style.height = container.scrollHeight + "px";
+							}
 						}
 					);
 					var transitionend = function(event){
