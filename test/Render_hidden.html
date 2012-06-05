@@ -35,32 +35,32 @@
 						{label:'Population', field:'population'},
 						{label:'Timezone', field:'timezone'}
 					];
-					var count = 0;
 					
-					window.tree = declare([Grid, Keyboard, Selection])({
+					var grid = window.grid = declare([Grid, Keyboard, Selection])({
 						store: testCountryStore,
 						query: {type: "continent"},
 						columns: columns
-					}, "tree");
+					}, "grid");
 
-					on(document.getElementById("unhideButton"), "click", function(event){
-						document.getElementById("hiddenTree").style.display = "block";
-						document.getElementById("reloadButton").style.display = "";
-						event.target.style.display = "none";
+					on(document.getElementById("toggle"), "click", function(event){
+						var node = document.getElementById("hiddenTree"),
+							display = node.style.display;
+						
+						node.style.display = display ? "" : "none";
 					});
-
-					on(document.getElementById("reloadButton"), "click", function(){
-						window.location.reload();
+					
+					on(document.getElementById("expandAF"), "click", function(event){
+						grid.expand("AF");
 					});
 				});
 		</script>
 	</head>
 	<body class="claro">
-		<h2>Tree grid rendered in a hidden node (display:none)</h2>
-		<div id="hiddenTree" style="display: none;">
-			<div id="tree"></div>
+		<h2>Tree grid rendered in a hideable node (to test expansion while hidden)</h2>
+		<button id="toggle">Toggle hide/show</button>
+		<button id="expandAF">Toggle Africa expansion</button>
+		<div id="hiddenTree">
+			<div id="grid"></div>
 		</div>
-		<button id="unhideButton">Un-hide</button>
-		<button id="reloadButton" style="display: none;">Reload Page</button>
 	</body>
 </html>

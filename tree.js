@@ -114,7 +114,7 @@ return function(column){
 			
 			var row = target.element ? target : grid.row(target);
 			
-			target = target.element || target; // if a row object was passed in, get the element first 
+			target = row.element;
 			target = target.className.indexOf("dgrid-expando-icon") > -1 ? target :
 				querySelector(".dgrid-expando-icon", target)[0];
 			
@@ -145,7 +145,8 @@ return function(column){
 						function(){
 							// Expand once results are retrieved, if the row is still expanded.
 							if(grid._expanded[row.id]){
-								container.style.height = container.scrollHeight + "px";
+								var scrollHeight = container.scrollHeight;
+								container.style.height = scrollHeight ? scrollHeight + "px" : "auto";
 							}
 						}
 					);
@@ -182,11 +183,14 @@ return function(column){
 						}, 600);
 					}
 				}
-				// show or hide all the children
+				
+				// Show or hide all the children.
 				
 				container = rowElement.connected;
-				var containerStyle = container.style;
 				container.hidden = !expanded;
+				var containerStyle = container.style,
+					scrollHeight;
+				
 				// make sure it is visible so we can measure it
 				if(transitionEventSupported === false || noTransition){
 					containerStyle.display = expanded ? "block" : "none";
@@ -194,21 +198,21 @@ return function(column){
 				}else{
 					if(expanded){
 						containerStyle.display = "block";
-						var scrollHeight = container.scrollHeight;
+						scrollHeight = container.scrollHeight;
 						containerStyle.height = "0px";
 					}
 					else{
-						// if it will be hidden we need to be able to give a full height without animating it, so it has the right starting point to animate to zero
+						// if it will be hidden we need to be able to give a full height
+						// without animating it, so it has the right starting point to animate to zero
 						put(container, ".dgrid-tree-resetting");
 						containerStyle.height = container.scrollHeight + "px";
 					}
-					// we now allow a transitioning						
-					if(!expanded || scrollHeight){
-						setTimeout(function(){
-							put(container, "!dgrid-tree-resetting");
-							containerStyle.height = (expanded ? scrollHeight : 0) + "px";
-						});
-					}
+					// Perform a transition for the expand or collapse.
+					setTimeout(function(){
+						put(container, "!dgrid-tree-resetting");
+						containerStyle.height =
+							expanded ? (scrollHeight ? scrollHeight + "px" : "auto") : "0px";
+					});
 				}
 				
 				// Update _expanded map.
