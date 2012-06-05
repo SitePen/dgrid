@@ -7,8 +7,9 @@ define([
 	"dojo/has",
 	"./Grid",
 	"put-selector/put",
-	"dojo/_base/sniff"
-], function(kernel, lang, Deferred, on, aspect, has, Grid, put){
+    "dojo/query",
+	"dojo/_base/sniff",
+], function(kernel, lang, Deferred, on, aspect, has, Grid, put, query){
 
 var activeCell, activeValue; // tracks cell currently being edited, and its value
 
@@ -191,8 +192,10 @@ function createSharedEditor(column, originalRenderCell){
 		parentNode.removeChild(node);
 		
 		// pass new value to original renderCell implementation for this cell
-		Grid.appendIfNode(parentNode, originalRenderCell(
-			column.grid.row(parentNode).data, activeValue, parentNode));
+		Grid.appendIfNode(parentNode, originalRenderCell.call(column,
+			column.grid.row(parentNode).data, activeValue, parentNode,
+            cmp._optionsForCell));
+        delete cmp._optionsForCell;
 		
 		// reset state now that editor is deactivated
 		activeCell = activeValue = null;
@@ -246,6 +249,10 @@ function showEditor(cmp, column, cell, value){
 		// (Clear flag on a timeout to wait for delayed onChange to fire first)
 		cmp._dgridIgnoreChange = true;
 		cmp.set("value", value);
+        if (column.onEdit) {
+            var obj = grid.cell(cell).row.data;
+            column.onEdit(obj, cmp);
+        }
 		setTimeout(function(){ cmp._dgridIgnoreChange = false; }, 0);
 	}
 	// track previous value for short-circuiting or in case we need to revert
@@ -254,12 +261,14 @@ function showEditor(cmp, column, cell, value){
 	if(activeCell){ activeValue = value; }
 }
 
-function edit(cell) {
+function edit(cell, options) {
 	// summary:
 	//		Method to be mixed into grid instances, which will show/focus the
 	//		editor for a given grid cell.  Also used by renderCell.
 	// cell: Object
 	//		Cell (or something resolvable by grid.cell) to activate editor on.
+    // options: Object (optional)
+    //      options used to render original cell
 	// returns:
 	//		If the cell is editable, returns a promise resolving to the editor
 	//		input/widget when the cell editor is focused.
@@ -280,7 +289,11 @@ function edit(cell) {
 			dirty = this.dirty && this.dirty[row.id];
 			value = (dirty && field in dirty) ? dirty[field] :
 				column.get ? column.get(row.data) : row.data[field];
-			
+
+            // Smuggle in options so that onblur() above (which is within createSharedEditor())
+            // can use the correct options when calling originalRenderCell(). This is needed
+            // if editor wraps a tree plugin.
+            cmp._optionsForCell = options;
 			showEditor(column.editorInstance, column, cellElement, value);
 			
 			// focus / blur-handler-resume logic is surrounded in a setTimeout
@@ -334,6 +347,10 @@ return function(column, editor, editOn){
 	column.renderCell = editOn ? function(object, value, cell, options){
 		var grid = column.grid;
 		
+        if (!(grid.store && grid.store.getIdentity)) {
+            throw new Error("Editor currently only works for store-backed grids");
+        }
+
 		// On first run, create one shared widget/input which will be swapped into
 		// the active cell.
 		if(!column.editorInstance){
@@ -351,31 +368,38 @@ return function(column, editor, editOn){
 				column.editorInstance.destroyRecursive();
 			});
 		}
-		
-		// TODO: Consider using event delegation
-		// (Would require using dgrid's focus events for activating on focus,
-		// which we already advocate in README for optimal use)
-		
-		// in IE<8, cell is the child of the td due to the extra padding node
-		on(cell.tagName == "TD" ? cell : cell.parentNode, editOn,
-			function(){ grid.edit(this); });
-		
-		// initially render content in non-edit mode
-		return originalRenderCell(object, value, cell, options);
+
+        // initially render content in non-edit mode
+        var nonEditNode = originalRenderCell.call(this, object, value, cell, options);
+
+        // Use grid.on to target exact element for event handling
+        var rowSel = ".dgrid-row#" + grid._rowIdForObject(object);
+        var colSelector = ".dgrid-content " + rowSel + " .dgrid-column-" + column.id;
+        // Does the editor wrap a tree? If so, get the content node
+        var treeExpandoClass = ".dgrid-expando-text";
+        var nl = query(treeExpandoClass, cell);
+        if (nl.length > 0) {
+            // TODO: This doesn't work with event dgrid-cellfocusin so event
+            // click needs to be used when you wrap a tree within an editor
+            colSelector += " " + treeExpandoClass;
+		}
+        var eventType = colSelector + ":" + editOn;
+        grid.on(eventType, function(evt) {
+            grid.edit(this, options);
+        });
+        return nonEditNode;
 	} : function(object, value, cell, options){
 		// always-on: create editor immediately upon rendering each cell
-		var grid = column.grid,
-			cmp = createEditor(column);
-		
+		var grid = column.grid;
 		if(!grid.edit){
 			grid.edit = edit; // add edit method on first render
 		}
-		
-		showEditor(cmp, column, cell, value);
-		
-		// Maintain reference for later use.
-		cell[isWidget ? "widget" : "input"] = cmp;
-		
+		if (!column.canEdit || column.canEdit(object, value)) {
+		    var cmp = createEditor(column);
+		    showEditor(cmp, column, cell, value);
+		    // Maintain reference for later use.
+		    cell[isWidget ? "widget" : "input"] = cmp;
+        }
 		if(isWidget){
 			if(!cleanupAdded){
 				cleanupAdded = true;

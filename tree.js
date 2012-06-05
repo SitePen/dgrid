@@ -93,7 +93,9 @@ return function(column){
 			target = target.element || target; // if a row object was passed in, get the element first 
 			target = target.className.indexOf("dgrid-expando-icon") > -1 ? target :
 				querySelector(".dgrid-expando-icon", target)[0];
-			if(target.mayHaveChildren){
+            // Check if target is defined. If editor is wrapped in editor pressing space key whilst
+            // editing will trigger this event and target will be undefined
+			if(target && target.mayHaveChildren){
 				// on click we toggle expanding and collapsing
 				var expanded = target.expanded = expand === undefined ? !target.expanded : expand;
 				// update the expando display
