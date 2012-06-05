@@ -22,10 +22,27 @@ return function(column){
 	
 	aspect.after(column, "init", function(){
 		var grid = column.grid,
+			colSelector = ".dgrid-content .dgrid-column-" + column.id,
 			transitionEventSupported,
 			tr, query;
 		
-		var colSelector = ".dgrid-content .dgrid-column-" + column.id;
+		if(!grid.store){
+			throw new Error("dgrid tree column plugin requires a store to operate.");
+		}
+		
+		if (!column.renderExpando){
+			// If no renderExpando function exists, create one with default logic.
+			column.renderExpando = function(level, hasChildren, expanded){
+				var dir = this.grid.isRTL ? "right" : "left",
+					cls = ".dgrid-expando-icon";
+				if(hasChildren){
+					cls += ".ui-icon.ui-icon-triangle-1-" + (expanded ? "se" : "e");
+				}
+				return put("div" + cls + "[style=margin-" + dir + ": " +
+					(level * (column.indentWidth || 9)) + "px; float: " + dir + "]");
+			};
+		}
+		
 		// Set up the event listener once and use event delegation for better memory use.
 		grid.on(column.expandOn || ".dgrid-expando-icon:click," + colSelector + ":dblclick," + colSelector + ":keydown",
 			function(event){
@@ -103,10 +120,10 @@ return function(column){
 			
 			if(target && target.mayHaveChildren){
 				// toggle or set expand/collapsed state based on optional 2nd argument
-				var expanded = target.expanded = expand === undefined ? !target.expanded : expand;
+				var expanded = expand === undefined ? !this._expanded[row.id] : expand;
 				
 				// update the expando display
-				target.className = "dgrid-expando-icon ui-icon ui-icon-triangle-1-" + (expanded ? "se" : "e"); 
+				target.className = "dgrid-expando-icon ui-icon ui-icon-triangle-1-" + (expanded ? "se" : "e");
 				var preloadNode = target.preloadNode,
 					rowElement = row.element,
 					container;
@@ -211,13 +228,12 @@ return function(column){
 		var grid = column.grid,
 			level = Number(options && options.query && options.query.level) + 1,
 			mayHaveChildren = !grid.store.mayHaveChildren || grid.store.mayHaveChildren(object),
-			dir = grid.isRTL ? "right" : "left",
-			expando = put("div.dgrid-expando-icon" + (mayHaveChildren ? ".ui-icon.ui-icon-triangle-1-e" : "") +
-				"[style=margin-" + dir + ": " + (level * 19) + "px; float: " + dir + "]"),
-			node;
+			expando, node;
 		
-		expando.innerHTML = "&nbsp;"; // for opera to space things properly
 		level = currentLevel = isNaN(level) ? 0 : level;
+		expando = column.renderExpando(level, mayHaveChildren,
+			grid._expanded[grid.store.getIdentity(object)]);
+		expando.innerHTML = "&nbsp;"; // for opera to space things properly
 		expando.level = level;
 		expando.mayHaveChildren = mayHaveChildren;
 		
