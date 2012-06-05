@@ -192,7 +192,7 @@ function createSharedEditor(column, originalRenderCell){
 		parentNode.removeChild(node);
 		
 		// pass new value to original renderCell implementation for this cell
-		Grid.appendIfNode(parentNode, originalRenderCell(
+		Grid.appendIfNode(parentNode, originalRenderCell.call(column,
 			column.grid.row(parentNode).data, activeValue, parentNode,
             cmp._optionsForCell));
         delete cmp._optionsForCell;
@@ -370,7 +370,7 @@ return function(column, editor, editOn){
 		}
 
         // initially render content in non-edit mode
-        var nonEditNode = originalRenderCell(object, value, cell, options);
+        var nonEditNode = originalRenderCell.call(this, object, value, cell, options);
 
         // Use grid.on to target exact element for event handling
         var rowSel = ".dgrid-row#" + grid._rowIdForObject(object);
