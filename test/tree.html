@@ -56,6 +56,9 @@
 					on(document.getElementById("save"), "click", function(){
 						treeGrid.save();
 					});
+					on(document.getElementById("revert"), "click", function(){
+						treeGrid.revert();
+					});
 					on(document.getElementById("add-country"), "click", function(){
 						testCountryStore.put({ id: 'GR', name:'Greece', type:'country', parent: 'EU'});
 					});
@@ -131,6 +134,7 @@
 		<h2>Lazy-loading tree grid, with store functionality</h2>
 		<div id="treeGrid"></div>
 		<button id="save">Save</button>
+		<button id="revert">Revert</button>
 		<button id="add-continent">Add Continent</button>
 		<button id="add-country">Add Greece To Europe</button>
 		<button id="remove-country">Remove Greece</button>

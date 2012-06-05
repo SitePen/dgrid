@@ -7,6 +7,19 @@ return function(column){
 	
 	var originalRenderCell = column.renderCell || Grid.defaultRenderCell;
 	
+	var currentLevel, // tracks last rendered item level (for aspected insertRow)
+		clicked; // tracks row that was clicked (for expand dblclick event handling)
+	
+	column.shouldExpand = column.shouldExpand || function(row, level, previouslyExpanded){
+		// summary:
+		//		Function called after each row is inserted to determine whether
+		//		expand(rowElement, true) should be automatically called.
+		//		The default implementation re-expands any rows that were expanded
+		//		the last time they were rendered (if applicable).
+		
+		return previouslyExpanded;
+	};
+	
 	aspect.after(column, "init", function(){
 		var grid = column.grid,
 			transitionEventSupported,
@@ -16,8 +29,22 @@ return function(column){
 		// Set up the event listener once and use event delegation for better memory use.
 		grid.on(column.expandOn || ".dgrid-expando-icon:click," + colSelector + ":dblclick," + colSelector + ":keydown",
 			function(event){
-				if(event.type != "keydown" || event.keyCode == 32){
-					grid.expand(this); 
+				if((event.type != "keydown" || event.keyCode == 32) &&
+						!(event.type == "dblclick" && clicked && clicked.count > 1 && grid.row(event).id == clicked.id)){
+					grid.expand(this);
+				}
+				
+				// If the expando icon was clicked, update clicked object to prevent
+				// potential over-triggering on dblclick (all tested browsers but IE < 9).
+				if(event.target.className.indexOf("dgrid-expando-icon") > -1){
+					if(clicked && clicked.id == grid.row(event).id){
+						clicked.count++;
+					}else{
+						clicked = {
+							id: grid.row(event).id,
+							count: 1
+						};
+					}
 				}
 			});
 		
@@ -26,6 +53,17 @@ return function(column){
 			grid.on(touchUtil.selector(colSelector, touchUtil.dbltap),
 				function(){ grid.expand(this); });
 		}
+		
+		grid._expanded = {}; // Stores IDs of expanded rows
+		
+		aspect.after(grid, "insertRow", function(rowElement){
+			// Auto-expand (shouldExpand) considerations
+			var row = this.row(rowElement),
+				expanded = column.shouldExpand(row, currentLevel, this._expanded[row.id]);
+			
+			if(expanded){ this.expand(rowElement, true, true); }
+			return rowElement; // pass return value through
+		});
 		
 		aspect.before(grid, "removeRow", function(rowElement, justCleanup){
 			var connected = rowElement.connected;
@@ -48,7 +86,7 @@ return function(column){
 			return rowElement.offsetHeight + (connected ? connected.offsetHeight : 0); 
 		};
 		
-		grid.expand = function(target, expand){
+		grid.expand = function(target, expand, noTransition){
 			// summary:
 			//		Expands the row corresponding to the given target.
 			// target: Object
@@ -87,9 +125,13 @@ return function(column){
 								return grid.renderQuery(query, preloadNode);
 							}) :
 							grid.renderArray(query({}), preloadNode),
-								function(){
-									container.style.height = container.scrollHeight + "px";
-								});
+						function(){
+							// Expand once results are retrieved, if the row is still expanded.
+							if(grid._expanded[row.id]){
+								container.style.height = container.scrollHeight + "px";
+							}
+						}
+					);
 					var transitionend = function(event){
 						// NOTE: this == container
 						var height = this.style.height;
@@ -129,7 +171,7 @@ return function(column){
 				var containerStyle = container.style;
 				container.hidden = !expanded;
 				// make sure it is visible so we can measure it
-				if(transitionEventSupported === false){
+				if(transitionEventSupported === false || noTransition){
 					containerStyle.display = expanded ? "block" : "none";
 					containerStyle.height = "";
 				}else{
@@ -151,6 +193,13 @@ return function(column){
 						});
 					}
 				}
+				
+				// Update _expanded map.
+				if(expanded){
+					this._expanded[row.id] = true;
+				}else{
+					delete this._expanded[row.id];
+				}
 			}
 		}; // end function grid.expand
 	});
@@ -168,7 +217,7 @@ return function(column){
 			node;
 		
 		expando.innerHTML = "&nbsp;"; // for opera to space things properly
-		level = isNaN(level) ? 0 : level;
+		level = currentLevel = isNaN(level) ? 0 : level;
 		expando.level = level;
 		expando.mayHaveChildren = mayHaveChildren;
 		
