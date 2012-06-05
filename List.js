@@ -458,14 +458,18 @@ function(arrayUtil, kernel, declare, listen, aspect, has, miscUtil, TouchScroll,
 			}
 			return whenDone(rows);
 		},
-		_autoId: 0,
+		
 		renderHeader: function(){
 			// no-op in a plain list
 		},
+		
+		_autoId: 0,
 		insertRow: function(object, parent, beforeNode, i, options){
 			// summary:
-			//		Renders a single row in the grid
-			var id = this.id + "-row-" + ((this.store && this.store.getIdentity) ? this.store.getIdentity(object) : this._autoId++);
+			//		Creates a single row in the grid.
+			
+			var id = this.id + "-row-" + ((this.store && this.store.getIdentity) ?
+				this.store.getIdentity(object) : this._autoId++);
 			var row = byId(id);
 			if(!row || // we must create a row if it doesn't exist, or if it previously belonged to a different container 
 					(beforeNode && row.parentNode != beforeNode.parentNode)){
@@ -473,7 +477,7 @@ function(arrayUtil, kernel, declare, listen, aspect, has, miscUtil, TouchScroll,
 					this.removeRow(row);
 				}
 				row = this.renderRow(object, options);
-				row.className = (row.className || "") + " ui-state-default dgrid-row " + (i% 2 == 1 ? oddClass : evenClass);
+				row.className = (row.className || "") + " ui-state-default dgrid-row " + (i % 2 == 1 ? oddClass : evenClass);
 				// get the row id for easy retrieval
 				this._rowIdToObject[row.id = id] = object;
 			}
@@ -482,6 +486,9 @@ function(arrayUtil, kernel, declare, listen, aspect, has, miscUtil, TouchScroll,
 			return row;
 		},
 		renderRow: function(value, options){
+			// summary:
+			//		Responsible for returning the DOM for a single row in the grid.
+			
 			return put("div", "" + value);
 		},
 		removeRow: function(rowElement, justCleanup){
@@ -492,6 +499,7 @@ function(arrayUtil, kernel, declare, listen, aspect, has, miscUtil, TouchScroll,
 				put(rowElement, "!");
 			}
 		},
+		
 		row: function(target){
 			// summary:
 			//		Get the row object by id, object, node, or event
@@ -530,6 +538,7 @@ function(arrayUtil, kernel, declare, listen, aspect, has, miscUtil, TouchScroll,
 				row: this.row(target)
 			};
 		},
+		
 		_move: move,
 		up: function(row, steps, visible){
 			return this.row(move(row, -(steps || 1), "dgrid-row", visible));
