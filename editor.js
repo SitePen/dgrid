@@ -198,7 +198,7 @@ function createSharedEditor(column, originalRenderCell){
 		while(i--){ put(parentNode.firstChild, "!"); }
 		Grid.appendIfNode(parentNode, column.renderCell(
 			column.grid.row(parentNode).data, activeValue, parentNode,
-			activeOptions ? lang.mixin(activeOptions, options) : options));
+			activeOptions ? lang.delegate(options, activeOptions) : options));
 		
 		// reset state now that editor is deactivated
 		activeCell = activeValue = activeOptions = null;
