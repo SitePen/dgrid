@@ -10,9 +10,13 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
   previously the earliest place a column plugin could really execute code was in
   the first `renderCell` call, but this could be obtuse, or even too late for
   some things.
-* The `tree` plugin now supports a `shouldExpand(row, level, previouslyExpanded)`
-  function on the column definition, providing for conditional automatic
-  expansion of parent rows. (#141)
+* The `tree` plugin now supports the following column definition properties:
+    * `shouldExpand(row, level, previouslyExpanded)`, a function providing for
+      conditional automatic expansion of parent rows (#141)
+    * `indentWidth`, an integer specifying the size (in pixels) of each level's
+      indent (note that the default is now `9`, though it was previously `19`)
+    * `renderExpando()`, a function which can replace the default logic for
+      rendering the expando node (the arrow next to the content of each cell)
 * The `editor` plugin now augments the grid instance with an `edit(cell)` method
   which can be used to programmatically activate the editor in a given cell.
 * A `util/mouse` module has been added, which exposes simulated events for
