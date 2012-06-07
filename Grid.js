@@ -356,6 +356,11 @@ function(kernel, declare, listen, has, put, List){
 			var subRowsLength = this.subRows.length,
 				i, j, column;
 			
+			// First remove rows (since they'll be refreshed after we're done),
+			// so that anything aspected onto removeRow by plugins can run.
+			// (cleanup will end up running again, but with nothing to iterate.)
+			this.cleanup();
+			
 			for(i = 0; i < subRowsLength; i++){
 				for(j = 0, len = this.subRows[i].length; j < len; j++){
 					column = this.subRows[i][j];

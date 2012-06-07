@@ -221,8 +221,7 @@ return declare([List, _StoreMixin], {
 					count += row.count || 1;
 					lastObserverIndex = currentObserverIndex;
 					// we just do cleanup here, as we will do a more efficient node destruction in the setTimeout below
-					grid.removeRow(row, true); 
-					delete grid._rowIdToObject[row.id]; // clear out of the lookup
+					grid.removeRow(row, true);
 					toDelete.push(row);
 				}
 				// now adjust the preloadNode based on the reclaimed space

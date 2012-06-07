@@ -92,7 +92,7 @@ return function(column){
 			if(connected){
 				// if it has a connected expando node, we process the children
 				querySelector(">.dgrid-row", connected).forEach(function(element){
-					grid.removeRow(element);
+					grid.removeRow(element, true);
 				});
 				// now remove the connected container node
 				if(!justCleanup){

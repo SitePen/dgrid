@@ -312,9 +312,11 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 		},
 		
 		cleanup: function(){
+			// summary:
+			//		Clears out all rows currently in the list.
+			
 			var observers = this.observers,
 				i;
-			// iterate through all the row elements and clean them up
 			for(i in this._rowIdToObject){
 				if(this._rowIdToObject[i] != this.columns){
 					var rowElement = byId(i);
@@ -496,6 +498,15 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			// summary:
 			//		Simply deletes the node in a plain List.
 			//		Column plugins may aspect this to implement their own cleanup routines.
+			// rowElement: Object|DOMNode
+			//		Object or element representing the row to be removed.
+			// justCleanup: Boolean
+			//		If true, the row element will not be removed from the DOM; this can
+			//		be used by extensions/plugins in cases where the DOM will be
+			//		massively cleaned up at a later point in time.
+			
+			rowElement = rowElement.element || rowElement;
+			delete this._rowIdToObject[rowElement.id];
 			if(!justCleanup){
 				put(rowElement, "!");
 			}

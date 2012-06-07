@@ -359,12 +359,12 @@ return function(column, editor, editOn){
 		
 		if(isWidget){
 			// add advice for cleaning up widgets in this column
-			aspect.before(grid, "removeRow", function(rowElement){
+			listeners.push(aspect.before(grid, "removeRow", function(rowElement){
 				// destroy our widget during the row removal operation
 				var cellElement = grid.cell(rowElement, column.id).element,
 					widget = (cellElement.contents || cellElement).widget;
 				if(widget){ widget.destroyRecursive(); }
-			});
+			}));
 		}
 	});
 	
