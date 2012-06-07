@@ -232,10 +232,10 @@ return function(column){
 		
 		// Set up a destroy function on column to tear down the listeners/aspects
 		// established above if the grid's columns are redefined later.
-		column.destroy = function(){
+		aspect.after(column, "destroy", function(){
 			arrayUtil.forEach(listeners, function(l){ l.remove(); });
 			delete grid.expand;
-		};
+		});
 	});
 	
 	column.renderCell = function(object, value, td, options){
