@@ -346,6 +346,24 @@ function(kernel, declare, listen, has, put, List){
 			}
 			return isArray ? rowColumns : subRow;
 		},
+		
+		_destroyColumns: function(){
+			// summary:
+			//		Iterates existing subRows looking for any column definitions with
+			//		destroy methods (defined by plugins) and calls them.  This is called
+			//		immediately before configuring a new column structure.
+			console.log(this);
+			var subRowsLength = this.subRows.length,
+				i, j, column;
+			
+			for(i = 0; i < subRowsLength; i++){
+				for(j = 0, len = this.subRows[i].length; j < len; j++){
+					column = this.subRows[i][j];
+					if(typeof column.destroy === "function"){ column.destroy(); }
+				}
+			}
+		},
+		
 		configStructure: function(){
 			// configure the columns and subRows
 			var subRows = this.subRows;
@@ -360,6 +378,7 @@ function(kernel, declare, listen, has, put, List){
 			}
 		},
 		_setColumns: function(columns){
+			this._destroyColumns();
 			// reset instance variables
 			this.subRows = null;
 			this.columns = columns;
@@ -367,6 +386,7 @@ function(kernel, declare, listen, has, put, List){
 			this._updateColumns();
 		},
 		_setSubRows: function(subrows){
+			this._destroyColumns();
 			this.subRows = subrows;
 			this._updateColumns();
 		},
@@ -381,7 +401,7 @@ function(kernel, declare, listen, has, put, List){
 		
 		_updateColumns: function(){
 			// summary:
-			//		Called after e.g. columns, subRows, columnSets are updated
+			//		Called when columns, subRows, or columnSets are reset
 			
 			this.configStructure();
 			this.renderHeader();

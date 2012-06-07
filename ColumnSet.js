@@ -98,6 +98,7 @@ function(kernel, declare, Deferred, listen, aspect, query, has, put, hasClass, G
 			}
 		},
 		_setColumnSets: function(columnSets){
+			this._destroyColumns();
 			this.columnSets = columnSets;
 			this._updateColumns();
 		},
