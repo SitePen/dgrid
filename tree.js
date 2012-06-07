@@ -47,7 +47,8 @@ return function(column){
 		grid.on(column.expandOn || ".dgrid-expando-icon:click," + colSelector + ":dblclick," + colSelector + ":keydown",
 			function(event){
 				if((event.type != "keydown" || event.keyCode == 32) &&
-						!(event.type == "dblclick" && clicked && clicked.count > 1 && grid.row(event).id == clicked.id)){
+						!(event.type == "dblclick" && clicked && clicked.count > 1 &&
+							grid.row(event).id == clicked.id && event.target.className.indexOf("dgrid-expando-icon") > -1)){
 					grid.expand(this);
 				}
 				
