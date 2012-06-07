@@ -5,11 +5,12 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ## Significant changes
 
-* Column plugins can now define an `init` function on column definitions, which
-  will be executed at the time the grid's column configuration is applied;
-  previously the earliest place a column plugin could really execute code was in
-  the first `renderCell` call, but this could be obtuse, or even too late for
-  some things.
+* Column plugins can now define the following functions on column definitions,
+  providing more opportune timing for initialization and tear-down:
+    * `init`, which will be executed at the time the grid's column configuration
+      is (re-)applied
+    * `destroy`, which will be executed when the grid is destroyed, as well as
+      before a new column configuration is applied
 * The `tree` plugin now supports the following column definition properties:
     * `shouldExpand(row, level, previouslyExpanded)`, a function providing for
       conditional automatic expansion of parent rows (#141)
