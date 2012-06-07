@@ -1,5 +1,5 @@
-define(["dojo/_base/declare", "dojo/_base/Deferred", "dojo/query", "dojo/on", "dojo/aspect", "./Grid", "dojo/has!touch?./util/touch", "put-selector/put"],
-function(declare, Deferred, querySelector, on, aspect, Grid, touchUtil, put){
+define(["dojo/_base/declare", "dojo/_base/array", "dojo/_base/Deferred", "dojo/query", "dojo/on", "dojo/aspect", "./Grid", "dojo/has!touch?./util/touch", "put-selector/put"],
+function(declare, arrayUtil, Deferred, querySelector, on, aspect, Grid, touchUtil, put){
 
 return function(column){
 	// summary:
@@ -233,11 +233,7 @@ return function(column){
 		// Set up a destroy function on column to tear down the listeners/aspects
 		// established above if the grid's columns are redefined later.
 		column.destroy = function(){
-			var i = listeners.length;
-			console.log('remove ' + i + ' listeners/aspects!');
-			while(i--){
-				listeners[i].remove();
-			}
+			arrayUtil.forEach(listeners, function(l){ l.remove(); });
 			delete grid.expand;
 		};
 	});

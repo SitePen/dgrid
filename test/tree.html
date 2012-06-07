@@ -36,6 +36,10 @@
 				function(on, Grid, tree, editor, Keyboard, Selection, selector, ColumnSet, declare, testStore){
 					var count = 0; // for incrementing edits from button under 1st grid
 					
+					function byId(id){
+						return document.getElementById(id);
+					}
+					
 					function nbspFormatter(value){
 						// returns "&nbsp;" for blank content, to prevent cell collapsing
 						return value === undefined || value === "" ? "&nbsp;" : value;
@@ -55,34 +59,34 @@
 						]
 					}, "treeGrid");
 					
-					on(document.getElementById("save"), "click", function(){
+					on(byId("save"), "click", function(){
 						treeGrid.save();
 					});
-					on(document.getElementById("revert"), "click", function(){
+					on(byId("revert"), "click", function(){
 						treeGrid.revert();
 					});
-					on(document.getElementById("add-country"), "click", function(){
+					on(byId("add-country"), "click", function(){
 						testCountryStore.put({ id: 'GR', name:'Greece', type:'country', parent: 'EU'});
 					});
-					on(document.getElementById("remove-country"), "click", function(){
+					on(byId("remove-country"), "click", function(){
 						testCountryStore.remove('GR');
 					});
-					on(document.getElementById("add-continent"), "click", function(){
+					on(byId("add-continent"), "click", function(){
 						testCountryStore.put({ id: 'NE', name:'My New Europe', type:'continent'});
 	        			testCountryStore.put({ id: 'NI', name:'My New Italy', type:'country', parent: 'NE'});
 					});
-					on(document.getElementById("delete"), "click", function(){
+					on(byId("delete"), "click", function(){
 						for(var id in treeGrid.selection){
 							console.log("id: ", id);
 							testCountryStore.remove(id);
 						}
 					});
-					on(document.getElementById("edit-continent"), "click", function(){
+					on(byId("edit-continent"), "click", function(){
 						var item = testCountryStore.get("EU");
 						item.name = "Europe Edit " + (++count);
 						testCountryStore.put(item);
 					});
-					on(document.getElementById("move-rome-na"), "click", function(){
+					on(byId("move-rome-na"), "click", function(){
 						var item = testCountryStore.get("Rome");
 						item.parent = "NA";
 						testCountryStore.put(item);
@@ -109,7 +113,7 @@
 					
 					// Test resetting column definition on this grid, since it exercises
 					// one of each type of OOTB column plugin.
-					on(document.getElementById("resetColumns"), "click", function(){
+					on(byId("resetColumns"), "click", function(){
 						treeSelector.set("columns", getTreeSelectorColumns());
 					});
 					
