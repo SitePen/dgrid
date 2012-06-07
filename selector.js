@@ -1,6 +1,9 @@
-define(["dojo/_base/kernel", "dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put"],
-function(kernel, on, aspect, has, put){
+define(["dojo/_base/kernel", "dojo/_base/array", "dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put"],
+function(kernel, arrayUtil, on, aspect, has, put){
 	return function(column, type){
+		
+		var listeners = [],
+			grid, recentInput, recentTimeout, headerCheckbox;
 		
 		if(column.type){
 			column.selectorType = column.type;
@@ -10,7 +13,6 @@ function(kernel, on, aspect, has, put){
 		column.selectorType = type = type || column.selectorType || "checkbox";
 		column.sortable = false;
 		
-		var grid, recentInput, recentTimeout, headerCheckbox;
 		function changeInput(value){
 			// creates a function that modifies the input on an event
 			return function(event){
@@ -81,10 +83,10 @@ function(kernel, on, aspect, has, put){
 		function setupSelectionEvents(){
 			// register one listener at the top level that receives events delegated
 			grid._hasSelectorInputListener = true;
-			aspect.before(grid, "_initSelectionEvents", function(){
+			listeners.push(aspect.before(grid, "_initSelectionEvents", function(){
 				// listen for clicks and keydown as the triggers
 				this.on(".dgrid-selector:click,.dgrid-selector:keydown", onSelect);
-			});
+			}));
 			var handleSelect = grid._handleSelect;
 			grid._handleSelect = function(event){
 				// ignore the default select handler for events that originate from the selector column
@@ -93,15 +95,15 @@ function(kernel, on, aspect, has, put){
 				}
 			};
 			if(typeof column.disabled == "function"){
-				// we override this method to have selection's follow the disabled method for selectability
+				// we override this method to have selections follow the disabled method for selectability
 				var originalAllowSelect = grid.allowSelect;
 				grid.allowSelect = function(row){
 					return originalAllowSelect.call(this, row) && !column.disabled(row.data);
 				};
 			}
 			// register listeners to the select and deselect events to change the input checked value
-			grid.on("dgrid-select", changeInput(true));
-			grid.on("dgrid-deselect", changeInput(false));
+			listeners.push(grid.on("dgrid-select", changeInput(true)));
+			listeners.push(grid.on("dgrid-deselect", changeInput(false)));
 		}
 		
 		var disabled = column.disabled;
@@ -124,6 +126,11 @@ function(kernel, on, aspect, has, put){
 		
 		column.init = function(){
 			grid = column.grid;
+		};
+		
+		column.destroy = function(){
+			arrayUtil.forEach(listeners, function(l){ l.remove(); });
+			grid._hasSelectorInputListener = false;
 		};
 		
 		column.renderCell = function(object, value, cell, options, header){
