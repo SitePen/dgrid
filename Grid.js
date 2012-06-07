@@ -352,7 +352,7 @@ function(kernel, declare, listen, has, put, List){
 			//		Iterates existing subRows looking for any column definitions with
 			//		destroy methods (defined by plugins) and calls them.  This is called
 			//		immediately before configuring a new column structure.
-			console.log(this);
+			
 			var subRowsLength = this.subRows.length,
 				i, j, column;
 			

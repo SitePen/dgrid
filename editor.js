@@ -1,6 +1,7 @@
 define([
 	"dojo/_base/kernel",
 	"dojo/_base/lang",
+	"dojo/_base/array",
 	"dojo/_base/Deferred",
 	"dojo/on",
 	"dojo/aspect",
@@ -8,7 +9,7 @@ define([
 	"./Grid",
 	"put-selector/put",
 	"dojo/_base/sniff"
-], function(kernel, lang, Deferred, on, aspect, has, Grid, put){
+], function(kernel, lang, arrayUtil, Deferred, on, aspect, has, Grid, put){
 
 // Variables to track info for cell currently being edited (editOn only).
 var activeCell, activeValue, activeOptions;
@@ -322,6 +323,7 @@ return function(column, editor, editOn){
 	//		Adds editing capability to a column's cells.
 	
 	var originalRenderCell = column.renderCell || Grid.defaultRenderCell,
+		listeners = [],
 		isWidget;
 	
 	// accept arguments as parameters to editor function, or from column def,
@@ -347,9 +349,9 @@ return function(column, editor, editOn){
 		
 		if(isWidget){
 			// Clean up shared widget instance when the grid is destroyed.
-			aspect.before(grid, "destroy", function(){
+			listeners.push(aspect.before(grid, "destroy", function(){
 				column.editorInstance.destroyRecursive();
-			});
+			}));
 		}
 	} : function(){
 		var grid = column.grid;
@@ -364,6 +366,11 @@ return function(column, editor, editOn){
 				if(widget){ widget.destroyRecursive(); }
 			});
 		}
+	});
+	
+	aspect.after(column, "destroy", function(){
+		if(editOn && isWidget){ column.editorInstance.destroyRecursive(); }
+		arrayUtil.forEach(listeners, function(l){ l.remove(); });
 	});
 	
 	column.renderCell = editOn ? function(object, value, cell, options){
