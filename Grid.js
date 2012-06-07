@@ -256,6 +256,12 @@ function(kernel, declare, listen, has, put, List){
 			}
 		},
 		
+		destroy: function(){
+			// Run _destroyColumns first to perform any column plugin tear-down logic.
+			this._destroyColumns();
+			this.inherited(arguments);
+		},
+		
 		_setSort: function(property, descending){
 			// summary:
 			//		Extension of List.js sort to update sort arrow in UI

@@ -346,13 +346,6 @@ return function(column, editor, editOn){
 		
 		// Create one shared widget/input to be swapped into the active cell.
 		column.editorInstance = createSharedEditor(column, originalRenderCell);
-		
-		if(isWidget){
-			// Clean up shared widget instance when the grid is destroyed.
-			listeners.push(aspect.before(grid, "destroy", function(){
-				column.editorInstance.destroyRecursive();
-			}));
-		}
 	} : function(){
 		var grid = column.grid;
 		if(!grid.edit){ grid.edit = edit; }
