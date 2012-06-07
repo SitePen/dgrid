@@ -369,8 +369,10 @@ return function(column, editor, editOn){
 	});
 	
 	aspect.after(column, "destroy", function(){
-		if(editOn && isWidget){ column.editorInstance.destroyRecursive(); }
 		arrayUtil.forEach(listeners, function(l){ l.remove(); });
+		if(column._editorBlurHandle){ column._editorBlurHandle.remove(); }
+		
+		if(editOn && isWidget){ column.editorInstance.destroyRecursive(); }
 	});
 	
 	column.renderCell = editOn ? function(object, value, cell, options){
