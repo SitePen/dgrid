@@ -24,6 +24,7 @@ return function(column){
 		var grid = column.grid,
 			colSelector = ".dgrid-content .dgrid-column-" + column.id,
 			transitionEventSupported,
+			listeners = [], // to be removed when this column is "destroyed"
 			tr, query;
 		
 		if(!grid.store){
@@ -44,7 +45,8 @@ return function(column){
 		}
 		
 		// Set up the event listener once and use event delegation for better memory use.
-		grid.on(column.expandOn || ".dgrid-expando-icon:click," + colSelector + ":dblclick," + colSelector + ":keydown",
+		listeners.push(grid.on(
+			column.expandOn || ".dgrid-expando-icon:click," + colSelector + ":dblclick," + colSelector + ":keydown",
 			function(event){
 				if((event.type != "keydown" || event.keyCode == 32) &&
 						!(event.type == "dblclick" && clicked && clicked.count > 1 &&
@@ -64,26 +66,28 @@ return function(column){
 						};
 					}
 				}
-			});
+			})
+		);
 		
 		if(touchUtil){
 			// Also listen on double-taps of the cell.
-			grid.on(touchUtil.selector(colSelector, touchUtil.dbltap),
-				function(){ grid.expand(this); });
+			listeners.push(grid.on(touchUtil.selector(colSelector, touchUtil.dbltap),
+				function(){ grid.expand(this); }));
 		}
 		
-		grid._expanded = {}; // Stores IDs of expanded rows
+		// Set up hash to store IDs of expanded rows
+		if(!grid._expanded){ grid._expanded = {}; }
 		
-		aspect.after(grid, "insertRow", function(rowElement){
+		listeners.push(aspect.after(grid, "insertRow", function(rowElement){
 			// Auto-expand (shouldExpand) considerations
 			var row = this.row(rowElement),
 				expanded = column.shouldExpand(row, currentLevel, this._expanded[row.id]);
 			
 			if(expanded){ this.expand(rowElement, true, true); }
 			return rowElement; // pass return value through
-		});
+		}));
 		
-		aspect.before(grid, "removeRow", function(rowElement, justCleanup){
+		listeners.push(aspect.before(grid, "removeRow", function(rowElement, justCleanup){
 			var connected = rowElement.connected;
 			if(connected){
 				// if it has a connected expando node, we process the children
@@ -95,7 +99,8 @@ return function(column){
 					put(connected, "!");
 				}
 			}
-		});
+		}));
+		
 		grid._calcRowHeight = function(rowElement){
 			// we override this method so we can provide row height measurements that
 			// include the children of a row
@@ -224,6 +229,17 @@ return function(column){
 				}
 			}
 		}; // end function grid.expand
+		
+		// Set up a destroy function on column to tear down the listeners/aspects
+		// established above if the grid's columns are redefined later.
+		column.destroy = function(){
+			var i = listeners.length;
+			console.log('remove ' + i + ' listeners/aspects!');
+			while(i--){
+				listeners[i].remove();
+			}
+			delete grid.expand;
+		};
 	});
 	
 	column.renderCell = function(object, value, td, options){
