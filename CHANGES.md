@@ -1,7 +1,7 @@
 This document outlines changes since 0.3.0.  For older changelogs, see the
 [dgrid wiki](https://github.com/SitePen/dgrid/wiki).
 
-# 0.3.1 (in progress)
+# 0.3.1
 
 ## Significant changes
 
@@ -22,16 +22,17 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
   which can be used to programmatically activate the editor in a given cell.
 * A `util/mouse` module has been added, which exposes simulated events for
   the mouse entering and leaving grid rows and cells. (#165)
-* A `package.js` has been added (and `package.json` has been updated to reference
-  it in its `dojoBuild` property) in order to streamline the build process;
-  the same has been done for xstyle and put-selector.
+* A `package.js` has been added in order to streamline the build process.
+  `package.json` has been updated to reflect the presence of `package.js` and
+  reference the latest versions of xstyle and put-selector, each of which now
+  have a `package.js` of their own.
 
 ## Other Fixes
 
 * Mouse events for expanding/collapsing rows in tree grids should be a bit more
   reliable. (#112)
-* Rows expanded in a tree grid which has been started but is currently hidden
-  will now show up properly when re-shown. (#140)
+* Rows expanded in a tree grid which has been started up but is currently hidden
+  will now be rendered properly when re-shown. (#140)
 * The `tree` and `editor` plugins can now both be used on the same column, by
   wrapping `editor` with `tree`. (#144)
 * `sortable` now defaults to `false` for columns where `field` is `"_item"`
