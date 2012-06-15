@@ -35,12 +35,15 @@ return function(column){
 			// If no renderExpando function exists, create one with default logic.
 			column.renderExpando = function(level, hasChildren, expanded){
 				var dir = this.grid.isRTL ? "right" : "left",
-					cls = ".dgrid-expando-icon";
+					cls = ".dgrid-expando-icon",
+					node;
 				if(hasChildren){
 					cls += ".ui-icon.ui-icon-triangle-1-" + (expanded ? "se" : "e");
 				}
-				return put("div" + cls + "[style=margin-" + dir + ": " +
-					(level * (column.indentWidth || 9)) + "px; float: " + dir + "]");
+				node = put("div" + cls + "[style=margin-" + dir + ": " +
+					(level * (this.indentWidth || 9)) + "px; float: " + dir + "]");
+				node.innerHTML = "&nbsp;"; // for opera to space things properly
+				return node;
 			};
 		}
 		
@@ -250,7 +253,6 @@ return function(column){
 		level = currentLevel = isNaN(level) ? 0 : level;
 		expando = column.renderExpando(level, mayHaveChildren,
 			grid._expanded[grid.store.getIdentity(object)]);
-		expando.innerHTML = "&nbsp;"; // for opera to space things properly
 		expando.level = level;
 		expando.mayHaveChildren = mayHaveChildren;
 		
