@@ -56,16 +56,29 @@
 				function(Grid, tree, Selection, DnD, Keyboard, DnDSource, declare, lang, arrayUtil, Deferred){
 					var DnDGrid = declare([Grid, Selection, DnD, Keyboard]);
 					
+					// Create a custom data array based on testOrderedData, but adding an
+					// extra item to test item-specific DnD types.
+					var orderedData = lang.clone(testOrderedData);
+					orderedData.push({
+						order: 10,
+						name: "grue",
+						description: "A grue! Run away!",
+						type: "grue"
+					});
+					
 					function byId(id){ return document.getElementById(id); }
 					
 					// Note: testOrderedStore hard-wires sorting anyway,
 					// so leaving sort disabled on columns in this grid.
 					window.grid1 = new DnDGrid({
-						store: testOrderedStore,
+						store: createOrderedStore(orderedData),
 						columns: [
 							{label:"Name", field:"name", sortable: false},
 							{label:"Description", field:"description", sortable: false}
-						]
+						],
+						getObjectDndType: function(item){
+							return [item.type ? item.type : this.dndSourceType];
+						}
 					}, "grid1");
 					window.grid2 = new DnDGrid({
 						store: createOrderedStore([]),
@@ -196,7 +209,7 @@
 		<div id="grid2"></div>
 		<div id="another-target">Another Target</div>
 		<div id="another-source">Another Source</div>
-		<div id="invalid-source">An Invalid Source</div>
+		<div id="invalid-source">A source only accepting grues</div>
 		<div class="clear">
 			<h2>Example of 2 grids w/ inter-grid DnD, sharing the same store</h2>
 			<div id="grid3"></div>

@@ -192,11 +192,17 @@ function(declare, lang, Deferred, DnDSource, DnDManager, put){
 		
 		insertRow: function(object){
 			// override to add dojoDndItem class to make the rows draggable
-			var row = this.inherited(arguments);
+			var row = this.inherited(arguments),
+				type = typeof this.getObjectDndType == "function" ?
+					this.getObjectDndType(object) : [this.dndSourceType];
+			
 			put(row, ".dojoDndItem");
 			// setup the source if it hasn't been done yet
 			setupDnD(this);
-			this.dndSource.setItem(row.id, {data: object, type: [this.dndSourceType]});
+			this.dndSource.setItem(row.id, {
+				data: object,
+				type: type instanceof Array ? type : [type]
+			});
 			return row;
 		}
 	});
