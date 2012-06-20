@@ -87,6 +87,21 @@ function(kernel, declare, Deferred, listen, aspect, query, has, put, hasClass, G
 			
 			positionScrollers(this, domNode);
 		},
+		
+		_destroyColumns: function(){
+			var columnSetsLength = this.columnSets.length,
+				i, j, k, subRowsLength, len, columnSet, subRow, column;
+			for(i = 0; i < columnSetsLength; i++){
+				columnSet = this.columnSets[i];
+				for(j = 0, subRowsLength = columnSet.length; j < subRowsLength; j++){
+					subRow = columnSet[j];
+					for(k = 0, len = subRow.length; k < len; k++){
+						column = subRow[k];
+						if(typeof column.destroy === "function"){ column.destroy(); }
+					}
+				}
+			}
+		},
 		configStructure: function(){
 			this.columns = {};
 			for(var i = 0, l = this.columnSets.length; i < l; i++){

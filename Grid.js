@@ -360,7 +360,7 @@ function(kernel, declare, listen, has, put, List){
 			//		immediately before configuring a new column structure.
 			
 			var subRowsLength = this.subRows.length,
-				i, j, column;
+				i, j, column, len;
 			
 			// First remove rows (since they'll be refreshed after we're done),
 			// so that anything aspected onto removeRow by plugins can run.
