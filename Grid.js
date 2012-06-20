@@ -53,7 +53,7 @@ function(kernel, declare, listen, has, put, List){
 					target = target.parentNode;
 				}while(target && target != this.domNode);
 			}
-			if(!element && columnId){
+			if(!element && typeof columnId != "undefined"){
 				var row = this.row(target),
 					rowElement = row.element;
 				if(rowElement){ 
