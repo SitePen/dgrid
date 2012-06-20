@@ -338,10 +338,12 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			//		Destroys this grid
 			
 			// remove any event listeners
-			for(var i = this._listeners.length; i--;){
-				this._listeners[i].remove();
+			if(this._listeners){ // guard against accidental subsequent calls to destroy
+				for(var i = this._listeners.length; i--;){
+					this._listeners[i].remove();
+				}
+				delete this._listeners;
 			}
-			delete this._listeners;
 			
 			this.cleanup();
 			// destroy DOM
