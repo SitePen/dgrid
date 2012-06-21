@@ -85,6 +85,26 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 		return "dgrid_" + autogen++;
 	}
 	
+	// common functions for class and className setters/getters
+	// (these are run in instance context)
+	var spaceRx = / +/g;
+	function setClass(cls){
+		// Format input appropriately for use with put...
+		var putClass = "." + cls.replace(spaceRx, ".");
+		
+		// Remove any old classes, and add new ones.
+		if(this._class){
+			putClass = "!" + this._class.replace(spaceRx, "!") + putClass;
+		}
+		put(this.domNode, putClass);
+		
+		// Store for later retrieval/removal.
+		this._class = cls;
+	}
+	function getClass(){
+		return this._class;
+	}
+	
 	// window resize event handler
 	var winResizeHandler = has("ie") < 7 && !has("quirks") ? function(grid){
 		// IE6 triggers window.resize on any element resize;
@@ -146,10 +166,15 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 		listType: "list",
 		
 		create: function(params, srcNodeRef){
-			// mix in params now, but wait until postScript to create
+			var domNode = this.domNode = srcNodeRef || put("div");
+			
 			if(params){
 				this.params = params;
 				declare.safeMixin(this, params);
+				
+				// Check for class or className in params and apply to domNode
+				var cls = params["class"] || params.className;
+				if(cls){ setClass.call(this, cls); }
 				
 				// handle sort param - TODO: revise @ 1.0 when _sort -> sort
 				this._sort = params.sort || [];
@@ -157,7 +182,6 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			}else{
 				this._sort = [];
 			}
-			var domNode = this.domNode = srcNodeRef || put("div");
 			
 			// ensure arrays and hashes are initialized
 			this.observers = [];
@@ -630,6 +654,12 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			
 			return this;
 		},
+		
+		// Accept both class and className programmatically to set domNode class.
+		_getClass: getClass,
+		_setClass: setClass,
+		_getClassName: getClass,
+		_setClassName: setClass,
 		
 		_setSort: function(property, descending){
 			// summary:
