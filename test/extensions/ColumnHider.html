@@ -39,7 +39,7 @@
 				function(lang, Grid, ColumnHider, ColumnResizer, Selection, declare, testStore){
 					var columns = {
 						col1: "Column 1Column1Column 1 Column 1",
-						col2: {label: "Column2 (unhidable)", sortable: false, unhidable: true},
+						col2: { label: "Column2 (unhidable)", sortable: false, unhidable: true },
 						col3: "Column3333333333333333333",
 						col4: "Column 4",
 						col5: "Column 5"
@@ -47,7 +47,8 @@
 					columns1 = lang.clone(columns);
 					columns2 = [
 						{ field: "col2", label: "Col2" },
-						{ field: "col4", label: "Col4", sortable: false },
+						// test setting unhidable *and* hidden (i.e. not in menu, not displayed)
+						{ field: "col4", label: "Col4", sortable: false, hidden: true, unhidable: true },
 						{ field: "col1", label: "Col1" },
 						{ field: "col5", label: "Column 5" }
 					];
@@ -74,7 +75,7 @@
 		<div id="grid"></div>
 		<div>Buttons to test changing column structure:
 			<button onclick="grid.set('columns', columns2);">New Structure</button>
-			<button onclick="grid.set('columns', columns1);">Original</button>
+			<button onclick="grid.set('columns', columns1);">Original Structure</button>
 		</div>
 		<h2>Another grid w/ ColumnHider and ColumnResizer</h2>
 		<div id="gridresize"></div>

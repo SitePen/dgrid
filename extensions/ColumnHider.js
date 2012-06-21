@@ -99,6 +99,12 @@ define(["dojo/_base/declare", "dojo/has", "dojo/on", "dojo/query", "dojo/dom", "
 				for(j = 0, len = this.subRows[i].length; j < len; j++){
 					col = this.subRows[i][j];
 					id = col.id;
+					
+					if(col.hidden){
+						// hidden state is true; hide the column
+						this._columnStyleRules[id] = this.styleColumn(id, "display: none");
+					}
+					
 					// allow cols to opt out of the hider (specifically for selector col)
 					if (col.unhidable) continue;
 					
@@ -112,10 +118,7 @@ define(["dojo/_base/declare", "dojo/has", "dojo/on", "dojo/query", "dojo/dom", "
 						'" for="' + checkId + '">' + col.label.replace(/</g, "&lt;") +
 						'</label>';
 					
-					if(col.hidden){
-						// hidden state is true; hide the column
-						this._columnStyleRules[id] = this.styleColumn(id, "display: none");
-					}else{
+					if(!col.hidden){
 						// hidden state is false; checkbox should be initially checked
 						div.firstChild.checked = true;
 					}
