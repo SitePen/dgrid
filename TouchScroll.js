@@ -2,7 +2,7 @@
 // * fix glide routines (and use transitions)
 // * ensure scroll info/events are available (e.g. for OnDemandList)
 
-define(["dojo/_base/declare", "dojo/on", "dojo/has", "./util/touch"],
+define(["dojo/_base/declare", "dojo/on", "./util/has-css3", "./util/touch"],
 function(declare, on, has, touchUtil){
 	var
 		bodyTouchListener, // stores handle to body touch handler once connected
