@@ -195,3 +195,22 @@ html.has-mozilla .dgrid-focus {
 #dgrid-css-dgrid-loaded {
 	display: none;
 }
+
+/* styles for autoheight */
+.dgrid-autoheight {
+    height: auto;
+}
+.dgrid-autoheight .dgrid-scroller {
+    position: relative;
+    overflow-y: hidden;
+}
+.has-ie-6 .dgrid-autoheight .dgrid-scroller {
+    /* IE6 doesn't react properly to hidden for some reason */
+    overflow-y: visible;
+}
+.dgrid-autoheight .dgrid-header-scroll {
+    display: none;
+}
+.dgrid-autoheight .dgrid-header {
+    right: 0;
+}

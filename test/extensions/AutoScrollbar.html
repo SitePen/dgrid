@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Test AutoScrollbar</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+		<meta name="viewport" content="width=570"/>
+		<style type="text/css">
+			@import "../../../dijit/themes/claro/document.css";
+			@import "../../../dijit/themes/claro/claro.css";
+			@import "../../css/skins/claro.css";
+			html, body {
+				padding: 0;
+				margin: 0;
+				width: 100%;
+				height: 100%;
+			}
+			#bc {
+				height: 100%;
+			}
+			
+			#cpLeft .dgrid {
+				width: 300px;
+			}
+			
+			.dijitDialog {
+				width: 500px;
+			}
+		</style>
+		<script type="text/javascript" src="../../../dojo/dojo.js"
+			data-dojo-config="async: true"></script>
+		<script type="text/javascript">
+			require(["dgrid/OnDemandGrid",
+				"dgrid/Selection",
+				"dgrid/extensions/DijitRegistry",
+				"dgrid/extensions/AutoScrollbar",
+				"dojo/_base/lang",
+				"dojo/_base/declare",
+				"dojo/store/Memory", 
+				"dojo/store/Observable",
+				"dijit/layout/BorderContainer",
+				"dijit/layout/ContentPane",
+				"dijit/form/Button",
+				// non-returns
+				"dgrid/test/data/base",
+				"dojo/domReady!"
+			], function(OnDemandGrid, Selection, DijitRegistry, AutoScrollbar, lang, declare, Memory, Observable, BC, CP, Button){
+				
+				var
+					allColors = smallColorStore.query(),
+					nextColorId = allColors[allColors.length - 1].id + 1,
+					localColorStore = Observable(new Memory({data: allColors.concat()})),
+					asyncCols = {
+						col1: "Column 1", 
+						col2: "Column 2", 
+						col3: "Column 3", 
+						col4: 'Column 4'},
+					colorCols = {
+						col1: "Color name", 
+						col3: "Type", 
+						col4: {formatter: function(value) { return value; }, label: 'Description'}, 
+						col5: "Red", 
+						col6: "Green", 
+						col7: "Blue"},
+					CustomGrid = declare([OnDemandGrid, Selection, DijitRegistry, AutoScrollbar]),
+					gridLeft = new CustomGrid({
+						id: "gridLeft",
+						store: testAsyncStore,
+						columns: lang.clone(asyncCols),
+						selectionMode: "single"
+					}),
+					gridTop = new CustomGrid({
+						id: "gridTop",
+						store: localColorStore,
+						columns: lang.clone(colorCols),
+						selectionMode: "single"
+					}), 
+				   buttonsDiv = document.createElement("div"),
+					addRowButton = new Button({label: "Add row"}),
+					removeRowButton = new Button({label: "Remove row"}),
+					toggleRowButton = new Button({label: "Toggle first row height"}),
+					bc = new BC({
+						design: "sidebar"
+					}, "bc");
+				
+				var leftCp = new CP({
+					content: gridLeft,
+					region: "left", 
+					splitter: true
+				});
+				leftCp.domNode.style.width = "400px";
+				bc.addChild(leftCp);
+				bc.addChild(new CP({
+					content: gridTop,
+					region: "center"
+				}));
+				
+				addRowButton.on("click", function() { 
+					localColorStore.add(
+							  lang.mixin({}, allColors[Math.floor(Math.random() * allColors.length)], {id: nextColorId++}));
+				});
+				removeRowButton.on("click", function() {
+					localColorStore.remove((localColorStore.query().pop() || {}).id);
+				});
+				toggleRowButton.on("click", function() {
+					var firstRow = lang.mixin({}, localColorStore.query()[0]);
+					if (firstRow) {
+						if (firstRow.col4.indexOf("<br/>") == -1) {
+							firstRow.col4 = "=======<br/>" + firstRow.col4 + "<br/>======="; 
+						} else {
+							firstRow.col4 = firstRow.col4.split("<br/>")[1];
+						}
+						
+						localColorStore.put(firstRow);
+					}
+				});
+				
+				buttonsDiv.appendChild(addRowButton.domNode);
+				buttonsDiv.appendChild(removeRowButton.domNode);
+				buttonsDiv.appendChild(toggleRowButton.domNode);
+				
+				bc.addChild(new CP({
+					content: buttonsDiv,
+					region: "bottom",
+					splitter: true
+				}));
+				bc.startup();
+			});
+		</script>
+	</head>
+	<body class="claro">
+		<div id="bc"></div>
+	</body>
+</html>
