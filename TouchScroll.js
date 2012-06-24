@@ -1,13 +1,13 @@
 // FIXME:
-// * always resets to 0 position on new drag
-// * am I dragging the wrong node?
-// * no glide (and doesn't yet use transitions)
+// * fix glide routines (and use transitions)
+// * ensure scroll info/events are available (e.g. for OnDemandList)
 
-define(["dojo/_base/declare", "dojo/on", "dojo/has", "./util/touch", "xstyle/css!./css/touchscroll.css"],
+define(["dojo/_base/declare", "dojo/on", "dojo/has", "./util/touch"],
 function(declare, on, has, touchUtil){
 	var
 		bodyTouchListener, // stores handle to body touch handler once connected
-		timerRes = 15, // ms between drag velocity measurements
+		calcTimerRes = 100, // ms between drag velocity measurements
+		glideTimerRes = 30, // ms between glide animation ticks
 		transitionDuration = 250, // duration (ms) for each CSS transition step
 		touches = 0, // records number of touches on document
 		current = {}, // records info for widget currently being scrolled/glided
@@ -33,7 +33,7 @@ function(declare, on, has, touchUtil){
 	
 	if(!hasTransitions || !translatePrefix){
 		console.warn("CSS3 features unavailable for touch scroll effects.");
-		return;
+		return function(){};
 	}
 	
 	// figure out strings for use later in events
@@ -61,7 +61,7 @@ function(declare, on, has, touchUtil){
 			clearTimeout(current.timer);
 			
 			// determine current translate X/Y from final used values
-			match = matrixRx.exec(window.getComputedStyle(this, transformProp));
+			match = matrixRx.exec(window.getComputedStyle(this)[transformProp]);
 			pos = match && match.length == 3 ? match.slice(1) : [0, 0];
 			
 			// stop current transition in its tracks
@@ -84,7 +84,7 @@ function(declare, on, has, touchUtil){
 			// subtract touch coords now, then add back later, so that translation
 			// goes further negative when moving upwards
 			start: [pos[0] - touch.pageX, pos[1] - touch.pageY],
-			timer: setTimeout(calcTick, timerRes)
+			timer: setTimeout(calcTick, calcTimerRes)
 		};
 	}
 	function ontouchmove(evt){
@@ -106,9 +106,7 @@ function(declare, on, has, touchUtil){
 		on.emit(current.widget.domNode, "scroll", {});
 	}
 	function ontouchend(evt){
-		if(touches != 1 || !current){ return; } // ignore multitouch/invalid events
-		current.timer && clearTimeout(current.timer);
-		startGlide();
+		if(touches == 1 && current){ startGlide(); }
 	}
 	
 	// glide-related functions
@@ -118,20 +116,12 @@ function(declare, on, has, touchUtil){
 		if(!current){ return; } // no currently-scrolling widget; abort
 		
 		var node = current.node,
-			match = translateRx.exec(node.style[transformProp]),
-			x = match[1] || 0,
-			y = match[2] || 0;
-		/*
-		if("prevX" in current){
-			// calculate velocity using previous reference point
-			current.velX = x - current.prevX;
-			current.velY = y - current.prevY;
-		}
-		*/
+			match = translateRx.exec(node.style[transformProp]);
+		
 		// set previous reference point for future iteration or calculation
-		current.lastPos = [x, y];
+		current.lastPos = match && match.length == 3 ? match.slice(1) : [0, 0];
 		current.lastTick = new Date();
-		current.timer = setTimeout(calcTick, timerRes);
+		current.timer = setTimeout(calcTick, calcTimerRes);
 	}
 	
 	function startGlide(){
@@ -140,21 +130,26 @@ function(declare, on, has, touchUtil){
 			time, match, pos, vel;
 		
 		// calculate velocity based on time and displacement since last tick
+		current.timer && clearTimeout(current.timer);
 		time = (new Date()) - current.lastTick;
 		match = translateRx.exec(current.node.style[transformProp]);
 		pos = match && match.length == 3 ? match.slice(1) : [0, 0];
 		
 		vel = [ // TODO: timerRes -> transitionDuration
-			(pos[0] - lastPos[0]) / timerRes,
-			(pos[1] - lastPos[1]) / timerRes
+			(pos[0] - lastPos[0]) / calcTimerRes,
+			(pos[1] - lastPos[1]) / calcTimerRes
 		];
 		
-		if(!vel[0] && !vel[1]){ return; } // no glide to perform
+		//if(!vel[0] && !vel[1]){ // no glide to perform
+			current = null;
+			return;
+		//}
 		
 		// update lastPos with current position, for glide calculations
 		current.lastPos = pos;
+		current.vel = vel;
 		current.calcFunc = function(){ calcGlide(); };
-		current.timer = setTimeout(current.calcFunc, timerRes);
+		current.timer = setTimeout(current.calcFunc, glideTimerRes);
 	}
 	function calcGlide(){
 		// performs glide and decelerates according to widget's glideDecel method
@@ -165,8 +160,8 @@ function(declare, on, has, touchUtil){
 		
 		node = current.node;
 		widget = current.widget;
-		x = current.lastPos[0];
-		y = current.lastPos[1];
+		x = +current.lastPos[0];
+		y = +current.lastPos[1];
 		nvx = widget.glideDecel(current.vel[0]);
 		nvy = widget.glideDecel(current.vel[1]);
 		
@@ -175,17 +170,15 @@ function(declare, on, has, touchUtil){
 			nx = Math.max(Math.min(0, x + nvx), -(node.scrollWidth - node.offsetWidth));
 			ny = Math.max(Math.min(0, y + nvy), -(node.scrollHeight - node.offsetHeight));
 			if(nx != x || ny != y){
-				// still scrollable; update velocities and schedule next tick
+				// still scrollable; update offsets/velocities and schedule next tick
 				node.style[transformProp] =
 					translatePrefix + nx + "px," + ny + "px" + translateSuffix;
-				/* old
-				node.scrollLeft += nvx;
-				node.scrollTop += nvy;
-				*/
 				// update information
 				current.lastPos = [nx, ny];
 				current.vel = [nvx, nvy];
-				current.timer = setTimeout(current.calcFunc, timerRes);
+				current.timer = setTimeout(current.calcFunc, glideTimerRes);
+			}else{
+				current = null;
 			}
 		}
 	}
