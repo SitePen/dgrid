@@ -324,15 +324,15 @@ return function(column, editor, editOn){
 	
 	var originalRenderCell = column.renderCell || Grid.defaultRenderCell,
 		listeners = [],
-		isWidget,
-		editorArgsFunc = null;
+		isWidget;
 	
 	// accept arguments as parameters to editor function, or from column def,
 	// but normalize to column def.
 	column.editor = editor = editor || column.editor || "text";
 	column.editOn = editOn = editOn || column.editOn;
+
 	if (typeof column.editorArgs === 'function') {
-		editorArgsFunc = column.editorArgs;
+		column.editorArgsFunc = column.editorArgs;
 	}
 	
 	isWidget = typeof editor != "string";
@@ -385,8 +385,8 @@ return function(column, editor, editOn){
 			});
 		}
 
-		if (editorArgsFunc) {
-			column.editorArgs = editorArgsFunc(object);
+		if (column.editorArgsFunc) {
+			column.editorArgs = column.editorArgsFunc(object);
 		}
 		
 		// initially render content in non-edit mode
@@ -396,8 +396,8 @@ return function(column, editor, editOn){
 		// always-on: create editor immediately upon rendering each cell
 		var cmp = createEditor(column);
 
-		if (editorArgsFunc) {
-			column.editorArgs = editorArgsFunc(object);
+		if (column.editorArgsFunc) {
+			column.editorArgs = column.editorArgsFunc(object);
 		}
 		
 		showEditor(cmp, column, cell, value);
