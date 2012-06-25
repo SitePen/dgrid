@@ -324,12 +324,16 @@ return function(column, editor, editOn){
 	
 	var originalRenderCell = column.renderCell || Grid.defaultRenderCell,
 		listeners = [],
-		isWidget;
+		isWidget,
+		editorArgsFunc = null;
 	
 	// accept arguments as parameters to editor function, or from column def,
 	// but normalize to column def.
 	column.editor = editor = editor || column.editor || "text";
 	column.editOn = editOn = editOn || column.editOn;
+	if (typeof column.editorArgs === 'function') {
+		editorArgsFunc = column.editorArgs;
+	}
 	
 	isWidget = typeof editor != "string";
 	
@@ -380,6 +384,10 @@ return function(column, editor, editOn){
 				column.grid.edit(this);
 			});
 		}
+
+		if (editorArgsFunc) {
+			column.editorArgs = editorArgsFunc(object);
+		}
 		
 		// initially render content in non-edit mode
 		return originalRenderCell.call(column, object, value, cell, options);
@@ -387,6 +395,10 @@ return function(column, editor, editOn){
 	} : function(object, value, cell, options){
 		// always-on: create editor immediately upon rendering each cell
 		var cmp = createEditor(column);
+
+		if (editorArgsFunc) {
+			column.editorArgs = editorArgsFunc(object);
+		}
 		
 		showEditor(cmp, column, cell, value);
 		
