@@ -34,7 +34,7 @@
 				border-color: #cc0;
 			}
 			.claro .cn {
-				border-color: #0cc;
+				border-color: #00c;
 			}
 			.claro .dom {
 				border-color: #c0c;
@@ -91,15 +91,15 @@
 					grid.on("click", function(){
 						var cls = grid.get("class");
 						
-						console.log(grid.id + " - before: get('class') = " +
-							cls + " / domNode.className = " + grid.domNode.className);
+						console.log(grid.id + " - before: get('class') = '" +
+							cls + "'; domNode.className = '" + grid.domNode.className + "'");
 						
 						// switch current class between toggle and no class
 						grid.set("class", cls === "toggle" ? "" : "toggle");
 						
-						console.log(grid.id + " - after: get('class') = " +
-							grid.get("class") + " / domNode.className = " +
-							grid.domNode.className);
+						console.log(grid.id + " - after: get('class') = '" +
+							grid.get("class") + "'; domNode.className = '" +
+							grid.domNode.className + "'");
 					});
 				});
 			});
@@ -115,7 +115,8 @@
 		<div id="gridCN"></div>
 		<div id="gridDOM" class="dom"></div>
 		<h2 class="clear">Declarative grid with initially-defined class</h2>
-		<table data-dojo-type="dgrid.GridFromHtml" data-dojo-id="gridDecl" class="dom">
+		<table data-dojo-type="dgrid.GridFromHtml" data-dojo-id="gridDecl"
+			id="gridDecl" class="dom">
 			<thead>
 				<th data-dgrid-column="{field: 'order'}">step</th>
 				<th data-dgrid-column="{field: 'name'}">name</th>
