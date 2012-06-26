@@ -465,7 +465,8 @@ function(arrayUtil, kernel, declare, listen, aspect, has, miscUtil, TouchScroll,
 		insertRow: function(object, parent, beforeNode, i, options){
 			// summary:
 			//		Renders a single row in the grid
-			var id = this.id + "-row-" + ((this.store && this.store.getIdentity) ? this.store.getIdentity(object) : this._autoId++);
+			var parentId = options.parentId;
+			var id = this.id + "-row-" + (parentId ? parentId + "-" : "") + ((this.store && this.store.getIdentity) ? this.store.getIdentity(object) : this._autoId++);
 			var row = byId(id);
 			if(!row || // we must create a row if it doesn't exist, or if it previously belonged to a different container 
 					(beforeNode && row.parentNode != beforeNode.parentNode)){

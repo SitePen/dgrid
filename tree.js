@@ -86,12 +86,15 @@ return function(column){
 							return grid.store.getChildren(row.data, options);
 						};
 						query.level = target.level;
+						if(column.allowDuplicates){
+							var options = {parentId: row.id};
+						}
 						Deferred.when(
 							grid.renderQuery ?
 								grid._trackError(function(){
-									return grid.renderQuery(query, preloadNode);
+									return grid.renderQuery(query, preloadNode, options);
 								}) :
-								grid.renderArray(query({}), preloadNode),
+								grid.renderArray(query(options), preloadNode),
 									function(){
 										container.style.height = container.scrollHeight + "px";
 									});

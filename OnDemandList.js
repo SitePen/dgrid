@@ -49,7 +49,7 @@ return declare([List, _StoreMixin], {
 				null, this.pagingDelay));
 	},
 	
-	renderQuery: function(query, preloadNode){
+	renderQuery: function(query, preloadNode, options){
 		// summary:
 		//		Creates a preload node for rendering a query into, and executes the query
 		//		for the first page of data. Subsequent data will be downloaded as it comes
@@ -57,7 +57,8 @@ return declare([List, _StoreMixin], {
 		var preload = {
 			query: query,
 			count: 0,
-			node: preloadNode
+			node: preloadNode,
+			options: options
 		};
 		if(!preloadNode){
 			var rootQuery = true;
@@ -68,7 +69,8 @@ return declare([List, _StoreMixin], {
 				count: 0,
 				//topPreloadNode.preload = true;
 				query: query,
-				next: preload
+				next: preload,
+				options: options
 			};
 			preload.node = preloadNode = put(this.contentNode, "div.dgrid-preload");
 			preload.previous = topPreload;
@@ -100,7 +102,7 @@ return declare([List, _StoreMixin], {
 		put(loadingNode, "div.dgrid-below", this.loadingMessage);
 		// Establish query options, mixing in our own.
 		// (The getter returns a delegated object, so simply using mixin is safe.)
-		var options = lang.mixin(this.get("queryOptions"),
+		options = lang.mixin(this.get("queryOptions"), options, 
 			{start: 0, count: this.minRowsPerPage, query: query});
 		// execute the query
 		var results = query(options);
@@ -293,7 +295,7 @@ return declare([List, _StoreMixin], {
 				}
 				count = Math.ceil(count);
 				offset = Math.min(Math.floor(offset), preload.count - count);
-				var options = grid.get("queryOptions");
+				var options = lang.mixin(grid.get("queryOptions"), preload.options);
 				preload.count -= count;
 				var beforeNode = preloadNode,
 					keepScrollTo, queryRowsOverlap = grid.queryRowsOverlap,
