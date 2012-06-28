@@ -29,7 +29,7 @@ function contains(parent, node){
 	if(has("dom-contains")){
 		return parent.contains(node);
 	}else{
-		return parent.compareDocumentPosition(child) & 8 /* DOCUMENT_POSITION_CONTAINS */;
+		return parent.compareDocumentPosition(node) & 8 /* DOCUMENT_POSITION_CONTAINS */;
 	}
 }
 
@@ -174,7 +174,7 @@ return declare([List], {
 					cell = grid.row(cellFocusedElement);
 				}
 				if(move){
-					cell = cell && grid[orientation](cell, move);
+					cell = cell && grid[orientation](cell, move, true);
 				}
 				var nextFocus = cell && cell.element;
 				if(nextFocus){

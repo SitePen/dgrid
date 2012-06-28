@@ -56,8 +56,8 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dojo/on", "dgrid/OnDemandList", "dgrid/OnDemandGrid","dgrid/Keyboard", "dgrid/Selection", "dgrid/Editor", "dijit/form/DateTextBox", "dijit/form/HorizontalSlider", "dijit/form/NumberSpinner",  "dgrid/test/data/base", "dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array", "dojo/_base/Deferred", "dojo/dom-construct", "dojo/store/Memory", "dojo/domReady!"],
-				function(on, List, Grid, Keyboard, Selection, Editor, DateTextBox, Slider, NumberSpinner, data, lang, declare, arrayUtil, Deferred, domConstruct, Memory){
+			require(["dojo/on", "dgrid/OnDemandList", "dgrid/OnDemandGrid","dgrid/Keyboard", "dgrid/Selection", "dgrid/editor", "dijit/form/DateTextBox", "dijit/form/HorizontalSlider", "dijit/form/NumberSpinner",  "dgrid/test/data/base", "dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array", "dojo/_base/Deferred", "dojo/dom-construct", "dojo/store/Memory", "dojo/domReady!"],
+				function(on, List, Grid, Keyboard, Selection, editor, DateTextBox, Slider, NumberSpinner, data, lang, declare, arrayUtil, Deferred, domConstruct, Memory){
 					
 					// Create error store
 					errorStore = new Memory();
@@ -94,17 +94,17 @@
 						col4: 'Column 4',
 						col5: 'Column 5',
 						col6: 'Column 6',
-						"last-col": {label: 'Column 7', field: 'col7'}
+						col7: 'Column 7'
 					};
 
 					var columns2 = [
-						Editor({label: 'Real Number', field: 'floatNum'}, Slider),
-						Editor({label: 'Integer', field: 'integer', editorArgs: {style: 'width: 5em;'}}, NumberSpinner),
-						Editor({label: 'Text editable if checkbox checked', field: 'text', canEdit: function(object){
+						editor({label: 'Real Number', field: 'floatNum'}, Slider),
+						editor({label: 'Integer', field: 'integer', editorArgs: {style: 'width: 5em;'}}, NumberSpinner),
+						editor({label: 'Text editable if checkbox checked', field: 'text', canEdit: function(object){
 							return object.bool;
 						}}, "text", "dblclick"),
-						Editor({label: 'Another Date (autoSave)', field: 'date2', autoSave:true}, DateTextBox, "focus"),
-						Editor({label: 'Check', field: 'bool'}, "checkbox")
+						editor({label: 'Another Date (autoSave)', field: 'date2', autoSave:true}, DateTextBox, "focus"),
+						editor({label: 'Check', field: 'bool'}, "checkbox")
 					];
 
 					var columns3 = {
@@ -121,38 +121,37 @@
 						col4: 'Description',
 						col5: 'R',
 						col6: 'G',
-						"last-col": {label: 'B', field: 'col7'}
+						col7: 'B'
 					};
-					window.grid = declare([Grid])({
+					var StandardGrid = declare([Grid, Selection, Keyboard]);
+					window.grid = new StandardGrid({
 						store: testStore,
 						columns: columns,
 						sort: "col3", // initially sort by col3 ascending
 						noDataMessage: "Nobody here but us chickens!"
 					}, "grid");
 
-					window.grid2 = declare([Grid, Selection, Keyboard])({
+					window.grid2 = new StandardGrid({
 						store: testTypesStore,
 						columns: columns2,
 						selectionMode: "single"
 					},"grid2");
 
-					window.grid3 = declare([Grid, Keyboard])({
+					window.grid3 = new StandardGrid({
 						store: testTypesStore,
 						columns: columns3
 					}, "grid3");
 
-					window.gridAddDel = declare([Grid, Keyboard, Selection])({
+					window.gridAddDel = new StandardGrid({
 						store: smallColorStore,
-						columns: columns4,
-						selectionMode: "multiple"
+						columns: lang.clone(columns4)
 					}, "gridAddDel");
 					
 					// also throw in a List connected to the same store
 					// (so additions/deletions should show up in both)
-					window.listAddDel = declare([List, Keyboard, Selection])({
+					window.listAddDel = new (declare([List, Keyboard, Selection]))({
 						store: smallColorStore,
-						columns: columns4,
-						selectionMode: "multiple",
+						columns: lang.clone(columns4),
 						renderRow: function(object, options){
 							// need to define renderRow to accommodate store items
 							return domConstruct.create("div", {
@@ -198,7 +197,7 @@
 								}
 						).shift();
 						if(sortByCol1){
-							console.log("modifying existing sortOrder for col1: ", sortByCol1);
+							console.log("modifying existing sort direction for col1: ", sortByCol1);
 						} else {
 							sortByCol1 = { attribute: "col1" };
 						}

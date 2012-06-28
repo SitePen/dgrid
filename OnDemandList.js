@@ -8,6 +8,13 @@ return declare([List, _StoreMixin], {
 	// maxRowsPerPage: Integer
 	//		The maximum number of rows to request at one time.
 	maxRowsPerPage: 100,
+	// maxEmptySpace: Integer
+	//		Defines the maximum size (in pixels) of unrendered space below the
+	//		currently-rendered rows. Setting this to less than Infinity can be useful if you
+	//		wish to limit the initial vertical scrolling of the grid so that the scrolling is
+	// 		not excessively sensitive. With very large grids of data this may make scrolling
+	//		easier to use, albiet it can limit the ability to instantly scroll to the end.
+	maxEmptySpace: Infinity,	
 	// bufferRows: Integer
 	//	  The number of rows to keep ready on each side of the viewport area so that the user can
 	//	  perform local scrolling without seeing the grid being built. Increasing this number can
@@ -17,8 +24,8 @@ return declare([List, _StoreMixin], {
 	//		Defines the minimum distance (in pixels) from the visible viewport area
 	//		rows must be in order to be removed.  Setting to Infinity causes rows
 	//		to never be removed.
-	farOffRemoval: 1000,
-
+	farOffRemoval: 10000,
+	
 	rowHeight: 22,
 	
 	// queryRowsOverlap: Integer
@@ -317,12 +324,12 @@ return declare([List, _StoreMixin], {
 				// the preload is below the line of sight
 				do{
 					preload = preload.previous;
-				}while(preload && !preload.node.offsetParent); // skip past preloads that are not currently connected
+				}while(preload && !preload.node.offsetWidth); // skip past preloads that are not currently connected
 			}else if(visibleTop - mungeAmount - searchBuffer > (preloadTop + (preloadHeight = preloadNode.offsetHeight))){
 				// the preload is above the line of sight
 				do{
 					preload = preload.next;
-				}while(preload && !preload.node.offsetParent);// skip past preloads that are not currently connected
+				}while(preload && !preload.node.offsetWidth);// skip past preloads that are not currently connected
 			}else{
 				// the preload node is visible, or close to visible, better show it
 				var offset = (visibleTop - preloadTop - requestBuffer) / grid.rowHeight;

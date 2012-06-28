@@ -1,15 +1,18 @@
 define([
 	"dojo/_base/kernel",
 	"dojo/_base/lang",
+	"dojo/_base/array",
+	"dojo/_base/Deferred",
 	"dojo/on",
 	"dojo/aspect",
 	"dojo/has",
 	"./Grid",
 	"put-selector/put",
 	"dojo/_base/sniff"
-], function(kernel, lang, on, aspect, has, Grid, put){
+], function(kernel, lang, arrayUtil, Deferred, on, aspect, has, Grid, put){
 
-var activeCell, activeValue; // tracks cell currently being edited, and its value
+// Variables to track info for cell currently being edited (editOn only).
+var activeCell, activeValue, activeOptions;
 
 function updateInputValue(input, value){
 	// common code for updating value of a standard input
@@ -46,7 +49,8 @@ function dataFromEditor(column, cmp){
 function setProperty(grid, cellElement, oldValue, value){
 	// Updates dirty hash and fires dgrid-datachange event for a changed value.
 	var cell, row, column;
-	if(oldValue.valueOf() != value.valueOf()){
+	// test whether old and new values are inequal, with coercion (e.g. for Dates)
+	if(!(oldValue >= value && oldValue <= value)){
 		cell = grid.cell(cellElement);
 		row = cell.row;
 		column = cell.column;
@@ -62,7 +66,7 @@ function setProperty(grid, cellElement, oldValue, value){
 						bubbles: true,
 						cancelable: true
 					})){
-				if (grid.updateDirty){
+				if(grid.updateDirty){
 					// for OnDemandGrid: update dirty data, and save if autoSave is true
 					grid.updateDirty(row.id, column.field, value);
 					// perform auto-save (if applicable) in next tick to avoid
@@ -86,9 +90,9 @@ function setPropertyFromEditor(grid, column, cmp) {
 			activeCell ? activeValue : cmp._dgridLastValue,
 			dataFromEditor(column, cmp));
 		
-		if(activeCell){ // for Editors with editOn defined
+		if(activeCell){ // for editors with editOn defined
 			activeValue = value;
-		}else{ // for always-on Editors, update _dgridLastValue immediately
+		}else{ // for always-on editors, update _dgridLastValue immediately
 			cmp._dgridLastValue = value;
 		}
 	}
@@ -113,10 +117,9 @@ function createEditor(column){
 		node = cmp.focusNode || cmp.domNode;
 		
 		// Add dgrid-input to className to make consistent with HTML inputs.
-		// (Can't do this using className argument to constructor; causes issues)
 		node.className += " dgrid-input";
 		
-		// For editOn Editors, connect to onBlur rather than onChange, since
+		// For editOn editors, connect to onBlur rather than onChange, since
 		// the latter is delayed by setTimeouts in Dijit and will fire too late.
 		cmp.connect(cmp, editOn ? "onBlur" : "onChange", function(){
 			if(!cmp._dgridIgnoreChange){
@@ -184,17 +187,22 @@ function createSharedEditor(column, originalRenderCell){
 	
 	function onblur(){
 		var parentNode = node.parentNode,
+			cell = column.grid.cell(node),
+			i = parentNode.children.length - 1,
+			options = { alreadyHooked: true },
 			renderedNode;
 		
-		// remove the editor from the cell
+		// Remove the editor from the cell, to be reused later.
 		parentNode.removeChild(node);
 		
-		// pass new value to original renderCell implementation for this cell
-		Grid.appendIfNode(parentNode, originalRenderCell(
-			column.grid.row(parentNode).data, activeValue, parentNode));
+		// Clear out the rest of the cell's contents, then re-render with new value.
+		while(i--){ put(parentNode.firstChild, "!"); }
+		Grid.appendIfNode(parentNode, column.renderCell(
+			column.grid.row(parentNode).data, activeValue, parentNode,
+			activeOptions ? lang.delegate(options, activeOptions) : options));
 		
 		// reset state now that editor is deactivated
-		activeCell = activeValue = null;
+		activeCell = activeValue = activeOptions = null;
 		column._editorBlurHandle.pause();
 	}
 	
@@ -224,7 +232,7 @@ function createSharedEditor(column, originalRenderCell){
 
 function showEditor(cmp, column, cell, value){
 	// Places a shared editor into the newly-active cell in the column.
-	// Also called when rendering an editor in an "always-on" Editor column.
+	// Also called when rendering an editor in an "always-on" editor column.
 	
 	var grid = column.grid,
 		editor = column.editor,
@@ -239,7 +247,7 @@ function showEditor(cmp, column, cell, value){
 	if(isWidget){
 		// For widgets, ensure startup is called before setting value,
 		// to maximize compatibility with flaky widgets like dijit/form/Select.
-		if (!cmp._started){ cmp.startup(); }
+		if(!cmp._started){ cmp.startup(); }
 		
 		// Set value, but ensure it isn't processed as a user-generated change.
 		// (Clear flag on a timeout to wait for delayed onChange to fire first)
@@ -249,105 +257,141 @@ function showEditor(cmp, column, cell, value){
 	}
 	// track previous value for short-circuiting or in case we need to revert
 	cmp._dgridLastValue = value;
-	// if this is an Editor with editOn, also reset activeValue
+	// if this is an editor with editOn, also update activeValue
+	// (activeOptions will have been updated previously)
 	if(activeCell){ activeValue = value; }
 }
 
-// Editor column plugin function
+function edit(cell) {
+	// summary:
+	//		Method to be mixed into grid instances, which will show/focus the
+	//		editor for a given grid cell.  Also used by renderCell.
+	// cell: Object
+	//		Cell (or something resolvable by grid.cell) to activate editor on.
+	// returns:
+	//		If the cell is editable, returns a promise resolving to the editor
+	//		input/widget when the cell editor is focused.
+	//		If the cell is not editable, returns null.
+	
+	var row, column, cellElement, dirty, field, value, cmp, dfd;
+	
+	if(!cell.column){ cell = this.cell(cell); }
+	column = cell.column;
+	field = column.field;
+	cellElement = cell.element.contents || cell.element;
+	
+	if((cmp = column.editorInstance)){ // shared editor (editOn used)
+		if(activeCell != cellElement &&
+				(!column.canEdit || column.canEdit(cell.row.data, value))){
+			activeCell = cellElement;
+			row = cell.row;
+			dirty = this.dirty && this.dirty[row.id];
+			value = (dirty && field in dirty) ? dirty[field] :
+				column.get ? column.get(row.data) : row.data[field];
+			
+			showEditor(column.editorInstance, column, cellElement, value);
+			
+			// focus / blur-handler-resume logic is surrounded in a setTimeout
+			// to play nice with Keyboard's dgrid-cellfocusin as an editOn event
+			dfd = new Deferred();
+			setTimeout(function(){
+				// focus the newly-placed control (supported by form widgets and HTML inputs)
+				if(cmp.focus){ cmp.focus(); }
+				// resume blur handler once editor is focused
+				if(column._editorBlurHandle){ column._editorBlurHandle.resume(); }
+				dfd.resolve(cmp);
+			}, 0);
+			
+			return dfd.promise;
+		}
+	}else if(column.editor){ // editor but not shared; always-on
+		cmp = cellElement.widget || cellElement.input;
+		if(cmp){
+			dfd = new Deferred();
+			if(cmp.focus){ cmp.focus(); }
+			dfd.resolve(cmp);
+			return dfd.promise;
+		}
+	}
+	return null;
+}
+
+// editor column plugin function
 
 return function(column, editor, editOn){
 	// summary:
 	//		Adds editing capability to a column's cells.
 	
 	var originalRenderCell = column.renderCell || Grid.defaultRenderCell,
-		isWidget, cleanupAdded;
+		listeners = [],
+		isWidget;
 	
-	// accept arguments as parameters to Editor function, or from column def,
+	// accept arguments as parameters to editor function, or from column def,
 	// but normalize to column def.
-	column.editor = editor = editor || column.editor;
+	column.editor = editor = editor || column.editor || "text";
 	column.editOn = editOn = editOn || column.editOn;
 	
 	isWidget = typeof editor != "string";
 	
 	// warn for widgetArgs -> editorArgs; TODO: remove @ 1.0
-	if (column.widgetArgs) {
+	if(column.widgetArgs){
 		kernel.deprecated("column.widgetArgs", "use column.editorArgs instead",
 			"dgrid 1.0");
 		column.editorArgs = column.widgetArgs;
 	}
 	
+	aspect.after(column, "init", editOn ? function(){
+		var grid = column.grid;
+		if(!grid.edit){ grid.edit = edit; }
+		
+		// Create one shared widget/input to be swapped into the active cell.
+		column.editorInstance = createSharedEditor(column, originalRenderCell);
+	} : function(){
+		var grid = column.grid;
+		if(!grid.edit){ grid.edit = edit; }
+		
+		if(isWidget){
+			// add advice for cleaning up widgets in this column
+			listeners.push(aspect.before(grid, "removeRow", function(rowElement){
+				// destroy our widget during the row removal operation
+				var cellElement = grid.cell(rowElement, column.id).element,
+					widget = (cellElement.contents || cellElement).widget;
+				if(widget){ widget.destroyRecursive(); }
+			}));
+		}
+	});
+	
+	aspect.after(column, "destroy", function(){
+		arrayUtil.forEach(listeners, function(l){ l.remove(); });
+		if(column._editorBlurHandle){ column._editorBlurHandle.remove(); }
+		
+		if(editOn && isWidget){ column.editorInstance.destroyRecursive(); }
+	});
+	
 	column.renderCell = editOn ? function(object, value, cell, options){
-		// On first run, create one shared widget/input which will be swapped into
-		// the active cell.
-		if(!column.editorInstance){
-			column.editorInstance = createSharedEditor(column, originalRenderCell);
-		}
-		
-		if (!cleanupAdded && isWidget) {
-			cleanupAdded = true;
-			// clean up shared widget instance when the grid is destroyed
-			aspect.before(column.grid, "destroy", function(){
-				column.editorInstance.destroyRecursive();
-			});
-		}
-		
 		// TODO: Consider using event delegation
 		// (Would require using dgrid's focus events for activating on focus,
 		// which we already advocate in README for optimal use)
 		
-		// in IE<8, cell is the child of the td due to the extra padding node
-		on(cell.tagName == "TD" ? cell : cell.parentNode,
-				editOn, function(){
-			var cmp = column.editorInstance,
-				grid = column.grid,
-				field = column.field,
-				row, dirty, value;
-			
-			if(activeCell != this &&
-					(!column.canEdit || column.canEdit(object, value))){
-				activeCell = this;
-				
-				// retrieve latest value; if retrieving from row, run through column.get
-				row = grid.row(cell);
-				dirty = grid.dirty && grid.dirty[row.id];
-				value = (dirty && field in dirty) ? dirty[field] :
-					column.get ? column.get(row.data) : row.data[field];
-				showEditor(cmp, column, cell, value);
-				
-				// focus / blur-handler-resume logic is surrounded in a setTimeout
-				// to play nice with Keyboard's dgrid-cellfocusin as an editOn event
-				setTimeout(function(){
-					// focus the newly-placed control
-					cmp.focus && cmp.focus(); // supported by form widgets and HTML inputs
-					// resume blur handler once editor is focused
-					column._editorBlurHandle && column._editorBlurHandle.resume();
-				}, 0);
-			}
-		});
+		if(!options || !options.alreadyHooked){
+			// in IE<8, cell is the child of the td due to the extra padding node
+			on(cell.tagName == "TD" ? cell : cell.parentNode, editOn, function(){
+				activeOptions = options;
+				column.grid.edit(this);
+			});
+		}
+		
 		// initially render content in non-edit mode
-		return originalRenderCell(object, value, cell, options);
+		return originalRenderCell.call(column, object, value, cell, options);
+		
 	} : function(object, value, cell, options){
 		// always-on: create editor immediately upon rendering each cell
-		var grid = column.grid,
-			cmp = createEditor(column);
+		var cmp = createEditor(column);
+		
 		showEditor(cmp, column, cell, value);
 		
-		if(isWidget){
-			// maintain reference for later cleanup
-			cell.widget = cmp;
-			
-			if(!cleanupAdded){
-				cleanupAdded = true;
-				
-				// add advice for cleaning up widgets in this column
-				aspect.before(grid, "removeRow", function(rowElement){
-					// destroy our widget during the row removal operation
-					var cellElement = grid.cell(rowElement, column.id).element,
-						widget = (cellElement.contents || cellElement).widget;
-					widget && widget.destroyRecursive();
-				});
-			}
-		}
+		// Maintain reference for later use.
+		cell[isWidget ? "widget" : "input"] = cmp;
 	};
 	
 	return column;

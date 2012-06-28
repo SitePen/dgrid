@@ -22,7 +22,7 @@ return declare([List], {
 	
 	//allowSelectAll: Boolean
 	//		If true, allow ctrl/cmd+A to select all rows.
-	//		Also consulted by Selector for showing select-all checkbox.
+	//		Also consulted by the selector plugin for showing select-all checkbox.
 	allowSelectAll: false,
 	
 	create: function(){
@@ -158,8 +158,8 @@ return declare([List], {
 		
 		aspect.before(this, "removeRow", function(rowElement, justCleanup){
 			if(!justCleanup){
-				// if it is a real row removal, we deselect the item
-				this.deselect(rowElement);
+				// if it is a real row removal for a selected item, deselect it
+				if(this.row(rowElement).id in this.selection){ this.deselect(rowElement); }
 			}
 		});
 	},

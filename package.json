@@ -18,12 +18,13 @@
   },
   "dependencies": {
     "dojo": "1.7.2",
-    "put-selector": "0.2.0",
-    "xstyle": "0.0.2"
+    "put-selector": "0.3.0",
+    "xstyle": "0.0.5"
   },
   "directories": {
     "lib": "."
   },
   "main": "./OnDemandGrid",
-  "icon": "http://packages.dojofoundation.org/images/dgrid.png"
+  "icon": "http://packages.dojofoundation.org/images/dgrid.png",
+  "dojoBuild": "package.js"
 }

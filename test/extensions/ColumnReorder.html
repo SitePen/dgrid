@@ -55,12 +55,12 @@
 			require(["dgrid/Grid", "dgrid/extensions/ColumnReorder", "dgrid/extensions/ColumnResizer",
 					"dojo/_base/declare", "dojo/domReady!"],
 				function(Grid, ColumnReorder, ColumnResizer, declare){
-					window.grid = declare([Grid, ColumnReorder])({
+					window.grid = new (declare([Grid, ColumnReorder]))({
 						columns: columns1
 					}, "grid");
 					grid.renderArray(data);
 					
-					window.grid2 = declare([Grid, ColumnReorder, ColumnResizer])({
+					window.grid2 = new (declare([Grid, ColumnReorder, ColumnResizer]))({
 						columns: {
 							order: { label: "step", reorderable: false },
 							name: {},

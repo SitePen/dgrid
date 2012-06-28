@@ -101,9 +101,9 @@ function(kernel, declare, lang, Deferred, listen){
 			// summary:
 			//		Get a fresh queryOptions object, also including the current sort
 			var options = lang.delegate(this.queryOptions, {});
-			// Prevents SimpleQueryEngine from doing unnecessary "null" sorts (which can
-			// change the ordering in browsers that don't use a stable sort algorithm, eg Chrome)
-			if(this._sort && this._sort.length){
+			if(this._sort.length){
+				// Prevents SimpleQueryEngine from doing unnecessary "null" sorts (which can
+				// change the ordering in browsers that don't use a stable sort algorithm, eg Chrome)
 				options.sort = this._sort;
 			}
 			return options;
@@ -113,7 +113,8 @@ function(kernel, declare, lang, Deferred, listen){
 			//		Implemented consistent with _getQueryOptions so that if query is
 			//		an object, this returns a protected (delegated) object instead of
 			//		the original.
-			return lang.delegate(this.query, {});
+			var q = this.query;
+			return typeof q == "object" && q != null ? lang.delegate(q, {}) : q;
 		},
 		
 		_setSort: function(property, descending){
