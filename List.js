@@ -377,7 +377,8 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 					if(next.rowIndex > -1){
 						// skip non-numeric, non-rows
 						put(next, '.' + (rowIndex % 2 == 1 ? oddClass : evenClass) + '!' + (rowIndex % 2 == 0 ? oddClass : evenClass));
-						next.rowIndex = rowIndex++;
+						next.rowIndex = rowIndex;
+						rowIndex += "rowCount" in next ? next.rowCount : 1;
 					}
 				}while((next = next.nextSibling) && next.rowIndex != rowIndex);
 			}
@@ -453,23 +454,41 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			function whenDone(resolvedRows){
 				container = beforeNode ? beforeNode.parentNode : self.contentNode;
 				if(container){
-					// If the node we're inserting after represents a block of rows (preload/loading etc),
-					// we may need to reduce its size because of queryRowsOverlap. This code will work if
-					// for some reason there is a rowIndex gap between beforeNode and its previous sibling
 					var reclaimFrom = beforeNode && beforeNode.previousSibling,
 						rowsToReclaim = reclaimFrom && reclaimFrom.rowIndex + reclaimFrom.rowCount - options.start;
-					while (rowsToReclaim && reclaimFrom && !miscUtil.isDataRow(reclaimFrom) && reclaimFrom.rowCount != null){
-						var canReclaim = Math.min(rowsToReclaim, reclaimFrom.rowCount);
-						reclaimFrom.style.height = Math.max(0, reclaimFrom.offsetHeight - canReclaim * self.rowHeight) + "px";
-						reclaimFrom.rowCount -= canReclaim;
-						reclaimFrom = reclaimFrom.previousSibling;
-						rowsToReclaim -= canReclaim;
-					}
+					reclaimRows(reclaimFrom, rowsToReclaim, "previousSibling");
 					container.insertBefore(rowsFragment, beforeNode || null);
 					lastRow = resolvedRows[resolvedRows.length - 1];
-					lastRow && self.adjustRowIndices(lastRow);
+					if(lastRow){
+						// Although normally queryRowsOverlap normally overlaps rows above, it's also possible for it
+						// to overlap below (currently only if the query starts at row 0)  
+						reclaimFrom = beforeNode && beforeNode.nextSibling;
+						rowsToReclaim = reclaimFrom && Math.max(0, lastRow.rowIndex + 1 - reclaimFrom.rowIndex);
+						reclaimRows(reclaimFrom, rowsToReclaim, "nextSibling");
+						self.adjustRowIndices(lastRow);
+					}
 				}
 				return (rows = resolvedRows);
+			}
+			function reclaimRows(reclaimFrom, rowsToReclaim, direction){
+				// If the node we're inserting before/after represents a block of rows (preload/loading etc),
+				// we may need to reduce its size because of queryRowsOverlap. This code will work if
+				// for some reason there is a rowIndex gap between reclaimFrom and its sibling
+				var reclaimed = [];
+				while(rowsToReclaim && reclaimFrom && !miscUtil.isDataRow(reclaimFrom) && reclaimFrom.rowCount != null){
+					var canReclaim = Math.min(rowsToReclaim, reclaimFrom.rowCount);
+					reclaimFrom.style.height = Math.max(0, reclaimFrom.offsetHeight - canReclaim * self.rowHeight) + "px";
+					reclaimFrom.rowCount -= canReclaim;
+					reclaimed.push({node: reclaimFrom, reclaimed: canReclaim});
+					reclaimFrom = reclaimFrom[direction];
+					rowsToReclaim -= canReclaim;
+				}
+				// If we processed multiple nodes, we need to reduce the rowIndexes by the amount we took from the
+				// nodes above them. 
+				for(var i = reclaimed.length - 1, reduction = rowsToReclaim; i >= 0; i--){
+					reduction += (reclaimed[direction == "previousSibling" ? i + 1 : i] || {}).reclaimed || 0;
+					reclaimed[i].node.rowIndex += reduction * (direction == "previousSibling" ? -1 : 1);
+				}
 			}
 			return whenDone(rows);
 		},

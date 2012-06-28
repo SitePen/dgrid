@@ -25,7 +25,7 @@ return declare([List, _StoreMixin], {
 	//		rows must be in order to be removed.  Setting to Infinity causes rows
 	//		to never be removed.
 	farOffRemoval: 10000,
-	
+
 	rowHeight: 22,
 	
 	// queryRowsOverlap: Integer
@@ -39,6 +39,9 @@ return declare([List, _StoreMixin], {
 	//		on scroll. This can be increased for low-bandwidth clients, or to
 	//		reduce the number of requests against a server 
 	pagingDelay: miscUtil.defaultDelay,
+	// How far the grid has been expanded to (so that the scroll bar doesn't jump about when using 
+	// maxEmptySpace and scrolling back to the top) 
+	_expandedTo: 0,
 
 	postCreate: function(){
 		this.inherited(arguments);
@@ -133,7 +136,7 @@ return declare([List, _StoreMixin], {
 				preloadNode.rowIndex = trCount;
 				// if total is 0, IE quirks mode can't handle 0px height for some reason, I don't know why, but we are setting display: none for now
 				if(total){
-					preloadNode.style.height = total * self.rowHeight + "px";
+					preloadNode.style.height = Math.min(total * self.rowHeight, self.maxEmptySpace) + "px";
 				}
 				preloadNode.style.display = total ? "" : "none";
 				self._processScroll(); // recheck the scroll position in case the query didn't fill the screen
@@ -148,6 +151,7 @@ return declare([List, _StoreMixin], {
 	
 	refresh: function(){
 		this.inherited(arguments);
+		this._expandedTo = 0;
 		if(this.store){
 			// render the query
 			var self = this;
@@ -290,6 +294,12 @@ return declare([List, _StoreMixin], {
 		
 		function adjustHeight(preload){
 			var height = preload.node.rowCount * grid.rowHeight;
+			if (!preload.node.nextSibling){
+				// Only apply the maxEmptySpace limit to the last preload node, otherwise the rows below the node
+				// won't be where they should be
+				var emptySpace = Math.max(grid._expandedTo - preload.node.rowIndex * grid.rowHeight, grid.maxEmptySpace);
+				height = Math.min(height, emptySpace);
+			}
 			preload.node.style.height = height + "px";
 			preload.node.style.display = height ? "" : "none"; // IE6 workaround
 		}
@@ -376,21 +386,31 @@ return declare([List, _StoreMixin], {
 				}
 				options.start = Math.max(0, preloadNode.rowIndex - queryRowsOverlap);
 				options.count = count + queryRowsOverlap;
-				preloadNode.rowIndex += count;
 
-				adjustHeight(preload);
 				// create a loading node as a placeholder while the data is loaded
 				var loadingNode = put(beforeNode, "-div.dgrid-loading[style=height:" + count * grid.rowHeight + "px]", {
 					rowCount: count,
-					rowIndex: preloadNode.rowIndex - count
+					rowIndex: preloadNode.rowIndex
 				});
 				put(loadingNode, "div.dgrid-below", grid.loadingMessage);
 				// use the query associated with the preload node to get the next "page"
 				options.query = preload.query;
+				
+				if(!preloadNode.rowCount && preload.previous && preload.next){
+					// We've completely filled in the rows the preload was occupying, so it's now redundant
+					preloadNode.parentNode.removeChild(preloadNode);
+					preload.next.previous = preload.previous;
+					preload = preload.previous.next = preload.next;
+					preloadNode = preload.node;
+				}else{
+					preloadNode.rowIndex += count;
+					adjustHeight(preload);
+				}
+				
 				// Query now to fill in these rows.
 				// Keep _trackError-wrapped results separate, since if results is a
 				// promise, it will lose QueryResults functions when chained by `when`
-				var results = preload.query(options),
+				var results = options.query(options),
 					trackedResults = grid._trackError(function(){ return results; });
 				
 				if(trackedResults === undefined){ return; } // sync query failed
@@ -423,11 +443,16 @@ return declare([List, _StoreMixin], {
 							// readjust the height
 							last.node.rowCount = Math.max(0, total - last.node.rowIndex);
 							adjustHeight(last);
+							grid._expandedTo = grid.bodyNode.scrollHeight;
 						});
 					});
 				}).call(this, loadingNode, results);
 				preload = preload.previous;
 			}
+		}
+		if(preload){
+			// Make sure we haven't left ourselves referring to a removed preload 
+			grid.preload = preload;
 		}
 	}
 });

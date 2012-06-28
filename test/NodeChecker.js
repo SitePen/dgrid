@@ -1,9 +1,9 @@
-define(["dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/has", "dojo/aspect"],
-function(declare, lang, Deferred, has, aspect){
+define(["dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/has", "dojo/aspect", "../util/misc"],
+function(declare, lang, Deferred, has, aspect, misc){
 
 return declare([], {
 	// summary: Checks that rows, preloads and loading nodes of OnDemandLists are all in the correct places;
-	//      that is they have the correct rowIndex, rowCount, offsetTop and offsetHeight.
+	//      that is they have the correct rowIndex, rowCount, offsetTop, offsetHeight and even/odd class.
 	//      Apart from logging errors to the console, the extension has no visible presence.
 
 	// Set this to false when testing lists where the rows' heights vary to avoid spurious errors
@@ -78,32 +78,56 @@ return declare([], {
 		if (this.preload && !seenBody){
 			outputErrorHeader();
 			console.log("Prenode no longer part of document");
+			if (this.breakOnError){
+				debugger;
+			}
 		}
 
 		var expectedIdx = 0;
 		for (var curr = this.contentNode.firstChild; curr && !error; curr = curr.nextSibling){
-			if (curr.rowCount){
-				if (curr.rowIndex != null && expectedIdx != curr.rowIndex){
-					outputErrorHeader();
-					console.log("rowIndex not in sequence: " + curr.rowIndex + " (expecting " + expectedIdx + ") " +
-						(curr.id ? "#" + curr.id + " " : "") + curr.className);
-					console.log(curr);
-				}
-				// We're looking for logic errors which are not browser-specific. IE for whatever reason
-				// sometimes falls outside our tolerances - if the errors don't happen in FF/Chrome it's
-				// probably just IE being silly and we don't have to worry about it (it's not user-perceptible).
-				// IE8 likes to give us strange offsetHeights during scrolling - if the are no errors on other
-				// browsers or at other times (eg rendering) it's safe to ignore.
-				if (checkNodeHeights && (rowDelta = Math.abs(curr.offsetHeight / this.rowHeight - curr.rowCount)) > 0.95){
-					outputErrorHeader(rowDelta);
-					console.log("Wrong height: " + curr.offsetHeight + " [" + curr.offsetHeight / this.rowHeight + "] (expecting " +
-						curr.rowCount * this.rowHeight + " [" + curr.rowCount + "]) " + (curr.id ? "#" + curr.id + " " : "") +
-						curr.className);
-					console.log(curr);
-				}
+			var rowId = curr.id.match(/-row-(\d+)$/);
+			if (rowId && curr.rowIndex != null && rowId[1] != curr.rowIndex){
+				outputErrorHeader();
+				console.log("Row " + curr.rowIndex + " has id " + curr.id);
+				console.log(curr);
+			}
+			
+			var evenOdd = curr.className.match(/dgrid-row-(even|odd)/);
+			if (misc.isDataRow(curr) && evenOdd && curr.rowIndex % 2 != (evenOdd[1] == "odd")) {
+				outputErrorHeader();
+				console.log("Row " + curr.rowIndex + " is incorrectly marked as " + evenOdd[1]);
+				console.log(curr);
+			}
+			
+			if (curr.rowCount != null){
+				var rowCount = curr.rowCount;
+			} else if (curr.nextSibling && "rowIndex" in curr.nextSibling) {
+				rowCount = curr.nextSibling.rowIndex - expectedIdx;
+			} else {
+				rowCount = null;
+			}
+			
+			if (curr.rowIndex != null && expectedIdx != curr.rowIndex){
+				outputErrorHeader();
+				console.log("rowIndex not in sequence: " + curr.rowIndex + " (expecting " + expectedIdx + ") " +
+					(curr.id ? "#" + curr.id + " " : "") + curr.className);
+				console.log(curr);
+			}
+			// We're looking for logic errors which are not browser-specific. IE for whatever reason
+			// sometimes falls outside our tolerances - if the errors don't happen in FF/Chrome it's
+			// probably just IE being silly and we don't have to worry about it (it's not user-perceptible).
+			// IE8 likes to give us strange offsetHeights during scrolling - if the are no errors on other
+			// browsers or at other times (eg rendering) it's safe to ignore.
+			if (checkNodeHeights && rowCount && (this.maxEmptySpace == Infinity || curr.nextSibling) && 
+					(rowDelta = Math.abs(curr.offsetHeight / this.rowHeight - rowCount)) > 0.95){
+				outputErrorHeader(rowDelta);
+				console.log("Wrong height: " + curr.offsetHeight + " [" + curr.offsetHeight / this.rowHeight + "] (expecting " +
+					rowCount * this.rowHeight + " [" + rowCount + "]) " + (curr.id ? "#" + curr.id + " " : "") +
+					curr.className);
+				console.log(curr);
 			}
 			// See above comment
-			if (checkNodeHeights && curr.rowCount !== 0 && curr.rowIndex != null &&
+			if (checkNodeHeights && rowCount !== 0 && curr.rowIndex != null &&
 					(rowDelta = Math.abs(curr.offsetTop / this.rowHeight - curr.rowIndex)) > 0.95){
 				outputErrorHeader(rowDelta);
 				console.log("Wrong position: " + curr.offsetTop + " [" + curr.offsetTop / this.rowHeight + "] (expecting " +
@@ -114,7 +138,7 @@ return declare([], {
 			if (error && this.breakOnError){
 				debugger;
 			}
-			expectedIdx += curr.rowCount == null ? 1 : curr.rowCount;
+			expectedIdx += rowCount == null ? 1 : rowCount;
 		}
 	}
 });
