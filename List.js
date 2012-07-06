@@ -227,7 +227,7 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			if(has("quirks") || has("ie") < 8){
 				spacerNode = put(domNode, "div.dgrid-spacer");
 			}
-			bodyNode = this.bodyNode = this.touchNode = put(domNode, "div.dgrid-scroller");
+			bodyNode = this.bodyNode = put(domNode, "div.dgrid-scroller");
 			
 			// firefox 4 until at least 10 adds overflow: auto elements to the tab index by default for some
 			// reason; force them to be not tabbable
@@ -254,7 +254,7 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			this.configStructure();
 			this.renderHeader();
 			
-			this.contentNode = put(this.bodyNode, "div.dgrid-content.ui-widget-content");
+			this.contentNode = this.touchNode = put(this.bodyNode, "div.dgrid-content.ui-widget-content");
 			// add window resize handler, with reference for later removal if needed
 			this._listeners.push(this._resizeHandle = listen(window, "resize",
 				miscUtil.debounce(winResizeHandler)));
