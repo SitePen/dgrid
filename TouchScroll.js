@@ -9,8 +9,8 @@ function(declare, on, has, touchUtil){
 		calcTimerRes = 100, // ms between drag velocity measurements
 		glideTimerRes = 30, // ms between glide animation ticks
 		transitionDuration = 250, // duration (ms) for each CSS transition step
-		touches = 0, // records number of touches on document
-		current = {}, // records info for widget currently being scrolled/glided
+		touches = {}, // records number of touches on components
+		current = {}, // records info for widget(s) currently being scrolled
 		glideThreshold = 1, // speed (in px) below which to stop glide - TODO: remove
 		// RegExps for parsing relevant x/y from translate and matrix values:
 		translateRx = /^translate(?:3d)?\((-?\d+)(?:px)?, (-?\d+)/,
@@ -46,19 +46,20 @@ function(declare, on, has, touchUtil){
 	cssPrefix = hasTransforms === true ? "" :
 		"-" + hasTransforms.toLowerCase() + "-";
 	
-	function updatetouchcount(evt){
-		touches = evt.touches.length;
-	}
-	
 	// functions for handling touch events on node to be scrolled
 	
 	function ontouchstart(evt){
-		var id = evt.widget.id,
-			touch, match, pos;
+		var widget = evt.widget,
+			id = widget.id,
+			touch, match, pos, curr;
+		
+		// Check touches count (which hasn't counted this touch yet);
+		// ignore touch events on inappropriate number of contact points.
+		if(touches[id] !== widget.touchesToScroll - 1){ return; }
 		
 		// stop any active glide on this widget, since it's been re-touched
-		if(current){
-			clearTimeout(current.timer);
+		if((curr = current[id])){
+			clearTimeout(curr.timer);
 			
 			// determine current translate X/Y from final used values
 			match = matrixRx.exec(window.getComputedStyle(this)[transformProp]);
@@ -74,65 +75,82 @@ function(declare, on, has, touchUtil){
 			pos = match && match.length == 3 ? match.slice(1) : [0, 0];
 		}
 		
-		// check module-level touches count (which hasn't counted this touch yet)
-		if(touches > 0){ return; } // ignore multitouch gestures
-		
-		touch = evt.touches[0];
-		current = {
-			widget: evt.widget,
+		touch = evt.targetTouches[0];
+		curr = current[id] = {
+			widget: widget,
 			node: this,
 			// subtract touch coords now, then add back later, so that translation
 			// goes further negative when moving upwards
 			start: [pos[0] - touch.pageX, pos[1] - touch.pageY],
-			timer: setTimeout(calcTick, calcTimerRes)
+			tickFunc: function(){ calcTick(id); }
 		};
+		curr.timer = setTimeout(curr.tickFunc, calcTimerRes);
 	}
 	function ontouchmove(evt){
-		var touch, nx, ny;
-		if(touches > 1 || !current){ return; } // ignore multitouch/invalid events
+		var widget = evt.widget,
+			id = widget.id,
+			curr = current[id],
+			touch, nx, ny;
 		
-		touch = evt.touches[0];
-		nx = Math.max(Math.min(0, current.start[0] + touch.pageX),
+		// Ignore touchmove events with inappropriate number of contact points.
+		if(touches[id] !== widget.touchesToScroll || !curr){
+			if(touches[id] < widget.touchesToScroll && widget.preventDefaultMove){
+				evt.preventDefault();
+			}
+			return;
+		}
+		
+		touch = evt.targetTouches[0];
+		nx = Math.max(Math.min(0, curr.start[0] + touch.pageX),
 			-(this.scrollWidth - this.offsetWidth));
-		ny = Math.max(Math.min(0, current.start[1] + touch.pageY),
+		ny = Math.max(Math.min(0, curr.start[1] + touch.pageY),
 			-(this.scrollHeight - this.offsetHeight));
 		
-		// snub event and "scroll" the area
+		// squelch the event and scroll the area
 		evt.preventDefault();
 		evt.stopPropagation();
 		this.style[transformProp] =
 			translatePrefix + nx + "px," + ny + "px" + translateSuffix;
 		
-		on.emit(current.widget.domNode, "scroll", {});
+		on.emit(widget.domNode, "scroll", {});
 	}
 	function ontouchend(evt){
-		if(touches == 1 && current){ startGlide(); }
+		var widget = evt.widget,
+			id = widget.id,
+			curr = current[id];
+		
+		if(touches[id] != widget.touchesToScroll || !curr){ return; }
+		if(curr.timer){ clearTimeout(curr.timer); }
+		startGlide(curr);
 	}
 	
 	// glide-related functions
 	
-	function calcTick(){
+	function calcTick(id){
 		// Calculates current speed of touch drag
-		if(!current){ return; } // no currently-scrolling widget; abort
+		var curr = current[id],
+			node, match, x, y;
 		
-		var node = current.node,
-			match = translateRx.exec(node.style[transformProp]);
+		if(!curr){ return; } // no currently-scrolling widget; abort
+		
+		node = curr.node;
+		match = translateRx.exec(node.style[transformProp]);
 		
 		// set previous reference point for future iteration or calculation
-		current.lastPos = match && match.length == 3 ? match.slice(1) : [0, 0];
-		current.lastTick = new Date();
-		current.timer = setTimeout(calcTick, calcTimerRes);
+		curr.lastPos = match && match.length == 3 ? match.slice(1) : [0, 0];
+		curr.lastTick = new Date();
+		curr.timer = setTimeout(curr.tickFunc, calcTimerRes);
 	}
 	
-	function startGlide(){
+	function startGlide(curr){
 		// starts glide operation when drag ends
-		var lastPos = current.lastPos,
+		var lastPos = curr.lastPos,
 			time, match, pos, vel;
 		
 		// calculate velocity based on time and displacement since last tick
-		current.timer && clearTimeout(current.timer);
-		time = (new Date()) - current.lastTick;
-		match = translateRx.exec(current.node.style[transformProp]);
+		curr.timer && clearTimeout(curr.timer);
+		time = (new Date()) - curr.lastTick;
+		match = translateRx.exec(curr.node.style[transformProp]);
 		pos = match && match.length == 3 ? match.slice(1) : [0, 0];
 		
 		vel = [ // TODO: timerRes -> transitionDuration
@@ -141,29 +159,30 @@ function(declare, on, has, touchUtil){
 		];
 		
 		//if(!vel[0] && !vel[1]){ // no glide to perform
-			current = null;
+			delete current[curr.widget.id];
 			return;
 		//}
 		
 		// update lastPos with current position, for glide calculations
-		current.lastPos = pos;
-		current.vel = vel;
-		current.calcFunc = function(){ calcGlide(); };
-		current.timer = setTimeout(current.calcFunc, glideTimerRes);
+		curr.lastPos = pos;
+		curr.vel = vel;
+		curr.calcFunc = function(){ calcGlide(id); };
+		curr.timer = setTimeout(curr.calcFunc, glideTimerRes);
 	}
-	function calcGlide(){
+	function calcGlide(id){
 		// performs glide and decelerates according to widget's glideDecel method
-		var node, widget,
+		var curr = current[id],
+			node, widget,
 			x, y, nx, ny, nvx, nvy; // old/new coords and new velocities
 		
-		if(!current){ return; }
+		if(!curr){ return; }
 		
-		node = current.node;
-		widget = current.widget;
-		x = +current.lastPos[0];
-		y = +current.lastPos[1];
-		nvx = widget.glideDecel(current.vel[0]);
-		nvy = widget.glideDecel(current.vel[1]);
+		node = curr.node;
+		widget = curr.widget;
+		x = +curr.lastPos[0];
+		y = +curr.lastPos[1];
+		nvx = widget.glideDecel(curr.vel[0]);
+		nvy = widget.glideDecel(curr.vel[1]);
 		
 		if(Math.abs(nvx) >= glideThreshold || Math.abs(nvy) >= glideThreshold){
 			// still above stop threshold; update transformation
@@ -174,40 +193,85 @@ function(declare, on, has, touchUtil){
 				node.style[transformProp] =
 					translatePrefix + nx + "px," + ny + "px" + translateSuffix;
 				// update information
-				current.lastPos = [nx, ny];
-				current.vel = [nvx, nvy];
-				current.timer = setTimeout(current.calcFunc, glideTimerRes);
+				curr.lastPos = [nx, ny];
+				curr.vel = [nvx, nvy];
+				curr.timer = setTimeout(curr.calcFunc, glideTimerRes);
 			}else{
-				current = null;
+				delete current[curr.widget.id];
 			}
 		}
 	}
 	
+	function incrementTouchCount(evt){
+		touches[evt.widget.id] += evt.changedTouches.length;
+	}
+	function decrementTouchCount(evt){
+		touches[evt.widget.id] -= evt.changedTouches.length;
+	}
+	
 	return declare([], {
+		// touchesToScroll: Number
+		//		Number of touches to require on the component's touch target node
+		//		in order to trigger scrolling behavior.
+		touchesToScroll: 1,
+		
+		// preventDefaultMove: Boolean
+		//		Controls whether touchmove events are prevented specifically when
+		//		the number of touches on the given component is less than the value
+		//		of touchesToScroll.  Useful particularly for platforms which will
+		//		automatically scroll anyway, otherwise.
+		preventDefaultMove: false,
+		
+		// touchNode: DOMNode?
+		//		Node upon which event listeners should be hooked and scroll behavior
+		//		should be based.  If not specified, defaults to containerNode or
+		//		domNode (in that order).
+		touchNode: null,
+		
 		startup: function(){
-			!this._started && this._initTouch();
+			if(!this._started){
+				this._initTouch();
+				this.inherited(arguments);
+			}
 		},
+		
 		_initTouch: function(){
 			var node = this.touchNode = this.touchNode || this.containerNode || this.domNode,
 				widget = this;
 			
 			node.style[transitionPrefix + "Property"] = cssPrefix + "transform";
 			
-			// add touch event handlers
-			on(node, "touchstart", function(evt){
-				evt.widget = widget;
-				ontouchstart.call(this, evt);
-			});
-			on(node, "touchmove", ontouchmove);
-			on(node, "touchend,touchcancel", ontouchend);
-			
-			if(!bodyTouchListener){
-				// first call ever: hook up touch listeners to entire body,
-				// to track number of active touches
-				bodyTouchListener = on(document.body,
-					"touchstart,touchend,touchcancel", updatetouchcount);
+			function wrapHandler(func){
+				return function(evt){
+					evt.widget = widget;
+					func.call(this, evt);
+				};
 			}
+			
+			touches[this.id] = 0;
+			
+			this._touchScrollListeners = [
+				on(node, "touchstart", wrapHandler(ontouchstart)),
+				on(node, "touchmove", wrapHandler(ontouchmove)),
+				on(node, "touchend,touchcancel", wrapHandler(ontouchend)),
+				// Don't need to wrap the following, since the touchstart handler
+				// above already decorates the event
+				on(node, "touchstart", incrementTouchCount),
+				on(node, "touchend,touchcancel", decrementTouchCount)
+			];
 		},
+		
+		destroy: function(){
+			var i = this._touchScrollListeners.length;
+			while(i--){
+				this._touchScrollListeners[i].remove();
+			}
+			delete touches[this.id];
+			delete current[this.id];
+			
+			this.inherited(arguments);
+		},
+		
 		glideDecel: function(n){
 			// summary:
 			//		Deceleration algorithm. Given a number representing velocity,
