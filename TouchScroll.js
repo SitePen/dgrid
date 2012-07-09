@@ -5,7 +5,6 @@
 define(["dojo/_base/declare", "dojo/on", "./util/has-css3", "./util/touch"],
 function(declare, on, has, touchUtil){
 	var
-		bodyTouchListener, // stores handle to body touch handler once connected
 		calcTimerRes = 100, // ms between drag velocity measurements
 		glideTimerRes = 30, // ms between glide animation ticks
 		transitionDuration = 250, // duration (ms) for each CSS transition step
@@ -51,28 +50,31 @@ function(declare, on, has, touchUtil){
 	function ontouchstart(evt){
 		var widget = evt.widget,
 			id = widget.id,
-			touch, match, pos, curr;
+			posX = 0,
+			posY = 0,
+			touch, match, curr;
 		
 		// Check touches count (which hasn't counted this touch yet);
 		// ignore touch events on inappropriate number of contact points.
 		if(touches[id] !== widget.touchesToScroll - 1){ return; }
 		
-		// stop any active glide on this widget, since it's been re-touched
 		if((curr = current[id])){
-			clearTimeout(curr.timer);
-			
 			// determine current translate X/Y from final used values
 			match = matrixRx.exec(window.getComputedStyle(this)[transformProp]);
-			pos = match && match.length == 3 ? match.slice(1) : [0, 0];
-			
-			// stop current transition in its tracks
-			this.style[transitionPrefix + "Duration"] = "0";
-			this.style[transformProp] =
-				translatePrefix + pos[0] + "px," + pos[1] + "px" + translateSuffix;
 		}else{
 			// determine current translate X/Y from applied style
 			match = translateRx.exec(this.style[transformProp]);
-			pos = match && match.length == 3 ? match.slice(1) : [0, 0];
+		}
+		if(match){
+			posX = +match[1];
+			posY = +match[2];
+		}
+		if(curr){
+			// stop any active glide on this widget, since it's been re-touched
+			clearTimeout(curr.timer);
+			this.style[transitionPrefix + "Duration"] = "0";
+			this.style[transformProp] =
+				translatePrefix + posX + "px," + posY + "px" + translateSuffix;
 		}
 		
 		touch = evt.targetTouches[0];
@@ -81,7 +83,8 @@ function(declare, on, has, touchUtil){
 			node: this,
 			// subtract touch coords now, then add back later, so that translation
 			// goes further negative when moving upwards
-			start: [pos[0] - touch.pageX, pos[1] - touch.pageY],
+			startX: posX - touch.pageX,
+			startY: posY - touch.pageY,
 			tickFunc: function(){ calcTick(id); }
 		};
 		curr.timer = setTimeout(curr.tickFunc, calcTimerRes);
@@ -101,9 +104,9 @@ function(declare, on, has, touchUtil){
 		}
 		
 		touch = evt.targetTouches[0];
-		nx = Math.max(Math.min(0, curr.start[0] + touch.pageX),
+		nx = Math.max(Math.min(0, curr.startX + touch.pageX),
 			-(this.scrollWidth - this.offsetWidth));
-		ny = Math.max(Math.min(0, curr.start[1] + touch.pageY),
+		ny = Math.max(Math.min(0, curr.startY + touch.pageY),
 			-(this.scrollHeight - this.offsetHeight));
 		
 		// squelch the event and scroll the area
@@ -137,35 +140,48 @@ function(declare, on, has, touchUtil){
 		match = translateRx.exec(node.style[transformProp]);
 		
 		// set previous reference point for future iteration or calculation
-		curr.lastPos = match && match.length == 3 ? match.slice(1) : [0, 0];
+		if(match){
+			curr.lastX = +match[1];
+			curr.lastY = +match[2];
+		} else {
+			curr.lastX = curr.lastY = 0;
+		}
 		curr.lastTick = new Date();
 		curr.timer = setTimeout(curr.tickFunc, calcTimerRes);
 	}
 	
 	function startGlide(curr){
 		// starts glide operation when drag ends
-		var lastPos = curr.lastPos,
-			time, match, pos, vel;
+		var lastX = curr.lastX,
+			lastY = curr.lastY,
+			id = curr.widget.id,
+			time, match, posX, posY, velX, velY;
 		
 		// calculate velocity based on time and displacement since last tick
 		curr.timer && clearTimeout(curr.timer);
 		time = (new Date()) - curr.lastTick;
 		match = translateRx.exec(curr.node.style[transformProp]);
-		pos = match && match.length == 3 ? match.slice(1) : [0, 0];
+		if(match){
+			posX = +match[1];
+			posY = +match[2];
+		} else {
+			posX = posY = 0;
+		}
 		
-		vel = [ // TODO: timerRes -> transitionDuration
-			(pos[0] - lastPos[0]) / calcTimerRes,
-			(pos[1] - lastPos[1]) / calcTimerRes
-		];
+		// TODO: timerRes -> transitionDuration
+		velX = (posX - lastX) / calcTimerRes;
+		velY = (posY - lastY) / calcTimerRes;
 		
-		//if(!vel[0] && !vel[1]){ // no glide to perform
-			delete current[curr.widget.id];
+		//if(!velX && !velY){ // no glide to perform
+			delete current[id];
 			return;
 		//}
 		
-		// update lastPos with current position, for glide calculations
-		curr.lastPos = pos;
-		curr.vel = vel;
+		// update lastX/Y with current position, for glide calculations
+		curr.lastX = posX;
+		curr.lastY = posY;
+		curr.velX = velX;
+		curr.velY = velY;
 		curr.calcFunc = function(){ calcGlide(id); };
 		curr.timer = setTimeout(curr.calcFunc, glideTimerRes);
 	}
@@ -179,10 +195,10 @@ function(declare, on, has, touchUtil){
 		
 		node = curr.node;
 		widget = curr.widget;
-		x = +curr.lastPos[0];
-		y = +curr.lastPos[1];
-		nvx = widget.glideDecel(curr.vel[0]);
-		nvy = widget.glideDecel(curr.vel[1]);
+		x = curr.lastX;
+		y = curr.lastY;
+		nvx = widget.glideDecel(curr.velX);
+		nvy = widget.glideDecel(curr.velY);
 		
 		if(Math.abs(nvx) >= glideThreshold || Math.abs(nvy) >= glideThreshold){
 			// still above stop threshold; update transformation
@@ -193,11 +209,13 @@ function(declare, on, has, touchUtil){
 				node.style[transformProp] =
 					translatePrefix + nx + "px," + ny + "px" + translateSuffix;
 				// update information
-				curr.lastPos = [nx, ny];
-				curr.vel = [nvx, nvy];
+				curr.lastX = nx;
+				curr.lastY = ny;
+				curr.velX = nvx;
+				curr.velY = nvy;
 				curr.timer = setTimeout(curr.calcFunc, glideTimerRes);
 			}else{
-				delete current[curr.widget.id];
+				delete current[id];
 			}
 		}
 	}
