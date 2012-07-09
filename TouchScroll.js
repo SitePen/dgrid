@@ -2,8 +2,8 @@
 // * fix glide routines (and use transitions)
 // * ensure scroll info/events are available (e.g. for OnDemandList)
 
-define(["dojo/_base/declare", "dojo/on", "./util/has-css3", "./util/touch"],
-function(declare, on, has, touchUtil){
+define(["dojo/_base/declare", "dojo/on", "./util/has-css3", "./util/touch", "put-selector/put", "xstyle/css!./css/TouchScroll.css"],
+function(declare, on, has, touchUtil, put){
 	var
 		calcTimerRes = 100, // ms between drag velocity measurements
 		glideTimerRes = 30, // ms between glide animation ticks
@@ -45,6 +45,61 @@ function(declare, on, has, touchUtil){
 	cssPrefix = hasTransforms === true ? "" :
 		"-" + hasTransforms.toLowerCase() + "-";
 	
+	function showScrollbars(widget){
+		// Handles displaying of X/Y scrollbars as appropriate when a touchstart
+		// occurs.
+		
+		var node = widget.touchNode,
+			parentNode = node.parentNode,
+			scrollbarNode;
+		
+		if(node.scrollWidth > node.offsetWidth){
+			scrollbarNode = widget._scrollbarXNode =
+				widget._scrollbarXNode || put(parentNode, "div.touchscroll-bar-x");
+			scrollbarNode.style.width =
+				node.offsetWidth * node.offsetWidth / node.scrollWidth + "px";
+			scrollbarNode.style.left = node.offsetLeft + "px";
+			put(parentNode, ".touchscroll-scrolling-x");
+		}
+		if(node.scrollHeight > node.offsetHeight){
+			scrollbarNode = widget._scrollbarYNode =
+				widget._scrollbarYNode || put(parentNode, "div.touchscroll-bar-y");
+			scrollbarNode.style.height =
+				node.offsetHeight * node.offsetHeight / node.scrollHeight + "px";
+			scrollbarNode.style.top = node.offsetTop + "px";
+			put(parentNode, ".touchscroll-scrolling-y");
+		}
+	}
+	
+	function scroll(widget, x, y){
+		// Handles updating of scroll position (from touchmove or glide).
+		// NOTE: currently this is passed negative x and y values; should likely be flipped.
+		
+		var node = widget.touchNode;
+		
+		// Update transform on touchNode
+		node.style[transformProp] =
+			translatePrefix + x + "px," + y + "px" + translateSuffix;
+		
+		// Update scrollbar positions
+		if(widget._scrollbarXNode){
+			widget._scrollbarXNode.style[transformProp] = translatePrefix +
+				(-x * node.offsetWidth / node.scrollWidth) + "px,0" + translateSuffix;
+		}
+		if(widget._scrollbarYNode){
+			widget._scrollbarYNode.style[transformProp] = translatePrefix + "0," +
+				(-y * node.offsetHeight / node.scrollHeight) + "px" + translateSuffix;
+		}
+		
+		// Emit a scroll event that can be captured by handlers, passing along
+		// scroll information in the event itself (since we already have the info,
+		// and it'd be difficult to get from the node).
+		on.emit(widget.touchNode.parentNode, "scroll", {
+			scrollLeft: -x,
+			scrollTop: -y
+		});
+	}
+	
 	// functions for handling touch events on node to be scrolled
 	
 	function ontouchstart(evt){
@@ -76,6 +131,8 @@ function(declare, on, has, touchUtil){
 			this.style[transformProp] =
 				translatePrefix + posX + "px," + posY + "px" + translateSuffix;
 		}
+		
+		showScrollbars(widget, this);
 		
 		touch = evt.targetTouches[0];
 		curr = current[id] = {
@@ -112,10 +169,7 @@ function(declare, on, has, touchUtil){
 		// squelch the event and scroll the area
 		evt.preventDefault();
 		evt.stopPropagation();
-		this.style[transformProp] =
-			translatePrefix + nx + "px," + ny + "px" + translateSuffix;
-		
-		on.emit(widget.domNode, "scroll", {});
+		scroll(widget, nx, ny);
 	}
 	function ontouchend(evt){
 		var widget = evt.widget,
@@ -173,6 +227,7 @@ function(declare, on, has, touchUtil){
 		velY = (posY - lastY) / calcTimerRes;
 		
 		//if(!velX && !velY){ // no glide to perform
+			put(curr.node.parentNode, "!touchscroll-scrolling-x!touchscroll-scrolling-y");
 			delete current[id];
 			return;
 		//}
@@ -206,8 +261,7 @@ function(declare, on, has, touchUtil){
 			ny = Math.max(Math.min(0, y + nvy), -(node.scrollHeight - node.offsetHeight));
 			if(nx != x || ny != y){
 				// still scrollable; update offsets/velocities and schedule next tick
-				node.style[transformProp] =
-					translatePrefix + nx + "px," + ny + "px" + translateSuffix;
+				scroll(widget, nx, ny);
 				// update information
 				curr.lastX = nx;
 				curr.lastY = ny;
@@ -215,6 +269,7 @@ function(declare, on, has, touchUtil){
 				curr.velY = nvy;
 				curr.timer = setTimeout(curr.calcFunc, glideTimerRes);
 			}else{
+				put(node.parentNode, "!touchscroll-scrolling-x!touchscroll-scrolling-y");
 				delete current[id];
 			}
 		}

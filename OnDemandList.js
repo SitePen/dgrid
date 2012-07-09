@@ -163,14 +163,14 @@ return declare([List, _StoreMixin], {
 	},
 	
 	lastScrollTop: 0,
-	_processScroll: function(){
+	_processScroll: function(evt){
 		// summary:
 		//		Checks to make sure that everything in the viewable area has been
 		//		downloaded, and triggering a request for the necessary data when needed.
 		var grid = this,
 			scrollNode = grid.bodyNode,
-			transform = grid.contentNode.style.webkitTransform,
-			visibleTop = scrollNode.scrollTop + (transform ? -transform.match(/translate[\w]*\(.*?,(.*?)px/)[1] : 0),
+			// grab current visible top from event if provided, otherwise from node
+			visibleTop = (evt && evt.scrollTop) || scrollNode.scrollTop,
 			visibleBottom = scrollNode.offsetHeight + visibleTop,
 			priorPreload, preloadNode, preload = grid.preload,
 			lastScrollTop = grid.lastScrollTop,

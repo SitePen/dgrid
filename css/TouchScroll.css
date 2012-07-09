@@ -1,0 +1,36 @@
+/* styles for scrollbars during touch-scroll */
+
+.touchscroll-bar-x, .touchscroll-bar-y {
+	position: absolute;
+	background-color: rgba(88,88,88,0.97);
+	opacity: 0.7;
+	border: 1px solid rgba(88,88,88,1);
+	border-radius: 3px;
+	
+	/* the borders aren't anti-aliased on Android, so this smooths it out a bit */
+	-webkit-box-shadow: 0 0 1px rgba(88,88,88,0.4);
+	
+	/* establish base styles for scrollbar fade-in/out */
+	opacity: 0;
+	-webkit-transition: opacity 0.3s ease-out 0.3s;
+	-moz-transition: opacity 0.3s ease-out 0.3s;
+	-o-transition: opacity 0.3s ease-out 0.3s;
+	transition: opacity 0.3s ease-out 0.3s;
+}
+.touchscroll-scrolling-x .touchscroll-bar-x, .touchscroll-scrolling-y .touchscroll-bar-y {
+	opacity: 0.7;
+}
+
+.touchscroll-bar-x {
+	bottom: 1px;
+	height: 3px;
+}
+.touchscroll-bar-y {
+	right: 1px;
+	width: 3px;
+}
+
+/* indicator of a successful load */
+#dgrid-css-TouchScroll-loaded {
+	display: none;
+}
