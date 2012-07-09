@@ -254,8 +254,18 @@ function(declare, on, has, touchUtil){
 		},
 		
 		_initTouch: function(){
-			var node = this.touchNode = this.touchNode || this.containerNode || this.domNode,
+			var node = this.touchNode = this.touchNode || this.containerNode,
 				widget = this;
+			
+			if(!node || !node.parentNode){
+				// Bail out if we have no touchNode or containerNode, or if we don't
+				// seem to have a parent node to work with.
+				console.warn("TouchScroll requires a nested node upon which to operate.");
+				return;
+			}
+			
+			// Set overflow to hidden in order to prevent any native scroll logic.
+			node.parentNode.style.overflow = "hidden";
 			
 			node.style[transitionPrefix + "Property"] = cssPrefix + "transform";
 			
