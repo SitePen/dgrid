@@ -145,6 +145,8 @@ function(declare, on, has, touchUtil, put){
 			// goes further negative when moving upwards
 			startX: posX - touch.pageX,
 			startY: posY - touch.pageY,
+			lastX: posX,
+			lastY: posY,
 			tickFunc: function(){ calcTick(id); }
 		};
 		curr.timer = setTimeout(curr.tickFunc, calcTimerRes);
@@ -197,27 +199,30 @@ function(declare, on, has, touchUtil, put){
 		node = curr.node;
 		match = translateRx.exec(node.style[transformProp]);
 		
-		// set previous reference point for future iteration or calculation
 		if(match){
-			curr.lastX = +match[1];
-			curr.lastY = +match[2];
+			x = +match[1];
+			y = +match[2];
+			
+			// If previous reference point already exists, calculate velocity
+			curr.velX = x - curr.lastX;
+			curr.velY = y - curr.lastY;
+			
+			// set previous reference point for future iteration or calculation
+			curr.lastX = x;
+			curr.lastY = y;
 		} else {
 			curr.lastX = curr.lastY = 0;
 		}
-		curr.lastTick = new Date();
 		curr.timer = setTimeout(curr.tickFunc, calcTimerRes);
 	}
 	
 	function startGlide(curr){
 		// starts glide operation when drag ends
-		var lastX = curr.lastX,
-			lastY = curr.lastY,
-			id = curr.widget.id,
-			time, match, posX, posY, velX, velY;
+		var id = curr.widget.id,
+			match, posX, posY;
 		
 		// calculate velocity based on time and displacement since last tick
 		curr.timer && clearTimeout(curr.timer);
-		time = (new Date()) - curr.lastTick;
 		match = translateRx.exec(curr.node.style[transformProp]);
 		if(match){
 			posX = +match[1];
@@ -226,21 +231,15 @@ function(declare, on, has, touchUtil, put){
 			posX = posY = 0;
 		}
 		
-		// TODO: timerRes -> transitionDuration
-		velX = (posX - lastX) / calcTimerRes;
-		velY = (posY - lastY) / calcTimerRes;
-		
-		//if(!velX && !velY){ // no glide to perform
+		if(!curr.velX && !curr.velY){ // no glide to perform
 			put(curr.node.parentNode, "!touchscroll-scrolling-x!touchscroll-scrolling-y");
 			delete current[id];
 			return;
-		//}
+		}
 		
 		// update lastX/Y with current position, for glide calculations
 		curr.lastX = posX;
 		curr.lastY = posY;
-		curr.velX = velX;
-		curr.velY = velY;
 		curr.calcFunc = function(){ calcGlide(id); };
 		curr.timer = setTimeout(curr.calcFunc, glideTimerRes);
 	}
