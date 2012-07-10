@@ -246,7 +246,7 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			
 			listen(bodyNode, "scroll", function(event){
 				// keep the header aligned with the body
-				headerNode.scrollLeft = bodyNode.scrollLeft;
+				headerNode.scrollLeft = event.scrollLeft || bodyNode.scrollLeft;
 				// re-fire, since browsers are not consistent about propagation here
 				event.stopPropagation();
 				listen.emit(domNode, "scroll", {scrollTarget: bodyNode});
