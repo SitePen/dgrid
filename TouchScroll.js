@@ -11,6 +11,7 @@ function(declare, on, has, touchUtil, put){
 		touches = {}, // records number of touches on components
 		current = {}, // records info for widget(s) currently being scrolled
 		glideThreshold = 1, // speed (in px) below which to stop glide - TODO: remove
+		scrollbarAdjustment = 8, // number of px to adjust scrollbar dimension calculations
 		// RegExps for parsing relevant x/y from translate and matrix values:
 		translateRx = /^translate(?:3d)?\((-?\d+)(?:px)?, (-?\d+)/,
 		matrixRx = /^matrix\(1, 0, 0, 1, (-?\d+)(?:\.\d*)?(?:px)?, (-?\d+)/,
@@ -51,13 +52,15 @@ function(declare, on, has, touchUtil, put){
 		
 		var node = widget.touchNode,
 			parentNode = node.parentNode,
+			parentWidth = parentNode.offsetWidth - scrollbarAdjustment,
+			parentHeight = parentNode.offsetHeight - scrollbarAdjustment,
 			scrollbarNode;
 		
 		if(node.scrollWidth > parentNode.offsetWidth){
 			scrollbarNode = widget._scrollbarXNode =
 				widget._scrollbarXNode || put(parentNode, "div.touchscroll-bar-x");
 			scrollbarNode.style.width =
-				parentNode.offsetWidth * parentNode.offsetWidth / node.scrollWidth + "px";
+				parentWidth * parentWidth / node.scrollWidth + "px";
 			scrollbarNode.style.left = node.offsetLeft + "px";
 			put(parentNode, ".touchscroll-scrolling-x");
 		}
@@ -65,7 +68,7 @@ function(declare, on, has, touchUtil, put){
 			scrollbarNode = widget._scrollbarYNode =
 				widget._scrollbarYNode || put(parentNode, "div.touchscroll-bar-y");
 			scrollbarNode.style.height =
-				parentNode.offsetHeight * parentNode.offsetHeight / node.scrollHeight + "px";
+				parentHeight * parentHeight / node.scrollHeight + "px";
 			scrollbarNode.style.top = node.offsetTop + "px";
 			put(parentNode, ".touchscroll-scrolling-y");
 		}
