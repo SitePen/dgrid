@@ -162,9 +162,6 @@ function(declare, on, has, put){
 		
 		// Ignore touchmove events with inappropriate number of contact points.
 		if(touches[id] !== widget.touchesToScroll || !curr){
-			if(touches[id] < widget.touchesToScroll && widget.preventDefaultMove){
-				evt.preventDefault();
-			}
 			return;
 		}
 		
@@ -302,13 +299,6 @@ function(declare, on, has, put){
 		//		Number of touches to require on the component's touch target node
 		//		in order to trigger scrolling behavior.
 		touchesToScroll: 1,
-		
-		// preventDefaultMove: Boolean
-		//		Controls whether touchmove events are prevented specifically when
-		//		the number of touches on the given component is less than the value
-		//		of touchesToScroll.  Useful particularly for platforms which will
-		//		automatically scroll anyway, otherwise.
-		preventDefaultMove: false,
 		
 		// touchNode: DOMNode?
 		//		Node upon which event listeners should be hooked and scroll behavior
