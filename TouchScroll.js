@@ -2,8 +2,8 @@
 // * fix glide routines (and use transitions)
 // * ensure scroll info/events are available (e.g. for OnDemandList)
 
-define(["dojo/_base/declare", "dojo/on", "./util/has-css3", "./util/touch", "put-selector/put", "xstyle/css!./css/TouchScroll.css"],
-function(declare, on, has, touchUtil, put){
+define(["dojo/_base/declare", "dojo/on", "./util/has-css3", "put-selector/put", "xstyle/css!./css/TouchScroll.css"],
+function(declare, on, has, put){
 	var
 		calcTimerRes = 100, // ms between drag velocity measurements
 		glideTimerRes = 30, // ms between glide animation ticks
