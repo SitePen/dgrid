@@ -53,19 +53,19 @@ function(declare, on, has, touchUtil, put){
 			parentNode = node.parentNode,
 			scrollbarNode;
 		
-		if(node.scrollWidth > node.offsetWidth){
+		if(node.scrollWidth > parentNode.offsetWidth){
 			scrollbarNode = widget._scrollbarXNode =
 				widget._scrollbarXNode || put(parentNode, "div.touchscroll-bar-x");
 			scrollbarNode.style.width =
-				node.offsetWidth * node.offsetWidth / node.scrollWidth + "px";
+				parentNode.offsetWidth * parentNode.offsetWidth / node.scrollWidth + "px";
 			scrollbarNode.style.left = node.offsetLeft + "px";
 			put(parentNode, ".touchscroll-scrolling-x");
 		}
-		if(node.scrollHeight > node.offsetHeight){
+		if(node.scrollHeight > parentNode.offsetHeight){
 			scrollbarNode = widget._scrollbarYNode =
 				widget._scrollbarYNode || put(parentNode, "div.touchscroll-bar-y");
 			scrollbarNode.style.height =
-				node.offsetHeight * node.offsetHeight / node.scrollHeight + "px";
+				parentNode.offsetHeight * parentNode.offsetHeight / node.scrollHeight + "px";
 			scrollbarNode.style.top = node.offsetTop + "px";
 			put(parentNode, ".touchscroll-scrolling-y");
 		}
@@ -75,7 +75,8 @@ function(declare, on, has, touchUtil, put){
 		// Handles updating of scroll position (from touchmove or glide).
 		// NOTE: currently this is passed negative x and y values; should likely be flipped.
 		
-		var node = widget.touchNode;
+		var node = widget.touchNode,
+			parentNode = node.parentNode;
 		
 		// Update transform on touchNode
 		node.style[transformProp] =
@@ -84,11 +85,11 @@ function(declare, on, has, touchUtil, put){
 		// Update scrollbar positions
 		if(widget._scrollbarXNode){
 			widget._scrollbarXNode.style[transformProp] = translatePrefix +
-				(-x * node.offsetWidth / node.scrollWidth) + "px,0" + translateSuffix;
+				(-x * parentNode.offsetWidth / node.scrollWidth) + "px,0" + translateSuffix;
 		}
 		if(widget._scrollbarYNode){
 			widget._scrollbarYNode.style[transformProp] = translatePrefix + "0," +
-				(-y * node.offsetHeight / node.scrollHeight) + "px" + translateSuffix;
+				(-y * parentNode.offsetHeight / node.scrollHeight) + "px" + translateSuffix;
 		}
 		
 		// Emit a scroll event that can be captured by handlers, passing along
@@ -150,6 +151,7 @@ function(declare, on, has, touchUtil, put){
 		var widget = evt.widget,
 			id = widget.id,
 			curr = current[id],
+			parentNode = this.parentNode,
 			touch, nx, ny;
 		
 		// Ignore touchmove events with inappropriate number of contact points.
@@ -162,9 +164,9 @@ function(declare, on, has, touchUtil, put){
 		
 		touch = evt.targetTouches[0];
 		nx = Math.max(Math.min(0, curr.startX + touch.pageX),
-			-(this.scrollWidth - this.offsetWidth));
+			-(this.scrollWidth - parentNode.offsetWidth));
 		ny = Math.max(Math.min(0, curr.startY + touch.pageY),
-			-(this.scrollHeight - this.offsetHeight));
+			-(this.scrollHeight - parentNode.offsetHeight));
 		
 		// squelch the event and scroll the area
 		evt.preventDefault();
