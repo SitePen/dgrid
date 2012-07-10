@@ -1,6 +1,5 @@
 // FIXME:
-// * fix glide routines (and use transitions)
-// * ensure scroll info/events are available (e.g. for OnDemandList)
+// * use transitions in glide routines
 
 define(["dojo/_base/declare", "dojo/on", "./util/has-css3", "put-selector/put", "xstyle/css!./css/TouchScroll.css"],
 function(declare, on, has, put){
@@ -255,12 +254,13 @@ function(declare, on, has, put){
 	function calcGlide(id){
 		// performs glide and decelerates according to widget's glideDecel method
 		var curr = current[id],
-			node, widget,
+			node, parentNode, widget,
 			x, y, nx, ny, nvx, nvy; // old/new coords and new velocities
 		
 		if(!curr){ return; }
 		
 		node = curr.node;
+		parentNode = node.parentNode,
 		widget = curr.widget;
 		x = curr.lastX;
 		y = curr.lastY;
@@ -269,8 +269,8 @@ function(declare, on, has, put){
 		
 		if(Math.abs(nvx) >= glideThreshold || Math.abs(nvy) >= glideThreshold){
 			// still above stop threshold; update transformation
-			nx = Math.max(Math.min(0, x + nvx), -(node.scrollWidth - node.offsetWidth));
-			ny = Math.max(Math.min(0, y + nvy), -(node.scrollHeight - node.offsetHeight));
+			nx = Math.max(Math.min(0, x + nvx), -(node.scrollWidth - parentNode.offsetWidth));
+			ny = Math.max(Math.min(0, y + nvy), -(node.scrollHeight - parentNode.offsetHeight));
 			if(nx != x || ny != y){
 				// still scrollable; update offsets/velocities and schedule next tick
 				scroll(widget, -nx, -ny); // call scroll with positive coordinates
@@ -312,8 +312,7 @@ function(declare, on, has, put){
 		
 		// touchNode: DOMNode?
 		//		Node upon which event listeners should be hooked and scroll behavior
-		//		should be based.  If not specified, defaults to containerNode or
-		//		domNode (in that order).
+		//		should be based.  If not specified, defaults to containerNode.
 		touchNode: null,
 		
 		startup: function(){
