@@ -73,31 +73,30 @@ function(declare, on, has, touchUtil, put){
 	
 	function scroll(widget, x, y){
 		// Handles updating of scroll position (from touchmove or glide).
-		// NOTE: currently this is passed negative x and y values; should likely be flipped.
 		
 		var node = widget.touchNode,
 			parentNode = node.parentNode;
 		
 		// Update transform on touchNode
 		node.style[transformProp] =
-			translatePrefix + x + "px," + y + "px" + translateSuffix;
+			translatePrefix + -x + "px," + -y + "px" + translateSuffix;
 		
 		// Update scrollbar positions
 		if(widget._scrollbarXNode){
 			widget._scrollbarXNode.style[transformProp] = translatePrefix +
-				(-x * parentNode.offsetWidth / node.scrollWidth) + "px,0" + translateSuffix;
+				(x * parentNode.offsetWidth / node.scrollWidth) + "px,0" + translateSuffix;
 		}
 		if(widget._scrollbarYNode){
 			widget._scrollbarYNode.style[transformProp] = translatePrefix + "0," +
-				(-y * parentNode.offsetHeight / node.scrollHeight) + "px" + translateSuffix;
+				(y * parentNode.offsetHeight / node.scrollHeight) + "px" + translateSuffix;
 		}
 		
 		// Emit a scroll event that can be captured by handlers, passing along
 		// scroll information in the event itself (since we already have the info,
 		// and it'd be difficult to get from the node).
 		on.emit(widget.touchNode.parentNode, "scroll", {
-			scrollLeft: -x,
-			scrollTop: -y
+			scrollLeft: x,
+			scrollTop: y
 		});
 	}
 	
@@ -171,7 +170,7 @@ function(declare, on, has, touchUtil, put){
 		// squelch the event and scroll the area
 		evt.preventDefault();
 		evt.stopPropagation();
-		scroll(widget, nx, ny);
+		scroll(widget, -nx, -ny); // call scroll with positive coordinates
 	}
 	function ontouchend(evt){
 		var widget = evt.widget,
@@ -263,7 +262,7 @@ function(declare, on, has, touchUtil, put){
 			ny = Math.max(Math.min(0, y + nvy), -(node.scrollHeight - node.offsetHeight));
 			if(nx != x || ny != y){
 				// still scrollable; update offsets/velocities and schedule next tick
-				scroll(widget, nx, ny);
+				scroll(widget, -nx, -ny); // call scroll with positive coordinates
 				// update information
 				curr.lastX = nx;
 				curr.lastY = ny;
