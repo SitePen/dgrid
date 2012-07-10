@@ -1,6 +1,7 @@
 /* styles for scrollbars during touch-scroll */
 
 .touchscroll-bar-x, .touchscroll-bar-y {
+	display: none; /* overridden below */
 	position: absolute;
 	background-color: rgba(88,88,88,0.97);
 	opacity: 0.7;
@@ -11,14 +12,14 @@
 	-webkit-box-shadow: 0 0 1px rgba(88,88,88,0.4);
 	
 	/* establish base styles for scrollbar fade-in/out */
+	opacity: 0.7;
+}
+.touchscroll-fadeout .touchscroll-bar-x, .touchscroll-fadeout .touchscroll-bar-y {
 	opacity: 0;
 	-webkit-transition: opacity 0.3s ease-out 0.3s;
 	-moz-transition: opacity 0.3s ease-out 0.3s;
 	-o-transition: opacity 0.3s ease-out 0.3s;
 	transition: opacity 0.3s ease-out 0.3s;
-}
-.touchscroll-scrolling-x .touchscroll-bar-x, .touchscroll-scrolling-y .touchscroll-bar-y {
-	opacity: 0.7;
 }
 
 .touchscroll-bar-x {
@@ -28,6 +29,10 @@
 .touchscroll-bar-y {
 	right: 1px;
 	width: 3px;
+}
+
+.touchscroll-scrollable-x .touchscroll-bar-x, .touchscroll-scrollable-y .touchscroll-bar-y {
+	display: block; /* display scrollbar when appropriate */
 }
 
 /* indicator of a successful load */

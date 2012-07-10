@@ -62,7 +62,9 @@ function(declare, on, has, put){
 			scrollbarNode.style.width =
 				parentWidth * parentWidth / node.scrollWidth + "px";
 			scrollbarNode.style.left = node.offsetLeft + "px";
-			put(parentNode, ".touchscroll-scrolling-x");
+			put(parentNode, ".touchscroll-scrollable-x");
+		}else{
+			put(parentNode, "!touchscroll-scrollable-x");
 		}
 		if(node.scrollHeight > parentNode.offsetHeight){
 			scrollbarNode = widget._scrollbarYNode =
@@ -70,8 +72,11 @@ function(declare, on, has, put){
 			scrollbarNode.style.height =
 				parentHeight * parentHeight / node.scrollHeight + "px";
 			scrollbarNode.style.top = node.offsetTop + "px";
-			put(parentNode, ".touchscroll-scrolling-y");
+			put(parentNode, ".touchscroll-scrollable-y");
+		}else{
+			put(parentNode, "!touchscroll-scrollable-y");
 		}
+		put(parentNode, "!touchscroll-fadeout");
 	}
 	
 	function scroll(widget, x, y){
@@ -135,8 +140,6 @@ function(declare, on, has, put){
 				translatePrefix + posX + "px," + posY + "px" + translateSuffix;
 		}
 		
-		showScrollbars(widget, this);
-		
 		touch = evt.targetTouches[0];
 		curr = current[id] = {
 			widget: widget,
@@ -171,6 +174,12 @@ function(declare, on, has, put){
 			-(this.scrollWidth - parentNode.offsetWidth));
 		ny = Math.max(Math.min(0, curr.startY + touch.pageY),
 			-(this.scrollHeight - parentNode.offsetHeight));
+		
+		// Show touch scrollbars on first sign of drag.
+		if(!curr.scrollbarsShown){
+			showScrollbars(widget, this);
+			curr.scrollbarsShown = true;
+		}
 		
 		// squelch the event and scroll the area
 		evt.preventDefault();
@@ -232,7 +241,7 @@ function(declare, on, has, put){
 		}
 		
 		if(!curr.velX && !curr.velY){ // no glide to perform
-			put(curr.node.parentNode, "!touchscroll-scrolling-x!touchscroll-scrolling-y");
+			put(curr.node.parentNode, ".touchscroll-fadeout");
 			delete current[id];
 			return;
 		}
@@ -272,9 +281,12 @@ function(declare, on, has, put){
 				curr.velY = nvy;
 				curr.timer = setTimeout(curr.calcFunc, glideTimerRes);
 			}else{
-				put(node.parentNode, "!touchscroll-scrolling-x!touchscroll-scrolling-y");
+				put(curr.node.parentNode, ".touchscroll-fadeout");
 				delete current[id];
 			}
+		}else{
+			put(curr.node.parentNode, ".touchscroll-fadeout");
+			delete current[id];
 		}
 	}
 	
