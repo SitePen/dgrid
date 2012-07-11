@@ -56,8 +56,11 @@ function(declare, on, has, put){
 			scrollbarNode;
 		
 		if(node.scrollWidth > parentNode.offsetWidth){
+			if(!widget._scrollbarXNode){
+				scrollbarNode = put(parentNode, "div.touchscroll-x");
+			}
 			scrollbarNode = widget._scrollbarXNode =
-				widget._scrollbarXNode || put(parentNode, "div.touchscroll-bar-x");
+				widget._scrollbarXNode || put(scrollbarNode, "div.touchscroll-bar");
 			scrollbarNode.style.width =
 				parentWidth * parentWidth / node.scrollWidth + "px";
 			scrollbarNode.style.left = node.offsetLeft + "px";
@@ -66,8 +69,11 @@ function(declare, on, has, put){
 			put(parentNode, "!touchscroll-scrollable-x");
 		}
 		if(node.scrollHeight > parentNode.offsetHeight){
+			if(!widget._scrollbarYNode){
+				scrollbarNode = put(parentNode, "div.touchscroll-y");
+			}
 			scrollbarNode = widget._scrollbarYNode =
-				widget._scrollbarYNode || put(parentNode, "div.touchscroll-bar-y");
+				widget._scrollbarYNode || put(scrollbarNode, "div.touchscroll-bar");
 			scrollbarNode.style.height =
 				parentHeight * parentHeight / node.scrollHeight + "px";
 			scrollbarNode.style.top = node.offsetTop + "px";
