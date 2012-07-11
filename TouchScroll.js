@@ -149,12 +149,16 @@ function(declare, on, has, put){
 		curr = current[id] = {
 			widget: widget,
 			node: this,
-			// subtract touch coords now, then add back later, so that translation
-			// goes further negative when moving upwards
+			// Subtract touch coords now, then add back later, so that translation
+			// goes further negative when moving upwards.
 			startX: posX - touch.pageX,
 			startY: posY - touch.pageY,
+			// Initialize lastX/Y, in case of a fast flick (< 1 full calc cycle).
 			lastX: posX,
 			lastY: posY,
+			// Also store original pageX/Y for threshold check.
+			pageX: touch.pageX,
+			pageY: touch.pageY,
 			tickFunc: function(){ calcTick(id); }
 		};
 		curr.timer = setTimeout(curr.tickFunc, calcTimerRes);
@@ -164,29 +168,41 @@ function(declare, on, has, put){
 			id = widget.id,
 			curr = current[id],
 			parentNode = this.parentNode,
-			touch, nx, ny;
+			targetTouches, touch, nx, ny, i;
 		
 		// Ignore touchmove events with inappropriate number of contact points.
 		if(touches[id] !== widget.touchesToScroll || !curr){
 			return;
 		}
 		
-		touch = evt.targetTouches[0];
-		nx = Math.max(Math.min(0, curr.startX + touch.pageX),
-			-(this.scrollWidth - parentNode.offsetWidth));
-		ny = Math.max(Math.min(0, curr.startY + touch.pageY),
-			-(this.scrollHeight - parentNode.offsetHeight));
+		targetTouches = evt.targetTouches;
+		touch = targetTouches[0];
 		
 		// Show touch scrollbars on first sign of drag.
 		if(!curr.scrollbarsShown){
-			showScrollbars(widget, this);
-			curr.scrollbarsShown = true;
+			if(Math.abs(touch.pageX - curr.pageX) > widget.scrollThreshold ||
+					Math.abs(touch.pageY - curr.pageY) > widget.scrollThreshold){
+				showScrollbars(widget, this);
+				curr.scrollbarsShown = true;
+				
+				// Add flag to involved touches to provide indication to other handlers.
+				for(i = targetTouches.length; i--;){
+					targetTouches[i].touchScrolled = true;
+				}
+			}
 		}
 		
-		// squelch the event and scroll the area
+		// Squelch the event, and scroll the area if beyond the threshold.
 		evt.preventDefault();
 		evt.stopPropagation();
-		scroll(widget, -nx, -ny); // call scroll with positive coordinates
+		
+		if(curr.scrollbarsShown){
+			nx = Math.max(Math.min(0, curr.startX + touch.pageX),
+				-(this.scrollWidth - parentNode.offsetWidth));
+			ny = Math.max(Math.min(0, curr.startY + touch.pageY),
+				-(this.scrollHeight - parentNode.offsetHeight));
+			scroll(widget, -nx, -ny); // call scroll with positive coordinates
+		}
 	}
 	function ontouchend(evt){
 		var widget = evt.widget,
@@ -310,6 +326,11 @@ function(declare, on, has, put){
 		//		Node upon which event listeners should be hooked and scroll behavior
 		//		should be based.  If not specified, defaults to containerNode.
 		touchNode: null,
+		
+		// scrollThreshold: Number
+		//		Minimum number of pixels to wait for user to scroll (in any direction)
+		//		before initiating scroll.
+		scrollThreshold: 10,
 		
 		startup: function(){
 			if(!this._started){
