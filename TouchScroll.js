@@ -294,7 +294,7 @@ function(declare, on, has, put){
 		}
 		
 		function scrollbarEnd(evt){
-			console.log("scrollbarEnd", evt);
+			scrollbarNode.style[transitionPrefix + "Duration"] = "0";
 		}
 		
 		if (x != lastX || y != lastY){
