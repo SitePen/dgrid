@@ -348,6 +348,8 @@ function(declare, on, has, put){
 	function startGlide(id){
 		// starts glide operation when drag ends
 		var curr = current[id],
+			node = curr.node,
+			parentNode = node.parentNode,
 			match, posX, posY;
 		
 		// calculate velocity based on time and displacement since last tick
@@ -360,7 +362,11 @@ function(declare, on, has, put){
 			posX = posY = 0;
 		}
 		
-		if(!curr.velX && !curr.velY){ // no glide to perform
+		// If there is no glide to perform (no exit velocity), or if we are
+		// beyond boundaries on all applicable edges, immediately bounce back.
+		if((!curr.velX && !curr.velY) ||
+				((posX >= 0 || posX <= -(node.scrollWidth - parentNode.offsetWidth)) &&
+				(posY >= 0 || posY <= -(node.scrollHeight - parentNode.offsetHeight)))){
 			bounce(id);
 			return;
 		}
