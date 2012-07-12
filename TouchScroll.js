@@ -116,6 +116,7 @@ function(declare, on, has, put){
 	
 	function ontouchstart(evt){
 		var widget = evt.widget,
+			node = widget.touchNode,
 			id = widget.id,
 			posX = 0,
 			posY = 0,
@@ -127,10 +128,10 @@ function(declare, on, has, put){
 		
 		if((curr = current[id])){
 			// determine current translate X/Y from final used values
-			match = matrixRx.exec(window.getComputedStyle(this)[transformProp]);
+			match = matrixRx.exec(window.getComputedStyle(node)[transformProp]);
 		}else{
 			// determine current translate X/Y from applied style
-			match = translateRx.exec(this.style[transformProp]);
+			match = translateRx.exec(node.style[transformProp]);
 		}
 		if(match){
 			posX = +match[1];
@@ -148,15 +149,15 @@ function(declare, on, has, put){
 				}
 			}
 			
-			this.style[transitionPrefix + "Duration"] = "0";
-			this.style[transformProp] =
+			node.style[transitionPrefix + "Duration"] = "0";
+			node.style[transformProp] =
 				translatePrefix + posX + "px," + posY + "px" + translateSuffix;
 		}
 		
 		touch = evt.targetTouches[0];
 		curr = current[id] = {
 			widget: widget,
-			node: this,
+			node: node,
 			// Subtract touch coords now, then add back later, so that translation
 			// goes further negative when moving upwards.
 			startX: posX - touch.pageX,
@@ -175,7 +176,8 @@ function(declare, on, has, put){
 		var widget = evt.widget,
 			id = widget.id,
 			curr = current[id],
-			parentNode = this.parentNode,
+			node = curr.node,
+			parentNode = this,
 			targetTouches, touch, nx, ny, minX, minY, i;
 		
 		// Ignore touchmove events with inappropriate number of contact points.
@@ -208,8 +210,8 @@ function(declare, on, has, put){
 			nx = curr.scrollableX ? curr.startX + touch.pageX : curr.lastX;
 			ny = curr.scrollableY ? curr.startY + touch.pageY : curr.lastY;
 			
-			minX = -(this.scrollWidth - parentNode.offsetWidth);
-			minY = -(this.scrollHeight - parentNode.offsetHeight);
+			minX = -(node.scrollWidth - parentNode.offsetWidth);
+			minY = -(node.scrollHeight - parentNode.offsetHeight);
 			
 			// If dragged beyond edge, halve the distance between.
 			if(nx > 0){
@@ -426,8 +428,9 @@ function(declare, on, has, put){
 		touchesToScroll: 1,
 		
 		// touchNode: DOMNode?
-		//		Node upon which event listeners should be hooked and scroll behavior
-		//		should be based.  If not specified, defaults to containerNode.
+		//		Node upon which scroll behavior will be based; transformations will be
+		//		applied to this node, and events and some DOM/styles will be applied
+		//		to its *parent*.  If not specified, defaults to containerNode.
 		touchNode: null,
 		
 		// scrollThreshold: Number
@@ -449,7 +452,8 @@ function(declare, on, has, put){
 		
 		_initTouch: function(){
 			var node = this.touchNode = this.touchNode || this.containerNode,
-				widget = this;
+				widget = this,
+				parentNode;
 			
 			if(!node || !node.parentNode){
 				// Bail out if we have no touchNode or containerNode, or if we don't
@@ -458,8 +462,10 @@ function(declare, on, has, put){
 				return;
 			}
 			
+			parentNode = node.parentNode;
+			
 			// Set overflow to hidden in order to prevent any native scroll logic.
-			node.parentNode.style.overflow = "hidden";
+			parentNode.style.overflow = "hidden";
 			
 			node.style[transitionPrefix + "Property"] = cssPrefix + "transform";
 			node.style[transitionPrefix + "TimingFunction"] =
@@ -475,13 +481,13 @@ function(declare, on, has, put){
 			touches[this.id] = 0;
 			
 			this._touchScrollListeners = [
-				on(node, "touchstart", wrapHandler(ontouchstart)),
-				on(node, "touchmove", wrapHandler(ontouchmove)),
-				on(node, "touchend,touchcancel", wrapHandler(ontouchend)),
+				on(parentNode, "touchstart", wrapHandler(ontouchstart)),
+				on(parentNode, "touchmove", wrapHandler(ontouchmove)),
+				on(parentNode, "touchend,touchcancel", wrapHandler(ontouchend)),
 				// Don't need to wrap the following, since the touchstart handler
 				// above already decorates the event
-				on(node, "touchstart", incrementTouchCount),
-				on(node, "touchend,touchcancel", decrementTouchCount)
+				on(parentNode, "touchstart", incrementTouchCount),
+				on(parentNode, "touchend,touchcancel", decrementTouchCount)
 			];
 		},
 		
