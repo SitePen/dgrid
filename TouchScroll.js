@@ -11,7 +11,7 @@ function(declare, on, has, put){
 		glideThreshold = 1, // speed (in px) below which to stop glide - TODO: remove
 		scrollbarAdjustment = 8, // number of px to adjust scrollbar dimension calculations
 		// RegExps for parsing relevant x/y from translate and matrix values:
-		translateRx = /^translate(?:3d)?\((-?\d+)(?:px)?, (-?\d+)/,
+		translateRx = /^translate(?:3d)?\((-?\d+)(?:\.\d*)?(?:px)?, (-?\d+)/,
 		matrixRx = /^matrix\(1, 0, 0, 1, (-?\d+)(?:\.\d*)?(?:px)?, (-?\d+)/,
 		// store has-features we need, for computing property/function names:
 		hasTransitions = has("css-transitions"),
@@ -267,15 +267,13 @@ function(declare, on, has, put){
 		curr.timer = setTimeout(curr.tickFunc, calcTimerRes);
 	}
 	
-	function bounce(id){
+	function bounce(id, lastX, lastY){
 		// Function called when a scroll ends, to handle rubber-banding beyond edges.
 		var curr = current[id],
 			widget = curr.widget,
 			node = curr.node,
 			parentNode = node.parentNode,
 			scrollbarNode,
-			lastX = curr.lastX,
-			lastY = curr.lastY,
 			x = curr.scrollableX ?
 				Math.max(Math.min(0, lastX), -(node.scrollWidth - parentNode.offsetWidth)) :
 				lastX,
@@ -367,7 +365,7 @@ function(declare, on, has, put){
 		if((!curr.velX && !curr.velY) ||
 				((posX >= 0 || posX <= -(node.scrollWidth - parentNode.offsetWidth)) &&
 				(posY >= 0 || posY <= -(node.scrollHeight - parentNode.offsetHeight)))){
-			bounce(id);
+			bounce(id, posX, posY);
 			return;
 		}
 		
@@ -416,7 +414,7 @@ function(declare, on, has, put){
 			curr.velY = nvy;
 			curr.timer = setTimeout(curr.calcFunc, glideTimerRes);
 		}else{
-			bounce(id);
+			bounce(id, curr.lastX, curr.lastY);
 		}
 	}
 	
