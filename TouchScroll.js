@@ -4,7 +4,7 @@
 define(["dojo/_base/declare", "dojo/on", "./util/has-css3", "put-selector/put", "xstyle/css!./css/TouchScroll.css"],
 function(declare, on, has, put){
 	var
-		calcTimerRes = 100, // ms between drag velocity measurements
+		calcTimerRes = 50, // ms between drag velocity measurements
 		glideTimerRes = 30, // ms between glide animation ticks
 		touches = {}, // records number of touches on components
 		current = {}, // records info for widget(s) currently being scrolled
