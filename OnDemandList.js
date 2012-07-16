@@ -118,7 +118,7 @@ return declare([List, _StoreMixin], {
 				}
 				var height = 0;
 				for(var i = 0; i < trCount; i++){
-					height += trs[i].offsetHeight;
+					height += self._calcRowHeight(trs[i]);
 				}
 				// only update rowHeight if we actually got results and are visible
 				if(trCount && height){ self.rowHeight = height / trCount; }
@@ -159,7 +159,10 @@ return declare([List, _StoreMixin], {
 		// summary:
 		//		Calculate the height of a row. This is a method so it can be overriden for
 		//		plugins that add connected elements to a row, like the tree
-		return rowElement.offsetHeight;
+		
+		var sibling = rowElement.previousSibling;
+		return sibling && sibling.offsetTop != rowElement.offsetTop ?
+			rowElement.offsetHeight : 0;
 	},
 	
 	lastScrollTop: 0,
