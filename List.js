@@ -451,7 +451,7 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 					}
 					if(to > -1){
 						// add to new slot (either before an existing row, or at the end)
-						row = self.newRow(object, rows[to] || (rows[to-1] && rows[to-1].nextSibling) || beforeNode, to, options);
+						row = self.newRow(object, rows[to] || beforeNode.parentNode ? beforeNode : (rows[to-1] && rows[to-1].nextSibling), to, options);
 						if(row){
 							row.observerIndex = observerIndex;
 							rows.splice(to, 0, row);
