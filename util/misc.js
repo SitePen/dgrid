@@ -1,6 +1,5 @@
 define([], function(){
 	// This module defines miscellaneous utility methods.
-	
 	var util = {
 		defaultDelay: 15,
 		throttle: function(cb, context, delay){
@@ -16,20 +15,48 @@ define([], function(){
 				setTimeout(function(){ ran = false; }, delay);
 			}
 		},
-		throttleDelayed: function(cb, context, delay){
+		throttleDelayed: function(cb, context, delay, useLastArgs){
 			// summary:
 			//		Like throttle, except that the callback runs after the delay,
 			//		rather than before it.
-			var ran = false;
+			//		useLastArgs: If true, the arguments from the last invocation will be used, matching debounce()
+			var ran = false,
+				a;
 			delay = delay || util.defaultDelay;
 			return function(){
+				if(!ran || useLastArgs){
+					a = arguments;
+				}
 				if(ran){ return; }
 				ran = true;
-				var a = arguments;
 				setTimeout(function(){
 					cb.apply(context, a);
 					ran = false;
 				}, delay);
+			}
+		},
+		throttleCombined: function(cb, context, delay, useLastArgs){
+			// summary:
+			//		A combination of throttle and throttleDelayed; The first call within delay passes through immediately
+			//		so the action appears instantaneous to the user, but any further calls within delay are collapsed into 
+			//		a single call. Note that this call will fire twice per delay if continuously invoked. 
+			//		useLastArgs: If true, the arguments from the last invocation will be used, matching debounce() 
+			var count = 0, 
+				a;
+			delay = delay || util.defaultDelay;
+			return function(){
+				if(!count++ || useLastArgs){
+					a = arguments;
+				}
+				if(count == 1){
+					cb.apply(context, a);
+					setTimeout(function(){
+						if(count > 1){
+							cb.apply(context, a);
+						}
+						count = 0;
+					}, delay);
+				}
 			}
 		},
 		debounce: function(cb, context, delay){
