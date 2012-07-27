@@ -144,7 +144,8 @@ function(kernel, declare, listen, has, put, List){
 		},
 		renderRow: function(object, options){
 			var row = this.createRowCells("td", function(td, column){
-				var data = object;
+				var data = object,
+					renderedCell;
 				// we support the field, get, and formatter properties like the DataGrid
 				if(column.get){
 					data = column.get(object);
@@ -156,7 +157,13 @@ function(kernel, declare, listen, has, put, List){
 				}else if(column.renderCell){
 					// A column can provide a renderCell method to do its own DOM manipulation, 
 					// event handling, etc.
-					appendIfNode(td, column.renderCell(object, data, td, options));
+					renderedCell = column.renderCell(object, data, td, options);
+					if (renderedCell) {
+						appendIfNode(td, renderedCell);
+					}
+					else {
+						td.appendChild(document.createTextNode(data));
+					}
 				}else if(data != null){
 					td.appendChild(document.createTextNode(data));
 				}
@@ -181,7 +188,8 @@ function(kernel, declare, listen, has, put, List){
 			}
 			
 			var row = this.createRowCells("th[role=columnheader]", function(th, column){
-				var contentNode = column.headerNode = th;
+				var contentNode = column.headerNode = th,
+					renderedCell;
 				if(contentBoxSizing){
 					// we're interested in the th, but we're passed the inner div
 					th = th.parentNode;
@@ -192,7 +200,13 @@ function(kernel, declare, listen, has, put, List){
 				}
 				// allow for custom header content manipulation
 				if(column.renderHeaderCell){
-					appendIfNode(contentNode, column.renderHeaderCell(contentNode));
+					renderedCell = column.renderHeaderCell(contentNode);
+					if (renderedCell) {
+						appendIfNode(contentNode, renderedCell);
+					}
+					else {
+						contentNode.appendChild(document.createTextNode(column.label || column.field));
+					}
 				}else if(column.label || column.field){
 					contentNode.appendChild(document.createTextNode(column.label || column.field));
 				}
