@@ -135,6 +135,8 @@ return declare([List, _StoreMixin], {
 				self._processScroll(); // recheck the scroll position in case the query didn't fill the screen
 				// can remove the loading node now
 				return trs;
+			}, function(data) {
+				put(loadingNode, "div.dgrid-below.error-message", self.errorMessage);
 			});
 		});
 
@@ -358,6 +360,8 @@ return declare([List, _StoreMixin], {
 				
 				if(trackedResults === undefined){ return; } // sync query failed
 
+				var self = this;
+
 				// Isolate the variables in case we make multiple requests
 				// (which can happen if we need to render on both sides of an island of already-rendered rows)
 				(function(loadingNode, scrollNode, below, keepScrollTo, results){
@@ -383,6 +387,9 @@ return declare([List, _StoreMixin], {
 							});
 						}
 					});
+				}, function(data) {
+					console.log("error handler got data: ", data);
+					put(loadingNode, "div.dgrid-below.error-message", self.errorMessage);
 				}).call(this, loadingNode, scrollNode, below, keepScrollTo, results);
 				preload = preload.previous;
 			}
