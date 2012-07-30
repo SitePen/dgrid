@@ -39,26 +39,25 @@
 		<script type="text/javascript" src="../../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dgrid/OnDemandGrid", "dgrid/extensions/compoundColumns", "dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dojo/_base/lang", "dgrid/test/data/base", "dojo/domReady!"],
-				function(Grid, compoundColumns, Selection, Keyboard, declare, lang, testStore){
-					var subRows = compoundColumns([ // you can declare columns as an object hash (key translates to field)
-						{field: 'col1', label: 'Column 1'}, 
-						{label: "Full Name", children: [
-							{label: 'Given', children:[ 
-								{field: 'col2', label: 'First'},
-								{field: 'col5', label: 'Middle', sortable: false}]},
-							{field: 'col3', label: 'Last'}]},
-						{label: "No Sub-Headers", className: "noSub", children: [
-							{field: 'col4'},
-							{field: 'col5'}]},
-						{field:'col1', label: 'Column 5'}
-					]);
+			require(["dgrid/OnDemandGrid", "dgrid/extensions/CompoundColumns", "dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dojo/_base/lang", "dgrid/test/data/base", "dojo/domReady!"],
+				function(Grid, CompoundColumns, Selection, Keyboard, declare, lang, testStore){
 					//columns1 = lang.clone(columns);
 
-					var CompoundedGrid = declare([Grid, Selection, Keyboard]);
+					var CompoundedGrid = declare([Grid, CompoundColumns, Selection, Keyboard]);
 					window.grid = new CompoundedGrid({
 						store: testStore,
-						subRows: subRows
+						columns: [
+							{field: 'col1', label: 'Column 1'}, 
+							{label: "Full Name", children: [
+								{label: 'Given', children:[ 
+									{field: 'col2', label: 'First'},
+									{field: 'col5', label: 'Middle', sortable: false}]},
+								{field: 'col3', label: 'Last'}]},
+							{label: "No Sub-Headers", className: "noSub", children: [
+								{field: 'col4'},
+								{field: 'col5'}]},
+							{field:'col1', label: 'Column 5'}
+						]
 					}, "grid");
 				});
 		</script>
