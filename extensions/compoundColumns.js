@@ -1,9 +1,10 @@
-define(["dojo/_base/lang", "put-selector/put"], 
-	function(lang, put){
-		return function(columns){
+define(["dojo/_base/lang", "dojo/_base/declare", "dgrid/Grid", "put-selector/put"], 
+		function(lang, declare, Grid, put){
+	return declare([Grid], {
+		configStructure: function(){
 			// create a set of sub rows for the header row so we can do compound columns
 			// the first row is a special spacer row
-			var headerRows = [[]];
+			var columns = this.columns, headerRows = [[]];
 			// this first row is spacer row that will be made invisible (zero height) with CSS, 
 			// but the must be rendered as the first row since that is what the table layout is driven by
 			headerRows[0].className = "dgrid-spacer-row";
@@ -60,6 +61,8 @@ define(["dojo/_base/lang", "put-selector/put"],
 			// set our header rows so that the grid will use the alternate header row 
 			// configuration for rendering the headers
 			contentColumns.headerRows = headerRows;  
-			return contentColumns;
-		};
+			this.subRows = contentColumns;
+			this.inherited(arguments);
+		}
+	});
 });
