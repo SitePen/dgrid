@@ -1,5 +1,5 @@
-define(["dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/dnd/Source", "dojo/dnd/Manager", "put-selector/put", "xstyle/css!dojo/resources/dnd.css"],
-function(declare, lang, Deferred, DnDSource, DnDManager, put){
+define(["dojo/_base/declare", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/Deferred", "dojo/dnd/Source", "dojo/dnd/Manager", "dojo/_base/NodeList", "put-selector/put", "xstyle/css!dojo/resources/dnd.css"],
+function(declare, lang, arrayUtil, Deferred, DnDSource, DnDManager, NodeList, put){
 	// Requirements:
 	// * requires a store (sounds obvious, but not all Lists/Grids have stores...)
 	// * must support options.before in put calls
@@ -144,7 +144,15 @@ function(declare, lang, Deferred, DnDSource, DnDManager, put){
 			// 		augment checkAcceptance to block drops from sources without getObject
 			return source.getObject &&
 				DnDSource.prototype.checkAcceptance.apply(this, arguments);
-		}		
+		},
+		getSelectedNodes: function(){
+			// alternate implementation that uses a map of nodes
+			var t = new NodeList();
+			for(var i in this.grid.selection){
+				t.push(this._selectedNodes[this.grid.id + "-row-" + i]);
+			}
+			return t;	// NodeList
+		}
 		// TODO: could potentially also implement copyState to jive with default
 		// onDrop* implementations (checking whether store.copy is available);
 		// not doing that just yet until we're sure about default impl.
@@ -163,6 +171,19 @@ function(declare, lang, Deferred, DnDSource, DnDManager, put){
 				dropParent: grid.contentNode
 			})
 		);
+		var selectedNodes = grid.dndSource._selectedNodes = {};
+		grid.on("dgrid-select", function(event){
+			arrayUtil.forEach(event.rows, function(row){
+				var element = row.element;
+				selectedNodes[element.id] = element;
+			});
+		});
+		grid.on("dgrid-deselect", function(event){
+			arrayUtil.forEach(event.rows, function(row){
+				var element = row.element;
+				delete selectedNodes[element.id];
+			});
+		});
 	}
 	
 	var DnD = declare([], {
