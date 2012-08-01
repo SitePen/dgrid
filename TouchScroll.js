@@ -176,7 +176,7 @@ function(declare, on, has, put){
 		var widget = evt.widget,
 			id = widget.id,
 			curr = current[id],
-			node = curr.node,
+			node = curr && curr.node,
 			parentNode = this,
 			targetTouches, touch, nx, ny, minX, minY, i;
 		
@@ -206,7 +206,7 @@ function(declare, on, has, put){
 		evt.preventDefault();
 		evt.stopPropagation();
 		
-		if(curr.scrollbarsShown){
+		if(curr.scrollbarsShown && (curr.scrollableX || curr.scrollableY)){
 			nx = curr.scrollableX ? curr.startX + touch.pageX : curr.lastX;
 			ny = curr.scrollableY ? curr.startY + touch.pageY : curr.lastY;
 			
