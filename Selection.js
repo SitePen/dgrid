@@ -251,12 +251,18 @@ return declare([List], {
 		this.select(row, toRow, false);
 	},
 	clearSelection: function(exceptId){
+		// summary:
+		//		Deselects any currently-selected items.
+		// exceptId: Mixed?
+		//		If specified, the given id will not be deselected.
+		
 		this.allSelected = false;
 		for(var id in this.selection){
 			if(exceptId !== id){
 				this.deselect(id);
 			}
 		}
+		this._lastSelected = null;
 	},
 	selectAll: function(){
 		this.allSelected = true;
