@@ -27,8 +27,8 @@ define([], function(){
 				ran = true;
 				var a = arguments;
 				setTimeout(function(){
-					cb.apply(context, a);
 					ran = false;
+					cb.apply(context, a);
 				}, delay);
 			}
 		},
