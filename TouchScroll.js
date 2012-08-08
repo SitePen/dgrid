@@ -112,6 +112,16 @@ function(declare, on, has, put){
 		});
 	}
 	
+	function getScrollStyle(widget){
+		// Returns match object for current scroll position based on transform.
+		if(current[widget.id]){
+			// Mid-transition: determine current X/Y from computed values.
+			return matrixRx.exec(window.getComputedStyle(widget.touchNode)[transformProp]);
+		}
+		// Otherwise, determine current X/Y from applied style.
+		return translateRx.exec(widget.touchNode.style[transformProp]);
+	}
+	
 	// functions for handling touch events on node to be scrolled
 	
 	function ontouchstart(evt){
@@ -126,18 +136,12 @@ function(declare, on, has, put){
 		// ignore touch events on inappropriate number of contact points.
 		if(touches[id] !== widget.touchesToScroll - 1){ return; }
 		
-		if((curr = current[id])){
-			// determine current translate X/Y from final used values
-			match = matrixRx.exec(window.getComputedStyle(node)[transformProp]);
-		}else{
-			// determine current translate X/Y from applied style
-			match = translateRx.exec(node.style[transformProp]);
-		}
+		match = getScrollStyle(widget);
 		if(match){
 			posX = +match[1];
 			posY = +match[2];
 		}
-		if(curr){
+		if((curr = current[id])){
 			// stop any active glide on this widget, since it's been re-touched
 			clearTimeout(curr.timer);
 			
@@ -207,11 +211,11 @@ function(declare, on, has, put){
 		evt.stopPropagation();
 		
 		if(curr.scrollbarsShown && (curr.scrollableX || curr.scrollableY)){
-			nx = curr.scrollableX ? curr.startX + touch.pageX : curr.lastX;
-			ny = curr.scrollableY ? curr.startY + touch.pageY : curr.lastY;
+			nx = curr.scrollableX ? curr.startX + touch.pageX : 0;
+			ny = curr.scrollableY ? curr.startY + touch.pageY : 0;
 			
-			minX = -(node.scrollWidth - parentNode.offsetWidth);
-			minY = -(node.scrollHeight - parentNode.offsetHeight);
+			minX = curr.scrollableX ? -(node.scrollWidth - parentNode.offsetWidth) : 0;
+			minY = curr.scrollableY ? -(node.scrollHeight - parentNode.offsetHeight) : 0;
 			
 			// If dragged beyond edge, halve the distance between.
 			if(nx > 0){
@@ -292,7 +296,7 @@ function(declare, on, has, put){
 		}
 		
 		function scrollbarEnd(evt){
-			scrollbarNode.style[transitionPrefix + "Duration"] = "0";
+			this.style[transitionPrefix + "Duration"] = "0";
 		}
 		
 		if (x != lastX || y != lastY){
@@ -378,7 +382,7 @@ function(declare, on, has, put){
 	function calcGlide(id){
 		// performs glide and decelerates according to widget's glideDecel method
 		var curr = current[id],
-			node, parentNode, widget,
+			node, parentNode, widget, i,
 			nx, ny, nvx, nvy; // old/new coords and new velocities
 		
 		if(!curr){ return; }
@@ -395,14 +399,16 @@ function(declare, on, has, put){
 			ny = curr.lastY + nvy;
 			
 			// If glide has traveled beyond any edges, institute rubber-band effect
-			// by further decelerating, and set bounce flag for later bounce-back.
+			// by further decelerating.
 			if(nx > 0 || nx < -(node.scrollWidth - parentNode.offsetWidth)){
+				for(i = 6; i--;){
 				nvx = widget.glideDecel(nvx);
-				nvx = widget.glideDecel(nvx);
+				}
 			}
 			if(ny > 0 || ny < -(node.scrollHeight - parentNode.offsetHeight)){
+				for(i = 6; i--;){
 				nvy = widget.glideDecel(nvy);
-				nvy = widget.glideDecel(nvy);
+				}
 			}
 			
 			// still scrollable; update offsets/velocities and schedule next tick
@@ -504,6 +510,20 @@ function(declare, on, has, put){
 			delete current[this.id];
 			
 			this.inherited(arguments);
+		},
+		
+		scrollTo: function(x, y){
+			// summary:
+			//      Scrolls the widget to a specific position.
+			scroll(this, x, y);
+		},
+		
+		getScrollPosition: function(){
+			// summary:
+			//      Determines current translation from computed style
+			//      (if mid-transition), or applied style.
+			var match = getScrollStyle(this);
+			return match ? { x: -match[1], y: -match[2] } : { x: 0, y: 0 };
 		},
 		
 		glideDecel: function(n){
