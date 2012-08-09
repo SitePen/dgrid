@@ -156,6 +156,13 @@ html.has-quirks .dgrid-header-hidden .dgrid-cell {
 	width: 99%;
 }
 
+.dgrid-spacer-row th { /* Need to make these cells zero height/invisible, but still force the table layout */
+	padding-top: 0;
+	padding-bottom: 0;
+	border-top: none;
+	border-bottom: none;
+}
+
 /* UA-specific hacks*/
 html.has-mozilla .dgrid *:focus, html.has-opera .dgrid *:focus {
 	/* firefox's focus doesn't work by default for divs prior to actually tabbing into it. This fixes that

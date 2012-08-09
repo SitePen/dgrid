@@ -38,8 +38,8 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dgrid/OnDemandGrid", "dgrid/GridWithColumnSetsFromHtml", "dgrid/ColumnSet", "dgrid/Tree", "dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dojo/on", "dojo/parser", "dgrid/test/data/base", "dgrid/test/data/DeferredWrapper", "dojo/domReady!"],
-				function(Grid, GridFromHtml, ColumnSet, Tree, Selection, Keyboard, declare, on, parser, testStore, DeferredWrapper){
+			require(["dgrid/OnDemandGrid", "dgrid/GridWithColumnSetsFromHtml", "dgrid/extensions/ColumnReorder", "dgrid/ColumnSet", "dgrid/Tree", "dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dojo/on", "dojo/parser", "dgrid/test/data/base", "dgrid/test/data/DeferredWrapper", "dojo/domReady!"],
+				function(Grid, GridFromHtml, ColumnReorder, ColumnSet, Tree, Selection, Keyboard, declare, on, parser, testStore, DeferredWrapper){
 					var columnSets1 = [
 							[
 								[{label: 'Column 1', field: 'col1'},
@@ -57,6 +57,8 @@
 								[{label: 'Column 2', field: 'col2', sortable: false}]],
 							[
 								[{label: 'Column 1', field: 'col1', colSpan: 2}],
+								[{label: 'Column 1.5', field: 'col1', colSpan: 2}],
+								[{label: 'Column 1.6', field: 'col1', colSpan: 2}],
 								[{label: 'Column 4', field: 'col4'},
 									{label: 'Column 5', field: 'col5'}]
 							]],
@@ -106,7 +108,7 @@
 					
 					function byId(id){ return document.getElementById(id); }
 
-					var ComplexGrid = declare([Grid, ColumnSet, Selection, Keyboard]);
+					var ComplexGrid = declare([Grid, ColumnSet, ColumnReorder, Selection, Keyboard]);
 
 					window.gridNoColumnSets = new (declare([Grid, Selection, Keyboard]))({
 						store: DeferredWrapper(testStore),
