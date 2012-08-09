@@ -1,5 +1,5 @@
-define(["dojo/_base/declare", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/Deferred", "dojo/dnd/Source", "dojo/dnd/Manager", "dojo/_base/NodeList", "put-selector/put", "xstyle/css!dojo/resources/dnd.css"],
-function(declare, lang, arrayUtil, Deferred, DnDSource, DnDManager, NodeList, put){
+define(["dojo/_base/declare", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/Deferred", "dojo/aspect", "dojo/dnd/Source", "dojo/dnd/Manager", "dojo/_base/NodeList", "put-selector/put", "xstyle/css!dojo/resources/dnd.css"],
+function(declare, lang, arrayUtil, Deferred, aspect, DnDSource, DnDManager, NodeList, put){
 	// Requirements:
 	// * requires a store (sounds obvious, but not all Lists/Grids have stores...)
 	// * must support options.before in put calls
@@ -146,10 +146,16 @@ function(declare, lang, arrayUtil, Deferred, DnDSource, DnDManager, NodeList, pu
 				DnDSource.prototype.checkAcceptance.apply(this, arguments);
 		},
 		getSelectedNodes: function(){
-			// alternate implementation that uses a map of nodes
-			var t = new NodeList();
-			for(var i in this.grid.selection){
-				t.push(this._selectedNodes[this.grid.id + "-row-" + i]);
+			// If dgrid's Selection mixin is in use, synchronize with it, using a
+			// map of node references (updated on dgrid-[de]select events).
+			
+			if(!this.grid.selection){
+				return this.inherited(arguments);
+			}
+			var t = new NodeList(),
+				id;
+			for(id in this.grid.selection){
+				t.push(this._selectedNodes[id]);
 			}
 			return t;	// NodeList
 		}
@@ -171,19 +177,32 @@ function(declare, lang, arrayUtil, Deferred, DnDSource, DnDManager, NodeList, pu
 				dropParent: grid.contentNode
 			})
 		);
-		var selectedNodes = grid.dndSource._selectedNodes = {};
-		grid.on("dgrid-select", function(event){
-			arrayUtil.forEach(event.rows, function(row){
-				var element = row.element;
-				selectedNodes[element.id] = element;
+		
+		// If dgrid's Selection mixin is in use, set up handlers to maintain references.
+		var selectedNodes, selectRow, deselectRow;
+		
+		if(grid.selection){
+			selectedNodes = grid.dndSource._selectedNodes = {};
+			selectRow = function(row){
+				selectedNodes[row.id] = row.element;
+			};
+			deselectRow = function(row){
+				delete selectedNodes[row.id];
+			};
+			
+			grid.on("dgrid-select", function(event){
+				arrayUtil.forEach(event.rows, selectRow);
 			});
-		});
-		grid.on("dgrid-deselect", function(event){
-			arrayUtil.forEach(event.rows, function(row){
-				var element = row.element;
-				delete selectedNodes[element.id];
+			grid.on("dgrid-deselect", function(event){
+				arrayUtil.forEach(event.rows, deselectRow);
 			});
-		});
+		}
+		
+		aspect.after(grid, "destroy", function(){
+			delete grid.dndSource._selectedNodes;
+			selectedNodes = null;
+			grid.dndSource.destroy();
+		}, true);
 	}
 	
 	var DnD = declare([], {
