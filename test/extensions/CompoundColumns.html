@@ -7,11 +7,10 @@
 		<style type="text/css">
 			@import "../../../dojo/resources/dojo.css";
 			@import "../../css/skins/claro.css";
-			.heading {
-				font-weight: bold;
-				padding-bottom: 0.25em;
+			.dgrid {
+				margin: 10px;
 			}
-			#grid, #gridWide { 
+			#grid { 
 				width: 80%;
 			}
 			#grid .field-col1 {
@@ -28,9 +27,6 @@
 			}
 			#grid .field-col5 {
 				width: 50px;
-			}
-			.ui-widget{
-				margin: 10px;
 			}
 		</style>
 		<script>
@@ -53,9 +49,10 @@
 									{field: 'col2', label: 'First'},
 									{field: 'col5', label: 'Middle', sortable: false}]},
 								{field: 'col3', label: 'Last'}]},
-							{label: "No Sub-Headers", className: "noSub", children: [
+							{label: "No Sub-Headers", className: "noSub", showChildHeaders: false, children: [
 								{field: 'col4'},
-								{field: 'col5'}]},
+								{field: 'col5', formatter: function(data){ return Math.round(data); }}
+							]},
 							{field:'col1', label: 'Column 5'}
 						]
 					}, "grid");

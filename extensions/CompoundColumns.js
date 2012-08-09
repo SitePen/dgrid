@@ -4,8 +4,16 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dgrid/Grid", "put-selector/put
 		// summary:
 		//		Extension allowing for specification of columns with additional
 		//		header rows spanning multiple columns for strictly display purposes.
-		//		These are configured using a special recursive `children` property in
-		//		the column definition.
+		//		Currently only works on `columns`, not `subRows` (nor ColumnSets).
+		// description:
+		//		CompoundColumns allows nested header cell configurations, wherein the
+		//		higher-level headers may span multiple columns and are for
+		//		display purposes only.
+		//		These nested header cells are configured using a special recursive
+		//		`children` property in the column definition, where only the deepest
+		//		children are ultimately rendered in the grid as actual columns.
+		//		In addition, the deepest child columns may be rendered without
+		//		individual headers by specifying `showChildHeaders: false` on the parent.
 		
 		configStructure: function(){
 			// create a set of sub rows for the header row so we can do compound columns
@@ -25,15 +33,8 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dgrid/Grid", "put-selector/put
 				for(i in columns){
 					column = columns[i];
 					children = column.children;
-					hasChildLabels = false;
+					hasChildLabels = column.children && (column.showChildHeaders !== false);
 					if(children){
-						// it has children, let's check to see if this is a no-label situation
-						for(var j = 0; j < children.length; j++){
-							var child = children[j];
-							if(child.label || child.renderHeaderCell){
-								hasChildLabels = true;
-							}
-						}
 						// it has children, recursively process the children
 						numColumns += (column.colSpan = processColumns(children, level + 1, hasChildLabels));
 					}else{
