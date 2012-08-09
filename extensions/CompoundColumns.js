@@ -1,20 +1,31 @@
-define(["dojo/_base/lang", "dojo/_base/declare", "dgrid/Grid", "put-selector/put"], 
+define(["dojo/_base/lang", "dojo/_base/declare", "dgrid/Grid", "put-selector/put", "xstyle/css!../css/extensions/CompoundColumns.css"],
 		function(lang, declare, Grid, put){
-	return declare([Grid], {
+	return declare(Grid, {
+		// summary:
+		//		Extension allowing for specification of columns with additional
+		//		header rows spanning multiple columns for strictly display purposes.
+		//		These are configured using a special recursive `children` property in
+		//		the column definition.
+		
 		configStructure: function(){
 			// create a set of sub rows for the header row so we can do compound columns
 			// the first row is a special spacer row
-			var columns = this.columns, headerRows = [[]];
-			// this first row is spacer row that will be made invisible (zero height) with CSS, 
-			// but the must be rendered as the first row since that is what the table layout is driven by
+			var columns = this.columns,
+				headerRows = [[]];
+			// This first row is spacer row that will be made invisible (zero height)
+			// with CSS, but it must be rendered as the first row since that is what
+			// the table layout is driven by.
 			headerRows[0].className = "dgrid-spacer-row";
 			var contentColumns = [];
 			function processColumns(columns, level, hasLabel){
-				var numColumns = 0;
-				for(var i in columns){
-					var column = columns[i];
-					var children = column.children;
-					var hasChildLabels = false;
+				var numColumns = 0,
+					noop = function(){},
+					i, column, children, hasChildLabels;
+				
+				for(i in columns){
+					column = columns[i];
+					children = column.children;
+					hasChildLabels = false;
 					if(children){
 						// it has children, let's check to see if this is a no-label situation
 						for(var j = 0; j < children.length; j++){
@@ -28,8 +39,8 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dgrid/Grid", "put-selector/put
 					}else{
 						// it has no children, it is a normal header, add it to the content columns
 						contentColumns.push(column);
-						// add each one to the first spacer header row for proper layout of the header cells 
-						headerRows[0].push(lang.delegate(column, {renderHeaderCell: function(){}}));						
+						// add each one to the first spacer header row for proper layout of the header cells
+						headerRows[0].push(lang.delegate(column, {renderHeaderCell: noop}));
 						numColumns++;
 					}
 					if(!hasChildLabels){
@@ -45,19 +56,22 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dgrid/Grid", "put-selector/put
 				return numColumns;
 			}
 			processColumns(columns, 1, true);
-			var numHeaderRows = headerRows.length;
-			// now go back through and increase the rowSpans of the headers to be total rows minus the number of levels they are at
-			for(var i = 0; i < numHeaderRows; i++){
-				var headerRow = headerRows[i];
-				for(var j = 0; j < headerRow.length; j++){
-					var headerColumn = headerRow[j];
+			
+			var numHeaderRows = headerRows.length,
+				i, j, headerRow, headerColumn;
+			// Now go back through and increase the rowSpans of the headers to be
+			// total rows minus the number of levels they are at.
+			for(i = 0; i < numHeaderRows; i++){
+				headerRow = headerRows[i];
+				for(j = 0; j < headerRow.length; j++){
+					headerColumn = headerRow[j];
 					if(headerColumn.rowSpan < 1){
 						headerColumn.rowSpan += numHeaderRows;
-					} 
+					}
 				}
 			}
 			// we need to set this to be used for subRows, so we make it a single row
-			contentColumns = [contentColumns]; //  
+			contentColumns = [contentColumns];
 			// set our header rows so that the grid will use the alternate header row 
 			// configuration for rendering the headers
 			contentColumns.headerRows = headerRows;  
