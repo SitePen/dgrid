@@ -96,7 +96,7 @@ return declare([List], {
 				// as well as for right-clicks on unselected targets
 				if((event.button != 2 && mode == "extended" && !ctrlKey) ||
 						(event.button == 2 && !(this.selection[rowObj.id]))){
-					this.clearSelection(rowObj.id);
+					this.clearSelection(rowObj.id, true);
 				}
 				if(!event.shiftKey){
 					// null == toggle; undefined == true;
@@ -256,7 +256,7 @@ return declare([List], {
 	deselect: function(row, toRow){
 		this.select(row, toRow, false);
 	},
-	clearSelection: function(exceptId){
+	clearSelection: function(exceptId, dontResetLastSelected){
 		// summary:
 		//		Deselects any currently-selected items.
 		// exceptId: Mixed?
@@ -268,7 +268,9 @@ return declare([List], {
 				this.deselect(id);
 			}
 		}
-		this._lastSelected = null;
+		if(!dontResetLastSelected){
+			this._lastSelected = null;
+		}
 	},
 	selectAll: function(){
 		this.allSelected = true;
