@@ -4,7 +4,8 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dgrid/Grid", "put-selector/put
 		// summary:
 		//		Extension allowing for specification of columns with additional
 		//		header rows spanning multiple columns for strictly display purposes.
-		//		Currently only works on `columns`, not `subRows` (nor ColumnSets).
+		//		Only works on `columns` arrays, not `columns` objects or `subRows`
+		//		(nor ColumnSets).
 		// description:
 		//		CompoundColumns allows nested header cell configurations, wherein the
 		//		higher-level headers may span multiple columns and are for
@@ -18,13 +19,14 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dgrid/Grid", "put-selector/put
 		configStructure: function(){
 			// create a set of sub rows for the header row so we can do compound columns
 			// the first row is a special spacer row
-			var columns = this.columns,
-				headerRows = [[]];
+			var columns = (this.subRows && this.subRows[0]) || this.columns,
+				headerRows = [[]],
+				contentColumns = [];
 			// This first row is spacer row that will be made invisible (zero height)
 			// with CSS, but it must be rendered as the first row since that is what
 			// the table layout is driven by.
 			headerRows[0].className = "dgrid-spacer-row";
-			var contentColumns = [];
+			
 			function processColumns(columns, level, hasLabel){
 				var numColumns = 0,
 					noop = function(){},

@@ -43,7 +43,7 @@
 					window.grid = new CompoundedGrid({
 						store: testStore,
 						columns: [
-							{field: 'col1', label: 'Column 1'}, 
+							{field: 'col1', label: 'First Column'}, 
 							{label: "Full Name", children: [
 								{label: 'Given', children:[ 
 									{field: 'col2', label: 'First'},
@@ -53,7 +53,7 @@
 								{field: 'col4'},
 								{field: 'col5', formatter: function(data){ return Math.round(data); }}
 							]},
-							{field:'col1', label: 'Column 5'}
+							{field:'col1', label: 'Last Column'}
 						]
 					}, "grid");
 				});
