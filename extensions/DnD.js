@@ -16,9 +16,11 @@ function(declare, lang, arrayUtil, Deferred, aspect, DnDSource, DnDManager, Node
 		getObject: function(node){
 			// summary:
 			//		getObject is a method which should be defined on any source intending
-			// 		on interfacing with dgrid DnD
+			// 		on interfacing with dgrid DnD.
+			
 			var grid = this.grid;
-			return grid.store.get(grid.row(node).id);
+			// Extract item id from row node id (gridID-row-*).
+			return grid.store.get(node.id.slice(grid.id.length + 5));
 		},
 		_legalMouseDown: function(evt){
 			// summary:
