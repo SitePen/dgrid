@@ -114,8 +114,11 @@ function(kernel, declare, listen, has, put, List){
 					column = subRow[i];
 					id = column.id;
 					extraClassName = column.className || (column.field && "field-" + column.field);
-					cell = put(tag + (".dgrid-cell.dgrid-cell-padding.dgrid-column-" + id +
-						(extraClassName ? "." + extraClassName : "")).replace(invalidClassChars,"-"));
+					cell = put(tag + (
+							".dgrid-cell.dgrid-cell-padding" +
+							(id ? ".dgrid-column-" + id : "") +
+							(extraClassName ? "." + extraClassName : "")
+						).replace(invalidClassChars,"-"));
 					cell.columnId = id;
 					if(contentBoxSizing){
 						// The browser (IE7-) does not support box-sizing: border-box, so we emulate it with a padding div
