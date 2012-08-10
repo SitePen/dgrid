@@ -203,8 +203,7 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 					start = (page - 1) * count,
 					options = lang.mixin(grid.get("queryOptions"), {
 						start: start,
-						count: count,
-						query: grid.query
+						count: count
 						// current sort is also included by get("queryOptions")
 					}),
 					results,
