@@ -105,26 +105,26 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 		return this._class;
 	}
 	
-	// window resize event handler
-	var winResizeHandler = has("ie") < 7 && !has("quirks") ? function(grid){
+	// window resize event handler, run in context of List instance
+	var winResizeHandler = has("ie") < 7 && !has("quirks") ? function(){
 		// IE6 triggers window.resize on any element resize;
 		// avoid useless calls (and infinite loop if height: auto).
 		// The measurement logic here is based on dojo/window logic.
 		var root, w, h, dims;
 		
-		if(!grid._started){ return; } // no sense calling resize yet
+		if(!this._started){ return; } // no sense calling resize yet
 		
 		root = document.documentElement;
 		w = root.clientWidth;
 		h = root.clientHeight;
-		dims = grid._prevWinDims || [];
+		dims = this._prevWinDims || [];
 		if(dims[0] !== w || dims[1] !== h){
-			grid.resize();
-			grid._prevWinDims = [w, h];
+			this.resize();
+			this._prevWinDims = [w, h];
 		}
 	} :
-	function(grid){
-		grid._started && grid.resize();
+	function(){
+		if(this._started){ this.resize(); }
 	};
 	
 	return declare(TouchScroll ? [TouchScroll] : [], {
@@ -209,7 +209,6 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 		},
 		buildRendering: function(){
 			var domNode = this.domNode,
-				grid = this,
 				headerNode, spacerNode, bodyNode, footerNode, isRTL;
 			
 			// Detect RTL on html/body nodes; taken from dojo/dom-geometry
@@ -257,7 +256,7 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			this.contentNode = put(this.bodyNode, "div.dgrid-content.ui-widget-content");
 			// add window resize handler, with reference for later removal if needed
 			this._listeners.push(this._resizeHandle = listen(window, "resize",
-				miscUtil.debounce(winResizeHandler)));
+				miscUtil.throttleDelayed(winResizeHandler, this)));
 		},
 		startup: function(){
 			// summary:
