@@ -158,7 +158,7 @@ return function(column){
 							grid._trackError(function(){
 								return grid.renderQuery(query, preloadNode);
 							}) :
-							grid.renderArray(query({}), preloadNode),
+							grid.renderArray(query({}), preloadNode, {query: query}),
 						function(){
 							// Expand once results are retrieved, if the row is still expanded.
 							if(grid._expanded[row.id]){
