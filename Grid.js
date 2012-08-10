@@ -206,7 +206,7 @@ function(kernel, declare, listen, has, put, List){
 					th.sortable = true;
 					th.className += " dgrid-sortable";
 				}
-			}, this.subRows.headerRows);
+			}, this.subRows && this.subRows.headerRows);
 			this._rowIdToObject[row.id = this.id + "-header"] = this.columns;
 			headerNode.appendChild(row);
 			// if it columns are sortable, resort on clicks
