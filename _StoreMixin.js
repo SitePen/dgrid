@@ -5,6 +5,12 @@ function(kernel, declare, lang, Deferred, listen){
 	
 	function emitError(err){
 		// called by _trackError in context of list/grid, if an error is encountered
+		if(typeof err !== "object"){
+			// Ensure we actually have an error object, so we can attach a reference.
+			err = new Error(err);
+		}
+		err.grid = this;
+		
 		if(listen.emit(this.domNode, "dgrid-error", {error: err, cancelable: true, bubbles: true})){
 			console.error(err);
 		}
