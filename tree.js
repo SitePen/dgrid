@@ -104,6 +104,14 @@ return function(column){
 			}
 		}));
 		
+		if(column.collapseOnRefresh){
+			// Clear out the _expanded hash on each call to cleanup
+			// (which generally coincides with refreshes, as well as destroy).
+			listeners.push(aspect.after(grid, "cleanup", function(){
+				this._expanded = {};
+			}));
+		}
+		
 		grid._calcRowHeight = function(rowElement){
 			// we override this method so we can provide row height measurements that
 			// include the children of a row
@@ -237,7 +245,9 @@ return function(column){
 		// established above if the grid's columns are redefined later.
 		aspect.after(column, "destroy", function(){
 			arrayUtil.forEach(listeners, function(l){ l.remove(); });
+			// Delete methods we added/overrode on the instance.
 			delete grid.expand;
+			delete grid._calcRowHeight;
 		});
 	});
 	
