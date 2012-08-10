@@ -50,7 +50,7 @@
 						// test setting unhidable *and* hidden (i.e. not in menu, not displayed)
 						{ field: "col4", label: "Col4", sortable: false, hidden: true, unhidable: true },
 						{ field: "col1", label: "Col1" },
-						{ field: "col5", label: "Column 5" }
+						{ field: "col5" } // no label, to test fallback to field
 					];
 					
 					window.grid = new (declare([Grid, Selection, ColumnHider]))({
