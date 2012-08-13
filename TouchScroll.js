@@ -122,6 +122,35 @@ function(declare, on, has, put){
 		return translateRx.exec(widget.touchNode.style[transformProp]);
 	}
 	
+	function resetEffects(){
+		// Function to cut glide/bounce short, called in context of an object
+		// from the current hash; attached only when a glide or bounce occurs.
+		// Used by ontouchstart handler, and by scrollTo on instances
+		// (in case it's called directly during a glide/bounce).
+		
+		// Clear glide timer.
+		if(this.timer){
+			clearTimeout(this.timer);
+			this.timer = null;
+		}
+		
+		// Clear transition handlers, as we're about to cut it short.
+		if(this.transitionHandlers){
+			// Unhook any existing transitionend handlers, since we'll be
+			// canceling the transition and handling things in touch events.
+			for(var i = this.transitionHandlers.length; i--;){
+				this.transitionHandlers[i].remove();
+			}
+			delete this.transitionHandlers;
+		}
+		
+		// Clear transition duration.
+		this.node.style[transitionPrefix + "Duration"] = "0";
+		
+		// Remove this method so it can't be called again.
+		delete this.resetEffects;
+	}
+	
 	// functions for handling touch events on node to be scrolled
 	
 	function ontouchstart(evt){
@@ -142,18 +171,9 @@ function(declare, on, has, put){
 			posY = +match[2];
 		}
 		if((curr = current[id])){
-			// stop any active glide on this widget, since it's been re-touched
-			clearTimeout(curr.timer);
+			// stop any active glide or bounce, since it's been re-touched
+			if(curr.resetEffects){ curr.resetEffects(); }
 			
-			if(curr.transitionHandlers){
-				// Unhook any existing transitionend handlers, since we'll be
-				// canceling the transition and handling things in touch events.
-				for(i = curr.transitionHandlers.length; i--;){
-					curr.transitionHandlers[i].remove();
-				}
-			}
-			
-			node.style[transitionPrefix + "Duration"] = "0";
 			node.style[transformProp] =
 				translatePrefix + posX + "px," + posY + "px" + translateSuffix;
 		}
@@ -238,7 +258,6 @@ function(declare, on, has, put){
 			curr = current[id];
 		
 		if(touches[id] != widget.touchesToScroll || !curr){ return; }
-		if(curr.timer){ clearTimeout(curr.timer); }
 		startGlide(id);
 	}
 	
@@ -292,6 +311,7 @@ function(declare, on, has, put){
 			node.style[transitionPrefix + "Duration"] = "0";
 			
 			put(parentNode, ".touchscroll-fadeout");
+			delete curr.resetEffects;
 			delete current[id];
 		}
 		
@@ -299,7 +319,11 @@ function(declare, on, has, put){
 			this.style[transitionPrefix + "Duration"] = "0";
 		}
 		
+		// Timeout will have been cleared before bounce call, so remove timer.
+		delete curr.timer;
+		
 		if (x != lastX || y != lastY){
+			curr.resetEffects = resetEffects;
 			curr.transitionHandlers = [on.once(node, hasTransitionEnd, end)];
 			node.style[transitionPrefix + "Duration"] = widget.bounceDuration + "ms";
 			node.style[transformProp] =
@@ -354,8 +378,9 @@ function(declare, on, has, put){
 			parentNode = node.parentNode,
 			match, posX, posY;
 		
+		if(curr.timer){ clearTimeout(curr.timer); }
+		
 		// calculate velocity based on time and displacement since last tick
-		curr.timer && clearTimeout(curr.timer);
 		match = translateRx.exec(curr.node.style[transformProp]);
 		if(match){
 			posX = +match[1];
@@ -377,13 +402,15 @@ function(declare, on, has, put){
 		curr.lastX = posX;
 		curr.lastY = posY;
 		curr.calcFunc = function(){ calcGlide(id); };
+		curr.resetEffects = resetEffects;
 		curr.timer = setTimeout(curr.calcFunc, glideTimerRes);
 	}
 	function calcGlide(id){
 		// performs glide and decelerates according to widget's glideDecel method
 		var curr = current[id],
 			node, parentNode, widget, i,
-			nx, ny, nvx, nvy; // old/new coords and new velocities
+			nx, ny, nvx, nvy, // old/new coords and new velocities
+			BOUNCE_DECELERATION_AMOUNT = 6;
 		
 		if(!curr){ return; }
 		
@@ -401,13 +428,13 @@ function(declare, on, has, put){
 			// If glide has traveled beyond any edges, institute rubber-band effect
 			// by further decelerating.
 			if(nx > 0 || nx < -(node.scrollWidth - parentNode.offsetWidth)){
-				for(i = 6; i--;){
-				nvx = widget.glideDecel(nvx);
+				for(i = BOUNCE_DECELERATION_AMOUNT; i--;){
+					nvx = widget.glideDecel(nvx);
 				}
 			}
 			if(ny > 0 || ny < -(node.scrollHeight - parentNode.offsetHeight)){
-				for(i = 6; i--;){
-				nvy = widget.glideDecel(nvy);
+				for(i = BOUNCE_DECELERATION_AMOUNT; i--;){
+					nvy = widget.glideDecel(nvy);
 				}
 			}
 			
@@ -515,6 +542,14 @@ function(declare, on, has, put){
 		scrollTo: function(x, y){
 			// summary:
 			//      Scrolls the widget to a specific position.
+			
+			var curr = current[this.id];
+			if(curr && curr.resetEffects){
+				// Stop any glide or bounce occurring before scrolling.
+				curr.resetEffects();
+				// Ensure that any touch-scrollbars fade out.
+				put(curr.node.parentNode, ".touchscroll-fadeout");
+			}
 			scroll(this, x, y);
 		},
 		
