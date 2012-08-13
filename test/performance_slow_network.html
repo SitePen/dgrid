@@ -7,6 +7,7 @@
 		<meta name="viewport" content="width=570" />
 		<style type="text/css">
 			@import "../../dojo/resources/dojo.css";
+			@import "../../dijit/themes/tundra/tundra.css";
 			@import "../css/dgrid.css";
 			@import "../css/skins/tundra.css";
 			.heading {
@@ -27,12 +28,19 @@
 				height: 50em;
 				padding: 1px;
 			}
+			
+			label {
+				padding-right: 5em;
+			}
 		</style>
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dgrid/test/data/perf", "dgrid/test/data/DeferredWrapper", "dojo/domReady!"],
-				function(List, Grid, Selection, Keyboard, declare, testPerfStore, DeferredWrapper){
+			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", 
+				"dgrid/test/data/perf", "dgrid/test/data/DeferredWrapper", "dgrid/test/NodeChecker", "dijit/form/CheckBox", 
+				"dijit/form/NumberTextBox", "dojo/domReady!"],
+				function(List, Grid, Selection, Keyboard, declare, testPerfStore, DeferredWrapper, NodeChecker, CheckBox, 
+				         NumberTextBox){
 					var columns = [
 						{ name: 'Column 0', field: 'id', width: '10%' },
 						{ name: 'Column 1', field: 'integer', width: '10%' },
@@ -50,22 +58,48 @@
 					for(var i = 0; i < 20000; i += 10)
 						selection[i] = true;
 
+					var latency = 500;
 					var start = new Date().getTime();
-					window.grid = new (declare([Grid, Selection, Keyboard]))({
-						store: DeferredWrapper(testPerfStore, 500),
+					window.grid = new (declare([Grid, Selection, Keyboard, NodeChecker]))({
+						store: DeferredWrapper(testPerfStore, latency),
 						columns: columns,
 						selection: selection,
-						deselectOnRefresh: false
+						deselectOnRefresh: false,
+						maxEmptySpace: Infinity,
+						breakOnError: false // Set to true to make debugging easier
 					}, "grid");
 					console.log(new Date().getTime() - start);
+					var farOffRemoval = new CheckBox({checked: window.grid.farOffRemoval < Infinity, onChange: resetGrid}, 
+							  "farOffRowRemoval");
+					var maxEmptySpace = new NumberTextBox({constraints: {min: 0}, value: 0, onChange: resetGrid}, 
+							  "maxEmptySpace");
+					
+					farOffRemoval.startup();
+					maxEmptySpace.startup();
+					
+					function resetGrid(){
+						window.grid.farOffRemoval = farOffRemoval.get("checked") ? Grid.prototype.farOffRemoval : Infinity;
+						window.grid.maxEmptySpace = maxEmptySpace.get("value") || Grid.prototype.maxEmptySpace;
+						// Temporarily disable checking so we don't report false alarms caused by stale responses coming back
+						window.grid.nodeCheckerEnabled = false;
+						window.grid.refresh();
+						setTimeout(function() { window.grid.nodeCheckerEnabled = true; }, latency * 2);
+					}
 				});
-				
 		</script>
 	</head>
 	<body class="tundra">
 		<h2 class="heading">Tests handling of large data sets on a (simulated) slow network, with results being returned
 			after a delay and out of order, and the total number of rows being returned at a different
 			time to the result set.</h2>
+		<p>This page uses the tests/NodeChecker plugin to make sure that the grid's nodes are correct. Rapidly drag
+			the grid's scrollbar up and down to simulate the most pathological situations; NodeChecker will report any
+			errors it finds to the console. Due to the fairly random nature of the testing, you may need to do this for
+			up to 30 seconds to be sure there are no issues (although most major problems are detected pretty quickly).</p>
+		<div class="ui-widget">
+			<label for="farOffRowRemoval"><span id="farOffRowRemoval"></span> Remove far off rows</label>
+			<label for="maxEmptySpace">maxEmptySpace: <span id="maxEmptySpace"></span> (0 means infinite)</label>
+		</div>
 		<div id="grid"></div>
 	</body>
 </html>
