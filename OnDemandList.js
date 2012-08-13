@@ -44,8 +44,7 @@ return declare([List, _StoreMixin], {
 		this.inherited(arguments);
 		var self = this;
 		// check visibility on scroll events
-		listen(this.bodyNode, "scroll",
-			miscUtil.throttleDelayed(function(event){ self._processScroll(event); },
+		listen(this.bodyNode, "scroll", miscUtil.throttleDelayed(function(event){ self._processScroll(event); },
 				null, this.pagingDelay));
 	},
 	
@@ -132,7 +131,7 @@ return declare([List, _StoreMixin], {
 					// if total is 0, IE quirks mode can't handle 0px height for some reason, I don't know why, but we are setting display: none for now
 					preloadNode.style.display = "none";
 				}
-				self._processScroll(); // recheck the scroll position in case the query didn't fill the screen
+				self._processScroll({}); // recheck the scroll position in case the query didn't fill the screen
 				// can remove the loading node now
 				return trs;
 			});
@@ -166,14 +165,14 @@ return declare([List, _StoreMixin], {
 	},
 	
 	lastScrollTop: 0,
-	_processScroll: function(){
+	_processScroll: function(event){
 		// summary:
-		//		Checks to make sure that everything in the viewable area has been
+		//		Checks to make sure that everything in te viewable area has been
 		//		downloaded, and triggering a request for the necessary data when needed.
 		var grid = this,
 			scrollNode = grid.bodyNode,
 			transform = grid.contentNode.style.webkitTransform,
-			visibleTop = scrollNode.scrollTop + (transform ? -transform.match(/translate[\w]*\(.*?,(.*?)px/)[1] : 0),
+			visibleTop = event && event.pseudoTouch ? scrollNode.instantScrollTop : scrollNode.scrollTop,
 			visibleBottom = scrollNode.offsetHeight + visibleTop,
 			priorPreload, preloadNode, preload = grid.preload,
 			lastScrollTop = grid.lastScrollTop,

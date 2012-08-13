@@ -79,18 +79,39 @@ html.has-quirks .dgrid-header-hidden .dgrid-cell {
 }
 
 .dgrid-content {
-	position: relative;
+	/*position: relative;*/
 	height: 99%;
 }
 
 .dgrid-scroller {
 	overflow-x: auto;
 	overflow-y: scroll;
+	-webkit-overflow-scrolling: touch;
 	position: absolute;
 	top: 0px;
 	margin-top: 25px; /* this will be adjusted programmatically to fit below the header*/
 	bottom: 0px;
 	width: 100%;
+}
+.dgrid-touch-scrollbar-y, .dgrid-touch-scrollbar-x {
+	position: absolute;
+	background-color: rgba(88,88,88,0.97);
+	opacity: 0.7;
+	border: 1px solid rgba(88,88,88,1);
+	border-radius: 3px;
+	-webkit-box-shadow: 0 0 1px rgba(88,88,88,0.4); /* the border's aren't anti-aliased on android, so this smooths it out a bit*/
+}
+.dgrid-touch-scrollbar-y {
+	right: 1px;
+	width: 3px;
+}
+.dgrid-touch-scrollbar-x {
+	bottom: 1px;
+	height: 3px;
+}
+.dgrid-touch-scrollbar-fade .dgrid-touch-scrollbar-y, .dgrid-touch-scrollbar-fade .dgrid-touch-scrollbar-x {
+	-webkit-transition: opacity 0.3s ease-out 0.3s;
+	opacity: 0;
 }
 
 .dgrid-loading {
