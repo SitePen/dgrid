@@ -274,7 +274,6 @@ function(declare, on, has, put){
 		
 		// Squelch the event, and scroll the area if beyond the threshold.
 		evt.preventDefault();
-		evt.stopPropagation();
 		
 		if(curr.scrollbarsShown && (curr.scrollableX || curr.scrollableY)){
 			nx = curr.scrollableX ? curr.startX + touch.pageX : 0;
