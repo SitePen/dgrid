@@ -115,7 +115,8 @@ define(["dojo/_base/declare", "dojo/has", "dojo/on", "dojo/query", "dojo/dom", "
 					div.innerHTML = '<input type="checkbox" id="' + checkId +
 						'" class="dgrid-hider-menu-check hider-menu-check-' + id +
 						'"><label class="dgrid-hider-menu-label hider-menu-label-' + id +
-						'" for="' + checkId + '">' + col.label.replace(/</g, "&lt;") +
+						'" for="' + checkId + '">' +
+						(col.label || col.field || "").replace(/</g, "&lt;") +
 						'</label>';
 					
 					if(!col.hidden){

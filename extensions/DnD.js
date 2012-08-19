@@ -1,5 +1,5 @@
-define(["dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/dnd/Source", "dojo/dnd/Manager", "put-selector/put", "xstyle/css!dojo/resources/dnd.css"],
-function(declare, lang, Deferred, DnDSource, DnDManager, put){
+define(["dojo/_base/declare", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/Deferred", "dojo/aspect", "dojo/dnd/Source", "dojo/dnd/Manager", "dojo/_base/NodeList", "put-selector/put", "xstyle/css!dojo/resources/dnd.css"],
+function(declare, lang, arrayUtil, Deferred, aspect, DnDSource, DnDManager, NodeList, put){
 	// Requirements:
 	// * requires a store (sounds obvious, but not all Lists/Grids have stores...)
 	// * must support options.before in put calls
@@ -16,9 +16,11 @@ function(declare, lang, Deferred, DnDSource, DnDManager, put){
 		getObject: function(node){
 			// summary:
 			//		getObject is a method which should be defined on any source intending
-			// 		on interfacing with dgrid DnD
+			// 		on interfacing with dgrid DnD.
+			
 			var grid = this.grid;
-			return grid.store.get(grid.row(node).id);
+			// Extract item id from row node id (gridID-row-*).
+			return grid.store.get(node.id.slice(grid.id.length + 5));
 		},
 		_legalMouseDown: function(evt){
 			// summary:
@@ -144,7 +146,21 @@ function(declare, lang, Deferred, DnDSource, DnDManager, put){
 			// 		augment checkAcceptance to block drops from sources without getObject
 			return source.getObject &&
 				DnDSource.prototype.checkAcceptance.apply(this, arguments);
-		}		
+		},
+		getSelectedNodes: function(){
+			// If dgrid's Selection mixin is in use, synchronize with it, using a
+			// map of node references (updated on dgrid-[de]select events).
+			
+			if(!this.grid.selection){
+				return this.inherited(arguments);
+			}
+			var t = new NodeList(),
+				id;
+			for(id in this.grid.selection){
+				t.push(this._selectedNodes[id]);
+			}
+			return t;	// NodeList
+		}
 		// TODO: could potentially also implement copyState to jive with default
 		// onDrop* implementations (checking whether store.copy is available);
 		// not doing that just yet until we're sure about default impl.
@@ -163,6 +179,32 @@ function(declare, lang, Deferred, DnDSource, DnDManager, put){
 				dropParent: grid.contentNode
 			})
 		);
+		
+		// If dgrid's Selection mixin is in use, set up handlers to maintain references.
+		var selectedNodes, selectRow, deselectRow;
+		
+		if(grid.selection){
+			selectedNodes = grid.dndSource._selectedNodes = {};
+			selectRow = function(row){
+				selectedNodes[row.id] = row.element;
+			};
+			deselectRow = function(row){
+				delete selectedNodes[row.id];
+			};
+			
+			grid.on("dgrid-select", function(event){
+				arrayUtil.forEach(event.rows, selectRow);
+			});
+			grid.on("dgrid-deselect", function(event){
+				arrayUtil.forEach(event.rows, deselectRow);
+			});
+		}
+		
+		aspect.after(grid, "destroy", function(){
+			delete grid.dndSource._selectedNodes;
+			selectedNodes = null;
+			grid.dndSource.destroy();
+		}, true);
 	}
 	
 	var DnD = declare([], {

@@ -251,9 +251,9 @@ function(lang, Deferred, Memory, Observable, QueryResults){
 		}
 	}
 	// global function createOrderedStore
-	createOrderedStore = function(data){
+	createOrderedStore = function(data, options){
 		// Instantiate a Memory store modified to support ordering.
-		return Observable(new Memory({data: data,
+		return Observable(new Memory(lang.mixin({data: data,
 			idProperty: "name",
 			put: function(object, options){
 				object.order = calculateOrder(this, object, options.before);
@@ -281,10 +281,11 @@ function(lang, Deferred, Memory, Observable, QueryResults){
 				this.add(obj, options);
 			},
 			query: function(query, options){
+				options = options || {};
 				options.sort = [{attribute:"order"}];
 				return Memory.prototype.query.call(this, query, options);
 			}
-		}));
+		}, options)));
 	};
 	// global var testOrderedData
 	testOrderedData = [

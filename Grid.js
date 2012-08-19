@@ -105,14 +105,20 @@ function(kernel, declare, listen, has, put, List){
 				// for single-subrow cases in modern browsers, TR can be skipped
 				// http://jsperf.com/table-without-trs
 				tr = (sl == 1 && !has("ie")) ? tbody : put(tbody, "tr");
+				if(subRow.className){
+					put(tr, "." + subRow.className);
+				}
 				
 				for(i = 0, l = subRow.length; i < l; i++){
 					// iterate through the columns
 					column = subRow[i];
 					id = column.id;
 					extraClassName = column.className || (column.field && "field-" + column.field);
-					cell = put(tag + (".dgrid-cell.dgrid-cell-padding.dgrid-column-" + id +
-						(extraClassName ? "." + extraClassName : "")).replace(invalidClassChars,"-"));
+					cell = put(tag + (
+							".dgrid-cell.dgrid-cell-padding" +
+							(id ? ".dgrid-column-" + id : "") +
+							(extraClassName ? "." + extraClassName : "")
+						).replace(invalidClassChars,"-"));
 					cell.columnId = id;
 					if(contentBoxSizing){
 						// The browser (IE7-) does not support box-sizing: border-box, so we emulate it with a padding div
@@ -200,7 +206,7 @@ function(kernel, declare, listen, has, put, List){
 					th.sortable = true;
 					th.className += " dgrid-sortable";
 				}
-			});
+			}, this.subRows && this.subRows.headerRows);
 			this._rowIdToObject[row.id = this.id + "-header"] = this.columns;
 			headerNode.appendChild(row);
 			// if it columns are sortable, resort on clicks

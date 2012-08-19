@@ -4,8 +4,14 @@ $id_prefix = "";
 if(isset($_GET["parent"])){
 	$id_prefix = $_GET["parent"]."-";
 }
+$range = "";
 if(isset($_SERVER["HTTP_RANGE"])){
-	preg_match('/(\d+)-(\d+)/',$_SERVER["HTTP_RANGE"], $matches);
+	$range = $_SERVER["HTTP_RANGE"];
+}else if(isset($_SERVER["HTTP_X_RANGE"])){
+	$range = $_SERVER["HTTP_X_RANGE"];
+}
+if($range){
+	preg_match('/(\d+)-(\d+)/', $range, $matches);
 	
 	$start = $matches[1];
 	$end = $matches[2];
