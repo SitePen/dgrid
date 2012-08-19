@@ -8,6 +8,7 @@ function(declare, on, has, put){
 		glideTimerRes = 30, // ms between glide animation ticks
 		touches = {}, // records number of touches on components
 		current = {}, // records info for widget(s) currently being scrolled
+		previous = {}, // records info for widget(s) that were in the middle of being scrolled when someone decided to scroll again
 		glideThreshold = 1, // speed (in px) below which to stop glide - TODO: remove
 		scrollbarAdjustment = 8, // number of px to adjust scrollbar dimension calculations
 		// RegExps for parsing relevant x/y from translate and matrix values:
@@ -176,6 +177,8 @@ function(declare, on, has, put){
 			
 			node.style[transformProp] =
 				translatePrefix + posX + "px," + posY + "px" + translateSuffix;
+			
+			previous[id] = curr;
 		}
 		
 		touch = evt.targetTouches[0];
@@ -214,8 +217,9 @@ function(declare, on, has, put){
 		
 		// Show touch scrollbars on first sign of drag.
 		if(!curr.scrollbarsShown){
-			if(Math.abs(touch.pageX - curr.pageX) > widget.scrollThreshold ||
-					Math.abs(touch.pageY - curr.pageY) > widget.scrollThreshold){
+			if(previous[id] || (
+					Math.abs(touch.pageX - curr.pageX) > widget.scrollThreshold ||
+					Math.abs(touch.pageY - curr.pageY) > widget.scrollThreshold)){
 				showScrollbars(widget, curr);
 				curr.scrollbarsShown = true;
 				
@@ -374,9 +378,13 @@ function(declare, on, has, put){
 	function startGlide(id){
 		// starts glide operation when drag ends
 		var curr = current[id],
+			prev = previous[id],
 			node = curr.node,
 			parentNode = node.parentNode,
-			match, posX, posY;
+			match, posX, posY,
+			INERTIA_ACCELERATION = 1.15;
+		
+		delete previous[id];
 		
 		if(curr.timer){ clearTimeout(curr.timer); }
 		
@@ -396,6 +404,16 @@ function(declare, on, has, put){
 				(posY >= 0 || posY <= -(node.scrollHeight - parentNode.offsetHeight)))){
 			bounce(id, posX, posY);
 			return;
+		}
+		
+		function sameSign(a, b){
+			return ((a.velX <= 0 && b.velX <= 0) || (a.velX >= 0 && b.velX >= 0)) &&
+					((a.velY <= 0 && b.velY <= 0) || (a.velY >= 0 && b.velY >= 0));
+		}
+		
+		if(prev && (prev.velX || prev.velY) && sameSign(curr, prev)){
+			curr.velX = (curr.velX + prev.velX) * INERTIA_ACCELERATION;
+			curr.velY = (curr.velY + prev.velY) * INERTIA_ACCELERATION;
 		}
 		
 		// update lastX/Y with current position, for glide calculations
