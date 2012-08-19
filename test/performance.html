@@ -45,18 +45,20 @@
 						{ name: 'Column 8', field: 'price', width: '10%' },
 						{ name: 'Column 9', field: 'today', width: '10%' }
 					];
-					var start = new Date().getTime();
-					window.grid = new (declare([Grid, Selection, Keyboard]))({
+					var start = new Date();
+					var grid = window.grid = new (declare([Grid, Selection, Keyboard]))({
 						store: testPerfStore,
 						columns: columns
 					}, "grid");
-					console.log("startup time", new Date().getTime() - start);
+					console.log("startup time: " + (new Date() - start) + "ms");
+					
 					var processScroll = grid._processScroll;
-					grid._processScroll = function(){
-						var start = new Date().getTime();
-						processScroll.call(this);
-						console.log("scroll time", new Date().getTime() - start);
+					grid._processScroll = function(evt){
+						var start = new Date();
+						processScroll.call(this, evt);
+						console.log("scroll time: " + (new Date() - start) + "ms");
 					};
+					
 				});
 				
 		</script>
