@@ -369,7 +369,12 @@ return declare([List, _StoreMixin], {
 							// if the preload area above the nodes is approximated based on average
 							// row height, we may need to adjust the scroll once they are filled in
 							// so we don't "jump" in the scrolling position
-							scrollNode.scrollTop += beforeNode.offsetTop - keepScrollTo;
+							if(grid.scrollTo){ // TouchScroll is enabled
+								var pos = grid.getScrollPosition();
+								grid.scrollTo(pos.x, pos.y + beforeNode.offsetTop - keepScrollTo);
+							}else{
+								scrollNode.scrollTop += beforeNode.offsetTop - keepScrollTo;
+							}
 						}
 						if(below){
 							// if it is below, we will use the total from the results to update
