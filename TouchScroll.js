@@ -20,7 +20,7 @@ function(declare, on, has, put){
 		hasTransforms = has("css-transforms"),
 		hasTransforms3d = has("css-transforms3d"),
 		// and declare vars to store info on the properties/functions we'll need
-		cssPrefix, transitionPrefix, transformProp, translatePrefix, translateSuffix, transitionend;
+		cssPrefix, transitionPrefix, transformProp, translatePrefix, translateSuffix;
 	
 	if(hasTransforms3d){
 		translatePrefix = "translate3d(";
@@ -49,32 +49,38 @@ function(declare, on, has, put){
 		
 		var node = widget.touchNode,
 			parentNode = node.parentNode,
-			parentWidth = parentNode.offsetWidth - scrollbarAdjustment,
-			parentHeight = parentNode.offsetHeight - scrollbarAdjustment,
+			adjustedParentWidth = parentNode.offsetWidth - scrollbarAdjustment,
+			adjustedParentHeight = parentNode.offsetHeight - scrollbarAdjustment,
+			// Also populate scroll/offset properties on curr for reuse,
+			// to avoid having to repeatedly hit the DOM.
+			scrollWidth = curr.scrollWidth = node.scrollWidth,
+			scrollHeight = curr.scrollHeight = node.scrollHeight,
+			parentWidth = curr.parentWidth = parentNode.offsetWidth,
+			parentHeight = curr.parentHeight = parentNode.offsetHeight,
 			scrollbarNode;
 		
-		if(node.scrollWidth > parentNode.offsetWidth){
+		if(scrollWidth > parentWidth){
 			if(!widget._scrollbarXNode){
 				scrollbarNode = put(parentNode, "div.touchscroll-x");
 			}
 			scrollbarNode = widget._scrollbarXNode =
 				widget._scrollbarXNode || put(scrollbarNode, "div.touchscroll-bar");
 			scrollbarNode.style.width =
-				parentWidth * parentWidth / node.scrollWidth + "px";
+				adjustedParentWidth * adjustedParentWidth / scrollWidth + "px";
 			scrollbarNode.style.left = node.offsetLeft + "px";
 			put(parentNode, ".touchscroll-scrollable-x");
 			curr.scrollableX = true;
 		}else{
 			put(parentNode, "!touchscroll-scrollable-x");
 		}
-		if(node.scrollHeight > parentNode.offsetHeight){
+		if(scrollHeight > parentHeight){
 			if(!widget._scrollbarYNode){
 				scrollbarNode = put(parentNode, "div.touchscroll-y");
 			}
 			scrollbarNode = widget._scrollbarYNode =
 				widget._scrollbarYNode || put(scrollbarNode, "div.touchscroll-bar");
 			scrollbarNode.style.height =
-				parentHeight * parentHeight / node.scrollHeight + "px";
+				adjustedParentHeight * adjustedParentHeight / scrollHeight + "px";
 			scrollbarNode.style.top = node.offsetTop + "px";
 			put(parentNode, ".touchscroll-scrollable-y");
 			curr.scrollableY = true;
@@ -88,20 +94,21 @@ function(declare, on, has, put){
 		// Handles updating of scroll position (from touchmove or glide).
 		
 		var node = widget.touchNode,
-			parentNode = node.parentNode;
+			parentNode = node.parentNode,
+			curr = current[widget.id];
 		
 		// Update transform on touchNode
 		node.style[transformProp] =
 			translatePrefix + -x + "px," + -y + "px" + translateSuffix;
 		
 		// Update scrollbar positions
-		if(widget._scrollbarXNode){
+		if(curr && widget._scrollbarXNode){
 			widget._scrollbarXNode.style[transformProp] = translatePrefix +
-				(x * parentNode.offsetWidth / node.scrollWidth) + "px,0" + translateSuffix;
+				(x * curr.parentWidth / curr.scrollWidth) + "px,0" + translateSuffix;
 		}
-		if(widget._scrollbarYNode){
+		if(curr && widget._scrollbarYNode){
 			widget._scrollbarYNode.style[transformProp] = translatePrefix + "0," +
-				(y * parentNode.offsetHeight / node.scrollHeight) + "px" + translateSuffix;
+				(y * curr.parentHeight / curr.scrollHeight) + "px" + translateSuffix;
 		}
 		
 		// Emit a scroll event that can be captured by handlers, passing along
@@ -160,7 +167,7 @@ function(declare, on, has, put){
 			id = widget.id,
 			posX = 0,
 			posY = 0,
-			touch, match, curr, i;
+			touch, match, curr;
 		
 		// Check touches count (which hasn't counted this touch yet);
 		// ignore touch events on inappropriate number of contact points.
@@ -238,8 +245,8 @@ function(declare, on, has, put){
 			nx = curr.scrollableX ? curr.startX + touch.pageX : 0;
 			ny = curr.scrollableY ? curr.startY + touch.pageY : 0;
 			
-			minX = curr.scrollableX ? -(node.scrollWidth - parentNode.offsetWidth) : 0;
-			minY = curr.scrollableY ? -(node.scrollHeight - parentNode.offsetHeight) : 0;
+			minX = curr.scrollableX ? -(curr.scrollWidth - curr.parentWidth) : 0;
+			minY = curr.scrollableY ? -(curr.scrollHeight - curr.parentHeight) : 0;
 			
 			// If dragged beyond edge, halve the distance between.
 			if(nx > 0){
@@ -302,10 +309,10 @@ function(declare, on, has, put){
 			parentNode = node.parentNode,
 			scrollbarNode,
 			x = curr.scrollableX ?
-				Math.max(Math.min(0, lastX), -(node.scrollWidth - parentNode.offsetWidth)) :
+				Math.max(Math.min(0, lastX), -(curr.scrollWidth - curr.parentWidth)) :
 				lastX,
 			y = curr.scrollableY ?
-				Math.max(Math.min(0, lastY), -(node.scrollHeight - parentNode.offsetHeight)) :
+				Math.max(Math.min(0, lastY), -(curr.scrollHeight - curr.parentHeight)) :
 				lastY;
 		
 		function end(){
@@ -400,8 +407,8 @@ function(declare, on, has, put){
 		// If there is no glide to perform (no exit velocity), or if we are
 		// beyond boundaries on all applicable edges, immediately bounce back.
 		if((!curr.velX && !curr.velY) ||
-				((posX >= 0 || posX <= -(node.scrollWidth - parentNode.offsetWidth)) &&
-				(posY >= 0 || posY <= -(node.scrollHeight - parentNode.offsetHeight)))){
+				((posX >= 0 || posX <= -(curr.scrollWidth - curr.parentWidth)) &&
+				(posY >= 0 || posY <= -(curr.scrollHeight - curr.parentHeight)))){
 			bounce(id, posX, posY);
 			return;
 		}
@@ -445,12 +452,12 @@ function(declare, on, has, put){
 			
 			// If glide has traveled beyond any edges, institute rubber-band effect
 			// by further decelerating.
-			if(nx > 0 || nx < -(node.scrollWidth - parentNode.offsetWidth)){
+			if(nx > 0 || nx < -(curr.scrollWidth - curr.parentWidth)){
 				for(i = BOUNCE_DECELERATION_AMOUNT; i--;){
 					nvx = widget.glideDecel(nvx);
 				}
 			}
-			if(ny > 0 || ny < -(node.scrollHeight - parentNode.offsetHeight)){
+			if(ny > 0 || ny < -(curr.scrollHeight - curr.parentHeight)){
 				for(i = BOUNCE_DECELERATION_AMOUNT; i--;){
 					nvy = widget.glideDecel(nvy);
 				}
