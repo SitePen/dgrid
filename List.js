@@ -389,7 +389,7 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			// make sure all the content has been removed so it can be recreated
 			this.contentNode.innerHTML = "";
 			// If using TouchScroll, reset its scroll position as well.
-			if(this.scrollTo){ this.scrollTo(0, 0); }
+			if(this.scrollTo){ this.scrollTo({ x: 0, y: 0 }); }
 		},
 		newRow: function(object, before, to, options){
 			if(before.parentNode){

@@ -90,23 +90,41 @@ function(declare, on, has, put){
 		put(parentNode, "!touchscroll-fadeout");
 	}
 	
-	function scroll(widget, x, y){
+	function scroll(widget, options){
 		// Handles updating of scroll position (from touchmove or glide).
-		
 		var node = widget.touchNode,
-			parentNode = node.parentNode,
-			curr = current[widget.id];
+			curr = current[widget.id],
+			pos, hasX, hasY, x, y;
+		
+		if(typeof options !== "object"){
+			// Allow x, y to be passed directly w/o extra object creation.
+			// (e.g. from ontouchmove)
+			x = options;
+			y = arguments[2];
+			options = arguments[3];
+			hasX = hasY = true;
+		}else{
+			hasX = "x" in options;
+			hasY = "y" in options;
+			
+			// If either x or y weren't specified, pass through the current value.
+			if(!hasX || !hasY){
+				pos = widget.getScrollPosition();
+			}
+			x = hasX ? options.x : pos.x;
+			y = hasY ? options.y : pos.y;
+		}
 		
 		// Update transform on touchNode
 		node.style[transformProp] =
 			translatePrefix + -x + "px," + -y + "px" + translateSuffix;
 		
 		// Update scrollbar positions
-		if(curr && widget._scrollbarXNode){
+		if(curr && hasX && widget._scrollbarXNode){
 			widget._scrollbarXNode.style[transformProp] = translatePrefix +
 				(x * curr.parentWidth / curr.scrollWidth) + "px,0" + translateSuffix;
 		}
-		if(curr && widget._scrollbarYNode){
+		if(curr && hasY && widget._scrollbarYNode){
 			widget._scrollbarYNode.style[transformProp] = translatePrefix + "0," +
 				(y * curr.parentHeight / curr.scrollHeight) + "px" + translateSuffix;
 		}
@@ -130,11 +148,16 @@ function(declare, on, has, put){
 		return translateRx.exec(widget.touchNode.style[transformProp]);
 	}
 	
-	function resetEffects(){
+	function resetEffects(options){
 		// Function to cut glide/bounce short, called in context of an object
 		// from the current hash; attached only when a glide or bounce occurs.
-		// Used by ontouchstart handler, and by scrollTo on instances
-		// (in case it's called directly during a glide/bounce).
+		// Called on touchstart, when touch scrolling is canceled, when
+		// momentum/bounce finishes, and by scrollTo on instances (in case it's
+		// called directly during a glide/bounce).
+		
+		var widget = this.widget,
+			nodes = [this.node, widget._scrollbarXNode, widget._scrollbarYNode],
+			i = nodes.length;
 		
 		// Clear glide timer.
 		if(this.timer){
@@ -143,17 +166,21 @@ function(declare, on, has, put){
 		}
 		
 		// Clear transition handlers, as we're about to cut it short.
-		if(this.transitionHandlers){
-			// Unhook any existing transitionend handlers, since we'll be
-			// canceling the transition and handling things in touch events.
-			for(var i = this.transitionHandlers.length; i--;){
-				this.transitionHandlers[i].remove();
+		if(this.transitionHandler){
+			// Unhook any existing transitionend handler, since we'll be
+			// canceling the transition.
+			this.transitionHandler.remove();
 			}
-			delete this.transitionHandlers;
+		
+		// Clear transition duration on main node and scrollbars.
+		while(i--){
+			if(nodes[i]){ nodes[i].style[transitionPrefix + "Duration"] = "0"; }
 		}
 		
-		// Clear transition duration.
-		this.node.style[transitionPrefix + "Duration"] = "0";
+		// Fade out scrollbars unless indicated otherwise (e.g. re-touch).
+		if(!options || !options.preserveScrollbars){
+			put(this.node.parentNode, ".touchscroll-fadeout");
+		}
 		
 		// Remove this method so it can't be called again.
 		delete this.resetEffects;
@@ -169,9 +196,11 @@ function(declare, on, has, put){
 			posY = 0,
 			touch, match, curr;
 		
-		// Check touches count (which hasn't counted this touch yet);
+		// Check touches count (which hasn't counted this event yet);
 		// ignore touch events on inappropriate number of contact points.
-		if(touches[id] !== widget.touchesToScroll - 1){ return; }
+		if(touches[id] !== widget.touchesToScroll - evt.changedTouches.length){
+			return;
+		}
 		
 		match = getScrollStyle(widget);
 		if(match){
@@ -180,7 +209,9 @@ function(declare, on, has, put){
 		}
 		if((curr = current[id])){
 			// stop any active glide or bounce, since it's been re-touched
-			if(curr.resetEffects){ curr.resetEffects(); }
+			if(curr.resetEffects){
+				curr.resetEffects({ preserveScrollbars: true });
+			}
 			
 			node.style[transformProp] =
 				translatePrefix + posX + "px," + posY + "px" + translateSuffix;
@@ -209,13 +240,17 @@ function(declare, on, has, put){
 	function ontouchmove(evt){
 		var widget = evt.widget,
 			id = widget.id,
+			activeTouches = touches[id],
+			touchesToScroll = widget.touchesToScroll,
 			curr = current[id],
-			node = curr && curr.node,
-			parentNode = this,
 			targetTouches, touch, nx, ny, minX, minY, i;
 		
 		// Ignore touchmove events with inappropriate number of contact points.
-		if(touches[id] !== widget.touchesToScroll || !curr){
+		if(activeTouches !== touchesToScroll || !curr){
+			// Also cancel touch scrolling if there are too many contact points.
+			if(activeTouches > touchesToScroll){
+				widget.cancelTouchScroll();
+			}
 			return;
 		}
 		
@@ -318,24 +353,19 @@ function(declare, on, has, put){
 		function end(){
 			// Performs reset operations upon end of scroll process.
 			
-			// Reset duration, in case anything else externally tweaks the transform.
-			node.style[transitionPrefix + "Duration"] = "0";
-			
-			put(parentNode, ".touchscroll-fadeout");
-			delete curr.resetEffects;
+			// Since transitions have run, delete transitionHandler up-front
+			// (since it auto-removed itself anyway), then let
+			// resetEffects do the rest of its usual job.
+			delete curr.transitionHandler;
+			curr.resetEffects();
 			delete current[id];
-		}
-		
-		function scrollbarEnd(evt){
-			this.style[transitionPrefix + "Duration"] = "0";
 		}
 		
 		// Timeout will have been cleared before bounce call, so remove timer.
 		delete curr.timer;
 		
 		if (x != lastX || y != lastY){
-			curr.resetEffects = resetEffects;
-			curr.transitionHandlers = [on.once(node, hasTransitionEnd, end)];
+			curr.transitionHandler = on.once(node, hasTransitionEnd, end);
 			node.style[transitionPrefix + "Duration"] = widget.bounceDuration + "ms";
 			node.style[transformProp] =
 				translatePrefix + x + "px," + y + "px" + translateSuffix;
@@ -343,8 +373,6 @@ function(declare, on, has, put){
 			// Also handle transitions for scrollbars.
 			if(x != lastX && curr.scrollableX){
 				scrollbarNode = curr.widget._scrollbarXNode;
-				curr.transitionHandlers.push(
-					on.once(scrollbarNode, hasTransitionEnd, scrollbarEnd));
 				scrollbarNode.style[transitionPrefix + "Duration"] =
 					widget.bounceDuration + "ms";
 				if(lastX > x){
@@ -361,8 +389,6 @@ function(declare, on, has, put){
 			}
 			if(y != lastY && curr.scrollableY){
 				scrollbarNode = curr.widget._scrollbarYNode;
-				curr.transitionHandlers.push(
-					on.once(scrollbarNode, hasTransitionEnd, scrollbarEnd));
 				scrollbarNode.style[transitionPrefix + "Duration"] =
 					widget.bounceDuration + "ms";
 				if(lastY > y){
@@ -386,14 +412,15 @@ function(declare, on, has, put){
 		// starts glide operation when drag ends
 		var curr = current[id],
 			prev = previous[id],
-			node = curr.node,
-			parentNode = node.parentNode,
 			match, posX, posY,
 			INERTIA_ACCELERATION = 1.15;
 		
 		delete previous[id];
 		
 		if(curr.timer){ clearTimeout(curr.timer); }
+		
+		// Enable usage of resetEffects during glide or bounce.
+		curr.resetEffects = resetEffects;
 		
 		// calculate velocity based on time and displacement since last tick
 		match = translateRx.exec(curr.node.style[transformProp]);
@@ -427,7 +454,6 @@ function(declare, on, has, put){
 		curr.lastX = posX;
 		curr.lastY = posY;
 		curr.calcFunc = function(){ calcGlide(id); };
-		curr.resetEffects = resetEffects;
 		curr.timer = setTimeout(curr.calcFunc, glideTimerRes);
 	}
 	function calcGlide(id){
@@ -533,9 +559,14 @@ function(declare, on, has, put){
 			node.style[transitionPrefix + "TimingFunction"] =
 				"cubic-bezier(0.33, 0.66, 0.66, 1)";
 			
+			function cancelTouchScroll(){
+				widget.cancelTouchScroll();
+			}
+			
 			function wrapHandler(func){
 				return function(evt){
 					evt.widget = widget;
+					evt.cancelTouchScroll = cancelTouchScroll;
 					func.call(this, evt);
 				};
 			}
@@ -564,18 +595,22 @@ function(declare, on, has, put){
 			this.inherited(arguments);
 		},
 		
-		scrollTo: function(x, y){
+		scrollTo: function(options){
 			// summary:
 			//      Scrolls the widget to a specific position.
+			// options: Object
+			//		Object containing target x and/or y position to scroll to
+			//		(if unspecified, scroll in that direction will be preserved).
+			//		Also supports the following other options:
+			//		* preserveMomentum: if true, will not reset any active
+			//			momentum or bounce on the widget
 			
 			var curr = current[this.id];
-			if(curr && curr.resetEffects){
+			if(!options.preserveMomentum && curr && curr.resetEffects){
 				// Stop any glide or bounce occurring before scrolling.
 				curr.resetEffects();
-				// Ensure that any touch-scrollbars fade out.
-				put(curr.node.parentNode, ".touchscroll-fadeout");
 			}
-			scroll(this, x, y);
+			scroll(this, options);
 		},
 		
 		getScrollPosition: function(){
@@ -584,6 +619,24 @@ function(declare, on, has, put){
 			//      (if mid-transition), or applied style.
 			var match = getScrollStyle(this);
 			return match ? { x: -match[1], y: -match[2] } : { x: 0, y: 0 };
+		},
+		
+		cancelTouchScroll: function(){
+			// summary:
+			//		Removes any existing scroll information for this component from the
+			//		current map, effectively canceling any TouchScroll behavior for
+			//		that particular touch gesture.
+			
+			var curr = current[this.id];
+			if(!curr){ return; }
+			
+			if(curr.resetEffects){ curr.resetEffects(); }
+			else{
+				if(curr.timer){ clearTimeout(curr.timer); }
+				put(curr.node.parentNode, ".touchscroll-fadeout");
+			}
+			
+			delete current[this.id];
 		},
 		
 		glideDecel: function(n){

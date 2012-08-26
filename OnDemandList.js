@@ -371,7 +371,15 @@ return declare([List, _StoreMixin], {
 							// so we don't "jump" in the scrolling position
 							if(grid.scrollTo){ // TouchScroll is enabled
 								var pos = grid.getScrollPosition();
-								grid.scrollTo(pos.x, pos.y + beforeNode.offsetTop - keepScrollTo);
+								grid.scrollTo({
+									// Since we already had to query the scroll
+									// position, include x to avoid TouchScroll
+									// querying it again on its end.
+									x: pos.x,
+									y: pos.y + beforeNode.offsetTop - keepScrollTo,
+									// Don't kill momentum mid-scroll.
+									preserveMomentum: true
+								});
 							}else{
 								scrollNode.scrollTop += beforeNode.offsetTop - keepScrollTo;
 							}
