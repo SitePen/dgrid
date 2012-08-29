@@ -209,6 +209,7 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 		},
 		buildRendering: function(){
 			var domNode = this.domNode,
+				self = this,
 				headerNode, spacerNode, bodyNode, footerNode, isRTL;
 			
 			// Detect RTL on html/body nodes; taken from dojo/dom-geometry
@@ -244,7 +245,7 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			}
 			
 			listen(bodyNode, "scroll", function(event){
-				if(grid.showHeader){
+				if(self.showHeader){
 					// keep the header aligned with the body
 					headerNode.scrollLeft = event.scrollLeft || bodyNode.scrollLeft;
 				}
