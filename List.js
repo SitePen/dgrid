@@ -439,7 +439,9 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 						if(row.parentNode == container){
 							firstRow = row.nextSibling;
 							if(firstRow){ // it's possible for this to have been already removed if it is in overlapping query results
-								firstRow.rowIndex--; // adjust the rowIndex so adjustRowIndices has the right starting point
+								if(from != to){ // if from and to are identical, it is an in-place update and we don't want to alter the rowIndex at all
+									firstRow.rowIndex--; // adjust the rowIndex so adjustRowIndices has the right starting point
+								}
 								self.removeRow(row); // now remove
 							}
 						}
@@ -455,7 +457,11 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 							row.observerIndex = observerIndex;
 							rows.splice(to, 0, row);
 							if(!firstRow || to < firstRow.rowIndex){
-								firstRow = row;
+								// the inserted row is first, so we update firstRow to point to it
+								var previous = row.previousSibling;
+								// if we are not in sync with the previous row, roll the firstRow back one so adjustRowIndices can sync everything back up.
+								firstRow = previous && previous.rowIndex + 1 == row.rowIndex ?
+									row : previous;
 							}
 						}
 						options.count++;
@@ -506,6 +512,7 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			var id = this.id + "-row-" + ((this.store && this.store.getIdentity) ?
 				this.store.getIdentity(object) : this._autoId++);
 			var row = byId(id);
+			var previousRow = row && row.previousSibling;
 			if(!row || // we must create a row if it doesn't exist, or if it previously belonged to a different container 
 					(beforeNode && row.parentNode != beforeNode.parentNode)){
 				if(row){// if it existed elsewhere in the DOM, we will remove it, so we can recreate it
@@ -517,6 +524,10 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 				this._rowIdToObject[row.id = id] = object;
 			}
 			parent.insertBefore(row, beforeNode);
+			if(previousRow){
+				// in this case, we are pulling the row from another location in the grid, and we need to readjust the rowIndices from the point it was removed
+				this.adjustRowIndices(previousRow);
+			}
 			row.rowIndex = i;
 			return row;
 		},
