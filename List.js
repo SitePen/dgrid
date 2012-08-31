@@ -456,7 +456,7 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 						if(row){
 							row.observerIndex = observerIndex;
 							rows.splice(to, 0, row);
-							if(!firstRow || to < firstRow.rowIndex){
+							if(!firstRow || to < from){
 								// the inserted row is first, so we update firstRow to point to it
 								var previous = row.previousSibling;
 								// if we are not in sync with the previous row, roll the firstRow back one so adjustRowIndices can sync everything back up.
