@@ -57,45 +57,46 @@ return declare([List, _StoreMixin], {
 		var preload = {
 			query: query,
 			count: 0,
+			bottom: true,
 			node: preloadNode
+		};
+		var topPreload = {
+			node: put(preloadNode || this.contentNode, (preloadNode ? "-" : "") + "div.dgrid-preload", {
+				rowIndex: 0
+			}),
+			count: 0,
+			query: query,
+			next: preload
 		};
 		if(!preloadNode){
 			var rootQuery = true;
-			var topPreload = {
-				node: put(this.contentNode, "div.dgrid-preload", {
-					rowIndex: 0
-				}),
-				count: 0,
-				//topPreloadNode.preload = true;
-				query: query,
-				next: preload
-			};
 			preload.node = preloadNode = put(this.contentNode, "div.dgrid-preload");
-			preload.previous = topPreload;
 		}
+		preload.previous = topPreload;
 		// this preload node is used to represent the area of the grid that hasn't been
 		// downloaded yet
 		preloadNode.rowIndex = this.minRowsPerPage;
+		preloadNode.blocksMove = true;
 
 		var priorPreload = this.preload;
 		if(priorPreload){
 			// the preload nodes (if there are multiple) are represented as a linked list, need to insert it
 			if((preload.next = priorPreload.next) && 
 					// check to make sure that the current scroll position is below this preload
-					this.bodyNode.scrollTop >= priorPreload.node.offsetTop){ 
+					(preloadNode.offsetTop || this.bodyNode.scrollTop) >= priorPreload.node.offsetTop){ 
 				// the prior preload is above/before in the linked list
-				preload.previous = priorPreload;
+				topPreload.previous = priorPreload;
 			}else{
 				// the prior preload is below/after in the linked list
 				preload.next = priorPreload;
-				preload.previous = priorPreload.previous;
+				topPreload.previous = priorPreload.previous;
 			}
 			// adjust the previous and next links so the linked list is proper
-			preload.previous.next = preload;
+			topPreload.previous.next = topPreload;
 			preload.next.previous = preload; 
-		}else{
-			this.preload = preload;
 		}
+		this.preload = preload;
+
 		var loadingNode = put(preloadNode, "-div.dgrid-loading");
 		put(loadingNode, "div.dgrid-below", this.loadingMessage);
 		// Establish query options, mixing in our own.
@@ -254,24 +255,21 @@ return declare([List, _StoreMixin], {
 		// there can be multiple preloadNodes (if they split, or multiple queries are created),
 		//	so we can traverse them until we find whatever is in the current viewport, making
 		//	sure we don't backtrack
-		while(preload && preload != priorPreload){
-			priorPreload = grid.preload;
-			grid.preload = preload;
+		var nextPreload = preload;
+		while((preload = preload.previous)){
+			nextPreload = preload;
+		}
+		while((preload = nextPreload)){
+			nextPreload = preload.next;
 			preloadNode = preload.node;
 			var preloadTop = preloadNode.offsetTop;
 			var preloadHeight;
-			
+
 			if(visibleBottom + mungeAmount + searchBuffer < preloadTop){
 				// the preload is below the line of sight
-				do{
-					preload = preload.previous;
-				}while(preload && !preload.node.offsetWidth); // skip past preloads that are not currently connected
 			}else if(visibleTop - mungeAmount - searchBuffer > (preloadTop + (preloadHeight = preloadNode.offsetHeight))){
 				// the preload is above the line of sight
-				do{
-					preload = preload.next;
-				}while(preload && !preload.node.offsetWidth);// skip past preloads that are not currently connected
-			}else{
+			}else if(preloadNode.offsetWidth){				
 				// the preload node is visible, or close to visible, better show it
 				var offset = ((preloadNode.rowIndex ? visibleTop - requestBuffer : visibleBottom) - preloadTop) / grid.rowHeight;
 				var count = (visibleBottom - visibleTop + 2 * requestBuffer) / grid.rowHeight;
