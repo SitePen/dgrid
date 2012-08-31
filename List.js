@@ -460,7 +460,7 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 								// the inserted row is first, so we update firstRow to point to it
 								var previous = row.previousSibling;
 								// if we are not in sync with the previous row, roll the firstRow back one so adjustRowIndices can sync everything back up.
-								firstRow = previous && previous.rowIndex + 1 == row.rowIndex ?
+								firstRow = !previous || previous.rowIndex + 1 == row.rowIndex || row.rowIndex == 0 ?
 									row : previous;
 							}
 						}
