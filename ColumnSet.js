@@ -73,9 +73,9 @@ function(kernel, declare, Deferred, listen, aspect, query, has, put, hasClass, G
 				}
 			} else {
 				// first-time-only operations
-				aspect.after(this, "resize", reposition);
+				aspect.after(this, "resize", reposition, true);
 				listen(domNode, ".dgrid-column-set:dgrid-cellfocusin", onScroll);
-				aspect.after(this, "styleColumn", reposition);		
+				aspect.after(this, "styleColumn", reposition, true);		
 			}
 			
 			// reset to new object to be populated in loop below
