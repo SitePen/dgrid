@@ -128,7 +128,7 @@ function(declare, has, listen, put){
 				this._listeners.push(listen(hiderMenuNode,
 						".dgrid-hider-menu-check:" + (hasIE < 9 || hasIEQuirks ? "click" : "change"),
 					function(e){
-						grid._setColumnHiddenState(
+						grid._updateColumnHiddenState(
 							getColumnIdFromCheckbox(e.target, grid), !e.target.checked);
 					}
 				));
@@ -180,7 +180,7 @@ function(declare, has, listen, put){
 			this._hiderMenuOpened = !hidden;
 		},
 
-		_setColumnHiddenState: function(id, hidden){
+		_updateColumnHiddenState: function(id, hidden){
 			// summary:
 			//		Performs internal work for toggleColumnHiddenState; see the public
 			//		method for more information.
@@ -211,7 +211,7 @@ function(declare, has, listen, put){
 			//		column.  If unspecified, toggles the column from the current state.
 			
 			if(typeof hidden === "undefined"){ hidden = !this._columnHiderRules[id]; }
-			this._setColumnHiddenState(id, hidden);
+			this._updateColumnHiddenState(id, hidden);
 			
 			// Since this can be called directly, re-sync the appropriate checkbox.
 			this._columnHiderCheckboxes[id].checked = !hidden;
