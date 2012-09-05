@@ -92,7 +92,7 @@ function(kernel, declare, lang, Deferred, listen){
 			// If we have new sort criteria, pass them through sort
 			// (which will update _sort and call refresh in itself).
 			// Otherwise, just refresh.
-			sort ? this.sort(sort) : this.refresh();
+			sort ? this.set("sort", sort) : this.refresh();
 		},
 		setStore: function(store, query, queryOptions){
 			kernel.deprecated("setStore(...)", 'use set("store", ...) instead', "dgrid 1.0");
