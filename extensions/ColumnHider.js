@@ -1,5 +1,5 @@
-define(["dojo/_base/declare", "dojo/has", "dojo/on", "dojo/query", "dojo/dom", "put-selector/put", "dojo/NodeList-dom", "xstyle/css!../css/extensions/ColumnHider.css"],
-function(declare, has, listen, query, dom, put){
+define(["dojo/_base/declare", "dojo/has", "dojo/on", "put-selector/put", "xstyle/css!../css/extensions/ColumnHider.css"],
+function(declare, has, listen, put){
 /*
  *	Column Hider plugin for dgrid
  *	v.1.0.0
