@@ -317,7 +317,6 @@ function(kernel, declare, listen, has, put, List){
 			// summary:
 			//		Dynamically creates a stylesheet rule to alter a column's style.
 			
-			// now add a rule to style the column
 			return this.addCssRule("#" + this.domNode.id + " .dgrid-column-" + colId, css);
 		},
 		

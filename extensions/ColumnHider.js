@@ -94,7 +94,7 @@ function(declare, has, listen, query, dom, put){
 					put(this.headerScrollNode, "div.dgrid-hider-toggle.dgrid-cell-padding", "+");
 				
 				this._listeners.push(listen(hiderToggleNode, "click", function(e){
-					grid._toggleHiderMenu(e);
+					grid._toggleColumnHiderMenu(e);
 				}));
 	
 				// Create the column list, with checkboxes.
@@ -109,7 +109,7 @@ function(declare, has, listen, query, dom, put){
 				this._listeners.push(listen(hiderMenuNode,
 						".dgrid-hider-menu-check:" + (has("ie") < 9 ? "click" : "change"),
 					function(e){
-						grid._toggleColumnState(e);
+						grid.toggleColumnHiddenState(getColumnIdFromCheckbox(e.target, grid));
 					}
 				));
 				this._listeners.push(listen(hiderMenuNode, "mousedown", function(e){
@@ -123,7 +123,7 @@ function(declare, has, listen, query, dom, put){
 					bodyListener = listen.pausable(document.body, "mousedown", function(e){
 						// If an event reaches this listener, the menu is open,
 						// but a click occurred outside, so close the dropdown.
-						activeGrid && activeGrid._toggleHiderMenu(e);
+						activeGrid && activeGrid._toggleColumnHiderMenu(e);
 					});
 					bodyListener.pause(); // pause initially; will resume when menu opens
 				}
@@ -147,7 +147,7 @@ function(declare, has, listen, query, dom, put){
 			return !!this._columnStyleRules[id];
 		},
 		
-		_toggleHiderMenu: function(){
+		_toggleColumnHiderMenu: function(){
 			var hidden = this.hiderMenuOpened; // reflects hidden state after toggle
 			// show or hide the hider menu
 			this.hiderMenuNode.style.display = (hidden ? "none" : "");
@@ -159,19 +159,27 @@ function(declare, has, listen, query, dom, put){
 			this.hiderMenuOpened = !hidden;
 		},
 
-		_toggleColumnState: function(e){
-			//	show or hide the given column
-			var id = getColumnIdFromCheckbox(e.target, this);
-			if(this._columnStyleRules[id]){
+		toggleColumnHiddenState: function(id, hidden){
+			// summary:
+			//		Shows or hides the column with the given id.
+			// id: String
+			//		ID of column to show/hide.
+			// hide: Boolean?
+			//		If specified, explicitly sets the hidden state of the specified
+			//		column.  If unspecified, toggles the column from the current state.
+			
+			if(typeof hidden === "undefined"){ hidden = !this._columnStyleRules[id]; }
+			
+			if(!hidden){
 				this._columnStyleRules[id].remove();
 				delete this._columnStyleRules[id];
-			} else {
+			}else{
 				this._columnStyleRules[id] = this.styleColumn(id, "display: none;");
 			}
 			// emit event to notify of column state change
 			listen.emit(this.domNode, "dgrid-columnstatechange", {
 				column: this.columns[id],
-				hidden: !e.target.checked
+				hidden: hidden
 			});
 
 			//	adjust the size of the header
