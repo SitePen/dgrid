@@ -33,7 +33,7 @@ function(declare, has, listen, query, dom, put){
 		hiderMenuNode: null,		// the menu to show/hide columns
 		hiderToggleNode: null,		// the toggler to open the menu
 		hiderMenuOpened: false,		// current state of the menu
-		_columnStyleRules: null,	// private map to hold the return of column.setStyle
+		_columnHiderRules: null,	// private map to hold the return of column.setStyle
 		
 		_renderHiderMenuEntries: function(){
 			// summary:
@@ -56,7 +56,7 @@ function(declare, has, listen, query, dom, put){
 			
 			if(col.hidden){
 				// Hidden state is true; hide the column.
-				this._columnStyleRules[id] = this.styleColumn(id, "display: none");
+				this._columnHiderRules[id] = this.styleColumn(id, "display: none");
 			}
 			
 			// Allow cols to opt out of the hider (e.g. for selector column).
@@ -129,13 +129,13 @@ function(declare, has, listen, query, dom, put){
 				}
 			}else{ // subsequent run
 				// Remove active rules, and clear out the menu (to be repopulated).
-				for (id in this._columnStyleRules){
-					this._columnStyleRules[id].remove();
+				for (id in this._columnHiderRules){
+					this._columnHiderRules[id].remove();
 				}
 				hiderMenuNode.innerHTML = "";
 			}
 			
-			this._columnStyleRules = {};
+			this._columnHiderRules = {};
 
 			// Populate menu with checkboxes/labels based on current columns.
 			this._renderHiderMenuEntries();
@@ -144,7 +144,7 @@ function(declare, has, listen, query, dom, put){
 		isColumnHidden: function(id){
 			// summary:
 			//		Convenience method to determine current hidden state of a column
-			return !!this._columnStyleRules[id];
+			return !!this._columnHiderRules[id];
 		},
 		
 		_toggleColumnHiderMenu: function(){
@@ -168,13 +168,13 @@ function(declare, has, listen, query, dom, put){
 			//		If specified, explicitly sets the hidden state of the specified
 			//		column.  If unspecified, toggles the column from the current state.
 			
-			if(typeof hidden === "undefined"){ hidden = !this._columnStyleRules[id]; }
+			if(typeof hidden === "undefined"){ hidden = !this._columnHiderRules[id]; }
 			
 			if(!hidden){
-				this._columnStyleRules[id].remove();
-				delete this._columnStyleRules[id];
+				this._columnHiderRules[id].remove();
+				delete this._columnHiderRules[id];
 			}else{
-				this._columnStyleRules[id] = this.styleColumn(id, "display: none;");
+				this._columnHiderRules[id] = this.styleColumn(id, "display: none;");
 			}
 			// emit event to notify of column state change
 			listen.emit(this.domNode, "dgrid-columnstatechange", {
