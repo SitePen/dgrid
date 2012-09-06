@@ -536,11 +536,9 @@ function(declare, on, has, put){
 		//		be useful info for further extensions.
 		_touches: 0,
 		
-		startup: function(){
-			if(!this._started){
-				this._initTouch();
-				this.inherited(arguments);
-			}
+		postCreate: function(){
+			this._initTouch();
+			this.inherited(arguments);
 		},
 		
 		_initTouch: function(){
