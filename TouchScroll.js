@@ -502,10 +502,10 @@ function(declare, on, has, put){
 	}
 	
 	function incrementTouchCount(evt){
-		touches[evt.widget.id] += evt.changedTouches.length;
+		evt.widget._touches = touches[evt.widget.id] += evt.changedTouches.length;
 	}
 	function decrementTouchCount(evt){
-		touches[evt.widget.id] -= evt.changedTouches.length;
+		evt.widget._touches = touches[evt.widget.id] -= evt.changedTouches.length;
 	}
 	
 	return declare([], {
@@ -529,6 +529,12 @@ function(declare, on, has, put){
 		//		Number of milliseconds which "rubber-banding" transitions
 		//		(i.e. bouncing back from beyond edges) should take.
 		bounceDuration: 300,
+		
+		// _touches: Number
+		//		Reports number of touches currently in contact with this widget.
+		//		Mostly used internally for determining when to scroll, but may also
+		//		be useful info for further extensions.
+		_touches: 0,
 		
 		startup: function(){
 			if(!this._started){
