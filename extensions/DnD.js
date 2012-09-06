@@ -1,5 +1,18 @@
-define(["dojo/_base/declare", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/Deferred", "dojo/aspect", "dojo/dnd/Source", "dojo/dnd/Manager", "dojo/_base/NodeList", "put-selector/put", "xstyle/css!dojo/resources/dnd.css"],
-function(declare, lang, arrayUtil, Deferred, aspect, DnDSource, DnDManager, NodeList, put){
+define([
+	"dojo/_base/declare",
+	"dojo/_base/lang",
+	"dojo/_base/array",
+	"dojo/_base/Deferred",
+	"dojo/aspect",
+	"dojo/on",
+	"dojo/topic",
+	"dojo/has",
+	"dojo/dnd/Source",
+	"dojo/dnd/Manager",
+	"dojo/_base/NodeList",
+	"put-selector/put",
+	"xstyle/css!dojo/resources/dnd.css"
+], function(declare, lang, arrayUtil, Deferred, aspect, on, topic, has, DnDSource, DnDManager, NodeList, put){
 	// Requirements:
 	// * requires a store (sounds obvious, but not all Lists/Grids have stores...)
 	// * must support options.before in put calls
@@ -13,10 +26,11 @@ function(declare, lang, arrayUtil, Deferred, aspect, DnDSource, DnDManager, Node
 	
 	var GridDnDSource = declare(DnDSource, {
 		grid: null,
+		
 		getObject: function(node){
 			// summary:
 			//		getObject is a method which should be defined on any source intending
-			// 		on interfacing with dgrid DnD.
+			//		on interfacing with dgrid DnD.
 			
 			var grid = this.grid;
 			// Extract item id from row node id (gridID-row-*).
@@ -24,8 +38,8 @@ function(declare, lang, arrayUtil, Deferred, aspect, DnDSource, DnDManager, Node
 		},
 		_legalMouseDown: function(evt){
 			// summary:
-			// 		fix _legalMouseDown to only allow starting drag from an item
-			// 		(not from bodyNode outside contentNode)
+			//		fix _legalMouseDown to only allow starting drag from an item
+			//		(not from bodyNode outside contentNode)
 			var legal = this.inherited("_legalMouseDown", arguments);
 			// DnDSource.prototype._legalMouseDown.apply(this, arguments);
 			return legal && evt.target != this.grid.bodyNode;
@@ -34,7 +48,7 @@ function(declare, lang, arrayUtil, Deferred, aspect, DnDSource, DnDManager, Node
 		// DnD method overrides
 		onDrop: function(sourceSource, nodes, copy){
 			// summary:
-			// 		on drop, determine where to move/copy the objects
+			//		on drop, determine where to move/copy the objects
 			var targetSource = this,
 				targetRow = this._targetAnchor = this.targetAnchor, // save for Internal
 				grid = this.grid,
@@ -166,47 +180,6 @@ function(declare, lang, arrayUtil, Deferred, aspect, DnDSource, DnDManager, Node
 		// not doing that just yet until we're sure about default impl.
 	});
 	
-	function setupDnD(grid){
-		if(grid.dndSource){
-			return;
-		}
-		// make the contents a DnD source/target
-		grid.dndSource = new (grid.dndConstructor || GridDnDSource)(
-			grid.bodyNode,
-			lang.mixin(grid.dndParams, {
-				// add cross-reference to grid for potential use in inter-grid drop logic
-				grid: grid,
-				dropParent: grid.contentNode
-			})
-		);
-		
-		// If dgrid's Selection mixin is in use, set up handlers to maintain references.
-		var selectedNodes, selectRow, deselectRow;
-		
-		if(grid.selection){
-			selectedNodes = grid.dndSource._selectedNodes = {};
-			selectRow = function(row){
-				selectedNodes[row.id] = row.element;
-			};
-			deselectRow = function(row){
-				delete selectedNodes[row.id];
-			};
-			
-			grid.on("dgrid-select", function(event){
-				arrayUtil.forEach(event.rows, selectRow);
-			});
-			grid.on("dgrid-deselect", function(event){
-				arrayUtil.forEach(event.rows, deselectRow);
-			});
-		}
-		
-		aspect.after(grid, "destroy", function(){
-			delete grid.dndSource._selectedNodes;
-			selectedNodes = null;
-			grid.dndSource.destroy();
-		}, true);
-	}
-	
 	var DnD = declare([], {
 		// dndSourceType: String
 		//		Specifies the type which will be set for DnD items in the grid,
@@ -227,9 +200,45 @@ function(declare, lang, arrayUtil, Deferred, aspect, DnDSource, DnDManager, Node
 			// ensure dndParams is initialized
 			this.dndParams = lang.mixin({ accept: [this.dndSourceType] }, this.dndParams);
 		},
+		
 		postCreate: function(){
 			this.inherited(arguments);
-			setupDnD(this);
+			
+			// Make the grid's content a DnD source/target.
+			this.dndSource = new (this.dndConstructor || GridDnDSource)(
+				this.bodyNode,
+				lang.mixin(this.dndParams, {
+					// add cross-reference to grid for potential use in inter-grid drop logic
+					grid: this,
+					dropParent: this.contentNode
+				})
+			);
+			
+			// If dgrid's Selection mixin is in use, set up handlers to maintain references.
+			var selectedNodes, selectRow, deselectRow;
+			
+			if(this.selection){
+				selectedNodes = this.dndSource._selectedNodes = {};
+				selectRow = function(row){
+					selectedNodes[row.id] = row.element;
+				};
+				deselectRow = function(row){
+					delete selectedNodes[row.id];
+				};
+				
+				this.on("dgrid-select", function(event){
+					arrayUtil.forEach(event.rows, selectRow);
+				});
+				this.on("dgrid-deselect", function(event){
+					arrayUtil.forEach(event.rows, deselectRow);
+				});
+			}
+			
+			aspect.after(this, "destroy", function(){
+				delete this.dndSource._selectedNodes;
+				selectedNodes = null;
+				this.dndSource.destroy();
+			}, true);
 		},
 		
 		insertRow: function(object){
@@ -239,8 +248,6 @@ function(declare, lang, arrayUtil, Deferred, aspect, DnDSource, DnDManager, Node
 					this.getObjectDndType(object) : [this.dndSourceType];
 			
 			put(row, ".dojoDndItem");
-			// setup the source if it hasn't been done yet
-			setupDnD(this);
 			this.dndSource.setItem(row.id, {
 				data: object,
 				type: type instanceof Array ? type : [type]
