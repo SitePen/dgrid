@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Test Grid DnD on Touch Devices</title>
+		<meta name="viewport" content="width=570">
+		<style type="text/css">
+			@import "../../../dojo/resources/dojo.css";
+			/* need a theme for some dnd styles (e.g. before/after indicators).
+			   Using tundra because claro has a silly dojoDndItemBefore/After bug
+			*/
+			@import "../../../dijit/themes/tundra/tundra.css";
+			@import "../../css/skins/tundra.css";
+			
+			.clear { clear: both; }
+			
+			.dojoDndItem { padding: 0; } /* override dijit.css */
+			
+			.dgrid {
+				margin: 10px;
+				height: 400px;
+			}
+			
+			/* styles for handles in 2nd grid */
+			.handleColumn {
+				width: 3em;
+			}
+			.handleColumn .dojoDndHandle {
+				width: 1em;
+				height: 1em;
+				background-color: #999;
+				border: 1px dotted #000;
+				margin: 0 auto;
+			}
+		</style>
+		<script type="text/javascript" src="../../../dojo/dojo.js"
+			data-dojo-config="async: true"></script>
+		<script type="text/javascript">
+			require(["dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/extensions/DnD", "put-selector/put",
+				"dojo/dnd/Source", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/Deferred",  "dgrid/test/data/base", "dojo/domReady!"],
+			function(Grid, Selection, DnD, put, DnDSource, declare, lang, arrayUtil, Deferred){
+				var DnDGrid = declare([Grid, Selection, DnD]);
+				
+				// Create a custom data array based on testOrderedData, but looping
+				// several times to create enough items to reasonably test node removal,
+				// and also adding an extra item to test item-specific DnD types.
+				var orderedData = [],
+					len = testOrderedData.length,
+					i, j, obj;
+				
+				for(i = 0; i < 10; i++){
+					for(j = 0; j < len; j++){
+						obj = lang.clone(testOrderedData[j]);
+						obj.order = obj.id = i * len + j + 1;
+						orderedData.push(obj);
+					}
+				}
+				
+				function getCommonProperties(){
+					return {
+						bufferRows: 5,
+						farOffRemoval: 400,
+						store: createOrderedStore(orderedData, { idProperty: "id" }),
+						getObjectDndType: function(item){
+							return [item.type ? item.type : this.dndSourceType];
+						}
+					};
+				}
+				
+				// Note: testOrderedStore hard-wires sorting anyway,
+				// so leaving sort disabled on columns in this grid.
+				var grid = window.grid = new DnDGrid(lang.mixin(getCommonProperties(), {
+					columns: [
+						{label:"Name", field:"name", sortable: false},
+						{label:"Description", field:"description", sortable: false}
+					],
+					touchesToScroll: 2
+				}), "grid");
+				
+				var gridWithHandles = window.gridWithHandles = new DnDGrid(lang.mixin(getCommonProperties(), {
+					columns: [
+						{
+							label: "Drag",
+							className: "handleColumn",
+							renderCell: function(){
+								return put("div.dojoDndHandle");
+							},
+							sortable: false
+						},
+						{ label: "Name", field: "name", sortable: false },
+						{ label: "Description", field: "description", sortable: false }
+					],
+					dndParams: {
+						withHandles: true
+					}
+				}), "gridWithHandles");
+			});
+		</script>
+	</head>
+	<body class="tundra">
+		<p>This page contains grids with DnD set up for touch devices.</p>
+		<h2>Grid with no DnD handles (entire items are draggable), 2-finger scroll</h2>
+		<div id="grid"></div>
+		<h2>Grid with DnD handles, 1-finger scroll elsewhere</h2>
+		<div id="gridWithHandles"></div>
+	</body>
+</html>
