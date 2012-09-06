@@ -119,6 +119,7 @@ function(kernel, declare, listen, has, put, List){
 							(id ? ".dgrid-column-" + id : "") +
 							(extraClassName ? "." + extraClassName : "")
 						).replace(invalidClassChars,"-"));
+					cell.setAttribute("role", "gridcell");
 					cell.columnId = id;
 					if(contentBoxSizing){
 						// The browser (IE7-) does not support box-sizing: border-box, so we emulate it with a padding div
@@ -170,7 +171,7 @@ function(kernel, declare, listen, has, put, List){
 			// row gets a wrapper div for a couple reasons:
 			//	1. So that one can set a fixed height on rows (heights can't be set on <table>'s AFAICT)
 			// 2. So that outline style can be set on a row when it is focused, and Safari's outline style is broken on <table>
-			return put("div[role=gridcell]>", row);
+			return put("div[role=row]>", row);
 		},
 		renderHeader: function(){
 			// summary:
@@ -211,8 +212,8 @@ function(kernel, declare, listen, has, put, List){
 			headerNode.appendChild(row);
 			// if it columns are sortable, resort on clicks
 			listen(row, "click,keydown", function(event){
-				// respond to click or space keypress
-				if(event.type == "click" || event.keyCode == 32){
+				// respond to click, space keypress, or enter keypress
+				if(event.type == "click" || event.keyCode == 32 /* space bar */ || event.keyCode == 13 /* enter */){
 					var
 						target = event.target,
 						field, descending, parentNode, sort;
