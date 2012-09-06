@@ -148,10 +148,33 @@ define([
 			
 			this.inherited(arguments); // DnDSource.prototype.onDndStart.apply(this, arguments);
 			if(source == this){
+				// If TouchScroll is in use, cancel any pending scroll operation.
+				if(this.grid.cancelTouchScroll){ this.grid.cancelTouchScroll(); }
+				
 				// Set avatar width to half the grid's width.
 				// Kind of a naive default, but prevents ridiculously wide avatars.
 				DnDManager.manager().avatar.node.style.width =
 					this.grid.domNode.offsetWidth / 2 + "px";
+			}
+		},
+		
+		onMouseDown: function(){
+			// Cancel the drag operation on presence of more than one contact point.
+			// (This check will evaluate to false under non-touch circumstances.)
+			if(this.grid._touches > 1 && this.isDragging){
+				topic.publish("/dnd/cancel");
+				DnDManager.manager().stopDrag();
+			}else{
+				this.inherited(arguments);
+			}
+		},
+		
+		onMouseMove: function(evt){
+			// If we're handling touchmove, only respond to single-contact events.
+			// The if below is specifically written as it is to satisfy both cases
+			// where there is more than one touch, and where touch support isn't used.
+			if(!(this.grid._touches > 1)){
+				this.inherited(arguments);
 			}
 		},
 		
