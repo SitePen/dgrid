@@ -25,7 +25,7 @@ has.add("dom-contains", function(){
 function contains(parent, node){
 	// summary:
 	//		Checks to see if an element is contained by another element.
-	
+
 	if(has("dom-contains")){
 		return parent.contains(node);
 	}else{
@@ -38,28 +38,28 @@ return declare([List], {
 	// 		Add keyboard navigation capability to a grid/list
 	pageSkip: 10,
 	tabIndex: 0,
-	
+
 	postCreate: function(){
 		this.inherited(arguments);
 		var grid = this;
-		
+
 		function handledEvent(event){
 			// text boxes and other inputs that can use direction keys should be ignored and not affect cell/row navigation
 			var target = event.target;
 			return target.type && (!delegatingInputTypes[target.type] || event.keyCode == 32);
 		}
-		
+
 		function navigateArea(areaNode){
 			var isFocusableClass = grid.cellNavigation ? hasGridCellClass : hasGridRowClass,
 				cellFocusedElement = areaNode,
 				next;
-			
+
 			function focusOnCell(element, event, dontFocus){
 				var cell = grid[grid.cellNavigation ? "cell" : "row"](element);
-				
+
 				element = cell && cell.element;
 				if(!element){ return; }
-				
+
 				if(!event.bubbles){
 					// IE doesn't always have a bubbles property already true, Opera will throw an error if you try to set it to true if it is already true
 					event.bubbles = true;
@@ -91,10 +91,11 @@ return declare([List], {
 				on.emit(cellFocusedElement, "dgrid-cellfocusin", lang.mixin({ parentType: event.type }, event));
 			}
 
-			while((next = cellFocusedElement.firstChild) && next.tagName){
+			while((next = cellFocusedElement.firstChild) && !isFocusableClass.test(next.className)){
 				cellFocusedElement = next;
 			}
-			
+			if(next){ cellFocusedElement = next; }
+
 			if(areaNode === grid.contentNode){
 				aspect.after(grid, "renderArray", function(ret){
 					// summary:
@@ -125,20 +126,20 @@ return declare([List], {
 			}else if(isFocusableClass.test(cellFocusedElement.className)){
 				cellFocusedElement.tabIndex = grid.tabIndex;
 			}
-			
+
 			on(areaNode, "mousedown", function(event){
 				if(!handledEvent(event)){
 					focusOnCell(event.target, event);
 				}
 			});
-			
+
 			on(areaNode, "keydown", function(event){
 				// For now, don't squash browser-specific functionalities by letting
 				// ALT and META function as they would natively
 				if(event.metaKey || event.altKey) {
 					return;
 				}
-				
+
 				var focusedElement = event.target;
 				var keyCode = event.keyCode;
 				if(handledEvent(event)){
@@ -201,17 +202,17 @@ return declare([List], {
 				}
 				event.preventDefault();
 			});
-			
+
 			return function(target){
 				target = target || cellFocusedElement;
 				focusOnCell(target, { target: target });
 			}
 		}
-		
+
 		if(this.tabableHeader){
 			this.focusHeader = navigateArea(this.headerNode);
 		}
-		
+
 		this.focus = navigateArea(this.contentNode);
 	}
 });
