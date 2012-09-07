@@ -213,9 +213,8 @@ function(kernel, declare, listen, has, put, List){
 			// if it columns are sortable, resort on clicks
 			listen(row, "click,keydown", function(event){
 				// respond to click, space keypress, or enter keypress
-				if(event.type == "click" || event.keyCode == 32 /* space bar */ || event.keyCode == 13 /* enter */){
-					var
-						target = event.target,
+				if(event.type == "click" || event.keyCode == 32 /* space bar */ || (!has("opera") && event.keyCode == 13) /* enter */){
+					var target = event.target,
 						field, descending, parentNode, sort;
 					do{
 						if(target.sortable){
