@@ -118,8 +118,8 @@ function(kernel, declare, listen, has, put, List){
 							".dgrid-cell.dgrid-cell-padding" +
 							(id ? ".dgrid-column-" + id : "") +
 							(extraClassName ? "." + extraClassName : "")
-						).replace(invalidClassChars,"-"));
-					cell.setAttribute("role", "gridcell");
+						).replace(invalidClassChars,"-") +
+						"[role=gridcell]");
 					cell.columnId = id;
 					if(contentBoxSizing){
 						// The browser (IE7-) does not support box-sizing: border-box, so we emulate it with a padding div
