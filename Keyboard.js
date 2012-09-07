@@ -25,7 +25,7 @@ has.add("dom-contains", function(){
 function contains(parent, node){
 	// summary:
 	//		Checks to see if an element is contained by another element.
-
+	
 	if(has("dom-contains")){
 		return parent.contains(node);
 	}else{
@@ -38,28 +38,28 @@ return declare([List], {
 	// 		Add keyboard navigation capability to a grid/list
 	pageSkip: 10,
 	tabIndex: 0,
-
+	
 	postCreate: function(){
 		this.inherited(arguments);
 		var grid = this;
-
+		
 		function handledEvent(event){
 			// text boxes and other inputs that can use direction keys should be ignored and not affect cell/row navigation
 			var target = event.target;
 			return target.type && (!delegatingInputTypes[target.type] || event.keyCode == 32);
 		}
-
+		
 		function navigateArea(areaNode){
 			var isFocusableClass = grid.cellNavigation ? hasGridCellClass : hasGridRowClass,
 				cellFocusedElement = areaNode,
 				next;
-
+			
 			function focusOnCell(element, event, dontFocus){
 				var cell = grid[grid.cellNavigation ? "cell" : "row"](element);
-
+				
 				element = cell && cell.element;
 				if(!element){ return; }
-
+				
 				if(!event.bubbles){
 					// IE doesn't always have a bubbles property already true, Opera will throw an error if you try to set it to true if it is already true
 					event.bubbles = true;
@@ -90,24 +90,24 @@ return declare([List], {
 				put(element, ".dgrid-focus");
 				on.emit(cellFocusedElement, "dgrid-cellfocusin", lang.mixin({ parentType: event.type }, event));
 			}
-
+			
 			while((next = cellFocusedElement.firstChild) && !isFocusableClass.test(next.className)){
 				cellFocusedElement = next;
 			}
 			if(next){ cellFocusedElement = next; }
-
+			
 			if(areaNode === grid.contentNode){
 				aspect.after(grid, "renderArray", function(ret){
 					// summary:
 					//		Ensures the first element of a grid is always keyboard selectable after data has been
 					//		retrieved if there is not already a valid focused element.
-
+					
 					return Deferred.when(ret, function(ret){
 						// do not update the focused element if we already have a valid one
 						if(isFocusableClass.test(cellFocusedElement.className) && contains(areaNode, cellFocusedElement)){
 							return ret;
 						}
-
+						
 						// ensure that the focused element is actually a grid cell, not a
 						// dgrid-preload or dgrid-content element, which should not be focusable,
 						// even when data is loaded asynchronously
@@ -117,29 +117,29 @@ return declare([List], {
 								break;
 							}
 						}
-
+						
 						cellFocusedElement.tabIndex = grid.tabIndex;
-
+						
 						return ret;
 					});
 				});
 			}else if(isFocusableClass.test(cellFocusedElement.className)){
 				cellFocusedElement.tabIndex = grid.tabIndex;
 			}
-
+			
 			on(areaNode, "mousedown", function(event){
 				if(!handledEvent(event)){
 					focusOnCell(event.target, event);
 				}
 			});
-
+			
 			on(areaNode, "keydown", function(event){
 				// For now, don't squash browser-specific functionalities by letting
 				// ALT and META function as they would natively
 				if(event.metaKey || event.altKey) {
 					return;
 				}
-
+				
 				var focusedElement = event.target;
 				var keyCode = event.keyCode;
 				if(handledEvent(event)){
@@ -202,17 +202,17 @@ return declare([List], {
 				}
 				event.preventDefault();
 			});
-
+			
 			return function(target){
 				target = target || cellFocusedElement;
 				focusOnCell(target, { target: target });
 			}
 		}
-
+		
 		if(this.tabableHeader){
 			this.focusHeader = navigateArea(this.headerNode);
 		}
-
+		
 		this.focus = navigateArea(this.contentNode);
 	}
 });

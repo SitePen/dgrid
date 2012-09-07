@@ -1,10 +1,10 @@
 define(["dojo/_base/kernel", "dojo/_base/array", "dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put"],
 function(kernel, arrayUtil, on, aspect, has, put){
 	return function(column, type){
-
+		
 		var listeners = [],
 			grid, recentInput, recentTimeout, headerCheckbox;
-
+		
 		if(column.type){
 			column.selectorType = column.type;
 			kernel.deprecated("columndef.type", "use columndef.selectorType instead", "dgrid 1.0");
@@ -12,7 +12,7 @@ function(kernel, arrayUtil, on, aspect, has, put){
 		// accept type as argument to Selector function, or from column def
 		column.selectorType = type = type || column.selectorType || "checkbox";
 		column.sortable = false;
-
+		
 		function changeInput(value){
 			// creates a function that modifies the input on an event
 			return function(event){
@@ -20,7 +20,7 @@ function(kernel, arrayUtil, on, aspect, has, put){
 					len = rows.length,
 					state = "false",
 					selection, mixed, i;
-
+				
 				for(i = 0; i < len; i++){
 					var element = grid.cell(rows[i], column.id).element;
 					if(!element){ continue; } // skip if row has been entirely removed
@@ -53,7 +53,7 @@ function(kernel, arrayUtil, on, aspect, has, put){
 				}
 			};
 		}
-
+		
 		function onSelect(event){
 			// we would really only care about click, since other input sources, like spacebar
 			// trigger a click, but the click event doesn't provide access to the shift key in firefox, so
@@ -61,7 +61,7 @@ function(kernel, arrayUtil, on, aspect, has, put){
 			// the shiftKey property from
 			if(event.type == "click" || event.keyCode == 32 || event.keyCode == 13 || event.keyCode === 0){
 				var row = grid.row(event), lastRow = grid._lastSelected && grid.row(grid._lastSelected);
-
+				
 				if(type == "radio"){
 					if(!lastRow || lastRow.id != row.id){
 						grid.clearSelection();
@@ -87,7 +87,7 @@ function(kernel, arrayUtil, on, aspect, has, put){
 				}
 			}
 		}
-
+		
 		function setupSelectionEvents(){
 			// register one listener at the top level that receives events delegated
 			grid._hasSelectorInputListener = true;
@@ -113,7 +113,7 @@ function(kernel, arrayUtil, on, aspect, has, put){
 			listeners.push(grid.on("dgrid-select", changeInput(true)));
 			listeners.push(grid.on("dgrid-deselect", changeInput(false)));
 		}
-
+		
 		var disabled = column.disabled;
 		var renderInput = typeof type == "function" ? type : function(value, cell, object){
 			var parent = cell.parentNode;
@@ -125,27 +125,27 @@ function(kernel, arrayUtil, on, aspect, has, put){
 				checked: value
 			}));
 			input.setAttribute("aria-checked", !!value);
-
+			
 			if(!grid._hasSelectorInputListener){
 				setupSelectionEvents();
 			}
-
+			
 			return input;
 		};
-
+		
 		column.init = function(){
 			grid = column.grid;
 		};
-
+		
 		column.destroy = function(){
 			arrayUtil.forEach(listeners, function(l){ l.remove(); });
 			grid._hasSelectorInputListener = false;
 		};
-
+		
 		column.renderCell = function(object, value, cell, options, header){
 			var row = object && grid.row(object);
 			value = row && grid.selection[row.id];
-
+			
 			if(header && (type == "radio" || typeof object == "string" || !grid.allowSelectAll)){
 				cell.appendChild(document.createTextNode(object||""));
 				if(!grid._hasSelectorInputListener){
@@ -159,7 +159,7 @@ function(kernel, arrayUtil, on, aspect, has, put){
 			column.renderCell(column.label || {}, null, th, null, true);
 			headerCheckbox = th.lastChild;
 		};
-
+		
 		return column;
 	};
 });
