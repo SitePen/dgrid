@@ -408,7 +408,9 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 				do{
 					if(next.rowIndex > -1){
 						// skip non-numeric, non-rows
-						put(next, '.' + (rowIndex % 2 == 1 ? oddClass : evenClass) + '!' + (rowIndex % 2 == 0 ? oddClass : evenClass));
+						if((next.className + ' ').indexOf("dgrid-row ") > -1){
+							put(next, '.' + (rowIndex % 2 == 1 ? oddClass : evenClass) + '!' + (rowIndex % 2 == 0 ? oddClass : evenClass));
+						}
 						next.rowIndex = rowIndex++;
 					}
 				}while((next = next.nextSibling) && next.rowIndex != rowIndex);
