@@ -57,7 +57,6 @@ return declare([List, _StoreMixin], {
 		var preload = {
 			query: query,
 			count: 0,
-			bottom: true,
 			node: preloadNode
 		};
 		var topPreload = {
@@ -76,7 +75,6 @@ return declare([List, _StoreMixin], {
 		// this preload node is used to represent the area of the grid that hasn't been
 		// downloaded yet
 		preloadNode.rowIndex = this.minRowsPerPage;
-		preloadNode.blocksMove = true;
 
 		var priorPreload = this.preload;
 		if(priorPreload){
