@@ -45,6 +45,8 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 					put(paginationNode, "div.dgrid-status"),
 				pageSizeOptions = this.pageSizeOptions;
 			
+			statusNode.tabIndex = 0;
+			
 			if(pageSizeOptions.length){
 				var sizeSelect = put(paginationNode, 'select.dgrid-page-size'),
 					i;
