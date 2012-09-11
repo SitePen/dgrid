@@ -2,18 +2,20 @@
 <html>
 	<head>
 		<title>Test Tree Grid</title>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-		<meta name="viewport" content="width=570" />
-		<style type="text/css">
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=570">
+		<style>
 			@import "../../dojo/resources/dojo.css";
 			@import "../css/skins/claro.css";
 			.dgrid {
 				width: 700px;
 			}
-			#tree .field-bool {
+			
+			.field-bool {
 				width: 4em;
 			}
-			#tree .field-type {
+			
+			#treeGrid .field-type {
 				width: 5em;
 			}
 			
@@ -25,17 +27,18 @@
 				margin: 10px;
 			}
 		</style>
-		<script>
-			var start= new Date().getTime();
-		</script>
-		<script type="text/javascript" src="../../dojo/dojo.js" 
+		<script src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
-		<script type="text/javascript">
+		<script>
 			require(["dojo/on", "dgrid/OnDemandGrid","dgrid/tree","dgrid/editor", "dgrid/Keyboard",
 					"dgrid/Selection", "dgrid/selector", "dgrid/ColumnSet",
 					"dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!"], 
 				function(on, Grid, tree, editor, Keyboard, Selection, selector, ColumnSet, declare, testStore){
 					var count = 0; // for incrementing edits from button under 1st grid
+					
+					function byId(id){
+						return document.getElementById(id);
+					}
 					
 					function nbspFormatter(value){
 						// returns "&nbsp;" for blank content, to prevent cell collapsing
@@ -56,49 +59,63 @@
 						]
 					}, "treeGrid");
 					
-					on(document.getElementById("save"), "click", function(){
+					on(byId("save"), "click", function(){
 						treeGrid.save();
 					});
-					on(document.getElementById("add-country"), "click", function(){
+					on(byId("revert"), "click", function(){
+						treeGrid.revert();
+					});
+					on(byId("add-country"), "click", function(){
 						testCountryStore.put({ id: 'GR', name:'Greece', type:'country', parent: 'EU'});
 					});
-					on(document.getElementById("remove-country"), "click", function(){
+					on(byId("remove-country"), "click", function(){
 						testCountryStore.remove('GR');
 					});
-					on(document.getElementById("add-continent"), "click", function(){
+					on(byId("add-continent"), "click", function(){
 						testCountryStore.put({ id: 'NE', name:'My New Europe', type:'continent'});
 	        			testCountryStore.put({ id: 'NI', name:'My New Italy', type:'country', parent: 'NE'});
 					});
-					on(document.getElementById("delete"), "click", function(){
+					on(byId("delete"), "click", function(){
 						for(var id in treeGrid.selection){
 							console.log("id: ", id);
 							testCountryStore.remove(id);
 						}
 					});
-					on(document.getElementById("edit-continent"), "click", function(){
+					on(byId("edit-continent"), "click", function(){
 						var item = testCountryStore.get("EU");
 						item.name = "Europe Edit " + (++count);
 						testCountryStore.put(item);
 					});
-					on(document.getElementById("move-rome-na"), "click", function(){
+					on(byId("move-rome-na"), "click", function(){
 						var item = testCountryStore.get("Rome");
 						item.parent = "NA";
 						testCountryStore.put(item);
 					});
+					
+					function getTreeSelectorColumns(){
+						return [
+							selector({className: "selector"}),
+							tree({label:"Name", field:"name", sortable: false}),
+							editor({label: "Visited", field: "bool", sortable: false}, "checkbox"),
+							{label:"Type", field:"type", sortable: false},
+							{label:"Population", field:"population"},
+							{label:"Timezone", field:"timezone"}
+						];
+					}
 					
 					window.treeSelector = new StandardGrid({
 						store: testCountryStore,
 						query: {type: "continent"},
 						selectionMode: "none",
 						allowSelectAll: true,
-						columns: [
-							selector({className: "selector"}),
-							tree({label:"Name", field:"name", sortable: false}),
-							{label:"Type", field:"type", sortable: false},
-							{label:"Population", field:"population"},
-							{label:"Timezone", field:"timezone"}
-						]
+						columns: getTreeSelectorColumns()
 					}, "treeSelector");
+					
+					// Test resetting column definition on this grid, since it exercises
+					// one of each type of OOTB column plugin.
+					on(byId("resetColumns"), "click", function(){
+						treeSelector.set("columns", getTreeSelectorColumns());
+					});
 					
 					window.treeSubRows = new StandardGrid({
 						store: testCountryStore,
@@ -134,6 +151,7 @@
 		<h2>Lazy-loading tree grid, with store functionality</h2>
 		<div id="treeGrid"></div>
 		<button id="save">Save</button>
+		<button id="revert">Revert</button>
 		<button id="add-continent">Add Continent</button>
 		<button id="add-country">Add Greece To Europe</button>
 		<button id="remove-country">Remove Greece</button>
@@ -143,6 +161,7 @@
 		
 		<h2>Tree grid with checkbox selector to test select-all on children</h2>
 		<div id="treeSelector"></div>
+		<button id="resetColumns">Reset Columns</button> (to test column.init/destroy)
 		<h2>Tree grid with subRows</h2>
 		<div id="treeSubRows"></div>
 		<h2>Tree grid with columnSets</h2>

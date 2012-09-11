@@ -29,7 +29,8 @@
 		<script type="text/javascript" src="../../dojo/dojo.js"
 			data-dojo-config="async: true, isDebug: true"></script>
 		<script type="text/javascript">
-			var editFirst; // function defined within require callback
+			var grid, // stores global reference to grid instance
+				editFirst; // function defined within require callback
 			
 			require(["dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Keyboard", "dgrid/editor",
 					"dojo/_base/lang", "dojo/_base/declare", "dojo/on", "dojo/dom-construct",
@@ -232,15 +233,20 @@
 								columnArgs.renderCell = customRenderCell;
 							}
 							
-							window.grid && window.grid.destroy();
-							domConstruct.create("div", { id: "grid" }, form, "after");
-							
-							window.grid = new CustomGrid({
-								store: Observable(new TestStore({ data: data })),
-								columns: {
+							if(!grid){
+								grid = new CustomGrid({
+									store: Observable(new TestStore({ data: data })),
+									columns: {
+										"editor": editor(lang.mixin({}, options.column, columnArgs))
+									}
+								}, "grid");
+							}else{
+								// instead of destroying/recreating, just reset store + columns
+								grid.set("store", Observable(new TestStore({ data: data })));
+								grid.set("columns", {
 									"editor": editor(lang.mixin({}, options.column, columnArgs))
-								}
-							}, "grid");
+								});
+							}
 						});
 						
 						return false;
@@ -282,6 +288,7 @@
 			<p><label><input type="checkbox" name="customRenderCell" value="true"> use custom renderCell</label></p>
 			<div><button type="submit" id="editorFormSubmit">Recreate Grid</button></div>
 		</form>
+		<div id="grid"></div>
 		<button type="button" onclick="grid.save();">Save</button>
 		<button type="button" onclick="grid.revert();">Revert</button>
 		<button type="button" onclick="editFirst();">Edit first cell</button>

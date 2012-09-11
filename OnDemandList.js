@@ -120,7 +120,7 @@ return declare([List, _StoreMixin], {
 				}
 				var height = 0;
 				for(var i = 0; i < trCount; i++){
-					height += trs[i].offsetHeight;
+					height += self._calcRowHeight(trs[i]);
 				}
 				// only update rowHeight if we actually got results and are visible
 				if(trCount && height){ self.rowHeight = height / trCount; }
@@ -161,18 +161,21 @@ return declare([List, _StoreMixin], {
 		// summary:
 		//		Calculate the height of a row. This is a method so it can be overriden for
 		//		plugins that add connected elements to a row, like the tree
-		return rowElement.offsetHeight;
+		
+		var sibling = rowElement.previousSibling;
+		return sibling && sibling.offsetTop != rowElement.offsetTop ?
+			rowElement.offsetHeight : 0;
 	},
 	
 	lastScrollTop: 0,
-	_processScroll: function(){
+	_processScroll: function(evt){
 		// summary:
 		//		Checks to make sure that everything in the viewable area has been
 		//		downloaded, and triggering a request for the necessary data when needed.
 		var grid = this,
 			scrollNode = grid.bodyNode,
-			transform = grid.contentNode.style.webkitTransform,
-			visibleTop = scrollNode.scrollTop + (transform ? -transform.match(/translate[\w]*\(.*?,(.*?)px/)[1] : 0),
+			// grab current visible top from event if provided, otherwise from node
+			visibleTop = (evt && evt.scrollTop) || scrollNode.scrollTop,
 			visibleBottom = scrollNode.offsetHeight + visibleTop,
 			priorPreload, preloadNode, preload = grid.preload,
 			lastScrollTop = grid.lastScrollTop,
@@ -223,8 +226,7 @@ return declare([List, _StoreMixin], {
 					count += row.count || 1;
 					lastObserverIndex = currentObserverIndex;
 					// we just do cleanup here, as we will do a more efficient node destruction in the setTimeout below
-					grid.removeRow(row, true); 
-					delete grid._rowIdToObject[row.id]; // clear out of the lookup
+					grid.removeRow(row, true);
 					toDelete.push(row);
 				}
 				// now adjust the preloadNode based on the reclaimed space
@@ -369,7 +371,20 @@ return declare([List, _StoreMixin], {
 							// if the preload area above the nodes is approximated based on average
 							// row height, we may need to adjust the scroll once they are filled in
 							// so we don't "jump" in the scrolling position
-							scrollNode.scrollTop += beforeNode.offsetTop - keepScrollTo;
+							if(grid.scrollTo){ // TouchScroll is enabled
+								var pos = grid.getScrollPosition();
+								grid.scrollTo({
+									// Since we already had to query the scroll
+									// position, include x to avoid TouchScroll
+									// querying it again on its end.
+									x: pos.x,
+									y: pos.y + beforeNode.offsetTop - keepScrollTo,
+									// Don't kill momentum mid-scroll.
+									preserveMomentum: true
+								});
+							}else{
+								scrollNode.scrollTop += beforeNode.offsetTop - keepScrollTo;
+							}
 						}
 						if(below){
 							// if it is below, we will use the total from the results to update

@@ -1,6 +1,7 @@
 define([
 	"dojo/_base/kernel",
 	"dojo/_base/lang",
+	"dojo/_base/array",
 	"dojo/_base/Deferred",
 	"dojo/on",
 	"dojo/aspect",
@@ -8,9 +9,10 @@ define([
 	"./Grid",
 	"put-selector/put",
 	"dojo/_base/sniff"
-], function(kernel, lang, Deferred, on, aspect, has, Grid, put){
+], function(kernel, lang, arrayUtil, Deferred, on, aspect, has, Grid, put){
 
-var activeCell, activeValue; // tracks cell currently being edited, and its value
+// Variables to track info for cell currently being edited (editOn only).
+var activeCell, activeValue, activeOptions;
 
 function updateInputValue(input, value){
 	// common code for updating value of a standard input
@@ -185,17 +187,22 @@ function createSharedEditor(column, originalRenderCell){
 	
 	function onblur(){
 		var parentNode = node.parentNode,
+			cell = column.grid.cell(node),
+			i = parentNode.children.length - 1,
+			options = { alreadyHooked: true },
 			renderedNode;
 		
-		// remove the editor from the cell
+		// Remove the editor from the cell, to be reused later.
 		parentNode.removeChild(node);
 		
-		// pass new value to original renderCell implementation for this cell
-		Grid.appendIfNode(parentNode, originalRenderCell(
-			column.grid.row(parentNode).data, activeValue, parentNode));
+		// Clear out the rest of the cell's contents, then re-render with new value.
+		while(i--){ put(parentNode.firstChild, "!"); }
+		Grid.appendIfNode(parentNode, column.renderCell(
+			column.grid.row(parentNode).data, activeValue, parentNode,
+			activeOptions ? lang.delegate(options, activeOptions) : options));
 		
 		// reset state now that editor is deactivated
-		activeCell = activeValue = null;
+		activeCell = activeValue = activeOptions = null;
 		column._editorBlurHandle.pause();
 	}
 	
@@ -250,7 +257,8 @@ function showEditor(cmp, column, cell, value){
 	}
 	// track previous value for short-circuiting or in case we need to revert
 	cmp._dgridLastValue = value;
-	// if this is an editor with editOn, also reset activeValue
+	// if this is an editor with editOn, also update activeValue
+	// (activeOptions will have been updated previously)
 	if(activeCell){ activeValue = value; }
 }
 
@@ -315,7 +323,8 @@ return function(column, editor, editOn){
 	//		Adds editing capability to a column's cells.
 	
 	var originalRenderCell = column.renderCell || Grid.defaultRenderCell,
-		isWidget, cleanupAdded;
+		listeners = [],
+		isWidget;
 	
 	// accept arguments as parameters to editor function, or from column def,
 	// but normalize to column def.
@@ -331,64 +340,58 @@ return function(column, editor, editOn){
 		column.editorArgs = column.widgetArgs;
 	}
 	
-	column.renderCell = editOn ? function(object, value, cell, options){
+	aspect.after(column, "init", editOn ? function(){
 		var grid = column.grid;
+		if(!grid.edit){ grid.edit = edit; }
 		
-		// On first run, create one shared widget/input which will be swapped into
-		// the active cell.
-		if(!column.editorInstance){
-			column.editorInstance = createSharedEditor(column, originalRenderCell);
+		// Create one shared widget/input to be swapped into the active cell.
+		column.editorInstance = createSharedEditor(column, originalRenderCell);
+	} : function(){
+		var grid = column.grid;
+		if(!grid.edit){ grid.edit = edit; }
+		
+		if(isWidget){
+			// add advice for cleaning up widgets in this column
+			listeners.push(aspect.before(grid, "removeRow", function(rowElement){
+				// destroy our widget during the row removal operation
+				var cellElement = grid.cell(rowElement, column.id).element,
+					widget = (cellElement.contents || cellElement).widget;
+				if(widget){ widget.destroyRecursive(); }
+			}));
 		}
+	});
+	
+	aspect.after(column, "destroy", function(){
+		arrayUtil.forEach(listeners, function(l){ l.remove(); });
+		if(column._editorBlurHandle){ column._editorBlurHandle.remove(); }
 		
-		if(!grid.edit){
-			grid.edit = edit; // add edit method on first render
-		}
-		
-		if(!cleanupAdded && isWidget){
-			cleanupAdded = true;
-			// clean up shared widget instance when the grid is destroyed
-			aspect.before(grid, "destroy", function(){
-				column.editorInstance.destroyRecursive();
-			});
-		}
-		
+		if(editOn && isWidget){ column.editorInstance.destroyRecursive(); }
+	});
+	
+	column.renderCell = editOn ? function(object, value, cell, options){
 		// TODO: Consider using event delegation
 		// (Would require using dgrid's focus events for activating on focus,
 		// which we already advocate in README for optimal use)
 		
-		// in IE<8, cell is the child of the td due to the extra padding node
-		on(cell.tagName == "TD" ? cell : cell.parentNode, editOn,
-			function(){ grid.edit(this); });
+		if(!options || !options.alreadyHooked){
+			// in IE<8, cell is the child of the td due to the extra padding node
+			on(cell.tagName == "TD" ? cell : cell.parentNode, editOn, function(){
+				activeOptions = options;
+				column.grid.edit(this);
+			});
+		}
 		
 		// initially render content in non-edit mode
-		return originalRenderCell(object, value, cell, options);
+		return originalRenderCell.call(column, object, value, cell, options);
+		
 	} : function(object, value, cell, options){
 		// always-on: create editor immediately upon rendering each cell
-		var grid = column.grid,
-			cmp = createEditor(column);
-		
-		if(!grid.edit){
-			grid.edit = edit; // add edit method on first render
-		}
+		var cmp = createEditor(column);
 		
 		showEditor(cmp, column, cell, value);
 		
 		// Maintain reference for later use.
 		cell[isWidget ? "widget" : "input"] = cmp;
-		
-		if(isWidget){
-			if(!cleanupAdded){
-				cleanupAdded = true;
-				
-				// add advice for cleaning up widgets in this column
-				aspect.before(grid, "removeRow", function(rowElement){
-					// destroy our widget during the row removal operation
-					var cellElement = grid.cell(rowElement, column.id).element,
-						widget = (cellElement.contents || cellElement).widget;
-					if(widget){ widget.destroyRecursive(); }
-				});
-			}
-		}
 	};
 	
 	return column;

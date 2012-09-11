@@ -1,10 +1,9 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" 
-	"http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html>
 <html>
 	<head>
+		<meta charset="utf-8">
 		<title>Test Grid DnD</title>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-		<meta name="viewport" content="width=570" />
+		<meta name="viewport" content="width=570">
 		<style type="text/css">
 			@import "../../../dojo/resources/dojo.css";
 			/* need a theme for some dnd styles (e.g. before/after indicators).
@@ -12,12 +11,10 @@
 			*/
 			@import "../../../dijit/themes/tundra/tundra.css";
 			@import "../../css/skins/tundra.css";
-			.heading {
-				font-weight: bold;
-				padding-bottom: 0.25em;
-			}
 			
 			.clear { clear: both; }
+			
+			.dojoDndItem { padding: 0; } /* override dijit.css */
 			
 			#another-target, #another-source, #invalid-source {
 				float: left;
@@ -56,16 +53,43 @@
 				function(Grid, tree, Selection, DnD, Keyboard, DnDSource, declare, lang, arrayUtil, Deferred){
 					var DnDGrid = declare([Grid, Selection, DnD, Keyboard]);
 					
+					// Create a custom data array based on testOrderedData, but looping
+					// several times to create enough items to reasonably test node removal,
+					// and also adding an extra item to test item-specific DnD types.
+					var orderedData = [],
+						len = testOrderedData.length,
+						i, j, obj;
+					
+					orderedData.push({
+						order: 1,
+						name: "grue",
+						description: "A grue! Run away!",
+						type: "grue"
+					});
+					
+					for(i = 0; i < 10; i++){
+						for(j = 0; j < len; j++){
+							obj = lang.clone(testOrderedData[j]);
+							obj.order = obj.id = i * len + j + 2;
+							orderedData.push(obj);
+						}
+					}
+					
 					function byId(id){ return document.getElementById(id); }
 					
 					// Note: testOrderedStore hard-wires sorting anyway,
 					// so leaving sort disabled on columns in this grid.
 					window.grid1 = new DnDGrid({
-						store: testOrderedStore,
+						bufferRows: 5,
+						farOffRemoval: 400,
+						store: store = createOrderedStore(orderedData, { idProperty: "id" }),
 						columns: [
 							{label:"Name", field:"name", sortable: false},
 							{label:"Description", field:"description", sortable: false}
-						]
+						],
+						getObjectDndType: function(item){
+							return [item.type ? item.type : this.dndSourceType];
+						}
 					}, "grid1");
 					window.grid2 = new DnDGrid({
 						store: createOrderedStore([]),
@@ -196,7 +220,7 @@
 		<div id="grid2"></div>
 		<div id="another-target">Another Target</div>
 		<div id="another-source">Another Source</div>
-		<div id="invalid-source">An Invalid Source</div>
+		<div id="invalid-source">A source only accepting grues</div>
 		<div class="clear">
 			<h2>Example of 2 grids w/ inter-grid DnD, sharing the same store</h2>
 			<div id="grid3"></div>

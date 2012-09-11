@@ -14,7 +14,7 @@ return declare([List], {
 	// selectionEvents: String
 	//		Event (or events, comma-delimited) to listen on to trigger select logic.
 	//		Note: this is ignored in the case of touch devices.
-	selectionEvents: "mousedown,dgrid-cellfocusin",
+	selectionEvents: "mousedown,mouseup,dgrid-cellfocusin",
 	
 	// deselectOnRefresh: Boolean
 	//		If true, the selection object will be cleared when refresh is called.
@@ -62,12 +62,14 @@ return declare([List], {
 		// don't run if selection mode is none,
 		// or if coming from a dgrid-cellfocusin from a mousedown
 		if(this.selectionMode == "none" ||
-				(event.type == "dgrid-cellfocusin" && event.parentType == "mousedown")){
+				(event.type == "dgrid-cellfocusin" && event.parentType == "mousedown") ||
+				(event.type == "mouseup" && currentTarget != this._waitForMouseUp)){
 			return;
 		}
+		this._waitForMouseUp = null;
 
-		var ctrlKey = event.type == "mousedown" ? event[ctrlEquiv] : event.ctrlKey;
-		if(event.type == "mousedown" || !event.ctrlKey || event.keyCode == 32){
+		var ctrlKey = !event.keyCode ? event[ctrlEquiv] : event.ctrlKey;
+		if(!event.keyCode || !event.ctrlKey || event.keyCode == 32){
 			var mode = this.selectionMode,
 				row = currentTarget,
 				rowObj = this.row(row),
@@ -84,13 +86,17 @@ return declare([List], {
 					this.select(row);
 				}
 				this._lastSelected = row;
+			}else if(this.selection[rowObj.id] && !event.shiftKey && event.type == "mousedown"){
+				// we wait for the mouse up if we are clicking a selected item so that drag n' drop
+				// is possible without losing our selection
+				this._waitForMouseUp = row;
 			}else{
 				var value;
 				// clear selection first for non-ctrl-clicks in extended mode,
 				// as well as for right-clicks on unselected targets
 				if((event.button != 2 && mode == "extended" && !ctrlKey) ||
 						(event.button == 2 && !(this.selection[rowObj.id]))){
-					this.clearSelection(rowObj.id);
+					this.clearSelection(rowObj.id, true);
 				}
 				if(!event.shiftKey){
 					// null == toggle; undefined == true;
@@ -104,7 +110,7 @@ return declare([List], {
 					this._lastSelected = row;
 				}
 			}
-			if(event.type == "mousedown" && (event.shiftKey || ctrlKey)){
+			if(!event.keyCode && (event.shiftKey || ctrlKey)){
 				// prevent selection in firefox
 				event.preventDefault();
 			}
@@ -157,9 +163,11 @@ return declare([List], {
 		}
 		
 		aspect.before(this, "removeRow", function(rowElement, justCleanup){
+			var row;
 			if(!justCleanup){
+				row = this.row(rowElement);
 				// if it is a real row removal for a selected item, deselect it
-				if(this.row(rowElement).id in this.selection){ this.deselect(rowElement); }
+				if(row && (row.id in this.selection)){ this.deselect(rowElement); }
 			}
 		});
 	},
@@ -248,12 +256,20 @@ return declare([List], {
 	deselect: function(row, toRow){
 		this.select(row, toRow, false);
 	},
-	clearSelection: function(exceptId){
+	clearSelection: function(exceptId, dontResetLastSelected){
+		// summary:
+		//		Deselects any currently-selected items.
+		// exceptId: Mixed?
+		//		If specified, the given id will not be deselected.
+		
 		this.allSelected = false;
 		for(var id in this.selection){
 			if(exceptId !== id){
 				this.deselect(id);
 			}
+		}
+		if(!dontResetLastSelected){
+			this._lastSelected = null;
 		}
 	},
 	selectAll: function(){

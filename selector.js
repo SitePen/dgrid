@@ -1,6 +1,9 @@
-define(["dojo/_base/kernel", "dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put"],
-function(kernel, on, aspect, has, put){
+define(["dojo/_base/kernel", "dojo/_base/array", "dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put"],
+function(kernel, arrayUtil, on, aspect, has, put){
 	return function(column, type){
+		
+		var listeners = [],
+			grid, recentInput, recentTimeout, headerCheckbox;
 		
 		if(column.type){
 			column.selectorType = column.type;
@@ -10,12 +13,12 @@ function(kernel, on, aspect, has, put){
 		column.selectorType = type = type || column.selectorType || "checkbox";
 		column.sortable = false;
 		
-		var grid, recentInput, recentTimeout, headerCheckbox;
 		function changeInput(value){
 			// creates a function that modifies the input on an event
 			return function(event){
 				var rows = event.rows,
 					len = rows.length,
+					state = "false",
 					selection, mixed, i;
 				
 				for(i = 0; i < len; i++){
@@ -25,6 +28,7 @@ function(kernel, on, aspect, has, put){
 					if(!element.disabled){
 						// only change the value if it is not disabled
 						element.checked = value;
+						element.setAttribute("aria-checked", value);
 					}
 				}
 				if(headerCheckbox.type == "checkbox"){
@@ -40,18 +44,24 @@ function(kernel, on, aspect, has, put){
 					}
 					headerCheckbox.indeterminate = mixed;
 					headerCheckbox.checked = grid.allSelected;
+					if (mixed) {
+						state = "mixed";
+					} else if (grid.allSelected) {
+						state = "true";
+					}
+					headerCheckbox.setAttribute("aria-checked", state);
 				}
 			};
 		}
-
+		
 		function onSelect(event){
 			// we would really only care about click, since other input sources, like spacebar
 			// trigger a click, but the click event doesn't provide access to the shift key in firefox, so
 			// listen for keydown's as well to get an event in firefox that we can properly retrieve
 			// the shiftKey property from
-			if(event.type == "click" || event.keyCode == 32 || event.keyCode == 0){ 
+			if(event.type == "click" || event.keyCode == 32 || (!has("opera") && event.keyCode == 13) || event.keyCode === 0){
 				var row = grid.row(event), lastRow = grid._lastSelected && grid.row(grid._lastSelected);
-	
+				
 				if(type == "radio"){
 					if(!lastRow || lastRow.id != row.id){
 						grid.clearSelection();
@@ -61,7 +71,7 @@ function(kernel, on, aspect, has, put){
 				}else{
 					if(row){
 						if(event.shiftKey){
-							// make sure the last input always ends up checked for shift key 
+							// make sure the last input always ends up checked for shift key
 							changeInput(true)({rows: [row]});
 						}else{
 							// no shift key, so no range selection
@@ -77,14 +87,14 @@ function(kernel, on, aspect, has, put){
 				}
 			}
 		}
-
+		
 		function setupSelectionEvents(){
 			// register one listener at the top level that receives events delegated
 			grid._hasSelectorInputListener = true;
-			aspect.before(grid, "_initSelectionEvents", function(){
+			listeners.push(aspect.before(grid, "_initSelectionEvents", function(){
 				// listen for clicks and keydown as the triggers
 				this.on(".dgrid-selector:click,.dgrid-selector:keydown", onSelect);
-			});
+			}));
 			var handleSelect = grid._handleSelect;
 			grid._handleSelect = function(event){
 				// ignore the default select handler for events that originate from the selector column
@@ -93,15 +103,15 @@ function(kernel, on, aspect, has, put){
 				}
 			};
 			if(typeof column.disabled == "function"){
-				// we override this method to have selection's follow the disabled method for selectability
+				// we override this method to have selections follow the disabled method for selectability
 				var originalAllowSelect = grid.allowSelect;
 				grid.allowSelect = function(row){
 					return originalAllowSelect.call(this, row) && !column.disabled(row.data);
 				};
 			}
 			// register listeners to the select and deselect events to change the input checked value
-			grid.on("dgrid-select", changeInput(true));
-			grid.on("dgrid-deselect", changeInput(false));
+			listeners.push(grid.on("dgrid-select", changeInput(true)));
+			listeners.push(grid.on("dgrid-deselect", changeInput(false)));
 		}
 		
 		var disabled = column.disabled;
@@ -114,22 +124,28 @@ function(kernel, on, aspect, has, put){
 				disabled: disabled && (typeof disabled == "function" ? disabled(object) : disabled),
 				checked: value
 			}));
+			input.setAttribute("aria-checked", !!value);
 			
 			if(!grid._hasSelectorInputListener){
 				setupSelectionEvents();
 			}
-
+			
 			return input;
 		};
-
+		
+		column.init = function(){
+			grid = column.grid;
+		};
+		
+		column.destroy = function(){
+			arrayUtil.forEach(listeners, function(l){ l.remove(); });
+			grid._hasSelectorInputListener = false;
+		};
+		
 		column.renderCell = function(object, value, cell, options, header){
-			if(!grid){
-				grid = column.grid;
-			}
-
 			var row = object && grid.row(object);
 			value = row && grid.selection[row.id];
-
+			
 			if(header && (type == "radio" || typeof object == "string" || !grid.allowSelectAll)){
 				cell.appendChild(document.createTextNode(object||""));
 				if(!grid._hasSelectorInputListener){
@@ -143,7 +159,7 @@ function(kernel, on, aspect, has, put){
 			column.renderCell(column.label || {}, null, th, null, true);
 			headerCheckbox = th.lastChild;
 		};
-
+		
 		return column;
 	};
 });

@@ -1,7 +1,6 @@
-define(["dojo/on", "dojo/has", "dojo/query"],
-function(on, has, query){
-	// This module exposes useful functions and has-features for working with
-	// touch devices.
+define(["dojo/on", "dojo/query"],
+function(on, query){
+	// This module exposes useful functions for working with touch devices.
 	
 	var util = {
 		tapRadius: 10,

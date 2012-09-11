@@ -55,7 +55,7 @@ define([
 				dndParent;
 			
 			// enable column reordering for simple single-row structures only
-			if(this.subRows.length == 1 && !this.columnSets){
+			if(this.subRows && this.subRows.length == 1 && !this.columnSets){
 				arrayUtil.forEach(this.subRows[0], function(col){
 					if(col.reorderable === false){ return; }
 					
@@ -74,6 +74,8 @@ define([
 				}else{
 					delete this.columnDndSource; // remove any previous leftovers
 				}
+			}else{
+				console.warn("The dgrid ColumnReorder extension only supports simple single-row structures.");
 			}
 		}
 	});

@@ -42,6 +42,7 @@ return declare([List], {
 	postCreate: function(){
 		this.inherited(arguments);
 		var grid = this;
+		
 		function handledEvent(event){
 			// text boxes and other inputs that can use direction keys should be ignored and not affect cell/row navigation
 			var target = event.target;
@@ -49,64 +50,64 @@ return declare([List], {
 		}
 		
 		function navigateArea(areaNode){
-			function focusOnCell(element, event, dontFocus){
-				var cell = grid[grid.cellNavigation ? "cell" : "row"](element);
-				if(cell){
-					element = cell.element;
-					if(element){
-						if(!event.bubbles){
-							// IE doesn't always have a bubbles property already true, Opera will throw an error if you try to set it to true if it is already true
-							event.bubbles = true;
-						}
-						// clean up previously-focused element
-						// remove the class name and the tabIndex attribute
-						put(cellFocusedElement, "!dgrid-focus[!tabIndex]");
-						if(cellFocusedElement){
-							if(has("ie") < 8){
-								// clean up after workaround below (for non-input cases)
-								cellFocusedElement.style.position = "";
-							}
-							event.cell = cellFocusedElement;
-							on.emit(element, "dgrid-cellfocusout", event);
-						}
-						cellFocusedElement = element;
-						event.cell = element;
-						if(!dontFocus){
-							if(has("ie") < 8){
-								// setting the position to relative magically makes the outline
-								// work properly for focusing later on with old IE.
-								// (can't be done a priori with CSS or screws up the entire table)
-								element.style.position = "relative";
-							}
-							element.tabIndex = grid.tabIndex;
-							element.focus();
-						}
-						put(element, ".dgrid-focus");
-						on.emit(cellFocusedElement, "dgrid-cellfocusin", lang.mixin({ parentType: event.type }, event));
-					}
-				}
-			}
-
 			var isFocusableClass = grid.cellNavigation ? hasGridCellClass : hasGridRowClass,
 				cellFocusedElement = areaNode,
 				next;
 			
-			while((next = cellFocusedElement.firstChild) && next.tagName){
+			function focusOnCell(element, event, dontFocus){
+				var cell = grid[grid.cellNavigation ? "cell" : "row"](element);
+				
+				element = cell && cell.element;
+				if(!element){ return; }
+				
+				if(!event.bubbles){
+					// IE doesn't always have a bubbles property already true, Opera will throw an error if you try to set it to true if it is already true
+					event.bubbles = true;
+				}
+				// clean up previously-focused element
+				// remove the class name and the tabIndex attribute
+				put(cellFocusedElement, "!dgrid-focus[!tabIndex]");
+				if(cellFocusedElement){
+					if(has("ie") < 8){
+						// clean up after workaround below (for non-input cases)
+						cellFocusedElement.style.position = "";
+					}
+					event.cell = cellFocusedElement;
+					on.emit(element, "dgrid-cellfocusout", event);
+				}
+				cellFocusedElement = element;
+				event.cell = element;
+				if(!dontFocus){
+					if(has("ie") < 8){
+						// setting the position to relative magically makes the outline
+						// work properly for focusing later on with old IE.
+						// (can't be done a priori with CSS or screws up the entire table)
+						element.style.position = "relative";
+					}
+					element.tabIndex = grid.tabIndex;
+					element.focus();
+				}
+				put(element, ".dgrid-focus");
+				on.emit(cellFocusedElement, "dgrid-cellfocusin", lang.mixin({ parentType: event.type }, event));
+			}
+			
+			while((next = cellFocusedElement.firstChild) && !isFocusableClass.test(next.className)){
 				cellFocusedElement = next;
 			}
+			if(next){ cellFocusedElement = next; }
 			
 			if(areaNode === grid.contentNode){
 				aspect.after(grid, "renderArray", function(ret){
 					// summary:
 					//		Ensures the first element of a grid is always keyboard selectable after data has been
 					//		retrieved if there is not already a valid focused element.
-
+					
 					return Deferred.when(ret, function(ret){
 						// do not update the focused element if we already have a valid one
 						if(isFocusableClass.test(cellFocusedElement.className) && contains(areaNode, cellFocusedElement)){
 							return ret;
 						}
-
+						
 						// ensure that the focused element is actually a grid cell, not a
 						// dgrid-preload or dgrid-content element, which should not be focusable,
 						// even when data is loaded asynchronously
@@ -116,9 +117,9 @@ return declare([List], {
 								break;
 							}
 						}
-
+						
 						cellFocusedElement.tabIndex = grid.tabIndex;
-
+						
 						return ret;
 					});
 				});
@@ -201,13 +202,18 @@ return declare([List], {
 				}
 				event.preventDefault();
 			});
+			
+			return function(target){
+				target = target || cellFocusedElement;
+				focusOnCell(target, { target: target });
+			}
 		}
 		
-		if(grid.tabableHeader){
-			navigateArea(grid.headerNode);
+		if(this.tabableHeader){
+			this.focusHeader = navigateArea(this.headerNode);
 		}
 		
-		navigateArea(grid.contentNode);
+		this.focus = navigateArea(this.contentNode);
 	}
 });
 });
