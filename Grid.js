@@ -119,7 +119,7 @@ function(kernel, declare, listen, has, put, List){
 							(id ? ".dgrid-column-" + id : "") +
 							(extraClassName ? "." + extraClassName : "")
 						).replace(invalidClassChars,"-") +
-						"[role=gridcell]");
+						"[role=" + (tag === "th" ? "columnheader" : "gridcell") + "]");
 					cell.columnId = id;
 					if(contentBoxSizing){
 						// The browser (IE7-) does not support box-sizing: border-box, so we emulate it with a padding div
@@ -187,7 +187,7 @@ function(kernel, declare, listen, has, put, List){
 				put(headerNode.childNodes[i], "!");
 			}
 			
-			var row = this.createRowCells("th[role=columnheader]", function(th, column){
+			var row = this.createRowCells("th", function(th, column){
 				var contentNode = column.headerNode = th;
 				if(contentBoxSizing){
 					// we're interested in the th, but we're passed the inner div
