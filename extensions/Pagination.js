@@ -70,25 +70,30 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 				previousNextLinks = this.previousNextLinks,
 				pagingLinks = this.pagingLinks,
 				end = this._total / this.rowsPerPage,
-				pagingTextBoxHandle = this._pagingTextBoxHandle;
+				pagingTextBoxHandle = this._pagingTextBoxHandle,
+				node;
 			
 			if(this.firstLastArrows){
 				// create a first-page link
-				put(navigationNode,  "a[href=javascript:].dgrid-first", "«");
+				node = put(navigationNode,  "a[href=javascript:].dgrid-first", "«");
+				node.setAttribute("aria-label", i18n.gotoFirst);
 			}
 			if(this.previousNextArrows){
 				// create a previous link
-				put(navigationNode,  "a[href=javascript:].dgrid-previous", "‹");
+				node = put(navigationNode,  "a[href=javascript:].dgrid-previous", "‹");
+				node.setAttribute("aria-label", i18n.gotoPrev);
 			}
 			
 			this.paginationLinksNode = put(navigationNode, "span.dgrid-pagination-links");
 			if(this.previousNextArrows){
 				// create a next link
-				put(navigationNode, "a[href=javascript:].dgrid-next", "›");	
+				node = put(navigationNode, "a[href=javascript:].dgrid-next", "›");
+				node.setAttribute("aria-label", i18n.gotoNext);
 			}
 			if(this.firstLastArrows){
 				// create a last-page link
-				put(navigationNode,  "a[href=javascript:].dgrid-last", "»");
+				node = put(navigationNode,  "a[href=javascript:].dgrid-last", "»");
+				node.setAttribute("aria-label", i18n.gotoLast);
 			}
 			
 			on(navigationNode, "a:click", function(evt){
@@ -135,6 +140,7 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 				if(grid.pagingTextBox && page == currentPage){
 					// use a paging text box if enabled instead of just a number
 					link = put(linksNode, 'input.dgrid-page-input[type=text][value=$]', currentPage);
+					link.setAttribute("aria-label", i18n.jumpPage);
 					grid._pagingTextBoxHandle = on(link, "change", function(evt){
 						var value = +this.value;
 						if(!isNaN(value) && value > 0 && value <= end){
@@ -146,6 +152,7 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 					link = put(linksNode,
 						'a[href=javascript:]' + (page == currentPage ? '.dgrid-page-disabled' : '') + '.dgrid-page-link',
 						page);
+					link.setAttribute("aria-label", i18n.gotoPage);
 				}
 				if(page == currentPage && focusLink){
 					// focus on it if we are supposed to retain the focus
