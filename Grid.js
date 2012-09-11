@@ -182,6 +182,8 @@ function(kernel, declare, listen, has, put, List){
 				headerNode = this.headerNode,
 				i = headerNode.childNodes.length;
 			
+			headerNode.setAttribute("role", "row");
+			
 			// clear out existing header in case we're resetting
 			while(i--){
 				put(headerNode.childNodes[i], "!");
