@@ -251,6 +251,9 @@ return declare([List, _StoreMixin], {
 		function adjustHeight(preload, noMax){
 			preload.node.style.height = Math.min(preload.count * grid.rowHeight, noMax ? Infinity : grid.maxEmptySpace) + "px";
 		}
+		while(preload && !preload.node.offsetWidth){ // skip past preloads that are not currently connected
+			preload = preload.previous;
+		}
 		// there can be multiple preloadNodes (if they split, or multiple queries are created),
 		//	so we can traverse them until we find whatever is in the current viewport, making
 		//	sure we don't backtrack
