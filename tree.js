@@ -143,7 +143,8 @@ return function(column){
 				target.className = "dgrid-expando-icon ui-icon ui-icon-triangle-1-" + (expanded ? "se" : "e");
 				var preloadNode = target.preloadNode,
 					rowElement = row.element,
-					container;
+					container, options;
+				
 				if(!preloadNode){
 					// if the children have not been created, create a container, a preload node and do the 
 					// query for the children
@@ -154,7 +155,10 @@ return function(column){
 					};
 					query.level = target.level;
 					if(column.allowDuplicates){
-						var options = {parentId: row.id};
+						// If allowDuplicates is specified, include parentId in options
+						// in order to facilitate unique IDs for each occurrence of the
+						// same item under multiple different parents.
+						options = { parentId: row.id };
 					}
 					Deferred.when(
 						grid.renderQuery ?

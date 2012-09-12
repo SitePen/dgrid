@@ -514,13 +514,18 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 		_autoId: 0,
 		insertRow: function(object, parent, beforeNode, i, options){
 			// summary:
-			//		Creates a single row in the grid
-			var parentId = options.parentId;
-			var id = this.id + "-row-" + (parentId ? parentId + "-" : "") + 
+			//		Creates a single row in the grid.
+			
+			// Include parentId within row identifier if one was specified in options.
+			// (This is used by tree to allow the same object to appear under
+			// multiple parents.)
+			var parentId = options.parentId,
+				id = this.id + "-row-" + (parentId ? parentId + "-" : "") + 
 					((this.store && this.store.getIdentity) ? 
-						this.store.getIdentity(object) : this._autoId++);
-			var row = byId(id);
-			var previousRow = row && row.previousSibling;
+						this.store.getIdentity(object) : this._autoId++),
+				row = byId(id),
+				previousRow = row && row.previousSibling;
+			
 			if(!row || // we must create a row if it doesn't exist, or if it previously belonged to a different container 
 					(beforeNode && row.parentNode != beforeNode.parentNode)){
 				if(row){// if it existed elsewhere in the DOM, we will remove it, so we can recreate it
