@@ -254,7 +254,7 @@ function showEditor(cmp, column, cell, value){
 		cmp._dgridIgnoreChange = true;
 		cmp.set("value", value);
         // Call optional column property 'onEdit'. Both the row data object
-        // and the widget are passed. Useful of widget needs to change itself
+        // and the widget are passed. Useful if widget needs to change itself
         // depending on particular cell's data.
         if (column.onEdit) {
             var obj = grid.cell(cell).row.data;
