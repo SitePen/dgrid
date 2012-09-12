@@ -153,12 +153,15 @@ return function(column){
 						return grid.store.getChildren(row.data, options);
 					};
 					query.level = target.level;
+					if(column.allowDuplicates){
+						var options = {parentId: row.id};
+					}
 					Deferred.when(
 						grid.renderQuery ?
 							grid._trackError(function(){
-								return grid.renderQuery(query, preloadNode);
+								return grid.renderQuery(query, preloadNode, options);
 							}) :
-							grid.renderArray(query({}), preloadNode, {query: query}),
+							grid.renderArray(query(options), preloadNode, {query: query}),
 						function(){
 							// Expand once results are retrieved, if the row is still expanded.
 							if(grid._expanded[row.id]){
@@ -258,11 +261,12 @@ return function(column){
 		var grid = column.grid,
 			level = Number(options && options.query && options.query.level) + 1,
 			mayHaveChildren = !grid.store.mayHaveChildren || grid.store.mayHaveChildren(object),
+			parentId = options.parentId,
 			expando, node;
 		
 		level = currentLevel = isNaN(level) ? 0 : level;
 		expando = column.renderExpando(level, mayHaveChildren,
-			grid._expanded[grid.store.getIdentity(object)]);
+			grid._expanded[(parentId ? parentId + "-" : "") + grid.store.getIdentity(object)]);
 		expando.level = level;
 		expando.mayHaveChildren = mayHaveChildren;
 		
