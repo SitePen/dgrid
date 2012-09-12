@@ -59,19 +59,20 @@ return declare([List, _StoreMixin], {
 			count: 0,
 			node: preloadNode
 		};
-		var topPreload = {
-			node: put(preloadNode || this.contentNode, (preloadNode ? "-" : "") + "div.dgrid-preload", {
-				rowIndex: 0
-			}),
-			count: 0,
-			query: query,
-			next: preload
-		};
 		if(!preloadNode){
 			var rootQuery = true;
+			var topPreload = {
+				node: put(this.contentNode, "div.dgrid-preload", {
+					rowIndex: 0
+				}),
+				count: 0,
+				//topPreloadNode.preload = true;
+				query: query,
+				next: preload
+			};
 			preload.node = preloadNode = put(this.contentNode, "div.dgrid-preload");
+			preload.previous = topPreload;
 		}
-		preload.previous = topPreload;
 		// this preload node is used to represent the area of the grid that hasn't been
 		// downloaded yet
 		preloadNode.rowIndex = this.minRowsPerPage;
@@ -81,20 +82,20 @@ return declare([List, _StoreMixin], {
 			// the preload nodes (if there are multiple) are represented as a linked list, need to insert it
 			if((preload.next = priorPreload.next) && 
 					// check to make sure that the current scroll position is below this preload
-					(preloadNode.offsetTop || this.bodyNode.scrollTop) >= priorPreload.node.offsetTop){ 
+					this.bodyNode.scrollTop >= priorPreload.node.offsetTop){ 
 				// the prior preload is above/before in the linked list
-				topPreload.previous = priorPreload;
+				preload.previous = priorPreload;
 			}else{
 				// the prior preload is below/after in the linked list
 				preload.next = priorPreload;
-				topPreload.previous = priorPreload.previous;
+				preload.previous = priorPreload.previous;
 			}
 			// adjust the previous and next links so the linked list is proper
-			topPreload.previous.next = topPreload;
+			preload.previous.next = preload;
 			preload.next.previous = preload; 
+		}else{
+			this.preload = preload;
 		}
-		this.preload = preload;
-
 		var loadingNode = put(preloadNode, "-div.dgrid-loading");
 		put(loadingNode, "div.dgrid-below", this.loadingMessage);
 		// Establish query options, mixing in our own.
@@ -250,24 +251,28 @@ return declare([List, _StoreMixin], {
 		function adjustHeight(preload, noMax){
 			preload.node.style.height = Math.min(preload.count * grid.rowHeight, noMax ? Infinity : grid.maxEmptySpace) + "px";
 		}
+
 		// there can be multiple preloadNodes (if they split, or multiple queries are created),
 		//	so we can traverse them until we find whatever is in the current viewport, making
 		//	sure we don't backtrack
-		var nextPreload = preload;
-		while((preload = preload.previous)){
-			nextPreload = preload;
-		}
-		while((preload = nextPreload)){
-			nextPreload = preload.next;
+		while(preload && preload != priorPreload){
+			priorPreload = grid.preload;
+			grid.preload = preload;
 			preloadNode = preload.node;
 			var preloadTop = preloadNode.offsetTop;
 			var preloadHeight;
-
+			
 			if(visibleBottom + mungeAmount + searchBuffer < preloadTop){
 				// the preload is below the line of sight
+				do{
+					preload = preload.previous;
+				}while(preload && !preload.node.offsetWidth); // skip past preloads that are not currently connected
 			}else if(visibleTop - mungeAmount - searchBuffer > (preloadTop + (preloadHeight = preloadNode.offsetHeight))){
 				// the preload is above the line of sight
-			}else if(preloadNode.offsetWidth){				
+				do{
+					preload = preload.next;
+				}while(preload && !preload.node.offsetWidth);// skip past preloads that are not currently connected
+			}else{
 				// the preload node is visible, or close to visible, better show it
 				var offset = ((preloadNode.rowIndex ? visibleTop - requestBuffer : visibleBottom) - preloadTop) / grid.rowHeight;
 				var count = (visibleBottom - visibleTop + 2 * requestBuffer) / grid.rowHeight;
