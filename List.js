@@ -514,10 +514,11 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 		_autoId: 0,
 		insertRow: function(object, parent, beforeNode, i, options){
 			// summary:
-			//		Creates a single row in the grid.
-			
-			var id = this.id + "-row-" + ((this.store && this.store.getIdentity) ?
-				this.store.getIdentity(object) : this._autoId++);
+			//		Creates a single row in the grid
+			var parentId = options.parentId;
+			var id = this.id + "-row-" + (parentId ? parentId + "-" : "") + 
+					((this.store && this.store.getIdentity) ? 
+						this.store.getIdentity(object) : this._autoId++);
 			var row = byId(id);
 			var previousRow = row && row.previousSibling;
 			if(!row || // we must create a row if it doesn't exist, or if it previously belonged to a different container 
