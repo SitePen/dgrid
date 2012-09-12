@@ -1,6 +1,23 @@
 This document outlines changes since 0.3.0.  For older changelogs, see the
 [dgrid wiki](https://github.com/SitePen/dgrid/wiki).
 
+# 0.3.2
+
+## Significant changes
+
+* The `ColumnHider` extension has undergone some refactoring to make it more
+  extensible and to provide a public API for toggling the hidden state of a
+  column, via the `toggleColumnHiddenState(columnId)` method.
+* The `ColumnReorder` extension has been refactored to allow reordering of
+  columns within the same subrow or columnset in more complex column structures,
+  in addition to the previous ability to reorder columns in simple single-row
+  structures.
+
+## Other changes and fixes
+
+* The non-standard `colsetid` attribute assigned to nodes by the `ColumnSet`
+  mixin has been replaced with the `data-dgrid-column-set-id` attribute.
+
 # 0.3.1
 
 ## Significant changes
