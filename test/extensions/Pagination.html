@@ -49,12 +49,12 @@
 			if(match){ skin = match[1]; }
 			skinDep = "xstyle/css!dgrid/css/skins/" + skin + ".css";
 			
-			require([skinDep, "dgrid/Grid", "dgrid/extensions/Pagination", "dgrid/Selection",
+			require([skinDep, "dgrid/Grid", "dgrid/extensions/Pagination", "dgrid/Selection", "dgrid/Keyboard",
 					"dojo/_base/lang", "dojo/_base/declare", "dojo/dom-construct", "dojo/dom-form", "dgrid/test/data/base", "dojo/domReady!"],
-				function(skinResource, Grid, Pagination, Selection,
+				function(skinResource, Grid, Pagination, Selection, Keyboard,
 						lang, declare, domConstruct, domForm, testStore){
 					
-					var CustomGrid = declare([Grid, Selection, Pagination]);
+					var CustomGrid = declare([Grid, Keyboard, Selection, Pagination]);
 					
 					getColumns = function(){
 						return {
