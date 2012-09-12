@@ -59,6 +59,14 @@ define([
 	});
 	
 	var ColumnReorder = declare([], {
+		// summary:
+		//		Extension allowing reordering of columns in a grid via drag'n'drop.
+		//		Reordering of columns within the same subrow or columnset is also
+		//		supported; between different ones is not.
+		
+		// columnDndConstructor: Function
+		//		Constructor to call for instantiating DnD sources within the grid's
+		//		header.
 		columnDndConstructor: ColumnDndSource,
 		
 		_initSubRowDnd: function(subRow, dndType){
