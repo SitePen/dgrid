@@ -166,14 +166,14 @@ return declare([List, _StoreMixin], {
 	},
 	
 	lastScrollTop: 0,
-	_processScroll: function(){
+	_processScroll: function(evt){
 		// summary:
 		//		Checks to make sure that everything in the viewable area has been
 		//		downloaded, and triggering a request for the necessary data when needed.
 		var grid = this,
 			scrollNode = grid.bodyNode,
-			transform = grid.contentNode.style.webkitTransform,
-			visibleTop = scrollNode.scrollTop + (transform ? -transform.match(/translate[\w]*\(.*?,(.*?)px/)[1] : 0),
+			// grab current visible top from event if provided, otherwise from node
+			visibleTop = (evt && evt.scrollTop) || scrollNode.scrollTop,
 			visibleBottom = scrollNode.offsetHeight + visibleTop,
 			priorPreload, preloadNode, preload = grid.preload,
 			lastScrollTop = grid.lastScrollTop,
@@ -370,7 +370,20 @@ return declare([List, _StoreMixin], {
 							// if the preload area above the nodes is approximated based on average
 							// row height, we may need to adjust the scroll once they are filled in
 							// so we don't "jump" in the scrolling position
-							scrollNode.scrollTop += beforeNode.offsetTop - keepScrollTo;
+							if(grid.scrollTo){ // TouchScroll is enabled
+								var pos = grid.getScrollPosition();
+								grid.scrollTo({
+									// Since we already had to query the scroll
+									// position, include x to avoid TouchScroll
+									// querying it again on its end.
+									x: pos.x,
+									y: pos.y + beforeNode.offsetTop - keepScrollTo,
+									// Don't kill momentum mid-scroll.
+									preserveMomentum: true
+								});
+							}else{
+								scrollNode.scrollTop += beforeNode.offsetTop - keepScrollTo;
+							}
 						}
 						if(below){
 							// if it is below, we will use the total from the results to update

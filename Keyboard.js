@@ -90,23 +90,24 @@ return declare([List], {
 				put(element, ".dgrid-focus");
 				on.emit(cellFocusedElement, "dgrid-cellfocusin", lang.mixin({ parentType: event.type }, event));
 			}
-
-			while((next = cellFocusedElement.firstChild) && next.tagName){
+			
+			while((next = cellFocusedElement.firstChild) && !isFocusableClass.test(next.className)){
 				cellFocusedElement = next;
 			}
+			if(next){ cellFocusedElement = next; }
 			
 			if(areaNode === grid.contentNode){
 				aspect.after(grid, "renderArray", function(ret){
 					// summary:
 					//		Ensures the first element of a grid is always keyboard selectable after data has been
 					//		retrieved if there is not already a valid focused element.
-
+					
 					return Deferred.when(ret, function(ret){
 						// do not update the focused element if we already have a valid one
 						if(isFocusableClass.test(cellFocusedElement.className) && contains(areaNode, cellFocusedElement)){
 							return ret;
 						}
-
+						
 						// ensure that the focused element is actually a grid cell, not a
 						// dgrid-preload or dgrid-content element, which should not be focusable,
 						// even when data is loaded asynchronously
@@ -116,9 +117,9 @@ return declare([List], {
 								break;
 							}
 						}
-
+						
 						cellFocusedElement.tabIndex = grid.tabIndex;
-
+						
 						return ret;
 					});
 				});

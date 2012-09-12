@@ -209,6 +209,7 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 		},
 		buildRendering: function(){
 			var domNode = this.domNode,
+				self = this,
 				headerNode, spacerNode, bodyNode, footerNode, isRTL;
 			
 			// Detect RTL on html/body nodes; taken from dojo/dom-geometry
@@ -226,7 +227,7 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			if(has("quirks") || has("ie") < 8){
 				spacerNode = put(domNode, "div.dgrid-spacer");
 			}
-			bodyNode = this.bodyNode = this.touchNode = put(domNode, "div.dgrid-scroller");
+			bodyNode = this.bodyNode = put(domNode, "div.dgrid-scroller");
 			
 			// firefox 4 until at least 10 adds overflow: auto elements to the tab index by default for some
 			// reason; force them to be not tabbable
@@ -244,8 +245,10 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			}
 			
 			listen(bodyNode, "scroll", function(event){
-				// keep the header aligned with the body
-				headerNode.scrollLeft = bodyNode.scrollLeft;
+				if(self.showHeader){
+					// keep the header aligned with the body
+					headerNode.scrollLeft = event.scrollLeft || bodyNode.scrollLeft;
+				}
 				// re-fire, since browsers are not consistent about propagation here
 				event.stopPropagation();
 				listen.emit(domNode, "scroll", {scrollTarget: bodyNode});
@@ -253,7 +256,7 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			this.configStructure();
 			this.renderHeader();
 			
-			this.contentNode = put(this.bodyNode, "div.dgrid-content.ui-widget-content");
+			this.contentNode = this.touchNode = put(this.bodyNode, "div.dgrid-content.ui-widget-content");
 			// add window resize handler, with reference for later removal if needed
 			this._listeners.push(this._resizeHandle = listen(window, "resize",
 				miscUtil.throttleDelayed(winResizeHandler, this)));
@@ -388,6 +391,8 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			
 			// make sure all the content has been removed so it can be recreated
 			this.contentNode.innerHTML = "";
+			// If using TouchScroll, reset its scroll position as well.
+			if(this.scrollTo){ this.scrollTo({ x: 0, y: 0 }); }
 		},
 		newRow: function(object, before, to, options){
 			if(before.parentNode){
@@ -408,7 +413,9 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 				do{
 					if(next.rowIndex > -1){
 						// skip non-numeric, non-rows
-						put(next, '.' + (rowIndex % 2 == 1 ? oddClass : evenClass) + '!' + (rowIndex % 2 == 0 ? oddClass : evenClass));
+						if((next.className + ' ').indexOf("dgrid-row ") > -1){
+							put(next, '.' + (rowIndex % 2 == 1 ? oddClass : evenClass) + '!' + (rowIndex % 2 == 0 ? oddClass : evenClass));
+						}
 						next.rowIndex = rowIndex++;
 					}
 				}while((next = next.nextSibling) && next.rowIndex != rowIndex);
@@ -439,7 +446,9 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 						if(row.parentNode == container){
 							firstRow = row.nextSibling;
 							if(firstRow){ // it's possible for this to have been already removed if it is in overlapping query results
-								firstRow.rowIndex--; // adjust the rowIndex so adjustRowIndices has the right starting point
+								if(from != to){ // if from and to are identical, it is an in-place update and we don't want to alter the rowIndex at all
+									firstRow.rowIndex--; // adjust the rowIndex so adjustRowIndices has the right starting point
+								}
 								self.removeRow(row); // now remove
 							}
 						}
@@ -454,8 +463,12 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 						if(row){
 							row.observerIndex = observerIndex;
 							rows.splice(to, 0, row);
-							if(!firstRow || to < firstRow.rowIndex){
-								firstRow = row;
+							if(!firstRow || to < from){
+								// the inserted row is first, so we update firstRow to point to it
+								var previous = row.previousSibling;
+								// if we are not in sync with the previous row, roll the firstRow back one so adjustRowIndices can sync everything back up.
+								firstRow = !previous || previous.rowIndex + 1 == row.rowIndex || row.rowIndex == 0 ?
+									row : previous;
 							}
 						}
 						options.count++;
@@ -506,6 +519,7 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			var id = this.id + "-row-" + ((this.store && this.store.getIdentity) ?
 				this.store.getIdentity(object) : this._autoId++);
 			var row = byId(id);
+			var previousRow = row && row.previousSibling;
 			if(!row || // we must create a row if it doesn't exist, or if it previously belonged to a different container 
 					(beforeNode && row.parentNode != beforeNode.parentNode)){
 				if(row){// if it existed elsewhere in the DOM, we will remove it, so we can recreate it
@@ -517,6 +531,10 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 				this._rowIdToObject[row.id = id] = object;
 			}
 			parent.insertBefore(row, beforeNode);
+			if(previousRow){
+				// in this case, we are pulling the row from another location in the grid, and we need to readjust the rowIndices from the point it was removed
+				this.adjustRowIndices(previousRow);
+			}
 			row.rowIndex = i;
 			return row;
 		},
