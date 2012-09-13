@@ -51,10 +51,12 @@ return function(column){
 		listeners.push(grid.on(
 			column.expandOn || ".dgrid-expando-icon:click," + colSelector + ":dblclick," + colSelector + ":keydown",
 			function(event){
-				if((event.type != "keydown" || event.keyCode == 32) &&
+				var row = grid.row(event);	
+				if((!grid.store.mayHaveChildren || grid.store.mayHaveChildren(row.data)) &&
+						(event.type != "keydown" || event.keyCode == 32) &&
 						!(event.type == "dblclick" && clicked && clicked.count > 1 &&
-							grid.row(event).id == clicked.id && event.target.className.indexOf("dgrid-expando-icon") > -1)){
-					grid.expand(this);
+							row.id == clicked.id && event.target.className.indexOf("dgrid-expando-icon") > -1)){
+					grid.expand(row);
 				}
 				
 				// If the expando icon was clicked, update clicked object to prevent
