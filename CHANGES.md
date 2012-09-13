@@ -5,6 +5,9 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ## Significant changes
 
+* The `ColumnSet` mixin now defines a `styleColumnSet` method, which is
+  analogous to Grid's `styleColumn` method, but instead adds a style rule for
+  the class on nodes containing the entire columnset contents for a row.
 * The `ColumnHider` extension has undergone some refactoring to make it more
   extensible and to provide a public API for toggling the hidden state of a
   column, via the `toggleColumnHiddenState(columnId)` method.
@@ -15,8 +18,16 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ## Other changes and fixes
 
+* Several accessibility issues have been addressed, including fixes to the
+  roles reported by certain elements, and labels added to the Pagination
+  extension's controls
 * The non-standard `colsetid` attribute assigned to nodes by the `ColumnSet`
   mixin has been replaced with the `data-dgrid-column-set-id` attribute.
+* A number of protected members in the ColumnHider extension have been renamed:
+    * `_toggleColumnState` has been replaced by `_setColumnHiddenState` and the
+      public API `toggleColumnHiddenState` mentioned above
+    * `_toggleHiderMenu` has been renamed to `_toggleColumnHiderMenu`
+    * `_columnStyleRules` has been renamed to `_columnHiderRules`
 
 # 0.3.1
 
