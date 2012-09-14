@@ -14,6 +14,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
     * exposes `scrollTo` and `getScrollPosition` methods to allow manipulation
       and retrieval of scroll information; updates have been made to dgrid
       components where necessary to leverage these
+    * allows configuring how many touches are necessary to activate scrolling,
+      via the `touchesToScroll` property
 * The `Keyboard` mixin now defines `focus` and `focusHeader` methods, for
   programmatically focusing a row or cell (depending on the value of the
   `cellNavigation` setting). (#130)
@@ -25,9 +27,14 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
   (via a `grid` property on the `error` object).
 * It is now possible to initialize or later set CSS classes on a dgrid component's
   top DOM node via `"class"` or `className`. (#183)
-* The `tree` column plugin now supports a `collapseOnRefresh` property, which
-  if set to `true`, will cause all parent rows to render collapsed whenever the
-  grid is refreshed, rather than remembering their previous state.
+* The `tree` column plugin now supports a `collapseOnRefresh` property in the
+  column definition; if set to `true`, it will cause all parent rows to render
+  collapsed whenever the grid is refreshed, rather than remembering their
+  previous state.
+* The `tree` column plugin now supports a `allowDuplicates` property in the
+  column definition; this can be set to `true` to allow for cases where the same
+  item may appear under multiple parents in the tree.  Note however that it
+  limits the capabilities of the `row` method to the top level only. (#147)
 * The `DnD` extension now supports specifying a `getObjectDndType` function, for
   customizing the DnD type reported for each item rendered.
 * The `ColumnHider` extension has undergone some refactoring to make it more
@@ -55,7 +62,11 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 * Fixed an issue with dgrid instances not reacting correctly to window resize.
 * Fixed an issue affecting odd/even row classes on in-place updates. (#269)
 * Fixed a rendering issue involving confusion of preload node dimensions. (#161)
+* Fixed an issue causing `tree` level indentation to render improperly when used
+  with the `Pagination` extension.
 * Fixed a deprecated API call in `_StoreMixin`. (#272)
+* Improved logic in `OnDemandList` to properly account for lists with displays
+  which tile items using `display: inline-block`.
 * The `DnD` extension can now drag non-root tree items *in Dojo 1.8 only* by
   passing `allowNested: true` to the source via `dndParams`. (#68)
 * The `DnD` extension now behaves better with regard to synchronizing with
