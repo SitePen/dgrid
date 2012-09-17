@@ -390,9 +390,9 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			this.contentNode.innerHTML = "";
 		},
 		newRow: function(object, before, to, options){
-			if(before.parentNode){
+			if(!before || before.parentNode){
 				var i = options.start + to;
-				var row = this.insertRow(object, before.parentNode, before, i, options);
+				var row = this.insertRow(object, before ? before.parentNode : this.contentNode, before, i, options);
 				put(row, ".ui-state-highlight");
 				setTimeout(function(){
 					put(row, "!ui-state-highlight");
@@ -450,7 +450,7 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 					}
 					if(to > -1){
 						// add to new slot (either before an existing row, or at the end)
-						row = self.newRow(object, rows[to] || (rows[to-1] && rows[to-1].nextSibling) || beforeNode, to, options);
+						row = self.newRow(object, rows[to] || (rows[to-1] && rows[to-1].nextSibling), to, options);
 						if(row){
 							row.observerIndex = observerIndex;
 							rows.splice(to, 0, row);
