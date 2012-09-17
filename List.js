@@ -440,8 +440,8 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 							firstRow = row.nextSibling;
 							if(firstRow){ // it's possible for this to have been already removed if it is in overlapping query results
 								firstRow.rowIndex--; // adjust the rowIndex so adjustRowIndices has the right starting point
-								self.removeRow(row); // now remove
 							}
+							self.removeRow(row); // now remove
 						}
 						// the removal of rows could cause us to need to page in more items
 						if(self._processScroll){
