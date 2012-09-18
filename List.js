@@ -221,6 +221,8 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			domNode.className = "";
 			
 			put(domNode, "[role=grid].ui-widget.dgrid.dgrid-" + this.listType);
+			
+			// Place header node (initially hidden if showHeader is false).
 			headerNode = this.headerNode = put(domNode, 
 				"div.dgrid-header.dgrid-header-row.ui-widget-header" +
 				(this.showHeader ? "" : ".dgrid-header-hidden"));
@@ -235,9 +237,9 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			
 			this.headerScrollNode = put(domNode, "div.dgrid-header-scroll.dgrid-scrollbar-width.ui-widget-header");
 			
-			footerNode = this.footerNode = put("div.dgrid-footer");
-			// hide unless showFooter is true (set by extensions which use footer)
-			if (!this.showFooter) { footerNode.style.display = "none"; }
+			// Place footer node (initially hidden if showFooter is false).
+			footerNode = this.footerNode = put("div.dgrid-footer" +
+				(this.showFooter ? "" : ".dgrid-footer-hidden"));
 			put(domNode, footerNode);
 			
 			if(isRTL){
@@ -287,7 +289,7 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 				quirks = has("quirks") || has("ie") < 7;
 			
 			this.headerScrollNode.style.height = bodyNode.style.marginTop = headerHeight + "px";
-			if(footerHeight){ bodyNode.style.marginBottom = footerHeight + "px"; }
+			bodyNode.style.marginBottom = footerHeight + "px";
 			
 			if(quirks){
 				// in IE6 and quirks mode, the "bottom" CSS property is ignored.
@@ -751,6 +753,15 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 		setShowHeader: function(show){
 			kernel.deprecated("setShowHeader(...)", 'use set("showHeader", ...) instead', "dgrid 1.0");
 			this.set("showHeader", show);
+		},
+		
+		_setShowFooter: function(show){
+			this.showFooter = show;
+			
+			// add/remove class which has styles for "hiding" header
+			put(this.footerNode, (show ? "!" : ".") + "dgrid-footer-hidden");
+			
+			this.resize(); // to account for (dis)appearance of header
 		}
 	});
 });
