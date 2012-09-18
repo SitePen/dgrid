@@ -396,6 +396,7 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			// If using TouchScroll, reset its scroll position as well.
 			if(this.scrollTo){ this.scrollTo({ x: 0, y: 0 }); }
 		},
+		
 		newRow: function(object, before, to, options){
 			if(before.parentNode){
 				var i = options.start + to;
@@ -617,6 +618,30 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			return this.row(move(row, steps || 1, "dgrid-row", visible));
 		},
 		
+		scrollTo: TouchScroll ? function(){
+			// If TouchScroll is the superclass, defer to its implementation.
+			return this.inherited(arguments);
+		} : function(options){
+			// No TouchScroll; simple implementation which sets scrollLeft/Top.
+			if(typeof options.x !== "undefined"){
+				this.bodyNode.scrollLeft = options.x;
+			}
+			if(typeof options.y !== "undefined"){
+				this.bodyNode.scrollTop = options.y;
+			}
+		},
+		
+		getScrollPosition: TouchScroll ? function(){
+			// If TouchScroll is the superclass, defer to its implementation.
+			return this.inherited(arguments);
+		} : function(){
+			// No TouchScroll; return based on scrollLeft/Top.
+			return {
+				x: this.bodyNode.scrollLeft,
+				y: this.bodyNode.scrollTop
+			};
+		},
+		
 		get: function(/*String*/ name /*, ... */){
 			// summary:
 			//		Get a property on a List instance.
@@ -742,13 +767,20 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			// (1) just in case someone *does* want to show a header in a List
 			// (2) helps address IE < 8 header display issue in List
 			
+			var headerNode = this.headerNode;
+			
 			this.showHeader = show;
 			
 			// add/remove class which has styles for "hiding" header
-			put(this.headerNode, (show ? "!" : ".") + "dgrid-header-hidden");
+			put(headerNode, (show ? "!" : ".") + "dgrid-header-hidden");
 			
 			this.renderHeader();
-			this.resize(); // to account for (dis)appearance of header
+			this.resize(); // resize to account for (dis)appearance of header
+			
+			if(show){
+				// Update scroll position of header to make sure it's in sync.
+				headerNode.scrollLeft = this.getScrollPosition().x;
+			}
 		},
 		setShowHeader: function(show){
 			kernel.deprecated("setShowHeader(...)", 'use set("showHeader", ...) instead', "dgrid 1.0");
