@@ -790,10 +790,10 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 		_setShowFooter: function(show){
 			this.showFooter = show;
 			
-			// add/remove class which has styles for "hiding" header
+			// add/remove class which has styles for hiding footer
 			put(this.footerNode, (show ? "!" : ".") + "dgrid-footer-hidden");
 			
-			this.resize(); // to account for (dis)appearance of header
+			this.resize(); // to account for (dis)appearance of footer
 		}
 	});
 });
