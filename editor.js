@@ -46,7 +46,7 @@ function dataFromEditor(column, cmp){
 	}
 }
 
-function setProperty(grid, cellElement, oldValue, value){
+function setProperty(grid, cellElement, oldValue, value, triggerEvent){
 	// Updates dirty hash and fires dgrid-datachange event for a changed value.
 	var cell, row, column;
 	// test whether old and new values are inequal, with coercion (e.g. for Dates)
@@ -64,7 +64,8 @@ function setProperty(grid, cellElement, oldValue, value){
 						oldValue: oldValue,
 						value: value,
 						bubbles: true,
-						cancelable: true
+						cancelable: true,
+						parentType: triggerEvent && triggerEvent.type
 					})){
 				if(grid.updateDirty){
 					// for OnDemandGrid: update dirty data, and save if autoSave is true
@@ -83,12 +84,12 @@ function setProperty(grid, cellElement, oldValue, value){
 }
 
 // intermediary frontend to setProperty for HTML and widget editors
-function setPropertyFromEditor(grid, column, cmp) {
+function setPropertyFromEditor(grid, column, cmp, triggerEvent) {
 	var value;
 	if(!cmp.isValid || cmp.isValid()){
 		value = setProperty(grid, (cmp.domNode || cmp).parentNode,
 			activeCell ? activeValue : cmp._dgridLastValue,
-			dataFromEditor(column, cmp));
+			dataFromEditor(column, cmp), triggerEvent);
 		
 		if(activeCell){ // for editors with editOn defined
 			activeValue = value;
@@ -123,14 +124,14 @@ function createEditor(column){
 		// the latter is delayed by setTimeouts in Dijit and will fire too late.
 		cmp.connect(cmp, editOn ? "onBlur" : "onChange", function(){
 			if(!cmp._dgridIgnoreChange){
-				setPropertyFromEditor(grid, column, this);
+				setPropertyFromEditor(grid, column, this, {type: "widget"});
 			}
 		});
 	}else{
 		handleChange = function(evt){
 			var target = evt.target;
 			if("_dgridLastValue" in target && target.className.indexOf("dgrid-input") > -1){
-				setPropertyFromEditor(grid, column, target);
+				setPropertyFromEditor(grid, column, target, evt);
 			}
 		};
 
