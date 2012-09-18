@@ -16,6 +16,11 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
       components where necessary to leverage these
     * allows configuring how many touches are necessary to activate scrolling,
       via the `touchesToScroll` property
+* All dgrid components now have `scrollTo` and `getScrollPosition` methods,
+    either inheriting from `TouchScroll` (see above) or implemented in `List`
+    based on `scrollTop` and `scrollLeft`.
+* All dgrid components now respond to `set("showFooter")` consistently with
+    `set("showHeader")`. (#284)
 * The `Keyboard` mixin now defines `focus` and `focusHeader` methods, for
   programmatically focusing a row or cell (depending on the value of the
   `cellNavigation` setting). (#130)
