@@ -39,18 +39,14 @@ define([
 			return grid.store.get(node.id.slice(grid.id.length + 5));
 		},
 		_legalMouseDown: function(evt){
-			// summary:
-			//		fix _legalMouseDown to only allow starting drag from an item
-			//		(not from bodyNode outside contentNode)
-			var legal = this.inherited("_legalMouseDown", arguments);
-			// DnDSource.prototype._legalMouseDown.apply(this, arguments);
+			// Fix _legalMouseDown to only allow starting drag from an item
+			// (not from bodyNode outside contentNode).
+			var legal = this.inherited(arguments);
 			return legal && evt.target != this.grid.bodyNode;
 		},
 
 		// DnD method overrides
 		onDrop: function(sourceSource, nodes, copy){
-			// summary:
-			//		on drop, determine where to move/copy the objects
 			var targetSource = this,
 				targetRow = this._targetAnchor = this.targetAnchor, // save for Internal
 				grid = this.grid,
@@ -145,8 +141,7 @@ define([
 		},
 		
 		onDndStart: function(source, nodes, copy){
-			// summary:
-			// 		listen for start events to apply style change to avatar
+			// Listen for start events to apply style change to avatar.
 			
 			this.inherited(arguments); // DnDSource.prototype.onDndStart.apply(this, arguments);
 			if(source == this){
@@ -180,8 +175,7 @@ define([
 		},
 		
 		checkAcceptance: function(source, nodes){
-			// summary:
-			// 		augment checkAcceptance to block drops from sources without getObject
+			// Augment checkAcceptance to block drops from sources without getObject.
 			return source.getObject &&
 				DnDSource.prototype.checkAcceptance.apply(this, arguments);
 		},

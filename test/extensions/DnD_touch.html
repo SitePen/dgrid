@@ -38,9 +38,9 @@
 		<script type="text/javascript" src="../../../dojo/dojo.js"
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/extensions/DnD", "put-selector/put",
-				"dojo/dnd/Source", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/Deferred",  "dgrid/test/data/base", "dojo/domReady!"],
-			function(Grid, Selection, DnD, put, DnDSource, declare, lang, arrayUtil, Deferred){
+			require(["dgrid/OnDemandGrid", "dgrid/extensions/DnD", "put-selector/put",
+				"dojo/_base/declare", "dojo/_base/lang", "dgrid/test/data/base", "dojo/domReady!"],
+			function(Grid, DnD, put, declare, lang){
 				var DnDGrid = declare([Grid, DnD]);
 				
 				// Create a custom data array based on testOrderedData, but looping
