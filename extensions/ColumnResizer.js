@@ -225,8 +225,17 @@ return declare([], {
 				});
 			}
 
-			colNodes.forEach(function(colNode){
-				this.resizeColumnWidth(colNode.columnId, colNode.offsetWidth);
+			// Get a set of sizes before we start mutating, to avoid
+			// weird disproportionate measures if the grid has set
+			// column widths, but no full grid width set
+			var colSizes = colNodes.map(function(colNode){
+				return colNode.offsetWidth;
+			});
+
+			// Set a baseline size for each column based on
+			// its original measure
+			colNodes.forEach(function(colNode, i){
+				this.resizeColumnWidth(colNode.columnId, colSizes[i]);
 			}, this);
 
 			this._resizedColumns = true;
