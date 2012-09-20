@@ -6,7 +6,6 @@ function(declare, on, has, put){
 	var
 		calcTimerRes = 50, // ms between drag velocity measurements
 		glideTimerRes = 30, // ms between glide animation ticks
-		touches = {}, // records number of touches on components
 		current = {}, // records info for widget(s) currently being scrolled
 		previous = {}, // records info for widget(s) that were in the middle of being scrolled when someone decided to scroll again
 		glideThreshold = 1, // speed (in px) below which to stop glide - TODO: remove
@@ -42,6 +41,16 @@ function(declare, on, has, put){
 		hasTransitions + "Transition";
 	cssPrefix = hasTransforms === true ? "" :
 		"-" + hasTransforms.toLowerCase() + "-";
+	
+	function currentTouches(evt, node){
+		for(var i = 0, numTouches = 0, touch; (touch = evt.touches[i]); ++i){
+			if(node.contains(touch.target)){
+				++numTouches;
+			}
+		}
+		
+		return numTouches;
+	}
 	
 	function showScrollbars(widget, curr){
 		// Handles displaying of X/Y scrollbars as appropriate when a touchstart
@@ -198,7 +207,7 @@ function(declare, on, has, put){
 		
 		// Check touches count (which hasn't counted this event yet);
 		// ignore touch events on inappropriate number of contact points.
-		if(touches[id] !== widget.touchesToScroll - evt.changedTouches.length){
+		if(currentTouches(evt, node) !== widget.touchesToScroll){
 			return;
 		}
 		
@@ -240,13 +249,12 @@ function(declare, on, has, put){
 	function ontouchmove(evt){
 		var widget = evt.widget,
 			id = widget.id,
-			activeTouches = touches[id],
 			touchesToScroll = widget.touchesToScroll,
 			curr = current[id],
-			targetTouches, touch, nx, ny, minX, minY, i;
+			activeTouches, targetTouches, touch, nx, ny, minX, minY, i;
 		
 		// Ignore touchmove events with inappropriate number of contact points.
-		if(activeTouches !== touchesToScroll || !curr){
+		if(!curr || (activeTouches = currentTouches(evt, widget.touchNode)) !== touchesToScroll){
 			// Also cancel touch scrolling if there are too many contact points.
 			if(activeTouches > touchesToScroll){
 				widget.cancelTouchScroll();
@@ -302,7 +310,7 @@ function(declare, on, has, put){
 			id = widget.id,
 			curr = current[id];
 		
-		if(touches[id] != widget.touchesToScroll || !curr){ return; }
+		if(!curr || currentTouches(evt, widget.touchNode) != widget.touchesToScroll - 1){ return; }
 		startGlide(id);
 	}
 	
@@ -340,7 +348,6 @@ function(declare, on, has, put){
 		var curr = current[id],
 			widget = curr.widget,
 			node = curr.node,
-			parentNode = node.parentNode,
 			scrollbarNode,
 			x = curr.scrollableX ?
 				Math.max(Math.min(0, lastX), -(curr.scrollWidth - curr.parentWidth)) :
@@ -501,13 +508,6 @@ function(declare, on, has, put){
 		}
 	}
 	
-	function incrementTouchCount(evt){
-		evt.widget._touches = touches[evt.widget.id] += evt.changedTouches.length;
-	}
-	function decrementTouchCount(evt){
-		evt.widget._touches = touches[evt.widget.id] -= evt.changedTouches.length;
-	}
-	
 	return declare([], {
 		// touchesToScroll: Number
 		//		Number of touches to require on the component's touch target node
@@ -529,12 +529,6 @@ function(declare, on, has, put){
 		//		Number of milliseconds which "rubber-banding" transitions
 		//		(i.e. bouncing back from beyond edges) should take.
 		bounceDuration: 300,
-		
-		// _touches: Number
-		//		Reports number of touches currently in contact with this widget.
-		//		Mostly used internally for determining when to scroll, but may also
-		//		be useful info for further extensions.
-		_touches: 0,
 		
 		postCreate: function(){
 			this._initTouch();
@@ -574,16 +568,10 @@ function(declare, on, has, put){
 				};
 			}
 			
-			touches[this.id] = 0;
-			
 			this._touchScrollListeners = [
 				on(parentNode, "touchstart", wrapHandler(ontouchstart)),
 				on(parentNode, "touchmove", wrapHandler(ontouchmove)),
-				on(parentNode, "touchend,touchcancel", wrapHandler(ontouchend)),
-				// Don't need to wrap the following, since the touchstart handler
-				// above already decorates the event
-				on(parentNode, "touchstart", incrementTouchCount),
-				on(parentNode, "touchend,touchcancel", decrementTouchCount)
+				on(parentNode, "touchend,touchcancel", wrapHandler(ontouchend))
 			];
 		},
 		
@@ -592,7 +580,6 @@ function(declare, on, has, put){
 			while(i--){
 				this._touchScrollListeners[i].remove();
 			}
-			delete touches[this.id];
 			delete current[this.id];
 			
 			this.inherited(arguments);
