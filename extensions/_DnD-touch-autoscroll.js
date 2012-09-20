@@ -1,18 +1,48 @@
 define([
+	"dojo/aspect",
 	"dojo/dom-geometry",
 	"dojo/dnd/autoscroll",
 	"../List"
-], function(domGeometry, autoscroll, List){
+], function(aspect, domGeometry, autoscroll, List){
 	// summary:
 	//		This module patches the autoScrollNodes function from the
 	//		dojo/dnd/autoscroll module, in order to behave properly for
 	//		dgrid TouchScroll components.
 	
-	var original = autoscroll.autoScrollNodes;
+	var original = autoscroll.autoScrollNodes,
+		instances, findEnclosing;
+	
+	// In order to properly detect autoscroll cases for dgrid+TouchScroll
+	// instances, we need to register instances so that we can look them up based
+	// on child nodes later.
+	
+	instances = {};
+	aspect.after(List.prototype, "postCreate", function(r){
+		var id = this.id;
+		// Since this code is only hooked in some cases, don't throw an error here,
+		// but do warn since duplicate IDs or improper destruction are likely going
+		// to lead to unintended consequences.
+		if(instances[id]){
+			console.warn("dgrid instance registered with duplicate id '" + id + "'");
+		}
+		instances[id] = this;
+		return r;
+	});
+	aspect.after(List.prototype, "destroy", function(r){
+		delete instances[this.id];
+		return r;
+	});
+	findEnclosing = function(node){
+		var id, instance;
+		while(node){
+			if((id = node.id) && (instance = instances[id])){ return instance; }
+			node = node.parentNode;
+		}
+	};
 	
 	autoscroll.autoScrollNodes = function(evt){
 		var node = evt.target,
-			list = List.registry.findEnclosing(node),
+			list = findEnclosing(node),
 			pos, nodeX, nodeY, thresholdX, thresholdY, dx, dy, oldScroll, newScroll;
 		
 		if(list){
