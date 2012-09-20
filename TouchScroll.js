@@ -608,11 +608,25 @@ function(declare, on, has, put){
 			//		* preserveMomentum: if true, will not reset any active
 			//			momentum or bounce on the widget
 			
-			var curr = current[this.id];
+			var curr = current[this.id],
+				touchNode = this.touchNode,
+				parentNode = touchNode.parentNode;
+			
 			if(!options.preserveMomentum && curr && curr.resetEffects){
 				// Stop any glide or bounce occurring before scrolling.
 				curr.resetEffects();
 			}
+			
+			// Constrain coordinates within scrollable boundaries.
+			if(options.x){
+				options.x = Math.max(0, Math.min(options.x,
+					touchNode.scrollWidth - parentNode.offsetWidth));
+			}
+			if(options.y){
+				options.y = Math.max(0, Math.min(options.y,
+					touchNode.scrollHeight - parentNode.offsetHeight));
+			}
+			
 			scroll(this, options);
 		},
 		
