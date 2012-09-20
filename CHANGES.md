@@ -52,6 +52,7 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 * A `CompoundColumns` extension has been added, which allows defining column
   structures which include additional spanning header cells describing the
   contents beneath.
+* The `DnD` extension now properly supports touch devices when used with Dojo 1.8.
 
 ## Other changes and fixes
 
