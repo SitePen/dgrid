@@ -1,8 +1,8 @@
 // FIXME:
 // * fully make use of transitions in glide routines
 
-define(["dojo/_base/declare", "dojo/on", "./util/has-css3", "put-selector/put", "xstyle/css!./css/TouchScroll.css"],
-function(declare, on, has, put){
+define(["dojo/_base/declare", "dojo/on", "./util/touch", "./util/has-css3", "put-selector/put", "xstyle/css!./css/TouchScroll.css"],
+function(declare, on, touchUtil, has, put){
 	var
 		calcTimerRes = 50, // ms between drag velocity measurements
 		glideTimerRes = 30, // ms between glide animation ticks
@@ -41,16 +41,6 @@ function(declare, on, has, put){
 		hasTransitions + "Transition";
 	cssPrefix = hasTransforms === true ? "" :
 		"-" + hasTransforms.toLowerCase() + "-";
-	
-	function currentTouches(evt, node){
-		for(var i = 0, numTouches = 0, touch; (touch = evt.touches[i]); ++i){
-			if(node.contains(touch.target)){
-				++numTouches;
-			}
-		}
-		
-		return numTouches;
-	}
 	
 	function showScrollbars(widget, curr){
 		// Handles displaying of X/Y scrollbars as appropriate when a touchstart
@@ -207,7 +197,7 @@ function(declare, on, has, put){
 		
 		// Check touches count (which hasn't counted this event yet);
 		// ignore touch events on inappropriate number of contact points.
-		if(currentTouches(evt, node) !== widget.touchesToScroll){
+		if(touchUtil.countCurrentTouches(evt, node) !== widget.touchesToScroll){
 			return;
 		}
 		
@@ -254,7 +244,7 @@ function(declare, on, has, put){
 			activeTouches, targetTouches, touch, nx, ny, minX, minY, i;
 		
 		// Ignore touchmove events with inappropriate number of contact points.
-		if(!curr || (activeTouches = currentTouches(evt, widget.touchNode)) !== touchesToScroll){
+		if(!curr || (activeTouches = touchUtil.countCurrentTouches(evt, widget.touchNode)) !== touchesToScroll){
 			// Also cancel touch scrolling if there are too many contact points.
 			if(activeTouches > touchesToScroll){
 				widget.cancelTouchScroll();
@@ -310,7 +300,9 @@ function(declare, on, has, put){
 			id = widget.id,
 			curr = current[id];
 		
-		if(!curr || currentTouches(evt, widget.touchNode) != widget.touchesToScroll - 1){ return; }
+		if(!curr || touchUtil.countCurrentTouches(evt, widget.touchNode) != widget.touchesToScroll - 1){
+			return;
+		}
 		startGlide(id);
 	}
 	

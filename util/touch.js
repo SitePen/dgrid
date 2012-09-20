@@ -4,7 +4,22 @@ function(on, query){
 	
 	var util = {
 		tapRadius: 10,
-		dbltapTime: 250
+		dbltapTime: 250,
+		countCurrentTouches: function(evt, node){
+			// summary:
+			//		Given a touch event and a DOM node, counts how many current touches
+			//		presently lie within that node.  Useful in cases where an accurate
+			//		count is needed but tracking changedTouches won't suffice because
+			//		other handlers stop events from bubbling high enough.
+			
+			var i, numTouches, touch;
+			for(i = 0, numTouches = 0; (touch = evt.touches[i]); ++i){
+				if(node.contains(touch.target)){
+					++numTouches;
+				}
+			}
+			return numTouches;
+		}
 	};
 	
 	function handleTapStart(target, listener, evt, prevent){

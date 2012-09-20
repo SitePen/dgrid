@@ -11,9 +11,10 @@ define([
 	"dojo/dnd/Manager",
 	"dojo/_base/NodeList",
 	"put-selector/put",
+	"dojo/has!touch?../util/touch",
 	"dojo/has!touch?./_DnD-touch-autoscroll",
 	"xstyle/css!dojo/resources/dnd.css"
-], function(declare, lang, arrayUtil, Deferred, aspect, on, topic, has, DnDSource, DnDManager, NodeList, put){
+], function(declare, lang, arrayUtil, Deferred, aspect, on, topic, has, DnDSource, DnDManager, NodeList, put, touchUtil){
 	// Requirements:
 	// * requires a store (sounds obvious, but not all Lists/Grids have stores...)
 	// * must support options.before in put calls
@@ -159,10 +160,11 @@ define([
 			}
 		},
 		
-		onMouseDown: function(){
+		onMouseDown: function(evt){
 			// Cancel the drag operation on presence of more than one contact point.
 			// (This check will evaluate to false under non-touch circumstances.)
-			if(this.grid._touches > 1 && this.isDragging){
+			if(has("touch") && this.isDragging &&
+					touchUtil.countCurrentTouches(evt, this.grid.touchNode) > 1){
 				topic.publish("/dnd/cancel");
 				DnDManager.manager().stopDrag();
 			}else{
@@ -172,9 +174,7 @@ define([
 		
 		onMouseMove: function(evt){
 			// If we're handling touchmove, only respond to single-contact events.
-			// The if below is specifically written as it is to satisfy both cases
-			// where there is more than one touch, and where touch support isn't used.
-			if(!(this.grid._touches > 1)){
+			if(!has("touch") || touchUtil.countCurrentTouches(evt, this.grid.touchNode) === 1){
 				this.inherited(arguments);
 			}
 		},
