@@ -49,6 +49,18 @@ mix in `OnDemandList` involves nothing more than an additional use of `declare`:
 
 ## Significant changes
 
+### General/Core
+
+* All dgrid components now have `scrollTo` and `getScrollPosition` methods,
+  either inheriting from `TouchScroll` (see above) or implemented in `List`
+  based on `scrollTop` and `scrollLeft`.
+* All dgrid components now respond to `set("showFooter")` consistently with
+  `set("showHeader")`. (#284)
+* It is now possible to initialize or later set CSS classes on a dgrid component's
+  top DOM node via `"class"` or `className`. (#183)
+* `_StoreMixin` (used by `OnDemandList` and the `Pagination` extension) now
+  includes a reference to the grid instance in emitted `dgrid-error` events
+  (via a `grid` property on the `error` object).
 * The `TouchScroll` module has undergone significant changes and improvements:
     * uses CSS3 `translate3d` to take advantage of hardware acceleration
         * a `util/has-css3` module has been added with has-feature tests to
@@ -60,22 +72,18 @@ mix in `OnDemandList` involves nothing more than an additional use of `declare`:
       components where necessary to leverage these
     * allows configuring how many touches are necessary to activate scrolling,
       via the `touchesToScroll` property
-* All dgrid components now have `scrollTo` and `getScrollPosition` methods,
-    either inheriting from `TouchScroll` (see above) or implemented in `List`
-    based on `scrollTop` and `scrollLeft`.
-* All dgrid components now respond to `set("showFooter")` consistently with
-    `set("showHeader")`. (#284)
-* The `Keyboard` mixin now defines `focus` and `focusHeader` methods, for
-  programmatically focusing a row or cell (depending on the value of the
-  `cellNavigation` setting). (#130)
+
+### Mixins
+
 * The `ColumnSet` mixin now defines a `styleColumnSet` method, which is
   analogous to Grid's `styleColumn` method, but instead adds a style rule for
   the class on nodes containing the entire columnset contents for a row.
-* `_StoreMixin` (used by `OnDemandList` and the `Pagination` extension) now
-  includes a reference to the grid instance in emitted `dgrid-error` events
-  (via a `grid` property on the `error` object).
-* It is now possible to initialize or later set CSS classes on a dgrid component's
-  top DOM node via `"class"` or `className`. (#183)
+* The `Keyboard` mixin now defines `focus` and `focusHeader` methods, for
+  programmatically focusing a row or cell (depending on the value of the
+  `cellNavigation` setting). (#130)
+
+### Column Plugins
+
 * The `tree` column plugin now supports a `collapseOnRefresh` property in the
   column definition; if set to `true`, it will cause all parent rows to render
   collapsed whenever the grid is refreshed, rather than remembering their
@@ -84,8 +92,12 @@ mix in `OnDemandList` involves nothing more than an additional use of `declare`:
   column definition; this can be set to `true` to allow for cases where the same
   item may appear under multiple parents in the tree.  Note however that it
   limits the capabilities of the `row` method to the top level only. (#147)
-* The `DnD` extension now supports specifying a `getObjectDndType` function, for
-  customizing the DnD type reported for each item rendered.
+
+### Extensions
+
+* A `CompoundColumns` extension has been added, which allows defining column
+  structures which include additional spanning header cells describing the
+  contents beneath.
 * The `ColumnHider` extension has undergone some refactoring to make it more
   extensible and to provide a public API for toggling the hidden state of a
   column, via the `toggleColumnHiddenState(columnId)` method.
@@ -93,12 +105,13 @@ mix in `OnDemandList` involves nothing more than an additional use of `declare`:
   columns within the same subrow or columnset in more complex column structures,
   in addition to the previous ability to reorder columns in simple single-row
   structures.
-* A `CompoundColumns` extension has been added, which allows defining column
-  structures which include additional spanning header cells describing the
-  contents beneath.
 * The `DnD` extension now properly supports touch devices when used with Dojo 1.8.
+* The `DnD` extension now supports specifying a `getObjectDndType` function, for
+  customizing the DnD type reported for each item rendered.
 
 ## Other changes and fixes
+
+### General/Core
 
 * Several accessibility issues have been addressed, including fixes to the
   roles reported by certain elements, and labels added to the Pagination
@@ -110,6 +123,11 @@ mix in `OnDemandList` involves nothing more than an additional use of `declare`:
 * Fixed an issue causing `tree` level indentation to render improperly when used
   with the `Pagination` extension.
 * Fixed a deprecated API call in `_StoreMixin`. (#272)
+* Improved logic in `OnDemandList` to properly account for lists with displays
+  which tile items using `display: inline-block`.
+
+### Mixins
+
 * The `ColumnSet` mixin now behaves properly when calling
   `set("columnSets", ...)`. (#202)
 * The non-standard `colsetid` attribute assigned to nodes by the `ColumnSet`
@@ -118,17 +136,14 @@ mix in `OnDemandList` involves nothing more than an additional use of `declare`:
   `clearSelection` is called. (#175)
 * The `Selection` mixin will now wait until `mouseup` when handling mouse events
   on targets that are already selected. (#251)
+
+### Column Plugins
+
 * The `tree` column plugin's `expand` function will no longer be called at all
   in reaction to events on rows which report no children.
-* Improved logic in `OnDemandList` to properly account for lists with displays
-  which tile items using `display: inline-block`.
-* The `DnD` extension can now drag non-root tree items *in Dojo 1.8 only* by
-  passing `allowNested: true` to the source via `dndParams`. (#68)
-* The `DnD` extension now behaves better with regard to synchronizing with
-  dgrid's `Selection` mixin, and also with regard to dragging when some selected
-  nodes are no longer in the DOM. (#185, #246)
-* The `DnD` extension now adds CSS to adequately override spurious styles which
-  can leak in from dijit.css in Dojo 1.8. (#255)
+
+### Extensions
+
 * The `ColumnHider` extension now supports setting `hidden` and `unhidable`
   together, resulting in the column being hidden and not being present in the
   popup menu (but it can still be shown programmatically). (#199)
@@ -141,6 +156,13 @@ mix in `OnDemandList` involves nothing more than an additional use of `declare`:
     * `_columnStyleRules` has been renamed to `_columnHiderRules`
 * An issue with the `ColumnResizer` extension which could cause distortion of
   width values on the first resize has been fixed. (#291)
+* The `DnD` extension can now drag non-root tree items *in Dojo 1.8 only* by
+  passing `allowNested: true` to the source via `dndParams`. (#68)
+* The `DnD` extension now behaves better with regard to synchronizing with
+  dgrid's `Selection` mixin, and also with regard to dragging when some selected
+  nodes are no longer in the DOM. (#185, #246)
+* The `DnD` extension now adds CSS to adequately override spurious styles which
+  can leak in from dijit.css in Dojo 1.8. (#255)
 
 # 0.3.1
 
