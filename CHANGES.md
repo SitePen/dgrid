@@ -52,8 +52,9 @@ mix in `OnDemandList` involves nothing more than an additional use of `declare`:
 ### General/Core
 
 * All dgrid components now have `scrollTo` and `getScrollPosition` methods,
-  either inheriting from `TouchScroll` (see above) or implemented in `List`
-  based on `scrollTop` and `scrollLeft`.
+  either inheriting from `TouchScroll` (see below) or implemented in `List`
+  based on `scrollTop` and `scrollLeft`.  Updates have been made to dgrid
+  components where necessary to leverage these methods.
 * All dgrid components now respond to `set("showFooter")` consistently with
   `set("showHeader")`. (#284)
 * It is now possible to initialize or later set CSS classes on a dgrid component's
@@ -67,9 +68,8 @@ mix in `OnDemandList` involves nothing more than an additional use of `declare`:
           detect CSS3 features to be used by `TouchScroll`
     * implements increased tension and bounce-back beyond edges
     * displays scrollbars as appropriate while scrolling
-    * exposes `scrollTo` and `getScrollPosition` methods to allow manipulation
-      and retrieval of scroll information; updates have been made to dgrid
-      components where necessary to leverage these
+    * implements `scrollTo` and `getScrollPosition` methods to allow manipulation
+      and retrieval of scroll information based on CSS transformations
     * allows configuring how many touches are necessary to activate scrolling,
       via the `touchesToScroll` property
 
@@ -115,7 +115,7 @@ mix in `OnDemandList` involves nothing more than an additional use of `declare`:
 
 * Several accessibility issues have been addressed, including fixes to the
   roles reported by certain elements, and labels added to the Pagination
-  extension's controls. (Fixes partly attributed to #273)
+  extension's controls. (Partly attributed to #273)
 * `Grid`: calls to `cell` with a falsy `columnId` value now work properly. (#198)
 * Fixed an issue with dgrid instances not reacting correctly to window resize.
 * Fixed an issue affecting odd/even row classes on in-place updates. (#269)
@@ -139,8 +139,8 @@ mix in `OnDemandList` involves nothing more than an additional use of `declare`:
 
 ### Column Plugins
 
-* The `tree` column plugin's `expand` function will no longer be called at all
-  in reaction to events on rows which report no children.
+* The `expand` method defined by the `tree` column plugin will no longer
+  be called at all in reaction to events on rows which report no children.
 
 ### Extensions
 
