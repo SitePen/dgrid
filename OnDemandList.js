@@ -335,6 +335,7 @@ return declare([List, _StoreMixin], {
 							// all of the nodes were removed, can position wherever we want
 							preload.next.count += preload.count - offset;
 							preload.next.node.rowIndex = offset + count;
+							adjustHeight(preload.next);
 							preload.count = offset;
 							queryRowsOverlap = 0;
 						}else{
