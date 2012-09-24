@@ -375,20 +375,15 @@ return declare([List, _StoreMixin], {
 							// if the preload area above the nodes is approximated based on average
 							// row height, we may need to adjust the scroll once they are filled in
 							// so we don't "jump" in the scrolling position
-							if(grid.scrollTo){ // TouchScroll is enabled
-								var pos = grid.getScrollPosition();
-								grid.scrollTo({
-									// Since we already had to query the scroll
-									// position, include x to avoid TouchScroll
-									// querying it again on its end.
-									x: pos.x,
-									y: pos.y + beforeNode.offsetTop - keepScrollTo,
-									// Don't kill momentum mid-scroll.
-									preserveMomentum: true
-								});
-							}else{
-								scrollNode.scrollTop += beforeNode.offsetTop - keepScrollTo;
-							}
+							var pos = grid.getScrollPosition();
+							grid.scrollTo({
+								// Since we already had to query the scroll position,
+								// include x to avoid TouchScroll querying it again on its end.
+								x: pos.x,
+								y: pos.y + beforeNode.offsetTop - keepScrollTo,
+								// Don't kill momentum mid-scroll (for TouchScroll only).
+								preserveMomentum: true
+							});
 						}
 						if(below){
 							// if it is below, we will use the total from the results to update
