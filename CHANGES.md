@@ -1,7 +1,51 @@
 This document outlines changes since 0.3.0.  For older changelogs, see the
 [dgrid wiki](https://github.com/SitePen/dgrid/wiki).
 
-# 0.3.2
+# master (0.3.2-pre)
+
+## Breaking changes
+
+### GridFromHtml and OnDemandGrid
+
+The `GridFromHtml` module no longer automatically mixes in the `OnDemandGrid`
+module, mixing in only `Grid` instead, in order to support the option of using
+alternative store-backed mechanisms such as the `Pagination` extension.
+This may cause existing code which relied on `GridFromHtml` and loaded from a
+store to break.  Such cases will now need to mix in `OnDemandList` manually
+(they don't need to mix in `OnDemandGrid`, since `Grid` is still inherited by
+`GridFromHtml`).
+
+There are a couple of ways to deal with this.  In Dojo 1.8, when parsing dgrid
+instances declaratively, the new `data-dojo-mixins` attribute can be used to
+mix `OnDemandList` into `GridFromHtml`:
+
+```html
+<table data-dojo-type="dgrid/GridFromHtml" data-dojo-mixins="dgrid/OnDemandList">
+    ...
+</table>
+```
+
+In the case of Dojo 1.7, `dojo/parser` doesn't understand module IDs, and so a
+global reference to the dgrid components used is needed.  Changing such code to
+mix in `OnDemandList` involves nothing more than an additional use of `declare`:
+
+```html
+<table data-dojo-type="dgrid.OnDemandGridFromHtml">
+    ...
+</table>
+...
+<script>
+    var dgrid = {}; // declared in global scope
+    require(["dojo/_base/declare", "dojo/parser", "dgrid/GridFromHtml", "dgrid/OnDemandList", ..., "dojo/domReady!"],
+    function(declare, parser, GridFromHtml, OnDemandList, ...) {
+        // Create dgrid constructor with necessary components, available in the global scope.
+        dgrid.OnDemandGridFromHtml = declare([GridFromHtml, OnDemandList]);
+        
+        // Parse the document, now that the above constructor is available.
+        parser.parse();
+    });
+</script>
+```
 
 ## Significant changes
 
