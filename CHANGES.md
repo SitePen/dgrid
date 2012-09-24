@@ -56,14 +56,9 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ## Other changes and fixes
 
-* The `ColumnSet` mixin now behaves properly when calling
-  `set("columnSets", ...)`. (#202)
-* The `Selection` mixin will now properly reset `_lastSelected` when
-  `clearSelection` is called. (#175)
-* The `Selection` mixin will now wait until `mouseup` when handling mouse events
-  on targets that are already selected. (#251)
-* The `tree` column plugin's `expand` function will no longer be called at all
-  in reaction to events on rows which report no children.
+* Several accessibility issues have been addressed, including fixes to the
+  roles reported by certain elements, and labels added to the Pagination
+  extension's controls. (Fixes partly attributed to #273)
 * `Grid`: calls to `cell` with a falsy `columnId` value now work properly. (#198)
 * Fixed an issue with dgrid instances not reacting correctly to window resize.
 * Fixed an issue affecting odd/even row classes on in-place updates. (#269)
@@ -71,6 +66,16 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 * Fixed an issue causing `tree` level indentation to render improperly when used
   with the `Pagination` extension.
 * Fixed a deprecated API call in `_StoreMixin`. (#272)
+* The `ColumnSet` mixin now behaves properly when calling
+  `set("columnSets", ...)`. (#202)
+* The non-standard `colsetid` attribute assigned to nodes by the `ColumnSet`
+  mixin has been replaced with the `data-dgrid-column-set-id` attribute.
+* The `Selection` mixin will now properly reset `_lastSelected` when
+  `clearSelection` is called. (#175)
+* The `Selection` mixin will now wait until `mouseup` when handling mouse events
+  on targets that are already selected. (#251)
+* The `tree` column plugin's `expand` function will no longer be called at all
+  in reaction to events on rows which report no children.
 * Improved logic in `OnDemandList` to properly account for lists with displays
   which tile items using `display: inline-block`.
 * The `DnD` extension can now drag non-root tree items *in Dojo 1.8 only* by
@@ -85,16 +90,13 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
   popup menu (but it can still be shown programmatically). (#199)
 * The `ColumnHider` extension now behaves appropriately for columns with no
   `label` defined. (#244)
-* Several accessibility issues have been addressed, including fixes to the
-  roles reported by certain elements, and labels added to the Pagination
-  extension's controls. (Fixes partly attributed to #273)
-* The non-standard `colsetid` attribute assigned to nodes by the `ColumnSet`
-  mixin has been replaced with the `data-dgrid-column-set-id` attribute.
-* A number of protected members in the ColumnHider extension have been renamed:
+* A number of protected members in the `ColumnHider` extension have been renamed:
     * `_toggleColumnState` has been replaced by `_setColumnHiddenState` and the
       public API `toggleColumnHiddenState` mentioned above
     * `_toggleHiderMenu` has been renamed to `_toggleColumnHiderMenu`
     * `_columnStyleRules` has been renamed to `_columnHiderRules`
+* An issue with the `ColumnResizer` extension which could cause distortion of
+  width values on the first resize has been fixed. (#291)
 
 # 0.3.1
 
