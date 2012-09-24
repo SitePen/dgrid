@@ -20,7 +20,7 @@ instances declaratively, the new `data-dojo-mixins` attribute can be used to
 mix `OnDemandList` into `GridFromHtml`:
 
 ```html
-<table data-dojo-type="dgrid/GridFromHtml" data-dojo-mixins="dgrid/OnDemandList">
+<table data-dojo-type="dgrid/GridFromHtml" data-dojo-mixins="dgrid/OnDemandList" data-dojo-props="...">
     ...
 </table>
 ```
@@ -30,7 +30,7 @@ global reference to the dgrid components used is needed.  Changing such code to
 mix in `OnDemandList` involves nothing more than an additional use of `declare`:
 
 ```html
-<table data-dojo-type="dgrid.OnDemandGridFromHtml">
+<table data-dojo-type="dgrid.OnDemandGridFromHtml" data-dojo-props="...">
     ...
 </table>
 ...
