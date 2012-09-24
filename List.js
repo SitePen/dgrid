@@ -452,8 +452,8 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 								if(from != to){ // if from and to are identical, it is an in-place update and we don't want to alter the rowIndex at all
 									firstRow.rowIndex--; // adjust the rowIndex so adjustRowIndices has the right starting point
 								}
-								self.removeRow(row); // now remove
 							}
+							self.removeRow(row); // now remove
 						}
 						// the removal of rows could cause us to need to page in more items
 						if(self._processScroll){
