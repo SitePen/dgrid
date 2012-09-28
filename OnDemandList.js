@@ -344,7 +344,7 @@ return declare([List, _StoreMixin], {
 					}
 					options.start = preload.count;
 				}
-				options.count = count + queryRowsOverlap;
+				options.count = Math.min(count + queryRowsOverlap, grid.maxRowsPerPage);
 				if(keepScrollTo){
 					keepScrollTo = beforeNode.offsetTop;
 				}
@@ -401,6 +401,8 @@ return declare([List, _StoreMixin], {
 								adjustHeight(below);
 							});
 						}
+						// make sure we have covered the visible area
+						grid._processScroll();
 					});
 				}).call(this, loadingNode, scrollNode, below, keepScrollTo, results);
 				preload = preload.previous;
