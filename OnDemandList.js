@@ -7,7 +7,7 @@ return declare([List, _StoreMixin], {
 	minRowsPerPage: 25,
 	// maxRowsPerPage: Integer
 	//		The maximum number of rows to request at one time.
-	maxRowsPerPage: 100,
+	maxRowsPerPage: 1000,
 	// maxEmptySpace: Integer
 	//		Defines the maximum size (in pixels) of unrendered space below the
 	//		currently-rendered rows. Setting this to less than Infinity can be useful if you
