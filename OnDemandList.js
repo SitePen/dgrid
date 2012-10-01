@@ -7,7 +7,7 @@ return declare([List, _StoreMixin], {
 	minRowsPerPage: 25,
 	// maxRowsPerPage: Integer
 	//		The maximum number of rows to request at one time.
-	maxRowsPerPage: 100,
+	maxRowsPerPage: 1000,
 	// maxEmptySpace: Integer
 	//		Defines the maximum size (in pixels) of unrendered space below the
 	//		currently-rendered rows. Setting this to less than Infinity can be useful if you
@@ -345,7 +345,7 @@ return declare([List, _StoreMixin], {
 					}
 					options.start = preload.count;
 				}
-				options.count = count + queryRowsOverlap;
+				options.count = Math.min(count + queryRowsOverlap, grid.maxRowsPerPage);
 				if(keepScrollTo){
 					keepScrollTo = beforeNode.offsetTop;
 				}
@@ -397,6 +397,8 @@ return declare([List, _StoreMixin], {
 								adjustHeight(below);
 							});
 						}
+						// make sure we have covered the visible area
+						grid._processScroll();
 					});
 				}).call(this, loadingNode, scrollNode, below, keepScrollTo, results);
 				preload = preload.previous;
