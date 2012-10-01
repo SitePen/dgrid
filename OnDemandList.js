@@ -7,7 +7,7 @@ return declare([List, _StoreMixin], {
 	minRowsPerPage: 25,
 	// maxRowsPerPage: Integer
 	//		The maximum number of rows to request at one time.
-	maxRowsPerPage: 1000,
+	maxRowsPerPage: 250,
 	// maxEmptySpace: Integer
 	//		Defines the maximum size (in pixels) of unrendered space below the
 	//		currently-rendered rows. Setting this to less than Infinity can be useful if you
@@ -24,7 +24,7 @@ return declare([List, _StoreMixin], {
 	//		Defines the minimum distance (in pixels) from the visible viewport area
 	//		rows must be in order to be removed.  Setting to Infinity causes rows
 	//		to never be removed.
-	farOffRemoval: 10000,
+	farOffRemoval: 2000,
 	
 	rowHeight: 22,
 	
