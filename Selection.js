@@ -67,53 +67,57 @@ return declare([List], {
 			return;
 		}
 		this._waitForMouseUp = null;
-
-		var ctrlKey = !event.keyCode ? event[ctrlEquiv] : event.ctrlKey;
-		if(!event.keyCode || !event.ctrlKey || event.keyCode == 32){
-			var mode = this.selectionMode,
-				row = currentTarget,
-				rowObj = this.row(row),
-				lastRow = this._lastSelected;
-			
-			if(mode == "single"){
-				if(lastRow == row){
-					if(ctrlKey){
-						// allow deselection even within single select mode
-						this.select(row, null, null);
+		this._triggerEvent = event;
+		try{
+			var ctrlKey = !event.keyCode ? event[ctrlEquiv] : event.ctrlKey;
+			if(!event.keyCode || !event.ctrlKey || event.keyCode == 32){
+				var mode = this.selectionMode,
+					row = currentTarget,
+					rowObj = this.row(row),
+					lastRow = this._lastSelected;
+				
+				if(mode == "single"){
+					if(lastRow == row){
+						if(ctrlKey){
+							// allow deselection even within single select mode
+							this.select(row, null, null);
+						}
+					}else{
+						this.clearSelection();
+						this.select(row);
 					}
-				}else{
-					this.clearSelection();
-					this.select(row);
-				}
-				this._lastSelected = row;
-			}else if(this.selection[rowObj.id] && !event.shiftKey && event.type == "mousedown"){
-				// we wait for the mouse up if we are clicking a selected item so that drag n' drop
-				// is possible without losing our selection
-				this._waitForMouseUp = row;
-			}else{
-				var value;
-				// clear selection first for non-ctrl-clicks in extended mode,
-				// as well as for right-clicks on unselected targets
-				if((event.button != 2 && mode == "extended" && !ctrlKey) ||
-						(event.button == 2 && !(this.selection[rowObj.id]))){
-					this.clearSelection(rowObj.id, true);
-				}
-				if(!event.shiftKey){
-					// null == toggle; undefined == true;
-					lastRow = value = ctrlKey ? null : undefined;
-				}
-				this.select(row, lastRow, value);
-
-				if(!lastRow){
-					// update lastRow reference for potential subsequent shift+select
-					// (current row was already selected by earlier logic)
 					this._lastSelected = row;
+				}else if(this.selection[rowObj.id] && !event.shiftKey && event.type == "mousedown"){
+					// we wait for the mouse up if we are clicking a selected item so that drag n' drop
+					// is possible without losing our selection
+					this._waitForMouseUp = row;
+				}else{
+					var value;
+					// clear selection first for non-ctrl-clicks in extended mode,
+					// as well as for right-clicks on unselected targets
+					if((event.button != 2 && mode == "extended" && !ctrlKey) ||
+							(event.button == 2 && !(this.selection[rowObj.id]))){
+						this.clearSelection(rowObj.id, true);
+					}
+					if(!event.shiftKey){
+						// null == toggle; undefined == true;
+						lastRow = value = ctrlKey ? null : undefined;
+					}
+					this.select(row, lastRow, value);
+	
+					if(!lastRow){
+						// update lastRow reference for potential subsequent shift+select
+						// (current row was already selected by earlier logic)
+						this._lastSelected = row;
+					}
+				}
+				if(!event.keyCode && (event.shiftKey || ctrlKey)){
+					// prevent selection in firefox
+					event.preventDefault();
 				}
 			}
-			if(!event.keyCode && (event.shiftKey || ctrlKey)){
-				// prevent selection in firefox
-				event.preventDefault();
-			}
+		}finally{
+			this._triggerEvent = null;
 		}
 	},
 
@@ -182,7 +186,8 @@ return declare([List], {
 	_selectionEventQueue: function(value, type){
 		var grid = this,
 			event = "dgrid-" + (value ? "select" : "deselect"),
-			rows = this[event]; // current event queue (actually cells for CellSelection)
+			rows = this[event], // current event queue (actually cells for CellSelection)
+			triggerEvent = grid._triggerEvent;
 		
 		if(rows){ return rows; } // return existing queue, allowing to push more
 		
@@ -193,7 +198,8 @@ return declare([List], {
 			
 			var eventObject = {
 				bubbles: true,
-				grid: grid
+				grid: grid,
+				parentType: triggerEvent && triggerEvent.type
 			};
 			eventObject[type] = rows;
 			on.emit(grid.contentNode, event, eventObject);

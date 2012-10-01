@@ -55,11 +55,15 @@ return declare([List], {
 				next;
 			
 			function focusOnCell(element, event, dontFocus){
-				var cell = grid[grid.cellNavigation ? "cell" : "row"](element);
+				var cellOrRowType = grid.cellNavigation ? "cell" : "row";
+				var cell = grid[cellOrRowType](element);
 				
 				element = cell && cell.element;
 				if(!element){ return; }
-				
+				event = lang.mixin({
+					parentType: event.type,
+					grid: grid
+				}, event);
 				if(!event.bubbles){
 					// IE doesn't always have a bubbles property already true, Opera will throw an error if you try to set it to true if it is already true
 					event.bubbles = true;
@@ -72,11 +76,13 @@ return declare([List], {
 						// clean up after workaround below (for non-input cases)
 						cellFocusedElement.style.position = "";
 					}
-					event.cell = cellFocusedElement;
+					event.cell = cellFocusedElement; // keeping this for some level of back-compat for when we passed in an element
+					event[cellOrRowType] = grid[cellOrRowType](cellFocusedElement); // set the cell or row
 					on.emit(element, "dgrid-cellfocusout", event);
 				}
 				cellFocusedElement = element;
-				event.cell = element;
+				event.cell = element; // keeping this for some level of back-compat for when we passed in an element
+				event[cellOrRowType] = cell;
 				if(!dontFocus){
 					if(has("ie") < 8){
 						// setting the position to relative magically makes the outline
@@ -88,7 +94,7 @@ return declare([List], {
 					element.focus();
 				}
 				put(element, ".dgrid-focus");
-				on.emit(cellFocusedElement, "dgrid-cellfocusin", lang.mixin({ parentType: event.type }, event));
+				on.emit(cellFocusedElement, "dgrid-cellfocusin", event);
 			}
 			
 			while((next = cellFocusedElement.firstChild) && !isFocusableClass.test(next.className)){

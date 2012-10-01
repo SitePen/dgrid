@@ -61,29 +61,33 @@ function(kernel, arrayUtil, on, aspect, has, put){
 			// the shiftKey property from
 			if(event.type == "click" || event.keyCode == 32 || (!has("opera") && event.keyCode == 13) || event.keyCode === 0){
 				var row = grid.row(event), lastRow = grid._lastSelected && grid.row(grid._lastSelected);
-				
-				if(type == "radio"){
-					if(!lastRow || lastRow.id != row.id){
-						grid.clearSelection();
-						grid.select(row, null, true);
-						grid._lastSelected = row.element;
-					}
-				}else{
-					if(row){
-						if(event.shiftKey){
-							// make sure the last input always ends up checked for shift key
-							changeInput(true)({rows: [row]});
-						}else{
-							// no shift key, so no range selection
-							lastRow = null;
+				grid._triggerEvent = event;
+				try{
+					if(type == "radio"){
+						if(!lastRow || lastRow.id != row.id){
+							grid.clearSelection();
+							grid.select(row, null, true);
+							grid._lastSelected = row.element;
 						}
-						lastRow = event.shiftKey ? lastRow : null;
-						grid.select(lastRow|| row, row, lastRow ? undefined : null);
-						grid._lastSelected = row.element;
 					}else{
-						put(this, (grid.allSelected ? "!" : ".") + "dgrid-select-all");
-						grid[grid.allSelected ? "clearSelection" : "selectAll"]();
+						if(row){
+							if(event.shiftKey){
+								// make sure the last input always ends up checked for shift key 
+								changeInput(true)({rows: [row]});
+							}else{
+								// no shift key, so no range selection
+								lastRow = null;
+							}
+							lastRow = event.shiftKey ? lastRow : null;
+							grid.select(lastRow|| row, row, lastRow ? undefined : null);
+							grid._lastSelected = row.element;
+						}else{
+							put(this, (grid.allSelected ? "!" : ".") + "dgrid-select-all");
+							grid[grid.allSelected ? "clearSelection" : "selectAll"]();
+						}
 					}
+				}finally{
+					grid._triggerEvent = null;
 				}
 			}
 		}
