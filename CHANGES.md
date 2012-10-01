@@ -3,6 +3,23 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 # master (0.3.3-pre)
 
+## Breaking changes
+
+* The `Keyboard` module's `dgrid-cellfocusin` and `dgrid-cellfocusout` events
+    now report either a `row` or `cell` object, depending on whether
+    `cellNavigation` is `false` or `true`, respectively.  (Formerly these events
+    always contained a `cell` property pointing to the DOM node that fired the event.)
+
+## Significant changes
+
+* All custom events fired by dgrid components now report the following properties:
+    * `grid`: The dgrid instance which fired the event.
+    * `parentType`: If the event was fired in direct response to another event,
+        this property reflects the type of the originating event.  If the event
+        was fired due to a direct API call, `parentType` will not be defined.
+
+## Other changes and fixes
+
 * The `OnDemandList` module now adheres more strictly to the `maxRowsPerPage`
     property.  To accommodate this, the default has been increased from `100` to
     `250`. (#280)
