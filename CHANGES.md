@@ -1,6 +1,14 @@
 This document outlines changes since 0.3.0.  For older changelogs, see the
 [dgrid wiki](https://github.com/SitePen/dgrid/wiki).
 
+# master (0.3.3-pre)
+
+* The `OnDemandList` module now adheres more strictly to the `maxRowsPerPage`
+    property.  To accommodate this, the default has been increased from `100` to
+    `250`.
+* The `OnDemandList` module's default value for `farOffRemoval` has been
+    lowered from `10000` to `2000`.
+
 # 0.3.2
 
 ## Breaking changes
