@@ -48,7 +48,7 @@ function dataFromEditor(column, cmp){
 
 function setProperty(grid, cellElement, oldValue, value, triggerEvent){
 	// Updates dirty hash and fires dgrid-datachange event for a changed value.
-	var cell, row, column;
+	var cell, row, column, eventObject;
 	// test whether old and new values are inequal, with coercion (e.g. for Dates)
 	if(!(oldValue >= value && oldValue <= value)){
 		cell = grid.cell(cellElement);
@@ -57,16 +57,20 @@ function setProperty(grid, cellElement, oldValue, value, triggerEvent){
 		if(column.field && row){
 			// TODO: remove rowId in lieu of cell (or grid.row/grid.cell)
 			// (keeping for the moment for back-compat, but will note in changes)
-			if(on.emit(cellElement, "dgrid-datachange", {
-						grid: this,
-						cell: cell,
-						rowId: row.id,
-						oldValue: oldValue,
-						value: value,
-						bubbles: true,
-						cancelable: true,
-						parentType: triggerEvent && triggerEvent.type
-					})){
+			eventObject = {
+				grid: grid,
+				cell: cell,
+				rowId: row.id,
+				oldValue: oldValue,
+				value: value,
+				bubbles: true,
+				cancelable: true
+			};
+			if(triggerEvent && triggerEvent.type){
+				eventObject.parentType = triggerEvent.type;
+			}
+			
+			if(on.emit(cellElement, "dgrid-datachange", eventObject)){
 				if(grid.updateDirty){
 					// for OnDemandGrid: update dirty data, and save if autoSave is true
 					grid.updateDirty(row.id, column.field, value);

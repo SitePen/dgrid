@@ -35,7 +35,7 @@ function contains(parent, node){
 
 return declare([List], {
 	// summary:
-	// 		Add keyboard navigation capability to a grid/list
+	//		Add keyboard navigation capability to a grid/list
 	pageSkip: 10,
 	tabIndex: 0,
 	
@@ -55,17 +55,18 @@ return declare([List], {
 				next;
 			
 			function focusOnCell(element, event, dontFocus){
-				var cellOrRowType = grid.cellNavigation ? "cell" : "row";
-				var cell = grid[cellOrRowType](element);
+				var cellOrRowType = grid.cellNavigation ? "cell" : "row",
+					cell = grid[cellOrRowType](element);
 				
 				element = cell && cell.element;
 				if(!element){ return; }
-				event = lang.mixin({
-					parentType: event.type,
-					grid: grid
-				}, event);
+				event = lang.mixin({ grid: grid }, event);
+				if(event.type){
+					event.parentType = event.type;
+				}
 				if(!event.bubbles){
-					// IE doesn't always have a bubbles property already true, Opera will throw an error if you try to set it to true if it is already true
+					// IE doesn't always have a bubbles property already true.
+					// Opera throws if you try to set it to true if it is already true.
 					event.bubbles = true;
 				}
 				// clean up previously-focused element
@@ -76,13 +77,20 @@ return declare([List], {
 						// clean up after workaround below (for non-input cases)
 						cellFocusedElement.style.position = "";
 					}
-					event.cell = cellFocusedElement; // keeping this for some level of back-compat for when we passed in an element
-					event[cellOrRowType] = grid[cellOrRowType](cellFocusedElement); // set the cell or row
+					
+					// Expose object representing focused cell or row losing focus, via
+					// event.cell or event.row; which is set depends on cellNavigation.
+					event[cellOrRowType] = grid[cellOrRowType](cellFocusedElement);
 					on.emit(element, "dgrid-cellfocusout", event);
 				}
 				cellFocusedElement = element;
-				event.cell = element; // keeping this for some level of back-compat for when we passed in an element
+				
+				// Expose object representing focused cell or row gaining focus, via
+				// event.cell or event.row; which is set depends on cellNavigation.
+				// Note that yes, the same event object is being reused; on.emit
+				// performs a shallow copy of properties into a new event object.
 				event[cellOrRowType] = cell;
+				
 				if(!dontFocus){
 					if(has("ie") < 8){
 						// setting the position to relative magically makes the outline
