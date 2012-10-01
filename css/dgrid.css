@@ -45,6 +45,11 @@ html.has-quirks .dgrid-header-hidden .dgrid-cell {
 	padding-bottom: 0 !important;
 }
 
+.dgrid-footer-hidden {
+	/* Hiding footer is much simpler; simply set its display to none. */
+	display: none;
+}
+
 .dgrid-sortable {
 	cursor: pointer;
 }

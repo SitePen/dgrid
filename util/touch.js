@@ -3,8 +3,55 @@ function(on, query){
 	// This module exposes useful functions for working with touch devices.
 	
 	var util = {
+		// Overridable defaults related to extension events defined below.
 		tapRadius: 10,
-		dbltapTime: 250
+		dbltapTime: 250,
+		
+		selector: function(selector, eventType, children){
+			// summary:
+			//		Reimplementation of on.selector, taking an iOS quirk into account
+			return function(target, listener){
+				var bubble = eventType.bubble;
+				if(bubble){
+					// the event type doesn't naturally bubble, but has a bubbling form, use that
+					eventType = bubble;
+				}else if(children !== false){
+					// for normal bubbling events we default to allowing children of the selector
+					children = true;
+				}
+				return on(target, eventType, function(event){
+					var eventTarget = event.target;
+					
+					// iOS tends to report the text node an event was fired on, rather than
+					// the top-level element; this may end up causing errors in selector engines
+					if(eventTarget.nodeType == 3){ eventTarget = eventTarget.parentNode; }
+					
+					// there is a selector, so make sure it matches
+					while(!query.matches(eventTarget, selector, target)){
+						if(eventTarget == target || !children || !(eventTarget = eventTarget.parentNode)){ // intentional assignment
+							return;
+						}
+					}
+					return listener.call(eventTarget, event);
+				});
+			};
+		},
+		
+		countCurrentTouches: function(evt, node){
+			// summary:
+			//		Given a touch event and a DOM node, counts how many current touches
+			//		presently lie within that node.  Useful in cases where an accurate
+			//		count is needed but tracking changedTouches won't suffice because
+			//		other handlers stop events from bubbling high enough.
+			
+			var i, numTouches, touch;
+			for(i = 0, numTouches = 0; (touch = evt.touches[i]); ++i){
+				if(node.contains(touch.target)){
+					++numTouches;
+				}
+			}
+			return numTouches;
+		}
 	};
 	
 	function handleTapStart(target, listener, evt, prevent){
@@ -71,36 +118,6 @@ function(on, query){
 	
 	util.tap = tap;
 	util.dbltap = dbltap;
-	
-	util.selector = function(selector, eventType, children){
-		// summary:
-		//		Reimplementation of on.selector, taking an iOS quirk into account
-		return function(target, listener){
-			var bubble = eventType.bubble;
-			if(bubble){
-				// the event type doesn't naturally bubble, but has a bubbling form, use that
-				eventType = bubble;
-			}else if(children !== false){
-				// for normal bubbling events we default to allowing children of the selector
-				children = true;
-			}
-			return on(target, eventType, function(event){
-				var eventTarget = event.target;
-				
-				// iOS tends to report the text node an event was fired on, rather than
-				// the top-level element; this may end up causing errors in selector engines
-				if(eventTarget.nodeType == 3){ eventTarget = eventTarget.parentNode; }
-				
-				// there is a selector, so make sure it matches
-				while(!query.matches(eventTarget, selector, target)){
-					if(eventTarget == target || !children || !(eventTarget = eventTarget.parentNode)){ // intentional assignment
-						return;
-					}
-				}
-				return listener.call(eventTarget, event);
-			});
-		};
-	};
 	
 	return util;
 });

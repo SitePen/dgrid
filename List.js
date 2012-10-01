@@ -221,6 +221,8 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			domNode.className = "";
 			
 			put(domNode, "[role=grid].ui-widget.dgrid.dgrid-" + this.listType);
+			
+			// Place header node (initially hidden if showHeader is false).
 			headerNode = this.headerNode = put(domNode, 
 				"div.dgrid-header.dgrid-header-row.ui-widget-header" +
 				(this.showHeader ? "" : ".dgrid-header-hidden"));
@@ -235,9 +237,9 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			
 			this.headerScrollNode = put(domNode, "div.dgrid-header-scroll.dgrid-scrollbar-width.ui-widget-header");
 			
-			footerNode = this.footerNode = put("div.dgrid-footer");
-			// hide unless showFooter is true (set by extensions which use footer)
-			if (!this.showFooter) { footerNode.style.display = "none"; }
+			// Place footer node (initially hidden if showFooter is false).
+			footerNode = this.footerNode = put("div.dgrid-footer" +
+				(this.showFooter ? "" : ".dgrid-footer-hidden"));
 			put(domNode, footerNode);
 			
 			if(isRTL){
@@ -287,7 +289,7 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 				quirks = has("quirks") || has("ie") < 7;
 			
 			this.headerScrollNode.style.height = bodyNode.style.marginTop = headerHeight + "px";
-			if(footerHeight){ bodyNode.style.marginBottom = footerHeight + "px"; }
+			bodyNode.style.marginBottom = footerHeight + "px";
 			
 			if(quirks){
 				// in IE6 and quirks mode, the "bottom" CSS property is ignored.
@@ -391,9 +393,10 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			
 			// make sure all the content has been removed so it can be recreated
 			this.contentNode.innerHTML = "";
-			// If using TouchScroll, reset its scroll position as well.
-			if(this.scrollTo){ this.scrollTo({ x: 0, y: 0 }); }
+			// Ensure scroll position always resets (especially for TouchScroll).
+			this.scrollTo({ x: 0, y: 0 });
 		},
+		
 		newRow: function(object, before, to, options){
 			if(before.parentNode){
 				var i = options.start + to;
@@ -449,8 +452,8 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 								if(from != to){ // if from and to are identical, it is an in-place update and we don't want to alter the rowIndex at all
 									firstRow.rowIndex--; // adjust the rowIndex so adjustRowIndices has the right starting point
 								}
-								self.removeRow(row); // now remove
 							}
+							self.removeRow(row); // now remove
 						}
 						// the removal of rows could cause us to need to page in more items
 						if(self._processScroll){
@@ -516,10 +519,16 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			// summary:
 			//		Creates a single row in the grid.
 			
-			var id = this.id + "-row-" + ((this.store && this.store.getIdentity) ?
-				this.store.getIdentity(object) : this._autoId++);
-			var row = byId(id);
-			var previousRow = row && row.previousSibling;
+			// Include parentId within row identifier if one was specified in options.
+			// (This is used by tree to allow the same object to appear under
+			// multiple parents.)
+			var parentId = options.parentId,
+				id = this.id + "-row-" + (parentId ? parentId + "-" : "") + 
+					((this.store && this.store.getIdentity) ? 
+						this.store.getIdentity(object) : this._autoId++),
+				row = byId(id),
+				previousRow = row && row.previousSibling;
+			
 			if(!row || // we must create a row if it doesn't exist, or if it previously belonged to a different container 
 					(beforeNode && row.parentNode != beforeNode.parentNode)){
 				if(row){// if it existed elsewhere in the DOM, we will remove it, so we can recreate it
@@ -607,6 +616,30 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 		},
 		down: function(row, steps, visible){
 			return this.row(move(row, steps || 1, "dgrid-row", visible));
+		},
+		
+		scrollTo: TouchScroll ? function(){
+			// If TouchScroll is the superclass, defer to its implementation.
+			return this.inherited(arguments);
+		} : function(options){
+			// No TouchScroll; simple implementation which sets scrollLeft/Top.
+			if(typeof options.x !== "undefined"){
+				this.bodyNode.scrollLeft = options.x;
+			}
+			if(typeof options.y !== "undefined"){
+				this.bodyNode.scrollTop = options.y;
+			}
+		},
+		
+		getScrollPosition: TouchScroll ? function(){
+			// If TouchScroll is the superclass, defer to its implementation.
+			return this.inherited(arguments);
+		} : function(){
+			// No TouchScroll; return based on scrollLeft/Top.
+			return {
+				x: this.bodyNode.scrollLeft,
+				y: this.bodyNode.scrollTop
+			};
 		},
 		
 		get: function(/*String*/ name /*, ... */){
@@ -734,17 +767,33 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			// (1) just in case someone *does* want to show a header in a List
 			// (2) helps address IE < 8 header display issue in List
 			
+			var headerNode = this.headerNode;
+			
 			this.showHeader = show;
 			
 			// add/remove class which has styles for "hiding" header
-			put(this.headerNode, (show ? "!" : ".") + "dgrid-header-hidden");
+			put(headerNode, (show ? "!" : ".") + "dgrid-header-hidden");
 			
 			this.renderHeader();
-			this.resize(); // to account for (dis)appearance of header
+			this.resize(); // resize to account for (dis)appearance of header
+			
+			if(show){
+				// Update scroll position of header to make sure it's in sync.
+				headerNode.scrollLeft = this.getScrollPosition().x;
+			}
 		},
 		setShowHeader: function(show){
 			kernel.deprecated("setShowHeader(...)", 'use set("showHeader", ...) instead', "dgrid 1.0");
 			this.set("showHeader", show);
+		},
+		
+		_setShowFooter: function(show){
+			this.showFooter = show;
+			
+			// add/remove class which has styles for hiding footer
+			put(this.footerNode, (show ? "!" : ".") + "dgrid-footer-hidden");
+			
+			this.resize(); // to account for (dis)appearance of footer
 		}
 	});
 });

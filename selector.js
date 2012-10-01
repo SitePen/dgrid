@@ -3,7 +3,7 @@ function(kernel, arrayUtil, on, aspect, has, put){
 	return function(column, type){
 		
 		var listeners = [],
-			grid, recentInput, recentTimeout, headerCheckbox;
+			grid, headerCheckbox;
 		
 		if(column.type){
 			column.selectorType = column.type;
@@ -133,14 +133,14 @@ function(kernel, arrayUtil, on, aspect, has, put){
 			return input;
 		};
 		
-		column.init = function(){
+		aspect.after(column, "init", function(){
 			grid = column.grid;
-		};
+		});
 		
-		column.destroy = function(){
+		aspect.after(column, "destroy", function(){
 			arrayUtil.forEach(listeners, function(l){ l.remove(); });
 			grid._hasSelectorInputListener = false;
-		};
+		});
 		
 		column.renderCell = function(object, value, cell, options, header){
 			var row = object && grid.row(object);

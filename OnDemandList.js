@@ -49,7 +49,7 @@ return declare([List, _StoreMixin], {
 				null, this.pagingDelay));
 	},
 	
-	renderQuery: function(query, preloadNode){
+	renderQuery: function(query, preloadNode, options){
 		// summary:
 		//		Creates a preload node for rendering a query into, and executes the query
 		//		for the first page of data. Subsequent data will be downloaded as it comes
@@ -57,7 +57,8 @@ return declare([List, _StoreMixin], {
 		var preload = {
 			query: query,
 			count: 0,
-			node: preloadNode
+			node: preloadNode,
+			options: options
 		};
 		if(!preloadNode){
 			var rootQuery = true;
@@ -68,7 +69,8 @@ return declare([List, _StoreMixin], {
 				count: 0,
 				//topPreloadNode.preload = true;
 				query: query,
-				next: preload
+				next: preload,
+				options: options
 			};
 			preload.node = preloadNode = put(this.contentNode, "div.dgrid-preload");
 			preload.previous = topPreload;
@@ -100,7 +102,7 @@ return declare([List, _StoreMixin], {
 		put(loadingNode, "div.dgrid-below", this.loadingMessage);
 		// Establish query options, mixing in our own.
 		// (The getter returns a delegated object, so simply using mixin is safe.)
-		var options = lang.mixin(this.get("queryOptions"),
+		options = lang.mixin(this.get("queryOptions"), options, 
 			{start: 0, count: this.minRowsPerPage, query: query});
 		// execute the query
 		var results = query(options);
@@ -251,6 +253,10 @@ return declare([List, _StoreMixin], {
 		function adjustHeight(preload, noMax){
 			preload.node.style.height = Math.min(preload.count * grid.rowHeight, noMax ? Infinity : grid.maxEmptySpace) + "px";
 		}
+		while(preload && !preload.node.offsetWidth){
+			// skip past preloads that are not currently connected
+			preload = preload.previous;
+		}
 		// there can be multiple preloadNodes (if they split, or multiple queries are created),
 		//	so we can traverse them until we find whatever is in the current viewport, making
 		//	sure we don't backtrack
@@ -295,7 +301,7 @@ return declare([List, _StoreMixin], {
 				}
 				count = Math.ceil(count);
 				offset = Math.min(Math.floor(offset), preload.count - count);
-				var options = grid.get("queryOptions");
+				var options = lang.mixin(grid.get("queryOptions"), preload.options);
 				preload.count -= count;
 				var beforeNode = preloadNode,
 					keepScrollTo, queryRowsOverlap = grid.queryRowsOverlap,
@@ -329,6 +335,7 @@ return declare([List, _StoreMixin], {
 							// all of the nodes were removed, can position wherever we want
 							preload.next.count += preload.count - offset;
 							preload.next.node.rowIndex = offset + count;
+							adjustHeight(preload.next);
 							preload.count = offset;
 							queryRowsOverlap = 0;
 						}else{
@@ -369,20 +376,15 @@ return declare([List, _StoreMixin], {
 							// if the preload area above the nodes is approximated based on average
 							// row height, we may need to adjust the scroll once they are filled in
 							// so we don't "jump" in the scrolling position
-							if(grid.scrollTo){ // TouchScroll is enabled
-								var pos = grid.getScrollPosition();
-								grid.scrollTo({
-									// Since we already had to query the scroll
-									// position, include x to avoid TouchScroll
-									// querying it again on its end.
-									x: pos.x,
-									y: pos.y + beforeNode.offsetTop - keepScrollTo,
-									// Don't kill momentum mid-scroll.
-									preserveMomentum: true
-								});
-							}else{
-								scrollNode.scrollTop += beforeNode.offsetTop - keepScrollTo;
-							}
+							var pos = grid.getScrollPosition();
+							grid.scrollTo({
+								// Since we already had to query the scroll position,
+								// include x to avoid TouchScroll querying it again on its end.
+								x: pos.x,
+								y: pos.y + beforeNode.offsetTop - keepScrollTo,
+								// Don't kill momentum mid-scroll (for TouchScroll only).
+								preserveMomentum: true
+							});
 						}
 						if(below){
 							// if it is below, we will use the total from the results to update
