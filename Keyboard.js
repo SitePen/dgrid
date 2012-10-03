@@ -33,7 +33,7 @@ function contains(parent, node){
 	}
 }
 
-return declare([List], {
+return declare(null, {
 	// summary:
 	//		Add keyboard navigation capability to a grid/list
 	pageSkip: 10,

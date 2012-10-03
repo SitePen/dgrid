@@ -96,7 +96,7 @@ define([
 		}
 	});
 	
-	var ColumnReorder = declare([], {
+	var ColumnReorder = declare(null, {
 		// summary:
 		//		Extension allowing reordering of columns in a grid via drag'n'drop.
 		//		Reordering of columns within the same subrow or columnset is also

@@ -2,7 +2,7 @@ define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/Deferred", "dojo/
 function(kernel, declare, Deferred, on, has, aspect, List, touchUtil, put){
 
 var ctrlEquiv = has("mac") ? "metaKey" : "ctrlKey";
-return declare([List], {
+return declare(null, {
 	// summary:
 	//		Add selection capabilities to a grid. The grid will have a selection property and
 	//		fire "dgrid-select" and "dgrid-deselect" events.

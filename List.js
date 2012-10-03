@@ -127,7 +127,7 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 		if(this._started){ this.resize(); }
 	};
 	
-	return declare(TouchScroll ? [TouchScroll] : [], {
+	return declare(TouchScroll ? TouchScroll : null, {
 		tabableHeader: false,
 		// showHeader: Boolean
 		//		Whether to render header (sub)rows.
