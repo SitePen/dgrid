@@ -39,16 +39,17 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 		_total: 0,
 		
 		buildRendering: function(){
-			var grid = this;
-			
 			this.inherited(arguments);
 			
 			// add pagination to footer
-			var paginationNode = this.paginationNode =
+			var grid = this,
+				paginationNode = this.paginationNode =
 					put(this.footerNode, "div.dgrid-pagination"),
 				statusNode = this.paginationStatusNode =
 					put(paginationNode, "div.dgrid-status"),
-				pageSizeOptions = this.pageSizeOptions;
+				pageSizeOptions = this.pageSizeOptions,
+				i18n = this.i18nPagination,
+				navigationNode, node;
 			
 			statusNode.tabIndex = 0;
 			
@@ -66,42 +67,36 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 			
 			// initialize some content into paginationStatusNode, to ensure
 			// accurate results on initial resize call
-			statusNode.innerHTML = string.substitute(this.i18nPagination.status,
+			statusNode.innerHTML = string.substitute(i18n.status,
 				{ start: 1, end: 1, total: 0 });
 			
-			var navigationNode = this.paginationNavigationNode =
-					put(paginationNode, "div.dgrid-navigation"),
-				currentPage = this._currentPage,
-				previousNextLinks = this.previousNextLinks,
-				pagingLinks = this.pagingLinks,
-				end = this._total / this.rowsPerPage,
-				pagingTextBoxHandle = this._pagingTextBoxHandle,
-				node;
+			navigationNode = this.paginationNavigationNode =
+				put(paginationNode, "div.dgrid-navigation");
 			
 			if(this.firstLastArrows){
 				// create a first-page link
 				node = put(navigationNode,  "a[href=javascript:].dgrid-first", "«");
-				node.setAttribute("aria-label", this.i18nPagination.gotoFirst);
+				node.setAttribute("aria-label", i18n.gotoFirst);
 			}
 			if(this.previousNextArrows){
 				// create a previous link
 				node = put(navigationNode,  "a[href=javascript:].dgrid-previous", "‹");
-				node.setAttribute("aria-label", this.i18nPagination.gotoPrev);
+				node.setAttribute("aria-label", i18n.gotoPrev);
 			}
 			
 			this.paginationLinksNode = put(navigationNode, "span.dgrid-pagination-links");
 			if(this.previousNextArrows){
 				// create a next link
 				node = put(navigationNode, "a[href=javascript:].dgrid-next", "›");
-				node.setAttribute("aria-label", this.i18nPagination.gotoNext);
+				node.setAttribute("aria-label", i18n.gotoNext);
 			}
 			if(this.firstLastArrows){
 				// create a last-page link
 				node = put(navigationNode,  "a[href=javascript:].dgrid-last", "»");
-				node.setAttribute("aria-label", this.i18nPagination.gotoLast);
+				node.setAttribute("aria-label", i18n.gotoLast);
 			}
 			
-			on(navigationNode, "a:click", function(evt){
+			on(navigationNode, "a:click", function(){
 				var cls = this.className,
 					curr, max;
 				
@@ -115,15 +110,14 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 				// determine navigation target based on clicked link's class
 				if(cls == "dgrid-page-link"){
 					grid.gotoPage(+this.innerHTML, true); // the innerHTML has the page number
-				}
-				if(cls == "dgrid-first"){
+				}else if(cls == "dgrid-first"){
 					grid.gotoPage(1);
-				}else if(cls == "dgrid-previous" && curr > 1){
-					grid.gotoPage(curr - 1);
-				}else if(cls == "dgrid-next" && curr < max){
-					grid.gotoPage(curr + 1);
 				}else if(cls == "dgrid-last"){
 					grid.gotoPage(max);
+				}else if(cls == "dgrid-previous"){
+					grid.gotoPage(curr - 1);
+				}else if(cls == "dgrid-next"){
+					grid.gotoPage(curr + 1);
 				}
 			});
 			
@@ -133,6 +127,7 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 			//		Update status and navigation controls based on total count from query
 			
 			var grid = this,
+				i18n = this.i18nPagination,
 				linksNode = this.paginationLinksNode,
 				currentPage = this._currentPage,
 				pagingLinks = this.pagingLinks,
@@ -145,8 +140,8 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 				if(grid.pagingTextBox && page == currentPage){
 					// use a paging text box if enabled instead of just a number
 					link = put(linksNode, 'input.dgrid-page-input[type=text][value=$]', currentPage);
-					link.setAttribute("aria-label", grid.i18nPagination.jumpPage);
-					grid._pagingTextBoxHandle = on(link, "change", function(evt){
+					link.setAttribute("aria-label", i18n.jumpPage);
+					grid._pagingTextBoxHandle = on(link, "change", function(){
 						var value = +this.value;
 						if(!isNaN(value) && value > 0 && value <= end){
 							grid.gotoPage(+this.value, true);
@@ -157,7 +152,7 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 					link = put(linksNode,
 						'a[href=javascript:]' + (page == currentPage ? '.dgrid-page-disabled' : '') + '.dgrid-page-link',
 						page);
-					link.setAttribute("aria-label", grid.i18nPagination.gotoPage);
+					link.setAttribute("aria-label", i18n.gotoPage);
 				}
 				if(page == currentPage && focusLink){
 					// focus on it if we are supposed to retain the focus
@@ -241,14 +236,14 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 				// Run new query and pass it into renderArray
 				results = grid.store.query(grid.query, options);
 				
-				return Deferred.when(grid.renderArray(results, loadingNode, options), function(trs){
+				return Deferred.when(grid.renderArray(results, loadingNode, options), function(){
 					put(loadingNode, "!");
 					delete grid._isLoading;
-					// reset scroll position now that new page is loaded
-					grid.bodyNode.scrollTop = 0;
+					// Reset scroll Y-position now that new page is loaded.
+					grid.scrollTo({ y: 0 });
 					
 					Deferred.when(results.total, function(total){
-						// update status text based on now-current page and total
+						// Update status text based on now-current page and total.
 						grid.paginationStatusNode.innerHTML = string.substitute(grid.i18nPagination.status, {
 							start: Math.min(start + 1, total),
 							end: Math.min(total, start + count),
@@ -258,7 +253,7 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 						grid._currentPage = page;
 						
 						// It's especially important that _updateNavigation is called only
-						// after renderArray is resolved as well (to prevent jumping)
+						// after renderArray is resolved as well (to prevent jumping).
 						grid._updateNavigation(focusLink);
 					});
 					
