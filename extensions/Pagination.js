@@ -2,7 +2,7 @@ define(["../_StoreMixin", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/D
 	"dojo/on", "dojo/query", "dojo/string", "dojo/has", "put-selector/put", "dojo/i18n!./nls/pagination",
 	"dojo/_base/sniff", "xstyle/css!../css/extensions/Pagination.css"],
 function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n){
-	return declare([_StoreMixin], {
+	return declare(_StoreMixin, {
 		// summary:
 		//		An extension for adding discrete pagination to a List or Grid.
 		
@@ -28,6 +28,11 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 		//		This provides options for different page sizes in a drop-down.
 		//		If it is empty (default), no page size drop-down will be displayed.
 		pageSizeOptions: [],
+
+		// i18nPagination: Object
+		//		This object contains all of the internationalized strings as
+		//		key/value pairs.
+		i18nPagination: i18n,
 		
 		showFooter: true,
 		_currentPage: 1,
@@ -61,7 +66,7 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 			
 			// initialize some content into paginationStatusNode, to ensure
 			// accurate results on initial resize call
-			statusNode.innerHTML = string.substitute(i18n.status,
+			statusNode.innerHTML = string.substitute(this.i18nPagination.status,
 				{ start: 1, end: 1, total: 0 });
 			
 			var navigationNode = this.paginationNavigationNode =
@@ -76,24 +81,24 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 			if(this.firstLastArrows){
 				// create a first-page link
 				node = put(navigationNode,  "a[href=javascript:].dgrid-first", "«");
-				node.setAttribute("aria-label", i18n.gotoFirst);
+				node.setAttribute("aria-label", this.i18nPagination.gotoFirst);
 			}
 			if(this.previousNextArrows){
 				// create a previous link
 				node = put(navigationNode,  "a[href=javascript:].dgrid-previous", "‹");
-				node.setAttribute("aria-label", i18n.gotoPrev);
+				node.setAttribute("aria-label", this.i18nPagination.gotoPrev);
 			}
 			
 			this.paginationLinksNode = put(navigationNode, "span.dgrid-pagination-links");
 			if(this.previousNextArrows){
 				// create a next link
 				node = put(navigationNode, "a[href=javascript:].dgrid-next", "›");
-				node.setAttribute("aria-label", i18n.gotoNext);
+				node.setAttribute("aria-label", this.i18nPagination.gotoNext);
 			}
 			if(this.firstLastArrows){
 				// create a last-page link
 				node = put(navigationNode,  "a[href=javascript:].dgrid-last", "»");
-				node.setAttribute("aria-label", i18n.gotoLast);
+				node.setAttribute("aria-label", this.i18nPagination.gotoLast);
 			}
 			
 			on(navigationNode, "a:click", function(evt){
@@ -113,10 +118,10 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 				}
 				if(cls == "dgrid-first"){
 					grid.gotoPage(1);
-				}else if(cls == "dgrid-previous"){
-					if(curr > 1){ grid.gotoPage(curr - 1); }
-				}else if(cls == "dgrid-next"){
-					if(curr < max){ grid.gotoPage(curr + 1); }
+				}else if(cls == "dgrid-previous" && curr > 1){
+					grid.gotoPage(curr - 1);
+				}else if(cls == "dgrid-next" && curr < max){
+					grid.gotoPage(curr + 1);
 				}else if(cls == "dgrid-last"){
 					grid.gotoPage(max);
 				}
@@ -140,7 +145,7 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 				if(grid.pagingTextBox && page == currentPage){
 					// use a paging text box if enabled instead of just a number
 					link = put(linksNode, 'input.dgrid-page-input[type=text][value=$]', currentPage);
-					link.setAttribute("aria-label", i18n.jumpPage);
+					link.setAttribute("aria-label", grid.i18nPagination.jumpPage);
 					grid._pagingTextBoxHandle = on(link, "change", function(evt){
 						var value = +this.value;
 						if(!isNaN(value) && value > 0 && value <= end){
@@ -152,7 +157,7 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 					link = put(linksNode,
 						'a[href=javascript:]' + (page == currentPage ? '.dgrid-page-disabled' : '') + '.dgrid-page-link',
 						page);
-					link.setAttribute("aria-label", i18n.gotoPage);
+					link.setAttribute("aria-label", grid.i18nPagination.gotoPage);
 				}
 				if(page == currentPage && focusLink){
 					// focus on it if we are supposed to retain the focus
@@ -244,7 +249,7 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 					
 					Deferred.when(results.total, function(total){
 						// update status text based on now-current page and total
-						grid.paginationStatusNode.innerHTML = string.substitute(i18n.status, {
+						grid.paginationStatusNode.innerHTML = string.substitute(grid.i18nPagination.status, {
 							start: Math.min(start + 1, total),
 							end: Math.min(total, start + count),
 							total: total
