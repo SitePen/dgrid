@@ -1,5 +1,5 @@
-define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/on"],
-function(kernel, declare, lang, Deferred, listen){
+define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/on", "put-selector/put"],
+function(kernel, declare, lang, Deferred, listen, put){
 	// This module isolates the base logic required by store-aware list/grid
 	// components, e.g. OnDemandList/Grid and the Pagination extension.
 	
@@ -259,6 +259,26 @@ function(kernel, declare, lang, Deferred, listen){
 			
 			// wrap in when call to handle reporting of potential async error
 			return Deferred.when(result, null, lang.hitch(this, emitError));
+		},
+		newRow: function(){
+			// override to remove no data message when a new row appears
+			if(this.noDataDiv){
+				put(this.noDataDiv, "!");
+				delete this.noDataDiv;
+			}
+			return this.inherited(arguments);
+		},
+		removeRow: function(rowElement, justCleanup){
+			var row = {element: rowElement};
+			// check to see if we are now empty
+			if(!justCleanup && this.noDataMessage &&
+					(this.up(row).element == rowElement) &&
+					(this.down(row).element == rowElement)){
+				// now empty, show the no data message
+				this.noDataDiv = put(this.contentNode, "div.dgrid-no-data");
+				this.noDataDiv.innerHTML = this.noDataMessage;
+			}
+			return this.inherited(arguments);
 		}
 	});
 });
