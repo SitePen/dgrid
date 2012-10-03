@@ -21,6 +21,9 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
     a column is reordered via drag'n'drop.  Note that this event always reports
     a `parentType` of `"dnd"` (there is no way to trigger this event directly
     from an API call).
+* The `Pagination` extension now exposes and references its i18n strings via the
+    `i18nPagination` instance property, allowing these strings to be overridden.
+    (#225)
 
 ## Other changes and fixes
 
