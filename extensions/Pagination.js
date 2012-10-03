@@ -241,8 +241,11 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 					delete grid._isLoading;
 					// reset scroll position now that new page is loaded
 					grid.bodyNode.scrollTop = 0;
-					
 					Deferred.when(results.total, function(total){
+						if(!total){
+							put(grid.contentNode, "div.dgrid-no-data").innerHTML = grid.noDataMessage;
+						}
+
 						// update status text based on now-current page and total
 						grid.paginationStatusNode.innerHTML = string.substitute(i18n.status, {
 							start: Math.min(start + 1, total),
