@@ -2,7 +2,7 @@ define(["../_StoreMixin", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/D
 	"dojo/on", "dojo/query", "dojo/string", "dojo/has", "put-selector/put", "dojo/i18n!./nls/pagination",
 	"dojo/_base/sniff", "xstyle/css!../css/extensions/Pagination.css"],
 function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n){
-	return declare([_StoreMixin], {
+	return declare(_StoreMixin, {
 		// summary:
 		//		An extension for adding discrete pagination to a List or Grid.
 		
@@ -118,10 +118,10 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 				}
 				if(cls == "dgrid-first"){
 					grid.gotoPage(1);
-				}else if(cls == "dgrid-previous"){
-					if(curr > 1){ grid.gotoPage(curr - 1); }
-				}else if(cls == "dgrid-next"){
-					if(curr < max){ grid.gotoPage(curr + 1); }
+				}else if(cls == "dgrid-previous" && curr > 1){
+					grid.gotoPage(curr - 1);
+				}else if(cls == "dgrid-next" && curr < max){
+					grid.gotoPage(curr + 1);
 				}else if(cls == "dgrid-last"){
 					grid.gotoPage(max);
 				}
