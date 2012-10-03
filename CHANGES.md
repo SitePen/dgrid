@@ -17,6 +17,10 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
     * `parentType`: If the event was fired in direct response to another event,
         this property reflects the type of the originating event.  If the event
         was fired due to a direct API call, `parentType` will not be defined.
+* The `ColumnReorder` extension now fires a `dgrid-columnreorder` event when
+    a column is reordered via drag'n'drop.  Note that this event always reports
+    a `parentType` of `"dnd"` (there is no way to trigger this event directly
+    from an API call).
 
 ## Other changes and fixes
 

@@ -74,7 +74,9 @@ define([
 					subRow: newSubRow,
 					column: columns[nodes[0].columnId],
 					bubbles: true,
-					cancelable: true
+					cancelable: true,
+					// Set parentType to indicate this is the result of user interaction.
+					parentType: "dnd"
 				};
 				// Set columnSets or subRows depending on which the grid is using.
 				eventObject[structureProperty] = grid[structureProperty];
