@@ -9,6 +9,10 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
     now report either a `row` or `cell` object, depending on whether
     `cellNavigation` is `false` or `true`, respectively.  (Formerly these events
     always contained a `cell` property pointing to the DOM node that fired the event.)
+* Several mixin and extension modules have had their `declare` hierarchies
+    simplified under the expectation that they will always be mixed in as
+    documented, and never be instantiated directly.  To be clear, this will not
+    break any code that is written as prescribed by the documentation.
 
 ## Significant changes
 
