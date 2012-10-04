@@ -623,8 +623,9 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			//		If true, rows that are currently hidden (i.e. children of
 			//		collapsed tree rows) will not be counted in the traversal.
 			// returns:
-			//		The appropriate row, or undefined if one does not exist the
-			//		given number of steps away.
+			//		A row object representing the appropriate row.  If the top of the
+			//		list is reached before the given number of steps, the first row will
+			//		be returned.
 			return this.row(this._move(row, -(steps || 1), "dgrid-row", visible));
 		},
 		down: function(row, steps, visible){
@@ -639,8 +640,9 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			//		If true, rows that are currently hidden (i.e. children of
 			//		collapsed tree rows) will not be counted in the traversal.
 			// returns:
-			//		The appropriate row, or undefined if one does not exist the
-			//		given number of steps away.
+			//		A row object representing the appropriate row.  If the bottom of the
+			//		list is reached before the given number of steps, the last row will
+			//		be returned.
 			return this.row(this._move(row, steps || 1, "dgrid-row", visible));
 		},
 		
