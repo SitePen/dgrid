@@ -37,7 +37,8 @@ function(kernel, declare, lang, Deferred, listen, put){
 		getBeforePut: true,
 		
 		// noDataMessage: String
-		//		Message to be displayed when no results exist for a query.
+		//		Message to be displayed when no results exist for a query, whether at
+		//		the time of the initial query or upon subsequent observed changes.
 		//		Defined by _StoreMixin, but to be implemented by subclasses.
 		noDataMessage: "",
 		
