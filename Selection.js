@@ -141,7 +141,7 @@ return declare(null, {
 			grid._handleSelect(event, this);
 		}
 		
-		if(touchUtil){
+		if(has("touch")){
 			// listen for touch taps if available
 			on(this.contentNode, touchUtil.selector(selector, touchUtil.tap), function(evt){
 				grid._handleSelect(evt, this);
