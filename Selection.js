@@ -184,7 +184,14 @@ return declare(null, {
 		var grid = this,
 			event = "dgrid-" + (value ? "select" : "deselect"),
 			rows = this[event], // current event queue (actually cells for CellSelection)
-			triggerEvent = grid._selectionTriggerEvent;
+			trigger = this._selectionTriggerEvent;
+		
+		if (trigger) {
+			// If selection was triggered by another event, we want to know its type
+			// to report later.  Grab it ahead of the timeout to avoid
+			// "member not found" errors in IE < 9.
+			trigger = trigger.type;
+		}
 		
 		if(rows){ return rows; } // return existing queue, allowing to push more
 		
@@ -197,9 +204,7 @@ return declare(null, {
 				bubbles: true,
 				grid: grid
 			};
-			if(triggerEvent && triggerEvent.type){
-				eventObject.parentType = triggerEvent.type;
-			}
+			if(trigger){ eventObject.parentType = trigger; }
 			eventObject[type] = rows;
 			on.emit(grid.contentNode, event, eventObject);
 			rows = null;
