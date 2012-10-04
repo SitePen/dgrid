@@ -79,13 +79,13 @@ return declare(null, {
 				if(lastRow == row){
 					if(ctrlKey){
 						// allow deselection even within single select mode
-						this.select(row, null, null);
+						this.clearSelection(undefined, false);
 					}
 				}else{
 					this.clearSelection();
 					this.select(row);
+				         this._lastSelected = row;
 				}
-				this._lastSelected = row;
 			}else if(this.selection[rowObj.id] && !event.shiftKey && event.type == "mousedown"){
 				// we wait for the mouse up if we are clicking a selected item so that drag n' drop
 				// is possible without losing our selection
