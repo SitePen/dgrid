@@ -612,9 +612,35 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 		
 		_move: move,
 		up: function(row, steps, visible){
+			// summary:
+			//		Returns the row that is the given number of steps (1 by default)
+			//		above the row represented by the given object.
+			// row:
+			//		The row to navigate upward from.
+			// steps:
+			//		Number of steps to navigate up from the given row; default is 1.
+			// visible:
+			//		If true, rows that are currently hidden (i.e. children of
+			//		collapsed tree rows) will not be counted in the traversal.
+			// returns:
+			//		The appropriate row, or undefined if one does not exist the
+			//		given number of steps away.
 			return this.row(move(row, -(steps || 1), "dgrid-row", visible));
 		},
 		down: function(row, steps, visible){
+			// summary:
+			//		Returns the row that is the given number of steps (1 by default)
+			//		below the row represented by the given object.
+			// row:
+			//		The row to navigate downward from.
+			// steps:
+			//		Number of steps to navigate down from the given row; default is 1.
+			// visible:
+			//		If true, rows that are currently hidden (i.e. children of
+			//		collapsed tree rows) will not be counted in the traversal.
+			// returns:
+			//		The appropriate row, or undefined if one does not exist the
+			//		given number of steps away.
 			return this.row(move(row, steps || 1, "dgrid-row", visible));
 		},
 		
