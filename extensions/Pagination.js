@@ -237,6 +237,10 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 				results = grid.store.query(grid.query, options);
 				
 				return Deferred.when(grid.renderArray(results, loadingNode, options), function(){
+					if(!total){
+						grid.noDataDiv = put(grid.contentNode, "div.dgrid-no-data");
+						grid.noDataDiv.innerHTML = grid.noDataMessage;
+					}
 					put(loadingNode, "!");
 					delete grid._isLoading;
 					// Reset scroll Y-position now that new page is loaded.
