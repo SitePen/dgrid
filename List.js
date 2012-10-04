@@ -587,28 +587,36 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 		
 		_move: function(item, steps, targetClass, visible){
 			var nextSibling, current, element;
+			// Start at the element indicated by the provided row or cell object.
 			element = current = item.element;
 			steps = steps || 1;
+			
 			do{
-				// move in the correct direction
-				if((nextSibling = current[steps < 0 ? 'previousSibling' : 'nextSibling'])){
+				// Outer loop: move in the appropriate direction.
+				if((nextSibling = current[steps < 0 ? "previousSibling" : "nextSibling"])){
 					do{
+						// Inner loop: advance, and dig into children if applicable.
 						current = nextSibling;
-						if(((current && current.className) + ' ').indexOf(targetClass + ' ') > -1){
-							// it's an element with the correct class name, counts as a real move
+						if(current && (current.className + " ").indexOf(targetClass + " ") > -1){
+							// Element with the appropriate class name; count step, stop digging.
 							element = current;
 							steps += steps < 0 ? 1 : -1;
 							break;
 						}
 						// If the next sibling isn't a match, drill down to search, unless
 						// visible is true and children are hidden.
-					}while((nextSibling = (!visible || !current.hidden) && current[steps < 0 ? 'lastChild' : 'firstChild']));
-				}else if((current = current.parentNode) === this.bodyNode || current === this.headerNode){
-					// Break out if we step out of the navigation area entirely.
-					break;
+					}while((nextSibling = (!visible || !current.hidden) && current[steps < 0 ? "lastChild" : "firstChild"]));
+				}else{
+					current = current.parentNode;
+					if(current === this.bodyNode || current === this.headerNode){
+						// Break out if we step out of the navigation area entirely.
+						break;
+					}
 				}
 			}while(steps);
-			return element;		
+			// Return the final element we arrived at, which might still be the
+			// starting element if we couldn't navigate further in that direction.
+			return element;
 		},
 		
 		up: function(row, steps, visible){
