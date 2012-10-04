@@ -116,8 +116,8 @@ return declare([List, _StoreMixin], {
 				var trCount = trs.length;
 				total = total || trCount;
 				if(!total){
-					self.noDataDiv = put(self.contentNode, "div.dgrid-no-data");
-					self.noDataDiv.innerHTML = self.noDataMessage;
+					self.noDataNode = put(self.contentNode, "div.dgrid-no-data");
+					self.noDataNode.innerHTML = self.noDataMessage;
 				}
 				var height = 0;
 				for(var i = 0; i < trCount; i++){

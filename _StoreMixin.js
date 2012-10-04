@@ -260,23 +260,24 @@ function(kernel, declare, lang, Deferred, listen, put){
 			// wrap in when call to handle reporting of potential async error
 			return Deferred.when(result, null, lang.hitch(this, emitError));
 		},
+		
 		newRow: function(){
-			// override to remove no data message when a new row appears
-			if(this.noDataDiv){
-				put(this.noDataDiv, "!");
-				delete this.noDataDiv;
+			// Override to remove no data message when a new row appears.
+			if(this.noDataNode){
+				put(this.noDataNode, "!");
+				delete this.noDataNode;
 			}
 			return this.inherited(arguments);
 		},
 		removeRow: function(rowElement, justCleanup){
 			var row = {element: rowElement};
-			// check to see if we are now empty
+			// Check to see if we are now empty...
 			if(!justCleanup && this.noDataMessage &&
-					(this.up(row).element == rowElement) &&
-					(this.down(row).element == rowElement)){
-				// now empty, show the no data message
-				this.noDataDiv = put(this.contentNode, "div.dgrid-no-data");
-				this.noDataDiv.innerHTML = this.noDataMessage;
+					(this.up(row).element === rowElement) &&
+					(this.down(row).element === rowElement)){
+				// ...we are empty, so show the no data message.
+				this.noDataNode = put(this.contentNode, "div.dgrid-no-data");
+				this.noDataNode.innerHTML = this.noDataMessage;
 			}
 			return this.inherited(arguments);
 		}
