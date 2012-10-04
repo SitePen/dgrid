@@ -54,31 +54,6 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 		return document.getElementById(id);
 	}
 
-	function move(item, steps, targetClass, visible){
-		var nextSibling, current, element;
-		element = current = item.element;
-		steps = steps || 1;
-		do{
-			// move in the correct direction
-			if(nextSibling = current[steps < 0 ? 'previousSibling' : 'nextSibling']){
-				do{
-					current = nextSibling;
-					if(((current && current.className) + ' ').indexOf(targetClass + ' ') > -1){
-						// it's an element with the correct class name, counts as a real move
-						element = current;
-						steps += steps < 0 ? 1 : -1;
-						break;
-					}
-					// if the next sibling isn't a match, drill down to search
-				}while(nextSibling = (!visible || !current.hidden) && current[steps < 0 ? 'lastChild' : 'firstChild']);
-			}else if((current = current.parentNode) == this.domNode || (current.className + ' ').indexOf("dgrid-row ") > -1){ // intentional assignment
-				// we stepped all the way out of the grid, given up now
-				break;
-			}
-		}while(steps);
-		return element;		
-	}
-	
 	// var and function for autogenerating ID when one isn't provided
 	var autogen = 0;
 	function generateId(){
@@ -610,7 +585,32 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			};
 		},
 		
-		_move: move,
+		_move: function(item, steps, targetClass, visible){
+			var nextSibling, current, element;
+			element = current = item.element;
+			steps = steps || 1;
+			do{
+				// move in the correct direction
+				if((nextSibling = current[steps < 0 ? 'previousSibling' : 'nextSibling'])){
+					do{
+						current = nextSibling;
+						if(((current && current.className) + ' ').indexOf(targetClass + ' ') > -1){
+							// it's an element with the correct class name, counts as a real move
+							element = current;
+							steps += steps < 0 ? 1 : -1;
+							break;
+						}
+						// If the next sibling isn't a match, drill down to search, unless
+						// visible is true and children are hidden.
+					}while((nextSibling = (!visible || !current.hidden) && current[steps < 0 ? 'lastChild' : 'firstChild']));
+				}else if((current = current.parentNode) === this.bodyNode || current === this.headerNode){
+					// Break out if we step out of the navigation area entirely.
+					break;
+				}
+			}while(steps);
+			return element;		
+		},
+		
 		up: function(row, steps, visible){
 			// summary:
 			//		Returns the row that is the given number of steps (1 by default)
@@ -625,7 +625,7 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			// returns:
 			//		The appropriate row, or undefined if one does not exist the
 			//		given number of steps away.
-			return this.row(move(row, -(steps || 1), "dgrid-row", visible));
+			return this.row(this._move(row, -(steps || 1), "dgrid-row", visible));
 		},
 		down: function(row, steps, visible){
 			// summary:
@@ -641,7 +641,7 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			// returns:
 			//		The appropriate row, or undefined if one does not exist the
 			//		given number of steps away.
-			return this.row(move(row, steps || 1, "dgrid-row", visible));
+			return this.row(this._move(row, steps || 1, "dgrid-row", visible));
 		},
 		
 		scrollTo: TouchScroll ? function(){
