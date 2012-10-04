@@ -654,7 +654,7 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			return this.row(this._move(row, steps || 1, "dgrid-row", visible));
 		},
 		
-		scrollTo: TouchScroll ? function(){
+		scrollTo: has("touch") ? function(){
 			// If TouchScroll is the superclass, defer to its implementation.
 			return this.inherited(arguments);
 		} : function(options){
@@ -667,7 +667,7 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			}
 		},
 		
-		getScrollPosition: TouchScroll ? function(){
+		getScrollPosition: has("touch") ? function(){
 			// If TouchScroll is the superclass, defer to its implementation.
 			return this.inherited(arguments);
 		} : function(){
