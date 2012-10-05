@@ -415,7 +415,7 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			if(results.observe){
 				// observe the results for changes
 				var observerIndex = this.observers.push(results.observe(function(object, from, to){
-					var firstRow;
+					var firstRow, nextNode;
 					// a change in the data took place
 					if(from > -1 && rows[from]){
 						// remove from old slot
@@ -436,8 +436,19 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 						}
 					}
 					if(to > -1){
-						// add to new slot (either before an existing row, or at the end)
-						row = self.newRow(object, rows[to] || (rows[to-1] && rows[to-1].nextSibling), to, options);
+						// Add to new slot (either before an existing row, or at the end)
+						// First determine the DOM node that this should be placed before.
+						nextNode = rows[to];
+						if(!nextNode){
+							nextNode = rows[to - 1];
+							if(nextNode){
+								// Make sure to skip connected nodes, so we don't accidentally
+								// insert a row in between a parent and its children.
+								nextNode = (nextNode.connected || nextNode).nextSibling;
+							}
+						}
+						row = self.newRow(object, nextNode, to, options);
+						
 						if(row){
 							row.observerIndex = observerIndex;
 							rows.splice(to, 0, row);
