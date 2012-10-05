@@ -49,7 +49,6 @@ return declare(null, {
 		
 		// Start selection fresh when switching mode.
 		this.clearSelection();
-		this._lastSelected = null;
 		
 		this.selectionMode = mode;
 	},
@@ -76,15 +75,13 @@ return declare(null, {
 				lastRow = this._lastSelected;
 			
 			if(mode == "single"){
-				if(lastRow == row){
-					if(ctrlKey){
-						// allow deselection even within single select mode
-						this.clearSelection(undefined, false);
-					}
+				if(lastRow === row){
+					// Allow ctrl to toggle selection, even within single select mode.
+					this.select(row, null, !ctrlKey || !this.isSelected(row));
 				}else{
 					this.clearSelection();
 					this.select(row);
-				         this._lastSelected = row;
+					this._lastSelected = row;
 				}
 			}else if(this.selection[rowObj.id] && !event.shiftKey && event.type == "mousedown"){
 				// we wait for the mouse up if we are clicking a selected item so that drag n' drop
