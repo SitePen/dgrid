@@ -21,9 +21,9 @@
 			var columns1, columns2;
 			require(["dojo/_base/lang", "dojo/_base/declare",
 				"dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Keyboard",
-				"dgrid/extensions/ColumnHider", "dgrid/extensions/ColumnResizer",
+				"dgrid/extensions/ColumnHider",
 				"dojo/store/Memory", "dojo/domReady!"],
-			function(lang, declare, Grid, Selection, Keyboard, ColumnHider, ColumnResizer, Memory){
+			function(lang, declare, Grid, Selection, Keyboard, ColumnHider, Memory){
 				var columns = {}, data = {id: "1"};
 
 				for (var i = 1; i <= 20; ++i) {

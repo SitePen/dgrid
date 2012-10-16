@@ -189,7 +189,6 @@ function(declare, has, listen, put){
 				// computed styles.
 				if (hiderMenuNode.offsetHeight > domNode.offsetHeight - 12) {
 					hiderMenuNode.style.height = (domNode.offsetHeight - 12) + "px";
-					console.log("Resized:", domNode.offsetHeight, hiderMenuNode.style.height);
 				}
 			}
 
