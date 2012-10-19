@@ -58,7 +58,7 @@ function(has){
 		var style = testDiv.style, left, prefix;
 		
 		// apply csstransforms3d class to test transform-3d media queries
-		testDiv.className = "csstransforms3d";
+		testDiv.className = "has-csstransforms3d";
 		// add to body to allow measurement
 		document.body.appendChild(testDiv);
 		left = testDiv.offsetLeft;
