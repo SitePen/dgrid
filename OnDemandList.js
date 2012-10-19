@@ -98,8 +98,11 @@ return declare([List, _StoreMixin], {
 		}else{
 			this.preload = preload;
 		}
-		var loadingNode = put(preloadNode, "-div.dgrid-loading");
-		put(loadingNode, "div.dgrid-below", this.loadingMessage);
+		
+		var loadingNode = put(preloadNode, "-div.dgrid-loading"),
+			innerNode = put(loadingNode, "div.dgrid-below");
+		innerNode.innerHTML = this.loadingMessage;
+		
 		// Establish query options, mixing in our own.
 		// (The getter returns a delegated object, so simply using mixin is safe.)
 		options = lang.mixin(this.get("queryOptions"), options, 
@@ -353,8 +356,9 @@ return declare([List, _StoreMixin], {
 
 				adjustHeight(preload);
 				// create a loading node as a placeholder while the data is loaded
-				var loadingNode = put(beforeNode, "-div.dgrid-loading[style=height:" + count * grid.rowHeight + "px]");
-				put(loadingNode, "div.dgrid-" + (below ? "below" : "above"), grid.loadingMessage);
+				var loadingNode = put(beforeNode, "-div.dgrid-loading[style=height:" + count * grid.rowHeight + "px]"),
+					innerNode = put(loadingNode, "div.dgrid-" + (below ? "below" : "above"));
+				innerNode.innerHTML = grid.loadingMessage;
 				loadingNode.count = count;
 				// use the query associated with the preload node to get the next "page"
 				options.query = preload.query;
