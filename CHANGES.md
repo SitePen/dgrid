@@ -47,6 +47,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
     `250`. (#280)
 * The `OnDemandList` module's default value for `farOffRemoval` has been
     lowered from `10000` to `2000`.
+* The `loadingMessage` property (referenced by `OnDemandList` and the `Pagination`
+    extension) now supports HTML strings, like `noDataMessage` (#312)
 * The CSS for one of the `util/has-css3` module's tests has had its class renamed
     to prevent conflicting with users of Modernizr. (#313)
 
