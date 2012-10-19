@@ -38,6 +38,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
     outside the list/grid in question.
 * Fixed an issue in the observer code in `List` which could cause an updated
     row to render out-of-sequence when `tree` is used. (#154)
+* Fixed an issue that could cause old IE to throw errors due to an undefined
+    parameter to `insertBefore`. (#308)
 * The `_StoreMixin` module now shows/hides a node displaying `noDataMessage` in
     reaction to the last row being removed or first row being added. (#229)
 * The `OnDemandList` module now adheres more strictly to the `maxRowsPerPage`
@@ -45,6 +47,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
     `250`. (#280)
 * The `OnDemandList` module's default value for `farOffRemoval` has been
     lowered from `10000` to `2000`.
+* The CSS for one of the `util/has-css3` module's tests has had its class renamed
+    to prevent conflicting with users of Modernizr. (#313)
 
 ### Mixins
 
@@ -53,6 +57,9 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ### Extensions
 
+* The `ColumnHider` extension will now resize its popup element and enable
+    scrolling within it, in cases where its height would otherwise exceed the
+    that of the parent grid. (#311)
 * The `Pagination` extension now supports `noDataMessage` like `OnDemandList`. (#180)
 
 # 0.3.2
