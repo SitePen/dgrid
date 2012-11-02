@@ -196,7 +196,7 @@ return declare(null, {
 
 		// show resizer
 		if(!grid._resizer){
-			grid._resizer = put(grid.domNode.parentNode, "div.dgrid-column-resizer");
+			grid._resizer = put(grid.domNode, "+div.dgrid-column-resizer");
 		}
 
 		grid._resizer.style.display = "block";
