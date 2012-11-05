@@ -1,6 +1,16 @@
 This document outlines changes since 0.3.0.  For older changelogs, see the
 [dgrid wiki](https://github.com/SitePen/dgrid/wiki).
 
+# master (0.3.4-pre)
+
+### General/Core
+
+* The column plugins (`editor`, `selector`, and `tree`) can now be invoked without
+    a column definition object at all, if no properties need to be set.  This
+    is mostly useful for `selector`. (#324)
+* Fixed an issue with the `selector` plugin when a column definition lacks a
+    `label` property. (#324)
+
 # 0.3.3
 
 ## Breaking changes
