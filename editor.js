@@ -331,6 +331,8 @@ return function(column, editor, editOn){
 		listeners = [],
 		isWidget;
 	
+	if(!column){ column = {}; }
+	
 	// accept arguments as parameters to editor function, or from column def,
 	// but normalize to column def.
 	column.editor = editor = editor || column.editor || "text";
