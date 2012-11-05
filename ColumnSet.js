@@ -1,5 +1,9 @@
 define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/Deferred", "dojo/on", "dojo/aspect", "dojo/query", "dojo/has", "put-selector/put", "xstyle/has-class", "./Grid", "dojo/_base/sniff", "xstyle/css!./css/columnset.css"],
 function(kernel, declare, Deferred, listen, aspect, query, has, put, hasClass, Grid){
+	has.add('event-mousewheel', function(global, document, element){
+		return typeof element.onmousewheel !== 'undefined';
+	});
+
 	var colsetidAttr = "data-dgrid-column-set-id";
 	
 	hasClass("safari", "ie-7");
@@ -36,13 +40,70 @@ function(kernel, declare, Deferred, listen, aspect, query, has, put, hasClass, G
 			doAdjustScrollLeft();
 		}
 	}
-	
+
+	function scrollColumnSet(grid, columnSetNode, amount){
+		var id = columnSetNode.getAttribute(colsetidAttr),
+			scroller = grid._columnSetScrollers[id],
+			scrollLeft = scroller.scrollLeft + amount;
+
+		scroller.scrollLeft = scrollLeft < 0 ? 0 : scrollLeft;
+	}
+	var horizMouseWheel;
+	if(!has('touch')){
+		horizMouseWheel = function(grid){
+			if(has('event-mousewheel')){
+				return function(target, listener){
+					return listen(target, 'mousewheel', function(event){
+						var node = event.target;
+						// WebKit will invoke mousewheel handlers with an event target of a text
+						// node; check target and if it's not an element node, start one node higher
+						// in the tree
+						if(node.nodeType !== 1){
+							node = node.parentNode;
+						}
+						while(!query.matches(node, '.dgrid-column-set[' + colsetidAttr + ']', target)){
+							if(node === target || !(node = node.parentNode)){
+								return;
+							}
+						}
+						if(event.wheelDeltaX){
+							// only respond to horizontal movement
+							listener.call(null, grid, node, -event.wheelDeltaX);
+						}
+					});
+				};
+			}
+
+			return function(target, listener){
+				return listen(target, '.dgrid-column-set[' + colsetidAttr + ']:MozMousePixelScroll', function(event){
+					if(event.axis === 1){
+						// only respond to horizontal movement
+						listener.call(null, grid, this, event.detail);
+					}
+				});
+			};
+		};
+	}
+
 	return declare(null, {
 		// summary:
 		//		Provides column sets to isolate horizontal scroll of sets of 
 		//		columns from each other. This mainly serves the purpose of allowing for
 		//		column locking.
 		
+		postCreate: function(){
+			this.inherited(arguments);
+
+			if(horizMouseWheel){
+				this.on(horizMouseWheel(this), function(grid, colsetNode, amount){
+					var id = colsetNode.getAttribute(colsetidAttr),
+						scroller = grid._columnSetScrollers[id],
+						scrollLeft = scroller.scrollLeft + amount;
+
+					scroller.scrollLeft = scrollLeft < 0 ? 0 : scrollLeft;
+				});
+			}
+		},
 		columnSets: [],
 		createRowCells: function(tag, each){
 			var row = put("table.dgrid-row-table");
