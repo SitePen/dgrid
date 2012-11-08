@@ -243,10 +243,7 @@ return declare([List, _StoreMixin], {
 					preloadNode.style.height = (preloadNode.offsetHeight + reclaimedHeight) + "px";
 				}
 				// we remove the elements after expanding the preload node so that the contraction doesn't alter the scroll position
-				var trashBin = put("div");
-				for(var i = 0; i < toDelete.length; i++){
-					put(trashBin, toDelete[i]); // remove it from the DOM
-				}
+				var trashBin = put("div", toDelete);
 				setTimeout(function(){
 					// we can defer the destruction until later
 					put(trashBin, "!");
