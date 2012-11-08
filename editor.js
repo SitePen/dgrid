@@ -105,7 +105,7 @@ function setPropertyFromEditor(grid, column, cmp, triggerEvent) {
 
 // editor creation/hookup/placement logic
 
-function createEditor(column){
+function createEditor(column, object, value){
 	// Creates an editor instance based on column definition properties,
 	// and hooks up events.
 	var editor = column.editor,
@@ -116,8 +116,14 @@ function createEditor(column){
 	
 	args = column.editorArgs || {};
 	if(typeof args == "function"){ args = args.call(grid, column); }
+	args = lang.delegate(args);
 	
 	if(isWidget){
+		if(column.canEdit){
+			args = lang.delegate(args, {
+				readOnly: !column.canEdit(object, value)
+			});
+		}
 		cmp = new editor(args);
 		node = cmp.focusNode || cmp.domNode;
 		
@@ -393,7 +399,7 @@ return function(column, editor, editOn){
 		
 	} : function(object, value, cell, options){
 		// always-on: create editor immediately upon rendering each cell
-		var cmp = createEditor(column);
+		var cmp = createEditor(column, object, value);
 		
 		showEditor(cmp, column, cell, value);
 		
