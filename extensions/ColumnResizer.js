@@ -105,6 +105,15 @@ return declare(null, {
 
 		this.inherited(arguments);
 	},
+	_configColumn: function(column, columnId){
+		this.inherited(arguments);
+
+		// set the widths of columns from the column config
+		var width = column.width;
+		if(width != null){
+			this.resizeColumnWidth(columnId, width);
+		}
+	},
 	renderHeader: function(){
 		this.inherited(arguments);
 		
