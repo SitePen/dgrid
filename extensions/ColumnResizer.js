@@ -67,6 +67,32 @@ function subRowAssoc(subRows){
 	return associations;
 }
 
+function resizeColumnWidth(grid, colId, width, emitEvent){
+	// Keep track of old styles so we don't get a long list in the stylesheet
+	
+	// don't react to widths <= 0, e.g. for hidden columns
+	if(width <= 0){ return; }
+
+	var event = {
+		grid: grid,
+		columnId: colId,
+		width: width,
+		bubbles: true,
+		cancelable: true
+	};
+	if(!emitEvent || listen.emit(grid.headerNode, "dgrid-columnresize", event)){
+		width = (width !== "auto" ? (width + "px") : width) + ";";
+		var old = grid._columnStyles[colId],
+			x = grid.styleColumn(colId, "width: " + width);
+
+		old && old.remove();
+
+		// keep a reference for future removal
+		grid._columnStyles[colId] = x;
+		return true;
+	}
+}
+
 return declare(null, {
 	resizeNode: null,
 	minWidth: 40,	//minimum column width in px
@@ -80,19 +106,7 @@ return declare(null, {
 		//      column id
 		// width: Integer
 		//      new width of the column
-
-		// Keep track of old styles so we don't get a long list in the stylesheet
-		
-		// don't react to widths <= 0, e.g. for hidden columns
-		if(width <= 0){ return; }
-		
-		var old = this._columnStyles[colId],
-			x = this.styleColumn(colId, "width: " + width + "px;");
-		
-		old && old.remove();
-		
-		// keep a reference for future removal
-		this._columnStyles[colId] = x;
+		return resizeColumnWidth(this, colId, width);
 	},
 	
 	configStructure: function(){
@@ -259,22 +273,24 @@ return declare(null, {
 			lastCol = obj.lastColId,
 			lastColWidth = query(".dgrid-column-"+lastCol, this.headerNode)[0].offsetWidth;
 
-		if(cell.columnId != lastCol){
-			if(totalWidth + delta < this.gridWidth) {
-				//need to set last column's width to auto
-				this.styleColumn(lastCol, "width: auto;");
-			}else if(lastColWidth-delta <= this.minWidth) {
-				//change last col width back to px, unless it is the last column itself being resized...
-				this.resizeColumnWidth(lastCol, this.minWidth);
-			}
-		}
 		if(newWidth < this.minWidth){
 			//enforce minimum widths
 			newWidth = this.minWidth;
 		}
 
-		this.resizeColumnWidth(cell.columnId, newWidth);
-		this.resize();
+		if(resizeColumnWidth(this, cell.columnId, newWidth, true)){
+			if(cell.columnId != lastCol){
+				if(totalWidth + delta < this.gridWidth) {
+					//need to set last column's width to auto
+					resizeColumnWidth(this, lastCol, "auto", true);
+				}else if(lastColWidth-delta <= this.minWidth) {
+					//change last col width back to px, unless it is the last column itself being resized...
+					resizeColumnWidth(this, lastCol, this.minWidth, true);
+				}
+			}
+
+			this.resize();
+		}
 		this._hideResizer();
 	},
 	_updateResizerPosition: function(e){
