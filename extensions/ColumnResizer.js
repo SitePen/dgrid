@@ -129,7 +129,7 @@ return declare(null, {
 				col = grid.columns[id],
 				childNodes = colNode.childNodes;
 
-			if(!col){ continue; }
+			if(!col || (typeof col.resizable !== "undefined" && !col.resizable)){ continue; }
 
 			var headerTextNode = put("div.dgrid-resize-header-container");
 			colNode.contents = headerTextNode;
