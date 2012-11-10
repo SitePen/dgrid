@@ -67,7 +67,7 @@ function subRowAssoc(subRows){
 	return associations;
 }
 
-function resizeColumnWidth(grid, colId, width, emitEvent){
+function resizeColumnWidth(grid, colId, width, parentType){
 	// Keep track of old styles so we don't get a long list in the stylesheet
 	
 	// don't react to widths <= 0, e.g. for hidden columns
@@ -80,7 +80,10 @@ function resizeColumnWidth(grid, colId, width, emitEvent){
 		bubbles: true,
 		cancelable: true
 	};
-	if(!emitEvent || listen.emit(grid.headerNode, "dgrid-columnresize", event)){
+	if(parentType){
+		event.parentType = parentType;
+	}
+	if(listen.emit(grid.headerNode, "dgrid-columnresize", event)){
 		width = (width !== "auto" ? (width + "px") : width) + ";";
 		var old = grid._columnStyles[colId],
 			x = grid.styleColumn(colId, "width: " + width);
@@ -278,14 +281,14 @@ return declare(null, {
 			newWidth = this.minWidth;
 		}
 
-		if(resizeColumnWidth(this, cell.columnId, newWidth, true)){
+		if(resizeColumnWidth(this, cell.columnId, newWidth, e.type)){
 			if(cell.columnId != lastCol){
 				if(totalWidth + delta < this.gridWidth) {
 					//need to set last column's width to auto
-					resizeColumnWidth(this, lastCol, "auto", true);
+					resizeColumnWidth(this, lastCol, "auto", e.type);
 				}else if(lastColWidth-delta <= this.minWidth) {
 					//change last col width back to px, unless it is the last column itself being resized...
-					resizeColumnWidth(this, lastCol, this.minWidth, true);
+					resizeColumnWidth(this, lastCol, this.minWidth, e.type);
 				}
 			}
 

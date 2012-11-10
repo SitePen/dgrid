@@ -130,11 +130,12 @@
 					}, "gridPersist");
 
 					on(document.body, 'dgrid-columnresize', function(event){
-						console.log('Column "' + event.columnId + '" size changed: ' + event.width);
 						if(event.grid === window.gridPrevent && event.width > 200){
+							console.log('Column "' + event.columnId + '" size changed: ' + event.width);
 							event.preventDefault();
 						}
-						if(event.grid === window.gridPersist){
+						if(event.grid === window.gridPersist && event.parentType){
+							console.log('Column "' + event.columnId + '" size changed: ' + event.width);
 							columnWidths[event.columnId] = event.width;
 							cookie('columnWidths', JSON.stringify(columnWidths));
 						}
