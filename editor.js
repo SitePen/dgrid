@@ -79,7 +79,8 @@ function setProperty(grid, cellElement, oldValue, value, triggerEvent){
 					column.autoSave && setTimeout(function(){ grid._trackError("save"); }, 0);
 				}
 			}else{
-				// else keep the value the same
+				// Otherwise keep the value the same
+				// For the sake of always-on editors, need to manually reset the value
 				var cmp;
 				if(cmp = cellElement.widget){
 					// set _dgridIgnoreChange to prevent an infinite loop in the
@@ -91,6 +92,7 @@ function setProperty(grid, cellElement, oldValue, value, triggerEvent){
 				}else if(cmp = cellElement.input){
 					updateInputValue(cmp, oldValue);
 				}
+				
 				return oldValue;
 			}
 		}
