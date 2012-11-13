@@ -393,12 +393,14 @@ return function(column, editor, editOn){
 		
 	} : function(object, value, cell, options){
 		// always-on: create editor immediately upon rendering each cell
-		var cmp = createEditor(column);
-		
-		showEditor(cmp, column, cell, value);
-		
-		// Maintain reference for later use.
-		cell[isWidget ? "widget" : "input"] = cmp;
+		if(!column.canEdit || column.canEdit(object, value)){
+			var cmp = createEditor(column);
+			showEditor(cmp, column, cell, value);
+			// Maintain reference for later use.
+			cell[isWidget ? "widget" : "input"] = cmp;
+		}else{
+			return originalRenderCell.call(column, object, value, cell, options);
+		}
 	};
 	
 	return column;
