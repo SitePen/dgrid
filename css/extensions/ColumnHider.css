@@ -2,6 +2,10 @@
 	font-weight:normal;
 	cursor: pointer;
 }
+.dgrid-header-scroll.dgrid-noscrollbar {
+	width: 15px;
+	border-left: 1px solid #bbb;
+}
 .dgrid-hider-toggle:hover {
 	font-weight: bold;
 }
