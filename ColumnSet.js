@@ -3,6 +3,17 @@ function(kernel, declare, Deferred, listen, aspect, query, has, put, hasClass, G
 	has.add("event-mousewheel", function(global, document, element){
 		return typeof element.onmousewheel !== "undefined";
 	});
+	has.add("event-wheel", function(global, document, element){
+		var supported = false;
+		// From https://developer.mozilla.org/en-US/docs/Mozilla_event_reference/wheel
+		try{
+			WheelEvent("wheel");
+			supported = true;
+		}finally{
+			return supported;
+		}
+	});
+	console.log(has("event-mousewheel"), has("event-wheel"));
 
 	var colsetidAttr = "data-dgrid-column-set-id";
 	
@@ -51,10 +62,10 @@ function(kernel, declare, Deferred, listen, aspect, query, has, put, hasClass, G
 	
 	var horizMouseWheel;
 	if(!has("touch")){
-		horizMouseWheel = has("event-mousewheel") ? function(grid){
+		horizMouseWheel = has("event-mousewheel") || has("event-wheel") ? function(grid){
 			return function(target, listener){
-				return listen(target, "mousewheel", function(event){
-					var node = event.target;
+				return listen(target, has("event-wheel") ? "wheel" : "mousewheel", function(event){
+					var node = event.target, deltaX;
 					// WebKit will invoke mousewheel handlers with an event target of a text
 					// node; check target and if it's not an element node, start one node higher
 					// in the tree
@@ -66,9 +77,10 @@ function(kernel, declare, Deferred, listen, aspect, query, has, put, hasClass, G
 							return;
 						}
 					}
-					if(event.wheelDeltaX){
+					deltaX = -event.wheelDeltaX || event.deltaX;
+					if(deltaX){
 						// only respond to horizontal movement
-						listener.call(null, grid, node, -event.wheelDeltaX);
+						listener.call(null, grid, node, deltaX);
 					}
 				});
 			};
