@@ -77,7 +77,11 @@ function(kernel, declare, Deferred, listen, aspect, query, has, put, hasClass, G
 							return;
 						}
 					}
-					deltaX = -event.wheelDeltaX || event.deltaX;
+					
+					// Normalize reported delta value:
+					// wheelDeltaX (webkit, mousewheel) needs to be negated and divided by 3
+					// deltaX (FF17+, wheel) can be used exactly as-is
+					deltaX = event.deltaX || -event.wheelDeltaX / 3;
 					if(deltaX){
 						// only respond to horizontal movement
 						listener.call(null, grid, node, deltaX);
