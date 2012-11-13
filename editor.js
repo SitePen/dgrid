@@ -80,6 +80,17 @@ function setProperty(grid, cellElement, oldValue, value, triggerEvent){
 				}
 			}else{
 				// else keep the value the same
+				var cmp;
+				if(cmp = cellElement.widget){
+					// set _dgridIgnoreChange to prevent an infinite loop in the
+					// onChange handler and prevent dgrid-datachange from firing
+					// a second time
+					cmp._dgridIgnoreChange = true;
+					cmp.set("value", oldValue);
+					setTimeout(function(){ cmp._dgridIgnoreChange = false; }, 0);
+				}else if(cmp = cellElement.input){
+					updateInputValue(cmp, oldValue);
+				}
 				return oldValue;
 			}
 		}
