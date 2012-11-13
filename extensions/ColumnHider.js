@@ -124,7 +124,7 @@ function(declare, has, listen, put){
 				// Assume that if this plugin is used, then columns are hidable.
 				// Create the toggle node.
 				hiderToggleNode = this.hiderToggleNode =
-					put(this.headerScrollNode, "div.dgrid-hider-toggle.dgrid-cell-padding", "+");
+					put(this.headerScrollNode, "div.dgrid-hider-toggle.dgrid-cell-padding");
 
 				this._listeners.push(listen(hiderToggleNode, "click", function(e){
 					grid._toggleColumnHiderMenu(e);
