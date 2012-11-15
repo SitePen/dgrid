@@ -56,6 +56,9 @@ keyed by column IDs.
 
 ### Extensions
 
+* The `Pagination` extension now re-queries for the current page of data when
+    the grid is notified of a store modification which affects the number of
+    items currently rendered. (#283)
 * The `Pagination` extension now returns a promise from the `refresh` and
     `gotoPage` methods, which resolves when the grid finishes rendering results.
     Note that it does not (yet) emit an event like `OnDemandList`.

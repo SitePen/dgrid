@@ -464,7 +464,7 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 						options.count++;
 					}
 					from != to && firstRow && self.adjustRowIndices(firstRow);
-					self._onRowsNotification(rows)
+					self._onNotification(rows, object, from, to);
 				}, true)) - 1;
 			}
 			var rowsFragment = document.createDocumentFragment();
@@ -498,7 +498,10 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			return whenDone(rows);
 		},
 
-		_onRowsNotification: function(){
+		_onNotification: function(rows, object, from, to){
+			// summary:
+			//		Protected method called whenever a store notification is observed.
+			//		Intended to be extended as necessary by mixins/extensions.
 		},
 
 		renderHeader: function(){
