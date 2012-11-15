@@ -5,11 +5,21 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ### General/Core
 
+* Resolved an issue in `List` relating to scrolling and preload nodes. (#318, #323)
+
+### Mixins
+
+* The `ColumnSet` mixin now supports horizontal mousewheel events. (#239)
+
+### Column Plugins
+
 * The column plugins (`editor`, `selector`, and `tree`) can now be invoked without
     a column definition object at all, if no properties need to be set.  This
     is mostly useful for `selector`. (#324)
 * Fixed an issue with the `selector` plugin when a column definition lacks a
     `label` property. (#324)
+* Always-on editors now properly revert their values if the `dgrid-datachange`
+    event is canceled. (#252)
 
 # 0.3.3
 
