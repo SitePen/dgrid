@@ -464,6 +464,7 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 						options.count++;
 					}
 					from != to && firstRow && self.adjustRowIndices(firstRow);
+					self._onRowsNotification(rows)
 				}, true)) - 1;
 			}
 			var rowsFragment = document.createDocumentFragment();
@@ -496,7 +497,10 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			}
 			return whenDone(rows);
 		},
-		
+
+		_onRowsNotification: function(){
+		},
+
 		renderHeader: function(){
 			// no-op in a plain list
 		},

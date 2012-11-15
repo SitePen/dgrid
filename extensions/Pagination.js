@@ -202,7 +202,13 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 			// reset to first page
 			return this.gotoPage(1);
 		},
-		
+		_onRowsNotification: function(rows){
+			if(rows.length > this.rowsPerPage || // too many rows
+				(rows.length < this.rowsPerPage && // or not enough rows
+						this._currentPage < Math.ceil(this._total / this.rowsPerPage))){ // and we aren't the last page
+				this.gotoPage(this._currentPage);
+			}
+		},
 		gotoPage: function(page, focusLink){
 			// summary:
 			//		Loads the given page.  Note that page numbers start at 1.
@@ -222,10 +228,7 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 					r, loadingNode;
 				
 				// remove any currently-rendered rows
-				for(r in rows){
-					grid.row(r.substr(substrLen)).remove();
-				}
-				grid._rowIdToObject = {};
+				grid.cleanup();
 				contentNode.innerHTML = "";
 				
 				loadingNode = put(contentNode, "div.dgrid-loading");

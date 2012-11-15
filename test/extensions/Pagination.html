@@ -87,6 +87,7 @@
 					}, "grid2");
 					
 					window.gridfromhtml = new (declare([GridFromHtml, Keyboard, Selection, Pagination]))({
+						noDataMessage: "No data!",
 						store: testStore
 					}, "gridfromhtml");
 					
@@ -136,7 +137,8 @@
 			<button onclick="grid.set('columns', getColumns());">Original</button>
 			<button onclick="grid.set('store', emptyStore);">Set to empty store</button>
 			<button onclick="grid.set('store', testStore);">Set to original store</button>
-			<button onclick="testStore.add({col1:'new', col2:true});">Add row to original store</button>
+			<button onclick="testAsyncStore.remove(5);">Delete row 6 from original store</button>
+			<button onclick="testAsyncStore.add({col1:'new', col2:true});">Add row to original store</button>
 			<button onclick="grid.set('showFooter', !grid.get('showFooter'));">Toggle footer</button>
 		</div>
 		
