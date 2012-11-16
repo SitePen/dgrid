@@ -131,7 +131,8 @@
 
 					on(document.body, 'dgrid-columnresize', function(event){
 						var grid = event.grid;
-						console.log('grid ' + grid.id + ' Column "' + event.columnId + '" size changed: ' + event.width, event);
+						console.log('grid ' + grid.id + ' Column "' + event.columnId + '" size changed: ' + event.width +
+							(event.parentType ? " (triggered by " + event.parentType + ")" : ""));
 						if(grid === window.gridPrevent && event.width > 200){
 							event.preventDefault();
 						}
