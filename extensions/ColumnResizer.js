@@ -96,11 +96,57 @@ function resizeColumnWidth(grid, colId, width, parentType){
 	}
 }
 
+// Functions for shared resizer node
+
+var resizerNode, // DOM node for resize indicator, reused between instances
+	resizableCount = 0; // Number of ColumnResizer-enabled grid instances
+var resizer = {
+	// This object contains functions for manipulating the shared resizerNode
+	create: function(){
+		resizerNode = put("div.dgrid-column-resizer");
+	},
+	destroy: function(){
+		put(resizerNode, "!");
+		resizerNode = null;
+	},
+	show: function(grid){
+		var pos = geom.position(grid.domNode, true);
+		resizerNode.style.top = pos.y + "px";
+		resizerNode.style.height = pos.h + "px";
+		put(document.body, resizerNode);
+	},
+	move: function(x){
+		resizerNode.style.left = x + "px";
+	},
+	hide: function(){
+		resizerNode.parentNode.removeChild(resizerNode);
+	}
+};
+
 return declare(null, {
 	resizeNode: null,
 	minWidth: 40,	//minimum column width in px
 	gridWidth: null, //place holder for the grid width property
 	_resizedColumns: false, //flag that indicates if resizer has converted column widths to px
+	
+	buildRendering: function(){
+		this.inherited(arguments);
+		
+		// Create resizerNode when first grid w/ ColumnResizer is created
+		if(!resizableCount++){
+			resizer.create();
+		}
+	},
+	
+	destroy: function(){
+		this.inherited(arguments);
+		
+		// If this is the last grid on the page with ColumnResizer, destroy the
+		// shared resizerNode
+		if(!--resizableCount){
+			resizer.destroy();
+		}
+	},
 	
 	resizeColumnWidth: function(colId, width){
 		// Summary:
@@ -179,11 +225,11 @@ return declare(null, {
 					grid.mouseUpListen.resume();
 				}
 			);
-			grid.mouseMoveListen = listen.pausable(document.body,
+			grid.mouseMoveListen = listen.pausable(document,
 				"mousemove" + (has("touch") ? ",touchmove" : ""),
 				miscUtil.throttleDelayed(function(e){ grid._updateResizerPosition(e); })
 			);
-			grid.mouseUpListen = listen.pausable(document.body,
+			grid.mouseUpListen = listen.pausable(document,
 				"mouseup" + (has("touch") ? ",touchend" : ""),
 				function(e){
 					grid._resizeMouseUp(e);
@@ -207,38 +253,26 @@ return declare(null, {
 		// in all but IE < 9.  setSelectable works for those.
 		e.preventDefault();
 		dom.setSelectable(this.domNode, false);
-		var grid = this;
-		grid._startX = grid._getResizeMouseLocation(e); //position of the target
+		this._startX = this._getResizeMouseLocation(e); //position of the target
 		
-		// Grab the position of the grid within the body;  will be used to place the resizer in the correct place
-		// Since geom.position returns an incorrect "x" value (due to mobile zoom and getBoundingClientRect()),
-		// webkitConvertPointFromNodeToPage and WebKitPoint will provide a more accurate point
-		grid._gridX = hasPointFromNode ? 
-						webkitConvertPointFromNodeToPage(grid.bodyNode, new WebKitPoint(0, 0)).x : 
-						geom.position(grid.bodyNode).x;
-						
-		grid._targetCell = query(".dgrid-column-" + target.columnId, grid.headerNode)[0];
+		var pos = geom.position(this.bodyNode);
+		
+		this._targetCell = query(".dgrid-column-" + target.columnId, this.headerNode)[0];
 
-		// show resizer
-		if(!grid._resizer){
-			grid._resizer = put(grid.domNode, "div.dgrid-column-resizer");
-		}
-
-		grid._resizer.style.display = "block";
-		grid._updateResizerPosition(e);
+		// Show resizerNode after initializing its x position
+		this._updateResizerPosition(e);
+		resizer.show(this);
 	},
 	_resizeMouseUp: function(e){
 		// Summary:
 		//      called when mouse button is released
 		// e: Object
 		//      mouseup event object
-
-		this._readyToResize = false;
-
+		
 		//This is used to set all the column widths to a static size
 		if(!this._resizedColumns){
 			var colNodes = query(".dgrid-cell", this.headerNode);
-
+			
 			if(this.columnSets && this.columnSets.length){
 				colNodes = colNodes.filter(function(node){
 					var idx = node.columnId.split("-");
@@ -249,24 +283,24 @@ return declare(null, {
 					return node.columnId.charAt(0) == "0";
 				});
 			}
-
+			
 			// Get a set of sizes before we start mutating, to avoid
 			// weird disproportionate measures if the grid has set
 			// column widths, but no full grid width set
 			var colSizes = colNodes.map(function(colNode){
 				return colNode.offsetWidth;
 			});
-
+			
 			// Set a baseline size for each column based on
 			// its original measure
 			colNodes.forEach(function(colNode, i){
 				this.resizeColumnWidth(colNode.columnId, colSizes[i]);
 			}, this);
-
+			
 			this._resizedColumns = true;
 		}
 		dom.setSelectable(this.domNode, true);
-
+		
 		var cell = this._targetCell,
 			delta = this._getResizeMouseLocation(e) - this._startX, //final change in position of resizer
 			newWidth = cell.offsetWidth + delta, //the new width after resize
@@ -274,12 +308,12 @@ return declare(null, {
 			totalWidth = obj.totalWidth,
 			lastCol = obj.lastColId,
 			lastColWidth = query(".dgrid-column-"+lastCol, this.headerNode)[0].offsetWidth;
-
+		
 		if(newWidth < this.minWidth){
 			//enforce minimum widths
 			newWidth = this.minWidth;
 		}
-
+		
 		if(resizeColumnWidth(this, cell.columnId, newWidth, e.type)){
 			if(cell.columnId != lastCol){
 				if(totalWidth + delta < this.gridWidth) {
@@ -292,29 +326,31 @@ return declare(null, {
 				this.resize();
 			}
 		}
-		this._hideResizer();
+		resizer.hide();
+		
+		// Clean up after the resize operation
+		delete this._startX;
+		delete this._targetCell;
 	},
+	
 	_updateResizerPosition: function(e){
 		// Summary:
 		//      updates position of resizer bar as mouse moves
 		// e: Object
 		//      mousemove event object
 
+		if(!this._targetCell){ return; } // Release event was already processed
+		
 		var mousePos = this._getResizeMouseLocation(e),
 			delta = mousePos - this._startX, //change from where user clicked to where they drag
-			cell = this._targetCell,
-			left = mousePos - this._gridX;
-		if(cell.offsetWidth + delta < this.minWidth){ 
-			left = this._startX - this._gridX - (cell.offsetWidth - this.minWidth); 
+			width = this._targetCell.offsetWidth,
+			left = mousePos;
+		if(width + delta < this.minWidth){ 
+			left = this._startX - (width - this.minWidth); 
 		}
-		this._resizer.style.left = left  + "px";
+		resizer.move(left);
 	},
 
-	_hideResizer: function(){
-		// Summary:
-		//      sets resizer bar display to none
-		this._resizer.style.display = "none";
-	},
 	_getResizeMouseLocation: function(e){
 		//Summary:
 		//      returns position of mouse relative to the left edge

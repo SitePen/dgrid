@@ -1,18 +1,19 @@
 <!DOCTYPE html>
 <html>
 	<head>
+		<meta charset="utf-8">
 		<title>Test Grid Column Resize</title>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		<meta name="viewport" content="width=570" />
-		<style type="text/css">
+		<meta name="viewport" content="width=800">
+		<style>
 			@import "../../../dojo/resources/dojo.css";
 			@import "../../css/skins/claro.css";
 			.heading {
 				font-weight: bold;
 				padding-bottom: 0.25em;
 			}
-			#grid, #gridWide, #gridPrevent, #gridPersist { 
+			.dgrid {
 				width: 750px;
+				margin: 10px;
 			}
 			#grid .field-col1 {
 				width: 100px;
@@ -70,16 +71,19 @@
 				width: 150px;
 			}
 			
-			.ui-widget{
-				margin: 10px;
+			.testrelative {
+				position: relative;
+				left: 25px;
+				top: 25px;
+				width: 750px;
 			}
 		</style>
 		<script>
 			var start= new Date().getTime();
 		</script>
-		<script type="text/javascript" src="../../../dojo/dojo.js" 
+		<script src="../../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
-		<script type="text/javascript">
+		<script>
 			require(["dgrid/OnDemandGrid", "dgrid/extensions/ColumnResizer", "dgrid/Selection", "dojo/_base/declare", "dojo/_base/lang", "dojo/on", "dojo/cookie", "dojo/json", "dgrid/test/data/base", "dojo/domReady!"],
 				function(Grid, ColumnResizer, Selection, declare, lang, on, cookie, json, testStore){
 					var columns = { // you can declare columns as an object hash (key translates to field)
@@ -152,8 +156,11 @@
 			<button onclick="grid.set('columns', columns2);">New Structure</button>
 			<button onclick="grid.set('columns', columns1);">Original</button>
 		</div>
-		<h2>Another grid w/ columns whose width initially exceed the table's width</h2>
-		<div id="gridWide"></div>
+		<h2>Another grid w/ columns whose width initially exceed the table's width,
+			placed within a relatively-positioned element</h2>
+		<div class="testrelative">
+			<div id="gridWide"></div>
+		</div>
 		<h2>Grid w/ columns whose resize will be prevented if the column will end up larger than 200px</h2>
 		<div id="gridPrevent"></div>
 		<h2>Grid w/ columns whose sizes will persist across page refreshes</h2>
