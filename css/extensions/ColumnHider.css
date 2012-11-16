@@ -1,6 +1,12 @@
 .dgrid-hider-toggle {
 	font-weight:normal;
 	cursor: pointer;
+	background: url(../images/ui-icons_222222_256x240.png) -81px -190px no-repeat;
+	height: 15px;
+}
+.dgrid-header-scroll.dgrid-noscrollbar {
+	width: 15px;
+	border-left: 1px solid #bbb;
 }
 .dgrid-hider-toggle:hover {
 	font-weight: bold;
