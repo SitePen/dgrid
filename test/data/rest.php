@@ -4,6 +4,7 @@ $id_prefix = "";
 if(isset($_GET["parent"])){
 	$id_prefix = $_GET["parent"]."-";
 }
+usleep(rand(0,500000));
 $range = "";
 if(isset($_SERVER["HTTP_RANGE"])){
 	$range = $_SERVER["HTTP_RANGE"];
@@ -15,14 +16,14 @@ if($range){
 	
 	$start = $matches[1];
 	$end = $matches[2];
-	if($end > 120){
-		$end = 120;
+	if($end > 1000){
+		$end = 1000;
 	}
 }else{
 	$start = 0;
 	$end = 40;
 }
-header("Content-Range: " . "items ".$start."-".$end."/120");
+header("Content-Range: " . "items ".$start."-".$end."/1000");
 echo '[';
 for ($i = $start; $i <= $end; $i++) {
 	if($i != $start){
