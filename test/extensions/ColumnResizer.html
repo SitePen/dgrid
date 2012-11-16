@@ -81,7 +81,7 @@
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
 			require(["dgrid/OnDemandGrid", "dgrid/extensions/ColumnResizer", "dgrid/Selection", "dojo/_base/declare", "dojo/_base/lang", "dojo/on", "dojo/cookie", "dojo/json", "dgrid/test/data/base", "dojo/domReady!"],
-				function(Grid, ColumnResizer, Selection, declare, lang, on, cookie, JSON, testStore){
+				function(Grid, ColumnResizer, Selection, declare, lang, on, cookie, json, testStore){
 					var columns = { // you can declare columns as an object hash (key translates to field)
 						col1: 'Column 1Column1Column 1 Column 1',
 						col2: {label: 'Column2222222222222222222222222', sortable: false},
@@ -112,12 +112,12 @@
 						columns: lang.clone(columns)
 					}, "gridPrevent");
 
-					var columnWidths = cookie('columnWidths');
-					columnWidths = columnWidths ? JSON.parse(columnWidths) : {};
+					var columnWidths = cookie('dgrid-columnWidths');
+					columnWidths = columnWidths ? json.parse(columnWidths) : {};
 
-					persistentColumns = lang.clone(columns);
+					var persistentColumns = lang.clone(columns);
 					for(var name in persistentColumns){
-						if(columnWidths[name] != null){
+						if(name in columnWidths){
 							if(typeof persistentColumns[name] === 'string'){
 								persistentColumns[name] = { label: persistentColumns[name] };
 							}
@@ -130,14 +130,15 @@
 					}, "gridPersist");
 
 					on(document.body, 'dgrid-columnresize', function(event){
-						if(event.grid === window.gridPrevent && event.width > 200){
-							console.log('Column "' + event.columnId + '" size changed: ' + event.width);
+						var grid = event.grid;
+						console.log('grid ' + grid.id + ' Column "' + event.columnId + '" size changed: ' + event.width, event);
+						if(grid === window.gridPrevent && event.width > 200){
 							event.preventDefault();
 						}
-						if(event.grid === window.gridPersist && event.parentType){
-							console.log('Column "' + event.columnId + '" size changed: ' + event.width);
+						if(grid === window.gridPersist && event.parentType){
+							// Persist new width to cookie
 							columnWidths[event.columnId] = event.width;
-							cookie('columnWidths', JSON.stringify(columnWidths));
+							cookie('dgrid-columnWidths', json.stringify(columnWidths));
 						}
 					});
 				});

@@ -126,9 +126,8 @@ return declare(null, {
 		this.inherited(arguments);
 
 		// set the widths of columns from the column config
-		var width = column.width;
-		if(width != null){
-			this.resizeColumnWidth(columnId, width);
+		if("width" in column){
+			this.resizeColumnWidth(columnId, column.width);
 		}
 	},
 	renderHeader: function(){
@@ -155,7 +154,7 @@ return declare(null, {
 				col = grid.columns[id],
 				childNodes = colNode.childNodes;
 
-			if(!col || (typeof col.resizable !== "undefined" && !col.resizable)){ continue; }
+			if(!col || col.resizable === false){ continue; }
 
 			var headerTextNode = put("div.dgrid-resize-header-container");
 			colNode.contents = headerTextNode;
@@ -290,9 +289,8 @@ return declare(null, {
 					//change last col width back to px, unless it is the last column itself being resized...
 					resizeColumnWidth(this, lastCol, this.minWidth, e.type);
 				}
+				this.resize();
 			}
-
-			this.resize();
 		}
 		this._hideResizer();
 	},
