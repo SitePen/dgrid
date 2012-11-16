@@ -91,9 +91,14 @@
 					}, "gridfromhtml");
 					
 					function createGrid(args){
-						window.grid = new CustomGrid(
-							lang.mixin({ store: testAsyncStore, columns: getColumns() }, args),
+						window.grid = new CustomGrid(lang.mixin({
+									store: testAsyncStore,
+									columns: getColumns(),
+									noDataMessage: "No results.",
+									loadingMessage: "Loading..."
+								}, args),
 							"grid");
+						console.log(args);
 					}
 					createGrid();
 					
@@ -102,6 +107,7 @@
 						var args = domForm.toObject(form);
 						args.pagingLinks = +args.pagingLinks;
 						if (!args.previousNextArrows) { args.previousNextArrows = false; }
+						if (!args.showLoadingMessage) { args.showLoadingMessage = false; }
 						
 						// recreate grid using args from form
 						window.grid.destroy();
@@ -123,6 +129,8 @@
 				Show previous/next page arrows</label></div>
 			<div><label><input type="checkbox" name="pagingTextBox">
 				Show "jump-to" textbox</label></div>
+			<div><label><input type="checkbox" name="showLoadingMessage" checked>
+				Show loading message while loading data</label></div>
 			<div>
 				<label><input type="text" name="pagingLinks" value="2" size="1">
 					Number of neighboring page numbers to display to each side of current

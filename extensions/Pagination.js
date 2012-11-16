@@ -2,6 +2,27 @@ define(["../_StoreMixin", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/D
 	"dojo/on", "dojo/query", "dojo/string", "dojo/has", "put-selector/put", "dojo/i18n!./nls/pagination",
 	"dojo/_base/sniff", "xstyle/css!../css/extensions/Pagination.css"],
 function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n){
+	function cleanupContent(grid){
+		// Remove any currently-rendered rows, or noDataMessage
+		if(grid.noDataNode){
+			put(grid.noDataNode, "!");
+			delete grid.noDataNode;
+		}else{
+			grid.cleanup();
+		}
+		grid.contentNode.innerHTML = "";
+	}
+	function cleanupLoading(grid){
+		// Clean up loadingNode, or content (if showLoadingMessage was false)
+		if(grid.loadingNode){
+			put(grid.loadingNode, "!");
+			delete grid.loadingNode;
+		}else{
+			cleanupContent(grid);
+		}
+		delete grid._isLoading;
+	}
+	
 	return declare(_StoreMixin, {
 		// summary:
 		//		An extension for adding discrete pagination to a List or Grid.
@@ -28,7 +49,13 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 		//		This provides options for different page sizes in a drop-down.
 		//		If it is empty (default), no page size drop-down will be displayed.
 		pageSizeOptions: [],
-
+		
+		// showLoadingMessage: Boolean
+		//		If true, clears previous data and displays loading node when requesting
+		//		another page; if false, leaves previous data in place until new data
+		//		arrives, then replaces it immediately.
+		showLoadingMessage: true,
+		
 		// i18nPagination: Object
 		//		This object contains all of the internationalized strings as
 		//		key/value pairs.
@@ -209,10 +236,20 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 				this.gotoPage(this._currentPage);
 			}
 		},
+		
+		renderArray: function(results){
+			var grid = this;
+			Deferred.when(results, function(){
+				cleanupLoading(grid);
+			});
+			return this.inherited(arguments);
+		},
+		
 		gotoPage: function(page, focusLink){
 			// summary:
 			//		Loads the given page.  Note that page numbers start at 1.
 			var grid = this;
+			
 			return this._trackError(function(){
 				var count = grid.rowsPerPage,
 					start = (page - 1) * count,
@@ -223,16 +260,13 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 					}),
 					results,
 					contentNode = grid.contentNode,
-					rows = grid._rowIdToObject,
-					substrLen = 5 + grid.id.length, // trimmed from front of row IDs
-					r, loadingNode;
+					loadingNode;
 				
-				// remove any currently-rendered rows
-				grid.cleanup();
-				contentNode.innerHTML = "";
-				
-				loadingNode = put(contentNode, "div.dgrid-loading");
-				loadingNode.innerHTML = grid.loadingMessage;
+				if(grid.showLoadingMessage){
+					cleanupContent(grid);
+					loadingNode = grid.loadingNode = put(contentNode, "div.dgrid-loading");
+					loadingNode.innerHTML = grid.loadingMessage;
+				}
 				
 				// set flag to deactivate pagination event handlers until loaded
 				grid._isLoading = true;
@@ -240,9 +274,7 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 				// Run new query and pass it into renderArray
 				results = grid.store.query(grid.query, options);
 				
-				return Deferred.when(grid.renderArray(results, loadingNode, options), function(){
-					put(loadingNode, "!");
-					delete grid._isLoading;
+				return Deferred.when(grid.renderArray(results, null, options), function(){
 					// Reset scroll Y-position now that new page is loaded.
 					grid.scrollTo({ y: 0 });
 					
@@ -274,9 +306,7 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 					
 					return results;
 				}, function(error){
-					// enable loading again before throwing the error
-					put(loadingNode, "!");
-					delete grid._isLoading;
+					cleanupLoading(grid);
 					throw error;
 				});
 			});

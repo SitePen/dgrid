@@ -56,12 +56,16 @@ keyed by column IDs.
 
 ### Extensions
 
-* The `Pagination` extension now re-queries for the current page of data when
-    the grid is notified of a store modification which affects the number of
-    items currently rendered. (#283)
 * The `Pagination` extension now returns a promise from the `refresh` and
     `gotoPage` methods, which resolves when the grid finishes rendering results.
     Note that it does not (yet) emit an event like `OnDemandList`.
+* The `Pagination` extension now re-queries for the current page of data when
+    the grid is notified of a store modification which affects the number of
+    items currently rendered. (#283)
+* The `Pagination` extension now supports a `showLoadingMessage` property; by
+    default (`true`), a loading node will be displayed whenever a new page is
+    requested; if set to `false`, the grid will instead retain the previous
+    content until the new data is fully received and ready to render. (#219)
 
 ## Other changes and fixes
 
@@ -135,7 +139,7 @@ keyed by column IDs.
 * The `ColumnResizer` extension's resize indicator now follows the cursor
     even when dragging beyond the grid's boundaries, and reacts if the mouse
     button is released even outside the boundaries of the browser window. (#310)
-    
+
 # 0.3.3
 
 ## Breaking changes
