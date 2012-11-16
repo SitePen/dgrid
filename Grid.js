@@ -143,10 +143,10 @@ function(kernel, declare, listen, has, put, List){
 			}
 			return row;
 		},
-		left: function(cell, steps){
+		previous: function(cell, steps){
 			return this.cell(this._move(cell, -(steps || 1), "dgrid-cell"));
 		},
-		right: function(cell, steps){
+		next: function(cell, steps){
 			return this.cell(this._move(cell, steps || 1, "dgrid-cell"));
 		},
 		renderRow: function(object, options){

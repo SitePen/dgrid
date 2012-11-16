@@ -158,7 +158,7 @@ return declare(null, {
 				"mousemove" + (has("touch") ? ",touchmove" : ""),
 				miscUtil.throttleDelayed(function(e){ grid._updateResizerPosition(e); })
 			);
-			grid.mouseUpListen = listen.pausable(document.body,
+			grid.mouseUpListen = listen.pausable(document,
 				"mouseup" + (has("touch") ? ",touchend" : ""),
 				function(e){
 					grid._resizeMouseUp(e);
@@ -196,7 +196,7 @@ return declare(null, {
 
 		// show resizer
 		if(!grid._resizer){
-			grid._resizer = put(grid.domNode, "div.dgrid-column-resizer");
+			grid._resizer = put(grid.domNode, "+div.dgrid-column-resizer");
 		}
 
 		grid._resizer.style.display = "block";
@@ -277,9 +277,9 @@ return declare(null, {
 		var mousePos = this._getResizeMouseLocation(e),
 			delta = mousePos - this._startX, //change from where user clicked to where they drag
 			cell = this._targetCell,
-			left = mousePos - this._gridX;
+			left = mousePos;
 		if(cell.offsetWidth + delta < this.minWidth){ 
-			left = this._startX - this._gridX - (cell.offsetWidth - this.minWidth); 
+			left = this._startX - (cell.offsetWidth - this.minWidth); 
 		}
 		this._resizer.style.left = left  + "px";
 	},
