@@ -18,7 +18,9 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
     is mostly useful for `selector`. (#324)
 * Fixed an issue with the `selector` plugin when a column definition lacks a
     `label` property. (#324)
-* Always-on editors now properly revert their values if the `dgrid-datachange`
+* Always-on `editor` columns now honor the `canEdit` function on column definitions
+    at the time each cell is rendered.
+* Always-on `editor` columns now properly revert values if the `dgrid-datachange`
     event is canceled. (#252)
 
 # 0.3.3
