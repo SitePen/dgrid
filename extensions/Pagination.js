@@ -85,6 +85,12 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 			}
 			
 			this.paginationLinksNode = put(navigationNode, "span.dgrid-pagination-links");
+
+			// I want to see how many page that I can jump, so I make a little trick to it.
+			this.paginationEndNode;
+			if(this.pagingTextBox) {
+			  this.paginationEndNode = put(navigationNode, "span.dgrid-pagination-links");
+			}
 			if(this.previousNextArrows){
 				// create a next link
 				node = put(navigationNode, "a[href=javascript:].dgrid-next", "›");
@@ -129,6 +135,7 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 			var grid = this,
 				i18n = this.i18nPagination,
 				linksNode = this.paginationLinksNode,
+				endNode = this.paginationEndNode,
 				currentPage = this._currentPage,
 				pagingLinks = this.pagingLinks,
 				paginationNavigationNode = this.paginationNavigationNode,
@@ -140,6 +147,9 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 				if(grid.pagingTextBox && page == currentPage){
 					// use a paging text box if enabled instead of just a number
 					link = put(linksNode, 'input.dgrid-page-input[type=text][value=$]', currentPage);
+					if(endNode) {
+					  endNode.innerHTML = " / "+end;
+					}
 					link.setAttribute("aria-label", i18n.jumpPage);
 					grid._pagingTextBoxHandle = on(link, "change", function(){
 						var value = +this.value;
