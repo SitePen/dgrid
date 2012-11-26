@@ -3,6 +3,24 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 # master (0.3.4-pre)
 
+## Significant changes
+
+### Extensions
+
+* The `ColumnResizer` extension now emits a `dgrid-columnresize` event when a resize
+    occurs; if initiated by the user, the event will include a `parentType` property
+    indicating the type of event that triggered it.  If this event is canceled,
+    the column will not be resized. (#320)
+* The `ColumnResizer` extension now honors a `width` property included on column
+    definition objects for the purpose of initializing the width of a column; this
+    can be useful if it is desired to persist and restore custom column widths
+    from a cookie or other local storage. (#321)
+* The `ColumnResizer` extension now honors a `resizable` property included on
+    column definition objects for the purpose of disallowing resize of specific
+    columns. (#325)
+
+## Other changes and fixes
+
 ### General/Core
 
 * Resolved an issue in `List` relating to scrolling and preload nodes. (#318, #323)
@@ -22,21 +40,13 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
     at the time each cell is rendered.
 * Always-on `editor` columns now properly revert values if the `dgrid-datachange`
     event is canceled. (#252)
-    
+
 ### Extensions
 
-* The `ColumnResizer` extension now emits a `dgrid-columnresize` event when a resize
-    occurs; if initiated by the user, the event will include a `parentType` property
-    indicating the type of event that triggered it.  If this event is canceled,
-    the column will not be resized. (#320)
-* The `ColumnResizer` extension now honors a `width` property included on column
-    definition objects for the purpose of initializing the width of a column; this
-    can be useful if it is desired to persist and restore custom column widths
-    from a cookie or other local storage. (#321)
-* The `ColumnResizer` extension now honors a `resizable` property included on
-    column definition objects for the purpose of disallowing resize of specific
-    columns. (#325)
-
+* The `ColumnResizer` extension's resize indicator now follows the cursor
+    even when dragging beyond the grid's boundaries, and reacts if the mouse
+    button is released even outside the boundaries of the browser window. (#310)
+    
 # 0.3.3
 
 ## Breaking changes
