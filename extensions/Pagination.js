@@ -237,11 +237,14 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 			}
 		},
 		
-		renderArray: function(results){
+		renderArray: function(results, beforeNode){
 			var grid = this;
-			Deferred.when(results, function(){
-				cleanupLoading(grid);
-			});
+			
+			if(!beforeNode){
+				Deferred.when(results, function(){
+					cleanupLoading(grid);
+				});
+			}
 			return this.inherited(arguments);
 		},
 		
