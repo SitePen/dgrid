@@ -9,11 +9,11 @@ function(kernel, declare, Deferred, listen, aspect, query, has, put, hasClass, G
 		try{
 			WheelEvent("wheel");
 			supported = true;
+		}catch(e){ // empty catch block; prevent debuggers from snagging
 		}finally{
 			return supported;
 		}
 	});
-	console.log(has("event-mousewheel"), has("event-wheel"));
 
 	var colsetidAttr = "data-dgrid-column-set-id";
 	
