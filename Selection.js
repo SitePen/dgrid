@@ -1,5 +1,5 @@
-define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/Deferred", "dojo/on", "dojo/has", "dojo/aspect", "./List", "dojo/has!touch?./util/touch", "put-selector/put", "dojo/query"],
-function(kernel, declare, Deferred, on, has, aspect, List, touchUtil, put){
+define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/Deferred", "dojo/on", "dojo/has", "dojo/aspect", "dojo/dom", "./List", "dojo/has!touch?./util/touch", "put-selector/put", "dojo/query"],
+function(kernel, declare, Deferred, on, has, aspect, dom, List, touchUtil, put){
 
 var ctrlEquiv = has("mac") ? "metaKey" : "ctrlKey";
 return declare(null, {
@@ -25,22 +25,36 @@ return declare(null, {
 	//		Also consulted by the selector plugin for showing select-all checkbox.
 	allowSelectAll: false,
 	
+	// selection:
+	//		An object where the property names correspond to 
+	//		object ids and values are true or false depending on whether an item is selected
+	selection: {},
+	
+	// selectionMode: String
+	//		The selection mode to use, can be "none", "multiple", "single", or "extended".
+	selectionMode: "extended",
+	
+	// allowTextSelection: Boolean
+	//		Whether to still allow text within cells to be selected.  The default
+	//		behavior is to allow text selection only when selectionMode is none;
+	//		setting this property to either true or false will explicitly set the
+	//		behavior regardless of selectionMode.
+	allowTextSelection: undefined,
+	
 	create: function(){
 		this.selection = {};
 		return this.inherited(arguments);
 	},
 	postCreate: function(){
 		this.inherited(arguments);
+		
+		// Force selectionMode setter to run.
+		var selectionMode = this.selectionMode;
+		this.selectionMode = "";
+		this.set("selectionMode", selectionMode);
+		
 		this._initSelectionEvents(); // first time; set up event hooks
 	},
-	
-	// selection:
-	//		An object where the property names correspond to 
-	//		object ids and values are true or false depending on whether an item is selected
-	selection: {},
-	// selectionMode: String
-	//		The selection mode to use, can be "none", "multiple", "single", or "extended".
-	selectionMode: "extended",
 	
 	_setSelectionMode: function(mode){
 		// summary:
@@ -51,10 +65,21 @@ return declare(null, {
 		this.clearSelection();
 		
 		this.selectionMode = mode;
+		
+		// Also re-run allowTextSelection setter in case it is in automatic mode.
+		this.set("allowTextSelection", this.allowTextSelection);
 	},
 	setSelectionMode: function(mode){
 		kernel.deprecated("setSelectionMode(...)", 'use set("selectionMode", ...) instead', "dgrid 1.0");
 		this.set("selectionMode", mode);
+	},
+	
+	_setAllowTextSelection: function(allow){
+		if(typeof allow !== "undefined"){
+			dom.setSelectable(this.bodyNode, allow);
+		}else{
+			dom.setSelectable(this.bodyNode, this.selectionMode === "none");
+		}
 	},
 	
 	_handleSelect: function(event, currentTarget){
@@ -122,17 +147,6 @@ return declare(null, {
 		
 		var grid = this,
 			selector = this.selectionDelegate;
-		
-		// This is to stop IE8+'s web accelerator and selection.
-		// It also stops selection in Chrome/Safari.
-		on(this.domNode, "selectstart", function(event){
-			// In IE, this also bubbles from text selection inside editor fields;
-			// we don't want to prevent that!
-			var tag = event.target && event.target.tagName;
-			if(tag != "INPUT" && tag != "TEXTAREA"){
-				event.preventDefault();
-			}
-		});
 		
 		function focus(event){
 			grid._handleSelect(event, this);
