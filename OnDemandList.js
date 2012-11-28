@@ -102,7 +102,12 @@ return declare([List, _StoreMixin], {
 		var loadingNode = put(preloadNode, "-div.dgrid-loading"),
 			innerNode = put(loadingNode, "div.dgrid-below");
 		innerNode.innerHTML = this.loadingMessage;
-		
+
+		function rethrow(e) {
+			put(loadingNode, "!");
+			throw e;
+		}
+
 		// Establish query options, mixing in our own.
 		// (The getter returns a delegated object, so simply using mixin is safe.)
 		options = lang.mixin(this.get("queryOptions"), options, 
@@ -141,8 +146,8 @@ return declare([List, _StoreMixin], {
 				self._processScroll(); // recheck the scroll position in case the query didn't fill the screen
 				// can remove the loading node now
 				return trs;
-			});
-		});
+			}, rethrow);
+		}, rethrow);
 
 		// return results so that callers can handle potential of async error
 		return results;
@@ -404,6 +409,9 @@ return declare([List, _StoreMixin], {
 						}
 						// make sure we have covered the visible area
 						grid._processScroll();
+					}, function (e) {
+						put(loadingNode, "!");
+						throw e;
 					});
 				}).call(this, loadingNode, scrollNode, below, keepScrollTo, results);
 				preload = preload.previous;

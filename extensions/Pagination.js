@@ -269,6 +269,7 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 						grid.resize();
 					}
 				}, function(error){
+					put(loadingNode, "!");
 					// enable loading again before throwing the error
 					delete grid._isLoading;
 					throw error;
