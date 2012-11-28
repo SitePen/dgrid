@@ -103,6 +103,12 @@
 			<button type="button" onclick="gridRowNavigation.set('selectionMode', 'multiple');">Multiple</button>
 			<button type="button" onclick="gridRowNavigation.set('selectionMode', 'extended');">Extended</button>
 		</div>
+		<div>Set allowTextSelection:
+			<button type="button" onclick="gridRowNavigation.set('allowTextSelection', true);">Always allow</button>
+			<button type="button" onclick="gridRowNavigation.set('allowTextSelection', false);">Always prevent</button>
+			<button type="button" onclick="gridRowNavigation.set('allowTextSelection', undefined);">Default</button>
+			(default = allowed only when selectionMode == none)
+		</div>
 		<div id="grid-row-navigation"></div>
 		<h2>A grid with cell-level selection (default selection mode of "extended")</h2>
 		<div id="grid-cell-navigation"></div>

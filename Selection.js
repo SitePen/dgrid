@@ -139,7 +139,7 @@ return declare(null, {
 		// Force selectionMode setter to run.
 		var selectionMode = this.selectionMode;
 		this.selectionMode = "";
-		this.set("selectionMode", selectionMode);
+		this._setSelectionMode(selectionMode);
 		
 		this._initSelectionEvents(); // first time; set up event hooks
 	},
@@ -163,7 +163,7 @@ return declare(null, {
 		this.selectionMode = mode;
 		
 		// Also re-run allowTextSelection setter in case it is in automatic mode.
-		this.set("allowTextSelection", this.allowTextSelection);
+		this._setAllowTextSelection(this.allowTextSelection);
 	},
 	setSelectionMode: function(mode){
 		kernel.deprecated("setSelectionMode(...)", 'use set("selectionMode", ...) instead', "dgrid 1.0");
@@ -176,6 +176,7 @@ return declare(null, {
 		}else{
 			setSelectable(this, this.selectionMode === "none");
 		}
+		this.allowTextSelection = allow;
 	},
 	
 	_handleSelect: function(event, currentTarget){
