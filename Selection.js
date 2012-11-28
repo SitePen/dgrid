@@ -1,7 +1,95 @@
-define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/Deferred", "dojo/on", "dojo/has", "dojo/aspect", "dojo/dom", "./List", "dojo/has!touch?./util/touch", "put-selector/put", "dojo/query"],
-function(kernel, declare, Deferred, on, has, aspect, dom, List, touchUtil, put){
+define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/Deferred", "dojo/on", "dojo/has", "dojo/aspect", "./List", "dojo/has!touch?./util/touch", "put-selector/put", "dojo/query", "dojo/_base/sniff"],
+function(kernel, declare, Deferred, on, has, aspect, List, touchUtil, put){
 
-var ctrlEquiv = has("mac") ? "metaKey" : "ctrlKey";
+// Add feature test for user-select CSS property for optionally disabling
+// text selection.  (Can't use dom.setSelectable because of bad sniffs, see #15990)
+has.add("css-user-select", function(global, doc, element){
+	var prefixes = ["ms", "O", "Moz", "Webkit", "Khtml"],
+		i = 0,
+		len = prefixes.length,
+		style = element.style;
+	
+	if(typeof style.userSelect !== "undefined"){
+		// Unlikely; user-select is non-standard, but might as well be future-proof...
+		return true;
+	}
+	
+	for(; i < len; i++){
+		if(style[prefixes[i] + "UserSelect"] !== undefined){
+			return prefixes[i];
+		}
+	}
+	return false;
+});
+
+// Also add a feature test for the onselectstart event, which offers a more
+// graceful fallback solution than node.unselectable.
+has.add("dom-selectstart", typeof document.onselectstart !== "undefined");
+
+var ctrlEquiv = has("mac") ? "metaKey" : "ctrlKey",
+	hasUserSelect = has("css-user-select");
+
+function makeUnselectable(node, unselectable){
+	// Utility function used in fallback path for recursively setting unselectable
+	var value = node.unselectable = unselectable ? "on" : "",
+		elements = node.getElementsByTagName("*"),
+		i = elements.length;
+	
+	while(--i){
+		if(elements[i].tagName === "INPUT" || elements[i].tagName === "TEXTAREA"){
+			continue; // Don't prevent text selection in text input fields.
+		}
+		elements[i].unselectable = value;
+	}
+}
+
+function setSelectable(grid, selectable){
+	// Alternative version of dojo/dom.setSelectable based on feature detection.
+	
+	var node = grid.bodyNode,
+		value = selectable ? "text" : "none";
+	
+	if(hasUserSelect === true){
+		node.style.userSelect = value;
+	}else if(hasUserSelect){
+		node.style[hasUserSelect + "UserSelect"] = value;
+	}else if(has("dom-selectstart")){
+		// For browsers that don't support user-select but support selectstart (IE<10),
+		// we can hook up an event handler as necessary.  Since selectstart bubbles,
+		// it will handle any child elements as well.
+		// Note, however, that both this and the unselectable fallback below are
+		// incapable of preventing text selection from outside the targeted node.
+		if(!selectable && !grid._selectstartHandle){
+			grid._selectstartHandle = on(node, "selectstart", function(evt){
+				var tag = evt.target && evt.target.tagName;
+				
+				// Prevent selection except where a text input field is involved.
+				if(tag !== "INPUT" && tag !== "TEXTAREA"){
+					evt.preventDefault();
+				}
+			});
+		}else if(selectable && grid._selectstartHandle){
+			grid._selectstartHandle.remove();
+			delete grid._selectstartHandle;
+		}
+	}else{
+		// For browsers that don't support either user-select or selectstart (Opera),
+		// we need to resort to setting the unselectable attribute on all nodes
+		// involved.  Since this doesn't automatically apply to child nodes, we also
+		// need to re-apply it whenever rows are rendered.
+		makeUnselectable(node, !selectable);
+		if(!selectable && !grid._unselectableHandle){
+			grid._unselectableHandle = aspect.after(grid, "renderRow", function(row){
+				makeUnselectable(row, true);
+				return row;
+			});
+		}else if(selectable && grid._unselectableHandle){
+			grid._unselectableHandle.remove();
+			delete grid._unselectableHandle;
+		}
+	}
+}
+
 return declare(null, {
 	// summary:
 	//		Add selection capabilities to a grid. The grid will have a selection property and
@@ -56,6 +144,14 @@ return declare(null, {
 		this._initSelectionEvents(); // first time; set up event hooks
 	},
 	
+	destroy: function(){
+		this.inherited(arguments);
+		
+		// Remove any handles added for cross-browser text selection prevention.
+		if(this._selectstartHandle){ this._selectstartHandle.remove(); }
+		if(this._unselectableHandle){ this._unselectableHandle.remove(); }
+	},
+	
 	_setSelectionMode: function(mode){
 		// summary:
 		//		Updates selectionMode, resetting necessary variables.
@@ -76,9 +172,9 @@ return declare(null, {
 	
 	_setAllowTextSelection: function(allow){
 		if(typeof allow !== "undefined"){
-			dom.setSelectable(this.bodyNode, allow);
+			setSelectable(this, allow);
 		}else{
-			dom.setSelectable(this.bodyNode, this.selectionMode === "none");
+			setSelectable(this, this.selectionMode === "none");
 		}
 	},
 	
