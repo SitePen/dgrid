@@ -357,7 +357,7 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			
 			this.cleanup();
 			// destroy DOM
-			put("!", this.domNode);
+			put(this.domNode, "!");
 		},
 		refresh: function(){
 			// summary:

@@ -184,7 +184,7 @@ function(kernel, declare, Deferred, listen, aspect, query, has, put, hasClass, G
 			if (scrollers) {
 				// this isn't the first time; destroy existing scroller nodes first
 				for(i in scrollers){
-					put("!", scrollers[i]);
+					put(scrollers[i], "!");
 				}
 			} else {
 				// first-time-only operations: hook up event/aspected handlers
