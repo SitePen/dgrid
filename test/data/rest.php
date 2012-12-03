@@ -1,5 +1,6 @@
 <?php
 header("Content-Type: application/json");
+$total = 500;
 $id_prefix = "";
 if(isset($_GET["parent"])){
 	$id_prefix = $_GET["parent"]."-";
@@ -16,14 +17,14 @@ if($range){
 	
 	$start = $matches[1];
 	$end = $matches[2];
-	if($end > 1000){
-		$end = 1000;
+	if($end > $total){
+		$end = $total;
 	}
 }else{
 	$start = 0;
 	$end = 40;
 }
-header("Content-Range: " . "items ".$start."-".$end."/1000");
+header('Content-Range: ' . 'items '.$start.'-'.$end.'/'.$total);
 echo '[';
 for ($i = $start; $i <= $end; $i++) {
 	if($i != $start){
