@@ -397,7 +397,7 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 							}
 							next.rowIndex = rowIndex++;
 						}
-					}while((next = next.nextSibling) && next.rowIndex != rowIndex);
+					}while((next = next.nextSibling) && next.rowIndex != rowIndex && !next.blockRowIndex);
 				}
 			}
 		},
