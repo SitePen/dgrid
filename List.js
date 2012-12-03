@@ -647,6 +647,7 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			//		A row object representing the appropriate row.  If the top of the
 			//		list is reached before the given number of steps, the first row will
 			//		be returned.
+			if(!row.element){ row = this.row(row); }
 			return this.row(this._move(row, -(steps || 1), "dgrid-row", visible));
 		},
 		down: function(row, steps, visible){
@@ -664,6 +665,7 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			//		A row object representing the appropriate row.  If the bottom of the
 			//		list is reached before the given number of steps, the last row will
 			//		be returned.
+			if(!row.element){ row = this.row(row); }
 			return this.row(this._move(row, steps || 1, "dgrid-row", visible));
 		},
 		

@@ -3,6 +3,13 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 # master (0.3.5-dev)
 
+## Significant changes
+
+* The `up` and `down` methods of `List` will now call `grid.row` internally to
+    resolve whatever argument is passed; the `left` and `right` methods of
+    `Grid` will call `grid.cell`.  (Formerly these methods only accepted a
+    row or cell object directly.)
+
 ## Other changes and fixes
 
 ### General/Core
