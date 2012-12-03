@@ -254,6 +254,11 @@ function(declare, has, listen, miscUtil, put){
 			}else{
 				this._hideColumn(id);
 			}
+			
+			// Update hidden state in actual column definition,
+			// in case columns are re-rendered.
+			this.columns[id].hidden = hidden;
+			
 			// Emit event to notify of column state change.
 			listen.emit(this.domNode, "dgrid-columnstatechange", {
 				grid: this,
