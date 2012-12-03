@@ -1,6 +1,15 @@
 This document outlines changes since 0.3.0.  For older changelogs, see the
 [dgrid wiki](https://github.com/SitePen/dgrid/wiki).
 
+# master (0.3.5-dev)
+
+## Other changes and fixes
+
+### General/Core
+
+* Resolved an issue where OnDemandList could end up firing requests where
+    start exceeds total and count is negative. (#323)
+
 # 0.3.4
 
 ## Significant changes
