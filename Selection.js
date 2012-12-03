@@ -2,23 +2,24 @@ define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/Deferred", "dojo/
 function(kernel, declare, Deferred, on, has, aspect, List, touchUtil, put){
 
 // Add feature test for user-select CSS property for optionally disabling
-// text selection.  (Can't use dom.setSelectable because of bad sniffs, see #15990)
+// text selection.
+// (Can't use dom.setSelectable prior to 1.8.2 because of bad sniffs, see #15990)
 has.add("css-user-select", function(global, doc, element){
-	var prefixes = ["ms", "O", "Moz", "Webkit", "Khtml"],
-		i = 0,
-		len = prefixes.length,
-		style = element.style;
-	
-	if(typeof style.userSelect !== "undefined"){
-		// Unlikely; user-select is non-standard, but might as well be future-proof...
-		return true;
-	}
-	
-	for(; i < len; i++){
-		if(style[prefixes[i] + "UserSelect"] !== undefined){
-			return prefixes[i];
+	var style = element.style,
+		prefixes = ["Khtml", "O", "ms", "Moz", "Webkit"],
+		i = prefixes.length,
+		name = "userSelect",
+		prefix;
+
+	// Iterate prefixes from most to least likely
+	do{
+		if(typeof style[name] !== "undefined"){
+			// Supported; return property name
+			return name;
 		}
-	}
+	}while(i-- && (name = prefixes[i] + "UserSelect"));
+
+	// Not supported if we didn't return before now
 	return false;
 });
 
@@ -49,10 +50,8 @@ function setSelectable(grid, selectable){
 	var node = grid.bodyNode,
 		value = selectable ? "text" : "none";
 	
-	if(hasUserSelect === true){
-		node.style.userSelect = value;
-	}else if(hasUserSelect){
-		node.style[hasUserSelect + "UserSelect"] = value;
+	if(hasUserSelect){
+		node.style[hasUserSelect] = value;
 	}else if(has("dom-selectstart")){
 		// For browsers that don't support user-select but support selectstart (IE<10),
 		// we can hook up an event handler as necessary.  Since selectstart bubbles,
