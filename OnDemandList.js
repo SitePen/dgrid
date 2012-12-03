@@ -350,7 +350,7 @@ return declare([List, _StoreMixin], {
 					options.start = preload.count;
 				}
 				options.count = Math.min(count + queryRowsOverlap, grid.maxRowsPerPage);
-				if(keepScrollTo){
+				if(keepScrollTo && beforeNode && beforeNode.offsetWidth){
 					keepScrollTo = beforeNode.offsetTop;
 				}
 
