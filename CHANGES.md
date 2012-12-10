@@ -1,6 +1,131 @@
 This document outlines changes since 0.3.0.  For older changelogs, see the
 [dgrid wiki](https://github.com/SitePen/dgrid/wiki).
 
+# master (0.3.5-dev)
+
+## Significant changes
+
+* The `up` and `down` methods of `List` will now call `grid.row` internally to
+    resolve whatever argument is passed; the `left` and `right` methods of
+    `Grid` will call `grid.cell`.  (Formerly these methods only accepted a
+    row or cell object directly.)
+
+## Other changes and fixes
+
+### General/Core
+
+* Resolved an issue where OnDemandList could end up firing requests where
+    start exceeds total and count is negative. (#323)
+
+# 0.3.4
+
+## Significant changes
+
+### Extensions
+
+* The `ColumnResizer` extension now emits a `dgrid-columnresize` event when a resize
+    occurs; if initiated by the user, the event will include a `parentType` property
+    indicating the type of event that triggered it.  If this event is canceled,
+    the column will not be resized. (#320)
+* The `ColumnResizer` extension now honors a `width` property included on column
+    definition objects for the purpose of initializing the width of a column; this
+    can be useful if it is desired to persist and restore custom column widths
+    from a cookie or other local storage. (#321)
+* The `ColumnResizer` extension now honors a `resizable` property included on
+    column definition objects for the purpose of disallowing resize of specific
+    columns. (#325)
+
+## Other changes and fixes
+
+### General/Core
+
+* Resolved an issue in `List` relating to scrolling and preload nodes. (#318, #323)
+
+### Mixins
+
+* The `ColumnSet` mixin now supports horizontal mousewheel events. (#239)
+
+### Column Plugins
+
+* The column plugins (`editor`, `selector`, and `tree`) can now be invoked without
+    a column definition object at all, if no properties need to be set.  This
+    is mostly useful for `selector`. (#324)
+* Fixed an issue with the `selector` plugin when a column definition lacks a
+    `label` property. (#324)
+* Always-on `editor` columns now honor the `canEdit` function on column definitions
+    at the time each cell is rendered.
+* Always-on `editor` columns now properly revert values if the `dgrid-datachange`
+    event is canceled. (#252)
+
+### Extensions
+
+* The `ColumnResizer` extension's resize indicator now follows the cursor
+    even when dragging beyond the grid's boundaries, and reacts if the mouse
+    button is released even outside the boundaries of the browser window. (#310)
+    
+# 0.3.3
+
+## Breaking changes
+
+* The `Keyboard` module's `dgrid-cellfocusin` and `dgrid-cellfocusout` events
+    now report either a `row` or `cell` object, depending on whether
+    `cellNavigation` is `false` or `true`, respectively.  (Formerly these events
+    always contained a `cell` property pointing to the DOM node that fired the event.)
+* Several mixin and extension modules have had their `declare` hierarchies
+    simplified under the expectation that they will always be mixed in as
+    documented, and never be instantiated directly.  To be clear, this will not
+    break any code that is written as prescribed by the documentation.
+
+## Significant changes
+
+* All custom events fired by dgrid components now report the following properties:
+    * `grid`: The dgrid instance which fired the event.
+    * `parentType`: If the event was fired in direct response to another event,
+        this property reflects the type of the originating event.  If the event
+        was fired due to a direct API call, `parentType` will not be defined.
+* The `ColumnReorder` extension now fires a `dgrid-columnreorder` event when
+    a column is reordered via drag'n'drop.  Note that this event always reports
+    a `parentType` of `"dnd"` (there is no way to trigger this event directly
+    from an API call).
+* The `Pagination` extension now exposes and references its i18n strings via the
+    `i18nPagination` instance property, allowing these strings to be overridden.
+    (#225)
+
+## Other changes and fixes
+
+### General/Core
+
+* Fixed an issue with the `up` and `down` methods in `List` and the `left` and
+    `right` methods in `Grid`, which could cause them to attempt to traverse
+    outside the list/grid in question.
+* Fixed an issue in the observer code in `List` which could cause an updated
+    row to render out-of-sequence when `tree` is used. (#154)
+* Fixed an issue that could cause old IE to throw errors due to an undefined
+    parameter to `insertBefore`. (#308)
+* The `_StoreMixin` module now shows/hides a node displaying `noDataMessage` in
+    reaction to the last row being removed or first row being added. (#229)
+* The `OnDemandList` module now adheres more strictly to the `maxRowsPerPage`
+    property.  To accommodate this, the default has been increased from `100` to
+    `250`. (#280)
+* The `OnDemandList` module's default value for `farOffRemoval` has been
+    lowered from `10000` to `2000`.
+* The `loadingMessage` property (referenced by `OnDemandList` and the `Pagination`
+    extension) now supports HTML strings, like `noDataMessage` (#312)
+* The CSS for one of the `util/has-css3` module's tests has had its class renamed
+    to prevent conflicting with users of Modernizr. (#313)
+
+### Mixins
+
+* The `Selection` mixin in single-selection mode now properly allows reselecting
+    a row that was deselected immediately prior. (#295)
+
+### Extensions
+
+* The `ColumnHider` extension will now resize its popup element and enable
+    scrolling within it, in cases where its height would otherwise exceed the
+    that of the parent grid. (#311)
+* The `Pagination` extension now supports `noDataMessage` like `OnDemandList`. (#180)
+
 # 0.3.2
 
 ## Breaking changes

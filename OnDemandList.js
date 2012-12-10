@@ -7,7 +7,7 @@ return declare([List, _StoreMixin], {
 	minRowsPerPage: 25,
 	// maxRowsPerPage: Integer
 	//		The maximum number of rows to request at one time.
-	maxRowsPerPage: 100,
+	maxRowsPerPage: 250,
 	// maxEmptySpace: Integer
 	//		Defines the maximum size (in pixels) of unrendered space below the
 	//		currently-rendered rows. Setting this to less than Infinity can be useful if you
@@ -24,7 +24,7 @@ return declare([List, _StoreMixin], {
 	//		Defines the minimum distance (in pixels) from the visible viewport area
 	//		rows must be in order to be removed.  Setting to Infinity causes rows
 	//		to never be removed.
-	farOffRemoval: 10000,
+	farOffRemoval: 2000,
 	
 	rowHeight: 22,
 	
@@ -98,8 +98,11 @@ return declare([List, _StoreMixin], {
 		}else{
 			this.preload = preload;
 		}
-		var loadingNode = put(preloadNode, "-div.dgrid-loading");
-		put(loadingNode, "div.dgrid-below", this.loadingMessage);
+		
+		var loadingNode = put(preloadNode, "-div.dgrid-loading"),
+			innerNode = put(loadingNode, "div.dgrid-below");
+		innerNode.innerHTML = this.loadingMessage;
+		
 		// Establish query options, mixing in our own.
 		// (The getter returns a delegated object, so simply using mixin is safe.)
 		options = lang.mixin(this.get("queryOptions"), options, 
@@ -116,7 +119,8 @@ return declare([List, _StoreMixin], {
 				var trCount = trs.length;
 				total = total || trCount;
 				if(!total){
-					put(self.contentNode, "div.dgrid-no-data").innerHTML = self.noDataMessage;
+					self.noDataNode = put(self.contentNode, "div.dgrid-no-data");
+					self.noDataNode.innerHTML = self.noDataMessage;
 				}
 				var height = 0;
 				for(var i = 0; i < trCount; i++){
@@ -316,12 +320,12 @@ return declare([List, _StoreMixin], {
 							offset = Math.min(preload.count, offset);
 							preload.previous.count += offset;
 							adjustHeight(preload.previous, true);
-							preload.count -= offset;
 							preloadNode.rowIndex += offset;
 							queryRowsOverlap = 0;
 						}else{
 							count += offset;
 						}
+						preload.count -= offset;
 					}
 					options.start = preloadNode.rowIndex - queryRowsOverlap;
 					preloadNode.rowIndex += count;
@@ -345,16 +349,18 @@ return declare([List, _StoreMixin], {
 					}
 					options.start = preload.count;
 				}
-				options.count = count + queryRowsOverlap;
-				if(keepScrollTo){
+				options.count = Math.min(count + queryRowsOverlap, grid.maxRowsPerPage);
+				if(keepScrollTo && beforeNode && beforeNode.offsetWidth){
 					keepScrollTo = beforeNode.offsetTop;
 				}
 
 				adjustHeight(preload);
 				// create a loading node as a placeholder while the data is loaded
-				var loadingNode = put(beforeNode, "-div.dgrid-loading[style=height:" + count * grid.rowHeight + "px]");
-				put(loadingNode, "div.dgrid-" + (below ? "below" : "above"), grid.loadingMessage);
+				var loadingNode = put(beforeNode, "-div.dgrid-loading[style=height:" + count * grid.rowHeight + "px]"),
+					innerNode = put(loadingNode, "div.dgrid-" + (below ? "below" : "above"));
+				innerNode.innerHTML = grid.loadingMessage;
 				loadingNode.count = count;
+				loadingNode.blockRowIndex = true;
 				// use the query associated with the preload node to get the next "page"
 				options.query = preload.query;
 				// Query now to fill in these rows.
@@ -372,7 +378,7 @@ return declare([List, _StoreMixin], {
 						// can remove the loading node now
 						beforeNode = loadingNode.nextSibling;
 						put(loadingNode, "!");
-						if(keepScrollTo && beforeNode){ // beforeNode may have been removed if the query results loading node was a removed as a distant node before rendering 
+						if(keepScrollTo && beforeNode && beforeNode.offsetWidth){ // beforeNode may have been removed if the query results loading node was a removed as a distant node before rendering 
 							// if the preload area above the nodes is approximated based on average
 							// row height, we may need to adjust the scroll once they are filled in
 							// so we don't "jump" in the scrolling position
@@ -397,6 +403,8 @@ return declare([List, _StoreMixin], {
 								adjustHeight(below);
 							});
 						}
+						// make sure we have covered the visible area
+						grid._processScroll();
 					});
 				}).call(this, loadingNode, scrollNode, below, keepScrollTo, results);
 				preload = preload.previous;
