@@ -215,9 +215,17 @@ function(declare, has, listen, miscUtil, put){
 			//		Hides the column indicated by the given id.
 			
 			// Use miscUtil function directly, since we clean these up ourselves anyway
+			var style;
+			
+			if(has("ie") === 8 && !has("quirks")){
+				// Avoid inconsistent behavior in IE8 when display: none is set on a cell
+				style = "width: 0 !important; white-space: nowrap !important; padding: 0 !important; margin: 0 !important; border: none !important;";
+			}else{
+				style = "display: none;";
+			}
+			
 			this._columnHiderRules[id] =
-				miscUtil.addCssRule("#" + this.domNode.id + " .dgrid-column-" + id,
-					"display: none");
+				miscUtil.addCssRule("#" + this.domNode.id + " .dgrid-column-" + id, style);
 		},
 		
 		_updateColumnHiddenState: function(id, hidden){
