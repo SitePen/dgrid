@@ -24,8 +24,11 @@ function(kernel, declare, Deferred, listen, aspect, query, has, put, hasClass, G
 			scrollers = grid._columnSetScrollers,
 			scrollerContents = grid._columnSetScrollerContents,
 			columnSets = grid.columnSets,
-			left = 0, scrollerWidth = 0,
+			left = 0,
+			scrollerWidth = 0,
+			numScrollers = 0, // tracks number of visible scrollers (sets w/ overflow)
 			i, l, columnSetElement, contentWidth;
+		
 		for(i = 0, l = columnSets.length; i < l; i++){
 			// iterate through the columnSets
 			left += scrollerWidth;
@@ -34,9 +37,17 @@ function(kernel, declare, Deferred, listen, aspect, query, has, put, hasClass, G
 			contentWidth = columnSetElement.firstChild.offsetWidth;
 			scrollerContents[i].style.width = contentWidth + "px";
 			scrollers[i].style.width = scrollerWidth + "px";
-			scrollers[i].style.overflowX = contentWidth > scrollerWidth ? "scroll" : "auto"; // IE seems to need it be set explicitly
+			// IE seems to need scroll to be set explicitly
+			scrollers[i].style.overflowX = contentWidth > scrollerWidth ? "scroll" : "auto";
 			scrollers[i].style.left = left + "px";
-		}	
+			// Keep track of how many scrollbars we're showing
+			if(contentWidth > scrollerWidth){ numScrollers++; }
+		}
+		
+		// Align bottom of body node depending on whether there are scrollbars
+		grid.bodyNode.style.bottom = numScrollers ?
+			(has("dom-scrollbar-height") + (has("ie") ? 1 : 0) + "px") :
+			"0";
 	}
 	function adjustScrollLeft(grid, row){
 		var scrollLefts = grid._columnSetScrollLefts;
@@ -146,7 +157,6 @@ function(kernel, declare, Deferred, listen, aspect, query, has, put, hasClass, G
 			// summary:
 			//		Setup the headers for the grid
 			this.inherited(arguments);
-			this.bodyNode.style.bottom = "17px";
 			
 			var columnSets = this.columnSets,
 				domNode = this.domNode,

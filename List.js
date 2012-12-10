@@ -5,12 +5,32 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 	
 	var oddClass = "dgrid-row-odd",
 		evenClass = "dgrid-row-even",
-		scrollbarWidth;
-
+		scrollbarWidth, scrollbarHeight;
+	
 	function byId(id){
 		return document.getElementById(id);
 	}
-
+	
+	function getScrollbarSize(node, dimension){
+		// Used by has tests for scrollbar width/height
+		var body = document.body,
+			size;
+		
+		put(body, node, ".dgrid-scrollbar-measure");
+		size = node["offset" + dimension] - node["client" + dimension];
+		
+		put(node, "!dgrid-scrollbar-measure");
+		body.removeChild(node);
+		
+		return size;
+	}
+	has.add("dom-scrollbar-width", function(global, doc, element){
+		return getScrollbarSize(element, "Width");
+	});
+	has.add("dom-scrollbar-height", function(global, doc, element){
+		return getScrollbarSize(element, "Height");
+	});
+	
 	// var and function for autogenerating ID when one isn't provided
 	var autogen = 0;
 	function generateId(){
@@ -245,16 +265,19 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			
 			if(!scrollbarWidth){
 				// Measure the browser's scrollbar width using a DIV we'll delete right away
-				var scrollDiv = put(document.body, "div.dgrid-scrollbar-measure");
-				scrollbarWidth = scrollDiv.offsetWidth - scrollDiv.clientWidth;
-				put(scrollDiv, "!");
+				scrollbarWidth = has("dom-scrollbar-width");
+				scrollbarHeight = has("dom-scrollbar-height");
 				
-				// avoid crazy issues in IE7 only, with certain widgets inside
-				if(has("ie") === 7){ scrollbarWidth++; }
+				// Avoid issues with certain widgets inside in IE7, and
+				// ColumnSet scroll issues with all supported IE versions
+				if(has("ie")){
+					scrollbarWidth++;
+					scrollbarHeight++;
+				}
 				
 				// add rules that can be used where scrollbar width/height is needed
 				miscUtil.addCssRule(".dgrid-scrollbar-width", "width: " + scrollbarWidth + "px");
-				miscUtil.addCssRule(".dgrid-scrollbar-height", "height: " + scrollbarWidth + "px");
+				miscUtil.addCssRule(".dgrid-scrollbar-height", "height: " + scrollbarHeight + "px");
 				
 				if(scrollbarWidth != 17 && !quirks){
 					// for modern browsers, we can perform a one-time operation which adds
