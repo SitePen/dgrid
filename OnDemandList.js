@@ -2,12 +2,18 @@ define(["./List", "./_StoreMixin", "dojo/_base/declare", "dojo/_base/lang", "doj
 function(List, _StoreMixin, declare, lang, Deferred, listen, miscUtil, put){
 
 return declare([List, _StoreMixin], {
+	// summary:
+	//		Extends List to include virtual scrolling functionality, querying a
+	//		dojo/store instance for the appropriate range when the user scrolls.
+	
 	// minRowsPerPage: Integer
 	//		The minimum number of rows to request at one time.
 	minRowsPerPage: 25,
+	
 	// maxRowsPerPage: Integer
 	//		The maximum number of rows to request at one time.
 	maxRowsPerPage: 250,
+	
 	// maxEmptySpace: Integer
 	//		Defines the maximum size (in pixels) of unrendered space below the
 	//		currently-rendered rows. Setting this to less than Infinity can be useful if you
@@ -15,18 +21,18 @@ return declare([List, _StoreMixin], {
 	// 		not excessively sensitive. With very large grids of data this may make scrolling
 	//		easier to use, albiet it can limit the ability to instantly scroll to the end.
 	maxEmptySpace: Infinity,	
+	
 	// bufferRows: Integer
 	//	  The number of rows to keep ready on each side of the viewport area so that the user can
 	//	  perform local scrolling without seeing the grid being built. Increasing this number can
 	//	  improve perceived performance when the data is being retrieved over a slow network.
 	bufferRows: 10,
+	
 	// farOffRemoval: Integer
 	//		Defines the minimum distance (in pixels) from the visible viewport area
 	//		rows must be in order to be removed.  Setting to Infinity causes rows
 	//		to never be removed.
 	farOffRemoval: 2000,
-	
-	rowHeight: 22,
 	
 	// queryRowsOverlap: Integer
 	//		Indicates the number of rows to overlap queries. This helps keep
@@ -39,7 +45,9 @@ return declare([List, _StoreMixin], {
 	//		on scroll. This can be increased for low-bandwidth clients, or to
 	//		reduce the number of requests against a server 
 	pagingDelay: miscUtil.defaultDelay,
-
+	
+	rowHeight: 22,
+	
 	postCreate: function(){
 		this.inherited(arguments);
 		var self = this;
@@ -61,13 +69,12 @@ return declare([List, _StoreMixin], {
 			options: options
 		};
 		if(!preloadNode){
-			var rootQuery = true;
+			// Initial query; set up top and bottom preload nodes
 			var topPreload = {
 				node: put(this.contentNode, "div.dgrid-preload", {
 					rowIndex: 0
 				}),
 				count: 0,
-				//topPreloadNode.preload = true;
 				query: query,
 				next: preload,
 				options: options
