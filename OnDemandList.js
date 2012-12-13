@@ -46,6 +46,12 @@ return declare([List, _StoreMixin], {
 	//		reduce the number of requests against a server 
 	pagingDelay: miscUtil.defaultDelay,
 	
+	// keepScrollPosition: Boolean
+	//		When refreshing the list, controls whether the scroll position is
+	//		preserved, or reset to the top.  This can also be overridden for
+	//		specific calls to refresh.
+	keepScrollPosition: false,
+	
 	rowHeight: 22,
 	
 	postCreate: function(){
@@ -145,8 +151,16 @@ return declare([List, _StoreMixin], {
 					// if total is 0, IE quirks mode can't handle 0px height for some reason, I don't know why, but we are setting display: none for now
 					preloadNode.style.display = "none";
 				}
-				self._processScroll(); // recheck the scroll position in case the query didn't fill the screen
-				// can remove the loading node now
+				
+				if (self._previousScrollPosition) {
+					// Restore position after a refresh operation w/ keepScrollPosition
+					self.scrollTo(self._previousScrollPosition);
+					delete self._previousScrollPosition;
+				}
+				
+				// Redo scroll processing in case the query didn't fill the screen,
+				// or in case scroll position was restored
+				self._processScroll();
 				return trs;
 			});
 		});
@@ -155,7 +169,23 @@ return declare([List, _StoreMixin], {
 		return results;
 	},
 	
-	refresh: function(){
+	refresh: function(options){
+		// summary:
+		//		Refreshes the contents of the grid.
+		// options: Object?
+		//		Optional object, supporting the following parameters:
+		//		* keepScrollPosition: like the keepScrollPosition instance property;
+		//			specifying it in the options here will override the instance
+		//			property's value for this specific refresh call only.
+		
+		var keep = (options && options.keepScrollPosition);
+		
+		// Fall back to instance property if option is not defined
+		if(typeof keep === "undefined"){ keep = this.keepScrollPosition; }
+		
+		// Store scroll position to be restored after new total is received
+		if(keep){ this._previousScrollPosition = this.getScrollPosition(); }
+		
 		this.inherited(arguments);
 		if(this.store){
 			// render the query
