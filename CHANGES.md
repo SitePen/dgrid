@@ -9,6 +9,10 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
     resolve whatever argument is passed; the `left` and `right` methods of
     `Grid` will call `grid.cell`.  (Formerly these methods only accepted a
     row or cell object directly.)
+* The `OnDemandList` module now supports a `keepScrollPosition` property, which
+    will attempt to preserve scroll position between refresh calls.  This can be
+    set on the instance itself to affect all refreshes, or can be passed to the
+    `refresh` method directly for a specific call.
 
 ## Other changes and fixes
 
