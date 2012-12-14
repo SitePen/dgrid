@@ -40,10 +40,18 @@ return declare([List, _StoreMixin], {
 	//		exactly align)
 	queryRowsOverlap: 1,
 	
+	// pagingMethod: String
+	//		Method (from dgrid/util/misc) to use to either throttle or debounce
+	//		requests.  Default is "debounce" which will cause the grid to wait until
+	//		the user pauses scrolling before firing any requests; can be set to
+	//		"throttleDelayed" instead to progressively request as the user scrolls,
+	//		which generally incurs more overhead but might appear more responsive.
+	pagingMethod: "debounce",
+	
 	// pagingDelay: Integer
-	//		Indicates the delay (in milliseconds) to wait before paging in more data
-	//		on scroll. This can be increased for low-bandwidth clients, or to
-	//		reduce the number of requests against a server 
+	//		Indicates the delay (in milliseconds) imposed upon pagingMethod, to wait
+	//		before paging in more data on scroll events. This can be increased to
+	//		reduce client-side overhead or the number of requests sent to a server.
 	pagingDelay: miscUtil.defaultDelay,
 	
 	// keepScrollPosition: Boolean
@@ -59,7 +67,7 @@ return declare([List, _StoreMixin], {
 		var self = this;
 		// check visibility on scroll events
 		listen(this.bodyNode, "scroll",
-			miscUtil.throttleDelayed(function(event){ self._processScroll(event); },
+			miscUtil[this.pagingMethod](function(event){ self._processScroll(event); },
 				null, this.pagingDelay));
 	},
 	
