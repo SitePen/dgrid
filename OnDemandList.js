@@ -169,6 +169,14 @@ return declare([List, _StoreMixin], {
 				// Redo scroll processing in case the query didn't fill the screen,
 				// or in case scroll position was restored
 				self._processScroll();
+				
+				// If _refreshDeferred is still defined after calling _processScroll,
+				// resolve it now (_processScroll will remove it and resolve it itself
+				// otherwise)
+				if(self._refreshDeferred){
+					self._refreshDeferred.resolve({ results: results, rows: trs });
+				}
+				
 				return trs;
 			});
 		});
@@ -186,7 +194,9 @@ return declare([List, _StoreMixin], {
 		//			specifying it in the options here will override the instance
 		//			property's value for this specific refresh call only.
 		
-		var keep = (options && options.keepScrollPosition);
+		var self = this,
+			keep = (options && options.keepScrollPosition),
+			dfd;
 		
 		// Fall back to instance property if option is not defined
 		if(typeof keep === "undefined"){ keep = this.keepScrollPosition; }
@@ -197,11 +207,35 @@ return declare([List, _StoreMixin], {
 		this.inherited(arguments);
 		if(this.store){
 			// render the query
-			var self = this;
+			dfd = this._refreshDeferred = new Deferred();
 			this._trackError(function(){
 				return self.renderQuery(function(queryOptions){
 					return self.store.query(self.query, queryOptions);
 				});
+			});
+			
+			// Internally, _refreshDeferred will always be resolved with an object
+			// containing `results` (QueryResults) and `rows` (the rendered rows);
+			// externally the promise will resolve simply with the QueryResults, but
+			// the event will be emitted with both under respective properties.
+			return dfd.then(function(obj){
+				// Emit on a separate turn to enable event to be used consistently for
+				// initial render, regardless of whether the backing store is async
+				setTimeout(function() {
+					listen.emit(self.domNode, "dgrid-refresh-complete", {
+						bubbles: true,
+						cancelable: false,
+						grid: self,
+						results: obj.results, // QueryResults object (may be a wrapped promise)
+						rows: obj.rows // array of rendered row elements
+					});
+				}, 0);
+				
+				// Delete the Deferred immediately so nothing tries to re-resolve
+				delete self._refreshDeferred;
+				
+				// Resolve externally with just the QueryResults
+				return obj.results;
 			});
 		}
 	},
@@ -229,7 +263,11 @@ return declare([List, _StoreMixin], {
 			priorPreload, preloadNode, preload = grid.preload,
 			lastScrollTop = grid.lastScrollTop,
 			requestBuffer = grid.bufferRows * grid.rowHeight,
-			searchBuffer = requestBuffer - grid.rowHeight; // Avoid rounding causing multiple queries
+			searchBuffer = requestBuffer - grid.rowHeight, // Avoid rounding causing multiple queries
+			// References related to emitting dgrid-refresh-complete if applicable
+			refreshDfd,
+			lastResults,
+			lastRows;
 		
 		// XXX: I do not know why this happens.
 		// munging the actual location of the viewport relative to the preload node by a few pixels in either
@@ -419,7 +457,9 @@ return declare([List, _StoreMixin], {
 				// Isolate the variables in case we make multiple requests
 				// (which can happen if we need to render on both sides of an island of already-rendered rows)
 				(function(loadingNode, scrollNode, below, keepScrollTo, results){
-					Deferred.when(grid.renderArray(results, loadingNode, options), function(){
+					lastRows = Deferred.when(grid.renderArray(results, loadingNode, options), function(rows){
+						lastResults = results;
+						
 						// can remove the loading node now
 						beforeNode = loadingNode.nextSibling;
 						put(loadingNode, "!");
@@ -450,10 +490,21 @@ return declare([List, _StoreMixin], {
 						}
 						// make sure we have covered the visible area
 						grid._processScroll();
+						
+						return rows;
 					});
 				}).call(this, loadingNode, scrollNode, below, keepScrollTo, results);
 				preload = preload.previous;
 			}
+		}
+		
+		// After iterating, if additional requests have been made mid-refresh,
+		// resolve the refresh promise based on the latest results obtained
+		if (lastRows && (refreshDfd = this._refreshDeferred)) {
+			delete this._refreshDeferred;
+			Deferred.when(lastRows, function(rows) {
+				refreshDfd.resolve({ results: lastResults, rows: rows });
+			});
 		}
 	}
 });
