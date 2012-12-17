@@ -221,21 +221,34 @@ function(kernel, declare, listen, has, put, List){
 				// respond to click, space keypress, or enter keypress
 				if(event.type == "click" || event.keyCode == 32 /* space bar */ || (!has("opera") && event.keyCode == 13) /* enter */){
 					var target = event.target,
-						field, descending, parentNode, sort;
+						parentNode, field, sort, newSort, eventObj;
 					do{
 						if(target.sortable){
-							// stash node subject to DOM manipulations,
-							// to be referenced then removed by sort()
-							grid._sortNode = target;
-							
-							field = target.field || target.columnId;
-							
-							// if the click is on the same column as the active sort,
+							// If the click is on the same column as the active sort,
 							// reverse sort direction
-							descending = (sort = grid._sort[0]) && sort.attribute == field &&
-								!sort.descending;
+							newSort = [{
+								attribute: (field = target.field || target.columnId),
+								descending: (sort = grid._sort[0]) && sort.attribute == field &&
+									!sort.descending
+							}];
 							
-							return grid.set("sort", field, descending);
+							// Emit an event with the new sort 
+							eventObj = {
+								bubbles: true,
+								cancelable: true,
+								grid: grid,
+								parentType: event.type,
+								sort: newSort
+							};
+							
+							if (listen.emit(target, "dgrid-sort", eventObj)){
+								// Stash node subject to DOM manipulations,
+								// to be referenced then removed by sort()
+								grid._sortNode = target;
+								grid.set("sort", newSort);
+							}
+							
+							break;
 						}
 					}while((target = target.parentNode) && target != headerNode);
 				}
@@ -278,21 +291,31 @@ function(kernel, declare, listen, has, put, List){
 			// summary:
 			//		Extension of List.js sort to update sort arrow in UI
 			
-			this.inherited(arguments); // normalize _sort first
+			// Normalize _sort first via inherited logic, then update the sort arrow
+			this.inherited(arguments);
+			this._updateSortArrow(this._sort);
+		},
+		
+		_updateSortArrow: function(sort){
+			// summary:
+			//		Protected method responsible for updating the placement of the arrow
+			//		in the appropriate header cell.  May be called by code which is
+			//		customizing sort (e.g. by reacting to the dgrid-sort event,
+			//		returning false, then performing logic and calling this manually).
 			
-			// clean up UI from any previous sort
+			// Clean up UI from any previous sort
 			if(this._lastSortedArrow){
-				// remove the sort classes from parent node
+				// Remove the sort classes from the parent node
 				put(this._lastSortedArrow, "<!dgrid-sort-up!dgrid-sort-down");
-				// destroy the lastSortedArrow node
+				// Destroy the lastSortedArrow node
 				put(this._lastSortedArrow, "!");
 				delete this._lastSortedArrow;
 			}
 			
-			if(!this._sort[0]){ return; } // nothing to do if no sort is specified
+			if(!sort[0]){ return; } // nothing to do if no sort is specified
 			
-			var prop = this._sort[0].attribute,
-				desc = this._sort[0].descending,
+			var prop = sort[0].attribute,
+				desc = sort[0].descending,
 				target = this._sortNode, // stashed if invoked from header click
 				columns, column, i;
 			
@@ -319,6 +342,7 @@ function(kernel, declare, listen, has, put, List){
 				this.resize();
 			}
 		},
+		
 		styleColumn: function(colId, css){
 			// summary:
 			//		Dynamically creates a stylesheet rule to alter a column's style.
