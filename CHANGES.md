@@ -5,6 +5,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ## Significant changes
 
+### General/Core
+
 * The `up` and `down` methods of `List` will now call `grid.row` internally to
     resolve whatever argument is passed; the `left` and `right` methods of
     `Grid` will call `grid.cell`.  (Formerly these methods only accepted a
@@ -18,6 +20,17 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
     will attempt to preserve scroll position between refresh calls.  This can be
     set on the instance itself to affect all refreshes, or can be passed to the
     `refresh` method directly for a specific call.
+* The `OnDemandList` module now returns a promise from the `refresh` method,
+    which resolves when the grid finishes rendering results after the refresh.
+    It also emits a `dgrid-refresh-complete` event, which includes both a
+    reference to the QueryResults object (`results`) and the rendered rows
+    (`rows`).
+
+### Extensions
+
+* The `Pagination` extension now returns a promise from the `refresh` and
+    `gotoPage` methods, which resolves when the grid finishes rendering results.
+    Note that it does not (yet) emit an event like `OnDemandList`.
 
 ## Other changes and fixes
 
