@@ -253,6 +253,11 @@ function(kernel, declare, listen, has, put, List){
 					}while((target = target.parentNode) && target != headerNode);
 				}
 			});
+			
+			// After re-rendering the header, re-apply the sort arrow if needed.
+			if (this._sort && this._sort.length){
+				this._updateSortArrow(this._sort);
+			}
 		},
 		
 		resize: function(){
