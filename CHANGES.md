@@ -11,6 +11,11 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
     resolve whatever argument is passed; the `left` and `right` methods of
     `Grid` will call `grid.cell`.  (Formerly these methods only accepted a
     row or cell object directly.)
+* The `Grid` module now emits a `dgrid-sort` event when a sortable header cell
+    is clicked; this event includes a `sort` property, and may be canceled to
+    stop the sort, or to substitute alternative behavior.  In the latter case,
+    if updating the sort arrow in the UI is still desired, call the
+    `_updateSortArrow` method and pass the `sort` value from the event.
 * The `OnDemandList` module now supports a `pagingMethod` property, which allows
     specifying whether to throttle or debounce scroll events.  The default
     behavior has been changed from `"throttleDelayed"` to `"debounce"`, which
