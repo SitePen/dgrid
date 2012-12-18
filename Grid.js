@@ -74,17 +74,7 @@ function(kernel, declare, listen, has, put, List){
 				};
 			}
 		},
-		_columnsCss: function(rule){
-			// This is an attempt at integration with xstyle, will probably change
-			rule.fullSelector = function(){
-				return this.parent.fullSelector() + " .dgrid-cell";
-			};
-			for(var i = 0;i < rule.children.length;i++){
-				var child = rule.children[i];
-				child.field = child.className = child.selector.substring(1); 
-			}
-			return rule.children;
-		},
+		
 		createRowCells: function(tag, each, subRows){
 			// summary:
 			//		Generates the grid for each row (used by renderHeader and and renderRow)
