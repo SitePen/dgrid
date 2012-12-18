@@ -256,7 +256,7 @@ function(kernel, declare, listen, has, put, List){
 			
 			// After re-rendering the header, re-apply the sort arrow if needed.
 			if (this._sort && this._sort.length){
-				this._updateSortArrow(this._sort);
+				this.updateSortArrow(this._sort);
 			}
 		},
 		
@@ -298,15 +298,24 @@ function(kernel, declare, listen, has, put, List){
 			
 			// Normalize _sort first via inherited logic, then update the sort arrow
 			this.inherited(arguments);
-			this._updateSortArrow(this._sort);
+			this.updateSortArrow(this._sort);
 		},
 		
-		_updateSortArrow: function(sort){
+		updateSortArrow: function(sort, updateSort){
 			// summary:
-			//		Protected method responsible for updating the placement of the arrow
-			//		in the appropriate header cell.  May be called by code which is
-			//		customizing sort (e.g. by reacting to the dgrid-sort event,
-			//		returning false, then performing logic and calling this manually).
+			//		Method responsible for updating the placement of the arrow in the
+			//		appropriate header cell.  Typically this should not be called (call
+			//		set("sort", ...) when actually updating sort programmatically), but
+			//		this method may be used by code which is customizing sort (e.g.
+			//		by reacting to the dgrid-sort event, canceling it, then
+			//		performing logic and calling this manually).
+			// sort: Array
+			//		Standard sort parameter - array of object(s) containing attribute
+			//		and optionally descending property
+			// updateSort: Boolean?
+			//		If true, will update this._sort based on the passed sort array
+			//		(i.e. to keep it in sync when custom logic is otherwise preventing
+			//		it from being updated); defaults to false
 			
 			// Clean up UI from any previous sort
 			if(this._lastSortedArrow){
@@ -317,6 +326,7 @@ function(kernel, declare, listen, has, put, List){
 				delete this._lastSortedArrow;
 			}
 			
+			if(updateSort){ this._sort = sort; }
 			if(!sort[0]){ return; } // nothing to do if no sort is specified
 			
 			var prop = sort[0].attribute,

@@ -15,7 +15,7 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
     is clicked; this event includes a `sort` property, and may be canceled to
     stop the sort, or to substitute alternative behavior.  In the latter case,
     if updating the sort arrow in the UI is still desired, call the
-    `_updateSortArrow` method and pass the `sort` value from the event.
+    `updateSortArrow` method and pass the `sort` value from the event.
 * The `OnDemandList` module now supports a `pagingMethod` property, which allows
     specifying whether to throttle or debounce scroll events.  The default
     behavior has been changed from `"throttleDelayed"` to `"debounce"`, which
