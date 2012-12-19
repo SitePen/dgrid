@@ -128,7 +128,8 @@
 						store: testStore,
 						columns: columns,
 						sort: "col3", // initially sort by col3 ascending
-						noDataMessage: "Nobody here but us chickens!"
+						noDataMessage: "Nobody here but us chickens!",
+						loadingMessage: "Loading..."
 					}, "grid");
 
 					window.grid2 = new StandardGrid({
@@ -286,7 +287,8 @@
 					// (currently error events don't seem to bubble,
 					// but perhaps we want them to?)
 					on(document, "dgrid-error", function(evt){
-						console.log("document received error: ", evt.error);
+						evt.preventDefault(); // Suppress console.error
+						console.log("document received error: " + evt.error);
 					});
 				});
 		</script>

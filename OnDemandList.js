@@ -76,12 +76,15 @@ return declare([List, _StoreMixin], {
 		//		Creates a preload node for rendering a query into, and executes the query
 		//		for the first page of data. Subsequent data will be downloaded as it comes
 		//		into view.
-		var preload = {
-			query: query,
-			count: 0,
-			node: preloadNode,
-			options: options
-		};
+		var self = this,
+			preload = {
+				query: query,
+				count: 0,
+				node: preloadNode,
+				options: options
+			},
+			priorPreload = this.preload;
+		
 		if(!preloadNode){
 			// Initial query; set up top and bottom preload nodes
 			var topPreload = {
@@ -100,7 +103,6 @@ return declare([List, _StoreMixin], {
 		// downloaded yet
 		preloadNode.rowIndex = this.minRowsPerPage;
 
-		var priorPreload = this.preload;
 		if(priorPreload){
 			// the preload nodes (if there are multiple) are represented as a linked list, need to insert it
 			if((preload.next = priorPreload.next) && 
@@ -124,70 +126,76 @@ return declare([List, _StoreMixin], {
 			innerNode = put(loadingNode, "div.dgrid-below");
 		innerNode.innerHTML = this.loadingMessage;
 
-		function rethrow(e) {
+		function errback(err) {
+			// Used as errback for when calls;
+			// remove the loadingNode and re-throw if an error was passed
 			put(loadingNode, "!");
-			throw e;
+			if(err){ throw err; }
 		}
 
 		// Establish query options, mixing in our own.
 		// (The getter returns a delegated object, so simply using mixin is safe.)
 		options = lang.mixin(this.get("queryOptions"), options, 
 			{start: 0, count: this.minRowsPerPage, query: query});
-		// execute the query
-		var results = query(options);
-		var self = this;
-		// render the result set
-		Deferred.when(this.renderArray(results, preloadNode, options), function(trs){
-			return Deferred.when(results.total || results.length, function(total){
-				// remove loading node
-				put(loadingNode, "!");
-				// now we need to adjust the height and total count based on the first result set
-				var trCount = trs.length;
-				total = total || trCount;
-				if(!total){
-					self.noDataNode = put(self.contentNode, "div.dgrid-no-data");
-					self.noDataNode.innerHTML = self.noDataMessage;
-				}
-				var height = 0;
-				for(var i = 0; i < trCount; i++){
-					height += self._calcRowHeight(trs[i]);
-				}
-				// only update rowHeight if we actually got results and are visible
-				if(trCount && height){ self.rowHeight = height / trCount; }
-				
-				total -= trCount;
-				preload.count = total;
-				preloadNode.rowIndex = trCount;
-				if(total){
-					preloadNode.style.height = Math.min(total * self.rowHeight, self.maxEmptySpace) + "px";
-				}else{
-					// if total is 0, IE quirks mode can't handle 0px height for some reason, I don't know why, but we are setting display: none for now
-					preloadNode.style.display = "none";
-				}
-				
-				if (self._previousScrollPosition) {
-					// Restore position after a refresh operation w/ keepScrollPosition
-					self.scrollTo(self._previousScrollPosition);
-					delete self._previousScrollPosition;
-				}
-				
-				// Redo scroll processing in case the query didn't fill the screen,
-				// or in case scroll position was restored
-				self._processScroll();
-				
-				// If _refreshDeferred is still defined after calling _processScroll,
-				// resolve it now (_processScroll will remove it and resolve it itself
-				// otherwise)
-				if(self._refreshDeferred){
-					self._refreshDeferred.resolve({ results: results, rows: trs });
-				}
-				
-				return trs;
-			}, rethrow);
-		}, rethrow);
-
-		// return results so that callers can handle potential of async error
-		return results;
+		
+		// Execute the query and return the results
+		// (encapsulate in a when call for proper flow of async errors)
+		return Deferred.when(this._trackError(function() { return query(options); }), function(results){
+			if(typeof results === "undefined"){
+				// Synchronous error occurred (but was caught by _trackError)
+				errback();
+				return;
+			}
+			// Render the result set
+			Deferred.when(self.renderArray(results, preloadNode, options), function(trs){
+				return Deferred.when(results.total || results.length, function(total){
+					// remove loading node
+					put(loadingNode, "!");
+					// now we need to adjust the height and total count based on the first result set
+					var trCount = trs.length;
+					total = total || trCount;
+					if(!total){
+						self.noDataNode = put(self.contentNode, "div.dgrid-no-data");
+						self.noDataNode.innerHTML = self.noDataMessage;
+					}
+					var height = 0;
+					for(var i = 0; i < trCount; i++){
+						height += self._calcRowHeight(trs[i]);
+					}
+					// only update rowHeight if we actually got results and are visible
+					if(trCount && height){ self.rowHeight = height / trCount; }
+					
+					total -= trCount;
+					preload.count = total;
+					preloadNode.rowIndex = trCount;
+					if(total){
+						preloadNode.style.height = Math.min(total * self.rowHeight, self.maxEmptySpace) + "px";
+					}else{
+						// if total is 0, IE quirks mode can't handle 0px height for some reason, I don't know why, but we are setting display: none for now
+						preloadNode.style.display = "none";
+					}
+					
+					if (self._previousScrollPosition) {
+						// Restore position after a refresh operation w/ keepScrollPosition
+						self.scrollTo(self._previousScrollPosition);
+						delete self._previousScrollPosition;
+					}
+					
+					// Redo scroll processing in case the query didn't fill the screen,
+					// or in case scroll position was restored
+					self._processScroll();
+					
+					// If _refreshDeferred is still defined after calling _processScroll,
+					// resolve it now (_processScroll will remove it and resolve it itself
+					// otherwise)
+					if(self._refreshDeferred){
+						self._refreshDeferred.resolve({ results: results, rows: trs });
+					}
+					
+					return trs;
+				}, errback);
+			}, errback);
+		}, errback);
 	},
 	
 	refresh: function(options){
@@ -213,10 +221,9 @@ return declare([List, _StoreMixin], {
 		if(this.store){
 			// render the query
 			dfd = this._refreshDeferred = new Deferred();
-			this._trackError(function(){
-				return self.renderQuery(function(queryOptions){
-					return self.store.query(self.query, queryOptions);
-				});
+			// renderQuery calls _trackError internally
+			return self.renderQuery(function(queryOptions){
+				return self.store.query(self.query, queryOptions);
 			});
 			
 			// Internally, _refreshDeferred will always be resolved with an object
@@ -457,7 +464,11 @@ return declare([List, _StoreMixin], {
 				var results = preload.query(options),
 					trackedResults = grid._trackError(function(){ return results; });
 				
-				if(trackedResults === undefined){ return; } // sync query failed
+				if(trackedResults === undefined){
+					// Sync query failed
+					put(loadingNode, "!");
+					return;
+				}
 
 				// Isolate the variables in case we make multiple requests
 				// (which can happen if we need to render on both sides of an island of already-rendered rows)
