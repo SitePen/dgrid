@@ -85,13 +85,15 @@ function resizeColumnWidth(grid, colId, width, parentType){
 	}
 	if(listen.emit(grid.headerNode, "dgrid-columnresize", event)){
 		width = (width !== "auto" ? (width + "px") : width) + ";";
-		var old = grid._columnStyles[colId],
-			x = grid.styleColumn(colId, "width: " + width);
+		// Use miscUtil function directly, since we clean these up ourselves anyway
+		var old = grid._columnSizes[colId],
+			x = miscUtil.addCssRule(
+				"#" + grid.domNode.id + " .dgrid-column-" + colId, "width: " + width);
 
-		old && old.remove();
+		if(old){ old.remove(); }
 
 		// keep a reference for future removal
-		grid._columnStyles[colId] = x;
+		grid._columnSizes[colId] = x;
 		return true;
 	}
 }
@@ -141,6 +143,11 @@ return declare(null, {
 	destroy: function(){
 		this.inherited(arguments);
 		
+		// Remove any applied column size styles since we're tracking them directly
+		for(var name in this._columnSizes){
+			this._columnSizes[name].remove();
+		}
+		
 		// If this is the last grid on the page with ColumnResizer, destroy the
 		// shared resizerNode
 		if(!--resizableCount){
@@ -161,10 +168,10 @@ return declare(null, {
 	configStructure: function(){
 		// Reset and remove column styles when a new structure is set
 		this._resizedColumns = false;
-		for(var name in this._columnStyles){
-			this._columnStyles[name].remove();
+		for(var name in this._columnSizes){
+			this._columnSizes[name].remove();
 		}
-		this._columnStyles = {};
+		this._columnSizes = {};
 
 		this.inherited(arguments);
 	},

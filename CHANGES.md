@@ -62,6 +62,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 * Resolved an issue where `ColumnHider` would leave styles applied for hiding
     columns, which could have adverse effects if a new grid is later created
     with the same ID. (#371)
+* Changed name of private `_columnStyles` object used by the `ColumnResizer`
+    extension to `_columnSizes` to reduce ambiguity.
 
 # 0.3.4
 

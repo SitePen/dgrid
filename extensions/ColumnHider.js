@@ -214,8 +214,7 @@ function(declare, has, listen, miscUtil, put){
 			// summary:
 			//		Hides the column indicated by the given id.
 			
-			// Use miscUtil function directly to avoid tracking on instance, since
-			// we're tracking and cleaning up these rules ourselves anyway
+			// Use miscUtil function directly, since we clean these up ourselves anyway
 			this._columnHiderRules[id] =
 				miscUtil.addCssRule("#" + this.domNode.id + " .dgrid-column-" + id,
 					"display: none");
