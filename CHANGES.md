@@ -50,6 +50,11 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
     `OnDemandList` as well as the `Pagination` extension.
     (#351; obsoletes #241, #242)
 
+### Extensions
+
+* Resolved an issue in ColumnResizer styles which caused body and header cells
+    to skew in Chrome 19 and Safari 6. (#142, #370)
+
 # 0.3.4
 
 ## Significant changes
