@@ -6,25 +6,25 @@ return declare(null, {
 	// summary:
 	//		Add selection capabilities to a grid. The grid will have a selection property and
 	//		fire "dgrid-select" and "dgrid-deselect" events.
-	
+
 	// selectionDelegate: String
 	//		Selector to delegate to as target of selection events.
 	selectionDelegate: ".dgrid-row",
-	
+
 	// selectionEvents: String
 	//		Event (or events, comma-delimited) to listen on to trigger select logic.
 	//		Note: this is ignored in the case of touch devices.
 	selectionEvents: "mousedown,mouseup,dgrid-cellfocusin",
-	
+
 	// deselectOnRefresh: Boolean
 	//		If true, the selection object will be cleared when refresh is called.
 	deselectOnRefresh: true,
-	
+
 	//allowSelectAll: Boolean
 	//		If true, allow ctrl/cmd+A to select all rows.
 	//		Also consulted by the selector plugin for showing select-all checkbox.
 	allowSelectAll: false,
-	
+
 	create: function(){
 		this.selection = {};
 		return this.inherited(arguments);
@@ -33,30 +33,30 @@ return declare(null, {
 		this.inherited(arguments);
 		this._initSelectionEvents(); // first time; set up event hooks
 	},
-	
+
 	// selection:
-	//		An object where the property names correspond to 
+	//		An object where the property names correspond to
 	//		object ids and values are true or false depending on whether an item is selected
 	selection: {},
 	// selectionMode: String
 	//		The selection mode to use, can be "none", "multiple", "single", or "extended".
 	selectionMode: "extended",
-	
+
 	_setSelectionMode: function(mode){
 		// summary:
 		//		Updates selectionMode, resetting necessary variables.
 		if(mode == this.selectionMode){ return; } // prevent unnecessary spinning
-		
+
 		// Start selection fresh when switching mode.
 		this.clearSelection();
-		
+
 		this.selectionMode = mode;
 	},
 	setSelectionMode: function(mode){
 		kernel.deprecated("setSelectionMode(...)", 'use set("selectionMode", ...) instead', "dgrid 1.0");
 		this.set("selectionMode", mode);
 	},
-	
+
 	_handleSelect: function(event, currentTarget){
 		// don't run if selection mode is none,
 		// or if coming from a dgrid-cellfocusin from a mousedown
@@ -73,7 +73,7 @@ return declare(null, {
 				row = currentTarget,
 				rowObj = this.row(row),
 				lastRow = this._lastSelected;
-			
+
 			if(mode == "single"){
 				if(lastRow === row){
 					// Allow ctrl to toggle selection, even within single select mode.
@@ -119,10 +119,10 @@ return declare(null, {
 		// summary:
 		//		Performs first-time hookup of event handlers containing logic
 		//		required for selection to operate.
-		
+
 		var grid = this,
 			selector = this.selectionDelegate;
-		
+
 		// This is to stop IE8+'s web accelerator and selection.
 		// It also stops selection in Chrome/Safari.
 		on(this.domNode, "selectstart", function(event){
@@ -133,11 +133,11 @@ return declare(null, {
 				event.preventDefault();
 			}
 		});
-		
+
 		function focus(event){
 			grid._handleSelect(event, this);
 		}
-		
+
 		if(has("touch")){
 			// listen for touch taps if available
 			on(this.contentNode, touchUtil.selector(selector, touchUtil.tap), function(evt){
@@ -159,7 +159,7 @@ return declare(null, {
 				}
 			});
 		}
-		
+
 		aspect.before(this, "removeRow", function(rowElement, justCleanup){
 			var row;
 			if(!justCleanup){
@@ -169,34 +169,34 @@ return declare(null, {
 			}
 		});
 	},
-	
+
 	allowSelect: function(row){
 		// summary:
-		//		A method that can be overriden to determine whether or not a row (or 
+		//		A method that can be overriden to determine whether or not a row (or
 		//		cell) can be selected. By default, all rows (or cells) are selectable.
 		return true;
 	},
-	
+
 	_selectionEventQueue: function(value, type){
 		var grid = this,
 			event = "dgrid-" + (value ? "select" : "deselect"),
 			rows = this[event], // current event queue (actually cells for CellSelection)
 			trigger = this._selectionTriggerEvent;
-		
+
 		if (trigger) {
 			// If selection was triggered by another event, we want to know its type
 			// to report later.  Grab it ahead of the timeout to avoid
 			// "member not found" errors in IE < 9.
 			trigger = trigger.type;
 		}
-		
+
 		if(rows){ return rows; } // return existing queue, allowing to push more
-		
+
 		// Create a timeout to fire an event for the accumulated rows once everything is done.
 		// We expose the callback in case the event needs to be fired immediately.
 		setTimeout(this._fireSelectionEvent = function(){
 			if(!rows){ return; } // rows will be set only the first time this is called
-			
+
 			var eventObject = {
 				bubbles: true,
 				grid: grid
@@ -214,7 +214,7 @@ return declare(null, {
 		if(value === undefined){
 			// default to true
 			value = true;
-		} 
+		}
 		if(!row.element){
 			row = this.row(row);
 		}
@@ -226,7 +226,8 @@ return declare(null, {
 				value = !previousValue;
 			}
 			var element = row.element;
-			if(!value && !this.allSelected){
+			if(!value){
+				this.allSelected = false;
 				delete this.selection[row.id];
 			}else{
 				selection[row.id] = value;
@@ -243,7 +244,7 @@ return declare(null, {
 				// add to the queue of row events
 				this._selectionEventQueue(value, "rows").push(row);
 			}
-			
+
 			if(toRow){
 				if(!toRow.element){
 					toRow = this.row(toRow);
@@ -251,7 +252,7 @@ return declare(null, {
 				var toElement = toRow.element;
 				var fromElement = row.element;
 				// find if it is earlier or later in the DOM
-				var traverser = (toElement && (toElement.compareDocumentPosition ? 
+				var traverser = (toElement && (toElement.compareDocumentPosition ?
 					toElement.compareDocumentPosition(fromElement) == 2 :
 					toElement.sourceIndex > fromElement.sourceIndex)) ? "down" : "up";
 				while(row.element != toElement && (row = this[traverser](row))){
@@ -268,7 +269,7 @@ return declare(null, {
 		//		Deselects any currently-selected items.
 		// exceptId: Mixed?
 		//		If specified, the given id will not be deselected.
-		
+
 		this.allSelected = false;
 		for(var id in this.selection){
 			if(exceptId !== id){
@@ -297,7 +298,7 @@ return declare(null, {
 
 		return !!this.selection[object.id];
 	},
-	
+
 	refresh: function(){
 		if(this.deselectOnRefresh){
 			this.clearSelection();
@@ -308,11 +309,11 @@ return declare(null, {
 		this._lastSelected = null;
 		this.inherited(arguments);
 	},
-	
+
 	renderArray: function(){
 		var grid = this,
 			rows = this.inherited(arguments);
-		
+
 		Deferred.when(rows, function(rows){
 			var selection = grid.selection,
 				i, row, selected;
