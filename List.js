@@ -3,53 +3,10 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 	// Add user agent/feature CSS classes 
 	hasClass("mozilla", "opera", "webkit", "ie", "ie-6", "ie-6-7", "quirks", "no-quirks", "touch");
 	
-	var scrollbarWidth;
+	var oddClass = "dgrid-row-odd",
+		evenClass = "dgrid-row-even",
+		scrollbarWidth;
 
-	// establish an extra stylesheet which addCssRule calls will use,
-	// plus an array to track actual indices in stylesheet for removal
-	var
-		extraSheet = put(document.getElementsByTagName("head")[0], "style"),
-		extraRules = [],
-		oddClass = "dgrid-row-odd",
-		evenClass = "dgrid-row-even";
-	// keep reference to actual StyleSheet object (.styleSheet for IE < 9)
-	extraSheet = extraSheet.sheet || extraSheet.styleSheet;
-	
-	// functions for adding and removing extra style rules.
-	// addExtraRule is exposed on the List prototype as addCssRule.
-	function addExtraRule(selector, css){
-		var index = extraRules.length;
-		extraRules[index] = (extraSheet.cssRules || extraSheet.rules).length;
-		extraSheet.addRule ?
-			extraSheet.addRule(selector, css) :
-			extraSheet.insertRule(selector + '{' + css + '}', extraRules[index]);
-		return {
-			remove: function(){ removeExtraRule(index); }
-		};
-	}
-	function removeExtraRule(index){
-		var
-			realIndex = extraRules[index],
-			i, l = extraRules.length;
-		if (realIndex === undefined) { return; } // already removed
-		
-		// remove rule indicated in internal array at index
-		extraSheet.deleteRule ?
-			extraSheet.deleteRule(realIndex) :
-			extraSheet.removeRule(realIndex); // IE < 9
-		
-		// Clear internal array item representing rule that was just deleted.
-		// NOTE: we do NOT splice, since the point of this array is specifically
-		// to negotiate the splicing that occurs in the stylesheet itself!
-		extraRules[index] = undefined;
-		
-		// Then update array items as necessary to downshift remaining rule indices.
-		// Can start at index, since array is sparse but strictly increasing.
-		for(i = index; i < l; i++){
-			if(extraRules[i] > realIndex){ extraRules[i]--; }
-		}
-	}
-	
 	function byId(id){
 		return document.getElementById(id);
 	}
@@ -112,9 +69,15 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 		//		in the footer area should set this to true.
 		showFooter: false,
 		// maintainOddEven: Boolean
-		//		Indicates whether to maintain the odd/even classes when new rows are inserted.
+		//		Whether to maintain the odd/even classes when new rows are inserted.
 		//		This can be disabled to improve insertion performance if odd/even styling is not employed.
 		maintainOddEven: true,
+		
+		// cleanAddedRules: Boolean
+		//		Whether to track rules added via the addCssRule method to be removed
+		//		when the list is destroyed.  Note this is effective at the time of
+		//		the call to addCssRule, not at the time of destruction.
+		cleanAddedRules: true,
 		
 		postscript: function(params, srcNodeRef){
 			// perform setup and invoke create in postScript to allow descendants to
@@ -290,15 +253,15 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 				if(has("ie") === 7){ scrollbarWidth++; }
 				
 				// add rules that can be used where scrollbar width/height is needed
-				this.addCssRule(".dgrid-scrollbar-width", "width: " + scrollbarWidth + "px");
-				this.addCssRule(".dgrid-scrollbar-height", "height: " + scrollbarWidth + "px");
+				miscUtil.addCssRule(".dgrid-scrollbar-width", "width: " + scrollbarWidth + "px");
+				miscUtil.addCssRule(".dgrid-scrollbar-height", "height: " + scrollbarWidth + "px");
 				
 				if(scrollbarWidth != 17 && !quirks){
 					// for modern browsers, we can perform a one-time operation which adds
 					// a rule to account for scrollbar width in all grid headers.
-					this.addCssRule(".dgrid-header", "right: " + scrollbarWidth + "px");
+					miscUtil.addCssRule(".dgrid-header", "right: " + scrollbarWidth + "px");
 					// add another for RTL grids
-					this.addCssRule(".dgrid-rtl-nonwebkit .dgrid-header", "left: " + scrollbarWidth + "px");
+					miscUtil.addCssRule(".dgrid-rtl-nonwebkit .dgrid-header", "left: " + scrollbarWidth + "px");
 				}
 			}
 			
@@ -311,7 +274,20 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 				}, 0);
 			}
 		},
-		addCssRule: addExtraRule,
+		
+		addCssRule: function(selector, css){
+			// summary:
+			//		Version of util/misc.addCssRule which tracks added rules and removes
+			//		them when the List is destroyed.
+			
+			var rule = miscUtil.addCssRule(selector, css);
+			if(this.cleanAddedRules){
+				// Although this isn't a listener, it shares the same remove contract
+				this._listeners.push(rule);
+			}
+			return rule;
+		},
+		
 		on: function(eventType, listener){
 			// delegate events to the domNode
 			var signal = listen(this.domNode, eventType, listener);
@@ -347,8 +323,8 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			// summary:
 			//		Destroys this grid
 			
-			// remove any event listeners
-			if(this._listeners){ // guard against accidental subsequent calls to destroy
+			// Remove any event listeners and other such removables
+			if(this._listeners){ // Guard against accidental subsequent calls to destroy
 				for(var i = this._listeners.length; i--;){
 					this._listeners[i].remove();
 				}

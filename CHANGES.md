@@ -7,6 +7,11 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ### General/Core
 
+* `List` instances will now clean up any styles added dynamically via the
+    `addCssRule` method; this also applies by extension to `Grid#styleColumn`
+    and `ColumnSet#styleColumnSet`.  This may cause a change in behavior in some
+    edge cases; the previous behavior can be obtained by passing
+    `cleanAddedRules: false` in the constructor arguments object. (#371)
 * The `up` and `down` methods of `List` will now call `grid.row` internally to
     resolve whatever argument is passed; the `left` and `right` methods of
     `Grid` will call `grid.cell`.  (Formerly these methods only accepted a
@@ -52,8 +57,11 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ### Extensions
 
-* Resolved an issue in ColumnResizer styles which caused body and header cells
+* Resolved an issue in `ColumnResizer` styles which caused body and header cells
     to skew in Chrome 19 and Safari 6. (#142, #370)
+* Resolved an issue where `ColumnHider` would leave styles applied for hiding
+    columns, which could have adverse effects if a new grid is later created
+    with the same ID. (#371)
 
 # 0.3.4
 
