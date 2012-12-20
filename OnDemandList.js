@@ -221,8 +221,9 @@ return declare([List, _StoreMixin], {
 		if(this.store){
 			// render the query
 			dfd = this._refreshDeferred = new Deferred();
+			
 			// renderQuery calls _trackError internally
-			return self.renderQuery(function(queryOptions){
+			self.renderQuery(function(queryOptions){
 				return self.store.query(self.query, queryOptions);
 			});
 			
@@ -248,6 +249,9 @@ return declare([List, _StoreMixin], {
 				
 				// Resolve externally with just the QueryResults
 				return obj.results;
+			}, function(err){
+				delete self._refreshDeferred;
+				throw err;
 			});
 		}
 	},
