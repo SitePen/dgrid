@@ -75,11 +75,13 @@ keyed by column IDs.
 
 ### Extensions
 
-* Resolved an issue in `ColumnResizer` styles which caused body and header cells
-    to skew in Chrome 19 and Safari 6. (#142, #370)
 * Resolved an issue where `ColumnHider` would leave styles applied for hiding
     columns, which could have adverse effects if a new grid is later created
     with the same ID. (#371)
+* Resolved an issue where widths set via the `ColumnResizer` extension would be
+    reset upon rearranging columns with the `ColumnReorder` extension.
+* Resolved an issue in `ColumnResizer` styles which caused body and header cells
+    to skew in Chrome 19 and Safari 6. (#142, #370)
 * Changed name of private `_columnStyles` object used by the `ColumnResizer`
     extension to `_columnSizes` to reduce ambiguity.
 
