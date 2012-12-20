@@ -73,18 +73,28 @@ function resizeColumnWidth(grid, colId, width, parentType){
 	// don't react to widths <= 0, e.g. for hidden columns
 	if(width <= 0){ return; }
 
-	var event = {
-		grid: grid,
-		columnId: colId,
-		width: width,
-		bubbles: true,
-		cancelable: true
-	};
+	var column = grid.columns[colId],
+		event = {
+			grid: grid,
+			columnId: colId,
+			width: width,
+			bubbles: true,
+			cancelable: true
+		};
 	if(parentType){
 		event.parentType = parentType;
 	}
+	
 	if(listen.emit(grid.headerNode, "dgrid-columnresize", event)){
-		width = (width !== "auto" ? (width + "px") : width) + ";";
+		// Update width on column object, then convert value for CSS
+		if(width === "auto"){
+			delete column.width;
+			width += ";";
+		}else{
+			column.width = width;
+			width += "px;";
+		}
+		
 		// Use miscUtil function directly, since we clean these up ourselves anyway
 		var old = grid._columnSizes[colId],
 			x = miscUtil.addCssRule(
