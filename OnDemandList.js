@@ -83,7 +83,8 @@ return declare([List, _StoreMixin], {
 				node: preloadNode,
 				options: options
 			},
-			priorPreload = this.preload;
+			priorPreload = this.preload,
+			results;
 		
 		if(!preloadNode){
 			// Initial query; set up top and bottom preload nodes
@@ -138,64 +139,66 @@ return declare([List, _StoreMixin], {
 		options = lang.mixin(this.get("queryOptions"), options, 
 			{start: 0, count: this.minRowsPerPage, query: query});
 		
-		// Execute the query and return the results
-		// (encapsulate in a when call for proper flow of async errors)
-		return Deferred.when(this._trackError(function() { return query(options); }), function(results){
-			if(typeof results === "undefined"){
-				// Synchronous error occurred (but was caught by _trackError)
-				errback();
-				return;
-			}
-			// Render the result set
-			Deferred.when(self.renderArray(results, preloadNode, options), function(trs){
-				return Deferred.when(results.total || results.length, function(total){
-					// remove loading node
-					put(loadingNode, "!");
-					// now we need to adjust the height and total count based on the first result set
-					var trCount = trs.length;
-					total = total || trCount;
-					if(!total){
-						self.noDataNode = put(self.contentNode, "div.dgrid-no-data");
-						self.noDataNode.innerHTML = self.noDataMessage;
-					}
-					var height = 0;
-					for(var i = 0; i < trCount; i++){
-						height += self._calcRowHeight(trs[i]);
-					}
-					// only update rowHeight if we actually got results and are visible
-					if(trCount && height){ self.rowHeight = height / trCount; }
-					
-					total -= trCount;
-					preload.count = total;
-					preloadNode.rowIndex = trCount;
-					if(total){
-						preloadNode.style.height = Math.min(total * self.rowHeight, self.maxEmptySpace) + "px";
-					}else{
-						// if total is 0, IE quirks mode can't handle 0px height for some reason, I don't know why, but we are setting display: none for now
-						preloadNode.style.display = "none";
-					}
-					
-					if (self._previousScrollPosition) {
-						// Restore position after a refresh operation w/ keepScrollPosition
-						self.scrollTo(self._previousScrollPosition);
-						delete self._previousScrollPosition;
-					}
-					
-					// Redo scroll processing in case the query didn't fill the screen,
-					// or in case scroll position was restored
-					self._processScroll();
-					
-					// If _refreshDeferred is still defined after calling _processScroll,
-					// resolve it now (_processScroll will remove it and resolve it itself
-					// otherwise)
-					if(self._refreshDeferred){
-						self._refreshDeferred.resolve({ results: results, rows: trs });
-					}
-					
-					return trs;
-				}, errback);
+		// Protect the query within a _trackError call, but return the QueryResults
+		this._trackError(function(){ results = query(options); });
+		
+		if(typeof results === "undefined"){
+			// Synchronous error occurred (but was caught by _trackError)
+			errback();
+			return;
+		}
+		
+		// Render the result set
+		Deferred.when(self.renderArray(results, preloadNode, options), function(trs){
+			return Deferred.when(results.total || results.length, function(total){
+				// remove loading node
+				put(loadingNode, "!");
+				// now we need to adjust the height and total count based on the first result set
+				var trCount = trs.length;
+				total = total || trCount;
+				if(!total){
+					self.noDataNode = put(self.contentNode, "div.dgrid-no-data");
+					self.noDataNode.innerHTML = self.noDataMessage;
+				}
+				var height = 0;
+				for(var i = 0; i < trCount; i++){
+					height += self._calcRowHeight(trs[i]);
+				}
+				// only update rowHeight if we actually got results and are visible
+				if(trCount && height){ self.rowHeight = height / trCount; }
+				
+				total -= trCount;
+				preload.count = total;
+				preloadNode.rowIndex = trCount;
+				if(total){
+					preloadNode.style.height = Math.min(total * self.rowHeight, self.maxEmptySpace) + "px";
+				}else{
+					// if total is 0, IE quirks mode can't handle 0px height for some reason, I don't know why, but we are setting display: none for now
+					preloadNode.style.display = "none";
+				}
+				
+				if (self._previousScrollPosition) {
+					// Restore position after a refresh operation w/ keepScrollPosition
+					self.scrollTo(self._previousScrollPosition);
+					delete self._previousScrollPosition;
+				}
+				
+				// Redo scroll processing in case the query didn't fill the screen,
+				// or in case scroll position was restored
+				self._processScroll();
+				
+				// If _refreshDeferred is still defined after calling _processScroll,
+				// resolve it now (_processScroll will remove it and resolve it itself
+				// otherwise)
+				if(self._refreshDeferred){
+					self._refreshDeferred.resolve({ results: results, rows: trs });
+				}
+				
+				return trs;
 			}, errback);
 		}, errback);
+		
+		return results;
 	},
 	
 	refresh: function(options){
