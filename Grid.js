@@ -377,7 +377,7 @@ function(kernel, declare, listen, has, put, List){
 					column.field = columnId;
 				}
 				columnId = column.id = column.id || (isNaN(columnId) ? columnId : (prefix + columnId));
-				if(prefix){ this.columns[columnId] = column; }
+				if(isArray){ this.columns[columnId] = column; }
 				
 				// allow further base configuration in subclasses
 				if(this._configColumn){
@@ -417,16 +417,28 @@ function(kernel, declare, listen, has, put, List){
 		
 		configStructure: function(){
 			// configure the columns and subRows
-			var subRows = this.subRows;
+			var subRows = this.subRows,
+				columns = this._columns = this.columns;
+			
+			// Reset this.columns unless it was already passed in as an object
+			this.columns = !columns || columns instanceof Array ? {} : columns;
+			
 			if(subRows){
-				// we have subRows, but no columns yet, need to create the columns
-				this.columns = {};
+				// Process subrows, which will in turn populate the this.columns object
 				for(var i = 0; i < subRows.length; i++){
 					subRows[i] = this._configColumns(i + "-", subRows[i]);
 				}
 			}else{
-				this.subRows = [this._configColumns("", this.columns)];
+				this.subRows = [this._configColumns("", columns)];
 			}
+		},
+		
+		_getColumns: function(){
+			// _columns preserves what was passed to set("columns"), but if subRows
+			// was set instead, columns contains the "object-ified" version, which
+			// was always accessible in the past, so maintain that accessibility going
+			// forward.
+			return this._columns || this.columns;
 		},
 		_setColumns: function(columns){
 			this._destroyColumns();
@@ -436,11 +448,13 @@ function(kernel, declare, listen, has, put, List){
 			// re-run logic
 			this._updateColumns();
 		},
+		
 		_setSubRows: function(subrows){
 			this._destroyColumns();
 			this.subRows = subrows;
 			this._updateColumns();
 		},
+		
 		setColumns: function(columns){
 			kernel.deprecated("setColumns(...)", 'use set("columns", ...) instead', "dgrid 1.0");
 			this.set("columns", columns);

@@ -3,6 +3,20 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 # master (0.3.5-dev)
 
+## Breaking Changes
+
+### Grid and the columns property
+
+The `Grid` module now normalizes the `columns` instance property to an object
+even when it is passed in as an array. This means that any code written
+which accesses `grid.columns` directly will break if it expects it to maintain
+the array structure that was originally passed in.
+
+To compensate for this, `get("columns")` retains the previous behavior - it
+returns `columns` as initially passed, except in the case where `subRows` is
+passed instead, in which case it returns an object hash version of the structure
+keyed by column IDs.
+
 ## Significant changes
 
 ### General/Core
@@ -16,6 +30,10 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
     resolve whatever argument is passed; the `left` and `right` methods of
     `Grid` will call `grid.cell`.  (Formerly these methods only accepted a
     row or cell object directly.)
+* The `Grid` module now ensures that an object hash of the grid's columns is
+    always available (see Breaking Changes above); this fixes issues when
+    column IDs are explicitly set, but then couldn't be properly looked up
+    against the `columns` array.
 * The `Grid` module now emits a `dgrid-sort` event when a sortable header cell
     is clicked; this event includes a `sort` property, and may be canceled to
     stop the sort, or to substitute alternative behavior.  In the latter case,
