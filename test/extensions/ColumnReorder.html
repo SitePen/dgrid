@@ -47,10 +47,11 @@
 				name: {},
 				description: { label: "what to do", sortable: false }
 			};
-			var columns2 = {
-				name: {},
-				description: { label: "what to do", sortable: false }
-			};
+			// columns2 tests using an array of columns with explicit IDs
+			var columns2 = [
+				{ id: "name", field: "name", label: "name" },
+				{ id: "description", field: "description", label: "what to do", sortable: false }
+			];
 			
 			var prevent;
 			
