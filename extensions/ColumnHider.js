@@ -215,17 +215,32 @@ function(declare, has, listen, miscUtil, put){
 			//		Hides the column indicated by the given id.
 			
 			// Use miscUtil function directly, since we clean these up ourselves anyway
-			var style;
+			var selectorPrefix = "#" + this.domNode.id + " .dgrid-column-",
+				next, rules, i; // used in IE8 code path
 			
 			if(has("ie") === 8 && !has("quirks")){
 				// Avoid inconsistent behavior in IE8 when display: none is set on a cell
-				style = "width: 0 !important; white-space: nowrap !important; padding: 0 !important; margin: 0 !important; border: none !important;";
+				next = this.column(id).headerNode.nextSibling;
+				
+				rules = [ miscUtil.addCssRule(selectorPrefix + id,
+					"width: 0 !important; white-space: nowrap !important; padding: 0 !important; margin: 0 !important; border: none !important;")
+				];
+				
+				if(next && (next = this.column(next)) && (next = next.id)){
+					// Also remove left border on next sibling if one exists, to avoid
+					// width issues due to borders not collapsing
+					rules.push(miscUtil.addCssRule(selectorPrefix + next, "border-left: none !important;"));
+				}
+				
+				this._columnHiderRules[id] = {
+					remove: function(){
+						for(i = rules.length; i--;){ rules[i].remove(); }
+					}
+				};
 			}else{
-				style = "display: none;";
+				this._columnHiderRules[id] =
+					miscUtil.addCssRule(selectorPrefix + id, "display: none;");
 			}
-			
-			this._columnHiderRules[id] =
-				miscUtil.addCssRule("#" + this.domNode.id + " .dgrid-column-" + id, style);
 		},
 		
 		_updateColumnHiddenState: function(id, hidden){
