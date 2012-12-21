@@ -101,7 +101,16 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 	function(){
 		if(this._started){ this.resize(); }
 	};
-	
+
+	function comparePosition(first, second){
+		if(!first || !second){
+			return true;
+		}
+		return second.compareDocumentPosition ?
+					second.compareDocumentPosition(first) == 2 :
+					second.sourceIndex > first.sourceIndex
+	}
+
 	return declare(TouchScroll ? TouchScroll : null, {
 		tabableHeader: false,
 		// showHeader: Boolean
@@ -417,7 +426,7 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			if(results.observe){
 				// observe the results for changes
 				var observerIndex = this.observers.push(results.observe(function(object, from, to){
-					var firstRow, nextNode;
+					var firstRow;
 					// a change in the data took place
 					if(from > -1 && rows[from]){
 						// remove from old slot
@@ -430,7 +439,10 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 									firstRow.rowIndex--; // adjust the rowIndex so adjustRowIndices has the right starting point
 								}
 							}
-							self.removeRow(row); // now remove
+							// check to see if the row is still in the known position, in case it was already repositioning into an earlier page
+							if(comparePosition(row, rows[from]) && comparePosition(rows[from-1], row)){
+								self.removeRow(row); // now remove
+							}
 						}
 						// the removal of rows could cause us to need to page in more items
 						if(self._processScroll){
@@ -438,19 +450,8 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 						}
 					}
 					if(to > -1){
-						// Add to new slot (either before an existing row, or at the end)
-						// First determine the DOM node that this should be placed before.
-						nextNode = rows[to];
-						if(!nextNode){
-							nextNode = rows[to - 1];
-							if(nextNode){
-								// Make sure to skip connected nodes, so we don't accidentally
-								// insert a row in between a parent and its children.
-								nextNode = (nextNode.connected || nextNode).nextSibling;
-							}
-						}
-						row = self.newRow(object, nextNode, to, options);
-						
+						// add to new slot (either before an existing row, or at the end)
+						row = self.newRow(object, rows[to] || (rows[to-1] && rows[to-1].nextSibling) || beforeNode, to, options);
 						if(row){
 							row.observerIndex = observerIndex;
 							rows.splice(to, 0, row);
@@ -464,6 +465,12 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 						}
 						options.count++;
 					}
+					if(from == 0){
+						overlapRows(1);
+					}
+					if(from == results.length - 1){
+						overlapRows();
+					}
 					from != to && firstRow && self.adjustRowIndices(firstRow);
 				}, true)) - 1;
 			}
@@ -472,6 +479,11 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 			if(results.map){
 				rows = results.map(mapEach, console.error);
 				if(rows.then){
+					results.then(function(resultsArray){
+						results = resultsArray;
+						overlapRows(1);
+						overlapRows();
+					});
 					return rows.then(whenDone);
 				}
 			}else{
@@ -480,7 +492,18 @@ function(arrayUtil, kernel, declare, listen, has, miscUtil, TouchScroll, hasClas
 					rows[i] = mapEach(results[i]);
 				}
 			}
+			overlapRows(1);
+			overlapRows();
 			var lastRow;
+			function overlapRows(top){
+				var lastRow = rows[top ? 0 : rows.length-1];
+				var row = self[top ? "up" : "down"](self.row(lastRow));
+				if(row && row.element != lastRow){
+					var method = top ? "unshift" : "push";
+					results[method](row.data);
+					rows[method](row.element);
+				}
+			}
 			function mapEach(object){
 				lastRow = self.insertRow(object, rowsFragment, null, start++, options);
 				lastRow.observerIndex = observerIndex;
