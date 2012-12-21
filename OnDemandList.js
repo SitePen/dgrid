@@ -258,6 +258,11 @@ return declare([List, _StoreMixin], {
 		}
 	},
 	
+	resize: function(){
+		this.inherited(arguments);
+		this._processScroll();
+	},
+	
 	_calcRowHeight: function(rowElement){
 		// summary:
 		//		Calculate the height of a row. This is a method so it can be overriden for
@@ -276,7 +281,7 @@ return declare([List, _StoreMixin], {
 		var grid = this,
 			scrollNode = grid.bodyNode,
 			// grab current visible top from event if provided, otherwise from node
-			visibleTop = (evt && evt.scrollTop) || scrollNode.scrollTop,
+			visibleTop = (evt && evt.scrollTop) || this.getScrollPosition().y,
 			visibleBottom = scrollNode.offsetHeight + visibleTop,
 			priorPreload, preloadNode, preload = grid.preload,
 			lastScrollTop = grid.lastScrollTop,
