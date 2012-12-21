@@ -5,15 +5,9 @@ define(["put-selector/put"], function(put){
 	
 	// establish an extra stylesheet which addCssRule calls will use,
 	// plus an array to track actual indices in stylesheet for removal
-	var
-		extraSheet = put(document.getElementsByTagName("head")[0], "style"),
-		extraRules = [],
+	var extraRules = [],
+		extraSheet,
 		removeMethod;
-	
-	// Keep reference to actual StyleSheet object (.styleSheet for IE < 9)
-	extraSheet = extraSheet.sheet || extraSheet.styleSheet;
-	// Store name of method used to remove rules (removeRule for IE < 9)
-	removeMethod = extraSheet.deleteRule ? "deleteRule" : "removeRule";
 	
 	function removeRule(index){
 		// Function called by the remove method on objects returned by addCssRule.
@@ -89,6 +83,15 @@ define(["put-selector/put"], function(put){
 			// summary:
 			//		Dynamically adds a style rule to the document.  Returns an object
 			//		with a remove method which can be called to later remove the rule.
+			
+			if(!extraSheet){
+				// First time, create an extra stylesheet for adding rules
+				extraSheet = put(document.getElementsByTagName("head")[0], "style");
+				// Keep reference to actual StyleSheet object (.styleSheet for IE < 9)
+				extraSheet = extraSheet.sheet || extraSheet.styleSheet;
+				// Store name of method used to remove rules (removeRule for IE < 9)
+				removeMethod = extraSheet.deleteRule ? "deleteRule" : "removeRule";
+			}
 			
 			var index = extraRules.length;
 			extraRules[index] = (extraSheet.cssRules || extraSheet.rules).length;
