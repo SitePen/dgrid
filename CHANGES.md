@@ -78,6 +78,8 @@ keyed by column IDs.
 * Resolved an issue where `ColumnHider` would leave styles applied for hiding
     columns, which could have adverse effects if a new grid is later created
     with the same ID. (#371)
+* Resolved an issue with `ColumnHider` related to IE8 standards mode's handling
+    of `display: none` cells. (#362)
 * Resolved an issue where widths set via the `ColumnResizer` extension would be
     reset upon rearranging columns with the `ColumnReorder` extension.
 * Resolved an issue in `ColumnResizer` styles which caused body and header cells
