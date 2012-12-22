@@ -245,7 +245,7 @@ function(kernel, declare, listen, has, put, List){
 			});
 			
 			// After re-rendering the header, re-apply the sort arrow if needed.
-			if (this._sort && this._sort.length){
+			if (this._started && this._sort && this._sort.length){
 				this.updateSortArrow(this._sort);
 			}
 		},
