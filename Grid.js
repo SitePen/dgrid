@@ -144,6 +144,7 @@ function(kernel, declare, listen, has, put, List){
 		},
 		
 		renderRow: function(object, options){
+			var self = this;
 			var row = this.createRowCells("td", function(td, column){
 				var data = object;
 				// we support the field, get, and formatter properties like the DataGrid
@@ -158,8 +159,10 @@ function(kernel, declare, listen, has, put, List){
 					// A column can provide a renderCell method to do its own DOM manipulation, 
 					// event handling, etc.
 					appendIfNode(td, column.renderCell(object, data, td, options));
-				}else if(data != null){
-					td.appendChild(document.createTextNode(data));
+				}else if (self.defaultRenderCell){
+					appendIfNode(td, self.defaultRenderCell(object, data, td, options));
+				}else{
+					appendIfNode(td, Grid.defaultRenderCell(object, data, td, options));
 				}
 			}, options && options.subRows);
 			// row gets a wrapper div for a couple reasons:
