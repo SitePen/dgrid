@@ -277,7 +277,7 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 				// Run new query and pass it into renderArray
 				results = grid.store.query(grid.query, options);
 				
-				return Deferred.when(grid.renderArray(results, null, options), function(){
+				return Deferred.when(grid.renderArray(results, contentNode.firstChild, options), function(){
 					// Reset scroll Y-position now that new page is loaded.
 					grid.scrollTo({ y: 0 });
 					
