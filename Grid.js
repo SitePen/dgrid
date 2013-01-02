@@ -243,11 +243,6 @@ function(kernel, declare, listen, has, put, List){
 					}while((target = target.parentNode) && target != headerNode);
 				}
 			});
-			
-			// After re-rendering the header, re-apply the sort arrow if needed.
-			if (this._started && this._sort && this._sort.length){
-				this.updateSortArrow(this._sort);
-			}
 		},
 		
 		resize: function(){
@@ -470,6 +465,11 @@ function(kernel, declare, listen, has, put, List){
 			
 			this.configStructure();
 			this.renderHeader();
+			// After re-rendering the header, re-apply the sort arrow if needed.
+			if (this._started && this._sort && this._sort.length){
+				this.updateSortArrow(this._sort);
+			}
+			
 			this.refresh();
 			// re-render last collection if present
 			this._lastCollection && this.renderArray(this._lastCollection);

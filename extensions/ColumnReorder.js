@@ -91,6 +91,10 @@ define([
 					// (since the inherited logic invoked above will have shifted cells).
 					setMatchingSubRow(grid, match, oldSubRow);
 					grid.renderHeader();
+					// After re-rendering the header, re-apply the sort arrow if needed.
+					if (this._sort && this._sort.length){
+						this.updateSortArrow(this._sort);
+					}
 				}
 			}, 0);
 		}
