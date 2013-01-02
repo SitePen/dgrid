@@ -151,6 +151,9 @@ html.has-quirks .dgrid-header-hidden .dgrid-cell {
 .dgrid-sort-up .dgrid-sort-arrow {
 	background-position: 0px -16px;
 }
+.dgrid-sort-down .dgrid-sort-arrow {
+	background-position: -64px -16px;
+}
 
 /* selection*/
 .dgrid-selected {
