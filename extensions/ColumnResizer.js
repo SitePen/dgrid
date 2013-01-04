@@ -137,9 +137,15 @@ var resizer = {
 
 return declare(null, {
 	resizeNode: null,
+	
 	// minWidth: Number
 	//		Minimum column width, in px.
 	minWidth: 40,
+	
+	// adjustLastColumn: Boolean
+	//		If true, adjusts the last column's width to "auto" at times where the
+	//		browser would otherwise stretch all columns to span the grid.
+	adjustLastColumn: true,
 	
 	_gridWidth: null, // placeholder for the grid width property
 	_resizedColumns: false, // flag indicating if resizer has converted column widths to px
@@ -335,7 +341,7 @@ return declare(null, {
 		}
 		
 		if(resizeColumnWidth(this, cell.columnId, newWidth, e.type)){
-			if(cell.columnId != lastCol){
+			if(cell.columnId != lastCol && this.adjustLastColumn){
 				if(totalWidth + delta < this._gridWidth) {
 					//need to set last column's width to auto
 					resizeColumnWidth(this, lastCol, "auto", e.type);
@@ -343,8 +349,8 @@ return declare(null, {
 					//change last col width back to px, unless it is the last column itself being resized...
 					resizeColumnWidth(this, lastCol, this.minWidth, e.type);
 				}
-				this.resize();
 			}
+			this.resize();
 		}
 		resizer.hide();
 		
