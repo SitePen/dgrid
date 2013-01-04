@@ -137,9 +137,12 @@ var resizer = {
 
 return declare(null, {
 	resizeNode: null,
-	minWidth: 40,	//minimum column width in px
-	gridWidth: null, //place holder for the grid width property
-	_resizedColumns: false, //flag that indicates if resizer has converted column widths to px
+	// minWidth: Number
+	//		Minimum column width, in px.
+	minWidth: 40,
+	
+	_gridWidth: null, // placeholder for the grid width property
+	_resizedColumns: false, // flag indicating if resizer has converted column widths to px
 	
 	buildRendering: function(){
 		this.inherited(arguments);
@@ -197,7 +200,7 @@ return declare(null, {
 		this.inherited(arguments);
 		
 		var grid = this;
-		grid.gridWidth = grid.headerNode.clientWidth - 1; //for some reason, total column width needs to be 1 less than this
+		grid._gridWidth = grid.headerNode.clientWidth - 1; //for some reason, total column width needs to be 1 less than this
 
 		var assoc;
 		if(this.columnSets && this.columnSets.length){
@@ -333,7 +336,7 @@ return declare(null, {
 		
 		if(resizeColumnWidth(this, cell.columnId, newWidth, e.type)){
 			if(cell.columnId != lastCol){
-				if(totalWidth + delta < this.gridWidth) {
+				if(totalWidth + delta < this._gridWidth) {
 					//need to set last column's width to auto
 					resizeColumnWidth(this, lastCol, "auto", e.type);
 				}else if(lastColWidth-delta <= this.minWidth) {
