@@ -56,6 +56,11 @@ keyed by column IDs.
 
 ### Extensions
 
+* The `ColumnResizer` extension now supports an `adjustLastColumn` flag; when
+    set to `true` (the default, and previous behavior), this will adjust the
+    last column's width to `auto` at times where a column resize operation would
+    otherwise cause column widths to stretch due to how browsers render tables.
+    This can be set to `false` to purposely disable this behavior.
 * The `Pagination` extension now returns a promise from the `refresh` and
     `gotoPage` methods, which resolves when the grid finishes rendering results.
     Note that it does not (yet) emit an event like `OnDemandList`.
