@@ -71,6 +71,10 @@ keyed by column IDs.
     default (`true`), a loading node will be displayed whenever a new page is
     requested; if set to `false`, the grid will instead retain the previous
     content until the new data is fully received and ready to render. (#219)
+* The `Pagination` extension now includes localized strings for the following languages:
+    * French (#381, thanks mduriancik)
+    * Brazilian Portuguese (#376, thanks stavarengo)
+    * Slovak (#381, thanks mduriancik)
 
 ## Other changes and fixes
 
