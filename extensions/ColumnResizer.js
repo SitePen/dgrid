@@ -150,7 +150,6 @@ return declare(null, {
 	//		browser would otherwise stretch all columns to span the grid.
 	adjustLastColumn: true,
 	
-	_gridWidth: null, // placeholder for the grid width property
 	_resizedColumns: false, // flag indicating if resizer has converted column widths to px
 	
 	buildRendering: function(){
@@ -229,8 +228,7 @@ return declare(null, {
 		this.inherited(arguments);
 		
 		var grid = this;
-		grid._gridWidth = grid.headerNode.clientWidth - 1; //for some reason, total column width needs to be 1 less than this
-
+		
 		var assoc;
 		if(this.columnSets && this.columnSets.length){
 			var csi = this.columnSets.length;
@@ -304,8 +302,6 @@ return declare(null, {
 		dom.setSelectable(this.domNode, false);
 		this._startX = this._getResizeMouseLocation(e); //position of the target
 		
-		var pos = geom.position(this.bodyNode);
-		
 		this._targetCell = query(".dgrid-column-" + target.columnId, this.headerNode)[0];
 
 		// Show resizerNode after initializing its x position
@@ -319,7 +315,12 @@ return declare(null, {
 		//      mouseup event object
 		
 		var columnSizes = this._columnSizes,
-			colNodes, colWidths;
+			colNodes, colWidths, gridWidth;
+		
+		if(this.adjustLastColumn){
+			// For some reason, total column width needs to be 1 less than this
+			gridWidth = this.headerNode.clientWidth - 1;
+		}
 		
 		//This is used to set all the column widths to a static size
 		if(!this._resizedColumns){
@@ -368,7 +369,7 @@ return declare(null, {
 		
 		if(resizeColumnWidth(this, cell.columnId, newWidth, e.type)){
 			if(cell.columnId != lastCol && this.adjustLastColumn){
-				if(totalWidth + delta < this._gridWidth) {
+				if(totalWidth + delta < gridWidth) {
 					//need to set last column's width to auto
 					resizeColumnWidth(this, lastCol, "auto", e.type);
 				}else if(lastColWidth-delta <= this.minWidth) {
