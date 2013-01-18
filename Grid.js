@@ -465,15 +465,21 @@ function(kernel, declare, listen, has, put, List){
 			
 			this.configStructure();
 			this.renderHeader();
-			// After re-rendering the header, re-apply the sort arrow if needed.
-			if (this._started && this._sort && this._sort.length){
-				this.updateSortArrow(this._sort);
-			}
 			
 			this.refresh();
 			// re-render last collection if present
 			this._lastCollection && this.renderArray(this._lastCollection);
-			this.resize();
+			
+			// After re-rendering the header, re-apply the sort arrow if needed.
+			if(this._started){
+				if(this._sort && this._sort.length){
+					this.updateSortArrow(this._sort);
+				} else {
+					// Only call resize directly if we didn't call updateSortArrow,
+					// since that calls resize itself when it updates.
+					this.resize();
+				}
+			}
 		}
 	});
 	
