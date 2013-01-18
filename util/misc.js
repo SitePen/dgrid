@@ -7,7 +7,8 @@ define(["put-selector/put"], function(put){
 	// plus an array to track actual indices in stylesheet for removal
 	var extraRules = [],
 		extraSheet,
-		removeMethod;
+		removeMethod,
+		rulesProperty;
 	
 	function removeRule(index){
 		// Function called by the remove method on objects returned by addCssRule.
@@ -87,10 +88,12 @@ define(["put-selector/put"], function(put){
 			if(!extraSheet){
 				// First time, create an extra stylesheet for adding rules
 				extraSheet = put(document.getElementsByTagName("head")[0], "style");
-				// Keep reference to actual StyleSheet object (.styleSheet for IE < 9)
+				// Keep reference to actual StyleSheet object (`styleSheet` for IE < 9)
 				extraSheet = extraSheet.sheet || extraSheet.styleSheet;
-				// Store name of method used to remove rules (removeRule for IE < 9)
+				// Store name of method used to remove rules (`removeRule` for IE < 9)
 				removeMethod = extraSheet.deleteRule ? "deleteRule" : "removeRule";
+				// Store name of property used to access rules (`rules` for IE < 9)
+				rulesProperty = extraSheet.cssRules ? "cssRules" : "rules";
 			}
 			
 			var index = extraRules.length;
@@ -98,8 +101,19 @@ define(["put-selector/put"], function(put){
 			extraSheet.addRule ?
 				extraSheet.addRule(selector, css) :
 				extraSheet.insertRule(selector + '{' + css + '}', extraRules[index]);
+			
 			return {
-				remove: function(){ removeRule(index); }
+				get: function(prop) {
+					return extraSheet[rulesProperty][extraRules[index]].style[prop];
+				},
+				set: function(prop, value) {
+					if (typeof extraRules[index] !== "undefined") {
+						extraSheet[rulesProperty][extraRules[index]].style[prop] = value;
+					}
+				},
+				remove: function(){
+					removeRule(index);
+				}
 			};
 		}
 	};
