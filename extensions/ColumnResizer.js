@@ -78,7 +78,9 @@ function resizeColumnWidth(grid, colId, width, parentType){
 			width: width,
 			bubbles: true,
 			cancelable: true
-		};
+		},
+		rule;
+	
 	if(parentType){
 		event.parentType = parentType;
 	}
@@ -87,21 +89,24 @@ function resizeColumnWidth(grid, colId, width, parentType){
 		// Update width on column object, then convert value for CSS
 		if(width === "auto"){
 			delete column.width;
-			width += ";";
 		}else{
 			column.width = width;
-			width += "px;";
+			width += "px";
 		}
 		
-		// Use miscUtil function directly, since we clean these up ourselves anyway
-		var old = grid._columnSizes[colId],
-			x = miscUtil.addCssRule(
-				"#" + grid.domNode.id + " .dgrid-column-" + colId, "width: " + width);
-
-		if(old){ old.remove(); }
+		rule = grid._columnSizes[colId];
+		
+		if(rule){
+			// Modify existing, rather than deleting + adding
+			rule.set("width", width);
+		}else{
+			// Use miscUtil function directly, since we clean these up ourselves anyway
+			rule = miscUtil.addCssRule(
+				"#" + grid.domNode.id + " .dgrid-column-" + colId, "width: " + width + ";");
+		}
 
 		// keep a reference for future removal
-		grid._columnSizes[colId] = x;
+		grid._columnSizes[colId] = rule;
 		return true;
 	}
 }
@@ -183,36 +188,40 @@ return declare(null, {
 	},
 	
 	configStructure: function(){
-		var oldSizes = this._columnSizes || {},
-			k, column, colId, rule;
+		var oldSizes = this._oldColumnSizes = lang.mixin({}, this._columnSizes), // shallow clone
+			k;
 		
-		// Reset and remove column styles when a new structure is set
 		this._resizedColumns = false;
 		this._columnSizes = {};
 		
 		this.inherited(arguments);
 		
+		// Remove old column styles that are no longer relevant; this is specifically
+		// done *after* calling inherited so that _columnSizes will contain keys
+		// for all columns in the new structure that were assigned widths.
 		for(k in oldSizes){
-			if(!k in this.columns){
+			if(!(k in this._columnSizes)){
 				oldSizes[k].remove();
 			}
 		}
+		delete this._oldColumnSizes;
+	},
+	
+	_configColumn: function(column){
+		this.inherited(arguments);
 		
-		// Set widths of columns from the column config
-		for(k in this.columns) {
-			column = this.columns[k];
-			colId = column.id;
-			if("width" in column){
-				if((rule = oldSizes[k])){
-					rule.set("width", column.width + "px");
-				}else{
-					rule = miscUtil.addCssRule(
-						"#" + this.domNode.id + " .dgrid-column-" + colId, "width: " + column.width + "px;");
-				}
-				
-				// keep a reference for future removal
-				this._columnSizes[colId] = rule;
+		var colId = column.id,
+			rule;
+		
+		if("width" in column){
+			// Update or add a style rule for the specified width
+			if((rule = this._oldColumnSizes[colId])){
+				rule.set("width", column.width + "px");
+			}else{
+				rule = miscUtil.addCssRule(
+					"#" + this.domNode.id + " .dgrid-column-" + colId, "width: " + column.width + "px;");
 			}
+			this._columnSizes[colId] = rule;
 		}
 	},
 	
