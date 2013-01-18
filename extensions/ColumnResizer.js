@@ -68,8 +68,6 @@ function subRowAssoc(subRows){
 }
 
 function resizeColumnWidth(grid, colId, width, parentType){
-	// Keep track of old styles so we don't get a long list in the stylesheet
-	
 	// don't react to widths <= 0, e.g. for hidden columns
 	if(width <= 0){ return; }
 
@@ -185,23 +183,39 @@ return declare(null, {
 	},
 	
 	configStructure: function(){
+		var oldSizes = this._columnSizes || {},
+			k, column, colId, rule;
+		
 		// Reset and remove column styles when a new structure is set
 		this._resizedColumns = false;
-		for(var name in this._columnSizes){
-			this._columnSizes[name].remove();
-		}
 		this._columnSizes = {};
-
+		
 		this.inherited(arguments);
-	},
-	_configColumn: function(column, columnId){
-		this.inherited(arguments);
-
-		// set the widths of columns from the column config
-		if("width" in column){
-			this.resizeColumnWidth(columnId, column.width);
+		
+		for(k in oldSizes){
+			if(!k in this.columns){
+				oldSizes[k].remove();
+			}
+		}
+		
+		// Set widths of columns from the column config
+		for(k in this.columns) {
+			column = this.columns[k];
+			colId = column.id;
+			if("width" in column){
+				if((rule = oldSizes[k])){
+					rule.set("width", column.width + "px");
+				}else{
+					rule = miscUtil.addCssRule(
+						"#" + this.domNode.id + " .dgrid-column-" + colId, "width: " + column.width + "px;");
+				}
+				
+				// keep a reference for future removal
+				this._columnSizes[colId] = rule;
+			}
 		}
 	},
+	
 	renderHeader: function(){
 		this.inherited(arguments);
 		
@@ -295,32 +309,35 @@ return declare(null, {
 		// e: Object
 		//      mouseup event object
 		
+		var columnSizes = this._columnSizes,
+			colNodes, colWidths;
+		
 		//This is used to set all the column widths to a static size
 		if(!this._resizedColumns){
-			var colNodes = query(".dgrid-cell", this.headerNode);
+			colNodes = query(".dgrid-cell", this.headerNode);
 			
 			if(this.columnSets && this.columnSets.length){
 				colNodes = colNodes.filter(function(node){
 					var idx = node.columnId.split("-");
-					return idx[0] == "0";
+					return idx[0] == "0" && !(node.columnId in columnSizes);
 				});
 			}else if(this.subRows && this.subRows.length > 1){
 				colNodes = colNodes.filter(function(node){
-					return node.columnId.charAt(0) == "0";
+					return node.columnId.charAt(0) == "0" && !(node.columnId in columnSizes);
 				});
 			}
 			
 			// Get a set of sizes before we start mutating, to avoid
 			// weird disproportionate measures if the grid has set
 			// column widths, but no full grid width set
-			var colSizes = colNodes.map(function(colNode){
+			colWidths = colNodes.map(function(colNode){
 				return colNode.offsetWidth;
 			});
 			
 			// Set a baseline size for each column based on
 			// its original measure
 			colNodes.forEach(function(colNode, i){
-				this.resizeColumnWidth(colNode.columnId, colSizes[i]);
+				this.resizeColumnWidth(colNode.columnId, colWidths[i]);
 			}, this);
 			
 			this._resizedColumns = true;
