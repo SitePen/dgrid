@@ -225,18 +225,18 @@ return declare(null, {
 					grid.mouseUpListen.resume();
 				}
 			);
-			grid.mouseMoveListen = listen.pausable(document,
+			grid._listeners.push(grid.mouseMoveListen = listen.pausable(document,
 				"mousemove" + (has("touch") ? ",touchmove" : ""),
 				miscUtil.throttleDelayed(function(e){ grid._updateResizerPosition(e); })
-			);
-			grid.mouseUpListen = listen.pausable(document,
+			));
+			grid._listeners.push(grid.mouseUpListen = listen.pausable(document,
 				"mouseup" + (has("touch") ? ",touchend" : ""),
 				function(e){
 					grid._resizeMouseUp(e);
 					grid.mouseMoveListen.pause();
 					grid.mouseUpListen.pause();
 				}
-			);
+			));
 			// initially pause the move/up listeners until a drag happens
 			grid.mouseMoveListen.pause();
 			grid.mouseUpListen.pause();
