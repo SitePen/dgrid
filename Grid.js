@@ -370,7 +370,9 @@ function(kernel, declare, listen, has, put, List){
 			//		destroy methods (defined by plugins) and calls them.  This is called
 			//		immediately before configuring a new column structure.
 			
-			var subRowsLength = this.subRows.length,
+			var subRows = this.subRows,
+				// if we have column sets, then we don't need to do anything with the missing subRows, ColumnSet will handle it
+				subRowsLength = subRows && subRows.length,
 				i, j, column, len;
 			
 			// First remove rows (since they'll be refreshed after we're done),
@@ -379,8 +381,8 @@ function(kernel, declare, listen, has, put, List){
 			this.cleanup();
 			
 			for(i = 0; i < subRowsLength; i++){
-				for(j = 0, len = this.subRows[i].length; j < len; j++){
-					column = this.subRows[i][j];
+				for(j = 0, len = subRows[i].length; j < len; j++){
+					column = subRows[i][j];
 					if(typeof column.destroy === "function"){ column.destroy(); }
 				}
 			}

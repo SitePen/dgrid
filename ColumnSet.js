@@ -225,6 +225,7 @@ function(kernel, declare, Deferred, listen, aspect, query, has, put, hasClass, G
 					}
 				}
 			}
+			this.inherited(arguments);
 		},
 		configStructure: function(){
 			this.columns = {};
