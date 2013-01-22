@@ -13,12 +13,16 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 		grid.contentNode.innerHTML = "";
 	}
 	function cleanupLoading(grid){
-		// Clean up loadingNode, or content (if showLoadingMessage was false)
 		if(grid.loadingNode){
 			put(grid.loadingNode, "!");
 			delete grid.loadingNode;
-		}else{
-			cleanupContent(grid);
+		}else if(grid._oldPageNodes){
+			// If cleaning up after a load w/ showLoadingMessage: false,
+			// be careful to only clean up rows from the old page, not the new one
+			for(var i = grid._oldPageNodes.length; i--;){
+				grid.removeRow(grid._oldPageNodes[i]);
+			}
+			delete grid._oldPageNodes;
 		}
 		delete grid._isLoading;
 	}
@@ -237,17 +241,6 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 			}
 		},
 		
-		renderArray: function(results, beforeNode){
-			var grid = this;
-			
-			if(!beforeNode){
-				Deferred.when(results, function(){
-					cleanupLoading(grid);
-				});
-			}
-			return this.inherited(arguments);
-		},
-		
 		gotoPage: function(page, focusLink){
 			// summary:
 			//		Loads the given page.  Note that page numbers start at 1.
@@ -263,12 +256,20 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 					}),
 					results,
 					contentNode = grid.contentNode,
-					loadingNode;
+					loadingNode,
+					oldNodes, i, len;
 				
 				if(grid.showLoadingMessage){
 					cleanupContent(grid);
 					loadingNode = grid.loadingNode = put(contentNode, "div.dgrid-loading");
 					loadingNode.innerHTML = grid.loadingMessage;
+				}else{
+					// Reference nodes to be cleared later, rather than now;
+					// iterate manually since IE < 9 doesn't like slicing HTMLCollections
+					grid._oldPageNodes = oldNodes = [];
+					for(i = 0, len = contentNode.children.length; i < len; i++){
+						oldNodes[i] = contentNode.children[i];
+					}
 				}
 				
 				// set flag to deactivate pagination event handlers until loaded
@@ -278,6 +279,7 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 				results = grid.store.query(grid.query, options);
 				
 				return Deferred.when(grid.renderArray(results, contentNode.firstChild, options), function(){
+					cleanupLoading(grid);
 					// Reset scroll Y-position now that new page is loaded.
 					grid.scrollTo({ y: 0 });
 					
