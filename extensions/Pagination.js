@@ -23,6 +23,13 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 				grid.removeRow(grid._oldPageNodes[i]);
 			}
 			delete grid._oldPageNodes;
+			// Also remove the observer from the previous page, if there is one
+			if(grid._oldPageObserver){
+				grid._oldPageObserver.cancel();
+				delete grid._oldPageObserver;
+			}
+			// Make sure _lastCollection is cleared (due to logic in List)
+			grid._lastCollection = null;
 		}
 		delete grid._isLoading;
 	}
@@ -270,6 +277,8 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 					for(i = 0, len = contentNode.children.length; i < len; i++){
 						oldNodes[i] = contentNode.children[i];
 					}
+					// Also reference the current page's observer (if any)
+					grid._oldPageObserver = grid.observers.pop();
 				}
 				
 				// set flag to deactivate pagination event handlers until loaded
