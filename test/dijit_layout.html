@@ -43,7 +43,6 @@
 			require(["dgrid/OnDemandGrid",
 				"dgrid/extensions/DijitRegistry",
 				"dijit/Dialog",
-				"dojo/_base/lang",
 				"dojo/_base/declare",
 				"dojo/parser",
 				// widgets only used declaratively
@@ -55,7 +54,7 @@
 				// non-returns
 				"dgrid/test/data/base",
 				"dojo/domReady!"
-			], function(Grid, DijitRegistry, Dialog, lang, declare, parser){
+			], function(Grid, DijitRegistry, Dialog, declare, parser){
 			
 				var CustomGrid = declare([Grid, DijitRegistry]);
 				
