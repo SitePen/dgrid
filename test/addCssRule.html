@@ -4,9 +4,11 @@
 		<title>list.addCssRule tests</title>
 		<style>
 .box {
-	padding: 8px;
+	display: inline-block;
+	font-size: 0;
 	margin: 2px;
-	float: left;
+	padding: 8px;
+	width: 0;
 }
 		</style>
 	</head>
@@ -36,7 +38,7 @@ require(["put-selector/put", "dojo/on", "dgrid/util/misc", "dojo/query"], functi
 		rules = {}, i;
 	
 	for(i = 1; i <= 20; i++){
-		put(container, "div#box" + i + ".box");
+		put(container, "span#box" + i + ".box");
 		rules["box" + i] = addRule("#box" + i, "background-color: " + getRandomColor() + ";");
 	}
 	
