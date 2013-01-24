@@ -191,6 +191,7 @@ return declare([List, _StoreMixin], {
 				// otherwise)
 				if(self._refreshDeferred){
 					self._refreshDeferred.resolve({ results: results, rows: trs });
+					delete self._refreshDeferred;
 				}
 				
 				return trs;
