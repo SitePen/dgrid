@@ -18,7 +18,7 @@
 				height: 100%;
 			}
 			
-			#cpLeft .dgrid {
+			.bcLeft {
 				width: 300px;
 			}
 			
@@ -116,8 +116,10 @@
 				bc.addChild(tb);
 				bc.addChild(new CP({
 					id: "cpLeft",
+					"class": "bcLeft",
 					region: "left",
-					content: gridLeft
+					content: gridLeft,
+					splitter: true
 				}));
 				bc.addChild(tc);
 				

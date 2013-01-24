@@ -17,7 +17,7 @@
 				width: 99%;
 				height: 99%;
 			}
-			.bcLeft, .bcRight {
+			.bcLeft {
 				width: 300px;
 			}
 			.dijitDialog {
@@ -76,7 +76,7 @@
 				</span>
 			</div>
 			<div data-dojo-type="dijit.layout.ContentPane"
-				data-dojo-props="id:'cpLeft', region:'left'">
+				data-dojo-props="id:'cpLeft', region:'left', splitter:true">
 				<!-- left: dgrid inside contentpane -->
 				<div data-dojo-type="dgrid.Grid" id="gridBCCP" class="bcLeft"
 					data-dojo-props="store: testStore, columns: getGridCols()"></div>
