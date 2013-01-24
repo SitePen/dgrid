@@ -1,5 +1,5 @@
-define(["dojo/_base/declare", "dijit/registry"],
-function(declare, registry){
+define(["dojo/_base/declare", "dojo/dom-geometry", "dijit/registry"],
+function(declare, domGeometry, registry){
 	return declare(null, {
 		// summary:
 		//		A dgrid extension which will add the grid to the dijit registry,
@@ -38,6 +38,15 @@ function(declare, registry){
 			// provide hollow implementation for logic which assumes its existence
 			// (e.g. dijit/form/_FormMixin)
 			return [];
+		},
+		
+		resize: function(changeSize){
+			// Honor changeSize parameter used by layout widgets, and resize grid
+			if(changeSize){
+				domGeometry.setMarginBox(this.domNode, changeSize);
+			}
+			
+			this.inherited(arguments);
 		}
 	});
 });
