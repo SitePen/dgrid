@@ -108,6 +108,11 @@
 						store: testStore,
 						columns: columns1
 					}, "grid");
+					window.gridPeriod = new ResizeGrid({
+						id: "gridPeriod",
+						store: testStore,
+						columns: columns1
+					}, "grid.period");
 					window.gridWide = new ResizeGrid({
 						store: testStore,
 						columns: lang.clone(columns)
@@ -161,6 +166,8 @@
 			<button onclick="grid.set('adjustLastColumn', true);">Enable</button>
 			<button onclick="grid.set('adjustLastColumn', false);">Disable</button>
 		</div>
+		<h2>A basic grid with a period in its ID, to ensure injected size rules work</h2>
+		<div id="grid.period"></div>
 		<h2>Another grid w/ columns whose width initially exceed the table's width,
 			placed within a relatively-positioned element</h2>
 		<div class="testrelative">
