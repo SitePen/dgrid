@@ -226,7 +226,7 @@ function createSharedEditor(column, originalRenderCell){
 	
 	function dismissOnKey(evt){
 		// Contains logic for reacting to enter/escape keypresses to save/cancel edits.
-		// Returns boolean specifying whether this key event should dismiss the field.
+		// Calls `focusNode.blur()` in cases where field should be dismissed.
 		var key = evt.keyCode || evt.which;
 		
 		if(key == 27){ // escape: revert + dismiss
