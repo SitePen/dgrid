@@ -16,6 +16,7 @@ function(kernel, declare, Deferred, listen, aspect, query, has, put, hasClass, G
 	});
 
 	var colsetidAttr = "data-dgrid-column-set-id";
+	var allPeriods = /\./g;
 	
 	hasClass("safari", "ie-7");
 	
@@ -217,7 +218,7 @@ function(kernel, declare, Deferred, listen, aspect, query, has, put, hasClass, G
 			// summary:
 			//		Dynamically creates a stylesheet rule to alter a columnset's style.
 			
-			var rule = this.addCssRule("#" + this.domNode.id + " .dgrid-column-set-" + colsetId, css);
+			var rule = this.addCssRule("#" + this.domNode.id.replace(allPeriods, "\\.") + " .dgrid-column-set-" + colsetId, css);
 			positionScrollers(this);
 			return rule;
 		},

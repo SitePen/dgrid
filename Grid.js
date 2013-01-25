@@ -1,7 +1,8 @@
 define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/on", "dojo/has", "put-selector/put", "./List", "dojo/_base/sniff"],
 function(kernel, declare, listen, has, put, List){
 	var contentBoxSizing = has("ie") < 8 && !has("quirks");
-	var invalidClassChars = /[^\._a-zA-Z0-9-]/g;	
+	var invalidClassChars = /[^\._a-zA-Z0-9-]/g;
+	var allPeriods = /\./g;
 	function appendIfNode(parent, subNode){
 		if(subNode && subNode.nodeType){
 			parent.appendChild(subNode);
@@ -56,7 +57,7 @@ function(kernel, declare, listen, has, put, List){
 			if(!element && typeof columnId != "undefined"){
 				var row = this.row(target),
 					rowElement = row.element;
-				if(rowElement){ 
+				if(rowElement){
 					var elements = rowElement.getElementsByTagName("td");
 					for(var i = 0; i < elements.length; i++){
 						if(elements[i].columnId == columnId){
@@ -155,7 +156,7 @@ function(kernel, declare, listen, has, put, List){
 				if(column.formatter){
 					td.innerHTML = column.formatter(data);
 				}else if(column.renderCell){
-					// A column can provide a renderCell method to do its own DOM manipulation, 
+					// A column can provide a renderCell method to do its own DOM manipulation,
 					// event handling, etc.
 					appendIfNode(td, column.renderCell(object, data, td, options));
 				}else if(data != null){
@@ -222,7 +223,7 @@ function(kernel, declare, listen, has, put, List){
 									!sort.descending
 							}];
 							
-							// Emit an event with the new sort 
+							// Emit an event with the new sort
 							eventObj = {
 								bubbles: true,
 								cancelable: true,
@@ -347,7 +348,7 @@ function(kernel, declare, listen, has, put, List){
 			// summary:
 			//		Dynamically creates a stylesheet rule to alter a column's style.
 			
-			return this.addCssRule("#" + this.domNode.id + " .dgrid-column-" + colId, css);
+			return this.addCssRule("#" + this.domNode.id.replace(allPeriods, "\\.") + " .dgrid-column-" + colId, css);
 		},
 		
 		/*=====
