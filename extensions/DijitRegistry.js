@@ -6,6 +6,11 @@ function(declare, domGeometry, registry){
 		//		so that startup() will be successfully called by dijit layout widgets
 		//		with dgrid children.
 		
+		// Defaults normally imposed on _WidgetBase by container widget modules:
+		minSize: 0, // BorderContainer
+		maxSize: Infinity, // BorderContainer
+		showTitle: true, // StackContainer
+		
 		buildRendering: function(){
 			registry.add(this);
 			this.inherited(arguments);
@@ -47,6 +52,19 @@ function(declare, domGeometry, registry){
 			}
 			
 			this.inherited(arguments);
+		},
+		
+		_set: function(prop, value){
+			// summary:
+			//		Simple analogue of _WidgetBase#_set for compatibility with some
+			//		Dijit layout widgets which assume its existence.
+			this[prop] = value;
+		},
+		
+		watch: function(){
+			// summary:
+			//		dgrid doesn't support watch; this is a no-op for compatibility with
+			//		some Dijit layout widgets which assume its existence.
 		}
 	});
 });
