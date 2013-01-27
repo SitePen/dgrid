@@ -17,7 +17,7 @@
 				width: 99%;
 				height: 99%;
 			}
-			.bcLeft, .bcRight {
+			.bcLeft {
 				width: 300px;
 			}
 			.dijitDialog {
@@ -49,7 +49,6 @@
 				// widgets only used declaratively
 				"dijit/layout/BorderContainer",
 				"dijit/layout/TabContainer",
-				"dijit/layout/ContentPane",
 				"dijit/Toolbar",
 				"dijit/form/Button",
 				// non-returns
@@ -59,7 +58,7 @@
 			
 				var CustomGrid = declare([Grid, DijitRegistry]);
 				
-				// simply passing columns via data-dojo-props, don't want GridFromHtml
+				// Simply passing columns via data-dojo-props, don't want GridFromHtml
 				window.dgrid = { Grid: CustomGrid };
 				
 				parser.parse();
@@ -75,26 +74,20 @@
 					Show declarative dialog
 				</span>
 			</div>
-			<div data-dojo-type="dijit.layout.ContentPane"
-				data-dojo-props="id:'cpLeft', region:'left'">
-				<!-- left: dgrid inside contentpane -->
-				<div data-dojo-type="dgrid.Grid" id="gridBCCP" class="bcLeft"
-					data-dojo-props="store: testStore, columns: getGridCols()"></div>
+			<!-- left: dgrid as direct child -->
+			<div data-dojo-type="dgrid.Grid" id="gridBCCP" class="bcLeft"
+				data-dojo-props="region: 'left', splitter: true, store: testStore, columns: getGridCols()">
 			</div>
 			<!-- center: tabcontainer -->
 			<div data-dojo-type="dijit.layout.TabContainer" class="bcCenter" id="tc"
 				data-dojo-props="region: 'center'">
-				<!-- initial tab: dgrid inside contentpane -->
-				<div data-dojo-type="dijit.layout.ContentPane"
-					data-dojo-props="id: 'tab1', title: 'Tab 1'">
-					<div data-dojo-type="dgrid.Grid" id="gridTab1" class="gridTab"
-						data-dojo-props="store: testStore, columns: getGridCols()"></div>
+				<!-- initial tab: dgrid as direct child -->
+				<div data-dojo-type="dgrid.Grid" id="gridTab1" class="gridTab"
+					data-dojo-props="title: 'Tab 1', store: testStore, columns: getGridCols()">
 				</div>
-				<!-- tab 2: dgrid inside contentpane again, but not initially visible -->
-				<div data-dojo-type="dijit.layout.ContentPane"
-					data-dojo-props="id: 'tab2', title: 'Tab 2'">
-					<div data-dojo-type="dgrid.Grid" id="gridTab2" class="gridTab"
-						data-dojo-props="store: testStore, columns: getGridCols()"></div>
+				<!-- tab 2: dgrid as direct child again, but not initially visible -->
+				<div data-dojo-type="dgrid.Grid" id="gridTab2" class="gridTab"
+					data-dojo-props="title: 'Tab 2', store: testStore, columns: getGridCols()">
 				</div>
 			</div>
 		</div>
