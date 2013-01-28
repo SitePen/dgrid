@@ -9,6 +9,7 @@ function(declare, domGeometry, registry){
 		// Defaults normally imposed on _WidgetBase by container widget modules:
 		minSize: 0, // BorderContainer
 		maxSize: Infinity, // BorderContainer
+		layoutPriority: 0, // BorderContainer
 		showTitle: true, // StackContainer
 		
 		buildRendering: function(){
