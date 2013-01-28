@@ -91,6 +91,9 @@ automatically.
     * French (#381, thanks mduriancik)
     * Brazilian Portuguese (#376, thanks stavarengo)
     * Slovak (#381, thanks mduriancik)
+* The `DijitRegistry` extension now supports dgrid components as direct children
+    of common Dijit layout container widgets, and will now properly alter the
+    size of a list or grid if the `resize` method is passed an argument. (#401)
 
 ## Other changes and fixes
 
