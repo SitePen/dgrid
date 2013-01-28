@@ -54,6 +54,14 @@ keyed by column IDs.
     reference to the QueryResults object (`results`) and the rendered rows
     (`rows`).
 
+### Mixins
+
+* The `Selection` mixin now supports an `allowTextSelection` property, allowing
+    text selection within a List or Grid to be permitted or denied completely
+    independently from the `selectionMode` property; default behavior is still
+    to prevent unless `selectionMode` is `none`.  Selection prevention itself
+    has also been fixed to work in all browsers. (#148)
+
 ### Extensions
 
 * The `ColumnResizer` extension now supports an `adjustLastColumn` flag; when
@@ -88,12 +96,26 @@ keyed by column IDs.
 * Resolved issues regarding proper handling of errors / rejected promises in
     `OnDemandList` as well as the `Pagination` extension.
     (#351; obsoletes #241, #242)
+* Resolved issues in `Grid`, `ColumnSet`, `ColumnHider`, and `ColumnResizer`
+    regarding dynamic style injection for grids with DOM node IDs containing
+    unsafe characters; added `escapeCssIdentifier` function to `util/misc`. (#402)
+* Resolved an issue in `TouchScroll` which unnecessarily prevented native
+    touch-scrolling even when the component can't be scrolled. (#344)
+
+### Mixins
+
+* Resolved an issue with the `ColumnSet` mixin where clicking within the
+    horizontal scrollbar area (aside from the arrows/handle) wouldn't work in IE.
+    (#307)
 
 ### Extensions
 
 * Resolved an issue where `ColumnHider` would leave styles applied for hiding
     columns, which could have adverse effects if a new grid is later created
     with the same ID. (#371)
+* Resolved an issue with `ColumnHider` which could cause the hidden state of
+    columns to be forgotten when other components such as `ColumnReorder`
+    interact with the column structure. (#289)
 * Resolved an issue with `ColumnHider` related to IE8 standards mode's handling
     of `display: none` cells. (#362)
 * Resolved an issue where widths set via the `ColumnResizer` extension would be
