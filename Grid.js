@@ -94,7 +94,7 @@ function(kernel, declare, listen, has, put, List){
 				subRow = subRows[si];
 				// for single-subrow cases in modern browsers, TR can be skipped
 				// http://jsperf.com/table-without-trs
-				tr = (sl == 1 && !has("ie")) ? tbody : put(tbody, "tr");
+				tr = put(tbody, "tr");
 				if(subRow.className){
 					put(tr, "." + subRow.className);
 				}
