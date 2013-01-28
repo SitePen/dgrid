@@ -96,8 +96,8 @@ keyed by column IDs.
 * Resolved issues regarding proper handling of errors / rejected promises in
     `OnDemandList` as well as the `Pagination` extension.
     (#351; obsoletes #241, #242)
-* Resolved potential memory leaks in `ColumnSet` and `ColumnResizer`.
-    (#394, #395, #396, #397)
+* Resolved potential memory leaks in `Grid`, `ColumnSet`, and `ColumnResizer`.
+    (#393, #394, #395, #396, #397)
 * Resolved issues in `Grid`, `ColumnSet`, `ColumnHider`, and `ColumnResizer`
     regarding dynamic style injection for grids with DOM node IDs containing
     unsafe characters; added `escapeCssIdentifier` function to `util/misc`. (#402)

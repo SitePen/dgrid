@@ -206,12 +206,18 @@ function(kernel, declare, listen, has, put, List){
 			}, this.subRows && this.subRows.headerRows);
 			this._rowIdToObject[row.id = this.id + "-header"] = this.columns;
 			headerNode.appendChild(row);
-			// if it columns are sortable, resort on clicks
-			listen(row, "click,keydown", function(event){
+			
+			// If the columns are sortable, re-sort on clicks.
+			// Use a separate listener property to be managed by renderHeader in case
+			// of subsequent calls.
+			if(this._sortListener){
+				this._sortListener.remove();
+			}
+			this._sortListener = listen(row, "click,keydown", function(event){
 				// respond to click, space keypress, or enter keypress
 				if(event.type == "click" || event.keyCode == 32 /* space bar */ || (!has("opera") && event.keyCode == 13) /* enter */){
 					var target = event.target,
-						parentNode, field, sort, newSort, eventObj;
+						field, sort, newSort, eventObj;
 					do{
 						if(target.sortable){
 							// If the click is on the same column as the active sort,
@@ -274,6 +280,10 @@ function(kernel, declare, listen, has, put, List){
 		destroy: function(){
 			// Run _destroyColumns first to perform any column plugin tear-down logic.
 			this._destroyColumns();
+			if(this._sortListener){
+				this._sortListener.remove();
+			}
+			
 			this.inherited(arguments);
 		},
 		
