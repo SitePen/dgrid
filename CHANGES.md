@@ -17,6 +17,14 @@ returns `columns` as initially passed, except in the case where `subRows` is
 passed instead, in which case it returns an object hash version of the structure
 keyed by column IDs.
 
+### put-selector version
+
+When updating to dgrid 0.3.5, make sure you also update your version of
+[put-selector](https://github.com/kriszyp/put-selector) to 0.3.1 or higher
+(0.3.2 is the latest at the time of this writing).  If you use
+[cpm](https://github.com/kriszyp/cpm) to update dgrid, this should happen
+automatically.
+
 ## Significant changes
 
 ### General/Core
