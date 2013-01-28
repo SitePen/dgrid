@@ -398,14 +398,14 @@ return declare(null, {
 		}
 	},
 	isSelected: function(object){
-		if(!object){
+		if(object===undefined || object===null){
 			return false;
 		}
 		if(!object.element){
 			object = this.row(object);
 		}
 
-		return !!this.selection[object.id];
+		return (object.id in this.selection)? !!this.selection[object.id] : this.allSelected;
 	},
 	
 	refresh: function(){
