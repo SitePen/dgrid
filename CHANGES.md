@@ -110,6 +110,9 @@ keyed by column IDs.
 * Resolved an issue with the `ColumnSet` mixin where clicking within the
     horizontal scrollbar area (aside from the arrows/handle) wouldn't work in IE.
     (#307)
+* Improved logic of `isSelect` for `Selection` and `CellSelection` regarding
+    unloaded rows/cells in combination with the select-all feature in some cases.
+    (#258)
 
 ### Extensions
 

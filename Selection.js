@@ -398,14 +398,21 @@ return declare(null, {
 		}
 	},
 	isSelected: function(object){
-		if(object===undefined || object===null){
+		// summary:
+		//		Returns true if the indicated row is selected.
+		
+		if(typeof object === "undefined" || object === null){
 			return false;
 		}
 		if(!object.element){
 			object = this.row(object);
 		}
-
-		return (object.id in this.selection)? !!this.selection[object.id] : this.allSelected;
+		
+		// First check whether the given row is indicated in the selection hash;
+		// failing that, check if allSelected is true (testing against the
+		// allowSelect method if possible)
+		return (object.id in this.selection) ? !!this.selection[object.id] :
+			this.allSelected && (!object.data || this.allowSelect(object));
 	},
 	
 	refresh: function(){
