@@ -91,6 +91,7 @@ keyed by column IDs.
 * Resolved an issue where upon changing column structure, the placement of the
     sort arrow would be lost even though the grid is still sorting by the same
     field.
+* Simplified logic in `Grid` to always create `tr` elements. (#387)
 * Resolved an issue where `OnDemandList` could end up firing requests where
     start exceeds total and count is negative. (#323)
 * Resolved issues regarding proper handling of errors / rejected promises in
