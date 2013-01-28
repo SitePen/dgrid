@@ -38,8 +38,8 @@
 		<script type="text/javascript" src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script type="text/javascript">
-			require(["dgrid/OnDemandGrid", "dgrid/GridWithColumnSetsFromHtml", "dgrid/ColumnSet", "dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dojo/on", "dojo/parser", "dgrid/test/data/base", "dgrid/test/data/DeferredWrapper", "dojo/domReady!"],
-				function(OnDemandGrid, GridFromHtml, ColumnSet, Selection, Keyboard, declare, on, parser, testStore, DeferredWrapper){
+			require(["dgrid/OnDemandGrid", "dgrid/GridWithColumnSetsFromHtml", "dgrid/ColumnSet", "dgrid/Selection", "dgrid/Keyboard", "dgrid/selector", "dojo/_base/declare", "dojo/on", "dojo/parser", "dgrid/test/data/base", "dgrid/test/data/DeferredWrapper", "dojo/domReady!"],
+				function(OnDemandGrid, GridFromHtml, ColumnSet, Selection, Keyboard, selector, declare, on, parser, testStore, DeferredWrapper){
 					var columnSets1 = [
 							[
 								[{label: 'Column 1', field: 'col1'},
@@ -102,7 +102,22 @@
 									{label: 'Column 1', field: 'col1'},
 									{label: 'Column 4', field: 'col4'}
 								]
-							]];
+							]],
+						columnSetsSelector = [
+							[
+								{
+									id: selector({
+										className:'checkbox'
+									})
+								}
+							],
+							[
+								[
+									{label: 'Column 1', field: 'col1'},
+									{label: 'Column 4', field: 'col4'}
+								]
+							]
+						];
 					
 					function byId(id){ return document.getElementById(id); }
 
@@ -118,6 +133,13 @@
 						columnSets: columnSetsSingleRow
 					}, "gridSingleRow");
 					
+					window.gridSelector = new ComplexGrid({
+						store: DeferredWrapper(testStore),
+						columnSets: columnSetsSelector,
+						selectionMode: "none",
+						allowSelectAll: true
+					}, "gridSelector");
+
 					window.grid = new ComplexGrid({
 						store: DeferredWrapper(testStore),
 						columnSets: columnSets1
@@ -165,6 +187,8 @@
 		</p>
 		<h2>A Grid with locking columns but only one subrow</h2>
 		<div id="gridSingleRow" class="grid"></div>
+		<h2>A Grid with a selector</h2>
+		<div id="gridSelector" class="grid"></div>
 		<h2>A Grid with complex columns including locking columns and subrows</h2>
 		<div id="grid" class="grid"></div>
 		<p>Buttons to test resetting columnSets:
