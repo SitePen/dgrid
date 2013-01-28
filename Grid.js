@@ -2,7 +2,6 @@ define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/on", "dojo/has", "put-s
 function(kernel, declare, listen, has, put, List){
 	var contentBoxSizing = has("ie") < 8 && !has("quirks");
 	var invalidClassChars = /[^\._a-zA-Z0-9-]/g;
-	var allPeriods = /\./g;
 	function appendIfNode(parent, subNode){
 		if(subNode && subNode.nodeType){
 			parent.appendChild(subNode);
@@ -348,7 +347,8 @@ function(kernel, declare, listen, has, put, List){
 			// summary:
 			//		Dynamically creates a stylesheet rule to alter a column's style.
 			
-			return this.addCssRule("#" + this.domNode.id.replace(allPeriods, "\\.") + " .dgrid-column-" + colId, css);
+			return this.addCssRule("#" + miscUtil.escapeCssIdentifier(this.domNode.id) +
+				" .dgrid-column-" + colId, css);
 		},
 		
 		/*=====

@@ -20,7 +20,6 @@ function(declare, has, listen, miscUtil, put){
 	
 	var activeGrid, // references grid for which the menu is currently open
 		bodyListener, // references pausable event handler for body mousedown
-		allPeriods = /\./g, // regex to clean identifiers for CSS rule addition
 		// Need to handle old IE specially for checkbox listener and for attribute.
 		hasIE = has("ie"),
 		hasIEQuirks = hasIE && has("quirks"),
@@ -216,7 +215,7 @@ function(declare, has, listen, miscUtil, put){
 			//		Hides the column indicated by the given id.
 			
 			// Use miscUtil function directly, since we clean these up ourselves anyway
-			var selectorPrefix = "#" + this.domNode.id.replace(allPeriods, "\\.") + " .dgrid-column-",
+			var selectorPrefix = "#" + miscUtil.escapeCssIdentifier(this.domNode.id) + " .dgrid-column-",
 				next, rules, i; // used in IE8 code path
 			
 			if(has("ie") === 8 && !has("quirks")){

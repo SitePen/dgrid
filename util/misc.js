@@ -8,7 +8,8 @@ define(["put-selector/put"], function(put){
 	var extraRules = [],
 		extraSheet,
 		removeMethod,
-		rulesProperty;
+		rulesProperty,
+		invalidCssChars = /([^A-Za-z0-9_\u00A0-\uFFFF-])/g;
 	
 	function removeRule(index){
 		// Function called by the remove method on objects returned by addCssRule.
@@ -115,6 +116,16 @@ define(["put-selector/put"], function(put){
 					removeRule(index);
 				}
 			};
+		},
+		
+		escapeCssIdentifier: function(id){
+			// summary:
+			//		Escapes normally-invalid characters in a CSS identifier (such as .);
+			//		see http://www.w3.org/TR/CSS2/syndata.html#value-def-identifier
+			// id: String
+			//		CSS identifier (e.g. tag name, class, or id) to be escaped
+			
+			return id.replace(invalidCssChars, "\\$1");
 		}
 	};
 	return util;

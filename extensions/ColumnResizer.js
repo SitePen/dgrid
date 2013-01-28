@@ -2,7 +2,6 @@ define(["dojo/_base/declare", "dojo/on", "dojo/query", "dojo/_base/lang", "dojo/
 function(declare, listen, query, lang, dom, geom, has, miscUtil, put){
 
 var hasPointFromNode = has("touch") && webkitConvertPointFromNodeToPage;
-var allPeriods = /\./g;
 
 function addRowSpan(table, span, startRow, column, id){
 	// loop through the rows of the table and add this column's id to
@@ -103,7 +102,7 @@ function resizeColumnWidth(grid, colId, width, parentType){
 		}else{
 			// Use miscUtil function directly, since we clean these up ourselves anyway
 			rule = miscUtil.addCssRule(
-				"#" + grid.domNode.id.replace(allPeriods, "\\.") + " .dgrid-column-" + colId, "width: " + width + ";");
+				"#" + miscUtil.escapeCssIdentifier(grid.domNode.id) + " .dgrid-column-" + colId, "width: " + width + ";");
 		}
 
 		// keep a reference for future removal
