@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
 	<head>
+		<meta charset="utf-8">
 		<title>Test Grid Store Observation</title>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-		<meta name="viewport" content="width=570" />
-		<style type="text/css">
+		<meta name="viewport" content="width=570">
+		<style>
 			@import "../../dojo/resources/dojo.css";
 			@import "../../dijit/themes/claro/claro.css";
 			@import "../css/skins/claro.css";
@@ -53,9 +53,9 @@
 		<script>
 			var start= new Date().getTime();
 		</script>
-		<script type="text/javascript" src="../../dojo/dojo.js" 
+		<script src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
-		<script type="text/javascript">
+		<script>
 			require(["dojo/on", "dgrid/OnDemandList", "dgrid/OnDemandGrid","dgrid/Keyboard", "dgrid/Selection", "dgrid/editor", "dijit/form/DateTextBox", "dijit/form/HorizontalSlider", "dijit/form/NumberSpinner",  "dgrid/test/data/base", "dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array", "dojo/_base/Deferred", "dojo/dom-construct", "dojo/store/Memory", "dojo/domReady!"],
 				function(on, List, Grid, Keyboard, Selection, editor, DateTextBox, Slider, NumberSpinner, data, lang, declare, arrayUtil, Deferred, domConstruct, Memory){
 					
