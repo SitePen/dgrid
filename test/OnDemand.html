@@ -56,8 +56,8 @@
 		<script src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script>
-			require(["dojo/on", "dgrid/OnDemandList", "dgrid/OnDemandGrid","dgrid/Keyboard", "dgrid/Selection", "dgrid/editor", "dijit/form/DateTextBox", "dijit/form/HorizontalSlider", "dijit/form/NumberSpinner",  "dgrid/test/data/base", "dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array", "dojo/_base/Deferred", "dojo/dom-construct", "dojo/store/Memory", "dojo/domReady!"],
-				function(on, List, Grid, Keyboard, Selection, editor, DateTextBox, Slider, NumberSpinner, data, lang, declare, arrayUtil, Deferred, domConstruct, Memory){
+			require(["dojo/on", "dgrid/OnDemandList", "dgrid/OnDemandGrid","dgrid/Keyboard", "dgrid/Selection", "dgrid/editor", "dijit/form/DateTextBox", "dijit/form/HorizontalSlider", "dijit/form/NumberSpinner",  "dgrid/test/data/base", "dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array", "dojo/_base/Deferred", "dojo/store/Memory", "put-selector/put", "dojo/domReady!"],
+				function(on, List, Grid, Keyboard, Selection, editor, DateTextBox, Slider, NumberSpinner, data, lang, declare, arrayUtil, Deferred, Memory, put){
 					
 					// Create error store
 					errorStore = new Memory();
@@ -155,9 +155,7 @@
 						columns: lang.clone(columns4),
 						renderRow: function(object, options){
 							// need to define renderRow to accommodate store items
-							return domConstruct.create("div", {
-								innerHTML: object.col1
-							});
+							return put("div", object.col1);
 						}
 					}, "listAddDel");
 					
@@ -234,11 +232,11 @@
 					
 					function updateDirty(){
 						setTimeout(function(){
+							var dirtyDiv = document.getElementById("dirty");
 							// clear "dirty items" list after change has been processed
-							domConstruct.empty("dirty");
+							dirtyDiv.innerHTML = "";
 							for(var rowId in grid2.dirty){
-								var node = domConstruct.create("div",
-									{ innerHTML: "rowId: "+rowId }, "dirty");
+								var node = put(dirtyDiv, "div", "rowId: "+rowId);
 							}
 						}, 0);
 					}
