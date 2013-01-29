@@ -4,7 +4,7 @@
 		<title>Test Grid Selectors</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 		<meta name="viewport" content="width=570" />
-		<style type="text/css">
+		<style>
 			@import "../../dojo/resources/dojo.css";
 			@import "../css/skins/claro.css";
 			.heading {
@@ -26,9 +26,9 @@
 				width: 42px;
 			}
 		</style>
-		<script type="text/javascript" src="../../dojo/dojo.js" 
+		<script src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
-		<script type="text/javascript">
+		<script>
 			require(["dojo/on", "dgrid/OnDemandGrid", "dgrid/selector", "dgrid/Selection", "dgrid/Keyboard", "dgrid/ColumnSet",
 					"dojo/_base/declare", "dojo/_base/array", "dojo/json", "dgrid/test/data/base", "dojo/domReady!"], 
 				function(on, Grid, selector, Selection, Keyboard, ColumnSet, declare, arrayUtil, json, testStore){

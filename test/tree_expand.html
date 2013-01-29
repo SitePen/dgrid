@@ -4,7 +4,7 @@
 		<title>Test Tree Grid</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 		<meta name="viewport" content="width=570" />
-		<style type="text/css">
+		<style>
 			@import "../../dojo/resources/dojo.css";
 			@import "../css/skins/claro.css";
 			.container {
@@ -28,9 +28,9 @@
 		<script>
 			var start= new Date().getTime();
 		</script>
-		<script type="text/javascript" src="../../dojo/dojo.js" 
+		<script src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
-		<script type="text/javascript">
+		<script>
 			require(["dojo/on", "dgrid/OnDemandGrid","dgrid/tree","dgrid/editor", "dgrid/Keyboard",
 					"dgrid/Selection", "dgrid/selector",
 					"dojo/_base/declare", "dojo/_base/array", "dgrid/test/data/base", "dojo/domReady!"], 

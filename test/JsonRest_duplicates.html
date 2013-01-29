@@ -4,7 +4,7 @@
 		<title>Test JsonRest Tree with objects repeated in different places in hierarchy</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 		<meta name="viewport" content="width=570" />
-		<style type="text/css">
+		<style>
 			@import "../../dojo/resources/dojo.css";
 			@import "../css/skins/claro.css";
 			h2 {
@@ -14,9 +14,9 @@
 				margin: 10px;
 			}
 		</style>
-		<script type="text/javascript" src="../../dojo/dojo.js"
+		<script src="../../dojo/dojo.js"
 			data-dojo-config="async: true"></script>
-		<script type="text/javascript">
+		<script>
 			function deleteSelected(){
 				for(var i in grid.selection){
 					testStore.remove(i);
