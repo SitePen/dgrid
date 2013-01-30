@@ -423,7 +423,7 @@ return declare(null, {
 			this._fireSelectionEvent && this._fireSelectionEvent();
 		}
 		this._lastSelected = null;
-		this.inherited(arguments);
+		return this.inherited(arguments);
 	},
 	
 	renderArray: function(){
