@@ -261,9 +261,10 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 		gotoPage: function(page, focusLink){
 			// summary:
 			//		Loads the given page.  Note that page numbers start at 1.
-			var grid = this;
+			var grid = this,
+				dfd = new Deferred();
 			
-			return this._trackError(function(){
+			var result = this._trackError(function(){
 				var count = grid.rowsPerPage,
 					start = (page - 1) * count,
 					options = lang.mixin(grid.get("queryOptions"), {
@@ -328,12 +329,18 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 						grid.resize();
 					}
 					
-					return results;
+					dfd.resolve(results);
 				}, function(error){
 					cleanupLoading(grid);
-					throw error;
+					dfd.reject(error);
 				});
 			});
+			
+			if (!result) {
+				// A synchronous error occurred; reject the promise.
+				dfd.reject();
+			}
+			return dfd.promise;
 		}
 	});
 });
