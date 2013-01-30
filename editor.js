@@ -205,10 +205,8 @@ function createSharedEditor(column, originalRenderCell){
 	
 	function onblur(){
 		var parentNode = node.parentNode,
-			cell = column.grid.cell(node),
 			i = parentNode.children.length - 1,
-			options = { alreadyHooked: true },
-			renderedNode;
+			options = { alreadyHooked: true };
 		
 		// Remove the editor from the cell, to be reused later.
 		parentNode.removeChild(node);
@@ -252,9 +250,7 @@ function showEditor(cmp, column, cell, value){
 	// Places a shared editor into the newly-active cell in the column.
 	// Also called when rendering an editor in an "always-on" editor column.
 	
-	var grid = column.grid,
-		editor = column.editor,
-		isWidget = cmp.domNode;
+	var isWidget = cmp.domNode;
 	
 	// for regular inputs, we can update the value before even showing it
 	if(!isWidget){ updateInputValue(cmp, value); }
