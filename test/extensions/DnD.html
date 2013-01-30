@@ -76,8 +76,6 @@
 						}
 					}
 					
-					function byId(id){ return document.getElementById(id); }
-					
 					// Note: testOrderedStore hard-wires sorting anyway,
 					// so leaving sort disabled on columns in this grid.
 					window.grid1 = new DnDGrid({
@@ -100,17 +98,20 @@
 					}, "grid2");
 					
 					// set up other targets
-					var anotherTargetDiv = byId("another-target");
-					var target = new DnDSource(anotherTargetDiv, {accept:["dgrid-row"], isSource:false});
-					target.onDrop = function(source, nodes){
-						nodes.forEach(function(node){
-							anotherTargetDiv.innerHTML = "Dropped " + source.getItem(node.id).data.name;
-						});
-					};
+					var anotherTargetDiv = document.getElementById("another-target");
+					var target = new DnDSource("another-target", {
+						accept: ["dgrid-row"],
+						isSource:false,
+						onDrop: function(source, nodes){
+							nodes.forEach(function(node){
+								anotherTargetDiv.innerHTML = "Dropped " + source.getItem(node.id).data.name;
+							});
+						}
+					});
 					
 					// Set up a dnd source with items that can drag into the grid.
 					// This is one way of doing it; there are likely several...
-					var source = new DnDSource(byId("another-source"), {
+					var source = new DnDSource("another-source", {
 						accept: ["dgrid-row"]
 					});
 					function nameObj(args){
@@ -137,7 +138,7 @@
 						return this.getItem(node.id).data;
 					};
 					
-					var invalidSource = new DnDSource(byId("invalid-source"), {
+					var invalidSource = new DnDSource("invalid-source", {
 						accept: ["grue"]
 					});
 					invalidSource.insertNodes(false, [
