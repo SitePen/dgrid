@@ -97,10 +97,10 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 				for(i = 0; i < pageSizeOptions.length; i++){
 					put(sizeSelect, 'option', pageSizeOptions[i], {value: pageSizeOptions[i]});
 				}
-				on(sizeSelect, "change", function(){
+				this._listeners.push(on(sizeSelect, "change", function(){
 					grid.rowsPerPage = +sizeSelect.value;
 					grid.gotoPage(1);
-				});
+				}));
 			}
 			
 			// initialize some content into paginationStatusNode, to ensure
@@ -134,7 +134,7 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 				node.setAttribute("aria-label", i18n.gotoLast);
 			}
 			
-			on(navigationNode, "a:click", function(){
+			this._listeners.push(on(navigationNode, "a:click", function(){
 				var cls = this.className,
 					curr, max;
 				
@@ -157,9 +157,16 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 				}else if(cls == "dgrid-next"){
 					grid.gotoPage(curr + 1);
 				}
-			});
-			
+			}));
 		},
+		
+		destroy: function(){
+			this.inherited(arguments);
+			if(this._pagingTextBoxHandle){
+				this._pagingTextBoxHandle.remove();
+			}
+		},
+		
 		_updateNavigation: function(focusLink){
 			// summary:
 			//		Update status and navigation controls based on total count from query
