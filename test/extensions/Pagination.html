@@ -51,9 +51,12 @@
 			
 			require([skinDep, "dgrid/Grid", "dgrid/extensions/Pagination",
 					"dgrid/Selection", "dgrid/Keyboard", "dgrid/GridFromHtml",
-					"dojo/_base/lang", "dojo/_base/declare", "dojo/dom-construct", "dojo/dom-form", "dgrid/test/data/base", "dojo/domReady!"],
+					"dojo/_base/lang", "dojo/_base/declare", "dojo/on", "dojo/dom-construct",
+					"dojo/dom-form", "dgrid/test/data/errorStores", "dgrid/test/data/base", "dojo/domReady!"],
 				function(skinResource, Grid, Pagination, Selection, Keyboard, GridFromHtml,
-						lang, declare, domConstruct, domForm, testStore){
+						lang, declare, on, domConstruct, domForm, errorStores, testStore){
+					
+					window.errorStores = errorStores; // for easy access by button handlers
 					
 					var CustomGrid = declare([Grid, Keyboard, Selection, Pagination]);
 					
@@ -77,7 +80,7 @@
 					
 					document.body.className = skin;
 					
-					window.grid2 = new CustomGrid({
+					var grid2 = window.grid2 = new CustomGrid({
 						store: testStore,
 						columns: getColumns2(),
 						pagingLinks: false,
@@ -115,6 +118,10 @@
 						
 						return false;
 					};
+					
+					on(document.body, "dgrid-error", function(evt){
+						console.warn("error on grid: ", evt.grid.id, evt.error);
+					});
 				});
 		</script>
 	</head>
@@ -141,8 +148,15 @@
 		<div>Buttons to test changing column structure:
 			<button onclick="grid.set('columns', getColumns2());">New Structure</button>
 			<button onclick="grid.set('columns', getColumns());">Original Structure</button>
+		</div>
+		<div>Buttons to test different stores:
+			<button onclick="grid.set('store', testAsyncStore);">Set to async store</button>
+			<button onclick="grid.set('store', testStore);">Set to sync store</button>
 			<button onclick="grid.set('store', emptyStore);">Set to empty store</button>
-			<button onclick="grid.set('store', testStore);">Set to original store</button>
+			<button onclick="grid.set('store', errorStores.asyncQuery);">Set to async error store</button>
+			<button onclick="grid.set('store', errorStores.query);">Set to sync error store</button>
+		</div>
+		<div>Buttons to test store operations:
 			<button onclick="testAsyncStore.remove(5);">Delete row 6 from original store</button>
 			<button onclick="testAsyncStore.add({col1:'new', col2:true});">Add row to original store</button>
 			<button onclick="grid.set('showFooter', !grid.get('showFooter'));">Toggle footer</button>
