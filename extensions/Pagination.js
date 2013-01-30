@@ -252,9 +252,8 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 		},
 		
 		_onNotification: function(rows){
-			if(rows.length > this.rowsPerPage || // too many rows
-				(rows.length < this.rowsPerPage && // or not enough rows
-						this._currentPage < Math.ceil(this._total / this.rowsPerPage))){ // and we aren't the last page
+			if(rows.length !== this.rowsPerPage){
+				// Refresh the current page to maintain correct number of rows on page
 				this.gotoPage(this._currentPage);
 			}
 		},
