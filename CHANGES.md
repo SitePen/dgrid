@@ -60,7 +60,8 @@ automatically.
     which resolves when the grid finishes rendering results after the refresh.
     It also emits a `dgrid-refresh-complete` event, which includes both a
     reference to the QueryResults object (`results`) and the rendered rows
-    (`rows`).
+    (`rows`).  In addition, the `dgrid-error` event now fires more consistently
+    (both for `OnDemandList` and `Pagination`).
 
 ### Mixins
 
@@ -141,6 +142,9 @@ automatically.
     to skew in Chrome 19 and Safari 6. (#142, #370)
 * Changed name of private `_columnStyles` object used by the `ColumnResizer`
     extension to `_columnSizes` to reduce ambiguity.
+* The `Pagination` extension will no longer immediately throw errors if it is
+    initialized without a store.  However, a warning will be logged, and any
+    method calls will likely throw errors until a store is assigned. (#355)
 
 # 0.3.4
 
