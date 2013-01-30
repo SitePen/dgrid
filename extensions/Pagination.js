@@ -298,7 +298,7 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 				// Run new query and pass it into renderArray
 				results = grid.store.query(grid.query, options);
 				
-				return Deferred.when(grid.renderArray(results, contentNode.firstChild, options), function(){
+				Deferred.when(grid.renderArray(results, contentNode.firstChild, options), function(){
 					cleanupLoading(grid);
 					// Reset scroll Y-position now that new page is loaded.
 					grid.scrollTo({ y: 0 });
@@ -334,6 +334,8 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 					cleanupLoading(grid);
 					dfd.reject(error);
 				});
+				
+				return dfd.promise;
 			});
 			
 			if (!result) {
