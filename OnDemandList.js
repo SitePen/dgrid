@@ -212,7 +212,7 @@ return declare([List, _StoreMixin], {
 		
 		var self = this,
 			keep = (options && options.keepScrollPosition),
-			dfd;
+			dfd, results;
 		
 		// Fall back to instance property if option is not defined
 		if(typeof keep === "undefined"){ keep = this.keepScrollPosition; }
@@ -226,9 +226,13 @@ return declare([List, _StoreMixin], {
 			dfd = this._refreshDeferred = new Deferred();
 			
 			// renderQuery calls _trackError internally
-			self.renderQuery(function(queryOptions){
+			results = self.renderQuery(function(queryOptions){
 				return self.store.query(self.query, queryOptions);
 			});
+			if(typeof results === "undefined"){
+				// Synchronous error occurred; reject the refresh promise.
+				dfd.reject();
+			}
 			
 			// Internally, _refreshDeferred will always be resolved with an object
 			// containing `results` (QueryResults) and `rows` (the rendered rows);
