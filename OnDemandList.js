@@ -140,7 +140,7 @@ return declare([List, _StoreMixin], {
 			{start: 0, count: this.minRowsPerPage, query: query});
 		
 		// Protect the query within a _trackError call, but return the QueryResults
-		this._trackError(function(){ results = query(options); });
+		this._trackError(function(){ return results = query(options); });
 		
 		if(typeof results === "undefined"){
 			// Synchronous error occurred (but was caught by _trackError)
