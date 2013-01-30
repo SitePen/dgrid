@@ -240,13 +240,17 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 		},
 		
 		refresh: function(){
-			if(!this.store){
-				throw new Error("Pagination requires a store to operate.");
-			}
 			this.inherited(arguments);
-			// reset to first page
+			
+			if(!this.store){
+				console.warn("Pagination requires a store to operate.");
+				return;
+			}
+			
+			// Reset to first page and return promise from gotoPage
 			return this.gotoPage(1);
 		},
+		
 		_onNotification: function(rows){
 			if(rows.length > this.rowsPerPage || // too many rows
 				(rows.length < this.rowsPerPage && // or not enough rows
