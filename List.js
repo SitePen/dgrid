@@ -415,7 +415,7 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 			if(results.observe){
 				// observe the results for changes
 				var observerIndex = this.observers.push(results.observe(function(object, from, to){
-					var firstRow, nextNode;
+					var firstRow, nextNode, parentNode;
 					// a change in the data took place
 					if(from > -1 && rows[from]){
 						// remove from old slot
@@ -447,8 +447,9 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 								nextNode = (nextNode.connected || nextNode).nextSibling;
 							}
 						}
-						row = self.newRow(object, beforeNode ? beforeNode.parentNode : self.contentNode,
-							nextNode, options.start + to, options);
+						parentNode = (beforeNode && beforeNode.parentNode) ||
+							(nextNode && nextNode.parentNode) || self.contentNode;
+						row = self.newRow(object, parentNode, nextNode, options.start + to, options);
 						
 						if(row){
 							row.observerIndex = observerIndex;
