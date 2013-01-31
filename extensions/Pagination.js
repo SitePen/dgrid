@@ -250,7 +250,7 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 		},
 		
 		_onNotification: function(rows){
-			if(rows.length !== this.rowsPerPage){
+			if(rows.length !== this._rowsOnPage){
 				// Refresh the current page to maintain correct number of rows on page
 				this.gotoPage(this._currentPage);
 			}
@@ -321,7 +321,7 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 				// Run new query and pass it into renderArray
 				results = grid.store.query(grid.query, options);
 				
-				Deferred.when(grid.renderArray(results, null, options), function(){
+				Deferred.when(grid.renderArray(results, null, options), function(rows){
 					cleanupLoading(grid);
 					// Reset scroll Y-position now that new page is loaded.
 					grid.scrollTo({ y: 0 });
@@ -341,6 +341,7 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 						});
 						grid._total = total;
 						grid._currentPage = page;
+						grid._rowsOnPage = rows.length;
 						
 						// It's especially important that _updateNavigation is called only
 						// after renderArray is resolved as well (to prevent jumping).
