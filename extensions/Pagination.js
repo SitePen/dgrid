@@ -19,8 +19,8 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 		}else if(grid._oldPageNodes){
 			// If cleaning up after a load w/ showLoadingMessage: false,
 			// be careful to only clean up rows from the old page, not the new one
-			for(var i = grid._oldPageNodes.length; i--;){
-				grid.removeRow(grid._oldPageNodes[i]);
+			for(var id in grid._oldPageNodes){
+				grid.removeRow(grid._oldPageNodes[id]);
 			}
 			delete grid._oldPageNodes;
 			// Also remove the observer from the previous page, if there is one
@@ -265,6 +265,18 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 			return rows;
 		},
 		
+		insertRow: function(){
+			var oldNodes = this._oldPageNodes,
+				row = this.inherited(arguments);
+			
+			if(oldNodes && row === oldNodes[row.id]){
+				// If the previous row was reused, avoid removing it in cleanup
+				delete oldNodes[row.id];
+			}
+			
+			return row;
+		},
+		
 		gotoPage: function(page, focusLink){
 			// summary:
 			//		Loads the given page.  Note that page numbers start at 1.
@@ -282,7 +294,10 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 					results,
 					contentNode = grid.contentNode,
 					loadingNode,
-					oldNodes, i, len;
+					oldNodes,
+					children,
+					i,
+					len;
 				
 				if(grid.showLoadingMessage){
 					cleanupContent(grid);
@@ -291,9 +306,10 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 				}else{
 					// Reference nodes to be cleared later, rather than now;
 					// iterate manually since IE < 9 doesn't like slicing HTMLCollections
-					grid._oldPageNodes = oldNodes = [];
-					for(i = 0, len = contentNode.children.length; i < len; i++){
-						oldNodes[i] = contentNode.children[i];
+					grid._oldPageNodes = oldNodes = {};
+					children = contentNode.children;
+					for(i = 0, len = children.length; i < len; i++){
+						oldNodes[children[i].id] = children[i];
 					}
 					// Also reference the current page's observer (if any)
 					grid._oldPageObserver = grid.observers.pop();
@@ -305,7 +321,7 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 				// Run new query and pass it into renderArray
 				results = grid.store.query(grid.query, options);
 				
-				Deferred.when(grid.renderArray(results, contentNode.firstChild, options), function(){
+				Deferred.when(grid.renderArray(results, null, options), function(){
 					cleanupLoading(grid);
 					// Reset scroll Y-position now that new page is loaded.
 					grid.scrollTo({ y: 0 });
