@@ -5,6 +5,12 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ## Breaking Changes
 
+### Signature of the newRow method
+
+The `newRow` method in List, called in reaction to observed store changes,
+has had its signature altered to match that of `insertRow`.  Please note
+that it is likely that `newRow` may be refactored out of existence in the future.
+
 ### Grid and the columns property
 
 The `Grid` module now normalizes the `columns` instance property to an object
@@ -70,6 +76,11 @@ automatically.
     independently from the `selectionMode` property; default behavior is still
     to prevent unless `selectionMode` is `none`.  Selection prevention itself
     has also been fixed to work in all browsers. (#148)
+
+### Column Plugins
+
+* Fixed a `tree` regression since 0.3.2 involving only-child rows being misplaced
+    upon observed changes. (#353)
 
 ### Extensions
 

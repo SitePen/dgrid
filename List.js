@@ -371,10 +371,9 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 			this.scrollTo({ x: 0, y: 0 });
 		},
 		
-		newRow: function(object, before, to, options){
-			if(!before || before.parentNode){
-				var i = options.start + to;
-				var row = this.insertRow(object, before ? before.parentNode : this.contentNode, before, i, options);
+		newRow: function(object, parentNode, beforeNode, i, options){
+			if(parentNode){
+				var row = this.insertRow(object, parentNode, beforeNode, i, options);
 				put(row, ".ui-state-highlight");
 				setTimeout(function(){
 					put(row, "!ui-state-highlight");
@@ -448,7 +447,8 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 								nextNode = (nextNode.connected || nextNode).nextSibling;
 							}
 						}
-						row = self.newRow(object, nextNode, to, options);
+						row = self.newRow(object, beforeNode ? beforeNode.parentNode : self.contentNode,
+							nextNode, options.start + to, options);
 						
 						if(row){
 							row.observerIndex = observerIndex;
