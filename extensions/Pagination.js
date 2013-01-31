@@ -28,8 +28,6 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 				grid._oldPageObserver.cancel();
 				delete grid._oldPageObserver;
 			}
-			// Make sure _lastCollection is cleared (due to logic in List)
-			grid._lastCollection = null;
 		}
 		delete grid._isLoading;
 	}
@@ -256,6 +254,15 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 				// Refresh the current page to maintain correct number of rows on page
 				this.gotoPage(this._currentPage);
 			}
+		},
+		
+		renderArray: function(){
+			var rows = this.inherited(arguments);
+			
+			// Make sure _lastCollection is cleared (due to logic in List)
+			this._lastCollection = null;
+			
+			return rows;
 		},
 		
 		gotoPage: function(page, focusLink){
