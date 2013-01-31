@@ -62,6 +62,7 @@
 					
 					getColumns = function(){
 						return {
+							id: "ID",
 							col1: 'Column 1',
 							col2: {label: 'Column2', sortable: false},
 							col3: 'Column 3',
@@ -157,8 +158,8 @@
 			<button onclick="grid.set('store', errorStores.query);">Set to sync error store</button>
 		</div>
 		<div>Buttons to test store operations:
-			<button onclick="testAsyncStore.remove(5);">Delete row 6 from original store</button>
-			<button onclick="testAsyncStore.add({col1:'new', col2:true});">Add row to original store</button>
+			<button onclick="grid.store.remove(5);">Delete item with id 5 from store</button>
+			<button onclick="grid.store.add({col1:'new', col2:true});">Add item to store</button>
 			<button onclick="grid.set('showFooter', !grid.get('showFooter'));">Toggle footer</button>
 		</div>
 		
