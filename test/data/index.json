@@ -24,12 +24,6 @@
         "parent": ""
     },
     {
-        "name": "destroy.html",
-        "url": "destroy.html",
-        "title": "Test List/Grid Destruction",
-        "parent": ""
-    },
-    {
         "name": "dijit_layout.html",
         "url": "dijit_layout.html",
         "title": "Test Declarative Dijit Layout",
@@ -46,6 +40,23 @@
         "url": "dijit_layout_programmatic.html",
         "title": "Test Programmatic Dijit Layout",
         "parent": ""
+    },
+    {
+        "name": "doh",
+        "url": "doh",
+        "parent": ""
+    },
+    {
+        "name": "create-destroy.html",
+        "url": "doh/create-destroy.html",
+        "title": "Create/Destroy Tests",
+        "parent": "doh"
+    },
+    {
+        "name": "runTests.html",
+        "url": "doh/runTests.html",
+        "title": "dgrid DOH Test Suite",
+        "parent": "doh"
     },
     {
         "name": "editor.html",
@@ -212,12 +223,6 @@
         "name": "Keyboard.html",
         "url": "Keyboard.html",
         "title": "Test Keyboard Mixin",
-        "parent": ""
-    },
-    {
-        "name": "List_no_params.html",
-        "url": "List_no_params.html",
-        "title": "Test Simple List",
         "parent": ""
     },
     {
