@@ -11,6 +11,7 @@
 				height: 100%;
 				margin: 0;
 				padding: 0;
+				overflow: hidden;
 			}
 			body {
 				font-family: Calibri, Verdana, Arial, Helvetica, sans-serif;
@@ -19,7 +20,7 @@
 				border: none;
 				height: 100%;
 			}
-			.toc .dgrid-header {
+			.toc .header-title {
 				padding: 7px 20px;
 			}
 			.toc .dgrid-cell {
@@ -50,9 +51,10 @@
 				"dojo/cookie",
 				"dgrid/OnDemandGrid",
 				"dgrid/tree",
+				"put-selector/put",
 				"dojo/query",
 				"dojo/domReady!"
-			], function(xhr, on, json, Memory, cookie, OnDemandGrid, tree){
+			], function(xhr, on, json, Memory, cookie, OnDemandGrid, tree, put){
 				xhr.get({
 					url: "data/index.json",
 					handleAs: "json"
@@ -76,11 +78,11 @@
 						_expanded: persistedInfo.expanded,
 						className: "toc",
 						columns: {
-							name: tree({ expandOn: "click" }),
+							name: tree({ expandOn: ".dgrid-row:click" }),
 							title: "Title"
 						},
 						renderHeader: function(){
-							this.headerNode.appendChild(document.createTextNode("dgrid Tests"));
+							put(this.headerNode, "div.header-title", "dgrid Tests");
 						},
 						query: { parent: "" },
 						sort: "name",
