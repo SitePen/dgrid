@@ -38,4 +38,4 @@ function populateList(subdir) {
 }
 
 populateList();
-fs.writeFileSync(filename, JSON.stringify(list));
+fs.writeFileSync(filename, JSON.stringify(list, null, 4));
