@@ -34,6 +34,12 @@
 			.toc .dgrid-row:hover {
 				background-color: #def;
 			}
+			.toc a {
+				/* Subdue default link styles, since entire row is clickable */
+				color: #000;
+				text-decoration: none;
+			}
+			
 			.toc .field-name {
 				width: 20em;
 			}
@@ -74,12 +80,16 @@
 						persistedInfo = cookie(cookieName);
 					persistedInfo = persistedInfo ? json.parse(persistedInfo) : {};
 					
+					function renderLinkCell(object, value){
+						return put("a[href=" + object.url + "]", value);
+					}
+					
 					var grid = new OnDemandGrid({
 						_expanded: persistedInfo.expanded,
 						className: "toc",
 						columns: {
-							name: tree({ expandOn: ".dgrid-row:click" }),
-							title: "Title"
+							name: tree({ renderCell: renderLinkCell, expandOn: ".dgrid-row:click" }),
+							title: { renderCell: renderLinkCell }
 						},
 						renderHeader: function(){
 							put(this.headerNode, "div.header-title", "dgrid Tests");
@@ -90,6 +100,7 @@
 					}, "grid");
 					
 					if(persistedInfo.scroll){
+						// Restore scroll position on initial refresh
 						on.once(grid, "dgrid-refresh-complete", function(){
 							grid.scrollTo({ y: persistedInfo.scroll });
 						});
@@ -103,8 +114,11 @@
 								expanded: grid._expanded,
 								scroll: grid.getScrollPosition().y
 							}));
-							// Navigate to test page
-							location.href = item.url;
+							// Navigate to test page, unless a link was clicked
+							// (in which case navigation will occur anyway)
+							if(evt.target.tagName !== "A"){
+								location.href = item.url;
+							}
 						}
 					});
 				});
