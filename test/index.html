@@ -44,12 +44,15 @@
 		<script>
 			require([
 				"dojo/_base/xhr",
+				"dojo/on",
+				"dojo/json",
 				"dojo/store/Memory",
+				"dojo/cookie",
 				"dgrid/OnDemandGrid",
 				"dgrid/tree",
 				"dojo/query",
 				"dojo/domReady!"
-			], function(xhr, Memory, OnDemandGrid, tree){
+			], function(xhr, on, json, Memory, cookie, OnDemandGrid, tree){
 				xhr.get({
 					url: "data/index.json",
 					handleAs: "json"
@@ -64,7 +67,13 @@
 							return !parent.title; // Items with title are html pages, leaves
 						}
 					});
+					
+					var cookieName = "dgrid-test-index",
+						persistedInfo = cookie(cookieName);
+					persistedInfo = persistedInfo ? json.parse(persistedInfo) : {};
+					
 					var grid = new OnDemandGrid({
+						_expanded: persistedInfo.expanded,
 						className: "toc",
 						columns: {
 							name: tree({ expandOn: "click" }),
@@ -78,10 +87,21 @@
 						store: store
 					}, "grid");
 					
+					if(persistedInfo.scroll){
+						on.once(grid, "dgrid-refresh-complete", function(){
+							grid.scrollTo({ y: persistedInfo.scroll });
+						});
+					}
+					
 					grid.on(".dgrid-row:click", function(evt){
 						var item = grid.row(evt).data;
 						if(item.title){
-							// If row represents a test page (not a subdir), navigate to it
+							// Persist state of expansion and scroll
+							cookie(cookieName, json.stringify({
+								expanded: grid._expanded,
+								scroll: grid.getScrollPosition().y
+							}));
+							// Navigate to test page
 							location.href = item.url;
 						}
 					});
