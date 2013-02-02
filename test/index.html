@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>dgrid Tests</title>
+		<style>
+			@import "../css/dgrid.css";
+			@import "../css/skins/slate.css";
+			
+			html, body {
+				height: 100%;
+				margin: 0;
+				padding: 0;
+			}
+			body {
+				font-family: Calibri, Verdana, Arial, Helvetica, sans-serif;
+			}
+			.toc {
+				border: none;
+				height: 100%;
+			}
+			.toc .dgrid-header {
+				padding: 7px 20px;
+			}
+			.toc .dgrid-cell {
+				border: none;
+			}
+			.toc .dgrid-row {
+				background-color: #fff;
+				border-bottom: 1px solid #ccc;
+				cursor: pointer;
+			}
+			.toc .dgrid-row:hover {
+				background-color: #def;
+			}
+			.toc .field-name {
+				width: 20em;
+			}
+		</style>
+	</head>
+	<body class="slate">
+		<div id="grid"></div>
+		<script src="../../dojo/dojo.js" data-dojo-config="async: true"></script>
+		<script>
+			require([
+				"dojo/_base/xhr",
+				"dojo/store/Memory",
+				"dgrid/OnDemandGrid",
+				"dgrid/tree",
+				"dojo/query",
+				"dojo/domReady!"
+			], function(xhr, Memory, OnDemandGrid, tree){
+				xhr.get({
+					url: "data/index.json",
+					handleAs: "json"
+				}).then(function(data){
+					var store = window.store = new Memory({
+						data: data,
+						idProperty: "url",
+						getChildren: function(parent, options){
+							return this.query({ parent: parent.url }, options);
+						},
+						mayHaveChildren: function(parent){
+							return !parent.title; // Items with title are html pages, leaves
+						}
+					});
+					var grid = new OnDemandGrid({
+						className: "toc",
+						columns: {
+							name: tree({ expandOn: "click" }),
+							title: "Title"
+						},
+						renderHeader: function(){
+							this.headerNode.appendChild(document.createTextNode("dgrid Tests"));
+						},
+						query: { parent: "" },
+						sort: "name",
+						store: store
+					}, "grid");
+					
+					grid.on(".dgrid-row:click", function(evt){
+						var item = grid.row(evt).data;
+						if(item.title){
+							// If row represents a test page (not a subdir), navigate to it
+							location.href = item.url;
+						}
+					});
+				});
+			});
+		</script>
+	</body>
+</html>
