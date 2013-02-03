@@ -7,13 +7,12 @@
 		<script>
 			require([
 				"doh",
-				"dojo/_base/declare",
 				"dojo/dom-style", // for cross-browser getComputedStyle
 				"dojo/query",
 				"dgrid/Grid",
 				"dgrid/util/misc",
 				"dojo/domReady!"
-			], function(doh, declare, domStyle, query, Grid, miscUtil){
+			], function(doh, domStyle, query, Grid, miscUtil){
 				var testDiv = document.getElementById("test");
 				
 				// These tests use width styles because it tends to be one that
