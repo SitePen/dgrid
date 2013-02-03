@@ -81,7 +81,10 @@
 					persistedInfo = persistedInfo ? json.parse(persistedInfo) : {};
 					
 					function renderLinkCell(object, value){
-						return put("a[href=" + object.url + "]", value || "");
+						// Render a link for cells in rows representing pages
+						// (not parent directories)
+						return put(object.title ? "a[href=" + object.url + "]" : "div",
+							value || "");
 					}
 					
 					var grid = new OnDemandGrid({
