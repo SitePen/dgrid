@@ -1,11 +1,5 @@
 [
     {
-        "name": "addCssRule.html",
-        "url": "addCssRule.html",
-        "title": "addCssRule tests",
-        "parent": ""
-    },
-    {
         "name": "autoheight.html",
         "url": "autoheight.html",
         "title": "Test height:auto",
