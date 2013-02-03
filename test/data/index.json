@@ -47,6 +47,12 @@
         "parent": ""
     },
     {
+        "name": "addCssRule.html",
+        "url": "doh/addCssRule.html",
+        "title": "addCssRule and Related Tests",
+        "parent": "doh"
+    },
+    {
         "name": "create-destroy.html",
         "url": "doh/create-destroy.html",
         "title": "Create/Destroy Tests",
