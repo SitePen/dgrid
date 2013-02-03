@@ -17,7 +17,7 @@
 			], function(doh, List, Grid, editor, registry, TextBox, DateTextBox){
 				var body = document.body;
 				
-				doh.register([
+				doh.register("create-destroy", [
 					function noParamsList(doh){
 						// Test creating a List w/ no constructor params
 						var list = window.list = new List();
@@ -25,16 +25,16 @@
 						body.appendChild(list.domNode);
 						list.startup();
 						list.renderArray([ "foo", "bar", "baz" ]);
-						doh.is(list.contentNode.children.length, 3,
+						doh.is(3, list.contentNode.children.length,
 							"List's contentNode has expected number of children after renderArray");
 						
 						list.destroy();
-						doh.isNot(list.parentNode, body,
+						doh.isNot(body, list.parentNode,
 							"List is removed from body after destroy");
 					},
 					function editorGrid(doh){
 						// Test creating a Grid w/ editor plugins, then destroy and count widgets
-						doh.is(registry.length, 0,
+						doh.is(0, registry.length,
 							"dijit registry should have no entries before creating grid");
 						var grid = new Grid({
 							columns: {
@@ -47,11 +47,11 @@
 						grid.startup();
 						grid.renderArray(testOrderedData);
 						
-						doh.is(registry.length, testOrderedData.length + 1,
+						doh.is(testOrderedData.length + 1, registry.length,
 							"dijit registry has 1 entry per row plus 1 shared editor widget");
 						
 						grid.destroy();
-						doh.is(registry.length, 0,
+						doh.is(0, registry.length,
 							"dijit registry has 0 entries after destroy");
 					}
 				]);
@@ -59,4 +59,5 @@
 			});
 		</script>
 	</head>
+	<body></body>
 </html>
