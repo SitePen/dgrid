@@ -238,6 +238,8 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 		},
 		
 		refresh: function(){
+			var self = this;
+			
 			this.inherited(arguments);
 			
 			if(!this.store){
@@ -246,7 +248,20 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 			}
 			
 			// Reset to first page and return promise from gotoPage
-			return this.gotoPage(1);
+			return this.gotoPage(1).then(function(results){
+				// Emit on a separate turn to enable event to be used consistently for
+				// initial render, regardless of whether the backing store is async
+				setTimeout(function() {
+					on.emit(self.domNode, "dgrid-refresh-complete", {
+						bubbles: true,
+						cancelable: false,
+						grid: self,
+						results: results // QueryResults object (may be a wrapped promise)
+					});
+				}, 0);
+				
+				return results;
+			});
 		},
 		
 		_onNotification: function(rows){
