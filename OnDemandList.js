@@ -131,7 +131,14 @@ return declare([List, _StoreMixin], {
 			// Used as errback for when calls;
 			// remove the loadingNode and re-throw if an error was passed
 			put(loadingNode, "!");
-			if(err){ throw err; }
+			
+			if(err){
+				if(self._refreshDeferred){
+					self._refreshDeferred.reject(err);
+					delete self._refreshDeferred;
+				}
+				throw err;
+			}
 		}
 
 		// Establish query options, mixing in our own.
