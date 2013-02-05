@@ -1,9 +1,43 @@
 This document outlines changes since 0.3.0.  For older changelogs, see the
 [dgrid wiki](https://github.com/SitePen/dgrid/wiki).
 
+# master (0.3.6-dev)
+
+## Breaking changes
+
+### OnDemandList's dgrid-refresh-complete event no longer includes rows
+
+The `rows` property of this event was removed to match the implementation
+added to the Pagination extension, which does not include it.  If a particular
+row is needed, it can be resolved from the QueryResults included on the event
+via `grid.row(...).element`.
+
+## Significant changes
+
+### General/Core
+
+* Added an index page to the test folder to browse the tests via a grid. (#407)
+* Added a preliminary set of DOH tests to assist in spotting regressions. (#412)
+
+### Extensions
+
+* The `Pagination` extension now emits `dgrid-refresh-complete` like
+  `OnDemandList`.  (#188, #411)
+
+## Other changes and fixes
+
+### General/Core
+
+* Fixed `Grid#styleColumn`, which had broken in 0.3.5. (#408)
+* Fixed logic in `_StoreMixin` to work around a
+  [Dojo 1.8 bug with `when`](http://bugs.dojotoolkit.org/ticket/16667), which
+  could inappropriately mutate the return value of `_trackError`. (#411)
+* Fixed logic in `OnDemandList` so that asynchronous errors during `refresh`
+  are properly signaled via the promise it returns. (#411)
+
 # 0.3.5
 
-## Breaking Changes
+## Breaking changes
 
 ### Signature of the newRow method
 
