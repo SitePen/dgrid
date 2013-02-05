@@ -1,5 +1,5 @@
-define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/on", "dojo/has", "put-selector/put", "./List", "dojo/_base/sniff"],
-function(kernel, declare, listen, has, put, List){
+define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/on", "dojo/has", "put-selector/put", "./List", "./util/misc", "dojo/_base/sniff"],
+function(kernel, declare, listen, has, put, List, miscUtil){
 	var contentBoxSizing = has("ie") < 8 && !has("quirks");
 	var invalidClassChars = /[^\._a-zA-Z0-9-]/g;
 	function appendIfNode(parent, subNode){
