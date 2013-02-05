@@ -1,11 +1,5 @@
 [
     {
-        "name": "addCssRule.html",
-        "url": "addCssRule.html",
-        "title": "addCssRule tests",
-        "parent": ""
-    },
-    {
         "name": "autoheight.html",
         "url": "autoheight.html",
         "title": "Test height:auto",
@@ -21,12 +15,6 @@
         "name": "complex_column.html",
         "url": "complex_column.html",
         "title": "Test Grid Complex Columns",
-        "parent": ""
-    },
-    {
-        "name": "destroy.html",
-        "url": "destroy.html",
-        "title": "Test List/Grid Destruction",
         "parent": ""
     },
     {
@@ -46,6 +34,35 @@
         "url": "dijit_layout_programmatic.html",
         "title": "Test Programmatic Dijit Layout",
         "parent": ""
+    },
+    {
+        "name": "doh",
+        "url": "doh",
+        "parent": ""
+    },
+    {
+        "name": "addCssRule.html",
+        "url": "doh/addCssRule.html",
+        "title": "addCssRule and Related Tests",
+        "parent": "doh"
+    },
+    {
+        "name": "create-destroy.html",
+        "url": "doh/create-destroy.html",
+        "title": "Create/Destroy Tests",
+        "parent": "doh"
+    },
+    {
+        "name": "runTests.html",
+        "url": "doh/runTests.html",
+        "title": "dgrid DOH Test Suite",
+        "parent": "doh"
+    },
+    {
+        "name": "stores.html",
+        "url": "doh/stores.html",
+        "title": "OnDemand and Pagination Initial Render Tests",
+        "parent": "doh"
     },
     {
         "name": "editor.html",
@@ -212,12 +229,6 @@
         "name": "Keyboard.html",
         "url": "Keyboard.html",
         "title": "Test Keyboard Mixin",
-        "parent": ""
-    },
-    {
-        "name": "List_no_params.html",
-        "url": "List_no_params.html",
-        "title": "Test Simple List",
         "parent": ""
     },
     {
