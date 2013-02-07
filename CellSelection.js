@@ -56,9 +56,9 @@ return declare(Selection, {
 			}
 		}
 	},
-	select: function(cell, toCell, value, selectFullRow){
-		if(selectFullRow){
-			selectFullRow(row, toRow, value);
+	select: function(cell, toCell, value, wholeRow){
+		if(wholeRow){
+			this.selectFullRow(cell, toCell, value);
 		}
 		var i, id;
 		if(value === undefined){
