@@ -35,6 +35,11 @@ via `grid.row(...).element`.
 * Fixed logic in `OnDemandList` so that asynchronous errors during `refresh`
   are properly signaled via the promise it returns. (#411)
 
+### Column Plugins
+
+* The `tree` plugin has been refactored to make use of the `util/has-css3`
+  module, rather than feature-detecting upon first expansion. (#416)
+
 # 0.3.5
 
 ## Breaking changes
