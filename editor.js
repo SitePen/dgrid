@@ -271,7 +271,7 @@ function showEditor(cmp, column, cell, value){
         // and the widget are passed. Useful if widget needs to change itself
         // depending on particular cell's data.
         if (column.onEdit) {
-            var obj = grid.cell(cell).row.data;
+            var obj = column.grid.cell(cell).row.data;
             column.onEdit(obj, cmp);
         }
 		setTimeout(function(){ cmp._dgridIgnoreChange = false; }, 0);
