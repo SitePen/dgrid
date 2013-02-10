@@ -1,7 +1,7 @@
-define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/on", "dojo/has", "put-selector/put", "./List", "dojo/_base/sniff"],
-function(kernel, declare, listen, has, put, List){
+define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/on", "dojo/has", "put-selector/put", "./List", "./util/misc", "dojo/_base/sniff"],
+function(kernel, declare, listen, has, put, List, miscUtil){
 	var contentBoxSizing = has("ie") < 8 && !has("quirks");
-	var invalidClassChars = /[^\._a-zA-Z0-9-]/g;	
+	var invalidClassChars = /[^\._a-zA-Z0-9-]/g;
 	function appendIfNode(parent, subNode){
 		if(subNode && subNode.nodeType){
 			parent.appendChild(subNode);
@@ -56,7 +56,7 @@ function(kernel, declare, listen, has, put, List){
 			if(!element && typeof columnId != "undefined"){
 				var row = this.row(target),
 					rowElement = row.element;
-				if(rowElement){ 
+				if(rowElement){
 					var elements = rowElement.getElementsByTagName("td");
 					for(var i = 0; i < elements.length; i++){
 						if(elements[i].columnId == columnId){
@@ -74,17 +74,7 @@ function(kernel, declare, listen, has, put, List){
 				};
 			}
 		},
-		_columnsCss: function(rule){
-			// This is an attempt at integration with xstyle, will probably change
-			rule.fullSelector = function(){
-				return this.parent.fullSelector() + " .dgrid-cell";
-			};
-			for(var i = 0;i < rule.children.length;i++){
-				var child = rule.children[i];
-				child.field = child.className = child.selector.substring(1); 
-			}
-			return rule.children;
-		},
+		
 		createRowCells: function(tag, each, subRows){
 			// summary:
 			//		Generates the grid for each row (used by renderHeader and and renderRow)
@@ -104,7 +94,7 @@ function(kernel, declare, listen, has, put, List){
 				subRow = subRows[si];
 				// for single-subrow cases in modern browsers, TR can be skipped
 				// http://jsperf.com/table-without-trs
-				tr = (sl == 1 && !has("ie")) ? tbody : put(tbody, "tr");
+				tr = put(tbody, "tr");
 				if(subRow.className){
 					put(tr, "." + subRow.className);
 				}
@@ -165,7 +155,7 @@ function(kernel, declare, listen, has, put, List){
 				if(column.formatter){
 					td.innerHTML = column.formatter(data);
 				}else if(column.renderCell){
-					// A column can provide a renderCell method to do its own DOM manipulation, 
+					// A column can provide a renderCell method to do its own DOM manipulation,
 					// event handling, etc.
 					appendIfNode(td, column.renderCell(object, data, td, options));
 				}else if(data != null){
@@ -216,26 +206,45 @@ function(kernel, declare, listen, has, put, List){
 			}, this.subRows && this.subRows.headerRows);
 			this._rowIdToObject[row.id = this.id + "-header"] = this.columns;
 			headerNode.appendChild(row);
-			// if it columns are sortable, resort on clicks
-			listen(row, "click,keydown", function(event){
+			
+			// If the columns are sortable, re-sort on clicks.
+			// Use a separate listener property to be managed by renderHeader in case
+			// of subsequent calls.
+			if(this._sortListener){
+				this._sortListener.remove();
+			}
+			this._sortListener = listen(row, "click,keydown", function(event){
 				// respond to click, space keypress, or enter keypress
 				if(event.type == "click" || event.keyCode == 32 /* space bar */ || (!has("opera") && event.keyCode == 13) /* enter */){
 					var target = event.target,
-						field, descending, parentNode, sort;
+						field, sort, newSort, eventObj;
 					do{
 						if(target.sortable){
-							// stash node subject to DOM manipulations,
-							// to be referenced then removed by sort()
-							grid._sortNode = target;
-							
-							field = target.field || target.columnId;
-							
-							// if the click is on the same column as the active sort,
+							// If the click is on the same column as the active sort,
 							// reverse sort direction
-							descending = (sort = grid._sort[0]) && sort.attribute == field &&
-								!sort.descending;
+							newSort = [{
+								attribute: (field = target.field || target.columnId),
+								descending: (sort = grid._sort[0]) && sort.attribute == field &&
+									!sort.descending
+							}];
 							
-							return grid.set("sort", field, descending);
+							// Emit an event with the new sort
+							eventObj = {
+								bubbles: true,
+								cancelable: true,
+								grid: grid,
+								parentType: event.type,
+								sort: newSort
+							};
+							
+							if (listen.emit(target, "dgrid-sort", eventObj)){
+								// Stash node subject to DOM manipulations,
+								// to be referenced then removed by sort()
+								grid._sortNode = target;
+								grid.set("sort", newSort);
+							}
+							
+							break;
 						}
 					}while((target = target.parentNode) && target != headerNode);
 				}
@@ -271,6 +280,10 @@ function(kernel, declare, listen, has, put, List){
 		destroy: function(){
 			// Run _destroyColumns first to perform any column plugin tear-down logic.
 			this._destroyColumns();
+			if(this._sortListener){
+				this._sortListener.remove();
+			}
+			
 			this.inherited(arguments);
 		},
 		
@@ -278,21 +291,41 @@ function(kernel, declare, listen, has, put, List){
 			// summary:
 			//		Extension of List.js sort to update sort arrow in UI
 			
-			this.inherited(arguments); // normalize _sort first
+			// Normalize _sort first via inherited logic, then update the sort arrow
+			this.inherited(arguments);
+			this.updateSortArrow(this._sort);
+		},
+		
+		updateSortArrow: function(sort, updateSort){
+			// summary:
+			//		Method responsible for updating the placement of the arrow in the
+			//		appropriate header cell.  Typically this should not be called (call
+			//		set("sort", ...) when actually updating sort programmatically), but
+			//		this method may be used by code which is customizing sort (e.g.
+			//		by reacting to the dgrid-sort event, canceling it, then
+			//		performing logic and calling this manually).
+			// sort: Array
+			//		Standard sort parameter - array of object(s) containing attribute
+			//		and optionally descending property
+			// updateSort: Boolean?
+			//		If true, will update this._sort based on the passed sort array
+			//		(i.e. to keep it in sync when custom logic is otherwise preventing
+			//		it from being updated); defaults to false
 			
-			// clean up UI from any previous sort
+			// Clean up UI from any previous sort
 			if(this._lastSortedArrow){
-				// remove the sort classes from parent node
+				// Remove the sort classes from the parent node
 				put(this._lastSortedArrow, "<!dgrid-sort-up!dgrid-sort-down");
-				// destroy the lastSortedArrow node
+				// Destroy the lastSortedArrow node
 				put(this._lastSortedArrow, "!");
 				delete this._lastSortedArrow;
 			}
 			
-			if(!this._sort[0]){ return; } // nothing to do if no sort is specified
+			if(updateSort){ this._sort = sort; }
+			if(!sort[0]){ return; } // nothing to do if no sort is specified
 			
-			var prop = this._sort[0].attribute,
-				desc = this._sort[0].descending,
+			var prop = sort[0].attribute,
+				desc = sort[0].descending,
 				target = this._sortNode, // stashed if invoked from header click
 				columns, column, i;
 			
@@ -319,11 +352,13 @@ function(kernel, declare, listen, has, put, List){
 				this.resize();
 			}
 		},
+		
 		styleColumn: function(colId, css){
 			// summary:
 			//		Dynamically creates a stylesheet rule to alter a column's style.
 			
-			return this.addCssRule("#" + this.domNode.id + " .dgrid-column-" + colId, css);
+			return this.addCssRule("#" + miscUtil.escapeCssIdentifier(this.domNode.id) +
+				" .dgrid-column-" + colId, css);
 		},
 		
 		/*=====
@@ -348,7 +383,7 @@ function(kernel, declare, listen, has, put, List){
 					column.field = columnId;
 				}
 				columnId = column.id = column.id || (isNaN(columnId) ? columnId : (prefix + columnId));
-				if(prefix){ this.columns[columnId] = column; }
+				if(isArray){ this.columns[columnId] = column; }
 				
 				// allow further base configuration in subclasses
 				if(this._configColumn){
@@ -370,7 +405,9 @@ function(kernel, declare, listen, has, put, List){
 			//		destroy methods (defined by plugins) and calls them.  This is called
 			//		immediately before configuring a new column structure.
 			
-			var subRowsLength = this.subRows.length,
+			var subRows = this.subRows,
+				// if we have column sets, then we don't need to do anything with the missing subRows, ColumnSet will handle it
+				subRowsLength = subRows && subRows.length,
 				i, j, column, len;
 			
 			// First remove rows (since they'll be refreshed after we're done),
@@ -379,8 +416,8 @@ function(kernel, declare, listen, has, put, List){
 			this.cleanup();
 			
 			for(i = 0; i < subRowsLength; i++){
-				for(j = 0, len = this.subRows[i].length; j < len; j++){
-					column = this.subRows[i][j];
+				for(j = 0, len = subRows[i].length; j < len; j++){
+					column = subRows[i][j];
 					if(typeof column.destroy === "function"){ column.destroy(); }
 				}
 			}
@@ -388,16 +425,28 @@ function(kernel, declare, listen, has, put, List){
 		
 		configStructure: function(){
 			// configure the columns and subRows
-			var subRows = this.subRows;
+			var subRows = this.subRows,
+				columns = this._columns = this.columns;
+			
+			// Reset this.columns unless it was already passed in as an object
+			this.columns = !columns || columns instanceof Array ? {} : columns;
+			
 			if(subRows){
-				// we have subRows, but no columns yet, need to create the columns
-				this.columns = {};
+				// Process subrows, which will in turn populate the this.columns object
 				for(var i = 0; i < subRows.length; i++){
 					subRows[i] = this._configColumns(i + "-", subRows[i]);
 				}
 			}else{
-				this.subRows = [this._configColumns("", this.columns)];
+				this.subRows = [this._configColumns("", columns)];
 			}
+		},
+		
+		_getColumns: function(){
+			// _columns preserves what was passed to set("columns"), but if subRows
+			// was set instead, columns contains the "object-ified" version, which
+			// was always accessible in the past, so maintain that accessibility going
+			// forward.
+			return this._columns || this.columns;
 		},
 		_setColumns: function(columns){
 			this._destroyColumns();
@@ -407,11 +456,13 @@ function(kernel, declare, listen, has, put, List){
 			// re-run logic
 			this._updateColumns();
 		},
+		
 		_setSubRows: function(subrows){
 			this._destroyColumns();
 			this.subRows = subrows;
 			this._updateColumns();
 		},
+		
 		setColumns: function(columns){
 			kernel.deprecated("setColumns(...)", 'use set("columns", ...) instead', "dgrid 1.0");
 			this.set("columns", columns);
@@ -427,10 +478,21 @@ function(kernel, declare, listen, has, put, List){
 			
 			this.configStructure();
 			this.renderHeader();
+			
 			this.refresh();
 			// re-render last collection if present
 			this._lastCollection && this.renderArray(this._lastCollection);
-			this.resize();
+			
+			// After re-rendering the header, re-apply the sort arrow if needed.
+			if(this._started){
+				if(this._sort && this._sort.length){
+					this.updateSortArrow(this._sort);
+				} else {
+					// Only call resize directly if we didn't call updateSortArrow,
+					// since that calls resize itself when it updates.
+					this.resize();
+				}
+			}
 		}
 	});
 	

@@ -109,14 +109,25 @@ return declare(Selection, {
 		}
 	},
 	isSelected: function(object, columnId){
-		if(!object){
+		// summary:
+		//		Returns true if the indicated cell is selected.
+		
+		if(typeof object === "undefined" || object === null){
 			return false;
 		}
 		if(!object.element){
 			object = this.cell(object, columnId);
 		}
-
-		return this.selection[object.row.id] && !!this.selection[object.row.id][object.column.id];
+		
+		// First check whether the given cell is indicated in the selection hash;
+		// failing that, check if allSelected is true (testing against the
+		// allowSelect method if possible)
+		var rowId = object.row.id;
+		if(rowId in this.selection){
+			return !!this.selection[rowId][object.column.id];
+		}else{
+			return this.allSelected && (!object.row.data || this.allowSelect(object));
+		}
 	},
 	clearSelection: function(exceptId){
 		// disable exceptId in cell selection, since it would require double parameters

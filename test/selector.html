@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
 	<head>
+		<meta charset="utf-8">
 		<title>Test Grid Selectors</title>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-		<meta name="viewport" content="width=570" />
-		<style type="text/css">
+		<meta name="viewport" content="width=570">
+		<style>
 			@import "../../dojo/resources/dojo.css";
 			@import "../css/skins/claro.css";
 			.heading {
@@ -13,39 +13,25 @@
 			}
 			.dgrid { 
 				width: 70%;
+				margin: 10px;
 			}
 			.field-col1 {
 				width: 40px;
 			}
-			.ui-widget {
-				margin: 10px;
+			
+			#grid-complex .dgrid-cell-padding {
+				height: 2em; /* force consistent heights across columnset cells */
+			}
+			.dgrid-column-set-0 {
+				width: 42px;
 			}
 		</style>
-		<script type="text/javascript" src="../../dojo/dojo.js" 
+		<script src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
-		<script type="text/javascript">
-			require(["dojo/on", "dgrid/OnDemandGrid", "dgrid/selector", "dgrid/Selection", "dgrid/Keyboard",
+		<script>
+			require(["dojo/on", "dgrid/OnDemandGrid", "dgrid/selector", "dgrid/Selection", "dgrid/Keyboard", "dgrid/ColumnSet",
 					"dojo/_base/declare", "dojo/_base/array", "dojo/json", "dgrid/test/data/base", "dojo/domReady!"], 
-				function(on, Grid, selector, Selection, Keyboard, declare, arrayUtil, json, testStore){
-					var columns = { // you can declare columns as an object hash (key translates to field)
-							col1: selector({ disabled: function(object){ return object.col1 == "note"; }}),
-							id: "ID",
-							col2: {label: 'Column 2', sortable: false},
-							col3: {label: 'Column 3'}
-						};
-					var columns2 = {
-							col1: selector({ label: "Select" }),
-							id: "ID",
-							col2: {label: 'Column 2', sortable: false},
-							col3: {label: 'Column 3'}
-						};
-					var columnsRadio = {
-						col1: selector({ label: 'Radio', disabled: function(object){ return object.col3 == "read"; } }, "radio"),
-						id: "ID",
-						col2: {label: 'Column 2', sortable: false},
-						col3: {label: 'Column 3'}
-					};
-					
+				function(on, Grid, selector, Selection, Keyboard, ColumnSet, declare, arrayUtil, json, testStore){
 					on(document.body, "dgrid-select,dgrid-deselect",
 						function(event){
 							var msg = (event.type == "dgrid-deselect" ? "de" : "") + "selected";
@@ -61,21 +47,53 @@
 					window.grid = new SelectionGrid({
 						store: testStore,
 						selectionMode: "none",
-						columns: columns,
+						columns: {
+							col1: selector({ disabled: function(object){ return object.col1 == "note"; }}),
+							id: "ID",
+							col2: {label: 'Column 2', sortable: false},
+							col3: {label: 'Column 3'}
+						},
 						allowSelectAll: true
 					}, "grid");
 					window.grid2 = new SelectionGrid({
 						store: testStore,
 						selectionMode: "none",
-						columns: columns2,
+						columns: {
+							col1: selector({ label: "Select" }),
+							id: "ID",
+							col2: {label: 'Column 2', sortable: false},
+							col3: {label: 'Column 3'}
+						},
 						allowSelectAll: false
 					}, "grid2");
 
 					window.gridRadio = new SelectionGrid({
 						store: testStore,
 						selectionMode: "none",
-						columns: columnsRadio
+						columns: {
+							col1: selector({ label: 'Radio', disabled: function(object){ return object.col3 == "read"; } }, "radio"),
+							id: "ID",
+							col2: {label: 'Column 2', sortable: false},
+							col3: {label: 'Column 3'}
+						}
 					}, "grid-radio");
+					
+					window.gridComplex = new (declare([Grid, ColumnSet, Selection, Keyboard]))({
+						store: testStore,
+						columnSets: [
+							[
+								[
+									selector({ field: "col1", disabled: function(object){ return object.col1 == "note"; }})
+								]
+							], [
+								[
+									{ field: "id", label: "ID" },
+									{ field: "col2", label: "Column 2", sortable: false },
+									{ field: "col3", label: "Column 3" }
+								]
+							]
+						]
+					}, "grid-complex");
 				}
 			);
 		</script>
@@ -104,5 +122,7 @@
 		<div id="grid-radio"></div>
 		<h2>A grid with checkbox selectors, with select-all disabled</h2>
 		<div id="grid2"></div>
+		<h2>A grid with checkbox selectors and column sets</h2>
+		<div id="grid-complex"></div>
 	</body>
 </html>

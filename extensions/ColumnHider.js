@@ -1,5 +1,5 @@
-define(["dojo/_base/declare", "dojo/has", "dojo/on", "put-selector/put", "xstyle/css!../css/extensions/ColumnHider.css"],
-function(declare, has, listen, put){
+define(["dojo/_base/declare", "dojo/has", "dojo/on", "../util/misc", "put-selector/put", "xstyle/css!../css/extensions/ColumnHider.css"],
+function(declare, has, listen, miscUtil, put){
 /*
  *	Column Hider plugin for dgrid
  *	Originally contributed by TRT 2011-09-28
@@ -46,7 +46,7 @@ function(declare, has, listen, put){
 		_hiderMenuOpened: false,
 		
 		// _columnHiderRules: Object
-		//		Hash containing handles returned from styleColumn.
+		//		Hash containing handles returned from addCssRule.
 		_columnHiderRules: null,
 		
 		// _columnHiderCheckboxes: Object
@@ -74,7 +74,7 @@ function(declare, has, listen, put){
 			
 			if(col.hidden){
 				// Hidden state is true; hide the column.
-				this._columnHiderRules[id] = this.styleColumn(id, "display: none");
+				this._hideColumn(id);
 			}
 			
 			// Allow cols to opt out of the hider (e.g. for selector column).
@@ -149,7 +149,7 @@ function(declare, has, listen, put){
 				}
 			}else{ // subsequent run
 				// Remove active rules, and clear out the menu (to be repopulated).
-				for (id in this._columnHiderRules){
+				for(id in this._columnHiderRules){
 					this._columnHiderRules[id].remove();
 				}
 				hiderMenuNode.innerHTML = "";
@@ -160,6 +160,14 @@ function(declare, has, listen, put){
 
 			// Populate menu with checkboxes/labels based on current columns.
 			this._renderHiderMenuEntries();
+		},
+		
+		destroy: function(){
+			this.inherited(arguments);
+			// Remove any remaining rules applied to hidden columns.
+			for(var id in this._columnHiderRules){
+				this._columnHiderRules[id].remove();
+			}
 		},
 		
 		isColumnHidden: function(id){
@@ -201,7 +209,40 @@ function(declare, has, listen, put){
 			// Toggle the instance property
 			this._hiderMenuOpened = !hidden;
 		},
-
+		
+		_hideColumn: function(id){
+			// summary:
+			//		Hides the column indicated by the given id.
+			
+			// Use miscUtil function directly, since we clean these up ourselves anyway
+			var selectorPrefix = "#" + miscUtil.escapeCssIdentifier(this.domNode.id) + " .dgrid-column-",
+				next, rules, i; // used in IE8 code path
+			
+			if(has("ie") === 8 && !has("quirks")){
+				// Avoid inconsistent behavior in IE8 when display: none is set on a cell
+				next = this.column(id).headerNode.nextSibling;
+				
+				rules = [ miscUtil.addCssRule(selectorPrefix + id,
+					"width: 0 !important; white-space: nowrap !important; padding: 0 !important; margin: 0 !important; border: none !important;")
+				];
+				
+				if(next && (next = this.column(next)) && (next = next.id)){
+					// Also remove left border on next sibling if one exists, to avoid
+					// width issues due to borders not collapsing
+					rules.push(miscUtil.addCssRule(selectorPrefix + next, "border-left: none !important;"));
+				}
+				
+				this._columnHiderRules[id] = {
+					remove: function(){
+						for(i = rules.length; i--;){ rules[i].remove(); }
+					}
+				};
+			}else{
+				this._columnHiderRules[id] =
+					miscUtil.addCssRule(selectorPrefix + id, "display: none;");
+			}
+		},
+		
 		_updateColumnHiddenState: function(id, hidden){
 			// summary:
 			//		Performs internal work for toggleColumnHiddenState; see the public
@@ -211,8 +252,13 @@ function(declare, has, listen, put){
 				this._columnHiderRules[id].remove();
 				delete this._columnHiderRules[id];
 			}else{
-				this._columnHiderRules[id] = this.styleColumn(id, "display: none;");
+				this._hideColumn(id);
 			}
+			
+			// Update hidden state in actual column definition,
+			// in case columns are re-rendered.
+			this.columns[id].hidden = hidden;
+			
 			// Emit event to notify of column state change.
 			listen.emit(this.domNode, "dgrid-columnstatechange", {
 				grid: this,

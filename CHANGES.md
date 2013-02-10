@@ -1,21 +1,200 @@
 This document outlines changes since 0.3.0.  For older changelogs, see the
 [dgrid wiki](https://github.com/SitePen/dgrid/wiki).
 
-# master (0.3.5-dev)
+# master (0.3.6-dev)
+
+## Breaking changes
+
+### OnDemandList's dgrid-refresh-complete event no longer includes rows
+
+The `rows` property of this event was removed to match the implementation
+added to the Pagination extension, which does not include it.  If a particular
+row is needed, it can be resolved from the QueryResults included on the event
+via `grid.row(...).element`.
 
 ## Significant changes
 
-* The `up` and `down` methods of `List` will now call `grid.row` internally to
-    resolve whatever argument is passed; the `left` and `right` methods of
-    `Grid` will call `grid.cell`.  (Formerly these methods only accepted a
-    row or cell object directly.)
+### General/Core
+
+* Added an index page to the test folder to browse the tests via a grid. (#407)
+* Added a preliminary set of DOH tests to assist in spotting regressions. (#412)
+
+### Extensions
+
+* The `Pagination` extension now emits `dgrid-refresh-complete` like
+  `OnDemandList`.  (#188, #411)
 
 ## Other changes and fixes
 
 ### General/Core
 
-* Resolved an issue where OnDemandList could end up firing requests where
+* Fixed `Grid#styleColumn`, which had broken in 0.3.5. (#408)
+* Fixed logic in `_StoreMixin` to work around a
+  [Dojo 1.8 bug with `when`](http://bugs.dojotoolkit.org/ticket/16667), which
+  could inappropriately mutate the return value of `_trackError`. (#411)
+* Fixed logic in `OnDemandList` so that asynchronous errors during `refresh`
+  are properly signaled via the promise it returns. (#411)
+
+### Column Plugins
+
+* The `tree` plugin has been refactored to make use of the `util/has-css3`
+  module, rather than feature-detecting upon first expansion. (#416)
+
+# 0.3.5
+
+## Breaking changes
+
+### Signature of the newRow method
+
+The `newRow` method in List, called in reaction to observed store changes,
+has had its signature altered to match that of `insertRow`.  Please note
+that it is likely that `newRow` may be refactored out of existence in the future.
+
+### Grid and the columns property
+
+The `Grid` module now normalizes the `columns` instance property to an object
+even when it is passed in as an array. This means that any code written
+which accesses `grid.columns` directly will break if it expects it to maintain
+the array structure that was originally passed in.
+
+To compensate for this, `get("columns")` retains the previous behavior - it
+returns `columns` as initially passed, except in the case where `subRows` is
+passed instead, in which case it returns an object hash version of the structure
+keyed by column IDs.
+
+### put-selector version
+
+When updating to dgrid 0.3.5, make sure you also update your version of
+[put-selector](https://github.com/kriszyp/put-selector) to 0.3.1 or higher
+(0.3.2 is the latest at the time of this writing).  If you use
+[cpm](https://github.com/kriszyp/cpm) to update dgrid, this should happen
+automatically.
+
+## Significant changes
+
+### General/Core
+
+* `List` instances will now clean up any styles added dynamically via the
+    `addCssRule` method; this also applies by extension to `Grid#styleColumn`
+    and `ColumnSet#styleColumnSet`.  This may cause a change in behavior in some
+    edge cases; the previous behavior can be obtained by passing
+    `cleanAddedRules: false` in the constructor arguments object. (#371)
+* The `up` and `down` methods of `List` will now call `grid.row` internally to
+    resolve whatever argument is passed; the `left` and `right` methods of
+    `Grid` will call `grid.cell`.  (Formerly these methods only accepted a
+    row or cell object directly.)
+* The `Grid` module now ensures that an object hash of the grid's columns is
+    always available (see Breaking Changes above); this fixes issues when
+    column IDs are explicitly set, but then couldn't be properly looked up
+    against the `columns` array.
+* The `Grid` module now emits a `dgrid-sort` event when a sortable header cell
+    is clicked; this event includes a `sort` property, and may be canceled to
+    stop the sort, or to substitute alternative behavior.  In the latter case,
+    if updating the sort arrow in the UI is still desired, call the
+    `updateSortArrow` method and pass the `sort` value from the event.
+* The `OnDemandList` module now supports a `pagingMethod` property, which allows
+    specifying whether to throttle or debounce scroll events.  The default
+    behavior has been changed from `"throttleDelayed"` to `"debounce"`, which
+    generally is capable of far reducing the number of store queries issued,
+    moreso if `pagingDelay` is increased (though its default remains the same).
+* The `OnDemandList` module now supports a `keepScrollPosition` property, which
+    will attempt to preserve scroll position between refresh calls.  This can be
+    set on the instance itself to affect all refreshes, or can be passed to the
+    `refresh` method directly for a specific call.
+* The `OnDemandList` module now returns a promise from the `refresh` method,
+    which resolves when the grid finishes rendering results after the refresh.
+    It also emits a `dgrid-refresh-complete` event, which includes both a
+    reference to the QueryResults object (`results`) and the rendered rows
+    (`rows`).  In addition, the `dgrid-error` event now fires more consistently
+    (both for `OnDemandList` and `Pagination`).
+
+### Mixins
+
+* The `Selection` mixin now supports an `allowTextSelection` property, allowing
+    text selection within a List or Grid to be permitted or denied completely
+    independently from the `selectionMode` property; default behavior is still
+    to prevent unless `selectionMode` is `none`.  Selection prevention itself
+    has also been fixed to work in all browsers. (#148)
+
+### Column Plugins
+
+* Fixed a `tree` regression since 0.3.2 involving only-child rows being misplaced
+    upon observed changes. (#353)
+
+### Extensions
+
+* The `ColumnResizer` extension now supports an `adjustLastColumn` flag; when
+    set to `true` (the default, and previous behavior), this will adjust the
+    last column's width to `auto` at times where a column resize operation would
+    otherwise cause column widths to stretch due to how browsers render tables.
+    This can be set to `false` to purposely disable this behavior.
+* The `Pagination` extension now returns a promise from the `refresh` and
+    `gotoPage` methods, which resolves when the grid finishes rendering results.
+    Note that it does not (yet) emit an event like `OnDemandList`.
+* The `Pagination` extension now re-queries for the current page of data when
+    the grid is notified of a store modification which affects the number of
+    items currently rendered. (#283)
+* The `Pagination` extension now supports a `showLoadingMessage` property; by
+    default (`true`), a loading node will be displayed whenever a new page is
+    requested; if set to `false`, the grid will instead retain the previous
+    content until the new data is fully received and ready to render. (#219)
+* The `Pagination` extension now includes localized strings for the following languages:
+    * French (#381, thanks mduriancik)
+    * Brazilian Portuguese (#376, thanks stavarengo)
+    * Slovak (#381, thanks mduriancik)
+* The `DijitRegistry` extension now supports dgrid components as direct children
+    of common Dijit layout container widgets, and will now properly alter the
+    size of a list or grid if the `resize` method is passed an argument. (#401)
+
+## Other changes and fixes
+
+### General/Core
+
+* Resolved an issue where upon changing column structure, the placement of the
+    sort arrow would be lost even though the grid is still sorting by the same
+    field.
+* Simplified logic in `Grid` to always create `tr` elements. (#387)
+* Resolved an issue where `OnDemandList` could end up firing requests where
     start exceeds total and count is negative. (#323)
+* Resolved issues regarding proper handling of errors / rejected promises in
+    `OnDemandList` as well as the `Pagination` extension.
+    (#351; obsoletes #241, #242)
+* Resolved potential memory leaks in `Grid`, `ColumnSet`, and `ColumnResizer`.
+    (#393, #394, #395, #396, #397)
+* Resolved issues in `Grid`, `ColumnSet`, `ColumnHider`, and `ColumnResizer`
+    regarding dynamic style injection for grids with DOM node IDs containing
+    unsafe characters; added `escapeCssIdentifier` function to `util/misc`. (#402)
+* Resolved an issue in `TouchScroll` which unnecessarily prevented native
+    touch-scrolling even when the component can't be scrolled. (#344)
+
+### Mixins
+
+* Resolved an issue with the `ColumnSet` mixin where clicking within the
+    horizontal scrollbar area (aside from the arrows/handle) wouldn't work in IE.
+    (#307)
+* Improved logic of `isSelect` for `Selection` and `CellSelection` regarding
+    unloaded rows/cells in combination with the select-all feature in some cases.
+    (#258)
+
+### Extensions
+
+* Resolved an issue where `ColumnHider` would leave styles applied for hiding
+    columns, which could have adverse effects if a new grid is later created
+    with the same ID. (#371)
+* Resolved an issue with `ColumnHider` which could cause the hidden state of
+    columns to be forgotten when other components such as `ColumnReorder`
+    interact with the column structure. (#289)
+* Resolved an issue with `ColumnHider` related to IE8 standards mode's handling
+    of `display: none` cells. (#362)
+* Resolved an issue where widths set via the `ColumnResizer` extension would be
+    reset upon rearranging columns with the `ColumnReorder` extension.
+* Resolved an issue in `ColumnResizer` styles which caused body and header cells
+    to skew in Chrome 19 and Safari 6. (#142, #370)
+* Changed name of private `_columnStyles` object used by the `ColumnResizer`
+    extension to `_columnSizes` to reduce ambiguity.
+* The `Pagination` extension will no longer immediately throw errors if it is
+    initialized without a store.  However, a warning will be logged, and any
+    method calls will likely throw errors until a store is assigned. (#355)
 
 # 0.3.4
 
@@ -62,7 +241,7 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 * The `ColumnResizer` extension's resize indicator now follows the cursor
     even when dragging beyond the grid's boundaries, and reacts if the mouse
     button is released even outside the boundaries of the browser window. (#310)
-    
+
 # 0.3.3
 
 ## Breaking changes
