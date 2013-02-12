@@ -50,7 +50,7 @@ function setProperty(grid, cellElement, oldValue, value, triggerEvent){
 	// Updates dirty hash and fires dgrid-datachange event for a changed value.
 	var cell, row, column, eventObject;
 	// test whether old and new values are inequal, with coercion (e.g. for Dates)
-	if(!(oldValue >= value && oldValue <= value)){
+	if((oldValue&&oldValue.valueOf()) != (value&&value.valueOf())){
 		cell = grid.cell(cellElement);
 		row = cell.row;
 		column = cell.column;
