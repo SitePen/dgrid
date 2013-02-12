@@ -38,6 +38,8 @@ via `grid.row(...).element`.
 
 ### Column Plugins
 
+* The `editor` plugin now supports widgets returning object values by comparing
+  using `valueOf`. (#256, #304, #423)
 * The `tree` plugin has been refactored to make use of the `util/has-css3`
   module, rather than feature-detecting upon first expansion. (#416)
 
