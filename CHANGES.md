@@ -29,6 +29,7 @@ via `grid.row(...).element`.
 ### General/Core
 
 * Fixed `Grid#styleColumn`, which had broken in 0.3.5. (#408)
+* The `Keyboard` mixin now properly handles Home/End keypresses.
 * Fixed logic in `_StoreMixin` to work around a
   [Dojo 1.8 bug with `when`](http://bugs.dojotoolkit.org/ticket/16667), which
   could inappropriately mutate the return value of `_trackError`. (#411)

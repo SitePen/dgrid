@@ -7,8 +7,9 @@ define([
 	"dojo/has",
 	"put-selector/put",
 	"dojo/_base/Deferred",
+	"dojo/query",
 	"dojo/_base/sniff"
-], function(declare, aspect, on, List, lang, has, put, Deferred){
+], function(declare, aspect, on, List, lang, has, put, Deferred, query){
 
 var delegatingInputTypes = {
 		checkbox: 1,
@@ -47,6 +48,69 @@ return declare(null, {
 			// text boxes and other inputs that can use direction keys should be ignored and not affect cell/row navigation
 			var target = event.target;
 			return target.type && (!delegatingInputTypes[target.type] || event.keyCode == 32);
+		}
+		
+		function handleHeaderEndScroll(event){
+			// Header case is always simple, since all rows/cells are present
+			var scrollToBeginning = event.keyCode === 36,
+				nodes;
+			if(grid.cellNavigation){
+				nodes = query(".dgrid-" + (grid.cellNavigation ? "cell" : "header-row"),
+					grid.headerNode);
+				grid.focusHeader(nodes[scrollToBeginning ? 0 : nodes.length - 1]);
+			}
+			// In row-navigation mode, there's nothing to do - only one row in header
+			
+			// Prevent browser from scrolling entire page
+			event.preventDefault();
+		}
+		
+		function handleEndScroll(event, columnId){
+			// summary:
+			//		Handles requests to scroll to the beginning or end of the grid.
+			
+			// Assume scrolling to top unless event is specifically for End key
+			var scrollToTop = event.keyCode === 36,
+				cellNavigation = grid.cellNavigation,
+				contentNode = grid.contentNode,
+				contentPos = scrollToTop ? 0 : contentNode.scrollHeight,
+				scrollPos = contentNode.scrollTop + contentPos,
+				loadedRows = query(".dgrid-row", contentNode),
+				endNode = loadedRows[scrollToTop ? 0 : loadedRows.length - 1],
+				endPos = endNode.offsetTop + (scrollToTop ? 0 : endNode.offsetHeight),
+				handle;
+			
+			// Grid content may be lazy-loaded, so check if content needs to be
+			// loaded first
+			if(contentPos === endPos){
+				// End row is loaded; focus the first/last row/cell now
+				if(cellNavigation){
+					// Preserve column that was currently focused
+					endNode = grid.cell(endNode, columnId);
+				}
+				grid.focus(endNode);
+			}else{
+				// If the topmost/bottommost row rendered doesn't reach the top/bottom of
+				// the contentNode, we are using OnDemandList and need to wait for more
+				// data to render, then focus the first/last row in the new content.
+				handle = aspect.after(grid, "renderArray", function(rows){
+					handle.remove();
+					return Deferred.when(rows, function(rows){
+						var target = rows[scrollToTop ? 0 : rows.length - 1];
+						if(cellNavigation){
+							// Preserve column that was currently focused
+							target = grid.cell(target, columnId);
+						}
+						grid.focus(target);
+					});
+				});
+			}
+			
+			if(scrollPos === endPos){
+				// Grid body is already scrolled to end; prevent browser from scrolling
+				// entire page instead
+				event.preventDefault();
+			}
 		}
 		
 		function navigateArea(areaNode){
@@ -141,21 +205,22 @@ return declare(null, {
 				cellFocusedElement.tabIndex = grid.tabIndex;
 			}
 			
-			on(areaNode, "mousedown", function(event){
+			grid._listeners.push(on(areaNode, "mousedown", function(event){
 				if(!handledEvent(event)){
 					focusOnCell(event.target, event);
 				}
-			});
+			}));
 			
-			on(areaNode, "keydown", function(event){
+			grid._listeners.push(on(areaNode, "keydown", function(event){
 				// For now, don't squash browser-specific functionalities by letting
 				// ALT and META function as they would natively
 				if(event.metaKey || event.altKey) {
 					return;
 				}
 				
-				var focusedElement = event.target;
-				var keyCode = event.keyCode;
+				var keyCode = event.keyCode,
+					isHeader = areaNode === grid.headerNode;
+				
 				if(handledEvent(event)){
 					// text boxes and other inputs that can use direction keys should be ignored and not affect cell/row navigation
 					return;
@@ -167,11 +232,14 @@ return declare(null, {
 					37: -1, // left
 					38: -1, // up
 					39: 1, // right
-					40: 1, // down
-					35: 10000, //end
-					36: -10000 // home
+					40: 1 // down
 				}[keyCode];
 				if(isNaN(move)){
+					// Handle home and end specially - may need to wait for rows to load
+					if(keyCode === 35 || keyCode === 36){
+						(isHeader ? handleHeaderEndScroll : handleEndScroll)(event,
+							grid.cellNavigation && grid.cell(cellFocusedElement).column.id);
+					}
 					return;
 				}
 				var nextSibling, columnId, cell = grid.cell(cellFocusedElement);
@@ -215,7 +283,7 @@ return declare(null, {
 					focusOnCell(nextFocus, event, inputFocused);
 				}
 				event.preventDefault();
-			});
+			}));
 			
 			return function(target){
 				target = target || cellFocusedElement;
