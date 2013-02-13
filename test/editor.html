@@ -270,6 +270,13 @@
 						}
 					});
 					
+					on(document.body, "dgrid-editor-show", function(evt){
+						console.log("show editOn editor: ", evt);
+					});
+					on(document.body, "dgrid-editor-hide", function(evt){
+						console.log("hide editOn editor: ", evt);
+					});
+					
 					editFirst = function() {
 						var grid = window.grid;
 						window.grid.edit(window.grid.cell(0, "editor"));
