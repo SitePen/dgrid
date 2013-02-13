@@ -207,15 +207,14 @@ function createSharedEditor(column, originalRenderCell){
 		var parentNode = node.parentNode,
 			i = parentNode.children.length - 1,
 			options = { alreadyHooked: true };
-		// emit an event immediately prior to placing a shared editor,
-		// or an "always-on" editor for its initial placement.
+		// emit an event immediately prior to removing an editOn editor
 		on.emit(column.headerNode, "dgrid-editor-hide", {
 			grid: column.grid,
 			cell: node,
 			column: column,
 			editor: cmp,
 			bubbles: true,
-			cancelable: true
+			cancelable: false
 		});
 		// Remove the editor from the cell, to be reused later.
 		parentNode.removeChild(node);
@@ -265,17 +264,6 @@ function showEditor(cmp, column, cell, value){
 	if(!isWidget){ updateInputValue(cmp, value); }
 	
 	cell.innerHTML = "";
-	// emit an event immediately prior to placing a shared editor,
-	// or an "always-on" editor for its initial placement.
-	on.emit(column.headerNode, "dgrid-editor-show", {
-		grid: column.grid,
-		cell: cell,
-		column: column,
-		editor: cmp,
-		bubbles: true,
-		cancelable: true
-	});
-	
 	put(cell, cmp.domNode || cmp);
 	
 	if(isWidget){
@@ -293,7 +281,18 @@ function showEditor(cmp, column, cell, value){
 	cmp._dgridLastValue = value;
 	// if this is an editor with editOn, also update activeValue
 	// (activeOptions will have been updated previously)
-	if(activeCell){ activeValue = value; }
+	if(activeCell){ 
+		activeValue = value; 
+		// emit an event immediately prior to placing a shared editor
+		on.emit(column.headerNode, "dgrid-editor-show", {
+			grid: column.grid,
+			cell: cell,
+			column: column,
+			editor: cmp,
+			bubbles: true,
+			cancelable: false
+		});
+	}
 }
 
 function edit(cell) {
