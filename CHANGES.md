@@ -19,6 +19,11 @@ via `grid.row(...).element`.
 * Added an index page to the test folder to browse the tests via a grid. (#407)
 * Added a preliminary set of DOH tests to assist in spotting regressions. (#412)
 
+### Column Plugins
+
+* The `editor` column plugin now emits `dgrid-editor-show` and `dgrid-editor-hide`
+  events when an editor with `editOn` set is shown or hidden, respectively. (#424)
+
 ### Extensions
 
 * The `Pagination` extension now emits `dgrid-refresh-complete` like
