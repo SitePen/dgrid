@@ -7,9 +7,8 @@ define([
 	"dojo/has",
 	"put-selector/put",
 	"dojo/_base/Deferred",
-	"dojo/query",
 	"dojo/_base/sniff"
-], function(declare, aspect, on, List, lang, has, put, Deferred, query){
+], function(declare, aspect, on, List, lang, has, put, Deferred){
 
 var delegatingInputTypes = {
 		checkbox: 1,
@@ -55,8 +54,7 @@ return declare(null, {
 			var scrollToBeginning = event.keyCode === 36,
 				nodes;
 			if(grid.cellNavigation){
-				nodes = query(".dgrid-" + (grid.cellNavigation ? "cell" : "header-row"),
-					grid.headerNode);
+				nodes = grid.headerNode.getElementsByTagName("th");
 				grid.focusHeader(nodes[scrollToBeginning ? 0 : nodes.length - 1]);
 			}
 			// In row-navigation mode, there's nothing to do - only one row in header
@@ -75,20 +73,30 @@ return declare(null, {
 				contentNode = grid.contentNode,
 				contentPos = scrollToTop ? 0 : contentNode.scrollHeight,
 				scrollPos = contentNode.scrollTop + contentPos,
-				loadedRows = query(".dgrid-row", contentNode),
-				endNode = loadedRows[scrollToTop ? 0 : loadedRows.length - 1],
-				endPos = endNode.offsetTop + (scrollToTop ? 0 : endNode.offsetHeight),
+				endChild = contentNode[scrollToTop ? "firstChild" : "lastChild"],
+				hasPreload = endChild.className.indexOf("dgrid-preload") > -1,
+				endTarget = hasPreload ? endChild[(scrollToTop ? "next" : "previous") + "Sibling"] : endChild,
+				endPos = endTarget.offsetTop + (scrollToTop ? 0 : endTarget.offsetHeight),
 				handle;
+			
+			if(hasPreload){
+				// Find the nearest dgrid-row to the relevant end of the grid
+				while(endTarget && endTarget.className.indexOf("dgrid-row") < 0){
+					endTarget = endTarget[(scrollToTop ? "next" : "previous") + "Sibling"];
+				}
+				// If none is found, there are no rows, and nothing to navigate
+				if(!endTarget){ return; }
+			}
 			
 			// Grid content may be lazy-loaded, so check if content needs to be
 			// loaded first
-			if(contentPos === endPos){
+			if(!hasPreload || endChild.offsetHeight < 1){
 				// End row is loaded; focus the first/last row/cell now
 				if(cellNavigation){
 					// Preserve column that was currently focused
-					endNode = grid.cell(endNode, columnId);
+					endTarget = grid.cell(endTarget, columnId);
 				}
-				grid.focus(endNode);
+				grid.focus(endTarget);
 			}else{
 				// If the topmost/bottommost row rendered doesn't reach the top/bottom of
 				// the contentNode, we are using OnDemandList and need to wait for more
