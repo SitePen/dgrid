@@ -79,6 +79,15 @@ return declare(null, {
 				endPos = endTarget.offsetTop + (scrollToTop ? 0 : endTarget.offsetHeight),
 				handle;
 			
+			if(hasPreload){
+				// Find the nearest dgrid-row to the relevant end of the grid
+				while(endTarget && endTarget.className.indexOf("dgrid-row") < 0){
+					endTarget = endTarget[(scrollToTop ? "next" : "previous") + "Sibling"];
+				}
+				// If none is found, there are no rows, and nothing to navigate
+				if(!endTarget){ return; }
+			}
+			
 			// Grid content may be lazy-loaded, so check if content needs to be
 			// loaded first
 			if(!hasPreload || endChild.offsetHeight < 1){
