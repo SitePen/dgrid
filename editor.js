@@ -207,7 +207,16 @@ function createSharedEditor(column, originalRenderCell){
 		var parentNode = node.parentNode,
 			i = parentNode.children.length - 1,
 			options = { alreadyHooked: true };
-		
+		// emit an event immediately prior to placing a shared editor,
+		// or an "always-on" editor for its initial placement.
+		on.emit(column.headerNode, "dgrid-editor-hide", {
+			grid: column.grid,
+			cell: node,
+			column: column,
+			editor: cmp,
+			bubbles: true,
+			cancelable: true
+		});
 		// Remove the editor from the cell, to be reused later.
 		parentNode.removeChild(node);
 		
@@ -256,6 +265,17 @@ function showEditor(cmp, column, cell, value){
 	if(!isWidget){ updateInputValue(cmp, value); }
 	
 	cell.innerHTML = "";
+	// emit an event immediately prior to placing a shared editor,
+	// or an "always-on" editor for its initial placement.
+	on.emit(column.headerNode, "dgrid-editor-show", {
+		grid: column.grid,
+		cell: cell,
+		column: column,
+		editor: cmp,
+		bubbles: true,
+		cancelable: true
+	});
+	
 	put(cell, cmp.domNode || cmp);
 	
 	if(isWidget){
