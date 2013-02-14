@@ -11,7 +11,7 @@ define([
 	"put-selector/put"
 ], function(declare, arrayUtil, Deferred, querySelector, on, aspect, has, Grid, touchUtil, put){
 
-function defaultRenderExpando(level, hasChildren, expanded){
+function defaultRenderExpando(level, hasChildren, expanded, object){
 	// summary:
 	//		Provides default implementation for column.renderExpando.
 	
@@ -288,7 +288,7 @@ function tree(column){
 		
 		level = currentLevel = isNaN(level) ? 0 : level;
 		expando = column.renderExpando(level, mayHaveChildren,
-			grid._expanded[(parentId ? parentId + "-" : "") + grid.store.getIdentity(object)]);
+			grid._expanded[(parentId ? parentId + "-" : "") + grid.store.getIdentity(object)], object);
 		expando.level = level;
 		expando.mayHaveChildren = mayHaveChildren;
 		
