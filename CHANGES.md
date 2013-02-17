@@ -19,6 +19,20 @@ via `grid.row(...).element`.
 * Added an index page to the test folder to browse the tests via a grid. (#407)
 * Added a preliminary set of DOH tests to assist in spotting regressions. (#412)
 
+### Mixins
+
+* The `Keyboard` mixin has been made significantly more extensible (#429):
+  * Added `keyMap` and `headerKeyMap` properties, which are object hashes
+    whose keys are event key codes and whose values are functions to be
+    executed in the context of the instance; if not specified, defaults
+    (exposed via `Keyboard.defaultKeyMap` and `keyboard.defaultHeaderKeyMap`)
+    will be used.
+  * Added `addKeyHandler(key, callback, isHeader)` method for registering
+    additional keyboard handlers; this is usually easier than trying to
+    override `keyMap` or `headerKeyMap`.
+* The `Keyboard` mixin no longer emits `dgrid-cellfocusout` and
+  `dgrid-cellfocusin` when spacebar is pressed. (#429)
+
 ### Column Plugins
 
 * The `editor` column plugin now emits `dgrid-editor-show` and `dgrid-editor-hide`
@@ -34,12 +48,16 @@ via `grid.row(...).element`.
 ### General/Core
 
 * Fixed `Grid#styleColumn`, which had broken in 0.3.5. (#408)
+* Fixed an issue with `Grid#cell` specific to when a cell object representing a
+  header cell was passed in. (#429)
 * The `Keyboard` mixin now properly handles Home/End keypresses.
 * Fixed logic in `_StoreMixin` to work around a
   [Dojo 1.8 bug with `when`](http://bugs.dojotoolkit.org/ticket/16667), which
   could inappropriately mutate the return value of `_trackError`. (#411)
 * Fixed logic in `OnDemandList` so that asynchronous errors during `refresh`
   are properly signaled via the promise it returns. (#411)
+* Added CSS to ensure that IE6 renders empty `OnDemandList` preload nodes with
+  0 height. (#429)
 
 ### Column Plugins
 
