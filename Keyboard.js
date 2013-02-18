@@ -2,13 +2,12 @@ define([
 	"dojo/_base/declare",
 	"dojo/aspect",
 	"dojo/on",
-	"./List",
 	"dojo/_base/lang",
 	"dojo/has",
 	"put-selector/put",
 	"dojo/_base/Deferred",
 	"dojo/_base/sniff"
-], function(declare, aspect, on, List, lang, has, put, Deferred){
+], function(declare, aspect, on, lang, has, put, Deferred){
 
 var delegatingInputTypes = {
 		checkbox: 1,
