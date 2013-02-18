@@ -17,8 +17,8 @@ var delegatingInputTypes = {
 	hasGridCellClass = /\bdgrid-cell\b/,
 	hasGridRowClass = /\bdgrid-row\b/;
 
-has.add("dom-contains", function(){
-	return !!document.createElement("a").contains;
+has.add("dom-contains", function(global, doc, element){
+	return !!element.contains; // not supported by FF < 9
 });
 
 function contains(parent, node){
