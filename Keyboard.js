@@ -2,13 +2,12 @@ define([
 	"dojo/_base/declare",
 	"dojo/aspect",
 	"dojo/on",
-	"./List",
 	"dojo/_base/lang",
 	"dojo/has",
 	"put-selector/put",
 	"dojo/_base/Deferred",
 	"dojo/_base/sniff"
-], function(declare, aspect, on, List, lang, has, put, Deferred){
+], function(declare, aspect, on, lang, has, put, Deferred){
 
 var delegatingInputTypes = {
 		checkbox: 1,
@@ -18,8 +17,8 @@ var delegatingInputTypes = {
 	hasGridCellClass = /\bdgrid-cell\b/,
 	hasGridRowClass = /\bdgrid-row\b/;
 
-has.add("dom-contains", function(){
-	return !!document.createElement("a").contains;
+has.add("dom-contains", function(global, doc, element){
+	return !!element.contains; // not supported by FF < 9
 });
 
 function contains(parent, node){
@@ -243,14 +242,11 @@ var Keyboard = declare(null, {
 
 // Common functions used in default keyMap (called in instance context)
 
-var moveFocusVertical = Keyboard.moveFocusVertical = function(event){
-	var key = event.keyCode,
-		cellNavigation = this.cellNavigation,
+var moveFocusVertical = Keyboard.moveFocusVertical = function(event, steps){
+	var cellNavigation = this.cellNavigation,
 		target = this[cellNavigation ? "cell" : "row"](event),
 		columnId = cellNavigation && target.column.id,
-		direction = key === 33 || key === 38 ? "up" : "down", // [page] up vs. down
-		steps = key === 33 || key === 34 ? this.pageSkip : 1, // page vs. arrow up/down
-		next = this[direction](this._focusedNode, steps, true);
+		next = this.down(this._focusedNode, steps, true);
 	
 	// Navigate within same column if cell navigation is enabled
 	if(cellNavigation){ next = this.cell(next, columnId); }
@@ -259,21 +255,42 @@ var moveFocusVertical = Keyboard.moveFocusVertical = function(event){
 	event.preventDefault();
 };
 
-var moveFocusHorizontal = Keyboard.moveFocusHorizontal = function(event){
+var moveFocusUp = Keyboard.moveFocusUp = function(event){
+	moveFocusVertical.call(this, event, -1);
+};
+
+var moveFocusDown = Keyboard.moveFocusDown = function(event){
+	moveFocusVertical.call(this, event, 1);
+};
+
+var moveFocusPageUp = Keyboard.moveFocusPageUp = function(event){
+	moveFocusVertical.call(this, event, -this.pageSkip);
+};
+
+var moveFocusPageDown = Keyboard.moveFocusPageDown = function(event){
+	moveFocusVertical.call(this, event, this.pageSkip);
+};
+
+var moveFocusHorizontal = Keyboard.moveFocusHorizontal = function(event, steps){
 	if(!this.cellNavigation){ return; }
-	var key = event.keyCode,
-		direction = key === 37 ? "left" : "right",
-		isHeader = !this.row(event), // header reports row as undefined
+	var isHeader = !this.row(event), // header reports row as undefined
 		currentNode = this["_focused" + (isHeader ? "Header" : "") + "Node"];
 	
-	this._focusOnNode(this[direction](currentNode), isHeader, event);
+	this._focusOnNode(this.right(currentNode, steps), isHeader, event);
 	event.preventDefault();
 };
 
-var moveHeaderFocusEnd = Keyboard.moveHeaderFocusEnd = function(event){
+var moveFocusLeft = Keyboard.moveFocusLeft = function(event){
+	moveFocusHorizontal.call(this, event, -1);
+};
+
+var moveFocusRight = Keyboard.moveFocusRight = function(event){
+	moveFocusHorizontal.call(this, event, 1);
+};
+
+var moveHeaderFocusEnd = Keyboard.moveHeaderFocusEnd = function(event, scrollToBeginning){
 	// Header case is always simple, since all rows/cells are present
-	var scrollToBeginning = event.keyCode === 36,
-		nodes;
+	var nodes;
 	if(this.cellNavigation){
 		nodes = this.headerNode.getElementsByTagName("th");
 		this._focusOnNode(nodes[scrollToBeginning ? 0 : nodes.length - 1], true, event);
@@ -284,13 +301,16 @@ var moveHeaderFocusEnd = Keyboard.moveHeaderFocusEnd = function(event){
 	event.preventDefault();
 };
 
-var moveFocusEnd = Keyboard.moveFocusEnd = function(event){
+var moveHeaderFocusHome = Keyboard.moveHeaderFocusHome = function(event){
+	moveHeaderFocusEnd.call(this, event, true);
+};
+
+var moveFocusEnd = Keyboard.moveFocusEnd = function(event, scrollToTop){
 	// summary:
 	//		Handles requests to scroll to the beginning or end of the grid.
 	
 	// Assume scrolling to top unless event is specifically for End key
 	var self = this,
-		scrollToTop = event.keyCode === 36,
 		cellNavigation = this.cellNavigation,
 		contentNode = this.contentNode,
 		contentPos = scrollToTop ? 0 : contentNode.scrollHeight,
@@ -349,29 +369,33 @@ var moveFocusEnd = Keyboard.moveFocusEnd = function(event){
 	}
 };
 
+var moveFocusHome = Keyboard.moveFocusHome = function(event){
+	moveFocusEnd.call(this, event, true);
+};
+
 function preventDefault(event){
 	event.preventDefault();
 }
 
 Keyboard.defaultKeyMap = {
 	32: preventDefault, // space
-	33: moveFocusVertical, // page up
-	34: moveFocusVertical, // page down
+	33: moveFocusPageUp, // page up
+	34: moveFocusPageDown, // page down
 	35: moveFocusEnd, // end
-	36: moveFocusEnd, // home
-	37: moveFocusHorizontal, // left
-	38: moveFocusVertical, // up
-	39: moveFocusHorizontal, // right
-	40: moveFocusVertical // down
+	36: moveFocusHome, // home
+	37: moveFocusLeft, // left
+	38: moveFocusUp, // up
+	39: moveFocusRight, // right
+	40: moveFocusDown // down
 };
 
 // Header needs fewer default bindings (no vertical), so bind it separately
 Keyboard.defaultHeaderKeyMap = {
 	32: preventDefault, // space
 	35: moveHeaderFocusEnd, // end
-	36: moveHeaderFocusEnd, // home
-	37: moveFocusHorizontal, // left
-	39: moveFocusHorizontal // right
+	36: moveHeaderFocusHome, // home
+	37: moveFocusLeft, // left
+	39: moveFocusRight // right
 };
 
 return Keyboard;
