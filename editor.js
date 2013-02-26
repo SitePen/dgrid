@@ -222,8 +222,7 @@ function createSharedEditor(column, originalRenderCell){
 		// Remove the editor from the cell, to be reused later.
 		parentNode.removeChild(node);
 		
-		// Remove the cell editing class
-		put(cell.element, '!dgrid-cell-editing');
+		put(cell.element, "!dgrid-cell-editing");
 		
 		// Clear out the rest of the cell's contents, then re-render with new value.
 		while(i--){ put(parentNode.firstChild, "!"); }
@@ -271,10 +270,8 @@ function showEditor(cmp, column, cellElement, value){
 	if(!isWidget){ updateInputValue(cmp, value); }
 	
 	cellElement.innerHTML = "";
+	put(cellElement, ".dgrid-cell-editing");
 	put(cellElement, cmp.domNode || cmp);
-	
-	// Add cell editing class
-	put(cellElement, '.dgrid-cell-editing');
 	
 	if(isWidget){
 		// For widgets, ensure startup is called before setting value,
