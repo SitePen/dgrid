@@ -67,6 +67,8 @@ via `grid.row(...).element`.
   using `valueOf`. (#256, #304, #423)
 * The `tree` plugin has been refactored to make use of the `util/has-css3`
   module, rather than feature-detecting upon first expansion. (#416)
+* The `tree` plugin now implements `expand` such that it will bail out if the
+  target row is already in the desired state.
 
 # 0.3.5
 
