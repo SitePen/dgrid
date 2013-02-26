@@ -37,6 +37,8 @@ via `grid.row(...).element`.
 
 * The `editor` column plugin now emits `dgrid-editor-show` and `dgrid-editor-hide`
   events when an editor with `editOn` set is shown or hidden, respectively. (#424)
+* The `editor` column plugin now adds a `dgrid-cell-editing` class to any cell
+  containing an active editor. (#442; thanks Brandano for the idea)
 
 ### Extensions
 
