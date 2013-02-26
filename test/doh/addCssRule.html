@@ -24,15 +24,15 @@
 							testDiv.className = "foo";
 						},
 						runTest: function(doh){
-							var origStyle = domStyle.getComputedStyle(testDiv).width,
-								rule = miscUtil.addCssRule(".foo", "width: 100px;");
+							var origStyle = domStyle.getComputedStyle(testDiv).fontSize,
+								rule = miscUtil.addCssRule(".foo", "font-size: 8px;");
 							
-							doh.is("100px", domStyle.getComputedStyle(testDiv).width,
-								"Node with matching class has expected width");
+							doh.is("8px", domStyle.getComputedStyle(testDiv).fontSize,
+								"Node with matching class has expected font-size");
 							
 							rule.remove();
-							doh.is(origStyle, domStyle.getComputedStyle(testDiv).width,
-								"Node with matching class no longer has width from removed rule");
+							doh.is(origStyle, domStyle.getComputedStyle(testDiv).fontSize,
+								"Node with matching class no longer has font-size from removed rule");
 						},
 						tearDown: function(){
 							testDiv.className = "";
@@ -44,21 +44,21 @@
 							testDiv.className = "bar";
 						},
 						runTest: function(doh){
-							var origStyle = domStyle.getComputedStyle(testDiv).width,
-								rule = miscUtil.addCssRule(".bar", "width: 200px;");
+							var origStyle = domStyle.getComputedStyle(testDiv).fontSize,
+								rule = miscUtil.addCssRule(".bar", "font-size: 8px;");
 							
-							doh.is("200px", rule.get("width"),
-								"rule.get('width') reports expected value");
+							doh.is("8px", rule.get("fontSize"),
+								"rule.get('fontSize') reports expected value");
 							
-							rule.set("width", "300px");
-							doh.is("300px", domStyle.getComputedStyle(testDiv).width,
-								"Node with matching class has expected width after set");
-							doh.is("300px", rule.get("width"),
-								"rule.get('width') reports expected value after set");
+							rule.set("fontSize", "9px");
+							doh.is("9px", domStyle.getComputedStyle(testDiv).fontSize,
+								"Node with matching class has expected font-size after set");
+							doh.is("9px", rule.get("fontSize"),
+								"rule.get('fontSize') reports expected value after set");
 							
 							rule.remove();
-							doh.is(origStyle, domStyle.getComputedStyle(testDiv).width,
-								"Node with matching class no longer has width from removed rule");
+							doh.is(origStyle, domStyle.getComputedStyle(testDiv).fontSize,
+								"Node with matching class no longer has font-size from removed rule");
 						},
 						tearDown: function(){
 							testDiv.className = "";
@@ -67,12 +67,12 @@
 					{
 						name: "add/remove multiple rules in mixed order",
 						runTest: function(doh){
-							var origStyle = domStyle.getComputedStyle(testDiv).width,
+							var origStyle = domStyle.getComputedStyle(testDiv).fontSize,
 								rules = [],
 								expected = { // hash containing test classes / values
-									foo: "100px",
-									bar: "200px",
-									baz: "300px"
+									foo: "7px",
+									bar: "8px",
+									baz: "9px"
 								},
 								cls;
 							
@@ -81,15 +81,15 @@
 								var cls;
 								for(cls in expected){
 									testDiv.className = cls;
-									doh.is(expected[cls], domStyle.getComputedStyle(testDiv).width,
-										"Node with class " + cls + " has expected width");
+									doh.is(expected[cls], domStyle.getComputedStyle(testDiv).fontSize,
+										"Node with class " + cls + " has expected font-size");
 								}
 								testDiv.className = "";
 							}
 							
 							// Create rules and maintain references to returned objects
 							for(cls in expected){
-								rules.push(miscUtil.addCssRule("." + cls, "width: " + expected[cls] + ";"));
+								rules.push(miscUtil.addCssRule("." + cls, "font-size: " + expected[cls] + ";"));
 							}
 							
 							// Do initial check, then remove rules one by one, out of order,
@@ -112,7 +112,7 @@
 					{
 						name: "addCssRule via dgrid APIs",
 						runTest: function(doh){
-							var values = ["100px", "200px"/*, "300px"*/],
+							var values = ["7px", "8px"],
 								origValues,
 								grid;
 							
@@ -133,16 +133,16 @@
 							function addRules(){
 								var rules = [];
 								
-								rules.push(grid.addCssRule(".field-value", "width: " + values[0] + ";"));
-								rules.push(grid.styleColumn("name", "width: " + values[1] + ";"));
+								rules.push(grid.addCssRule(".field-value", "font-size: " + values[0] + ";"));
+								rules.push(grid.styleColumn("name", "font-size: " + values[1] + ";"));
 								
 								return rules;
 							}
 							
 							function getStyles(){
 								return [
-									domStyle.getComputedStyle(query(".field-value", grid.domNode)[0]).width,
-									domStyle.getComputedStyle(query(".dgrid-column-name", grid.domNode)[0]).width
+									domStyle.getComputedStyle(query(".field-value", grid.domNode)[0]).fontSize,
+									domStyle.getComputedStyle(query(".dgrid-column-name", grid.domNode)[0]).fontSize
 								];
 							}
 							
