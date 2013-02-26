@@ -177,7 +177,7 @@ function tree(column){
 			target = target.className.indexOf("dgrid-expando-icon") > -1 ? target :
 				querySelector(".dgrid-expando-icon", target)[0];
 			
-			if(target && target.mayHaveChildren){
+			if(target && target.mayHaveChildren && expand !== !!this._expanded[row.id]){
 				// toggle or set expand/collapsed state based on optional 2nd argument
 				var expanded = expand === undefined ? !this._expanded[row.id] : expand;
 				
