@@ -181,6 +181,10 @@ function tree(column){
 				// toggle or set expand/collapsed state based on optional 2nd argument
 				var expanded = expand === undefined ? !this._expanded[row.id] : expand;
 				
+				if (this._expanded[row.id] && expand) {
+					return;
+				}
+				
 				// update the expando display
 				target.className = "dgrid-expando-icon ui-icon ui-icon-triangle-1-" + (expanded ? "se" : "e");
 				var preloadNode = target.preloadNode,
