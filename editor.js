@@ -318,6 +318,10 @@ function edit(cell) {
 	if(!cell.column){ cell = this.cell(cell); }
 	column = cell.column;
 	field = column.field;
+	if (!cell.element) {
+		return;
+	}
+	
 	cellElement = cell.element.contents || cell.element;
 	
 	if((cmp = column.editorInstance)){ // shared editor (editOn used)
