@@ -77,6 +77,8 @@ function(kernel, declare, Deferred, listen, aspect, query, has, miscUtil, put, h
 			return function(target, listener){
 				return listen(target, has("event-wheel") ? "wheel" : "mousewheel", function(event){
 					var node = event.target, deltaX;
+					
+					event.preventDefault();
 					// WebKit will invoke mousewheel handlers with an event target of a text
 					// node; check target and if it's not an element node, start one node higher
 					// in the tree
