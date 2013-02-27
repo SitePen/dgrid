@@ -316,6 +316,8 @@ function edit(cell) {
 	var row, column, cellElement, dirty, field, value, cmp, dfd;
 	
 	if(!cell.column){ cell = this.cell(cell); }
+	if(!cell || !cell.element){ return null; }
+	
 	column = cell.column;
 	field = column.field;
 	cellElement = cell.element.contents || cell.element;
