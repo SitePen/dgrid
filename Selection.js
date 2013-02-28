@@ -420,7 +420,7 @@ return declare(null, {
 	},
 	
 	refresh: function(){
-		if(this.deselectOnRefresh){
+		if(this.deselectOnRefresh && !this._columnsDestroyed){
 			this.clearSelection();
 			// Need to fire the selection event now because after the refresh,
 			// the nodes that we will fire for will be gone.
@@ -430,9 +430,23 @@ return declare(null, {
 		return this.inherited(arguments);
 	},
 	
+	_destroyColumns: function () {
+		if (this.deselectOnRefresh) {
+			this.clearSelection();
+			
+			this._fireSelectionEvent && this._fireSelectionEvent();
+		}
+		
+		this._columnsDestroyed = true;
+		
+		this.inherited(arguments);
+	},
+	
 	renderArray: function(){
 		var grid = this,
 			rows = this.inherited(arguments);
+			
+		this._columnsDestroyed = false;
 		
 		Deferred.when(rows, function(rows){
 			var selection = grid.selection,
