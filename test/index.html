@@ -78,7 +78,8 @@
 					
 					var cookieName = "dgrid-test-index",
 						persistedInfo = cookie(cookieName);
-					persistedInfo = persistedInfo ? json.parse(persistedInfo) : {};
+					persistedInfo = persistedInfo ?
+						json.parse(persistedInfo) : { expanded: {} };
 					
 					function shouldExpand(row, level, previouslyExpanded) {
 						return previouslyExpanded || !!persistedInfo.expanded[row.id];
