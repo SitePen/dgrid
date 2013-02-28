@@ -243,10 +243,11 @@
 								}, "grid");
 							}else{
 								// instead of destroying/recreating, just reset store + columns
-								grid.set("store", Observable(new TestStore({ data: data })));
+								grid.set("store", null);
 								grid.set("columns", {
 									"editor": editor(lang.mixin({}, options.column, columnArgs))
 								});
+								grid.set("store", Observable(new TestStore({ data: data })));
 							}
 						});
 						
