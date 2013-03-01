@@ -6,8 +6,60 @@ return declare(Selection, {
 	
 	// ensure we don't select when an individual cell is not identifiable
 	selectionDelegate: ".dgrid-cell",
-	
-	select: function(cell, toCell, value){
+	selectFullRow: function(row, toRow, value){
+		if(value === undefined){
+			// default to true
+			value = true;
+		} 
+		if(!row.element){
+			row = this.row(row);
+		}
+		if(this.allowSelect(row)){
+			var selectionRow = this.selectionRow;
+			var previousValue = selectionRow[row.id];
+			if(value === null){
+				// indicates a toggle
+				value = !previousValue;
+			}
+			var element = row.element;
+			if(!value && !this.allSelected){
+				delete this.selectionRow[row.id];
+			}else{
+				selectionRow[row.id] = value;
+			}
+			if(element){
+				// add or remove classes as appropriate
+				if(value){
+					put(element, ".dgrid-selected.ui-state-active");
+				}else{
+					put(element, "!dgrid-selected!ui-state-active");
+				}
+			}
+			if(value != previousValue && element){
+				// add to the queue of row events
+				this._selectionEventQueue(value, "rows").push(row);
+			}
+			
+			if(toRow){
+				if(!toRow.element){
+					toRow = this.row(toRow);
+				}
+				var toElement = toRow.element;
+				var fromElement = row.element;
+				// find if it is earlier or later in the DOM
+				var traverser = (toElement && (toElement.compareDocumentPosition ? 
+					toElement.compareDocumentPosition(fromElement) == 2 :
+					toElement.sourceIndex > fromElement.sourceIndex)) ? "down" : "up";
+				while(row.element != toElement && (row = this[traverser](row))){
+					this.select(row);
+				}
+			}
+		}
+	},
+	select: function(cell, toCell, value, wholeRow){
+		if(wholeRow){
+			this.selectFullRow(cell, toCell, value);
+		}
 		var i, id;
 		if(value === undefined){
 			// default to true

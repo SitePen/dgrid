@@ -115,6 +115,9 @@ return declare(null, {
 	//		An object where the property names correspond to 
 	//		object ids and values are true or false depending on whether an item is selected
 	selection: {},
+	// selectionRow:
+	//		Stores an selection object exclusively for the selector when a full row is selected.	
+	selectionRow: {},
 	
 	// selectionMode: String
 	//		The selection mode to use, can be "none", "multiple", "single", or "extended".

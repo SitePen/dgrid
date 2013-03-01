@@ -69,7 +69,7 @@ function(kernel, arrayUtil, on, aspect, has, put){
 				if(type == "radio"){
 					if(!lastRow || lastRow.id != row.id){
 						grid.clearSelection();
-						grid.select(row, null, true);
+						grid.select(row, null, true, true);
 						grid._lastSelected = row.element;
 					}
 				}else{
@@ -82,7 +82,7 @@ function(kernel, arrayUtil, on, aspect, has, put){
 							lastRow = null;
 						}
 						lastRow = event.shiftKey ? lastRow : null;
-						grid.select(lastRow || row, row, lastRow ? undefined : null);
+						grid.select(lastRow || row, row, lastRow ? undefined : null, true);
 						grid._lastSelected = row.element;
 					}else{
 						// No row resolved; must be the select-all checkbox.
