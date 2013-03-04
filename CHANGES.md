@@ -7,10 +7,15 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ### Column Plugins
 
-* The `tree` module's `renderExpando` function now receives a 4th argument:
+* The `tree` plugin's `renderExpando` function now receives a 4th argument:
   the object represented by the current row. (#427; thanks pags)
 
 ## Other changes and fixes
+
+### Column Plugins
+
+* The `tree` plugin no longer completely overwrites classes on the expando node
+  when expanding/collapsing, so custom classes will be preserved. (#409)
 
 ### Extensions
 
