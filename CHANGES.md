@@ -10,6 +10,11 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 * The `tree` plugin's `renderExpando` function now receives a 4th argument:
   the object represented by the current row. (#427; thanks pags)
 
+### Extensions
+
+* The `ColumnResizer` extension no longer emits superfluous events for all columns
+  on the first resize. (#441)
+
 ## Other changes and fixes
 
 ### Column Plugins
