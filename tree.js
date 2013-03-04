@@ -182,6 +182,10 @@ function tree(column){
 				// toggle or set expand/collapsed state based on optional 2nd argument
 				var expanded = expand === undefined ? !this._expanded[row.id] : expand;
 				
+				if (this._expanded[row.id] && expand) {
+					return;
+				}
+				
 				// update the expando display
 				put(target, ".ui-icon-triangle-1-" + (expanded ? "se" : "e") +
 					"!ui-icon-triangle-1-" + (expanded ? "e" : "se"));
