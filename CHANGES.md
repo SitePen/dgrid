@@ -3,6 +3,13 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 # master (0.3.7-dev)
 
+## Significant changes
+
+### Column Plugins
+
+* The `tree` module's `renderExpando` function now receives a 4th argument:
+  the object represented by the current row. (#427; thanks pags)
+
 ## Other changes and fixes
 
 ### Extensions
