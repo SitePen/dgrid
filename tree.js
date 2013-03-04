@@ -183,7 +183,9 @@ function tree(column){
 				var expanded = expand === undefined ? !this._expanded[row.id] : expand;
 				
 				// update the expando display
-				target.className = "dgrid-expando-icon ui-icon ui-icon-triangle-1-" + (expanded ? "se" : "e");
+				put(target, ".ui-icon-triangle-1-" + (expanded ? "se" : "e") +
+					"!ui-icon-triangle-1-" + (expanded ? "e" : "se"));
+				
 				var preloadNode = target.preloadNode,
 					rowElement = row.element,
 					container,
