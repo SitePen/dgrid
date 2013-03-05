@@ -5,6 +5,12 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ## Significant changes
 
+### Mixins
+
+* The `Selection` mixin no longer calls `allowSelect` for `deselect` calls
+  (only `select` calls).  This avoids potential errors when resetting column
+  structures, and reduces unnecessary calls.
+
 ### Column Plugins
 
 * The `tree` plugin's `renderExpando` function now receives a 4th argument:
