@@ -29,6 +29,8 @@
 		<script src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script>
+			var getColumns;
+			
 			require(["dojo/on", "dgrid/OnDemandGrid", "dgrid/selector", "dgrid/Selection", "dgrid/Keyboard", "dgrid/ColumnSet",
 					"dojo/_base/declare", "dojo/_base/array", "dojo/json", "dgrid/test/data/base", "dojo/domReady!"], 
 				function(on, Grid, selector, Selection, Keyboard, ColumnSet, declare, arrayUtil, json, testStore){
@@ -41,18 +43,22 @@
 							console.log("selection: ", json.stringify(event.grid.selection, null, "  "));
 						}
 					);
-
+					
+					getColumns = function(){
+						return {
+							col1: selector({ disabled: function(object){ return object.col1 == "note"; }}),
+							id: "ID",
+							col2: { label: 'Column 2', sortable: false },
+							col3: { label: 'Column 3' }
+						};
+					};
+					
 					var SelectionGrid = declare([Grid, Selection, Keyboard]);
 					
 					window.grid = new SelectionGrid({
 						store: testStore,
 						selectionMode: "none",
-						columns: {
-							col1: selector({ disabled: function(object){ return object.col1 == "note"; }}),
-							id: "ID",
-							col2: {label: 'Column 2', sortable: false},
-							col3: {label: 'Column 3'}
-						},
+						columns: getColumns(),
 						allowSelectAll: true
 					}, "grid");
 					window.grid2 = new SelectionGrid({
@@ -112,6 +118,11 @@
 				Set selection mode to "extended"</button>
 		</div>
 		<div id="grid"></div>
+		<div>
+			<button type="button" onclick="grid.set('columns', getColumns());">
+				Reset columns (should not cause errors)
+			</button>
+		</div>
 		<h2>A grid with radio selectors</h2>
 		<div>
 			<button type="button" onclick="gridRadio.set('selectionMode', 'none');">
