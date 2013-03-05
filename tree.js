@@ -11,7 +11,7 @@ define([
 	"put-selector/put"
 ], function(declare, arrayUtil, Deferred, querySelector, on, aspect, has, Grid, touchUtil, put){
 
-function defaultRenderExpando(level, hasChildren, expanded){
+function defaultRenderExpando(level, hasChildren, expanded, object){
 	// summary:
 	//		Provides default implementation for column.renderExpando.
 	
@@ -177,12 +177,15 @@ function tree(column){
 			target = target.className.indexOf("dgrid-expando-icon") > -1 ? target :
 				querySelector(".dgrid-expando-icon", target)[0];
 			
-			if(target && target.mayHaveChildren){
+			if(target && target.mayHaveChildren &&
+					(noTransition || expand !== !!this._expanded[row.id])){
 				// toggle or set expand/collapsed state based on optional 2nd argument
 				var expanded = expand === undefined ? !this._expanded[row.id] : expand;
 				
 				// update the expando display
-				target.className = "dgrid-expando-icon ui-icon ui-icon-triangle-1-" + (expanded ? "se" : "e");
+				put(target, ".ui-icon-triangle-1-" + (expanded ? "se" : "e") +
+					"!ui-icon-triangle-1-" + (expanded ? "e" : "se"));
+				
 				var preloadNode = target.preloadNode,
 					rowElement = row.element,
 					container,
@@ -288,7 +291,7 @@ function tree(column){
 		
 		level = currentLevel = isNaN(level) ? 0 : level;
 		expando = column.renderExpando(level, mayHaveChildren,
-			grid._expanded[(parentId ? parentId + "-" : "") + grid.store.getIdentity(object)]);
+			grid._expanded[(parentId ? parentId + "-" : "") + grid.store.getIdentity(object)], object);
 		expando.level = level;
 		expando.mayHaveChildren = mayHaveChildren;
 		

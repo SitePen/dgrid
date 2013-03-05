@@ -18,7 +18,7 @@ function populateList(subdir) {
 	
 	for (i = 0, len = files.length; i < len; i++) {
 		file = files[i];
-		if (path.extname(file) === ".html") {
+		if (path.extname(file) === ".html" && file !== "index.html") {
 			list.push({
 				name: file, // filename only, for display purposes
 				url: path.join(subdir, file), // relative to test folder, serves as ID

@@ -85,7 +85,7 @@ function resizeColumnWidth(grid, colId, width, parentType){
 		event.parentType = parentType;
 	}
 	
-	if(listen.emit(grid.headerNode, "dgrid-columnresize", event)){
+	if(grid._resizedColumns && listen.emit(grid.headerNode, "dgrid-columnresize", event)){
 		// Update width on column object, then convert value for CSS
 		if(width === "auto"){
 			delete column.width;

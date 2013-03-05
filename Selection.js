@@ -8,8 +8,7 @@ has.add("css-user-select", function(global, doc, element){
 	var style = element.style,
 		prefixes = ["Khtml", "O", "ms", "Moz", "Webkit"],
 		i = prefixes.length,
-		name = "userSelect",
-		prefix;
+		name = "userSelect";
 
 	// Iterate prefixes from most to least likely
 	do{
@@ -244,10 +243,6 @@ return declare(null, {
 		var grid = this,
 			selector = this.selectionDelegate;
 		
-		function focus(event){
-			grid._handleSelect(event, this);
-		}
-		
 		if(has("touch")){
 			// listen for touch taps if available
 			on(this.contentNode, touchUtil.selector(selector, touchUtil.tap), function(evt){
@@ -255,9 +250,18 @@ return declare(null, {
 			});
 		}else{
 			// listen for actions that should cause selections
-			on(this.contentNode, on.selector(selector, this.selectionEvents), focus);
+			on(this.contentNode, on.selector(selector, this.selectionEvents), function(event){
+				grid._handleSelect(event, this);
+			});
 		}
-
+		
+		// Also hook up spacebar (for ctrl+space)
+		if(this.addKeyHandler){
+			this.addKeyHandler(32, function(event){
+				grid._handleSelect(event, event.target);
+			});
+		}
+		
 		// If allowSelectAll is true, allow ctrl/cmd+A to (de)select all rows.
 		// (Handler further checks against _allowSelectAll, which may be updated
 		// if selectionMode is changed post-init.)

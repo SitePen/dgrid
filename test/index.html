@@ -78,7 +78,12 @@
 					
 					var cookieName = "dgrid-test-index",
 						persistedInfo = cookie(cookieName);
-					persistedInfo = persistedInfo ? json.parse(persistedInfo) : {};
+					persistedInfo = persistedInfo ?
+						json.parse(persistedInfo) : { expanded: {} };
+					
+					function shouldExpand(row, level, previouslyExpanded) {
+						return previouslyExpanded || !!persistedInfo.expanded[row.id];
+					}
 					
 					function renderLinkCell(object, value){
 						// Render a link for cells in rows representing pages
@@ -88,10 +93,13 @@
 					}
 					
 					var grid = new OnDemandGrid({
-						_expanded: persistedInfo.expanded,
 						className: "toc",
 						columns: {
-							name: tree({ renderCell: renderLinkCell, expandOn: ".dgrid-row:click" }),
+							name: tree({
+								shouldExpand: shouldExpand,
+								renderCell: renderLinkCell,
+								expandOn: ".dgrid-row:click"
+							}),
 							title: { renderCell: renderLinkCell }
 						},
 						renderHeader: function(){
