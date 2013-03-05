@@ -430,6 +430,16 @@ return declare(null, {
 		return this.inherited(arguments);
 	},
 	
+	_destroyColumns: function () {
+		if (this.deselectOnRefresh) {
+			this.clearSelection();
+			
+			this._fireSelectionEvent && this._fireSelectionEvent();
+		}
+		
+		this.inherited(arguments);
+	},
+	
 	renderArray: function(){
 		var grid = this,
 			rows = this.inherited(arguments);
