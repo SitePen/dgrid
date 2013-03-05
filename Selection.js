@@ -332,7 +332,7 @@ return declare(null, {
 		if(!row.element){
 			row = this.row(row);
 		}
-		if(this.allowSelect(row)){
+		if(!value || this.allowSelect(row)){
 			var selection = this.selection;
 			var previousValue = selection[row.id];
 			if(value === null){
