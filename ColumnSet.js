@@ -37,6 +37,7 @@ function(kernel, declare, Deferred, listen, aspect, query, has, miscUtil, put, h
 			contentWidth = columnSetElement.firstChild.offsetWidth;
 			scrollerContents[i].style.width = contentWidth + "px";
 			scrollers[i].style.width = scrollerWidth + "px";
+			scrollers[i].style.bottom = grid.showFooter ? "20px" : "0px";
 			// IE seems to need scroll to be set explicitly
 			scrollers[i].style.overflowX = contentWidth > scrollerWidth ? "scroll" : "auto";
 			scrollers[i].style.left = left + "px";
