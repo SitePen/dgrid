@@ -41,6 +41,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 * The `ColumnHider` extension now relies on CSS to specify an icon, rather than
   using text to show a plus sign.  The icon can be changed by overriding
   the background on the `dgrid-hider-toggle` class.  (#306)
+* Fixed issues in the `ColumnHider` extension involving redundant calls to
+  `toggleColumnHiddenState`. (#464)
 
 # 0.3.6
 
