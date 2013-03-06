@@ -23,6 +23,11 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ## Other changes and fixes
 
+### Mixins
+
+* The `ColumnSet` mixin now adjusts the positioning of its scrollbars
+  appropriately if the footer node is present. (#463)
+
 ### Column Plugins
 
 * The `tree` plugin no longer completely overwrites classes on the expando node
