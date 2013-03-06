@@ -271,6 +271,11 @@ define([
 				type: type instanceof Array ? type : [type]
 			});
 			return row;
+		},
+		
+		removeRow: function (rowElement) {
+			this.dndSource.delItem(this.row(rowElement));
+			this.inherited(arguments);
 		}
 	});
 	DnD.GridSource = GridDnDSource;
