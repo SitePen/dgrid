@@ -217,6 +217,10 @@ function(declare, has, listen, miscUtil, put){
 			// Use miscUtil function directly, since we clean these up ourselves anyway
 			var selectorPrefix = "#" + miscUtil.escapeCssIdentifier(this.domNode.id) + " .dgrid-column-",
 				next, rules, i; // used in IE8 code path
+
+			if (this._columnHiderRules[id]) {
+				return;
+			}
 			
 			if(has("ie") === 8 && !has("quirks")){
 				// Avoid inconsistent behavior in IE8 when display: none is set on a cell
@@ -249,7 +253,7 @@ function(declare, has, listen, miscUtil, put){
 			//		method for more information.
 			
 			if(!hidden){
-				this._columnHiderRules[id].remove();
+				this._columnHiderRules[id] && this._columnHiderRules[id].remove();
 				delete this._columnHiderRules[id];
 			}else{
 				this._hideColumn(id);

@@ -23,6 +23,11 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ## Other changes and fixes
 
+### Mixins
+
+* The `ColumnSet` mixin now adjusts the positioning of its scrollbars
+  appropriately if the footer node is present. (#463)
+
 ### Column Plugins
 
 * The `tree` plugin no longer completely overwrites classes on the expando node
@@ -36,6 +41,10 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 * The `ColumnHider` extension now relies on CSS to specify an icon, rather than
   using text to show a plus sign.  The icon can be changed by overriding
   the background on the `dgrid-hider-toggle` class.  (#306)
+* Fixed issues in the `ColumnHider` extension involving redundant calls to
+  `toggleColumnHiddenState`. (#464)
+* The `DnD` extension now cleans references from the dnd source's hash when
+  `removeRow` is called on the grid. (#335)
 
 # 0.3.6
 
