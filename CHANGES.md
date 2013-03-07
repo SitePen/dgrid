@@ -43,6 +43,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
   the background on the `dgrid-hider-toggle` class.  (#306)
 * Fixed issues in the `ColumnHider` extension involving redundant calls to
   `toggleColumnHiddenState`. (#464)
+* The `DnD` extension now cleans references from the dnd source's hash when
+  `removeRow` is called on the grid. (#335)
 
 # 0.3.6
 
