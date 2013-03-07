@@ -523,17 +523,14 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 						this.store.getIdentity(object) : this._autoId++),
 				row = byId(id),
 				previousRow = row && row.previousSibling;
-			
-			if(!row || // we must create a row if it doesn't exist, or if it previously belonged to a different container 
-					(beforeNode && row.parentNode != beforeNode.parentNode)){
-				if(row){// if it existed elsewhere in the DOM, we will remove it, so we can recreate it
-					this.removeRow(row);
-				}
-				row = this.renderRow(object, options);
-				row.className = (row.className || "") + " ui-state-default dgrid-row " + (i % 2 == 1 ? oddClass : evenClass);
-				// get the row id for easy retrieval
-				this._rowIdToObject[row.id = id] = object;
+		
+			if(row){// if it existed elsewhere in the DOM, we will remove it, so we can recreate it
+				this.removeRow(row);
 			}
+			row = this.renderRow(object, options);
+			row.className = (row.className || "") + " ui-state-default dgrid-row " + (i % 2 == 1 ? oddClass : evenClass);
+			// get the row id for easy retrieval
+			this._rowIdToObject[row.id = id] = object;
 			parent.insertBefore(row, beforeNode || null);
 			if(previousRow){
 				// in this case, we are pulling the row from another location in the grid, and we need to readjust the rowIndices from the point it was removed
