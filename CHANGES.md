@@ -30,6 +30,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 * The `List` module's `startup` method now correctly checks `_started` before
   calling `this.inherited`.  (Thanks dancrumb)
+* Fixed an issue in `List` which could cause errors on certain successive tree
+  row removals/insertions. (#418, #467)
 
 ### Mixins
 
