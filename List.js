@@ -737,12 +737,12 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 			//		Sets named properties on a List object.
 			//		A programmatic setter may be defined in subclasses.
 			//
-			//	set() may also be called with a hash of name/value pairs, ex:
+			//		set() may also be called with a hash of name/value pairs, ex:
 			//	|	myObj.set({
 			//	|		foo: "Howdy",
 			//	|		bar: 3
 			//	|	})
-			//	This is equivalent to calling set(foo, "Howdy") and set(bar, 3)
+			//		This is equivalent to calling set(foo, "Howdy") and set(bar, 3)
 			
 			if(typeof name === "object"){
 				for(var k in name){

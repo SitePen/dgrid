@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Test formatters and formatterScope</title>
+		<meta name="viewport" content="width=570">
+		<style>
+			@import "../../dojo/resources/dojo.css";
+			@import "../css/dgrid.css";
+			@import "../css/skins/claro.css";
+			.heading {
+				font-weight: bold;
+				padding-bottom: 0.25em;
+			}
+			#grid {
+				width: 400px;
+			}
+			
+			/* styles for autoheight */
+			#grid {
+				height: auto;
+			}
+			#grid .dgrid-scroller {
+				position: relative;
+				overflow-y: hidden;
+			}
+			.has-ie-6 #grid .dgrid-scroller {
+				/* IE6 doesn't react properly to hidden on this page for some reason */
+				overflow-y: visible;
+			}
+			#grid .dgrid-header-scroll {
+				display: none;
+			}
+			#grid .dgrid-header {
+				right: 0;
+			}
+		</style>
+		<script src="../../dojo/dojo.js" 
+			data-dojo-config="async: true"></script>
+		<script>
+			require(["dgrid/OnDemandGrid","dojo/_base/declare", "dojo/date/locale", "dgrid/test/data/base", "dojo/domReady!"], 
+				function(Grid, declare, locale){
+					//we can define our formatterScope object and 
+					//then simply define formatter for column 
+					//as a string matching name of predefined function	
+					var formatterScope = {
+						date: function(value){
+							return locale.format(value,{
+								selector: "date",
+								formatLength: "short"
+							});
+						}
+					}
+				
+					window.grid = new Grid({
+						formatterScope: formatterScope,
+						store: testTypesStore,
+						columns: {
+							floatNum: 'Real Number',
+							integer: 'Integer',
+							text: 'Text',
+							date2: { 
+								label: 'Date', 
+								//formatter from formatterScope object
+								formatter: "date"
+							},
+							bool: { 
+								label: 'Check',
+								//normal formatter function
+								formatter: function(val){
+									return val ? "yes" : "no";
+								}
+							}
+						}
+					}, "grid");
+				});
+				
+		</script>
+	</head>
+	<body class="claro">
+		<h2>A basic grid with height:auto</h2>
+		<div id="grid"></div>
+		<a href="https://github.com/SitePen/dgrid">dgrid</a>
+	</body>
+</html>
