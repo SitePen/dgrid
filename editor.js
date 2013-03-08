@@ -18,7 +18,7 @@ function updateInputValue(input, value){
 	// common code for updating value of a standard input
 	input.value = value;
 	if(input.type == "radio" || input.type == "checkbox"){
-		input.checked = input.defaultChecked = value;
+		input.checked = input.defaultChecked = !!value;
 	}
 }
 
