@@ -147,21 +147,19 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 			var self = this;
 			var row = this.createRowCells("td", function(td, column){
 				var data = object;
-				// we support the field, get, and formatter properties like the DataGrid
+				// Support get function or field property (similar to DataGrid)
 				if(column.get){
 					data = column.get(object);
 				}else if("field" in column && column.field != "_item"){
 					data = data[column.field];
 				}
-				var formatter = column.formatter;
+				
+				// Support formatter, with or without formatterScope
+				var formatter = column.formatter,
+					formatterScope = self.formatterScope;
 				if(formatter){
-					//we support formatterScope like the DataGrid
-					var scope = self.formatterScope;
-					if(scope && typeof formatter == "string"){
-						formatter = scope[formatter];
-					}
-					
-					td.innerHTML = formatter(data, object);
+					td.innerHTML = typeof formatter === "string" && formatterScope ?
+						formatterScope[formatter](data, object) : formatter(data, object);
 				}else if(column.renderCell){
 					// A column can provide a renderCell method to do its own DOM manipulation,
 					// event handling, etc.
