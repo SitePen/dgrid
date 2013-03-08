@@ -161,7 +161,7 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 						formatter = scope[formatter];
 					}
 					
-					td.innerHTML = formatter(data);
+					td.innerHTML = formatter(data, object);
 				}else if(column.renderCell){
 					// A column can provide a renderCell method to do its own DOM manipulation,
 					// event handling, etc.
