@@ -5,6 +5,11 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ## Significant changes
 
+### General/Core
+
+* `Grid` now supports the `formatterScope` instance property, along the same
+  lines as `dojox/grid`. (Thanks gratex)
+
 ### Mixins
 
 * The `Selection` mixin no longer calls `allowSelect` for `deselect` calls
