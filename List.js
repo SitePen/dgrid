@@ -226,8 +226,8 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 			//		Called automatically after postCreate if the component is already
 			//		visible; otherwise, should be called manually once placed.
 			
-			this.inherited(arguments);
 			if(this._started){ return; } // prevent double-triggering
+			this.inherited(arguments);
 			this._started = true;
 			this.resize();
 			// apply sort (and refresh) now that we're ready to render
