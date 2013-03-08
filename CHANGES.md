@@ -45,6 +45,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ### Column Plugins
 
+* Fixed an issue in the `editor` plugin that caused checkboxes to fail to
+  initialize values properly in IE < 8. (#479)
 * The `tree` plugin no longer completely overwrites classes on the expando node
   when expanding/collapsing, so custom classes will be preserved. (#409)
 
