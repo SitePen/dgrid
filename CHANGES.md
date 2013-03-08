@@ -26,6 +26,11 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ## Other changes and fixes
 
+### General/Core
+
+* The `List` module's `startup` method now correctly checks `_started` before
+  calling `this.inherited`.  (Thanks dancrumb)
+
 ### Mixins
 
 * The `ColumnSet` mixin now adjusts the positioning of its scrollbars
