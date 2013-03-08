@@ -144,6 +144,7 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 		},
 		
 		renderRow: function(object, options){
+			var self = this;
 			var row = this.createRowCells("td", function(td, column){
 				var data = object;
 				// we support the field, get, and formatter properties like the DataGrid
@@ -152,8 +153,15 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 				}else if("field" in column && column.field != "_item"){
 					data = data[column.field];
 				}
-				if(column.formatter){
-					td.innerHTML = column.formatter(data);
+				var formatter = column.formatter;
+				if(formatter){
+					//we support formatterScope like the DataGrid
+					var scope = self.formatterScope;
+					if(scope && typeof formatter == "string"){
+						formatter = scope[formatter];
+					}
+					
+					td.innerHTML = formatter(data, object);
 				}else if(column.renderCell){
 					// A column can provide a renderCell method to do its own DOM manipulation,
 					// event handling, etc.

@@ -106,7 +106,7 @@ return declare(null, {
 	//		If true, the selection object will be cleared when refresh is called.
 	deselectOnRefresh: true,
 	
-	//allowSelectAll: Boolean
+	// allowSelectAll: Boolean
 	//		If true, allow ctrl/cmd+A to select all rows.
 	//		Also consulted by the selector plugin for showing select-all checkbox.
 	allowSelectAll: false,
