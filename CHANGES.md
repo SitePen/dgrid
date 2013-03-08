@@ -13,6 +13,9 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ### Column Plugins
 
+* The `selector` plugin will now match its disabled state against the
+  `allowSelect` method on the grid, as well as the column definition's
+  `disabled` function.
 * The `tree` plugin's `renderExpando` function now receives a 4th argument:
   the object represented by the current row. (#427; thanks pags)
 
