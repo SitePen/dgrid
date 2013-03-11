@@ -68,7 +68,7 @@
 							// native input types
 							{ label: "text", generate: generateText },
 							{ label: "checkbox", generate: generateBool },
-							{ label: "radio", generate: generateBool },
+							{ label: "radio", generate: generateBoolRadio },
 							{
 								label: "textarea",
 								generate: generateText,
@@ -178,6 +178,10 @@
 					function generateBool() {
 						return { editor: Math.random() > 0.5 ? true : false };
 					}
+					function generateBoolRadio(i) {
+						// Variant of generateBool that only returns true for i = 0
+						return { editor: !i };
+					}
 					function generateDate() {
 						// return a date within the past year
 						return { editor: new Date(today - Math.random() * 31536000000) };
@@ -229,7 +233,7 @@
 							i;
 						
 						for (i = 0; i < 100; i++){
-							data.push(lang.mixin(options.generate(), { id: i }));
+							data.push(lang.mixin(options.generate(i), { id: i }));
 						}
 						
 						require(deps, function(ctor){
