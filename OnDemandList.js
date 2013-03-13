@@ -38,7 +38,7 @@ return declare([List, _StoreMixin], {
 	//		Indicates the number of rows to overlap queries. This helps keep
 	//		continuous data when underlying data changes (and thus pages don't
 	//		exactly align)
-	queryRowsOverlap: 1,
+	queryRowsOverlap: 0,
 	
 	// pagingMethod: String
 	//		Method (from dgrid/util/misc) to use to either throttle or debounce
