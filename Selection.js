@@ -192,6 +192,7 @@ return declare(null, {
 			var mode = this.selectionMode,
 				row = currentTarget,
 				rowObj = this.row(row),
+				cellObj = this.cell(currentTarget),
 				lastRow = this._lastSelected;
 			
 			if(mode == "single"){
@@ -212,7 +213,10 @@ return declare(null, {
 				// clear selection first for non-ctrl-clicks in extended mode,
 				// as well as for right-clicks on unselected targets
 				if((event.button != 2 && mode == "extended" && !ctrlKey) ||
-						(event.button == 2 && !(this.selection[rowObj.id]))){
+						(event.button == 2 && 
+							// If the row is already selected, or if a cell in the row is already selected (for CellSelection)
+							(!(this.selection[rowObj.id]) || (!(this.selection[rowObj.id] && cellObj && this.selection[rowObj.id][cellObj.column.field])))
+						)){
 					this.clearSelection(rowObj.id, true);
 				}
 				if(!event.shiftKey){
