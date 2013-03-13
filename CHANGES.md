@@ -42,6 +42,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 * The `ColumnSet` mixin now adjusts the positioning of its scrollbars
   appropriately if the footer node is present. (#463)
+* The `CellSelection` mixin now properly deselects if an unselected cell within
+  the same row as a selected cell is right-clicked.
 
 ### Column Plugins
 
