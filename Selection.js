@@ -192,8 +192,9 @@ return declare(null, {
 			var mode = this.selectionMode,
 				row = currentTarget,
 				rowObj = this.row(row),
-				cellObj = this.cell(currentTarget),
-				lastRow = this._lastSelected;
+				lastRow = this._lastSelected,
+				selection = this.selection[rowObj.id],
+				cellObj;
 			
 			if(mode == "single"){
 				if(lastRow === row){
@@ -204,7 +205,7 @@ return declare(null, {
 					this.select(row);
 					this._lastSelected = row;
 				}
-			}else if(this.selection[rowObj.id] && !event.shiftKey && event.type == "mousedown"){
+			}else if(selection && !event.shiftKey && event.type == "mousedown"){
 				// we wait for the mouse up if we are clicking a selected item so that drag n' drop
 				// is possible without losing our selection
 				this._waitForMouseUp = row;
@@ -214,8 +215,10 @@ return declare(null, {
 				// as well as for right-clicks on unselected targets
 				if((event.button != 2 && mode == "extended" && !ctrlKey) ||
 						(event.button == 2 && 
-							// If the row is already selected, or if a cell in the row is already selected (for CellSelection)
-							(!(this.selection[rowObj.id]) || (!(this.selection[rowObj.id] && cellObj && this.selection[rowObj.id][cellObj.column.field])))
+							// If the row (or cell, for CellSelection) is already selected,
+							// then preserve the existing selection
+							(!selection || (typeof selection === "object" && this.cell &&
+								(cellObj = this.cell(currentTarget)) && !selection[cellObj.column.field]))
 						)){
 					this.clearSelection(rowObj.id, true);
 				}
