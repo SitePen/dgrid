@@ -116,12 +116,6 @@ define(["put-selector/put"], function(put){
 				}
 			};
 		},
-		isDataRow: function(row){
-			// summary:
-			//      Returns true if the given DOM node represents an actual data row,
-			//      as opposed to a preload or loading node (or something else)
-			return row && /(^| )dgrid-row( |$)/.test(row.className);
-		},		
 		escapeCssIdentifier: function(id){
 			// summary:
 			//		Escapes normally-invalid characters in a CSS identifier (such as .);
