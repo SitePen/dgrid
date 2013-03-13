@@ -15,14 +15,14 @@ define([
 	"dojo/has!touch?./_DnD-touch-autoscroll",
 	"xstyle/css!dojo/resources/dnd.css"
 ], function(declare, lang, arrayUtil, Deferred, aspect, on, topic, has, DnDSource, DnDManager, NodeList, put, touchUtil){
-	// Requirements:
+	// Requirements
 	// * requires a store (sounds obvious, but not all Lists/Grids have stores...)
 	// * must support options.before in put calls
 	//   (if undefined, put at end)
 	// * should support copy
 	//   (copy should also support options.before as above)
 	
-	// TODOs:
+	// TODOs
 	// * consider sending items rather than nodes to onDropExternal/Internal
 	// * consider emitting store errors via OnDemandList._trackError
 	
@@ -271,6 +271,11 @@ define([
 				type: type instanceof Array ? type : [type]
 			});
 			return row;
+		},
+		
+		removeRow: function (rowElement) {
+			this.dndSource.delItem(this.row(rowElement));
+			this.inherited(arguments);
 		}
 	});
 	DnD.GridSource = GridDnDSource;
