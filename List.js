@@ -441,7 +441,7 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 						nextNode = rows[to];
 						if(nextNode){
 							// re-retrieve the element in case we are referring to an orphan
-							nextNode = self.row(nextNode.id.slice(self.id.length + 5)).element;
+							nextNode = correctElement(nextNode);
 							//nextNode = nextNode.element;
 						}else{
 							nextNode = rows[to - 1];
@@ -486,6 +486,7 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 				if(rows.then){
 					results.then(function(resultsArray){
 						results = resultsArray;
+						// overlap rows in the results array when using observable so that we can determine page boundary changes
 						overlapRows([1,1,0,0]);
 					});
 					return rows.then(whenDone);
@@ -496,20 +497,25 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 					rows[i] = mapEach(results[i]);
 				}
 			}
-			overlapRows([1,1,0,0]);
 			var lastRow;
 			function overlapRows(sides){
-				for(var i = 0; i < sides.length; i++){
-					var top = sides[i];
-					//var lastRow = rows[top ? 0 : rows.length-1];
-					var lastRow = self.row(results[top ? 0 : rows.length-1]).element; 
-					var row = self[top ? "up" : "down"](self.row(lastRow));
-					if(row && row.element != lastRow){
-						var method = top ? "unshift" : "push";
-						results[method](row.data);
-						rows[method](row.element);
+				if(observerIndex > -1){// only do row overlap in the case of observable results
+					for(var i = 0; i < sides.length; i++){
+						var top = sides[i];
+						//var lastRow = rows[top ? 0 : rows.length-1];
+						var lastRow = correctElement(rows[top ? 0 : rows.length-1]); 
+						var row = self[top ? "up" : "down"](self.row(lastRow));
+						if(row && row.element != lastRow){
+							var method = top ? "unshift" : "push";
+							results[method](row.data);
+							rows[method](row.element);
+						}
 					}
 				}
+			}
+			function correctElement(row){
+				// if a node has been orphaned, this will retrieve the correct, in-document, element.
+				return self.row(row.id.slice(self.id.length + 5)).element;
 			}
 			function mapEach(object){
 				lastRow = self.insertRow(object, rowsFragment, null, start++, options);
@@ -525,7 +531,9 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 				}
 				return (rows = resolvedRows);
 			}
-			return whenDone(rows);
+			whenDone(rows);
+			overlapRows([1,1,0,0]);
+			return rows;
 		},
 
 		_onNotification: function(rows, object, from, to){
