@@ -15,6 +15,12 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 * The `Selection` mixin no longer calls `allowSelect` for `deselect` calls
   (only `select` calls).  This avoids potential errors when resetting column
   structures, and reduces unnecessary calls.
+* The `Selection` mixin has been refactored to break out logic for each selection
+  mode to a separate method.  These methods follow the naming convention
+  `_handleSelectMode` (where "mode" would be the name of the mode).  This allows
+  custom selection modes to be added easily.
+* The `Selection` mixin now supports a `toggle` mode, useful for touch input
+  where holding a modifier key to deselect is generally not an option.
 
 ### Column Plugins
 
