@@ -111,28 +111,41 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 			
 			if(this.firstLastArrows){
 				// create a first-page link
-				node = put(navigationNode,  "a[href=javascript:].dgrid-first", "«");
+				node = this.paginationFirstNode =
+					put(navigationNode,  "span.dgrid-first.dgrid-page-link", "«");
 				node.setAttribute("aria-label", i18n.gotoFirst);
+				node.tabIndex = 0;
 			}
 			if(this.previousNextArrows){
 				// create a previous link
-				node = put(navigationNode,  "a[href=javascript:].dgrid-previous", "‹");
+				node = this.paginationPreviousNode =
+					put(navigationNode,  "span.dgrid-previous.dgrid-page-link", "‹");
 				node.setAttribute("aria-label", i18n.gotoPrev);
+				node.tabIndex = 0;
 			}
 			
 			this.paginationLinksNode = put(navigationNode, "span.dgrid-pagination-links");
 			if(this.previousNextArrows){
 				// create a next link
-				node = put(navigationNode, "a[href=javascript:].dgrid-next", "›");
+				node = this.paginationNextNode =
+					put(navigationNode, "span.dgrid-next.dgrid-page-link", "›");
 				node.setAttribute("aria-label", i18n.gotoNext);
+				node.tabIndex = 0;
 			}
 			if(this.firstLastArrows){
 				// create a last-page link
-				node = put(navigationNode,  "a[href=javascript:].dgrid-last", "»");
+				node = this.paginationLastNode =
+					put(navigationNode,  "span.dgrid-last.dgrid-page-link", "»");
 				node.setAttribute("aria-label", i18n.gotoLast);
+				node.tabIndex = 0;
 			}
 			
-			this._listeners.push(on(navigationNode, "a:click", function(){
+			this._listeners.push(on(navigationNode, ".dgrid-page-link:click,.dgrid-page-link:keydown", function(event){
+				// For keyboard events, only respond to enter
+				if(event.type === "keydown" && event.keyCode !== 13){
+					return;
+				}
+				
 				var cls = this.className,
 					curr, max;
 				
@@ -144,16 +157,16 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 				max = Math.ceil(grid._total / grid.rowsPerPage);
 				
 				// determine navigation target based on clicked link's class
-				if(cls == "dgrid-page-link"){
-					grid.gotoPage(+this.innerHTML, true); // the innerHTML has the page number
-				}else if(cls == "dgrid-first"){
-					grid.gotoPage(1);
-				}else if(cls == "dgrid-last"){
-					grid.gotoPage(max);
-				}else if(cls == "dgrid-previous"){
+				if(this === grid.paginationPreviousNode){
 					grid.gotoPage(curr - 1);
-				}else if(cls == "dgrid-next"){
+				}else if(this === grid.paginationNextNode){
 					grid.gotoPage(curr + 1);
+				}else if(this === grid.paginationFirstNode){
+					grid.gotoPage(1);
+				}else if(this === grid.paginationLastNode){
+					grid.gotoPage(max);
+				}else if(cls === "dgrid-page-link"){
+					grid.gotoPage(+this.innerHTML, true); // the innerHTML has the page number
 				}
 			}));
 		},
@@ -193,9 +206,10 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 				}else{
 					// normal link
 					link = put(linksNode,
-						'a[href=javascript:]' + (page == currentPage ? '.dgrid-page-disabled' : '') + '.dgrid-page-link',
+						'span' + (page == currentPage ? '.dgrid-page-disabled' : '') + '.dgrid-page-link',
 						page);
 					link.setAttribute("aria-label", i18n.gotoPage);
+					link.tabIndex = 0;
 				}
 				if(page == currentPage && focusLink){
 					// focus on it if we are supposed to retain the focus
