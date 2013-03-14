@@ -160,6 +160,11 @@ return declare(null, {
 		
 		this.selectionMode = mode;
 		
+		// Compute name of selection handler for this mode once
+		// (in the form of _handleSelectFoo)
+		this._selectionHandlerName = "_handleSelect" +
+			mode.slice(0, 1).toUpperCase() + mode.slice(1);
+		
 		// Also re-run allowTextSelection setter in case it is in automatic mode.
 		this._setAllowTextSelection(this.allowTextSelection);
 	},
@@ -177,69 +182,97 @@ return declare(null, {
 		this.allowTextSelection = allow;
 	},
 	
-	_handleSelect: function(event, currentTarget){
-		// don't run if selection mode is none,
+	_handleSelect: function(event, target){
+		// Don't run if selection mode doesn't have a handler (incl. "none"),
 		// or if coming from a dgrid-cellfocusin from a mousedown
-		if(this.selectionMode == "none" ||
+		if(!this[this._selectionHandlerName] ||
 				(event.type == "dgrid-cellfocusin" && event.parentType == "mousedown") ||
-				(event.type == "mouseup" && currentTarget != this._waitForMouseUp)){
+				(event.type == "mouseup" && target != this._waitForMouseUp)){
 			return;
 		}
 		this._waitForMouseUp = null;
 		this._selectionTriggerEvent = event;
-		var ctrlKey = !event.keyCode ? event[ctrlEquiv] : event.ctrlKey;
+		
+		var isSelected = this.isSelected(target);
+		
+		// Clear selection first for right-clicks on unselected targets
+		if(event.button == 2 && !isSelected){
+			this.clearSelection(null, true);
+		}
+		
+		// Don't call select handler for ctrl+navigation
 		if(!event.keyCode || !event.ctrlKey || event.keyCode == 32){
-			var mode = this.selectionMode,
-				row = currentTarget,
-				rowObj = this.row(row),
-				lastRow = this._lastSelected,
-				selection = this.selection[rowObj.id],
-				cellObj;
-			
-			if(mode == "single"){
-				if(lastRow === row){
-					// Allow ctrl to toggle selection, even within single select mode.
-					this.select(row, null, !ctrlKey || !this.isSelected(row));
-				}else{
-					this.clearSelection();
-					this.select(row);
-					this._lastSelected = row;
-				}
-			}else if(selection && !event.shiftKey && event.type == "mousedown"){
-				// we wait for the mouse up if we are clicking a selected item so that drag n' drop
-				// is possible without losing our selection
-				this._waitForMouseUp = row;
+			// If clicking a selected item, wait for mouseup so that drag n' drop
+			// is possible without losing our selection
+			if(isSelected && !event.shiftKey && event.type == "mousedown"){
+				this._waitForMouseUp = target;
 			}else{
-				var value;
-				// clear selection first for non-ctrl-clicks in extended mode,
-				// as well as for right-clicks on unselected targets
-				if((event.button != 2 && mode == "extended" && !ctrlKey) ||
-						(event.button == 2 && 
-							// If the row (or cell, for CellSelection) is already selected,
-							// then preserve the existing selection
-							(!selection || (typeof selection === "object" && this.cell &&
-								(cellObj = this.cell(currentTarget)) && !selection[cellObj.column.field]))
-						)){
-					this.clearSelection(rowObj.id, true);
-				}
-				if(!event.shiftKey){
-					// null == toggle; undefined == true;
-					lastRow = value = ctrlKey ? null : undefined;
-				}
-				this.select(row, lastRow, value);
-
-				if(!lastRow){
-					// update lastRow reference for potential subsequent shift+select
-					// (current row was already selected by earlier logic)
-					this._lastSelected = row;
-				}
-			}
-			if(!event.keyCode && (event.shiftKey || ctrlKey)){
-				// prevent selection in firefox
-				event.preventDefault();
+				this[this._selectionHandlerName](event, target);
 			}
 		}
 		this._selectionTriggerEvent = null;
+	},
+	
+	_handleSelectSingle: function(event, target){
+		// summary:
+		//		Selection handler for "single" mode, where only one target may be
+		//		selected at a time.
+		
+		var ctrlKey = event.keyCode ? event.ctrlKey : event[ctrlEquiv];
+		if(this._lastSelected === target){
+			// Allow ctrl to toggle selection, even within single select mode.
+			this.select(target, null, !ctrlKey || !this.isSelected(target));
+		}else{
+			this.clearSelection();
+			this.select(target);
+			this._lastSelected = target;
+		}
+	},
+	
+	_handleSelectMultiple: function(event, target){
+		// summary:
+		//		Selection handler for "multiple" mode, where shift can be held to
+		//		select ranges, ctrl/cmd can be held to toggle, and clicks/keystrokes
+		//		without modifier keys will add to the current selection.
+		
+		var lastRow = this._lastSelected,
+			ctrlKey = event.keyCode ? event.ctrlKey : event[ctrlEquiv],
+			value;
+		
+		if(!event.shiftKey){
+			// Toggle if ctrl is held; otherwise select
+			value = ctrlKey ? null : true;
+			lastRow = null;
+		}
+		this.select(target, lastRow, value);
+
+		if(!lastRow){
+			// Update reference for potential subsequent shift+select
+			// (current row was already selected above)
+			this._lastSelected = target;
+		}
+	},
+	
+	_handleSelectExtended: function(event, target){
+		// summary:
+		//		Selection handler for "extended" mode, which is like multiple mode
+		//		except that clicks/keystrokes without modifier keys will clear
+		//		the previous selection.
+		
+		// Clear selection first for non-ctrl-clicks;
+		// otherwise, extended mode logic is identical to multiple mode
+		if(!(event.keyCode ? event.ctrlKey : event[ctrlEquiv])){
+			this.clearSelection(null, true);
+		}
+		this._handleSelectMultiple(event, target);
+	},
+	
+	_handleSelectToggle: function(event, target){
+		// summary:
+		//		Selection handler for "toggle" mode which simply toggles the selection
+		//		of the given target.  Primarily useful for touch input.
+		
+		this.select(target, null, null);
 	},
 
 	_initSelectionEvents: function(){
