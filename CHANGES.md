@@ -28,6 +28,9 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 * The `ColumnResizer` extension no longer emits superfluous events for all columns
   on the first resize. (#441)
+* The `Pagination` extension now applies the `dgrid-page-link` class to all
+  navigation controls (not just the page numbers), to make them distinguishable
+  by something other than what tag they use. (related to #379)
 
 ## Other changes and fixes
 
@@ -64,6 +67,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
   `toggleColumnHiddenState`. (#464)
 * The `DnD` extension now cleans references from the dnd source's hash when
   `removeRow` is called on the grid. (#335)
+* Resolved an issue in `Pagination` where IE9+ would dispatch events to the
+  wrong handlers after clicking one of the navigation controls. (#379)
 
 # 0.3.6
 
