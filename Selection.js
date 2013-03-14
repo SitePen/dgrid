@@ -193,18 +193,11 @@ return declare(null, {
 		this._waitForMouseUp = null;
 		this._selectionTriggerEvent = event;
 		
-		var isSelected = this.isSelected(target);
-		
-		// Clear selection first for right-clicks on unselected targets
-		if(event.button == 2 && !isSelected){
-			this.clearSelection(null, true);
-		}
-		
 		// Don't call select handler for ctrl+navigation
 		if(!event.keyCode || !event.ctrlKey || event.keyCode == 32){
 			// If clicking a selected item, wait for mouseup so that drag n' drop
 			// is possible without losing our selection
-			if(isSelected && !event.shiftKey && event.type == "mousedown"){
+			if(!event.shiftKey && event.type == "mousedown" && this.isSelected(target)){
 				this._waitForMouseUp = target;
 			}else{
 				this[this._selectionHandlerName](event, target);
@@ -259,9 +252,10 @@ return declare(null, {
 		//		except that clicks/keystrokes without modifier keys will clear
 		//		the previous selection.
 		
-		// Clear selection first for non-ctrl-clicks;
+		// Clear selection first for right-clicks outside selection and non-ctrl-clicks;
 		// otherwise, extended mode logic is identical to multiple mode
-		if(!(event.keyCode ? event.ctrlKey : event[ctrlEquiv])){
+		if(event.button === 2 ? !this.isSelected(target) :
+				!(event.keyCode ? event.ctrlKey : event[ctrlEquiv])){
 			this.clearSelection(null, true);
 		}
 		this._handleSelectMultiple(event, target);
