@@ -161,9 +161,8 @@ return declare(null, {
 		this.selectionMode = mode;
 		
 		// Compute name of selection handler for this mode once
-		// (in the form of _handleSelectFoo)
-		this._selectionHandlerName = "_handleSelect" +
-			mode.slice(0, 1).toUpperCase() + mode.slice(1);
+		// (in the form of _fooSelectionHandler)
+		this._selectionHandlerName = "_" + mode + "SelectionHandler";
 		
 		// Also re-run allowTextSelection setter in case it is in automatic mode.
 		this._setAllowTextSelection(this.allowTextSelection);
@@ -206,7 +205,7 @@ return declare(null, {
 		this._selectionTriggerEvent = null;
 	},
 	
-	_handleSelectSingle: function(event, target){
+	_singleSelectionHandler: function(event, target){
 		// summary:
 		//		Selection handler for "single" mode, where only one target may be
 		//		selected at a time.
@@ -222,7 +221,7 @@ return declare(null, {
 		}
 	},
 	
-	_handleSelectMultiple: function(event, target){
+	_multipleSelectionHandler: function(event, target){
 		// summary:
 		//		Selection handler for "multiple" mode, where shift can be held to
 		//		select ranges, ctrl/cmd can be held to toggle, and clicks/keystrokes
@@ -246,7 +245,7 @@ return declare(null, {
 		}
 	},
 	
-	_handleSelectExtended: function(event, target){
+	_extendedSelectionHandler: function(event, target){
 		// summary:
 		//		Selection handler for "extended" mode, which is like multiple mode
 		//		except that clicks/keystrokes without modifier keys will clear
@@ -258,10 +257,10 @@ return declare(null, {
 				!(event.keyCode ? event.ctrlKey : event[ctrlEquiv])){
 			this.clearSelection(null, true);
 		}
-		this._handleSelectMultiple(event, target);
+		this._multipleSelectionHandler(event, target);
 	},
 	
-	_handleSelectToggle: function(event, target){
+	_toggleSelectionHandler: function(event, target){
 		// summary:
 		//		Selection handler for "toggle" mode which simply toggles the selection
 		//		of the given target.  Primarily useful for touch input.
