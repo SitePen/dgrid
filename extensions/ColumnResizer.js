@@ -1,8 +1,6 @@
 define(["dojo/_base/declare", "dojo/on", "dojo/query", "dojo/_base/lang", "dojo/dom", "dojo/dom-geometry", "dojo/has", "../util/misc", "put-selector/put", "dojo/_base/html", "xstyle/css!../css/extensions/ColumnResizer.css"],
 function(declare, listen, query, lang, dom, geom, has, miscUtil, put){
 
-var hasPointFromNode = has("touch") && webkitConvertPointFromNodeToPage;
-
 function addRowSpan(table, span, startRow, column, id){
 	// loop through the rows of the table and add this column's id to
 	// the rows' column
