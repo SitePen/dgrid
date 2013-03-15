@@ -62,6 +62,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
   appropriately if the footer node is present. (#463)
 * The `CellSelection` mixin now properly deselects if an unselected cell within
   the same row as a selected cell is right-clicked.
+* Fixed issues with the `Keyboard` mixin pertaining to resetting columns, or
+  not setting them initially. (#494)
 * The `Keyboard` mixin now ensures that if the header area is scrolled due to a
   focus shift, the body scrolls with it. (#474)
 

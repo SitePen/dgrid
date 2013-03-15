@@ -79,10 +79,17 @@ var Keyboard = declare(null, {
 				isHeader = areaNode === grid.headerNode,
 				initialNode = areaNode;
 			
-			if(isHeader){
+			function initHeader(){
 				grid._focusedHeaderNode = initialNode =
 					cellNavigation ? grid.headerNode.getElementsByTagName("th")[0] : grid.headerNode;
-				initialNode.tabIndex = grid.tabIndex;
+				if(initialNode){ initialNode.tabIndex = grid.tabIndex; }
+			}
+			
+			if(isHeader){
+				// Initialize header now (since it's already been rendered),
+				// and aspect after future renderHeader calls to reset focus.
+				initHeader();
+				aspect.after(grid, "renderHeader", initHeader, true);
 			}else{
 				aspect.after(grid, "renderArray", function(ret){
 					// summary:
