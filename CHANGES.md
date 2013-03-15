@@ -21,6 +21,9 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
   custom selection modes to be added easily.
 * The `Selection` mixin now supports a `toggle` mode, useful for touch input
   where holding a modifier key to deselect is generally not an option.
+* Fixed an issue with the `Selection` and `CellSelection` mixins where calling
+  `deselect` with a range would actually deselect the first target, then select
+  everything else in the range. (#491)
 
 ### Column Plugins
 
