@@ -403,7 +403,7 @@ return declare(null, {
 					toElement.compareDocumentPosition(fromElement) == 2 :
 					toElement.sourceIndex > fromElement.sourceIndex)) ? "down" : "up";
 				while(row.element != toElement && (row = this[traverser](row))){
-					this.select(row);
+					this.select(row, null, value);
 				}
 			}
 		}
