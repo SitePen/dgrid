@@ -34,6 +34,9 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 * The `ColumnResizer` extension no longer emits superfluous events for all columns
   on the first resize. (#441)
+* The `DnD` extension now inherits the `Selection` mixin to guarantee resilient
+  handling of drag operations where part of the selection has scrolled out of
+  view and been unrendered.
 * The `Pagination` extension now applies the `dgrid-page-link` class to all
   navigation controls (not just the page numbers), to make them distinguishable
   by something other than what tag they use. (related to #379)
