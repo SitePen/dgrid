@@ -12,6 +12,9 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ### Mixins
 
+* Fixed a regression in the `Selection` mixin due to text selection changes,
+  where Firefox would not allow selecting text or moving the cursor inside
+  form inputs. (#492)
 * The `Selection` mixin no longer calls `allowSelect` for `deselect` calls
   (only `select` calls).  This avoids potential errors when resetting column
   structures, and reduces unnecessary calls.

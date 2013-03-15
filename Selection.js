@@ -46,8 +46,11 @@ function makeUnselectable(node, unselectable){
 function setSelectable(grid, selectable){
 	// Alternative version of dojo/dom.setSelectable based on feature detection.
 	
+	// For FF < 21, use -moz-none, which will respect -moz-user-select: text on
+	// child elements (e.g. form inputs).  In FF 21, none behaves the same.
+	// See https://developer.mozilla.org/en-US/docs/CSS/user-select
 	var node = grid.bodyNode,
-		value = selectable ? "text" : "none";
+		value = selectable ? "text" : has("ff") < 21 ? "-moz-none" : "none";
 	
 	if(hasUserSelect){
 		node.style[hasUserSelect] = value;
