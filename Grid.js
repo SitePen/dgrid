@@ -497,16 +497,14 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 	});
 	
 	function defaultRenderCell(object, data, td, options){
-		if(data != null){
-			if(this.formatter){
-				// Support formatter, with or without formatterScope
-				var formatter = this.formatter,
-					formatterScope = this.grid.formatterScope;
-				td.innerHTML = typeof formatter === "string" && formatterScope ?
-					formatterScope[formatter](data, object) : formatter(data, object);
-			}else{
-				td.appendChild(document.createTextNode(data)); 
-			}
+		if(this.formatter){
+			// Support formatter, with or without formatterScope
+			var formatter = this.formatter,
+				formatterScope = this.grid.formatterScope;
+			td.innerHTML = typeof formatter === "string" && formatterScope ?
+				formatterScope[formatter](data, object) : formatter(data, object);
+		}else if(data != null){
+			td.appendChild(document.createTextNode(data)); 
 		}
 	}
 	
