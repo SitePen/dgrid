@@ -1,5 +1,5 @@
-define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/on", "put-selector/put"],
-function(kernel, declare, lang, Deferred, listen, put){
+define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/on", "dojo/aspect", "put-selector/put"],
+function(kernel, declare, lang, Deferred, listen, aspect, put){
 	// This module isolates the base logic required by store-aware list/grid
 	// components, e.g. OnDemandList/Grid and the Pagination extension.
 	
@@ -62,6 +62,11 @@ function(kernel, declare, lang, Deferred, listen, put){
 			this.queryOptions = {};
 			this.dirty = {};
 			this._updating = {}; // tracks rows that are mid-update
+
+			// reset _columnsWithSet for a new column configuration
+			aspect.before(this, "configStructure", lang.hitch(this, function(){
+				this._columnsWithSet = {};
+			}));
 		},
 		
 		_configColumn: function(column){
@@ -69,16 +74,8 @@ function(kernel, declare, lang, Deferred, listen, put){
 			//		Implements extension point provided by Grid to store references to
 			//		any columns with `set` methods, for use during `save`.
 			if (column.set){
-				if(!this._columnsWithSet){ this._columnsWithSet = {}; }
 				this._columnsWithSet[column.field] = column;
 			}
-		},
-		
-		_configColumns: function(){
-			// summary:
-			//		Extends Grid to reset _StoreMixin's hash when columns are updated
-			this._columnsWithSet = null;
-			return this.inherited(arguments);
 		},
 		
 		_setStore: function(store, query, queryOptions){
