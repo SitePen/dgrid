@@ -81,6 +81,11 @@ When reporting a bug, please provide the following information:
   include a [Gist](https://gist.github.com/) with code for a page containing a
   reduced test case
 
+If you would like to suggest a fix for a particular issue, you are welcome to
+fork dgrid, create a branch, and submit a pull request.  Please note that a
+[Dojo CLA](http://www.dojofoundation.org/about/cla) is required for any
+non-trivial modifications.
+
 ## Getting Support
 
 Questions about dgrid usage can be discussed on the
