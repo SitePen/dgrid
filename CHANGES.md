@@ -11,7 +11,7 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
   lines as `dojox/grid`. (#470; thanks gratex)
 * `Grid` has been refactored to include `formatter` considerations within the
   default `renderCell` logic; this allows `formatter` functions to coexist with
-  the `editor` and `tree` column plugins. (#497; thanks gratex)
+  the `editor` and `tree` column plugins. (#495, #497; thanks gratex)
 
 ### Mixins
 
