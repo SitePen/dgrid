@@ -1,4 +1,4 @@
-require([
+define([
 	"doh",
 	"dojo/_base/lang",
 	"dojo/_base/declare",
