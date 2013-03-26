@@ -153,12 +153,12 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 				}else if("field" in column && column.field != "_item"){
 					data = data[column.field];
 				}
-								
+				
 				if(column.renderCell){
 					// A column can provide a renderCell method to do its own DOM manipulation,
 					// event handling, etc.
 					appendIfNode(td, column.renderCell(object, data, td, options));
-				}else {
+				}else{
 					defaultRenderCell.call(column, object, data, td, options);
 				}
 			}, options && options.subRows);
@@ -497,18 +497,18 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 	});
 	
 	function defaultRenderCell(object, data, td, options){
-		if(data != null){ 
+		if(data != null){
 			if(this.formatter){
 				// Support formatter, with or without formatterScope
 				var formatter = this.formatter,
-					formatterScope = this.grid.formatterScope;				
+					formatterScope = this.grid.formatterScope;
 				td.innerHTML = typeof formatter === "string" && formatterScope ?
 					formatterScope[formatter](data, object) : formatter(data, object);
 			}else{
 				td.appendChild(document.createTextNode(data)); 
 			}
-		};
-	};
+		}
+	}
 	
 	// expose appendIfNode and default implementation of renderCell,
 	// e.g. for use by column plugins
