@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Test pagination observe</title>
+<meta name="viewport" content="width=570">
+<style>
+@import "../../dojo/resources/dojo.css";
+
+@import "../css/dgrid.css";
+
+@import "../css/skins/claro.css";
+
+.heading {
+	font-weight: bold;
+	padding-bottom: 0.25em;
+}
+
+#grid {
+	width: 400px;
+}
+
+/* styles for autoheight */
+#grid {
+	height: auto;
+}
+
+#grid .dgrid-scroller {
+	position: relative;
+	overflow-y: hidden;
+}
+
+.has-ie-6 #grid .dgrid-scroller {
+	/* IE6 doesn't react properly to hidden on this page for some reason */
+	overflow-y: visible;
+}
+
+#grid .dgrid-header-scroll {
+	display: none;
+}
+
+#grid .dgrid-header {
+	right: 0;
+}
+</style>
+<script src="../../dojo/dojo.js" data-dojo-config="async: true"></script>
+<script>
+	require([
+		"dojo/_base/declare",
+		"dijit/registry",
+		"dgrid/OnDemandGrid",
+		"dgrid/extensions/Pagination",
+		"dojo/store/Observable",
+		"dojo/store/Memory",
+		"dijit/form/Button"
+	], function(declare, registry, OnDemandGrid, Pagination, Observable, Memory) {
+
+		var PaginationGrid = declare([
+			OnDemandGrid,
+			Pagination
+		]);
+
+		var grid = window.g = new PaginationGrid({
+			columns : {
+				id : "id",
+				date : "date"
+			},
+			rowsPerPage : 3,
+			store : Observable(Memory({
+				idProperty : "id",
+				data : [
+					{
+						id : "1",
+						date : new Date()
+					}
+				]
+			}))
+		}, "grid");
+
+		window.add = function() {
+			var item = grid.store.add({
+				date : new Date()
+			});
+		};
+	});
+</script>
+</head>
+<body class="claro">
+	<h2>A basic grid with pagination (rowsPerPage : 3)</h2>
+	<div id="grid"></div>
+	<button type="button" onclick="window.add();">Add row</button>
+	<a href="https://github.com/SitePen/dgrid">dgrid</a>
+</body>
+</html>
