@@ -56,7 +56,7 @@ define([
 			if(!this.before && targetRow){
 				// target before next node if dropped within bottom half of this node
 				// (unless there's no node to target at all)
-				targetRow = targetRow.nextSibling;
+				for(targetRow = targetRow.nextSibling; !grid.row(targetRow); targetRow=targetRow.nextSibling) { }
 			}
 			targetRow = targetRow && grid.row(targetRow);
 			
