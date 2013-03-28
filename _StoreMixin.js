@@ -61,9 +61,10 @@ function(kernel, declare, lang, Deferred, listen, aspect, put){
 			this.query = {};
 			this.queryOptions = {};
 			this.dirty = {};
-			this._updating = {}; // tracks rows that are mid-update
+			this._updating = {}; // Tracks rows that are mid-update
+			this._columnsWithSet = {};
 
-			// reset _columnsWithSet for a new column configuration
+			// Reset _columnsWithSet whenever column configuration is reset
 			aspect.before(this, "configStructure", lang.hitch(this, function(){
 				this._columnsWithSet = {};
 			}));
@@ -196,15 +197,14 @@ function(kernel, declare, lang, Deferred, listen, aspect, put){
 					for(key in dirtyObj){
 						object[key] = dirtyObj[key];
 					}
-					if(colsWithSet){
-						// Apply any set methods in column definitions.
-						// Note that while in the most common cases column.set is intended
-						// to return transformed data for the key in question, it is also
-						// possible to directly modify the object to be saved.
-						for(key in colsWithSet){
-							data = colsWithSet[key].set(object);
-							if(data !== undefined){ object[key] = data; }
-						}
+					
+					// Apply any set methods in column definitions.
+					// Note that while in the most common cases column.set is intended
+					// to return transformed data for the key in question, it is also
+					// possible to directly modify the object to be saved.
+					for(key in colsWithSet){
+						data = colsWithSet[key].set(object);
+						if(data !== undefined){ object[key] = data; }
 					}
 					
 					updating[id] = true;
