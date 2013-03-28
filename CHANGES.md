@@ -12,6 +12,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 * `Grid` has been refactored to include `formatter` considerations within the
   default `renderCell` logic; this allows `formatter` functions to coexist with
   the `editor` and `tree` column plugins. (#495, #497; thanks gratex)
+* Fixed an issue with `_StoreMixin` which caused `set` functions in column
+  definitions to be ignored for all but the last subrow or columnset. (#489)
 
 ### Mixins
 
