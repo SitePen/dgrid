@@ -53,10 +53,20 @@ define([
 				grid = this.grid,
 				store = grid.store;
 			
+      var after = false;
+      
 			if(!this.before && targetRow){
 				// target before next node if dropped within bottom half of this node
 				// (unless there's no node to target at all)
-				for(targetRow = targetRow.nextSibling; !grid.row(targetRow); targetRow=targetRow.nextSibling) { }
+        
+        var afterRow = targetRow;
+        
+				for(targetRow = targetRow.nextSibling; !grid.row((targetRow)?targetRow:{}); targetRow=targetRow.nextSibling ) { }
+        
+        if(!targetRow) {
+          targetRow = afterRow;
+          after = true;
+        }
 			}
 			targetRow = targetRow && grid.row(targetRow);
 			
@@ -68,13 +78,13 @@ define([
 				// Delegate to onDropInternal or onDropExternal for rest of logic.
 				// These are passed the target item as an additional argument.
 				if(targetSource != sourceSource){
-					targetSource.onDropExternal(sourceSource, nodes, copy, target);
+					targetSource.onDropExternal(sourceSource, nodes, copy, target, after);
 				}else{
-					targetSource.onDropInternal(nodes, copy, target);
+					targetSource.onDropInternal(nodes, copy, target, after);
 				}
 			});
 		},
-		onDropInternal: function(nodes, copy, targetItem){
+		onDropInternal: function(nodes, copy, targetItem, after){
 			var store = this.grid.store,
 				targetSource = this,
 				grid = this.grid,
@@ -100,12 +110,13 @@ define([
 					// otherwise settle for put anyway.
 					// (put will relocate an existing item with the same id, i.e. move).
 					store[copy && store.copy ? "copy" : "put"](object, {
-						before: targetItem
+						before: (!after)?targetItem:null,
+            after : (after)?targetItem:null
 					});
 				});
 			});
 		},
-		onDropExternal: function(sourceSource, nodes, copy, targetItem){
+		onDropExternal: function(sourceSource, nodes, copy, targetItem, after){
 			// Note: this default implementation expects that two grids do not
 			// share the same store.  There may be more ideal implementations in the
 			// case of two grids using the same store (perhaps differentiated by
@@ -135,7 +146,8 @@ define([
 					// since this coming from another dnd source, always behave as if
 					// it is a new store item if possible, rather than replacing existing.
 					store[store.copy ? "copy" : "put"](object, {
-						before: targetItem
+						before: (!after)?targetItem:null,
+            after : (after)?targetItem:null
 					});
 				});
 			});
