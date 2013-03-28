@@ -6,37 +6,45 @@ define([
 	 * so we are testing through OnDemandGrid for now. */
 	"dgrid/OnDemandGrid",
 	"dgrid/ColumnSet",
-	"dgrid/test/data/base"
+	"dgrid/test/data/base",
+	"dojo/domReady!"
 ], function(doh, lang, declare, OnDemandGrid, ColumnSet, testStoreMaster){
 
 	// Helper method used to set column set() methods for various grid compositions
-	function testSetMethod(grid){
-		var dfd = new doh.Deferred();
+	function testSetMethod(){
+		var dfd = new doh.Deferred(),
+			grid = this.grid;
 
 		var testStore = lang.clone(testStoreMaster); // clone test store so we can make modifications
 		grid.set("store", testStore);
+		document.body.appendChild(grid.domNode);
+		grid.startup();
 
 		var changes = [
-			{
-				objectId: 0,
-				field: "col1",
-				newValue: "sleepy",
-				expectedSavedValue: "SLEEPY"
-			},
-			{
-				objectId: 1,
-				field: "col3",
-				newValue: "dopey",
-				expectedSavedValue: "DOPEY"
-			},
-			{
-				objectId: 2,
-				field: "col4",
-				newValue: "rutherford",
-				expectedSavedValue: "RUTHERFORD"
-			}
-		];
-		for(var i = 0, change; i < changes.length; i++){
+				{
+					objectId: 0,
+					field: "col1",
+					newValue: "sleepy",
+					expectedSavedValue: "SLEEPY"
+				},
+				{
+					objectId: 1,
+					field: "col3",
+					newValue: "dopey",
+					expectedSavedValue: "DOPEY"
+				},
+				{
+					objectId: 2,
+					field: "col4",
+					newValue: "rutherford",
+					expectedSavedValue: "RUTHERFORD"
+				}
+			],
+			len = changes.length,
+			i,
+			change;
+		
+		for(i = 0; i < len; i++){
 			change = changes[i];
 			grid.updateDirty(change.objectId, change.field, change.newValue);
 		}
@@ -54,54 +62,66 @@ define([
 		return dfd;
 	}
 
+	// function used for test tear-down
+	function destroyGrid(){
+		this.grid.destroy();
+	}
+	
 	// the set() method to use for column.set() tests
 	function sampleSetMethod(item){
 		return item[this.field].toUpperCase();
 	}
 
 	doh.register("_StoreMixin", [
-		function columnSetMethodSupportedForSubRows(t){
-			var subRows = [
-				[
-					{ label: 'Column 1', field: 'col1', set: sampleSetMethod },
-					{ label: 'Column 2', field: 'col2', sortable: false },
-					{ label: 'Column 1', field: 'col1', rowSpan: 2 },
-					{ label: 'Column 4', field: 'col4', set: sampleSetMethod }
-				],
-				[
-					{ label: 'Column 3', field: 'col3', colSpan: 2, set: sampleSetMethod },
-					{ label: 'Column 5', field: 'col5' }
-				]
-			];
-
-			var grid = new OnDemandGrid({ subRows: subRows });
-			return testSetMethod(grid);
+		{
+			name: "column.set in subRows",
+			setUp: function(){
+				this.grid = new OnDemandGrid({
+					subRows: [
+						[
+							{ label: 'Column 1', field: 'col1', set: sampleSetMethod },
+							{ label: 'Column 2', field: 'col2', sortable: false },
+							{ label: 'Column 1', field: 'col1', rowSpan: 2 },
+							{ label: 'Column 4', field: 'col4', set: sampleSetMethod }
+						],
+						[
+							{ label: 'Column 3', field: 'col3', colSpan: 2, set: sampleSetMethod },
+							{ label: 'Column 5', field: 'col5' }
+						]
+					]
+				});
+			},
+			runTest: testSetMethod,
+			tearDown: destroyGrid
 		},
-		function columnSetMethodSupportedForColumnsSets(t){
-			var columnSets = [
-				[
-					[
-						{ label: 'Column 1', field: 'col1', set: sampleSetMethod },
-						{ label: 'Column 2', field: 'col2', sortable: false }
-					],
-					[
-						{label: 'Column 3', field: 'col3', colSpan: 2, set: sampleSetMethod }
+		{
+			name: "column.set in columnSets",
+			setUp: function(){
+				this.grid = new (declare([OnDemandGrid, ColumnSet]))({
+					columnSets: [
+						[
+							[
+								{ label: 'Column 1', field: 'col1', set: sampleSetMethod },
+								{ label: 'Column 2', field: 'col2', sortable: false }
+							],
+							[
+								{label: 'Column 3', field: 'col3', colSpan: 2, set: sampleSetMethod }
+							]
+						],
+						[
+							[
+								{ label: 'Column 1', field: 'col1', rowSpan: 2 },
+								{ label: 'Column 4', field: 'col4', set: sampleSetMethod }
+							],
+							[
+								{ label: 'Column 5', field: 'col5' }
+							]
+						]
 					]
-				],
-				[
-					[
-						{ label: 'Column 1', field: 'col1', rowSpan: 2 },
-						{ label: 'Column 4', field: 'col4', set: sampleSetMethod }
-					],
-					[
-						{ label: 'Column 5', field: 'col5' }
-					]
-				]
-			];
-
-			var OnDemandGridWithColumnSet = new declare([ OnDemandGrid, ColumnSet ], { });
-			var grid = new OnDemandGridWithColumnSet({ columnSets: columnSets });
-			return testSetMethod(grid);
+				});
+			},
+			runTest: testSetMethod,
+			tearDown: destroyGrid
 		}
 	]);
 });
