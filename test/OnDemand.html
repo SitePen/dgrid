@@ -206,6 +206,9 @@
 				on(document.getElementById("empty"), "click", function(){
 					grid.set("store", emptyStore, {});
 				});
+				on(document.getElementById("emptyAsync"), "click", function(){
+					grid.set("store", emptyAsyncStore, {});
+				});
 				on(document.getElementById("error"), "click", function(){
 					grid.set("store", errorStores.query, {});
 				});
@@ -288,8 +291,9 @@
 		<button id="setstore">Set Color Store</button>
 		<button id="restore">Set Original Store</button>
 		<button id="empty">Set to empty store</button>
+		<button id="emptyAsync">Set to empty store (async)</button>
 		<button id="error">Set to error store</button>
-		<button id="error2">Set to error store (def)</button>
+		<button id="error2">Set to error store (async)</button>
 
 		<br><br>
 		<h2>Simple test to show editor effect on store data</h2>

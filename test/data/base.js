@@ -26,18 +26,20 @@ function(lang, Deferred, Memory, Observable, QueryResults){
 	// global var testStore
 	testStore = Observable(new Memory({data: data}));
 
+	function asyncQuery() {
+		var results = Memory.prototype.query.apply(this, arguments);
+		var def = new Deferred();
+		setTimeout(function(){
+			def.resolve(results);
+		}, 200);
+		var promisedResults = QueryResults(def.promise);
+		promisedResults.total = results.total;
+		return promisedResults;
+	}
+	
 	testAsyncStore = Observable(new Memory({
 		data: data,
-		query: function(){
-			var results = Memory.prototype.query.apply(this, arguments);
-			var def = new Deferred();
-			setTimeout(function(){
-				def.resolve(results);
-			}, 200);
-			var promisedResults = QueryResults(def.promise);
-			promisedResults.total = results.total;
-			return promisedResults;
-		}
+		query: asyncQuery
 	}));
 	//sample color data
 	data2 = {
@@ -67,8 +69,11 @@ function(lang, Deferred, Memory, Observable, QueryResults){
 	}
 	smallColorStore = Observable(new Memory({data: data2}));
 	//empty store
-	emptyData = { identifier: 'id', label: 'id', items:[]};
-	emptyStore = Observable(new Memory({data: emptyData}));
+	emptyStore = Observable(new Memory({ data: [] }));
+	emptyAsyncStore = Observable(new Memory({
+		data: [],
+		query: asyncQuery
+	}));
 
 	//store with non-existent url
 	//errorStore = Observable(Memory({data: junk}));
