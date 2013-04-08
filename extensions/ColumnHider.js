@@ -110,7 +110,7 @@ function(declare, has, listen, miscUtil, put){
 				// Assume that if this plugin is used, then columns are hidable.
 				// Create the toggle node.
 				hiderToggleNode = this.hiderToggleNode =
-					put(this.headerScrollNode, "div.dgrid-hider-toggle.dgrid-cell-padding", "+");
+					put(this.headerScrollNode, "div.ui-icon.dgrid-hider-toggle");
 				
 				this._listeners.push(listen(hiderToggleNode, "click", function(e){
 					grid._toggleColumnHiderMenu(e);
@@ -217,6 +217,10 @@ function(declare, has, listen, miscUtil, put){
 			// Use miscUtil function directly, since we clean these up ourselves anyway
 			var selectorPrefix = "#" + miscUtil.escapeCssIdentifier(this.domNode.id) + " .dgrid-column-",
 				next, rules, i; // used in IE8 code path
+
+			if (this._columnHiderRules[id]) {
+				return;
+			}
 			
 			if(has("ie") === 8 && !has("quirks")){
 				// Avoid inconsistent behavior in IE8 when display: none is set on a cell
@@ -249,7 +253,7 @@ function(declare, has, listen, miscUtil, put){
 			//		method for more information.
 			
 			if(!hidden){
-				this._columnHiderRules[id].remove();
+				this._columnHiderRules[id] && this._columnHiderRules[id].remove();
 				delete this._columnHiderRules[id];
 			}else{
 				this._hideColumn(id);

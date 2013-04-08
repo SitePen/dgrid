@@ -56,6 +56,12 @@
 						console.log("data changed: ", evt.oldValue, " -> ", evt.value);
 						console.log("cell: ", evt.cell, evt.cell.row.id);
 					});
+					grid.on("dgrid-editor-show", function(evt){
+						console.log("show editOn editor: ", evt);
+					});
+					grid.on("dgrid-editor-hide", function(evt){
+						console.log("hide editOn editor: ", evt);
+					});
 					
 					grid.on(".field-integer:dgrid-datachange", function(evt){
 						if(evt.value > 1000){

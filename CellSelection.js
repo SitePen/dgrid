@@ -99,7 +99,7 @@ return declare(Selection, {
 					// and now loop through each column to be selected
 					for(i = 0; i < columnIds.length; i++){
 						cell = this.cell(nextNode, columnIds[i]);
-						this.select(cell);
+						this.select(cell, null, value);
 					}
 					if(nextNode == toElement){
 						break;

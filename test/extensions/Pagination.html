@@ -37,6 +37,13 @@
 				right: 0;
 			}
 			
+			/* styles for columnset grid */
+			#gridColumnSet .dgrid-cell {
+				width: 100px;
+			}
+			#gridColumnSet .field-col4 {
+				width: 20em;
+			}
 		</style>
 		<script src="../../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
@@ -50,10 +57,10 @@
 			skinDep = "xstyle/css!dgrid/css/skins/" + skin + ".css";
 			
 			require([skinDep, "dgrid/Grid", "dgrid/extensions/Pagination",
-					"dgrid/Selection", "dgrid/Keyboard", "dgrid/GridFromHtml",
+					"dgrid/Selection", "dgrid/Keyboard", "dgrid/ColumnSet", "dgrid/GridFromHtml",
 					"dojo/_base/lang", "dojo/_base/declare", "dojo/on", "dojo/dom-construct",
 					"dojo/dom-form", "dgrid/test/data/errorStores", "dgrid/test/data/base", "dojo/domReady!"],
-				function(skinResource, Grid, Pagination, Selection, Keyboard, GridFromHtml,
+				function(skinResource, Grid, Pagination, Selection, Keyboard, ColumnSet, GridFromHtml,
 						lang, declare, on, domConstruct, domForm, errorStores, testStore){
 					
 					window.errorStores = errorStores; // for easy access by button handlers
@@ -80,19 +87,6 @@
 					};
 					
 					document.body.className = skin;
-					
-					var grid2 = window.grid2 = new CustomGrid({
-						store: testStore,
-						columns: getColumns2(),
-						pagingLinks: false,
-						pagingTextBox: true,
-						firstLastArrows: true,
-						pageSizeOptions: [10, 15, 25]
-					}, "grid2");
-					
-					window.gridfromhtml = new (declare([GridFromHtml, Keyboard, Selection, Pagination]))({
-						store: testStore
-					}, "gridfromhtml");
 					
 					function createGrid(args){
 						window.grid = new CustomGrid(lang.mixin({
@@ -123,6 +117,36 @@
 					on(document.body, "dgrid-error", function(evt){
 						console.warn("error on grid: ", evt.grid.id, evt.error);
 					});
+					
+					// auto-height grid
+					var grid2 = window.grid2 = new CustomGrid({
+						store: testStore,
+						columns: getColumns2(),
+						pagingLinks: false,
+						pagingTextBox: true,
+						firstLastArrows: true,
+						pageSizeOptions: [10, 15, 25]
+					}, "grid2");
+					
+					// GridFromHtml
+					window.gridfromhtml = new (declare([GridFromHtml, Keyboard, Selection, Pagination]))({
+						store: testStore
+					}, "gridfromhtml");
+					
+					// ColumnSet grid
+					window.gridColumnSet = new (declare([Grid, Keyboard, Selection, ColumnSet, Pagination]))({
+						store: testStore,
+						columnSets: [
+							[[
+								{ label: "ID", field: "id" }
+							]], [[
+								{ label: "Column 1", field: "col1" },
+								{ label: "Column 3", field: "col3" },
+								{ label: "Column 4", field: "col4" },
+								{ label: "Column 5", field: "col5" }
+							]]
+						]
+					}, "gridColumnSet");
 				});
 		</script>
 	</head>
@@ -177,5 +201,8 @@
 		<h2>An autoheight grid with the Pagination extension,
 			with a rows-per-page drop-down</h2>
 		<div id="grid2"></div>
+		
+		<h2>A grid with ColumnSets with the Pagination extension</h2>
+		<div id="gridColumnSet"></div>
 	</body>
 </html>

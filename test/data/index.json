@@ -172,6 +172,18 @@
         "parent": "extensions"
     },
     {
+        "name": "GridFromHtml.html",
+        "url": "GridFromHtml.html",
+        "title": "GridFromHtml Tests",
+        "parent": ""
+    },
+    {
+        "name": "GridFromHtml_Editors.html",
+        "url": "GridFromHtml_Editors.html",
+        "title": "Test declarative cell editors ",
+        "parent": ""
+    },
+    {
         "name": "Grid_headerless.html",
         "url": "Grid_headerless.html",
         "title": "Test Grid Common Cases with showHeader: false",
@@ -190,27 +202,9 @@
         "parent": ""
     },
     {
-        "name": "GridFromHtml.html",
-        "url": "GridFromHtml.html",
-        "title": "GridFromHtml Tests",
-        "parent": ""
-    },
-    {
-        "name": "GridFromHtml_Editors.html",
-        "url": "GridFromHtml_Editors.html",
-        "title": "Test declarative cell editors ",
-        "parent": ""
-    },
-    {
         "name": "has-css3.html",
         "url": "has-css3.html",
         "title": "has-css3 tests",
-        "parent": ""
-    },
-    {
-        "name": "index.html",
-        "url": "index.html",
-        "title": "dgrid Tests",
         "parent": ""
     },
     {

@@ -22,8 +22,11 @@
 				border: 1px solid #333;
 				padding: 0 4px;
 			}
-			.inner {
-				background-color: #ccc;
+			.rendercell {
+				background-color: #ccf;
+			}
+			.formatter {
+				background-color: #cfc;
 			}
 		</style>
 		<script src="../../dojo/dojo.js"
@@ -204,9 +207,14 @@
 					
 					function customRenderCell(object, data) {
 						var container = domConstruct.create("div", { "class": "outer" });
-						domConstruct.place('<span class="inner">' +
+						domConstruct.place('<span class="rendercell">' +
 							("" + data).replace(/</g, "&lt;") + "</span>", container);
 						return container;
+					}
+					
+					function customFormatter(data) {
+						return '<div class="outer"><span class="formatter">' +
+							("" + data).replace(/</g, "&lt;") + "</span></div>";
 					}
 					
 					var cancelDataChange = false;
@@ -232,6 +240,9 @@
 							if(editOn){ columnArgs.editOn = editOn; }
 							if(form.elements.customRenderCell.checked){
 								columnArgs.renderCell = customRenderCell;
+							}
+							if(form.elements.customFormatter.checked){
+								columnArgs.formatter = customFormatter;
 							}
 							cancelDataChange = form.elements.cancelDataChange.checked;
 							
@@ -270,6 +281,13 @@
 						}
 					});
 					
+					on(document.body, "dgrid-editor-show", function(evt){
+						console.log("show editOn editor: ", evt);
+					});
+					on(document.body, "dgrid-editor-hide", function(evt){
+						console.log("hide editOn editor: ", evt);
+					});
+					
 					editFirst = function() {
 						var grid = window.grid;
 						window.grid.edit(window.grid.cell(0, "editor"));
@@ -295,6 +313,7 @@
 			<p><label><input type="checkbox" name="autoSave" value="true"> autoSave</label></p>
 			<p><label><input type="checkbox" name="cancelDataChange" value="false"> cancel dgrid-datachange</label></p>
 			<p><label><input type="checkbox" name="customRenderCell" value="true"> use custom renderCell</label></p>
+			<p><label><input type="checkbox" name="customFormatter" value="true"> use custom formatter (note: customRenderCell supersedes this setting)</label></p>
 			<div><button type="submit" id="editorFormSubmit">Recreate Grid</button></div>
 		</form>
 		<div id="grid"></div>

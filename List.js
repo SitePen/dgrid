@@ -226,8 +226,8 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 			//		Called automatically after postCreate if the component is already
 			//		visible; otherwise, should be called manually once placed.
 			
-			this.inherited(arguments);
 			if(this._started){ return; } // prevent double-triggering
+			this.inherited(arguments);
 			this._started = true;
 			this.resize();
 			// apply sort (and refresh) now that we're ready to render
@@ -523,17 +523,14 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 						this.store.getIdentity(object) : this._autoId++),
 				row = byId(id),
 				previousRow = row && row.previousSibling;
-			
-			if(!row || // we must create a row if it doesn't exist, or if it previously belonged to a different container 
-					(beforeNode && row.parentNode != beforeNode.parentNode)){
-				if(row){// if it existed elsewhere in the DOM, we will remove it, so we can recreate it
-					this.removeRow(row);
-				}
-				row = this.renderRow(object, options);
-				row.className = (row.className || "") + " ui-state-default dgrid-row " + (i % 2 == 1 ? oddClass : evenClass);
-				// get the row id for easy retrieval
-				this._rowIdToObject[row.id = id] = object;
+		
+			if(row){// if it existed elsewhere in the DOM, we will remove it, so we can recreate it
+				this.removeRow(row);
 			}
+			row = this.renderRow(object, options);
+			row.className = (row.className || "") + " ui-state-default dgrid-row " + (i % 2 == 1 ? oddClass : evenClass);
+			// get the row id for easy retrieval
+			this._rowIdToObject[row.id = id] = object;
 			parent.insertBefore(row, beforeNode || null);
 			if(previousRow){
 				// in this case, we are pulling the row from another location in the grid, and we need to readjust the rowIndices from the point it was removed
@@ -740,12 +737,12 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 			//		Sets named properties on a List object.
 			//		A programmatic setter may be defined in subclasses.
 			//
-			//	set() may also be called with a hash of name/value pairs, ex:
+			//		set() may also be called with a hash of name/value pairs, ex:
 			//	|	myObj.set({
 			//	|		foo: "Howdy",
 			//	|		bar: 3
 			//	|	})
-			//	This is equivalent to calling set(foo, "Howdy") and set(bar, 3)
+			//		This is equivalent to calling set(foo, "Howdy") and set(bar, 3)
 			
 			if(typeof name === "object"){
 				for(var k in name){

@@ -97,6 +97,7 @@ return declare([List, _StoreMixin], {
 				next: preload,
 				options: options
 			};
+			topPreload.node.style.height = "0";
 			preload.node = preloadNode = put(this.contentNode, "div.dgrid-preload");
 			preload.previous = topPreload;
 		}

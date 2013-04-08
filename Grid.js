@@ -31,7 +31,7 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 			// summary:
 			//		Get the cell object by node, or event, id, plus a columnId
 			
-			if(target.row && target.row instanceof this._Row){ return target; }
+			if(target.column && target.element){ return target; }
 			
 			if(target.target && target.target.nodeType){
 				// event
@@ -144,22 +144,22 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 		},
 		
 		renderRow: function(object, options){
+			var self = this;
 			var row = this.createRowCells("td", function(td, column){
 				var data = object;
-				// we support the field, get, and formatter properties like the DataGrid
+				// Support get function or field property (similar to DataGrid)
 				if(column.get){
 					data = column.get(object);
 				}else if("field" in column && column.field != "_item"){
 					data = data[column.field];
 				}
-				if(column.formatter){
-					td.innerHTML = column.formatter(data);
-				}else if(column.renderCell){
+				
+				if(column.renderCell){
 					// A column can provide a renderCell method to do its own DOM manipulation,
 					// event handling, etc.
 					appendIfNode(td, column.renderCell(object, data, td, options));
-				}else if(data != null){
-					td.appendChild(document.createTextNode(data));
+				}else{
+					defaultRenderCell.call(column, object, data, td, options);
 				}
 			}, options && options.subRows);
 			// row gets a wrapper div for a couple reasons:
@@ -496,11 +496,22 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 		}
 	});
 	
+	function defaultRenderCell(object, data, td, options){
+		if(this.formatter){
+			// Support formatter, with or without formatterScope
+			var formatter = this.formatter,
+				formatterScope = this.grid.formatterScope;
+			td.innerHTML = typeof formatter === "string" && formatterScope ?
+				formatterScope[formatter](data, object) : formatter(data, object);
+		}else if(data != null){
+			td.appendChild(document.createTextNode(data)); 
+		}
+	}
+	
 	// expose appendIfNode and default implementation of renderCell,
 	// e.g. for use by column plugins
 	Grid.appendIfNode = appendIfNode;
-	Grid.defaultRenderCell = function(object, data, td, options){
-		if(data != null){ td.appendChild(document.createTextNode(data)); }
-	};
+	Grid.defaultRenderCell = defaultRenderCell;
+	
 	return Grid;
 });
