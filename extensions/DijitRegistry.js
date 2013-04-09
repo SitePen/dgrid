@@ -46,6 +46,11 @@ function(declare, domGeometry, registry){
 			return [];
 		},
 		
+		isLeftToRight: function(){
+			// Implement method expected by Dijit layout widgets
+			return !this.isRTL;
+		},
+		
 		resize: function(changeSize){
 			// Honor changeSize parameter used by layout widgets, and resize grid
 			if(changeSize){
