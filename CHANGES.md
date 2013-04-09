@@ -3,7 +3,10 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 # master (0.3.8-dev)
 
-Coming soon!
+## Other changes and fixes
+
+* The `DijitRegistry` extension now implements an `isLeftToRight` method, to
+  accommodate needs of Dijit layout widgets in Dojo 1.9. (#536)
 
 # 0.3.7
 
