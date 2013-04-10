@@ -5,6 +5,11 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ## Significant changes
 
+### General/Core
+
+* Fixed a regression (present since 0.3.5) in `OnDemandList` which prevented
+  `noDataMessage` from being displayed for async stores. (#519)
+
 ### Extensions
 
 * Fixed a regression in the `ColumnResizer` extension where columns were no
