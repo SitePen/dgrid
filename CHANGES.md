@@ -3,7 +3,16 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 # master (0.3.8-dev)
 
+## Significant changes
+
+### Extensions
+
+* Fixed a regression in the `ColumnResizer` extension where columns were no
+  longer appropriately adjusted when the first resize occurred. (#526)
+
 ## Other changes and fixes
+
+### Extensions
 
 * The `DijitRegistry` extension now implements an `isLeftToRight` method, to
   accommodate needs of Dijit layout widgets in Dojo 1.9. (#536)
