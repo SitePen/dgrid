@@ -237,7 +237,7 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 								sort: newSort
 							};
 							
-							if (listen.emit(target, "dgrid-sort", eventObj)){
+							if (listen.emit(event.target, "dgrid-sort", eventObj)){
 								// Stash node subject to DOM manipulations,
 								// to be referenced then removed by sort()
 								grid._sortNode = target;
