@@ -76,7 +76,11 @@ var Keyboard = declare(null, {
 			var cellNavigation = grid.cellNavigation,
 				isFocusableClass = cellNavigation ? hasGridCellClass : hasGridRowClass,
 				isHeader = areaNode === grid.headerNode,
-				initialNode = areaNode;
+				initialNode = areaNode,
+				elements = areaNode.getElementsByTagName("*"),
+				focusedNode,
+				element,
+				i;
 			
 			function initHeader(){
 				grid._focusedHeaderNode = initialNode =
@@ -96,7 +100,7 @@ var Keyboard = declare(null, {
 					//		retrieved if there is not already a valid focused element.
 					
 					return Deferred.when(ret, function(ret){
-						var focusedNode = grid._focusedNode || initialNode;
+						focusedNode = grid._focusedNode || initialNode;
 						
 						// do not update the focused element if we already have a valid one
 						if(isFocusableClass.test(focusedNode.className) && contains(areaNode, focusedNode)){
@@ -106,7 +110,7 @@ var Keyboard = declare(null, {
 						// ensure that the focused element is actually a grid cell, not a
 						// dgrid-preload or dgrid-content element, which should not be focusable,
 						// even when data is loaded asynchronously
-						for(var i = 0, elements = areaNode.getElementsByTagName("*"), element; (element = elements[i]); ++i){
+						for(i = 0; element = elements[i]; ++i){
 							if(isFocusableClass.test(element.className)){
 								focusedNode = grid._focusedNode = element;
 								break;
@@ -330,8 +334,9 @@ var moveFocusEnd = Keyboard.moveFocusEnd = function(event, scrollToTop){
 		hasPreload = endChild.className.indexOf("dgrid-preload") > -1,
 		endTarget = hasPreload ? endChild[(scrollToTop ? "next" : "previous") + "Sibling"] : endChild,
 		endPos = endTarget.offsetTop + (scrollToTop ? 0 : endTarget.offsetHeight),
-		handle;
-	
+		handle,
+		target;
+
 	if(hasPreload){
 		// Find the nearest dgrid-row to the relevant end of the grid
 		while(endTarget && endTarget.className.indexOf("dgrid-row") < 0){
@@ -363,7 +368,7 @@ var moveFocusEnd = Keyboard.moveFocusEnd = function(event, scrollToTop){
 		handle = aspect.after(this, "renderArray", function(rows){
 			handle.remove();
 			return Deferred.when(rows, function(rows){
-				var target = rows[scrollToTop ? 0 : rows.length - 1];
+				target = rows[scrollToTop ? 0 : rows.length - 1];
 				if(cellNavigation){
 					// Preserve column that was currently focused
 					target = self.cell(target, self.cell(event).column.id);
