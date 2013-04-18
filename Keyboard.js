@@ -132,7 +132,7 @@ var Keyboard = declare(null, {
 			grid._listeners.push(on(areaNode, "keydown", function(event){
 				// For now, don't squash browser-specific functionalities by letting
 				// ALT and META function as they would natively
-				if(event.metaKey || event.altKey) {
+				if(event.metaKey || event.altKey){
 					return;
 				}
 				
