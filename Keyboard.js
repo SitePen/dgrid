@@ -27,9 +27,8 @@ function contains(parent, node){
 	
 	if(has("dom-contains")){
 		return parent.contains(node);
-	}else{
-		return parent.compareDocumentPosition(node) & 8 /* DOCUMENT_POSITION_CONTAINS */;
 	}
+	return parent.compareDocumentPosition(node) & 8 /* DOCUMENT_POSITION_CONTAINS */;
 }
 
 var Keyboard = declare(null, {
