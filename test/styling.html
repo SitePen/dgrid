@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Test height:auto</title>
+		<meta name="viewport" content="width=570">
+		<style>
+			@import "../../dojo/resources/dojo.css";
+			@import "../css/dgrid.css";
+			@import "../css/skins/claro.css";
+		
+			/* alternative rows */
+			.dgrid-row-odd {
+			    background: rgb(243, 243, 243);
+			}
+			
+			/* population column */
+			.dgrid-column-population {
+			   width: 100px; /* except the name column should be 50px wide*/
+			   font-style: italic;
+			}
+			
+			/* custom class for continents */
+			.row-continent{
+				background: rgb(219, 242, 255);
+			}
+			
+			/* custom class for cities */
+			.cell-value-city{
+				color: blue;
+				font-weight: bold;
+			}
+		</style>
+		
+		
+		
+		<script src="../../dojo/dojo.js" 
+			data-dojo-config="async: true"></script>
+		<script>
+			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dojo/dom-class", "dojo/dom-construct", "dgrid/test/data/base", "dojo/domReady!"], 
+				function(List, Grid, Selection, Keyboard, declare, domClass, domConstruct){
+					window.grid = new (declare([Grid, Selection, Keyboard]))({
+						store: testCountryStore,
+						columns: {
+							name: { 
+								label: "Name",
+								renderCell: function(item, value, td, options) {
+									var div = domConstruct.create("div", {
+										innerHTML : value,
+										className : item.type == "city" ? "cell-value-city" : ""
+									});
+									return div;
+								}
+							},
+							population : "Population",
+							type: "Type"
+						},
+						styleRow : function(row, object){
+							// All cities will be highlighted with custom background  
+							if(object.type == "continent"){
+								domClass.add(row, "row-continent");
+							}
+						}
+					}, "grid");
+				});
+				
+		</script>
+	</head>
+	<body class="claro">
+		<h2>Styling of dgrid</h2>
+		<div id="grid"></div>
+		<a href="https://github.com/SitePen/dgrid">dgrid</a><br />
+		More info about styling dgrid can be found <a href="https://github.com/SitePen/dgrid/wiki/Styling-dgrid">here</a>
+	</body>
+</html>

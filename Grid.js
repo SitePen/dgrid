@@ -162,8 +162,14 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 					defaultRenderCell.call(column, object, data, td, options);
 				}
 			}, options && options.subRows);
+
+			// Support custom row styling
+			if(this.styleRow){
+				this.styleRow(row, object);
+			}
+			
 			// row gets a wrapper div for a couple reasons:
-			//	1. So that one can set a fixed height on rows (heights can't be set on <table>'s AFAICT)
+			// 1. So that one can set a fixed height on rows (heights can't be set on <table>'s AFAICT)
 			// 2. So that outline style can be set on a row when it is focused, and Safari's outline style is broken on <table>
 			return put("div[role=row]>", row);
 		},
