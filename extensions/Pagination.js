@@ -193,7 +193,7 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 			
 			function pageLink(page){
 				var link;
-				if(grid.pagingTextBox && page == currentPage){
+				if(grid.pagingTextBox && page == currentPage && end > 1){
 					// use a paging text box if enabled instead of just a number
 					link = put(linksNode, 'input.dgrid-page-input[type=text][value=$]', currentPage);
 					link.setAttribute("aria-label", i18n.jumpPage);
