@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Test Stateful Editing</title>
+		<meta name="viewport" content="width=570">
+		<style>
+			@import "../../dojo/resources/dojo.css";
+			@import "../../dijit/themes/claro/claro.css";
+			@import "../css/skins/claro.css";
+		</style>
+		<script src="../../dojo/dojo.js" 
+			data-dojo-config="async: true, isDebug: true"></script>
+		<script>
+		require([
+			"dojo/_base/declare",
+			"dojo/store/Memory",
+			"dijit/_WidgetBase",
+			"dgrid/OnDemandGrid",
+			"dgrid/editor"
+		], function (declare, Memory, _WidgetBase, OnDemandGrid, editor) {
+			var StatefulWidget = declare(_WidgetBase, {
+					_setFooAttr: function (value) {
+						console.log("foo updating from", this.foo, "to", value);
+						this.foo = value;
+					}
+				}),
+				data = [
+					new StatefulWidget({
+						foo: "bar"
+					}),
+					new StatefulWidget({
+						foo: "baz"
+					})
+				],
+				store = window.store = new Memory({data:data});
+
+			window.grid = new OnDemandGrid({
+				store: store,
+				columns: [
+					editor({
+						label: "Foo",
+						field: "foo",
+						editor: "text",
+						editOn: "dblclick"
+					})
+				]
+			}, "grid");
+
+			grid.startup();
+		});
+		</script>
+	</head>
+	<body class="claro">
+		<h2>Editor with Stateful objects</h2>
+		(This test requires dojo and dijit to be installed)
+		<div id="grid"></div>
+		<button type="button" id="save" onclick="grid.save()">Save</button>
+	</body>
+</html>

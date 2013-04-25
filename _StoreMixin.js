@@ -193,11 +193,16 @@ function(kernel, declare, lang, Deferred, listen, aspect, put){
 					var colsWithSet = self._columnsWithSet,
 						updating = self._updating,
 						key, data;
-					// Copy dirty props to the original, applying setters if applicable
-					for(key in dirtyObj){
-						object[key] = dirtyObj[key];
+
+					if (object.set && typeof object.set === "function") {
+						object.set(dirtyObj);
+					} else {
+						// Copy dirty props to the original, applying setters if applicable
+						for(key in dirtyObj){
+							object[key] = dirtyObj[key];
+						}
 					}
-					
+
 					// Apply any set methods in column definitions.
 					// Note that while in the most common cases column.set is intended
 					// to return transformed data for the key in question, it is also
