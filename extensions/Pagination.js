@@ -244,7 +244,9 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 					put(linksNode, "span.dgrid-page-skip", "...");
 				}
 				// last link
-				pageLink(end);
+				if(end > 1){
+					pageLink(end);
+				}
 			}else if(grid.pagingTextBox){
 				// The pageLink function is also used to create the paging textbox.
 				pageLink(currentPage);
