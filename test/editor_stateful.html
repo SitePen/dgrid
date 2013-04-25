@@ -17,30 +17,54 @@
 			"dojo/store/Memory",
 			"dijit/_WidgetBase",
 			"dgrid/OnDemandGrid",
-			"dgrid/editor"
+			"dgrid/editor",
+			"dgrid/test/data/base"
 		], function (declare, Memory, _WidgetBase, OnDemandGrid, editor) {
-			var StatefulWidget = declare(_WidgetBase, {
-					_setFooAttr: function (value) {
-						console.log("foo updating from", this.foo, "to", value);
-						this.foo = value;
+			var State = declare(_WidgetBase, {
+					_setAbbreviationAttr: function (abbreviation) {
+						console.log("abbreviation updating from", this.abbreviation, "to", abbreviation);
+						this.abbreviation = abbreviation;
+					},
+					_setNameAttr: function (name) {
+						console.log("name updating from", this.name, "to", name);
+						this.name = name;
 					}
-				}),
-				data = [
-					new StatefulWidget({
-						foo: "bar"
-					}),
-					new StatefulWidget({
-						foo: "baz"
-					})
-				],
-				store = window.store = new Memory({data:data});
+				});
+
+			function createStore() {
+				var data = [],
+					states = testStateStore.data,
+					state, i, total;
+
+				for (i = 0, total = states.length; i < total; i++) {
+					state = states[i];
+
+					data.push(
+						new State({
+							abbreviation: state.abbreviation,
+							name: state.name
+						})
+					);
+				}
+
+				return new Memory({
+					data: data,
+					idProperty: "abbreviation"
+				});
+			}
 
 			window.grid = new OnDemandGrid({
-				store: store,
+				store: createStore(),
 				columns: [
 					editor({
-						label: "Foo",
-						field: "foo",
+						label: "Abbreviation",
+						field: "abbreviation",
+						editor: "text",
+						editOn: "dblclick"
+					}),
+					editor({
+						label: "Name",
+						field: "name",
 						editor: "text",
 						editOn: "dblclick"
 					})
