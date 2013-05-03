@@ -428,7 +428,7 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 									firstRow.rowIndex--; // adjust the rowIndex so adjustRowIndices has the right starting point
 								}
 							}
-							self.removeRow(row); // now remove
+							self.removeRow(row, false, to > -1); // now remove
 						}
 						// the removal of rows could cause us to need to page in more items
 						if(self._processScroll){
@@ -545,7 +545,7 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 			
 			return put("div", "" + value);
 		},
-		removeRow: function(rowElement, justCleanup){
+		removeRow: function(rowElement, justCleanup, justMove){
 			// summary:
 			//		Simply deletes the node in a plain List.
 			//		Column plugins may aspect this to implement their own cleanup routines.
@@ -555,7 +555,11 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 			//		If true, the row element will not be removed from the DOM; this can
 			//		be used by extensions/plugins in cases where the DOM will be
 			//		massively cleaned up at a later point in time.
-			
+			// justMove: Boolean
+			//		If true, the row element is just being updated via a remove and insert.
+			//		This can be used by extensions/plugins that need to know the element is 
+			//		not actually being removed (e.g.  Selection).
+
 			rowElement = rowElement.element || rowElement;
 			delete this._rowIdToObject[rowElement.id];
 			if(!justCleanup){
