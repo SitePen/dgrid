@@ -428,7 +428,7 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 									firstRow.rowIndex--; // adjust the rowIndex so adjustRowIndices has the right starting point
 								}
 							}
-							self.removeRow(row); // now remove
+							self.removeRow(row, from === to); // now remove
 						}
 						// the removal of rows could cause us to need to page in more items
 						if(self._processScroll){
