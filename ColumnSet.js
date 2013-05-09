@@ -124,7 +124,81 @@ function(kernel, declare, lang, Deferred, listen, aspect, query, has, miscUtil, 
 			return rows;
 		},
 
-		positionScrollers: function (){
+		renderHeader: function(){
+			// summary:
+			//		Setup the headers for the grid
+			this.inherited(arguments);
+			
+			var columnSets = this.columnSets,
+				domNode = this.domNode,
+				scrollers = this._columnSetScrollers,
+				scrollerContents = this._columnSetScrollerContents = {},
+				scrollLefts = this._columnSetScrollLefts = {},
+				grid = this,
+				i, l;
+
+			function reposition(){
+				grid._positionScrollers();
+			}
+			
+			if (scrollers) {
+				// this isn't the first time; destroy existing scroller nodes first
+				for(i in scrollers){
+					put(scrollers[i], "!");
+				}
+			} else {
+				// first-time-only operations: hook up event/aspected handlers
+				aspect.after(this, "resize", reposition, true);
+				aspect.after(this, "styleColumn", reposition, true);
+				listen(domNode, ".dgrid-column-set:dgrid-cellfocusin", lang.hitch(this, '_onColumnSetScroll'));
+			}
+			
+			// reset to new object to be populated in loop below
+			scrollers = this._columnSetScrollers = {};
+			
+			for(i = 0, l = columnSets.length; i < l; i++){
+				this._putScroller(columnSets[i], i);
+			}
+			
+			this._positionScrollers();
+		},
+		
+		styleColumnSet: function(colsetId, css){
+			// summary:
+			//		Dynamically creates a stylesheet rule to alter a columnset's style.
+			
+			var rule = this.addCssRule("#" + miscUtil.escapeCssIdentifier(this.domNode.id) + " .dgrid-column-set-" + colsetId, css);
+			this._positionScrollers();
+			return rule;
+		},
+		
+		_destroyColumns: function(){
+			var columnSetsLength = this.columnSets.length,
+				i, j, k, subRowsLength, len, columnSet, subRow, column;
+			for(i = 0; i < columnSetsLength; i++){
+				columnSet = this.columnSets[i];
+				for(j = 0, subRowsLength = columnSet.length; j < subRowsLength; j++){
+					subRow = columnSet[j];
+					for(k = 0, len = subRow.length; k < len; k++){
+						column = subRow[k];
+						if(typeof column.destroy === "function"){ column.destroy(); }
+					}
+				}
+			}
+			this.inherited(arguments);
+		},
+		configStructure: function(){
+			this.columns = {};
+			for(var i = 0, l = this.columnSets.length; i < l; i++){
+				// iterate through the columnSets
+				var columnSet = this.columnSets[i];
+				for(var j = 0; j < columnSet.length; j++){
+					columnSet[j] = this._configColumns(i + "-" + j + "-", columnSet[j]);
+				}
+			}
+		},
+
+		_positionScrollers: function (){
 			var domNode = this.domNode,
 				scrollers = this._columnSetScrollers,
 				scrollerContents = this._columnSetScrollerContents,
@@ -156,16 +230,16 @@ function(kernel, declare, lang, Deferred, listen, aspect, query, has, miscUtil, 
 				"0";
 		},
 
-		putScroller: function (columnSet, i){
+		_putScroller: function (columnSet, i){
 			// function called for each columnSet
 			var scroller = this._columnSetScrollers[i] =
 				put(this.domNode, "div.dgrid-column-set-scroller.dgrid-scrollbar-height.dgrid-column-set-scroller-" + i +
 					"[" + colsetidAttr + "=" + i +"]");
 			this._columnSetScrollerContents[i] = put(scroller, "div.dgrid-column-set-scroller-content");
-			listen(scroller, "scroll", lang.hitch(this, 'onScroll'));
+			listen(scroller, "scroll", lang.hitch(this, '_onColumnSetScroll'));
 		},
 
-		onScroll: function (evt){
+		_onColumnSetScroll: function (evt){
 			var scrollLeft = evt.target.scrollLeft,
 				colSetId = evt.target.getAttribute(colsetidAttr);
 
@@ -177,80 +251,7 @@ function(kernel, declare, lang, Deferred, listen, aspect, query, has, miscUtil, 
 					});
 			}
 		},
-
-		renderHeader: function(){
-			// summary:
-			//		Setup the headers for the grid
-			this.inherited(arguments);
-			
-			var columnSets = this.columnSets,
-				domNode = this.domNode,
-				scrollers = this._columnSetScrollers,
-				scrollerContents = this._columnSetScrollerContents = {},
-				scrollLefts = this._columnSetScrollLefts = {},
-				grid = this,
-				i, l;
-
-			function reposition(){
-				grid.positionScrollers();
-			}
-			
-			if (scrollers) {
-				// this isn't the first time; destroy existing scroller nodes first
-				for(i in scrollers){
-					put(scrollers[i], "!");
-				}
-			} else {
-				// first-time-only operations: hook up event/aspected handlers
-				aspect.after(this, "resize", reposition, true);
-				aspect.after(this, "styleColumn", reposition, true);
-				listen(domNode, ".dgrid-column-set:dgrid-cellfocusin", lang.hitch(this, 'onScroll'));
-			}
-			
-			// reset to new object to be populated in loop below
-			scrollers = this._columnSetScrollers = {};
-			
-			for(i = 0, l = columnSets.length; i < l; i++){
-				this.putScroller(columnSets[i], i);
-			}
-			
-			this.positionScrollers();
-		},
 		
-		styleColumnSet: function(colsetId, css){
-			// summary:
-			//		Dynamically creates a stylesheet rule to alter a columnset's style.
-			
-			var rule = this.addCssRule("#" + miscUtil.escapeCssIdentifier(this.domNode.id) + " .dgrid-column-set-" + colsetId, css);
-			this.positionScrollers();
-			return rule;
-		},
-		
-		_destroyColumns: function(){
-			var columnSetsLength = this.columnSets.length,
-				i, j, k, subRowsLength, len, columnSet, subRow, column;
-			for(i = 0; i < columnSetsLength; i++){
-				columnSet = this.columnSets[i];
-				for(j = 0, subRowsLength = columnSet.length; j < subRowsLength; j++){
-					subRow = columnSet[j];
-					for(k = 0, len = subRow.length; k < len; k++){
-						column = subRow[k];
-						if(typeof column.destroy === "function"){ column.destroy(); }
-					}
-				}
-			}
-			this.inherited(arguments);
-		},
-		configStructure: function(){
-			this.columns = {};
-			for(var i = 0, l = this.columnSets.length; i < l; i++){
-				// iterate through the columnSets
-				var columnSet = this.columnSets[i];
-				for(var j = 0; j < columnSet.length; j++){
-					columnSet[j] = this._configColumns(i + "-" + j + "-", columnSet[j]);
-				}
-			}
-		},
 		_setColumnSets: function(columnSets){
 			this._destroyColumns();
 			this.columnSets = columnSets;
