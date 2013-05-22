@@ -30,7 +30,6 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 		cell: function(target, columnId){
 			// summary:
 			//		Get the cell object by node, or event, id, plus a columnId
-			
 			if(target.column && target.element){ return target; }
 			
 			if(target.target && target.target.nodeType){
@@ -55,7 +54,7 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 			}
 			if(!element && typeof columnId != "undefined"){
 				var row = this.row(target),
-					rowElement = row.element;
+					rowElement = row && row.element;
 				if(rowElement){
 					var elements = rowElement.getElementsByTagName("td");
 					for(var i = 0; i < elements.length; i++){
