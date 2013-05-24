@@ -44,10 +44,11 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 					if(this._rowIdToObject[target.id]){
 						break;
 					}
-					var colId = target.columnId;
+					var colId = target.getAttribute('columnId');
 					if(colId){
 						columnId = colId;
 						element = target;
+						element.columnId = colId;
 						break;
 					}
 					target = target.parentNode;
@@ -59,8 +60,9 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 				if(rowElement){
 					var elements = rowElement.getElementsByTagName("td");
 					for(var i = 0; i < elements.length; i++){
-						if(elements[i].columnId == columnId){
+						if(elements[i].getAttribute('columnId') == columnId){
 							element = elements[i];
+							element.columnId = columnId;
 							break;
 						}
 					}
@@ -111,6 +113,7 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 						).replace(invalidClassChars,"-") +
 						"[role=" + (tag === "th" ? "columnheader" : "gridcell") + "]");
 					cell.columnId = id;
+					cell.setAttribute('columnId') = id;
 					if(contentBoxSizing){
 						// The browser (IE7-) does not support box-sizing: border-box, so we emulate it with a padding div
 						innerCell = put(cell, "!dgrid-cell-padding div.dgrid-cell-padding");// remove the dgrid-cell-padding, and create a child with that class
