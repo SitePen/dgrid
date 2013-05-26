@@ -113,7 +113,7 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 						).replace(invalidClassChars,"-") +
 						"[role=" + (tag === "th" ? "columnheader" : "gridcell") + "]");
 					cell.columnId = id;
-					cell.setAttribute('columnId') = id;
+					cell.setAttribute('columnId', id);
 					if(contentBoxSizing){
 						// The browser (IE7-) does not support box-sizing: border-box, so we emulate it with a padding div
 						innerCell = put(cell, "!dgrid-cell-padding div.dgrid-cell-padding");// remove the dgrid-cell-padding, and create a child with that class
