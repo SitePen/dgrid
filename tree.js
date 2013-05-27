@@ -230,6 +230,16 @@ function tree(column){
 								var scrollHeight = container.scrollHeight;
 								container.style.height = scrollHeight ? scrollHeight + "px" : "auto";
 							}
+							// Emit on a separate turn to enable event to be used consistently for
+							// initial render, regardless of whether the backing store is async
+							setTimeout(function () {
+								on.emit(grid.domNode, "dgrid-children-complete", {
+									bubbles: true,
+									cancelable: false,
+									grid: grid,
+									row: row
+								});
+							}, 0);
 						}
 					);
 					
