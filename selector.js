@@ -99,7 +99,9 @@ function(kernel, arrayUtil, on, aspect, has, put){
 			grid._hasSelectorInputListener = true;
 			listeners.push(aspect.before(grid, "_initSelectionEvents", function(){
 				// listen for clicks and keydown as the triggers
-				this.on(".dgrid-selector:click,.dgrid-selector:keydown", onSelect);
+				listeners.push(
+					this.on(".dgrid-selector:click,.dgrid-selector:keydown", onSelect)
+				);
 			}));
 			var handleSelect = grid._handleSelect;
 			grid._handleSelect = function(event){
