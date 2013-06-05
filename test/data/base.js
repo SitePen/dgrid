@@ -261,7 +261,7 @@ function(lang, Deferred, Memory, Observable, QueryResults){
 		return Observable(new Memory(lang.mixin({data: data,
 			idProperty: "name",
 			put: function(object, options){
-                object.order = calculateOrder(this, object, options && options.before);
+				object.order = calculateOrder(this, object, options && options.before);
 				return Memory.prototype.put.call(this, object, options);
 			},
 			// Memory's add does not need to be augmented since it calls put
