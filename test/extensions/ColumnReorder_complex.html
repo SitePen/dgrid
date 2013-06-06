@@ -22,9 +22,16 @@
 			<button onclick="grid.set('columns', columns);">simple columns</button>
 			<button onclick="grid.set('subRows', subRows);">subrows</button>
 		</div>
+
 		<h2>A grid with column re-ordering within columnsets</h2>
 		<div id="gridColumnSets"></div>
-		
+
+		<h2>A grid with column re-ordering within subrows with a dash-number id</h2>
+		<div id="grid-99"></div>
+
+		<h2>A grid with column re-ordering within columnsets with a dash-number id</h2>
+		<div id="gridColumnSets-99"></div>
+
 		<script src="../../../dojo/dojo.js"
 			data-dojo-config="async: true, isDebug: true"></script>
 		<script>
@@ -52,7 +59,11 @@
 						store: testStore,
 						columns: columns
 					}, "grid"),
-					gridColumnSets = window.gridColumnSets = new (declare([OnDemandGrid, ColumnSet, ColumnReorder]))({
+					    grid2 = window.grid2 = new (declare([OnDemandGrid, ColumnReorder]))({
+						    store: testStore,
+						    columns: columns
+					    }, "grid-99"),
+					    gridColumnSets = window.gridColumnSets = new (declare([OnDemandGrid, ColumnSet, ColumnReorder]))({
 						store: testStore,
 						columnSets: [
 							[
@@ -67,11 +78,30 @@
 								]
 							]
 						]
-					}, "gridColumnSets");
-				
+					}, "gridColumnSets"),
+					    gridColumnSets2 = window.gridColumnSets2 = new (declare([OnDemandGrid, ColumnSet, ColumnReorder]))({
+						    store: testStore,
+						    columnSets: [
+							    [
+								    [
+									    {label: 'Column 1', field: 'col1'},
+									    {label: 'Column 2', field: 'col2', sortable: false}
+								    ]
+							    ],
+							    [
+								    [
+									    {label: 'Column 3', field: 'col3'},
+									    {label: 'Column 5', field: 'col5'}
+								    ]
+							    ]
+						    ]
+					    }, "gridColumnSets-99")
+					    ;
+
+				grid2.set('subRows', subRows);
 				on(document.body, "dgrid-columnreorder", function(evt){
 					console.log(evt.grid.id + " dgrid-columnreorder" + ": ",
-						evt);
+						    evt);
 				});
 			});
 		</script>

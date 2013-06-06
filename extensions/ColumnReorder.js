@@ -28,6 +28,22 @@ define([
 			grid.subRows[match[1]] = subRow;
 		}
 	}
+
+	// Builds a prefix for a dndtype value based on a grid id.
+	function makeDndTypePrefix(gridId) {
+		return "dgrid-" + gridId;
+	}
+
+	// Removes the grid id prefix from a dndtype value.  This allows the grid id to contain
+	// a dash-number suffix.  This works only if a column is dropped on the grid from which it
+	// originated.  Otherwise, a dash-number suffix will cause the regex to match on the wrong values.
+	function stripIdPrefix(gridId, dndtype) {
+		var prefix = makeDndTypePrefix(gridId);
+		if(dndtype && dndtype.indexOf(prefix) === 0){
+			return dndtype.substring(prefix.length);
+		}
+		return dndtype;
+	}
 	
 	var ColumnDndSource = declare(DndSource, {
 		// summary:
@@ -48,7 +64,7 @@ define([
 		
 		onDropInternal: function(nodes){
 			var grid = this.grid,
-				match = dndTypeRx.exec(nodes[0].getAttribute("dndType")),
+				match = dndTypeRx.exec(stripIdPrefix(grid.id, nodes[0].getAttribute("dndType"))),
 				structureProperty = match[2] ? "columnSets" : "subRows",
 				oldSubRow = getMatchingSubRow(grid, match),
 				columns = grid.columns;
@@ -140,7 +156,7 @@ define([
 		},
 		
 		renderHeader: function(){
-			var dndTypePrefix = "dgrid-" + this.id + "-",
+			var dndTypePrefix = makeDndTypePrefix(this.id) + "-",
 				csLength, cs;
 			
 			this.inherited(arguments);
