@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>GH #226: Row loses selection after .notify</title>
+	<meta charset="utf-8">
+
+	<style>
+		@import "../../dojo/resources/dojo.css";
+		@import "../../dijit/themes/claro/claro.css";
+		@import "../css/skins/claro.css";
+
+		body {
+			margin: 20px;
+		}
+
+		#grid, #grid2 {
+			width: 400px;
+			height: 400px;
+		}
+
+		.testCaseTitle {
+			margin:10px;
+			font-weight: bold;
+		}
+	</style>
+
+	<script src="/dojo/dojo.js" data-dojo-config="async: true"></script>
+	<script>
+		require([
+			"dojo/_base/declare",
+			"dojo/_base/lang",
+			"dojo/on",
+			"dojo/store/Memory",
+			"dgrid/Grid",
+			"dgrid/OnDemandGrid",
+			"dgrid/Selection",
+			"dojo/store/Observable",
+			"dojo/aspect",
+			"dojo/domReady!"
+		], function(declare, lang, on, Memory, Grid, OnDemandGrid, Selection, Observable, aspect){
+
+			var grid, grid2,
+					i, storeData, store1, store2, currentStore,
+					CustomGrid, columns,
+					updateStore = function(){
+						console.log("Notifying store");
+						currentStore.put({ id: 5, first: "Updated First", last: "Updated Last"});
+						currentStore.put({ id: 99, first: "New First", last: "New Last"});
+					},
+					makeSelection = function(theGrid){
+						console.log("Selecting rows");
+						theGrid.select(3);
+						theGrid.select(4);
+						theGrid.select(5);
+						theGrid.select(6);
+						theGrid.select(7);
+					};
+
+			storeData = [];
+			for(i = 0; i < 15; i++){
+				storeData.push({
+					id: i,
+					first: "First" + i,
+					last: "Last" + i
+				});
+			}
+			currentStore = store1 = Observable(new Memory({
+				data: storeData
+			}));
+
+			storeData = [];
+			for(i = 0; i < 15; i++){
+				storeData.push({
+					id: i,
+					first: "John" + i,
+					last: "Doe" + i
+				});
+			}
+			store2 = Observable(new Memory({
+				data: storeData
+			}));
+
+			columns = {
+				first: "First Name",
+				last: "Last Name"
+			};
+
+			CustomGrid = declare([OnDemandGrid, Selection]);
+			grid = new CustomGrid({
+						columns: columns,
+						store: store1,
+						sort: 'id',
+						selectionMode: "multiple"
+					},
+					"grid"
+			);
+
+			grid2 = new declare([Grid, Selection])({
+				columns: columns,
+				selectionMode: "multiple"
+			}, "grid2");
+			grid2.renderArray(storeData);
+
+			aspect.after(grid2, "removeRow", function () {
+				document.getElementById("selected").innerHTML = JSON.stringify(grid2.selection);
+			});
+
+			on(document.getElementById("sendNotify1Btn"), "click", updateStore);
+			on(document.getElementById("sendNotify2Btn"), "click", updateStore);
+
+			on(document.getElementById("makeSelection1Btn"), "click", lang.partial(makeSelection, grid));
+			on(document.getElementById("makeSelection2Btn"), "click", lang.partial(makeSelection, grid));
+
+			on(document.getElementById("switchStoreBtn"), "click", function(){
+				console.log("Switching the store");
+				currentStore = (currentStore === store1) ? store2 : store1;
+				grid.set("store", currentStore);
+			});
+
+			on(document.getElementById("makeSelection3Btn"), "click", lang.partial(makeSelection, grid2));
+			on(document.getElementById("arrayRemove1Btn"), "click", function () {
+				var row = grid2.row(4);
+				if(row && row.data){
+					row.remove();
+				}
+			});
+
+		});
+
+	</script>
+</head>
+<body class="claro">
+
+<div class="testCaseTitle">Grid row updates with Observable store</div>
+<div id="grid"></div>
+<div style="margin-top: 10px">Steps to verify a selection survives row updates.</div>
+<ol>
+	<li>
+		<button id="makeSelection1Btn">Select Rows</button>
+		5 rows selected.
+	</li>
+	<li>
+		<button id="sendNotify1Btn">Update</button>
+		5 rows should remain selected.
+	</li>
+	<li>
+		<button id="switchStoreBtn">Switch Store</button>
+	</li>
+	<li>
+		<button id="makeSelection2Btn">Select Rows</button>
+		5 rows selected.
+	</li>
+	<li>
+		<button id="sendNotify2Btn">Update</button>
+		5 rows should remain selected.
+	</li>
+</ol>
+
+<hr/>
+<div class="testCaseTitle">Grid row updates with an array</div>
+<div id="grid2"></div>
+<ol>
+	<li>
+		<button id="makeSelection3Btn">Select Rows</button>
+		5 rows selected.
+	</li>
+	<li>
+		<button id="arrayRemove1Btn">Remove a Selected Row</button>
+		4 rows should remain selected.
+		<div id="selected"></div>
+	</li>
+</ol>
+</body>
+</html>

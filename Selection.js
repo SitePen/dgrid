@@ -309,17 +309,78 @@ return declare(null, {
 				}
 			});
 		}
-		
-		aspect.before(this, "removeRow", function(rowElement, justCleanup){
+
+		// Update aspects if there is a store change
+		if(this._setStore){
+			aspect.after(this, "_setStore", function(){
+				grid._updateRowAspects();
+			});
+		}
+		this._updateRowAspects();
+	},
+
+	// In order to properly adjust the selections after the store has been updated,
+	// aspect the store's notify function.
+	_updateRowAspects: function () {
+		var store = this.store;
+		// Remove anything previously configured.
+		this._removeSignals();
+		// Is there currently an observable store?
+		if (store && store.notify) {
+			this._aspectStoreNotify();
+		}else{
+			this._aspectRemoveRow();
+		}
+	},
+
+	_aspectRemoveRow: function(){
+		this._removeRowSignal = aspect.before(this, "removeRow", function(rowElement, justCleanup){
 			var row;
 			if(!justCleanup){
 				row = this.row(rowElement);
 				// if it is a real row removal for a selected item, deselect it
-				if(row && (row.id in this.selection)){ this.deselect(rowElement); }
+				if(row && (row.id in this.selection)){
+					this.deselect(rowElement);
+				}
 			}
-		});
+		}, true);
 	},
-	
+
+	// Aspect the store's notify function so a selection can survive a row update.
+	_aspectStoreNotify: function(){
+		var self = this;
+		this._storeNotifySignal = aspect.after(this.store, "notify", function(object, idToUpdate){
+
+			var id = idToUpdate || (object && object.id);
+			if (id) {
+				var row = self.row(id);
+				// Is the row currently in the selection list.
+				if(row && (row.id in self.selection)){
+					if(object){
+						// Call select to update the dom to reflect the selection.
+						self.select(row);
+					}else{
+						// The object is being removed from the store so deselect it.
+						self.deselect(id);
+					}
+				}
+			}
+		}, true);
+	},
+
+	_removeSignals: function(){
+		var signal = this._removeRowSignal;
+		if(signal){
+			signal.remove();
+			delete this._removeRowSignal;
+		}
+		signal = this._storeNotifySignal;
+		if(signal){
+			signal.remove();
+			delete this._storeNotifySignal;
+		}
+	},
+
 	allowSelect: function(row){
 		// summary:
 		//		A method that can be overriden to determine whether or not a row (or 
