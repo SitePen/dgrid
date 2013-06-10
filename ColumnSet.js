@@ -182,7 +182,7 @@ function(kernel, declare, Deferred, listen, aspect, query, has, miscUtil, put, h
 			function putScroller(columnSet, i){
 				// function called for each columnSet
 				var scroller = scrollers[i] =
-					put(domNode, "div.dgrid-column-set-scroller.dgrid-scrollbar-height.dgrid-column-set-scroller-" + i +
+					put(domNode, "div.dgrid-column-set-scroller.dgrid-column-set-scroller-" + i +
 						"[" + colsetidAttr + "=" + i +"]");
 				scrollerContents[i] = put(scroller, "div.dgrid-column-set-scroller-content");
 				listen(scroller, "scroll", onScroll);
