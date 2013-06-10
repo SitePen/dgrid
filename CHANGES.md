@@ -19,6 +19,12 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ## Other changes and fixes
 
+### Mixins
+
+* Resolved an issue in the `ColumnSet` mixin which caused some browsers to block
+  clicks near the bottom of the grid when no ColumnSet scrollbars are shown.
+  (#571)
+
 ### Extensions
 
 * The `DijitRegistry` extension now implements an `isLeftToRight` method, to
