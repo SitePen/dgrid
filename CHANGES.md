@@ -7,6 +7,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ### General/Core
 
+* The `dgrid-sort` event now emits off of the original target of the event which
+  triggered it, rather than always off of the header cell. (#539)
 * Fixed a regression (present since 0.3.5) in `OnDemandList` which prevented
   `noDataMessage` from being displayed for async stores. (#519)
 
