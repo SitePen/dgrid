@@ -8,7 +8,7 @@ define([
 	"put-selector/put",
 	"xstyle/css!../css/extensions/ColumnReorder.css"
 ], function(lang, declare, arrayUtil, on, query, DndSource, put){
-	var dndTypeRx = /-(\d+)(?:-(\d+))?$/; // used to determine subrow from dndType
+	var dndTypeRx = /(\d+)(?:-(\d+))?$/; // used to determine subrow from dndType
 	
 	// The following 2 functions are used by onDropInternal logic for
 	// retrieving/modifying a given subRow.  The `match` variable in each is
@@ -31,7 +31,7 @@ define([
 
 	// Builds a prefix for a dndtype value based on a grid id.
 	function makeDndTypePrefix(gridId) {
-		return "dgrid-" + gridId;
+		return "dgrid-" + gridId + '-';
 	}
 
 	// Removes the grid id prefix from a dndtype value.  This allows the grid id to contain
@@ -156,7 +156,7 @@ define([
 		},
 		
 		renderHeader: function(){
-			var dndTypePrefix = makeDndTypePrefix(this.id) + "-",
+			var dndTypePrefix = makeDndTypePrefix(this.id),
 				csLength, cs;
 			
 			this.inherited(arguments);
