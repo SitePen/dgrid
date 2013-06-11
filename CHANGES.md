@@ -16,6 +16,9 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 * Fixed a regression in the `ColumnResizer` extension where columns were no
   longer appropriately adjusted when the first resize occurred. (#526)
+* Revised the previous workaround for IE8 in the `ColumnHider` extension to
+  an alternative which involves less code and avoids an issue when all columns
+  are hidden. (#537)
 
 ## Other changes and fixes
 
