@@ -22,6 +22,12 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ## Other changes and fixes
 
+### General/Core
+
+* Fixed issues in `OnDemandList` and the `Pagination` extension where
+  `noDataMessage` could potentially appear multiple times for successive
+  empty query results. (#542)
+
 ### Mixins
 
 * Resolved an issue in the `ColumnSet` mixin which caused some browsers to block
