@@ -25,6 +25,13 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
   clicks near the bottom of the grid when no ColumnSet scrollbars are shown.
   (#571)
 
+### Column Plugins
+
+* Resolved an infinite-recursion issue in `selector`, observable when used in
+  conjunction with the `ColumnReorder` extension. (#525)
+* Resolved an issue in `selector` where rows that should be unselectable were
+  still selectable by clicking within the selector column. (#545)
+
 ### Extensions
 
 * The `DijitRegistry` extension now implements an `isLeftToRight` method, to
