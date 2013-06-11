@@ -133,11 +133,11 @@ function(kernel, declare, Deferred, listen, aspect, query, has, miscUtil, put, h
 		},
 		columnSets: [],
 		createRowCells: function(tag, each){
-			var row = put("table.dgrid-row-table[row=presentation]");
-			var tr = put(row, "tbody tr[row=presentation]");
+			var row = put("table.dgrid-row-table[role=presentation]");
+			var tr = put(row, "tbody tr[role=presentation]");
 			for(var i = 0, l = this.columnSets.length; i < l; i++){
 				// iterate through the columnSets
-				var cell = put(tr, tag + ".dgrid-column-set-cell.dgrid-column-set-" + i + "[row=presentation]" +
+				var cell = put(tr, tag + ".dgrid-column-set-cell.dgrid-column-set-" + i + "[role=presentation]" +
 					" div.dgrid-column-set[" + colsetidAttr + "=" + i + "]");
 				cell.appendChild(this.inherited(arguments, [tag, each, this.columnSets[i]]));
 			}
