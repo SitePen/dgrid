@@ -357,6 +357,10 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 					
 					Deferred.when(results.total, function(total){
 						if(!total){
+							if(grid.noDataNode){
+								put(grid.noDataNode, "!");
+								delete grid.noDataNode;
+							}
 							// If there are no results, display the no data message.
 							grid.noDataNode = put(grid.contentNode, "div.dgrid-no-data");
 							grid.noDataNode.innerHTML = grid.noDataMessage;
