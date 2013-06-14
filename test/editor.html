@@ -37,9 +37,10 @@
 			
 			require(["dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Keyboard", "dgrid/editor",
 					"dojo/_base/lang", "dojo/_base/declare", "dojo/on", "dojo/dom-construct",
-					"dojo/store/Memory", "dojo/store/Observable", "dojo/data/ObjectStore", "dojo/domReady!"],
+					"dojo/store/Memory", "dojo/store/Observable", "dojo/data/ObjectStore",
+					"dgrid/test/data/DeferredWrapper", "dojo/domReady!"],
 				function(Grid, Selection, Keyboard, editor,
-						lang, declare, on, domConstruct, Memory, Observable, ObjectStore){
+						lang, declare, on, domConstruct, Memory, Observable, ObjectStore, DeferredWrapper){
 					var today = new Date(),
 						form = document.getElementById("editorForm"),
 						typesArea = document.getElementById("editorComponentTypes"),
@@ -218,10 +219,17 @@
 							editOn = getSelected(form.elements.editOn),
 							deps = editorType.indexOf("/") > -1 ? [editorType] : [],
 							data = [],
+							async = form.elements.async.checked,
+							store,
 							i;
 						
-						for (i = 0; i < 100; i++){
+						for (i = 0; i < 200; i++){
 							data.push(lang.mixin(options.generate(i), { id: i }));
+						}
+						
+						store = new TestStore({ data: data });
+						if(async){
+							store = new DeferredWrapper(store, 100);
 						}
 						
 						require(deps, function(ctor){
@@ -240,10 +248,11 @@
 							
 							if(!grid){
 								grid = new CustomGrid({
-									store: Observable(new TestStore({ data: data })),
+									store: store,
 									columns: {
 										"editor": editor(lang.mixin({}, options.column, columnArgs))
-									}
+									},
+									farOffRemoval: async ? 400 : Infinity
 								}, "grid");
 							}else{
 								// instead of destroying/recreating, just reset store + columns
@@ -307,6 +316,7 @@
 			<p><label><input type="checkbox" name="cancelDataChange" value="false"> cancel dgrid-datachange</label></p>
 			<p><label><input type="checkbox" name="customRenderCell" value="true"> use custom renderCell</label></p>
 			<p><label><input type="checkbox" name="customFormatter" value="true"> use custom formatter (note: customRenderCell supersedes this setting)</label></p>
+			<p><label><input type="checkbox" name="async" value="true"> use async store</label></p>
 			<div><button type="submit" id="editorFormSubmit">Recreate Grid</button></div>
 		</form>
 		<div id="grid"></div>
