@@ -14,6 +14,10 @@ function(kernel, arrayUtil, on, aspect, has, put){
 		// accept type as argument to Selector function, or from column def
 		column.selectorType = type = type || column.selectorType || "checkbox";
 		column.sortable = false;
+
+		function disabled(item) {
+			return !grid.allowSelect(grid.row(item));
+		}
 		
 		function changeInput(value){
 			// creates a function that modifies the input on an event
@@ -121,20 +125,21 @@ function(kernel, arrayUtil, on, aspect, has, put){
 
 				// Wrap allowSelect to consult both the original allowSelect and disabled
 				grid.allowSelect = function(row){
-					return originalAllowSelect.call(this, row) &&
-						!originalDisabled.call(column, row.data);
+					var allow = originalAllowSelect.call(this, row);
+
+					if (originalDisabled === disabled) {
+						return allow;
+					} else {
+						return allow && !originalDisabled.call(column, row.data);
+					}
 				};
 
 				// Then wrap disabled to simply call the new allowSelect
-				column.disabled = function(item){
-					return !grid.allowSelect(grid.row(item));
-				};
+				column.disabled = disabled;
 			}else{
 				// If no disabled function was specified, institute a default one
 				// which honors allowSelect
-				column.disabled = function(item){
-					return !grid.allowSelect(grid.row(item));
-				};
+				column.disabled = disabled;
 			}
 			// register listeners to the select and deselect events to change the input checked value
 			listeners.push(grid.on("dgrid-select", changeInput(true)));

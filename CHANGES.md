@@ -7,6 +7,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ### General/Core
 
+* The `dgrid-sort` event now emits off of the original target of the event which
+  triggered it, rather than always off of the header cell. (#539)
 * Fixed a regression (present since 0.3.5) in `OnDemandList` which prevented
   `noDataMessage` from being displayed for async stores. (#519)
 
@@ -14,8 +16,30 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 * Fixed a regression in the `ColumnResizer` extension where columns were no
   longer appropriately adjusted when the first resize occurred. (#526)
+* Revised the previous workaround for IE8 in the `ColumnHider` extension to
+  an alternative which involves less code and avoids an issue when all columns
+  are hidden. (#537)
 
 ## Other changes and fixes
+
+### General/Core
+
+* Fixed issues in `OnDemandList` and the `Pagination` extension where
+  `noDataMessage` could potentially appear multiple times for successive
+  empty query results. (#542)
+
+### Mixins
+
+* Resolved an issue in the `ColumnSet` mixin which caused some browsers to block
+  clicks near the bottom of the grid when no ColumnSet scrollbars are shown.
+  (#571)
+
+### Column Plugins
+
+* Resolved an infinite-recursion issue in `selector`, observable when used in
+  conjunction with the `ColumnReorder` extension. (#525)
+* Resolved an issue in `selector` where rows that should be unselectable were
+  still selectable by clicking within the selector column. (#545)
 
 ### Extensions
 
