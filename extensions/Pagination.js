@@ -93,7 +93,10 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 				var sizeSelect = put(paginationNode, 'select.dgrid-page-size'),
 					i;
 				for(i = 0; i < pageSizeOptions.length; i++){
-					put(sizeSelect, 'option', pageSizeOptions[i], {value: pageSizeOptions[i]});
+					put(sizeSelect, 'option', pageSizeOptions[i], {
+						value: pageSizeOptions[i],
+						selected: this.rowsPerPage === pageSizeOptions[i]
+					});
 				}
 				this._listeners.push(on(sizeSelect, "change", function(){
 					grid.rowsPerPage = +sizeSelect.value;
