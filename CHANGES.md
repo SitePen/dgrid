@@ -45,6 +45,9 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 * The `DijitRegistry` extension now implements an `isLeftToRight` method, to
   accommodate needs of Dijit layout widgets in Dojo 1.9. (#536)
+* The `Pagination` extension now properly initializes the page size drop-down
+  based on the initial `rowsPerPage` value, if one matches.
+  (#577, thanks Gordon Smith)
 
 # 0.3.7
 
