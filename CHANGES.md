@@ -38,6 +38,9 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 * Resolved an infinite-recursion issue in `selector`, observable when used in
   conjunction with the `ColumnReorder` extension. (#525)
+* Resolved an issue in `selector` where selectors would not work in cases where
+  the initial column structure did not contain a selector column, but the
+  structure was later changed to include one. (#533)
 * Resolved an issue in `selector` where rows that should be unselectable were
   still selectable by clicking within the selector column. (#545)
 
