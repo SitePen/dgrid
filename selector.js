@@ -31,7 +31,7 @@ function(kernel, arrayUtil, on, aspect, has, put){
 					var element = grid.cell(rows[i], column.id).element;
 					if(!element){ continue; } // skip if row has been entirely removed
 					element = (element.contents || element).input;
-					if(!element.disabled){
+					if(element && !element.disabled){
 						// only change the value if it is not disabled
 						element.checked = value;
 						element.setAttribute("aria-checked", value);
