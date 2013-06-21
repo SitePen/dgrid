@@ -71,6 +71,13 @@ function(declare, domGeometry, registry){
 			// summary:
 			//		dgrid doesn't support watch; this is a no-op for compatibility with
 			//		some Dijit layout widgets which assume its existence.
+		},
+		
+		getParent: function(){
+			// summary:
+			//		Analogue of _WidgetBase#getParent for compatibility with for example
+			//		dijit._KeyNavContainer.
+			return registry.getEnclosingWidget(this.domNode.parentNode);
 		}
 	});
 });
