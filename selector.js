@@ -106,10 +106,14 @@ function(kernel, arrayUtil, on, aspect, has, put){
 		function setupSelectionEvents(){
 			// register one listener at the top level that receives events delegated
 			grid._hasSelectorInputListener = true;
-			listeners.push(aspect.before(grid, "_initSelectionEvents", function(){
-				// listen for clicks and keydown as the triggers
-				this.on(".dgrid-selector:click,.dgrid-selector:keydown", onSelect);
-			}));
+			if (grid._selectionEventsInitialized) {
+				listeners.push(grid.on(".dgrid-selector:click,.dgrid-selector:keydown", onSelect));
+			} else {
+				listeners.push(aspect.before(grid, "_initSelectionEvents", function(){
+					// listen for clicks and keydown as the triggers
+					this.on(".dgrid-selector:click,.dgrid-selector:keydown", onSelect);
+				}));
+			}
 			var handleSelect = grid._handleSelect;
 			grid._handleSelect = function(event){
 				// ignore the default select handler for events that originate from the selector column

@@ -129,6 +129,8 @@ return declare(null, {
 	//		setting this property to either true or false will explicitly set the
 	//		behavior regardless of selectionMode.
 	allowTextSelection: undefined,
+
+	_selectionEventsInitialized: false,
 	
 	create: function(){
 		this.selection = {};
@@ -318,6 +320,8 @@ return declare(null, {
 				if(row && (row.id in this.selection)){ this.deselect(rowElement); }
 			}
 		});
+
+		this._selectionEventsInitialized = true;
 	},
 	
 	allowSelect: function(row){
