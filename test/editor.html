@@ -126,17 +126,6 @@
 								} }
 							},
 							{
-								label: "dijit/Editor",
-								generate: generateText,
-								column: {
-									renderCell: function(object, data){
-										// this editor supports rich text; don't escape HTML in view
-										return domConstruct.create("div", { innerHTML: data });
-									},
-									editorArgs: { style: "height: 100px;" }
-								}
-							},
-							{
 								label: "text input combining first/last name",
 								editor: "text",
 								generate: generateName,
