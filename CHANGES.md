@@ -18,9 +18,6 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 * Fixed a regression in the `ColumnResizer` extension where columns were no
   longer appropriately adjusted when the first resize occurred. (#526)
-* Revised the previous workaround for IE8 in the `ColumnHider` extension to
-  an alternative which involves less code and avoids an issue when all columns
-  are hidden. (#537)
 
 ## Other changes and fixes
 
@@ -48,6 +45,9 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ### Extensions
 
+* Revised the previous workaround for IE8 in the `ColumnHider` extension to
+  an alternative which involves less code and avoids an issue when all columns
+  are hidden. (#537)
 * The `DijitRegistry` extension now implements the `isLeftToRight` method, to
   accommodate needs of Dijit layout widgets in Dojo 1.9. (#536)
 * The `DijitRegistry` extension now implements the `getParent` method, to
