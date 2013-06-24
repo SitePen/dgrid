@@ -11,6 +11,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
   triggered it, rather than always off of the header cell. (#539)
 * Fixed a regression (present since 0.3.5) in `OnDemandList` which prevented
   `noDataMessage` from being displayed for async stores. (#519)
+* `_StoreMixin` (used by `OnDemandList`, `OnDemandGrid`, and `Pagination`) now
+  supports calling the `set` method of Stateful objects during `save`.  (#563)
 
 ### Extensions
 
