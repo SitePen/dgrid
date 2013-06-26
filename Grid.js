@@ -151,7 +151,11 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 				if(column.get){
 					data = column.get(object);
 				}else if("field" in column && column.field != "_item"){
-					data = data[column.field];
+					//Get a property from a dot-separated string
+					var parts = column.field.split("."), i = 0;
+					while(data && (p = parts[i++])){
+						data = data[p];
+					}
 				}
 				
 				if(column.renderCell){

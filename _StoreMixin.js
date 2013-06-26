@@ -164,7 +164,7 @@ function(kernel, declare, lang, Deferred, listen, aspect, put){
 			if(!dirtyObj){
 				dirtyObj = dirty[id] = {};
 			}
-			dirtyObj[field] = value;
+			lang.setObject(field, value, dirtyObj);
 		},
 		setDirty: function(id, field, value){
 			kernel.deprecated("setDirty(...)", "use updateDirty() instead", "dgrid 1.0");
@@ -198,9 +198,7 @@ function(kernel, declare, lang, Deferred, listen, aspect, put){
 						object.set(dirtyObj);
 					} else {
 						// Copy dirty props to the original, applying setters if applicable
-						for(key in dirtyObj){
-							object[key] = dirtyObj[key];
-						}
+						mergeObjects(object, dirtyObj);
 					}
 
 					// Apply any set methods in column definitions.
@@ -294,4 +292,17 @@ function(kernel, declare, lang, Deferred, listen, aspect, put){
 			return this.inherited(arguments);
 		}
 	});
+	
+	function mergeObjects(obj1, obj2) {
+		for(var p in obj2) {
+			if(obj1.hasOwnProperty(p)) {
+				if(Object.prototype.toString.call(obj1[p]) === "[object Object]"){
+					obj1[p] = mergeObjects(obj1[p], obj2[p]);
+				}else{
+					obj1[p] = obj2[p];
+				}
+			}
+		}
+		return obj1;
+	}
 });

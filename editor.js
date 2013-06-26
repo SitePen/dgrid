@@ -302,6 +302,18 @@ function showEditor(cmp, column, cellElement, value){
 	}
 }
 
+function existsInNested(field, obj) {
+	var parts = field.split(".");
+
+	for(var i = 0, l = parts.length; i < l; i++){
+		if(!obj.hasOwnProperty(parts[i])){
+			return false;
+		}
+		obj = obj[parts[i]];
+	}
+	return true;
+}
+
 function edit(cell) {
 	// summary:
 	//		Method to be mixed into grid instances, which will show/focus the
@@ -328,8 +340,8 @@ function edit(cell) {
 			activeCell = cellElement;
 			row = cell.row;
 			dirty = this.dirty && this.dirty[row.id];
-			value = (dirty && field in dirty) ? dirty[field] :
-				column.get ? column.get(row.data) : row.data[field];
+			value = (dirty && existsInNested(field, dirty)) ? lang.getObject(field, false, dirty) :
+		        column.get ? column.get(row.data) : lang.getObject(field, false, row.data);
 			
 			showEditor(column.editorInstance, column, cellElement, value);
 			
