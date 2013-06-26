@@ -14,7 +14,7 @@ define([
 // Variables to track info for cell currently being edited (editOn only).
 var activeCell, activeValue, activeOptions;
 
-var previouslyFocused, previouslyBlurred, previouslyFocusedRowId, saveDfd;
+var previouslyFocused, previouslyBlurred, previouslyFocusedRowId, saveDfd, previouslyBlurredCell, previouslyBlurredRow;
 
 function updateInputValue(input, value){
 	// common code for updating value of a standard input
@@ -204,13 +204,13 @@ function createEditor(column){
 
 	// If we have a previously focused node, set up 
 	on(node, "blur", function () {
-		var previouslyBlurredCell = previouslyBlurred ? grid.cell(previouslyBlurred) : null,
-			handle, previouslyFocusedCell, previouslyFocusedRow;
+		var handle, previouslyFocusedCell, previouslyFocusedRow;
 
 		if (column.autoSave) {
 			if (!previouslyBlurredCell || !grid._updating[previouslyFocusedRowId ? previouslyFocusedRowId : -1]) {
 				previouslyBlurred = node;
 				previouslyFocusedRow = grid.row(node);
+				previouslyBlurredCell = grid.cell(node);
 
 				if (previouslyFocusedRow) {
 					previouslyFocusedRowId = previouslyFocusedRow.id;
@@ -226,6 +226,9 @@ function createEditor(column){
 							(element.input || element.widget).focus();
 							previouslyFocused = null;
 							previouslyBlurred = null;
+							previouslyBlurredCell = null;
+							previouslyBlurredRow = null;
+							previouslyFocusedRowId = null;
 							handle.remove();
 						});
 					}, true);
