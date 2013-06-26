@@ -220,7 +220,11 @@ function createSharedEditor(column, originalRenderCell){
 			cancelable: false
 		});
 		// Remove the editor from the cell, to be reused later.
-		parentNode.removeChild(node);
+		try{
+			parentNode.removeChild(node);
+		}catch(e){
+			// empty catch block; prevent WebKit from throwing DOM Exception 8
+		}
 		
 		put(cell.element, "!dgrid-cell-editing");
 		
