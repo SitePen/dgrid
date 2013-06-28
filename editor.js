@@ -377,10 +377,10 @@ return function(column, editor, editOn){
 	
 	isWidget = typeof editor != "string";
 	
-	// warn for widgetArgs -> editorArgs; TODO: remove @ 1.0
+	// warn for widgetArgs -> editorArgs; TODO: remove @ 0.4
 	if(column.widgetArgs){
 		kernel.deprecated("column.widgetArgs", "use column.editorArgs instead",
-			"dgrid 1.0");
+			"dgrid 0.4");
 		column.editorArgs = column.widgetArgs;
 	}
 	

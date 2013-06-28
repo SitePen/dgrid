@@ -134,7 +134,7 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 				// Check for initial class or className in params or on domNode
 				cls = params["class"] || params.className || domNode.className;
 				
-				// handle sort param - TODO: revise @ 1.0 when _sort -> sort
+				// handle sort param - TODO: revise @ 0.4 when _sort -> sort
 				this._sort = params.sort || [];
 				delete this.sort; // ensure back-compat method isn't shadowed
 			}else{
@@ -808,9 +808,9 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 				this.renderArray(this._lastCollection);
 			}
 		},
-		// TODO: remove the following two (and rename _sort to sort) in 1.0
+		// TODO: remove the following two (and rename _sort to sort) in 0.4
 		sort: function(property, descending){
-			kernel.deprecated("sort(...)", 'use set("sort", ...) instead', "dgrid 1.0");
+			kernel.deprecated("sort(...)", 'use set("sort", ...) instead', "dgrid 0.4");
 			this.set("sort", property, descending);
 		},
 		_getSort: function(){
@@ -838,7 +838,7 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 			}
 		},
 		setShowHeader: function(show){
-			kernel.deprecated("setShowHeader(...)", 'use set("showHeader", ...) instead', "dgrid 1.0");
+			kernel.deprecated("setShowHeader(...)", 'use set("showHeader", ...) instead', "dgrid 0.4");
 			this.set("showHeader", show);
 		},
 		

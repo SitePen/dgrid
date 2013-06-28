@@ -171,7 +171,7 @@ return declare(null, {
 		this._setAllowTextSelection(this.allowTextSelection);
 	},
 	setSelectionMode: function(mode){
-		kernel.deprecated("setSelectionMode(...)", 'use set("selectionMode", ...) instead', "dgrid 1.0");
+		kernel.deprecated("setSelectionMode(...)", 'use set("selectionMode", ...) instead', "dgrid 0.4");
 		this.set("selectionMode", mode);
 	},
 	

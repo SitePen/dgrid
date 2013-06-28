@@ -258,7 +258,7 @@ function(kernel, declare, lang, Deferred, listen, aspect, query, has, miscUtil, 
 			this._updateColumns();
 		},
 		setColumnSets: function(columnSets){
-			kernel.deprecated("setColumnSets(...)", 'use set("columnSets", ...) instead', "dgrid 1.0");
+			kernel.deprecated("setColumnSets(...)", 'use set("columnSets", ...) instead', "dgrid 0.4");
 			this.set("columnSets", columnSets);
 		}
 	});

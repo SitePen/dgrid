@@ -9,7 +9,7 @@ function(kernel, arrayUtil, on, aspect, has, put){
 		
 		if(column.type){
 			column.selectorType = column.type;
-			kernel.deprecated("columndef.type", "use columndef.selectorType instead", "dgrid 1.0");
+			kernel.deprecated("columndef.type", "use columndef.selectorType instead", "dgrid 0.4");
 		}
 		// accept type as argument to Selector function, or from column def
 		column.selectorType = type = type || column.selectorType || "checkbox";
