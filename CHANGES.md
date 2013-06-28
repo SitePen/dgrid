@@ -14,6 +14,11 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 * `_StoreMixin` (used by `OnDemandList`, `OnDemandGrid`, and `Pagination`) now
   supports calling the `set` method of Stateful objects during `save`.  (#563)
 
+### Column Plugins
+
+* Resolved an infinite-recursion regression in `selector`, observable when used
+  in conjunction with the `ColumnReorder` extension. (#525)
+
 ### Extensions
 
 * Fixed a regression in the `ColumnResizer` extension where columns were no
@@ -35,8 +40,6 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ### Column Plugins
 
-* Resolved an infinite-recursion issue in `selector`, observable when used in
-  conjunction with the `ColumnReorder` extension. (#525)
 * Resolved an issue in `selector` where selectors would not work in cases where
   the initial column structure did not contain a selector column, but the
   structure was later changed to include one. (#533)
