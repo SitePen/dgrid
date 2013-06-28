@@ -285,6 +285,12 @@
         "title": "Test Selection",
         "parent": ""
     },
+	{
+		"name": "Focus_row_updates.html",
+		"url": "Focus_row_updates.html",
+		"title": "Test Focus with store notifications",
+		"parent": ""
+	},
     {
         "name": "selector.html",
         "url": "selector.html",
