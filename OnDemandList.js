@@ -445,7 +445,8 @@ return declare([List, _StoreMixin], {
 						preload.count -= offset;
 					}
 					options.start = preloadNode.rowIndex - queryRowsOverlap;
-					preloadNode.rowIndex += count;
+					options.count = Math.min(count + queryRowsOverlap, grid.maxRowsPerPage);
+					preloadNode.rowIndex = options.start + options.count;
 				}else{
 					// add new rows above
 					if(preload.next){
@@ -465,8 +466,8 @@ return declare([List, _StoreMixin], {
 						
 					}
 					options.start = preload.count;
+					options.count = Math.min(count + queryRowsOverlap, grid.maxRowsPerPage);
 				}
-				options.count = Math.min(count + queryRowsOverlap, grid.maxRowsPerPage);
 				if(keepScrollTo && beforeNode && beforeNode.offsetWidth){
 					keepScrollTo = beforeNode.offsetTop;
 				}
