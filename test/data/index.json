@@ -285,6 +285,12 @@
         "title": "Test Selection",
         "parent": ""
     },
+	{
+		"name": "Selection_row_updates.html",
+		"url": "Selection_row_updates.html",
+		"title": "Test Selection with store notifications",
+		"parent": ""
+	},
     {
         "name": "selector.html",
         "url": "selector.html",
