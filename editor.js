@@ -14,6 +14,8 @@ define([
 // Variables to track info for cell currently being edited (editOn only).
 var activeCell, activeValue, activeOptions;
 
+var previouslyFocused, previouslyBlurred, previouslyFocusedRowId, saveDfd, previouslyBlurredCell, previouslyBlurredRow;
+
 function updateInputValue(input, value){
 	// common code for updating value of a standard input
 	input.value = value;
@@ -76,7 +78,14 @@ function setProperty(grid, cellElement, oldValue, value, triggerEvent){
 					grid.updateDirty(row.id, column.field, value);
 					// perform auto-save (if applicable) in next tick to avoid
 					// unintentional mishaps due to order of handler execution
-					column.autoSave && setTimeout(function(){ grid._trackError("save"); }, 0);
+					column.autoSave && setTimeout(function(){
+						grid._trackError("save").then(function () {
+							if (saveDfd) {
+								saveDfd.resolve();
+								saveDfd = null;
+							}
+						});
+					}, 0);
 				}
 			}else{
 				// Otherwise keep the value the same
@@ -182,7 +191,51 @@ function createEditor(column){
 	// XXX: stop mousedown propagation to prevent confusing Keyboard mixin logic
 	// with certain widgets; perhaps revising KB's `handledEvent` would be better.
 	on(node, "mousedown", function(evt){ evt.stopPropagation(); });
-	
+
+	on(node, "focus", function () {
+		// Save previously focused node for later use.
+		previouslyFocused = node;
+
+		// Select the contents of the editor.
+		if (node.select && typeof node.select === "function") {
+			node.select();
+		}
+	});
+
+	// If we have a previously focused node, set up 
+	on(node, "blur", function () {
+		var handle, previouslyFocusedCell, previouslyFocusedRow;
+
+		if (column.autoSave) {
+			if (!previouslyBlurredCell || !grid._updating[previouslyFocusedRowId ? previouslyFocusedRowId : -1]) {
+				previouslyBlurred = node;
+				previouslyFocusedRow = grid.row(node);
+				previouslyBlurredCell = grid.cell(node);
+
+				if (previouslyFocusedRow) {
+					previouslyFocusedRowId = previouslyFocusedRow.id;
+				}
+
+			} else {
+				previouslyFocusedCell = grid.cell(previouslyFocused);
+
+				if (previouslyFocusedCell) {
+					handle = aspect.after(previouslyFocusedCell.column, "renderCell", function (data, type, element) {
+						saveDfd = new Deferred();
+						saveDfd.then(function () {
+							(element.input || element.widget).focus();
+							previouslyFocused = null;
+							previouslyBlurred = null;
+							previouslyBlurredCell = null;
+							previouslyBlurredRow = null;
+							previouslyFocusedRowId = null;
+							handle.remove();
+						});
+					}, true);
+				}
+			}
+		}
+	});
 	return cmp;
 }
 
