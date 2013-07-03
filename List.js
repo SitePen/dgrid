@@ -382,21 +382,21 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 			}
 		},
 		adjustRowIndices: function(firstRow){
-			if(this.maintainOddEven){
-				// this traverses through rows to maintain odd/even classes on the rows when indexes shift;
-				var next = firstRow;
-				var rowIndex = next.rowIndex;
-				if(rowIndex > -1){ // make sure we have a real number in case this is called on a non-row
-					do{
-						if(next.rowIndex > -1){
-							// skip non-numeric, non-rows
+			// this traverses through rows to maintain odd/even classes on the rows when indexes shift;
+			var next = firstRow;
+			var rowIndex = next.rowIndex;
+			if(rowIndex > -1){ // make sure we have a real number in case this is called on a non-row
+				do{
+					if(next.rowIndex > -1){
+						// skip non-numeric, non-rows
+						if(this.maintainOddEven){
 							if((next.className + ' ').indexOf("dgrid-row ") > -1){
 								put(next, '.' + (rowIndex % 2 == 1 ? oddClass : evenClass) + '!' + (rowIndex % 2 == 0 ? oddClass : evenClass));
 							}
-							next.rowIndex = rowIndex++;
 						}
-					}while((next = next.nextSibling) && next.rowIndex != rowIndex);
-				}
+						next.rowIndex = rowIndex++;
+					}
+				}while((next = next.nextSibling) && next.rowIndex != rowIndex);
 			}
 		},
 		renderArray: function(results, beforeNode, options){
