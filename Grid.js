@@ -1,5 +1,5 @@
-define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/on", "dojo/has", "put-selector/put", "./List", "dojo/_base/sniff"],
-function(kernel, declare, listen, has, put, List){
+define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/on", "dojo/has", "put-selector/put", "./List", "dojo/query", "dojo/_base/sniff"],
+function(kernel, declare, listen, has, put, List, query){
 	var contentBoxSizing = has("ie") < 8 && !has("quirks");
 	var invalidClassChars = /[^\._a-zA-Z0-9-]/g;	
 	function appendIfNode(parent, subNode){
@@ -57,13 +57,7 @@ function(kernel, declare, listen, has, put, List){
 				var row = this.row(target),
 					rowElement = row.element;
 				if(rowElement){ 
-					var elements = rowElement.getElementsByTagName("td");
-					for(var i = 0; i < elements.length; i++){
-						if(elements[i].columnId == columnId){
-							element = elements[i];
-							break;
-						}
-					}
+					element = query('.field-' + columnId, rowElement)[0];
 				}
 			}
 			if(target != null){
