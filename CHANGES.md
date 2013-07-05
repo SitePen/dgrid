@@ -18,6 +18,11 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
   when items are modified.  Rows are still deselected if items are removed.
   (#226)
 
+### Column Plugins
+
+* Fixed issues in the `editor` column plugin regarding consistency of
+  dirty data and `dgrid-datachange` event firing for always-on radio buttons.
+
 ### Extensions
 
 * The `ColumnResizer` extension now properly calls the grid's `resize` method,
