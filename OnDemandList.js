@@ -342,17 +342,8 @@ return declare([List, _StoreMixin], {
 						break;
 					}
 					var nextRow = row[traversal]; // have to do this before removing it
-					var lastObserverIndex, currentObserverIndex = row.observerIndex;
-					if(currentObserverIndex != lastObserverIndex && lastObserverIndex > -1){
-						// we have gathered a whole page of observed rows, we can delete them now
-						var observers = grid.observers; 
-						var observer = observers[lastObserverIndex]; 
-						observer && observer.cancel();
-						observers[lastObserverIndex] = 0; // remove it so we don't call cancel twice
-					}
 					reclaimedHeight += rowHeight;
 					count += row.count || 1;
-					lastObserverIndex = currentObserverIndex;
 					// we just do cleanup here, as we will do a more efficient node destruction in the setTimeout below
 					grid.removeRow(row, true);
 					toDelete.push(row);
@@ -549,6 +540,31 @@ return declare([List, _StoreMixin], {
 			Deferred.when(lastRows, function() {
 				refreshDfd.resolve(lastResults);
 			});
+		}
+	},
+
+	removeRow: function(rowElement, justCleanup){
+		if (rowElement) {
+			// Clean up observers that need to be cleaned up.
+			var previousNode = rowElement.previousSibling,
+				nextNode = rowElement.nextSibling,
+				prevIndex = previousNode && previousNode.observerIndex,
+				nextIndex = nextNode && nextNode.observerIndex,
+				thisIndex = rowElement.observerIndex;
+
+			// Clear the observerIndex on the node being removed so it will not be considered any longer.
+			rowElement.observerIndex = undefined;
+
+			// Is this row's observer index different than those on either side?
+			if (thisIndex > -1 && thisIndex !== prevIndex && thisIndex !== nextIndex) {
+				// This is the last row that references the observer index.  Cancel the observer.
+				var observers = this.observers;
+				var observer = observers[thisIndex];
+				observer && observer.cancel();
+				observers[thisIndex] = 0; // remove it so we don't call cancel twice
+			}
+			// Finish the row removal.
+			this.inherited(arguments);
 		}
 	}
 });
