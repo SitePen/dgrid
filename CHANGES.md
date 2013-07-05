@@ -18,6 +18,11 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
   when items are modified.  Rows are still deselected if items are removed.
   (#226)
 
+### Extensions
+
+* The `ColumnResizer` extension now properly calls the grid's `resize` method,
+  even on programmatically-triggered resize operations.
+
 # 0.3.8
 
 ## Significant changes

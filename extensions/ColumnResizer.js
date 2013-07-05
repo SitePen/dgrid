@@ -105,6 +105,7 @@ function resizeColumnWidth(grid, colId, width, parentType){
 
 		// keep a reference for future removal
 		grid._columnSizes[colId] = rule;
+		grid.resize();
 		return true;
 	}
 }
@@ -375,7 +376,6 @@ return declare(null, {
 					resizeColumnWidth(this, lastCol, this.minWidth, e.type);
 				}
 			}
-			this.resize();
 		}
 		resizer.hide();
 		
