@@ -266,7 +266,7 @@
 					
 					on(document.body, "dgrid-datachange", function(evt){
 						console.log(evt.grid.id + " row " + evt.cell.row.id + " data changed" +
-						(event.parentType ? " (via " + event.parentType + "): " : ": "),
+						(evt.parentType ? " (via " + evt.parentType + "): " : ": "),
 						evt.oldValue, " -> ", evt.value);
 
 						if(cancelDataChange){
