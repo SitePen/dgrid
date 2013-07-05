@@ -339,12 +339,13 @@ return declare(null, {
 			this._deselectionSignal = aspect.after(store, "notify", function(object, idToUpdate){
 				var id = idToUpdate || (object && object[this.idProperty || "id"]);
 				if (id) {
-					var row = self.row(id);
+					var row = self.row(id),
+						selection = row && self.selection[row.id];
 					// Is the row currently in the selection list.
-					if(row && (row.id in self.selection)){
+					if(selection){
 						// Ensure consistency between DOM and state on add/put;
 						// prune from selection on remove
-						self[(object ? "" : "de") + "select"](row);
+						self[(object ? "" : "de") + "select"](row, null, selection);
 					}
 				}
 			}, true);

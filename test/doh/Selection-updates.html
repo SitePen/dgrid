@@ -11,14 +11,21 @@
 			"dojo/_base/array",
 			"dojo/_base/lang",
 			"dojo/store/Memory",
+			"dojo/store/Observable",
 			"dgrid/Grid",
 			"dgrid/OnDemandGrid",
 			"dgrid/Selection",
+			"dgrid/CellSelection",
 			"dgrid/extensions/Pagination",
-			"dojo/store/Observable",
 			"dojo/domReady!"
-		], function(doh, declare, arrayUtil, lang, Memory, Grid, OnDemandGrid, Selection, Pagination, Observable){
-
+		], function(doh, declare, arrayUtil, lang, Memory, Observable, Grid, OnDemandGrid, Selection, CellSelection, Pagination){
+			
+			var mixins = {
+					Selection: Selection,
+					CellSelection: CellSelection
+				},
+				tests = [];
+			
 			function _createTestData(size){
 				var data = [], aCode = 'A'.charCodeAt(0);
 				size = size || 15;
@@ -31,7 +38,7 @@
 				}
 				return data;
 			}
-
+			
 			function countProperties(object){
 				var count = 0,
 					key;
@@ -43,200 +50,201 @@
 				}
 				return count;
 			}
-
+			
 			function getColumns(){
 				return {
 					first: "First Name",
 					last: "Last Name"
 				};
 			}
+			
+			arrayUtil.forEach(["Selection", "CellSelection"], function(name){
+				var SelectionMixin = mixins[name];
+				tests = tests.concat([
+					{
+						name: name + " + update",
+						setUp: function(){
+							var store = this.store = Observable(new Memory({
+								data: _createTestData()
+							}));
 
-			doh.register("Selection updates", [
-				{
-					name: "selection + update",
-					setUp: function(){
-						var store = this.store = Observable(new Memory({
-							data: _createTestData()
-						}));
-
-						var grid = this.grid = new declare([OnDemandGrid, Selection])({
-							columns: getColumns(),
-							store: store,
-							sort: 'id',
-							selectionMode: "multiple"
-						});
-						document.body.appendChild(grid.domNode);
-						grid.startup();
-					},
-					runTest: function(doh){
-						var grid = this.grid,
-							store = this.store;
-
-						grid.select(3);
-						grid.select(4);
-						grid.select(5);
-						grid.select(6);
-						grid.select(7);
-
-						var selection = grid.selection;
-						doh.assertTrue(3 in selection);
-						doh.assertTrue(4 in selection);
-						doh.assertTrue(5 in selection);
-						doh.assertTrue(6 in selection);
-						doh.assertTrue(7 in selection);
-
-						store.put({ id: 5, first: "Updated First", last: "Updated Last"});
-						store.put({ id: 99, first: "New First", last: "New Last"});
-
-						doh.assertTrue(3 in selection);
-						doh.assertTrue(4 in selection);
-						doh.assertTrue(5 in selection);
-						doh.assertTrue(6 in selection);
-						doh.assertTrue(7 in selection);
-						doh.assertFalse(99 in selection);
-
-						store.remove(5);
-						doh.assertTrue(3 in selection);
-						doh.assertTrue(4 in selection);
-						doh.assertFalse(5 in selection);
-						doh.assertTrue(6 in selection);
-						doh.assertTrue(7 in selection);
-						doh.assertFalse(99 in selection);
-
-						// Calling remove row does not notify the store so the selection is not updated.
-						grid.row(4).remove();
-						doh.assertTrue(3 in selection);
-						doh.assertTrue(4 in selection);
-						doh.assertFalse(5 in selection);
-						doh.assertTrue(6 in selection);
-						doh.assertTrue(7 in selection);
-						doh.assertFalse(99 in selection);
-					},
-					tearDown: function(){
-						this.grid.destroy();
-					}
-				},
-				{
-					name: "selection + update + no store",
-					setUp: function(){
-						var grid = this.grid = new declare([Grid, Selection])({
-							columns: getColumns(),
-							selectionMode: "multiple"
-						});
-						document.body.appendChild(grid.domNode);
-						grid.startup();
-						grid.renderArray(_createTestData());
-
-					},
-					runTest: function(doh){
-						var grid = this.grid;
-
-						grid.select(3);
-						grid.select(4);
-						grid.select(5);
-						grid.select(6);
-						grid.select(7);
-
-						var selection = grid.selection;
-						doh.is(5, countProperties(selection));
-						doh.assertTrue(3 in selection);
-						doh.assertTrue(4 in selection);
-						doh.assertTrue(5 in selection);
-						doh.assertTrue(6 in selection);
-						doh.assertTrue(7 in selection);
-
-						grid.row(4).remove();
-						doh.is(4, countProperties(selection));
-						doh.assertTrue(3 in selection);
-						doh.assertFalse(4 in selection);
-						doh.assertTrue(5 in selection);
-						doh.assertTrue(6 in selection);
-						doh.assertTrue(7 in selection);
-
-						grid.row(3).remove();
-						doh.is(3, countProperties(selection));
-						doh.assertFalse(3 in selection);
-						doh.assertFalse(4 in selection);
-						doh.assertTrue(5 in selection);
-						doh.assertTrue(6 in selection);
-						doh.assertTrue(7 in selection);
-
-						grid.row(7).remove();
-						doh.is(2, countProperties(selection));
-						doh.assertFalse(3 in selection);
-						doh.assertFalse(4 in selection);
-						doh.assertTrue(5 in selection);
-						doh.assertTrue(6 in selection);
-						doh.assertFalse(7 in selection);
-
-						grid.row(5).remove();
-						grid.row(6).remove();
-						doh.is(0, countProperties(selection));
-					},
-					tearDown: function(){
-						this.grid.destroy();
-					}
-				},
-				{
-					// Create a selection, trigger paging, notify
-					name: "selection + update + store + paging",
-					setUp: function(){
-						var store = this.store = Observable(new Memory({
-							data: _createTestData(100)
-						}));
-						var grid = this.grid = new declare([Grid, Selection, Pagination])({
-							store: store,
-							columns: getColumns(),
-							selectionMode: "multiple"
-						});
-						document.body.appendChild(grid.domNode);
-						grid.startup();
-					},
-					runTest: function(doh){
-						var grid = this.grid,
-							store = this.store;
-
-						function checkSelected(ids){
-							var selection = grid.selection;
-							doh.is(ids.length, countProperties(selection));
-							arrayUtil.forEach(ids, function(id){
-								doh.assertTrue(id in selection);
+							var grid = this.grid = new declare([OnDemandGrid, SelectionMixin])({
+								columns: getColumns(),
+								store: store,
+								sort: 'id'
 							});
+							document.body.appendChild(grid.domNode);
+							grid.startup();
+						},
+						runTest: function(doh){
+							var grid = this.grid,
+								store = this.store;
+							
+							// Using this long-winded approach for the purposes
+							// of the same logic working for both Selection and
+							// CellSelection
+							grid.select(grid.row(3));
+							grid.select(grid.row(4));
+							grid.select(grid.row(5));
+							grid.select(grid.row(6));
+							grid.select(grid.row(7));
+							
+							var selection = grid.selection;
+							doh.is(5, countProperties(selection),
+								"Selection contains the expected number of items");
+							doh.t(selection[3] && selection[4] && selection[5] &&
+								selection[6] && selection[7],
+								"Selection contains the expected items");
+							
+							store.put({ id: 5, first: "Updated First", last: "Updated Last"});
+							store.put({ id: 99, first: "New First", last: "New Last"});
+							
+							doh.t(selection[3] && selection[4] && selection[5] &&
+								selection[6] && selection[7],
+								"Selection still contains the same items");
+							
+							doh.f(selection[99],
+								"Selection does not contain newly-added item");
+							
+							store.remove(5);
+							doh.t(selection[3] && selection[4] && !selection[5] &&
+								selection[6] && selection[7],
+								"Item 5 has been removed from the selection");
+							
+							// Calling remove row does not notify the store so the selection is not updated.
+							grid.row(4).remove();
+							doh.t(selection[3] && selection[4] && !selection[5] &&
+								selection[6] && selection[7],
+								"Selection is unchanged when calling removeRow directly on a store-backed grid");
+						},
+						tearDown: function(){
+							this.grid.destroy();
 						}
-
-						var initSelection = [3, 4, 5, 23, 24, 25];
-						arrayUtil.forEach(initSelection, function(id){
-							grid.select(id);
-						});
-						checkSelected(initSelection);
-
-						grid.gotoPage(4);
-						checkSelected(initSelection);
-
-						grid.gotoPage(1);
-						store.put({ id: 4, first: "Updated First", last: "Updated Last"});
-						checkSelected(initSelection);
-
-						store.put({ id: 24, first: "Updated First", last: "Updated Last"});
-						checkSelected(initSelection);
-
-						store.put({ id: 1999, first: "New First", last: "New Last"});
-						checkSelected(initSelection);
-
-						store.remove(2);
-						checkSelected(initSelection);
-
-						store.remove(3);
-						checkSelected([4, 5, 23, 24, 25]);
-
-						store.remove(25);
-						checkSelected([4, 5, 23, 24]);
 					},
-					tearDown: function(){
-						this.grid.destroy();
+					{
+						name: name + " + update + no store",
+						setUp: function(){
+							var grid = this.grid = new declare([Grid, SelectionMixin])({
+								columns: getColumns()
+							});
+							document.body.appendChild(grid.domNode);
+							grid.startup();
+							grid.renderArray(_createTestData());
+
+						},
+						runTest: function(doh){
+							var grid = this.grid;
+							
+							// Using this long-winded approach for the purposes
+							// of the same logic working for both Selection and
+							// CellSelection
+							grid.select(grid.row(3));
+							grid.select(grid.row(4));
+							grid.select(grid.row(5));
+							grid.select(grid.row(6));
+							grid.select(grid.row(7));
+							
+							var selection = grid.selection;
+							doh.is(5, countProperties(selection),
+								"Selection contains the expected number of items");
+							doh.t(selection[3] && selection[4] && selection[5] &&
+								selection[6] && selection[7],
+								"Selection contains the expected items");
+							
+							grid.row(4).remove();
+							doh.is(4, countProperties(selection),
+								"Selection contains 1 fewer items after removal of selected item");
+							doh.t(selection[3] && !selection[4] && selection[5] &&
+								selection[6] && selection[7],
+								"Item 4 has been removed from the selection");
+							
+							grid.row(1).remove();
+							doh.is(4, countProperties(selection),
+								"Selection is unchanged after removal of unselected item");
+							doh.t(selection[3] && !selection[4] && selection[5] &&
+								selection[6] && selection[7],
+								"Selection is unchanged after removal of unselected item");
+							
+							grid.row(3).remove();
+							doh.is(3, countProperties(selection),
+								"Selection contains 1 fewer items after removal of selected item");
+							doh.t(!selection[3] && !selection[4] && selection[5] &&
+								selection[6] && selection[7],
+								"Item 3 has been removed from the selection");
+							
+							grid.row(5).remove();
+							grid.row(6).remove();
+							grid.row(7).remove();
+							doh.is(0, countProperties(selection),
+								"No items are selected after all selected items have been removed");
+						},
+						tearDown: function(){
+							this.grid.destroy();
+						}
+					},
+					{
+						// Create a selection, trigger paging, notify
+						name: name + " + update + store + paging",
+						setUp: function(){
+							var store = this.store = Observable(new Memory({
+								data: _createTestData(100)
+							}));
+							var grid = this.grid = new declare([Grid, SelectionMixin, Pagination])({
+								store: store,
+								columns: getColumns()
+							});
+							document.body.appendChild(grid.domNode);
+							grid.startup();
+						},
+						runTest: function(doh){
+							var grid = this.grid,
+								store = this.store;
+
+							function checkSelected(ids){
+								var selection = grid.selection;
+								doh.is(ids.length, countProperties(selection),
+									"Selection contains the expected number of items");
+								doh.t(arrayUtil.every(ids, function(id){
+									return id in selection;
+								}), "Selection contains the expected items");
+							}
+
+							var initSelection = [3, 4, 5, 23, 24, 25];
+							arrayUtil.forEach(initSelection, function(id){
+								grid.select(grid.row(id));
+							});
+							checkSelected(initSelection);
+
+							grid.gotoPage(4);
+							checkSelected(initSelection);
+
+							grid.gotoPage(1);
+							store.put({ id: 4, first: "Updated First", last: "Updated Last"});
+							checkSelected(initSelection);
+
+							store.put({ id: 24, first: "Updated First", last: "Updated Last"});
+							checkSelected(initSelection);
+
+							store.put({ id: 1999, first: "New First", last: "New Last"});
+							checkSelected(initSelection);
+
+							store.remove(2);
+							checkSelected(initSelection);
+
+							store.remove(3);
+							checkSelected([4, 5, 23, 24, 25]);
+
+							store.remove(25);
+							checkSelected([4, 5, 23, 24]);
+						},
+						tearDown: function(){
+							this.grid.destroy();
+						}
 					}
-				}
-			]);
+				]);
+			});
+			
+			doh.register("Selection updates", tests);
 			doh.run();
 		});
 	</script>
