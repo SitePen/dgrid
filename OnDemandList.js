@@ -540,19 +540,28 @@ return declare([List, _StoreMixin], {
 	},
 
 	removeRow: function(rowElement, justCleanup){
-		if (rowElement) {
+		function chooseIndex(index1, index2){
+			return index1 != null ? index1 : index2;
+		}
+
+		if(rowElement){
 			// Clean up observers that need to be cleaned up.
 			var previousNode = rowElement.previousSibling,
 				nextNode = rowElement.nextSibling,
-				prevIndex = previousNode && previousNode.observerIndex,
-				nextIndex = nextNode && nextNode.observerIndex,
+				prevIndex = previousNode && chooseIndex(previousNode.observerIndex, previousNode.previousObserverIndex),
+				nextIndex = nextNode && chooseIndex(nextNode.observerIndex, nextNode.nextObserverIndex),
 				thisIndex = rowElement.observerIndex;
 
 			// Clear the observerIndex on the node being removed so it will not be considered any longer.
 			rowElement.observerIndex = undefined;
+			if(justCleanup){
+				// Save the indexes from the siblings for future calls to removeRow.
+				rowElement.nextObserverIndex = nextIndex;
+				rowElement.previousObserverIndex = prevIndex;
+			}
 
 			// Is this row's observer index different than those on either side?
-			if (thisIndex > -1 && thisIndex !== prevIndex && thisIndex !== nextIndex) {
+			if(thisIndex > -1 && thisIndex !== prevIndex && thisIndex !== nextIndex){
 				// This is the last row that references the observer index.  Cancel the observer.
 				var observers = this.observers;
 				var observer = observers[thisIndex];

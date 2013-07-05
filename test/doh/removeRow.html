@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>List remove rows</title>
+	<style>
+		.alist {
+			height: 300px;
+		}
+	</style>
+	<script src="../../../dojo/dojo.js" data-dojo-config="async: true"></script>
+	<script>
+		require([
+			"doh",
+			"dojo/_base/lang",
+			"dojo/store/Memory",
+			"dojo/store/Observable",
+			"dojo/query",
+			"dgrid/OnDemandList",
+			"put-selector/put",
+			"dojo/domReady!"
+		], function(doh, lang, Memory, Observable, query, OnDemandList, put){
+
+			function testInitialObservers(list, comment){
+				var observers = list.observers;
+				[true, true, true].forEach(function(test, i){
+					doh.assertTrue(!!observers[i] === test, [comment, "i: " + i + ", test = " + test, observers]);
+				});
+			}
+
+			function countObserverReferences(listId, observerIndex){
+				var count = 0;
+				query(".dgrid-row", listId).forEach(function(row){
+					if(row.observerIndex === observerIndex){
+						count += 1;
+					}
+				});
+				return count;
+			}
+
+			// These tests use width styles because it tends to be one that
+			// browsers won't morph the value of when getting computed style.
+			doh.register("List removeRow", [
+				{
+					name: "OnDemandList w/observers - remove all, clean up only",
+					setUp: function(){
+						var data = [];
+						for(var i = 0; i < 1000; i++){
+							data.push({id: i, value: i});
+						}
+
+						var store = Observable(new Memory({ data: data }));
+						this.list = new OnDemandList({
+							store: store,
+							renderRow: function(object){
+								return put("div", object.value);
+							},
+							minRowsPerPage: 10,
+							maxRowsPerPage: 10
+						}, "list1");
+					},
+					runTest: function(doh){
+						var list = this.list,
+							countRefs = lang.partial(countObserverReferences, "list1");
+						testInitialObservers(list, "Initial");
+						doh.assertEqual(9, countRefs(0));
+						doh.assertEqual(10, countRefs(1));
+						for(var i = 0; i < 8; i++){
+							console.log("iteration ", i);
+							var rowNode = document.getElementById("list1-row-" + i);
+							doh.assertEqual(0, rowNode.observerIndex, "Row's observerIndex");
+							doh.assertEqual(9 - i, countRefs(0), "Iteration " + i + ": observer reference count");
+							list.removeRow(rowNode, true);
+							testInitialObservers(list, "Iteration " + i);
+							doh.assertEqual(8 - i, countRefs(0), "Iteration " + i + ": observer reference count");
+							doh.assertEqual(10, countRefs(1))
+						}
+
+						list.removeRow(document.getElementById("list1-row-8"), true);
+						doh.assertEqual(0, countRefs(0));
+						doh.assertEqual(10, countRefs(1));
+						[false, true, true].forEach(function(test, i){
+							var observers = list.observers;
+							doh.assertTrue(!!observers[i] === test, ["i: " + i + ", test = " + test, observers]);
+						});
+					},
+					tearDown: function(){
+						this.list.destroy();
+					}
+				},
+				{
+					name: "OnDemandList w/observers - remove last 2, clean up only",
+					setUp: function(){
+						var data = [];
+						for(var i = 0; i < 1000; i++){
+							data.push({id: i, value: i});
+						}
+
+						var store = Observable(new Memory({ data: data }));
+						this.list = new OnDemandList({
+							store: store,
+							renderRow: function(object){
+								return put("div", object.value);
+							},
+							minRowsPerPage: 10,
+							maxRowsPerPage: 10
+						}, "list2");
+					},
+					runTest: function(doh){
+						var list = this.list,
+							countRefs = lang.partial(countObserverReferences, "list2");
+						// Removing the last two rows from observer #0 should not cancel the observer.
+						testInitialObservers(list, "Initial");
+						doh.assertEqual(9, countRefs(0));
+						doh.assertEqual(10, countRefs(1));
+
+						list.removeRow(document.getElementById("list2-row-7"), true);
+						testInitialObservers(list, "Removed row 7");
+						doh.assertEqual(8, countRefs(0));
+						doh.assertEqual(10, countRefs(1));
+
+						list.removeRow(document.getElementById("list2-row-8"), true);
+						testInitialObservers(list, "Removed row 8");
+						doh.assertEqual(7, countRefs(0));
+						doh.assertEqual(10, countRefs(1));
+
+						list.removeRow(document.getElementById("list2-row-1"), true);
+						testInitialObservers(list, "Removed row 1");
+						doh.assertEqual(6, countRefs(0));
+						doh.assertEqual(10, countRefs(1));
+
+						list.removeRow(document.getElementById("list2-row-0"), true);
+						testInitialObservers(list, "Removed row 0");
+						doh.assertEqual(5, countRefs(0));
+						doh.assertEqual(10, countRefs(1));
+					},
+					tearDown: function(){
+						this.list.destroy();
+					}
+				}
+			]);
+			doh.run();
+		});
+	</script>
+</head>
+<body>
+	<div class="alist" id="list1"></div>
+	<div class="alist" id="list2"></div>
+</body>
+</html>
