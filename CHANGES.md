@@ -35,6 +35,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ### Extensions
 
+* Fixed an issue with the `ColumnReorder` extension involving grids whose IDs
+  end with a hyphen followed by numbers. (#556)
 * The `ColumnResizer` extension now properly calls the grid's `resize` method,
   even on programmatically-triggered resize operations.
 
