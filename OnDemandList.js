@@ -481,7 +481,6 @@ return declare([List, _StoreMixin], {
 					innerNode = put(loadingNode, "div.dgrid-" + (below ? "below" : "above"));
 				innerNode.innerHTML = grid.loadingMessage;
 				loadingNode.count = count;
-				loadingNode.blockRowIndex = true;
 				// use the query associated with the preload node to get the next "page"
 				options.query = preload.query;
 				// Query now to fill in these rows.
