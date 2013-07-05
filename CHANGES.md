@@ -3,7 +3,20 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 # master (0.3.9-dev)
 
-Coming soon!
+## Significant changes
+
+### Mixins
+
+* The `CellSelection` mixin now supports selecting or deselecting all columns
+  in a row if a row object is passed.
+
+## Other changes and fixes
+
+### Mixins
+
+* The `Selection` and `CellSelection` mixins no longer lose selection of rows
+  when items are modified.  Rows are still deselected if items are removed.
+  (#226)
 
 # 0.3.8
 
