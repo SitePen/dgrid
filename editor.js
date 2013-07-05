@@ -6,10 +6,11 @@ define([
 	"dojo/on",
 	"dojo/aspect",
 	"dojo/has",
+	"dojo/query",
 	"./Grid",
 	"put-selector/put",
 	"dojo/_base/sniff"
-], function(kernel, lang, arrayUtil, Deferred, on, aspect, has, Grid, put){
+], function(kernel, lang, arrayUtil, Deferred, on, aspect, has, query, Grid, put){
 
 // Variables to track info for cell currently being edited (editOn only).
 var activeCell, activeValue, activeOptions;
@@ -102,7 +103,7 @@ function setProperty(grid, cellElement, oldValue, value, triggerEvent){
 
 // intermediary frontend to setProperty for HTML and widget editors
 function setPropertyFromEditor(grid, column, cmp, triggerEvent) {
-	var value;
+	var value, id, editedRow;
 	if(!cmp.isValid || cmp.isValid()){
 		value = setProperty(grid, (cmp.domNode || cmp).parentNode,
 			activeCell ? activeValue : cmp._dgridLastValue,
@@ -112,6 +113,30 @@ function setPropertyFromEditor(grid, column, cmp, triggerEvent) {
 			activeValue = value;
 		}else{ // for always-on editors, update _dgridLastValue immediately
 			cmp._dgridLastValue = value;
+		}
+
+		if(cmp.type === "radio" && cmp.name && !column.editOn && column.field){
+			editedRow = grid.row(cmp);
+			
+			// Update all other rendered radio buttons in the group
+			query("input[type=radio][name=" + cmp.name + "]", grid.contentNode).forEach(function(radioBtn){
+				var row = grid.row(radioBtn);
+				// Only update _dgridLastValue and the dirty data if it exists
+				// and is not already false
+				if(radioBtn !== cmp && radioBtn._dgridLastValue){
+					radioBtn._dgridLastValue = false;
+					if(grid.updateDirty){
+						grid.updateDirty(row.id, column.field, false);
+					}
+				}
+			});
+			
+			// Also update dirty data for rows that are not currently rendered
+			for(id in grid.dirty){
+				if(editedRow.id !== id && grid.dirty[id][column.field]){
+					grid.updateDirty(id, column.field, false);
+				}
+			}
 		}
 	}
 }
