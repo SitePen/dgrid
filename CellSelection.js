@@ -1,4 +1,12 @@
-define(["dojo/_base/declare", "./Selection", "dojo/on", "put-selector/put", "dojo/has"], function(declare, Selection, listen, put, has){
+define([
+	"dojo/_base/declare",
+	"dojo/aspect",
+	"dojo/on",
+	"dojo/has",
+	"./Selection",
+	"put-selector/put"
+], function(declare, aspect, listen, has, Selection, put){
+
 return declare(Selection, {
 	// summary:
 	//		Add cell level selection capabilities to a grid. The grid will have a selection property and
@@ -16,9 +24,17 @@ return declare(Selection, {
 		if(typeof cell != "object" || !("element" in cell)){
 			cell = this.cell(cell);
 		}else if(!cell.row){
-			// it is row, with the value being a hash
-			for(id in value){
-				this.select(this.cell(cell.id, id), null, value[id]);
+			// Row object was passed instead of cell
+			if(value && typeof value === "object"){
+				// value is a hash of true/false values
+				for(id in value){
+					this.select(this.cell(cell.id, id), null, value[id]);
+				}
+			}else{
+				// Select/deselect all columns in row
+				for(id in this.columns){
+					this.select(this.cell(cell.id, id), null, value);
+				}
 			}
 			return;
 		}
