@@ -148,9 +148,10 @@ return declare(null, {
 	destroy: function(){
 		this.inherited(arguments);
 		
-		// Remove any handles added for cross-browser text selection prevention.
+		// Remove any extra handles added by Selection.
 		if(this._selectstartHandle){ this._selectstartHandle.remove(); }
 		if(this._unselectableHandle){ this._unselectableHandle.remove(); }
+		if(this._deselectionHandle){ this._deselectionHandle.remove(); }
 	},
 	
 	_setSelectionMode: function(mode){
@@ -310,14 +311,55 @@ return declare(null, {
 			});
 		}
 		
-		aspect.before(this, "removeRow", function(rowElement, justCleanup){
-			var row;
-			if(!justCleanup){
-				row = this.row(rowElement);
-				// if it is a real row removal for a selected item, deselect it
-				if(row && (row.id in this.selection)){ this.deselect(rowElement); }
-			}
-		});
+		// Update aspects if there is a store change
+		if(this._setStore){
+			aspect.after(this, "_setStore", function(){
+				grid._updateDeselectionAspect();
+			});
+		}
+		this._updateDeselectionAspect();
+	},
+	
+	_updateDeselectionAspect: function(){
+		// summary:
+		//		Hooks up logic to handle deselection of removed items.
+		//		Aspects to an observable store's notify method if applicable,
+		//		or to the list/grid's removeRow method otherwise.
+		
+		var self = this,
+			store = this.store;
+		
+		// Remove anything previously configured
+		if(this._deselectionSignal){
+			this._deselectionSignal.remove();
+		}
+		
+		// Is there currently an observable store?
+		if(store && store.notify){
+			this._deselectionSignal = aspect.after(store, "notify", function(object, idToUpdate){
+				var id = idToUpdate || (object && object[this.idProperty || "id"]);
+				if (id) {
+					var row = self.row(id);
+					// Is the row currently in the selection list.
+					if(row && (row.id in self.selection)){
+						// Ensure consistency between DOM and state on add/put;
+						// prune from selection on remove
+						self[(object ? "" : "de") + "select"](row);
+					}
+				}
+			}, true);
+		}else{
+			this._deselectionSignal = aspect.before(this, "removeRow", function(rowElement, justCleanup){
+				var row;
+				if(!justCleanup){
+					row = this.row(rowElement);
+					// if it is a real row removal for a selected item, deselect it
+					if(row && (row.id in this.selection)){
+						this.deselect(row);
+					}
+				}
+			});
+		}
 	},
 	
 	allowSelect: function(row){

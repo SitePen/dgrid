@@ -59,6 +59,12 @@
         "parent": "doh"
     },
     {
+        "name": "Selection-updates.html",
+        "url": "doh/Selection-updates.html",
+        "title": "Grid row updates with selections",
+        "parent": "doh"
+    },
+    {
         "name": "stores.html",
         "url": "doh/stores.html",
         "title": "OnDemand and Pagination Initial Render Tests",

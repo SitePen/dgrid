@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Grid row updates with selections</title>
+	<script src="../../../dojo/dojo.js" data-dojo-config="async: true"></script>
+	<script>
+		require([
+			"doh",
+			"dojo/_base/declare",
+			"dojo/_base/array",
+			"dojo/_base/lang",
+			"dojo/store/Memory",
+			"dgrid/Grid",
+			"dgrid/OnDemandGrid",
+			"dgrid/Selection",
+			"dgrid/extensions/Pagination",
+			"dojo/store/Observable",
+			"dojo/domReady!"
+		], function(doh, declare, arrayUtil, lang, Memory, Grid, OnDemandGrid, Selection, Pagination, Observable){
+
+			function _createTestData(size){
+				var data = [], aCode = 'A'.charCodeAt(0);
+				size = size || 15;
+				for(i = 0; i < size; i++){
+					data.push({
+						id: i,
+						first: "First" + String.fromCharCode(aCode + (i % 26)),
+						last: "Last" + String.fromCharCode(aCode + 25 - (i % 26))
+					});
+				}
+				return data;
+			}
+
+			function countProperties(object){
+				var count = 0,
+					key;
+				
+				for(key in object){
+					if(object.hasOwnProperty(key)){
+						count++;
+					}
+				}
+				return count;
+			}
+
+			function getColumns(){
+				return {
+					first: "First Name",
+					last: "Last Name"
+				};
+			}
+
+			doh.register("Selection updates", [
+				{
+					name: "selection + update",
+					setUp: function(){
+						var store = this.store = Observable(new Memory({
+							data: _createTestData()
+						}));
+
+						var grid = this.grid = new declare([OnDemandGrid, Selection])({
+							columns: getColumns(),
+							store: store,
+							sort: 'id',
+							selectionMode: "multiple"
+						});
+						document.body.appendChild(grid.domNode);
+						grid.startup();
+					},
+					runTest: function(doh){
+						var grid = this.grid,
+							store = this.store;
+
+						grid.select(3);
+						grid.select(4);
+						grid.select(5);
+						grid.select(6);
+						grid.select(7);
+
+						var selection = grid.selection;
+						doh.assertTrue(3 in selection);
+						doh.assertTrue(4 in selection);
+						doh.assertTrue(5 in selection);
+						doh.assertTrue(6 in selection);
+						doh.assertTrue(7 in selection);
+
+						store.put({ id: 5, first: "Updated First", last: "Updated Last"});
+						store.put({ id: 99, first: "New First", last: "New Last"});
+
+						doh.assertTrue(3 in selection);
+						doh.assertTrue(4 in selection);
+						doh.assertTrue(5 in selection);
+						doh.assertTrue(6 in selection);
+						doh.assertTrue(7 in selection);
+						doh.assertFalse(99 in selection);
+
+						store.remove(5);
+						doh.assertTrue(3 in selection);
+						doh.assertTrue(4 in selection);
+						doh.assertFalse(5 in selection);
+						doh.assertTrue(6 in selection);
+						doh.assertTrue(7 in selection);
+						doh.assertFalse(99 in selection);
+
+						// Calling remove row does not notify the store so the selection is not updated.
+						grid.row(4).remove();
+						doh.assertTrue(3 in selection);
+						doh.assertTrue(4 in selection);
+						doh.assertFalse(5 in selection);
+						doh.assertTrue(6 in selection);
+						doh.assertTrue(7 in selection);
+						doh.assertFalse(99 in selection);
+					},
+					tearDown: function(){
+						this.grid.destroy();
+					}
+				},
+				{
+					name: "selection + update + no store",
+					setUp: function(){
+						var grid = this.grid = new declare([Grid, Selection])({
+							columns: getColumns(),
+							selectionMode: "multiple"
+						});
+						document.body.appendChild(grid.domNode);
+						grid.startup();
+						grid.renderArray(_createTestData());
+
+					},
+					runTest: function(doh){
+						var grid = this.grid;
+
+						grid.select(3);
+						grid.select(4);
+						grid.select(5);
+						grid.select(6);
+						grid.select(7);
+
+						var selection = grid.selection;
+						doh.is(5, countProperties(selection));
+						doh.assertTrue(3 in selection);
+						doh.assertTrue(4 in selection);
+						doh.assertTrue(5 in selection);
+						doh.assertTrue(6 in selection);
+						doh.assertTrue(7 in selection);
+
+						grid.row(4).remove();
+						doh.is(4, countProperties(selection));
+						doh.assertTrue(3 in selection);
+						doh.assertFalse(4 in selection);
+						doh.assertTrue(5 in selection);
+						doh.assertTrue(6 in selection);
+						doh.assertTrue(7 in selection);
+
+						grid.row(3).remove();
+						doh.is(3, countProperties(selection));
+						doh.assertFalse(3 in selection);
+						doh.assertFalse(4 in selection);
+						doh.assertTrue(5 in selection);
+						doh.assertTrue(6 in selection);
+						doh.assertTrue(7 in selection);
+
+						grid.row(7).remove();
+						doh.is(2, countProperties(selection));
+						doh.assertFalse(3 in selection);
+						doh.assertFalse(4 in selection);
+						doh.assertTrue(5 in selection);
+						doh.assertTrue(6 in selection);
+						doh.assertFalse(7 in selection);
+
+						grid.row(5).remove();
+						grid.row(6).remove();
+						doh.is(0, countProperties(selection));
+					},
+					tearDown: function(){
+						this.grid.destroy();
+					}
+				},
+				{
+					// Create a selection, trigger paging, notify
+					name: "selection + update + store + paging",
+					setUp: function(){
+						var store = this.store = Observable(new Memory({
+							data: _createTestData(100)
+						}));
+						var grid = this.grid = new declare([Grid, Selection, Pagination])({
+							store: store,
+							columns: getColumns(),
+							selectionMode: "multiple"
+						});
+						document.body.appendChild(grid.domNode);
+						grid.startup();
+					},
+					runTest: function(doh){
+						var grid = this.grid,
+							store = this.store;
+
+						function checkSelected(ids){
+							var selection = grid.selection;
+							doh.is(ids.length, countProperties(selection));
+							arrayUtil.forEach(ids, function(id){
+								doh.assertTrue(id in selection);
+							});
+						}
+
+						var initSelection = [3, 4, 5, 23, 24, 25];
+						arrayUtil.forEach(initSelection, function(id){
+							grid.select(id);
+						});
+						checkSelected(initSelection);
+
+						grid.gotoPage(4);
+						checkSelected(initSelection);
+
+						grid.gotoPage(1);
+						store.put({ id: 4, first: "Updated First", last: "Updated Last"});
+						checkSelected(initSelection);
+
+						store.put({ id: 24, first: "Updated First", last: "Updated Last"});
+						checkSelected(initSelection);
+
+						store.put({ id: 1999, first: "New First", last: "New Last"});
+						checkSelected(initSelection);
+
+						store.remove(2);
+						checkSelected(initSelection);
+
+						store.remove(3);
+						checkSelected([4, 5, 23, 24, 25]);
+
+						store.remove(25);
+						checkSelected([4, 5, 23, 24]);
+					},
+					tearDown: function(){
+						this.grid.destroy();
+					}
+				}
+			]);
+			doh.run();
+		});
+	</script>
+</head>
+<body>
+</body>
+</html>
