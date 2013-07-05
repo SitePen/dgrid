@@ -5,6 +5,11 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ## Significant changes
 
+### General/Core
+
+* Fixed a regression with `OnDemandList` which would cause improper rendering
+  after scrolling. (#548)
+
 ### Mixins
 
 * The `CellSelection` mixin now supports selecting or deselecting all columns
@@ -16,8 +21,6 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 * Reworked logic in `List#adjustRowIndices` to not skip updating row indices
   even when `maintainOddEven` is `false`.
-* Fixed an issue with `OnDemandList` which would cause improper rendering after
-  scrolling. (#548)
 
 ### Mixins
 
