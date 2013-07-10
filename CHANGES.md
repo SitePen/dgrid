@@ -34,6 +34,9 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 * Fixed issues in the `editor` column plugin regarding consistency of
   dirty data and `dgrid-datachange` event firing for always-on radio buttons.
+* Fixed an issue in the `editor` column plugin's cleanup logic which could occur
+  when the loading node for a request is removed before the request completes.
+  (#195)
 
 ### Extensions
 
