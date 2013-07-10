@@ -30,7 +30,6 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 		cell: function(target, columnId){
 			// summary:
 			//		Get the cell object by node, or event, id, plus a columnId
-			
 			if(target.column && target.element){ return target; }
 			
 			if(target.target && target.target.nodeType){
