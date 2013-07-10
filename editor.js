@@ -422,9 +422,10 @@ return function(column, editor, editOn){
 		if(isWidget){
 			// add advice for cleaning up widgets in this column
 			listeners.push(aspect.before(grid, "removeRow", function(rowElement){
-				// destroy our widget during the row removal operation
+				// destroy our widget during the row removal operation,
+				// but don't trip over loading nodes from incomplete requests
 				var cellElement = grid.cell(rowElement, column.id).element,
-					widget = (cellElement.contents || cellElement).widget;
+					widget = cellElement && (cellElement.contents || cellElement).widget;
 				if(widget){ widget.destroyRecursive(); }
 			}));
 		}

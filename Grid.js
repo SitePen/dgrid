@@ -55,7 +55,7 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 			}
 			if(!element && typeof columnId != "undefined"){
 				var row = this.row(target),
-					rowElement = row.element;
+					rowElement = row && row.element;
 				if(rowElement){
 					var elements = rowElement.getElementsByTagName("td");
 					for(var i = 0; i < elements.length; i++){
