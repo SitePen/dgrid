@@ -214,10 +214,12 @@ function(kernel, declare, lang, Deferred, listen, aspect, put){
 					
 					updating[id] = true;
 					// Put it in the store, returning the result/promise
-					return Deferred.when(store.put(object), function() {
+					return Deferred.when(store.put(object), function(valueOrPromise) {
 						// Clear the item now that it's been confirmed updated
 						delete dirty[id];
 						delete updating[id];
+            // Return the result (a Promise or a resolved value) of the PUT request.
+            return valueOrPromise;
 					});
 				};
 			}
