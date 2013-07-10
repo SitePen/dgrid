@@ -149,6 +149,54 @@ var Keyboard = declare(null, {
 			});
 		}
 		enableNavigation(this.contentNode);
+
+		// When a row is updated, one row is removed and another is inserted.
+		// Aspect removeRow to record info about the old row so focus can be restored to the new node.
+		aspect.before(this, "removeRow", function(row){
+			// Looking for focused rows not headers
+			var focusedNode = grid._focusedNode;
+			if(focusedNode){
+				var focusedRow = grid.row(focusedNode);
+				// Is the focused node in the row being removed?
+				if(focusedRow && focusedRow.element === row){
+					// Save the row id.
+					grid._restoreFocusData = {
+						rowId: row.getAttribute("id")
+					};
+					// If focus is on a cell, record the column id as well.
+					if(this.cellNavigation){
+						var column = grid.cell(focusedNode).column;
+						if(column){
+							grid._restoreFocusData.columnId = column.id;
+						}
+					}
+				}else{
+					grid._restoreFocusData = undefined;
+				}
+			}
+		}, true);
+
+		aspect.after(this, "insertRow", function(row){
+			var restoreFocus = grid._restoreFocusData;
+			if(restoreFocus && restoreFocus.rowId === row.getAttribute("id")){
+				if(restoreFocus.columnId == null){
+					grid.focus(row);
+				}else{
+					grid.focus(grid.cell(row, restoreFocus.columnId).element)
+				}
+			}
+			return row;
+		});
+	},
+
+	destroy: function(){
+		// Clean up the focus signal if it is still hanging around.
+		var signal = this._focusSignal;
+		if(signal){
+			signal.destroy();
+			this._focusSignal = undefined;
+		}
+		this.inherited(arguments);
 	},
 	
 	addKeyHandler: function(key, callback, isHeader){
@@ -178,11 +226,22 @@ var Keyboard = declare(null, {
 			input,
 			numInputs,
 			inputFocused,
-			i;
-		
+			i,
+			grid = this;
+
+		// Remove any saved focus restore info.
+		this._restoreFocusData = undefined;
+
 		element = cell && cell.element;
 		if(!element){ return; }
-		
+
+		// Set up a listener for blur events to clean up any styles and emit custom events.
+		this._focusSignal = on(element, "blur", function(event){
+			grid._focusSignal.remove();
+			grid._focusSignal = undefined;
+			grid._handleBlur(element, isHeader);
+		});
+
 		if(this.cellNavigation){
 			inputs = element.getElementsByTagName("input");
 			for(i = 0, numInputs = inputs.length; i < numInputs; i++){
@@ -207,20 +266,6 @@ var Keyboard = declare(null, {
 			// Opera throws if you try to set it to true if it is already true.
 			event.bubbles = true;
 		}
-		if(focusedNode){
-			// Clean up previously-focused element
-			// Remove the class name and the tabIndex attribute
-			put(focusedNode, "!dgrid-focus[!tabIndex]");
-			if(has("ie") < 8){
-				// Clean up after workaround below (for non-input cases)
-				focusedNode.style.position = "";
-			}
-			
-			// Expose object representing focused cell or row losing focus, via
-			// event.cell or event.row; which is set depends on cellNavigation.
-			event[cellOrRowType] = this[cellOrRowType](focusedNode);
-			on.emit(element, "dgrid-cellfocusout", event);
-		}
 		focusedNode = this[focusedNodeProperty] = element;
 		
 		// Expose object representing focused cell or row gaining focus, via
@@ -239,10 +284,35 @@ var Keyboard = declare(null, {
 			element.tabIndex = this.tabIndex;
 			element.focus();
 		}
+
 		put(element, ".dgrid-focus");
 		on.emit(focusedNode, "dgrid-cellfocusin", event);
 	},
-	
+
+	_handleBlur: function(element, isHeader){
+		var focusedNodeProperty = "_focused" + (isHeader ? "Header" : "") + "Node",
+			focusedNode = this[focusedNodeProperty],
+			cellOrRowType = this.cellNavigation ? "cell" : "row";
+
+		// Clean up previously-focused element
+		// Remove the class name and the tabIndex attribute
+		put(element, "!dgrid-focus[!tabIndex]");
+		if(has("ie") < 8){
+			// Clean up after workaround below (for non-input cases)
+			element.style.position = "";
+		}
+
+		// Expose object representing focused cell or row losing focus, via
+		// event.cell or event.row; which is set depends on cellNavigation.
+		event[cellOrRowType] = this[cellOrRowType](element);
+		on.emit(element, "dgrid-cellfocusout", event);
+
+		// If focus has not moved to another cell/row, then remove the property.
+		if(focusedNode === element){
+			this[focusedNodeProperty] = undefined;
+		}
+	},
+
 	focusHeader: function(element){
 		this._focusOnNode(element || this._focusedHeaderNode, true);
 	},

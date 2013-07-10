@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>GH #226: Row loses selection after .notify</title>
+	<meta charset="utf-8">
+
+	<style>
+		@import "../../dojo/resources/dojo.css";
+		@import "../../dijit/themes/claro/claro.css";
+		@import "../css/skins/claro.css";
+
+		body {
+			margin: 20px;
+		}
+
+		#grid1, #grid2 {
+			width: 400px;
+			height: 250px;
+		}
+
+		.testCaseTitle {
+			margin: 10px;
+			font-weight: bold;
+		}
+	</style>
+
+	<script src="/dojo/dojo.js" data-dojo-config="async: true"></script>
+	<script>
+		require([
+			"dojo/_base/declare",
+			"dojo/_base/lang",
+			"dojo/on",
+			"dojo/store/Memory",
+			"dgrid/OnDemandGrid",
+			"dgrid/Keyboard",
+			"dojo/store/Observable",
+			"dojo/domReady!"
+		], function(declare, lang, on, Memory, OnDemandGrid, Keyboard, Observable){
+
+			var grid1, grid2,
+					i, storeData, store,
+					CustomGrid, columns;
+
+			storeData = [];
+			for(i = 0; i < 10; i++){
+				storeData.push({
+					id: i,
+					first: "John" + i,
+					last: "Doe" + i
+				});
+			}
+
+			store = Observable(new Memory({
+				data: storeData
+			}));
+
+			columns = {
+				first: "First Name",
+				last: "Last Name"
+			};
+
+			grid1 = new declare([OnDemandGrid, Keyboard])({
+				columns: columns,
+				store: store,
+				cellNavigation: false
+			}, 'grid1');
+
+			grid2 = new declare([OnDemandGrid, Keyboard])({
+				columns: columns,
+				store: store,
+				cellNavigation: true
+			}, 'grid2');
+
+
+			var updateCnt = 0;
+			setInterval(function () {
+				updateCnt += 1;
+				store.put({id:5, first: 'Update ' + updateCnt, last: 'Update ' + updateCnt})
+			}, 3000);
+
+		});
+
+	</script>
+</head>
+<body class="claro">
+
+	<hr/>
+	<div class="testCaseTitle">Grid row updates with Observable store and row focus</div>
+	<div id="grid1"></div>
+	<div style="margin-top: 10px">ID 5 updates every 3 seconds.  Set focus there and make sure it remains.</div>
+
+	<hr/>
+	<div class="testCaseTitle">Grid row updates with Observable store and cell focus</div>
+	<div id="grid2"></div>
+	<div style="margin-top: 10px">ID 5 updates every 3 seconds.  Set focus there and make sure it remains.</div>
+
+</body>
+</html>
