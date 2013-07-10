@@ -411,7 +411,12 @@ return declare(null, {
 		if(!row.element){
 			row = this.row(row);
 		}
-		if(!value || this.allowSelect(row)){
+		
+		// Check whether we're allowed to select the given row before proceeding.
+		// If a deselect operation is being performed, this check is skipped,
+		// to avoid errors when changing column definitions, and since disabled
+		// rows shouldn't ever be selected anyway.
+		if(value === false || this.allowSelect(row)){
 			var selection = this.selection;
 			var previousValue = selection[row.id];
 			if(value === null){
