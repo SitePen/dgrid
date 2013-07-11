@@ -9,6 +9,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 * Fixed a regression with `OnDemandList` which would cause improper rendering
   after scrolling. (#548)
+* Added the capability to opt out of custom TouchScroll logic on devices that
+  support touch, by setting `useTouchScroll: false` on the instance. (#656)
 
 ### Mixins
 

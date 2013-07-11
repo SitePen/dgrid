@@ -79,15 +79,36 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 		if(this._started){ this.resize(); }
 	};
 	
-	return declare(TouchScroll ? TouchScroll : null, {
+	// Desktop versions of functions, deferred to when there is no touch support,
+	// or when the useTouchScroll instance property is set to false
+	
+	function desktopGetScrollPosition(){
+		return {
+			x: this.bodyNode.scrollLeft,
+			y: this.bodyNode.scrollTop
+		};
+	}
+	
+	function desktopScrollTo(options){
+		if(typeof options.x !== "undefined"){
+			this.bodyNode.scrollLeft = options.x;
+		}
+		if(typeof options.y !== "undefined"){
+			this.bodyNode.scrollTop = options.y;
+		}
+	}
+	
+	return declare(has("touch") ? TouchScroll : null, {
 		tabableHeader: false,
 		// showHeader: Boolean
 		//		Whether to render header (sub)rows.
 		showHeader: false,
+		
 		// showFooter: Boolean
 		//		Whether to render footer area.  Extensions which display content
 		//		in the footer area should set this to true.
 		showFooter: false,
+		
 		// maintainOddEven: Boolean
 		//		Whether to maintain the odd/even classes when new rows are inserted.
 		//		This can be disabled to improve insertion performance if odd/even styling is not employed.
@@ -98,6 +119,12 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 		//		when the list is destroyed.  Note this is effective at the time of
 		//		the call to addCssRule, not at the time of destruction.
 		cleanAddedRules: true,
+		
+		// useTouchScroll: Boolean
+		//		If touch support is available, this determines whether to
+		//		incorporate logic from the TouchScroll module (at the expense of
+		//		normal desktop/mouse or native mobile scrolling functionality).
+		useTouchScroll: true,
 		
 		postscript: function(params, srcNodeRef){
 			// perform setup and invoke create in postScript to allow descendants to
@@ -156,7 +183,7 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 			this.buildRendering();
 			if(cls){ setClass.call(this, cls); }
 			
-			this.postCreate && this.postCreate();
+			this.postCreate();
 			
 			// remove srcNodeRef instance property post-create
 			delete this.srcNodeRef;
@@ -221,6 +248,13 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 			this._listeners.push(this._resizeHandle = listen(window, "resize",
 				miscUtil.throttleDelayed(winResizeHandler, this)));
 		},
+		
+		postCreate: has("touch") ? function(){
+			if(this.useTouchScroll){
+				this.inherited(arguments);
+			}
+		} : function(){},
+		
 		startup: function(){
 			// summary:
 			//		Called automatically after postCreate if the component is already
@@ -357,6 +391,7 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 			this.cleanup();
 			// destroy DOM
 			put(this.domNode, "!");
+			this.inherited(arguments);
 		},
 		refresh: function(){
 			// summary:
@@ -673,29 +708,17 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 			return this.row(this._move(row, steps || 1, "dgrid-row", visible));
 		},
 		
-		scrollTo: has("touch") ? function(){
+		scrollTo: has("touch") ? function(options){
 			// If TouchScroll is the superclass, defer to its implementation.
-			return this.inherited(arguments);
-		} : function(options){
-			// No TouchScroll; simple implementation which sets scrollLeft/Top.
-			if(typeof options.x !== "undefined"){
-				this.bodyNode.scrollLeft = options.x;
-			}
-			if(typeof options.y !== "undefined"){
-				this.bodyNode.scrollTop = options.y;
-			}
-		},
+			return this.useTouchScroll ? this.inherited(arguments) :
+				desktopScrollTo.call(this, options);
+		} : desktopScrollTo,
 		
 		getScrollPosition: has("touch") ? function(){
 			// If TouchScroll is the superclass, defer to its implementation.
-			return this.inherited(arguments);
-		} : function(){
-			// No TouchScroll; return based on scrollLeft/Top.
-			return {
-				x: this.bodyNode.scrollLeft,
-				y: this.bodyNode.scrollTop
-			};
-		},
+			return this.useTouchScroll ? this.inherited(arguments) :
+				desktopGetScrollPosition.call(this);
+		} : desktopGetScrollPosition,
 		
 		get: function(/*String*/ name /*, ... */){
 			// summary:
