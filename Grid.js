@@ -39,7 +39,6 @@ function(kernel, declare, listen, has, put, List, query){
 			}
 			var element;
 			if(target.nodeType){
-				var object;
 				do{
 					if(this._rowIdToObject[target.id]){
 						break;
@@ -83,7 +82,6 @@ function(kernel, declare, listen, has, put, List, query){
 			// summary:
 			//		Generates the grid for each row (used by renderHeader and and renderRow)
 			var row = put("table.dgrid-row-table[role=presentation]"),
-				cellNavigation = this.cellNavigation,
 				// IE < 9 needs an explicit tbody; other browsers do not
 				tbody = (has("ie") < 9 || has("quirks")) ? put(row, "tbody") : row,
 				tr,
@@ -172,7 +170,6 @@ function(kernel, declare, listen, has, put, List, query){
 			//		Setup the headers for the grid
 			var
 				grid = this,
-				columns = this.columns,
 				headerNode = this.headerNode,
 				i = headerNode.childNodes.length;
 			
