@@ -12,5 +12,6 @@ define({
 	fr: true,
 	pt: true,
 	ja: true,
-	sk: true
+	sk: true,
+	de: true
 });
