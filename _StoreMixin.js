@@ -233,10 +233,10 @@ function(kernel, declare, lang, Deferred, all, when, listen, aspect, put){
 				// Add this item onto the promise chain,
 				// getting the item from the store first if desired.
 				promises.push(when(promise, getFunc(id)).then(put));
+			// Kick off and return the promise representing applicable get/put operation.
 				dfd.resolve();
 			}
       
-			// Kick off and return the promise representing all applicable get/put ops.
 			// If the success callback is fired, all operations succeeded; otherwise,
 			// save will stop at the first error it encounters.
 			return all(promises);
