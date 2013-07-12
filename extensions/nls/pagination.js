@@ -8,6 +8,7 @@ define({
 		gotoPage: "Go to page",
 		jumpPage: "Jump to page"
 	},
+	de: true,
 	es: true,
 	fr: true,
 	pt: true,
