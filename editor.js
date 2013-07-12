@@ -244,6 +244,7 @@ function createSharedEditor(column, originalRenderCell){
 			bubbles: true,
 			cancelable: false
 		});
+		column._editorBlurHandle.pause();
 		// Remove the editor from the cell, to be reused later.
 		parentNode.removeChild(node);
 		
@@ -257,7 +258,6 @@ function createSharedEditor(column, originalRenderCell){
 		
 		// reset state now that editor is deactivated
 		activeCell = activeValue = activeOptions = null;
-		column._editorBlurHandle.pause();
 	}
 	
 	function dismissOnKey(evt){
