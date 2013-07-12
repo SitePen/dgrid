@@ -35,11 +35,11 @@
 			var grid, // stores global reference to grid instance
 				editFirst; // function defined within require callback
 			
-			require(["dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Keyboard", "dgrid/editor",
+			require(["dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Keyboard", "dgrid/editor", "put-selector/put",
 					"dojo/_base/lang", "dojo/_base/declare", "dojo/on", "dojo/dom-construct",
 					"dojo/store/Memory", "dojo/store/Observable", "dojo/data/ObjectStore",
 					"dgrid/test/data/DeferredWrapper", "dojo/domReady!"],
-				function(Grid, Selection, Keyboard, editor,
+				function(Grid, Selection, Keyboard, editor, put,
 						lang, declare, on, domConstruct, Memory, Observable, ObjectStore, DeferredWrapper){
 					var today = new Date(),
 						form = document.getElementById("editorForm"),
@@ -106,7 +106,13 @@
 								generate: generateNumber,
 								column: { editorArgs: { constraints: { min: 0 } } }
 							},
-							{ label: "dijit/form/DateTextBox", generate: generateDate },
+							{
+								label: "dijit/form/DateTextBox",
+								generate: generateDate,
+								renderCell: function(object, value){
+									return put("div", value ? value.toString() : "No Date");
+								}
+							},
 							{
 								label: "dijit/form/HorizontalSlider",
 								generate: generateNumber,
@@ -237,10 +243,15 @@
 								autoSave: form.elements.autoSave.checked,
 								editor: ctor || editorType
 							};
+							
 							if(editOn){ columnArgs.editOn = editOn; }
+							
 							if(form.elements.customRenderCell.checked){
 								columnArgs.renderCell = customRenderCell;
+							}else if(options.renderCell){
+								columnArgs.renderCell = options.renderCell;
 							}
+							
 							if(form.elements.customFormatter.checked){
 								columnArgs.formatter = customFormatter;
 							}
