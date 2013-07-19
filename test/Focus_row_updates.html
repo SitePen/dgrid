@@ -76,6 +76,11 @@
 			setInterval(function () {
 				updateCnt += 1;
 				store.put({id:5, first: 'Update ' + updateCnt, last: 'Update ' + updateCnt})
+
+				var row = grid1.row(2);
+				if(row.element){
+					grid1.removeRow(row);
+				}
 			}, 3000);
 
 		});

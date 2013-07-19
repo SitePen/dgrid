@@ -120,9 +120,7 @@ var Keyboard = declare(null, {
 							// Set up the tab stop and listen for a focus event in case the user uses the tab key to
 							// move focus
 							grid._removeFocusSignal();
-							tabStopNode.tabIndex = grid.tabIndex;
-							var signal = grid._listenNodeFocus(tabStopNode);
-							grid._setFocusNodes({tabStopNode: element, signal: signal});
+							grid._setRowTabStop(element, grid.tabIndex)
 						}
 						return ret;
 					});
@@ -165,16 +163,19 @@ var Keyboard = declare(null, {
 			// The focus and tab index need to survive a row update.
 			// If a row contains the focus, then it will always contain the tab stop.  But a tab stop row
 			// may not have the focus.  So look for the tab stop row first.
-			var tabStopNode = this._getFocusNodes().tabStopNode;
+			var focusNodes = this._getFocusNodes(),
+				tabStopNode = focusNodes.tabStopNode,
+				hasFocus = focusNodes.hasFocus,
+				rowElement = row && row.element || row;
 			if(tabStopNode){
 				var tabStopRow = this.row(tabStopNode);
 				// Is the tab stop node in the row being removed?
-				if(tabStopRow && tabStopRow.element === row){
+				if(tabStopRow && tabStopRow.element === rowElement){
 					this._removeFocusSignal();
 					// Save the row id.
-					var restoreRowData = this._restoreRowData = {
-						rowId: row.id,
-						tabIndex: row.tabIndex
+					var restoreRowData = {
+						rowId: rowElement.id,
+						tabIndex: rowElement.tabIndex
 					};
 					// If tab stop is on a cell, record the column id as well.
 					if(this.cellNavigation){
@@ -184,10 +185,29 @@ var Keyboard = declare(null, {
 							restoreRowData.tabIndex = tabStopNode.tabIndex;
 						}
 					}
-					// Record whether or not the node is focused.
-					if (this._getFocusNodes().hasFocus){
-						restoreRowData.restoreFocus = true;
+
+					// The tab stop and (possibly) the focus needs to move to another row.  Look for a next row.
+					// If not available, look for a previous row.
+					var toFocus = this.down(row, 1, true);
+					if(toFocus.element === rowElement){
+						toFocus = this.up(row, 1, true);
 					}
+					if(toFocus){
+						if(column){
+							toFocus = this.cell(toFocus, column.id);
+						}
+						toFocus = toFocus.element;
+						if(hasFocus){
+							toFocus.tabIndex = rowElement.tabIndex;
+							this._focusOnNode(toFocus);
+						}else{
+							this._setRowTabStop(toFocus, rowElement.tabIndex);
+						}
+					}
+					// Record whether or not the node is focused.
+					restoreRowData.restoreFocus = hasFocus;
+
+					this._restoreRowData = restoreRowData;
 				}else{
 					this._restoreRowData = undefined;
 				}
@@ -199,27 +219,23 @@ var Keyboard = declare(null, {
 			this._restoreRowData = undefined;
 			// Does the row being inserted correspond to the row that was last removed?
 			if(restoreRowData && restoreRowData.rowId === row.id){
-				var node,
-					tabIndex = restoreRowData.tabIndex;
+				var node;
 				// Determine if the tab stop was on the row or on a cell in the row.
 				if(restoreRowData.columnId == null){
 					node = row;
 				}else{
 					node = this.cell(row, restoreRowData.columnId).element;
 				}
-				node.tabIndex = tabIndex;
 
 				// Determine whether or not the node had focus.
 				if(restoreRowData.restoreFocus){
 					// Set focus and the tab stop on the element.
+					node.tabIndex = restoreRowData.tabIndex;
 					this.focus(node);
 				}else{
 					// The node did not have focus.  Handle the focus event if the user
 					// uses the tab key to return to the node.
-					var signal = this._listenNodeFocus(node);
-
-					// Remember the node as a tab stop only.
-					this._setFocusNodes({tabStopNode: node, signal: signal});
+					this._setRowTabStop(node, restoreRowData.tabIndex);
 				}
 			}
 			return row;
@@ -287,6 +303,23 @@ var Keyboard = declare(null, {
 			signal.remove();
 			focusNodes.signal = undefined;
 		}
+	},
+
+	// Remember the given node as the current row tab stop.
+	_setRowTabStop: function(node, tabIndex){
+		// Remove the previous tab stop.
+		var tabStopNode = this._getFocusNodes().tabStopNode;
+		if(tabStopNode){
+			put(tabStopNode, "[!tabIndex]");
+		}
+
+		var element = node.element || node;
+		if(tabIndex != null){
+			element.tabIndex = tabIndex;
+		}
+		var signal = this._listenNodeFocus(element);
+		// Remember the node as a tab stop only.
+		this._setFocusNodes({tabStopNode: element, signal: signal});
 	},
 
 	_focusOnNode: function(element, isHeader, event){
