@@ -108,41 +108,6 @@
         "parent": ""
     },
     {
-        "name": "doh",
-        "url": "doh",
-        "parent": ""
-    },
-    {
-        "name": "Selection-updates.html",
-        "url": "doh/Selection-updates.html",
-        "title": "Grid row updates with selections",
-        "parent": "doh"
-    },
-    {
-        "name": "addCssRule.html",
-        "url": "doh/addCssRule.html",
-        "title": "addCssRule and Related Tests",
-        "parent": "doh"
-    },
-    {
-        "name": "create-destroy.html",
-        "url": "doh/create-destroy.html",
-        "title": "Create/Destroy Tests",
-        "parent": "doh"
-    },
-    {
-        "name": "runTests.html",
-        "url": "doh/runTests.html",
-        "title": "dgrid DOH Test Suite",
-        "parent": "doh"
-    },
-    {
-        "name": "stores.html",
-        "url": "doh/stores.html",
-        "title": "OnDemand and Pagination Initial Render Tests",
-        "parent": "doh"
-    },
-    {
         "name": "editor.html",
         "url": "editor.html",
         "title": "Test Cell Editors",
