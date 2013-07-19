@@ -1,5 +1,5 @@
-define(["dojo/_base/lang", "dojo/_base/declare", "dgrid/Grid", "put-selector/put", "xstyle/css!../css/extensions/CompoundColumns.css"],
-		function(lang, declare, Grid, put){
+define(["dojo/_base/lang", "dojo/_base/declare", "xstyle/css!../css/extensions/CompoundColumns.css"],
+		function(lang, declare){
 	return declare(null, {
 		// summary:
 		//		Extension allowing for specification of columns with additional
