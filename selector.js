@@ -182,7 +182,7 @@ function(kernel, arrayUtil, on, aspect, has, put){
 			renderInput(value, cell, object);
 		};
 		column.renderHeaderCell = function(th){
-			var label = column.label || column.field || "";
+			var label = column.label != null ? column.label : (column.field || "");
 			
 			if(type == "radio" || !grid.allowSelectAll){
 				th.appendChild(document.createTextNode(label));
