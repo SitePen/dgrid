@@ -13,6 +13,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
   after scrolling. (#548)
 * Added the capability to opt out of custom TouchScroll logic on devices that
   support touch, by setting `useTouchScroll: false` on the instance. (#656)
+* Fixed logic in `Grid`, `GridFromHtml`, and `selector` to allow specifying a
+  blank label for a column by passing an empty string to `column.label`. (#664)
 
 ### Mixins
 
