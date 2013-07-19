@@ -196,8 +196,8 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 				// allow for custom header content manipulation
 				if(column.renderHeaderCell){
 					appendIfNode(contentNode, column.renderHeaderCell(contentNode));
-				}else if(column.label || column.field){
-					contentNode.appendChild(document.createTextNode(column.label || column.field));
+				}else if(column.label != null || column.field){
+					contentNode.appendChild(document.createTextNode(column.label != null ? column.label : column.field));
 				}
 				if(column.sortable !== false && field && field != "_item"){
 					th.sortable = true;
