@@ -11,6 +11,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
   instead of DOH.  See the README for setup instructions.
 * Fixed a regression with `OnDemandList` which would cause improper rendering
   after scrolling. (#548)
+* Fixed an issue with `OnDemandList` causing `queryRowsOverlap` only taking
+  effect between the first two queries. (#644)
 * Added the capability to opt out of custom TouchScroll logic on devices that
   support touch, by setting `useTouchScroll: false` on the instance. (#656)
 * Fixed logic in `Grid`, `GridFromHtml`, and `selector` to allow specifying a
