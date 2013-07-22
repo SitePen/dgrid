@@ -438,14 +438,20 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 					if(to > -1){
 						// Add to new slot (either before an existing row, or at the end)
 						// First determine the DOM node that this should be placed before.
-						nextNode = rows[to];
-						if(!nextNode){
-							nextNode = rows[to - 1];
-							if(nextNode){
-								// Make sure to skip connected nodes, so we don't accidentally
-								// insert a row in between a parent and its children.
-								nextNode = (nextNode.connected || nextNode).nextSibling;
+						if(rows.length){
+							nextNode = rows[to];
+							if(!nextNode){
+								nextNode = rows[to - 1];
+								if(nextNode){
+									// Make sure to skip connected nodes, so we don't accidentally
+									// insert a row in between a parent and its children.
+									nextNode = (nextNode.connected || nextNode).nextSibling;
+								}
 							}
+						}else{
+							// There are no rows.  Allow for subclasses to insert new rows somewhere other than
+							// at the end of the parent node.
+							nextNode = self.getNewRowSibling && self.getNewRowSibling();
 						}
 						parentNode = (beforeNode && beforeNode.parentNode) ||
 							(nextNode && nextNode.parentNode) || self.contentNode;
