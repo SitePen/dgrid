@@ -78,6 +78,9 @@ function setProperty(grid, cellElement, oldValue, value, triggerEvent){
 					// perform auto-save (if applicable) in next tick to avoid
 					// unintentional mishaps due to order of handler execution
 					column.autoSave && setTimeout(function(){ grid._trackError("save"); }, 0);
+				}else{
+					// update store-less grid
+					row.data[column.field] = value;
 				}
 			}else{
 				// Otherwise keep the value the same
@@ -127,6 +130,9 @@ function setPropertyFromEditor(grid, column, cmp, triggerEvent) {
 					radioBtn._dgridLastValue = false;
 					if(grid.updateDirty){
 						grid.updateDirty(row.id, column.field, false);
+					}else{
+						// update store-less grid
+						row.data[column.field] = false;
 					}
 				}
 			});
