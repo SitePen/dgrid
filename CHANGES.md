@@ -20,6 +20,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ### Mixins
 
+* Fixed an issue in `ColumnSet` mixin which affected horizontal scrolling at
+  certain zoom levels on Chrome.
 * The `CellSelection` mixin now supports selecting or deselecting all columns
   in a row if a row object is passed.
 * Fixed a regression in the `Selection` mixin where unselectable rows could still
