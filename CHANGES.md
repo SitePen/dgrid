@@ -7,13 +7,21 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ### General/Core
 
+* dgrid now uses [Intern](http://theintern.io) for unit and functional tests,
+  instead of DOH.  See the README for setup instructions.
 * Fixed a regression with `OnDemandList` which would cause improper rendering
   after scrolling. (#548)
+* Fixed an issue with `OnDemandList` causing `queryRowsOverlap` only taking
+  effect between the first two queries. (#644)
 * Added the capability to opt out of custom TouchScroll logic on devices that
   support touch, by setting `useTouchScroll: false` on the instance. (#656)
+* Fixed logic in `Grid`, `GridFromHtml`, and `selector` to allow specifying a
+  blank label for a column by passing an empty string to `column.label`. (#664)
 
 ### Mixins
 
+* Fixed an issue in `ColumnSet` mixin which affected horizontal scrolling at
+  certain zoom levels on Chrome.
 * The `CellSelection` mixin now supports selecting or deselecting all columns
   in a row if a row object is passed.
 * Fixed a regression in the `Selection` mixin where unselectable rows could still
@@ -36,6 +44,9 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 * Fixed issues in the `editor` column plugin regarding consistency of
   dirty data and `dgrid-datachange` event firing for always-on radio buttons.
+* Fixed an issue in the `editor` plugin that caused errors in Chrome/Safari when
+  an editor loses focus and hides due to clicking within the browser's UI
+  controls. (#603)
 * Fixed an issue in the `editor` column plugin's cleanup logic which could occur
   when the loading node for a request is removed before the request completes.
   (#195)
