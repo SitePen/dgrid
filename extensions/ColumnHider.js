@@ -1,5 +1,5 @@
-define(["dojo/_base/declare", "dojo/has", "dojo/on", "../util/misc", "put-selector/put", "xstyle/css!../css/extensions/ColumnHider.css"],
-function(declare, has, listen, miscUtil, put){
+define(["dojo/_base/declare", "dojo/has", "dojo/on", "dojo/query", "../util/misc", "put-selector/put", "dojo/i18n!./nls/columnHider", "xstyle/css!../css/extensions/ColumnHider.css"],
+function(declare, has, listen, query, miscUtil, put, i18n){
 /*
  *	Column Hider plugin for dgrid
  *	Originally contributed by TRT 2011-09-28
@@ -110,7 +110,7 @@ function(declare, has, listen, miscUtil, put){
 				// Assume that if this plugin is used, then columns are hidable.
 				// Create the toggle node.
 				hiderToggleNode = this.hiderToggleNode =
-					put(this.headerScrollNode, "div.ui-icon.dgrid-hider-toggle");
+					put(this.headerScrollNode, "button.ui-icon.dgrid-hider-toggle");
 				
 				this._listeners.push(listen(hiderToggleNode, "click", function(e){
 					grid._toggleColumnHiderMenu(e);
@@ -118,7 +118,15 @@ function(declare, has, listen, miscUtil, put){
 	
 				// Create the column list, with checkboxes.
 				hiderMenuNode = this.hiderMenuNode =
-					put("div#dgrid-hider-menu-" + this.id + ".dgrid-hider-menu");
+					put("div#dgrid-hider-menu-" + this.id + ".dgrid-hider-menu[role=dialog][aria-label=" + i18n.popupLabel + "]");
+
+				this._listeners.push(listen(hiderMenuNode, "keyup", function (e) {
+					var charOrCode = e.charCode || e.keyCode;
+					if (charOrCode === /*ESCAPE*/27) {
+						grid._toggleColumnHiderMenu(e);
+						hiderToggleNode.focus();
+					}
+				}));
 				
 				// Make sure our menu is initially hidden, then attach to the document.
 				hiderMenuNode.style.display = "none";
@@ -179,7 +187,8 @@ function(declare, has, listen, miscUtil, put){
 		_toggleColumnHiderMenu: function(){
 			var hidden = this._hiderMenuOpened, // reflects hidden state after toggle
 				hiderMenuNode = this.hiderMenuNode,
-				domNode = this.domNode;
+				domNode = this.domNode,
+				firstCheckbox;
 
 			// Show or hide the hider menu
 			hiderMenuNode.style.display = (hidden ? "none" : "");
@@ -198,6 +207,8 @@ function(declare, has, listen, miscUtil, put){
 				if (hiderMenuNode.offsetHeight > domNode.offsetHeight - 12) {
 					hiderMenuNode.style.height = (domNode.offsetHeight - 12) + "px";
 				}
+				// focus on the first checkbox
+				(firstCheckbox = query('.dgrid-hider-menu-check', domNode)[0]) && firstCheckbox.focus();
 			}
 
 			// Pause or resume the listener for clicks outside the menu
