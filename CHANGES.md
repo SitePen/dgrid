@@ -20,8 +20,6 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ### Mixins
 
-* Fixed an issue in `ColumnSet` mixin which affected horizontal scrolling at
-  certain zoom levels on Chrome.
 * The `CellSelection` mixin now supports selecting or deselecting all columns
   in a row if a row object is passed.
 * Fixed a regression in the `Selection` mixin where unselectable rows could still
@@ -36,6 +34,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ### Mixins
 
+* Fixed an issue in the `ColumnSet` mixin which affected horizontal scrolling at
+  certain zoom levels on Chrome.
 * The `Selection` and `CellSelection` mixins no longer lose selection of rows
   when items are modified.  Rows are still deselected if items are removed.
   (#226)
@@ -50,6 +50,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 * Fixed an issue in the `editor` column plugin's cleanup logic which could occur
   when the loading node for a request is removed before the request completes.
   (#195)
+* The `editor` column plugin will now directly update row data in cases where
+  a store is not being used. (#171)
 
 ### Extensions
 
