@@ -442,14 +442,15 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 			options = options || {};
 			var self = this,
 				start = options.start || 0,
-				row, rows, container;
+				observers = this.observers,
+				row, rows, container, observerIndex;
 			
 			if(!beforeNode){
 				this._lastCollection = results;
 			}
 			if(results.observe){
 				// observe the results for changes
-				var observerIndex = this.observers.push(results.observe(function(object, from, to){
+				observerIndex = observers.push(results.observe(function(object, from, to){
 					var firstRow, nextNode, parentNode;
 					// a change in the data took place
 					if(from > -1 && rows[from]){
@@ -503,12 +504,42 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 					self._onNotification(rows, object, from, to);
 				}, true)) - 1;
 			}
-			var rowsFragment = document.createDocumentFragment();
+			var rowsFragment = document.createDocumentFragment(),
+				lastRow;
+			
+			function mapEach(object){
+				lastRow = self.insertRow(object, rowsFragment, null, start++, options);
+				lastRow.observerIndex = observerIndex;
+				return lastRow;
+			}
+			function whenError(error){
+				if(typeof observerIndex !== "undefined"){
+					observers[observerIndex].cancel();
+					observers[observerIndex] = 0;
+				}
+				if(error){
+					throw error;
+				}
+			}
+			function whenDone(resolvedRows){
+				container = beforeNode ? beforeNode.parentNode : self.contentNode;
+				if(container && container.parentNode && resolvedRows.length){
+					container.insertBefore(rowsFragment, beforeNode || null);
+					lastRow = resolvedRows[resolvedRows.length - 1];
+					lastRow && self.adjustRowIndices(lastRow);
+				}else if(observers[observerIndex]){
+					// Remove the observer and don't bother inserting;
+					// rows are already out of view or there were none to track
+					whenError();
+				}
+				return (rows = resolvedRows);
+			}
+			
 			// now render the results
 			if(results.map){
 				rows = results.map(mapEach, console.error);
 				if(rows.then){
-					return rows.then(whenDone);
+					return rows.then(whenDone, whenError);
 				}
 			}else{
 				rows = [];
@@ -516,21 +547,7 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 					rows[i] = mapEach(results[i]);
 				}
 			}
-			var lastRow;
-			function mapEach(object){
-				lastRow = self.insertRow(object, rowsFragment, null, start++, options);
-				lastRow.observerIndex = observerIndex;
-				return lastRow;
-			}
-			function whenDone(resolvedRows){
-				container = beforeNode ? beforeNode.parentNode : self.contentNode;
-				if(container){
-					container.insertBefore(rowsFragment, beforeNode || null);
-					lastRow = resolvedRows[resolvedRows.length - 1];
-					lastRow && self.adjustRowIndices(lastRow);
-				}
-				return (rows = resolvedRows);
-			}
+			
 			return whenDone(rows);
 		},
 
