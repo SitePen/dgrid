@@ -31,6 +31,9 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 * Reworked logic in `List#adjustRowIndices` to not skip updating row indices
   even when `maintainOddEven` is `false`.
+* Fixed an edge case in `OnDemandList` where it would refuse to load additional
+  data if the grid were resized larger while its viewport is scrolled to the top.
+  (#361)
 
 ### Mixins
 
