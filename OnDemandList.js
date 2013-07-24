@@ -308,7 +308,8 @@ return declare([List, _StoreMixin], {
 			// References related to emitting dgrid-refresh-complete if applicable
 			refreshDfd,
 			lastResults,
-			lastRows;
+			lastRows,
+			preloadSearchNext = true;
 		
 		// XXX: I do not know why this happens.
 		// munging the actual location of the viewport relative to the preload node by a few pixels in either
@@ -378,6 +379,12 @@ return declare([List, _StoreMixin], {
 		function adjustHeight(preload, noMax){
 			preload.node.style.height = Math.min(preload.count * grid.rowHeight, noMax ? Infinity : grid.maxEmptySpace) + "px";
 		}
+		function traversePreload(preload, moveNext){
+			do{
+				preload = moveNext ? preload.next : preload.previous;
+			}while(preload && !preload.node.offsetWidth);// skip past preloads that are not currently connected
+			return preload;
+		}
 		while(preload && !preload.node.offsetWidth){
 			// skip past preloads that are not currently connected
 			preload = preload.previous;
@@ -394,14 +401,10 @@ return declare([List, _StoreMixin], {
 			
 			if(visibleBottom + mungeAmount + searchBuffer < preloadTop){
 				// the preload is below the line of sight
-				do{
-					preload = preload.previous;
-				}while(preload && !preload.node.offsetWidth); // skip past preloads that are not currently connected
+				preload = traversePreload(preload, preloadSearchNext = false);
 			}else if(visibleTop - mungeAmount - searchBuffer > (preloadTop + (preloadHeight = preloadNode.offsetHeight))){
 				// the preload is above the line of sight
-				do{
-					preload = preload.next;
-				}while(preload && !preload.node.offsetWidth);// skip past preloads that are not currently connected
+				preload = traversePreload(preload, preloadSearchNext = true);
 			}else{
 				// the preload node is visible, or close to visible, better show it
 				var offset = ((preloadNode.rowIndex ? visibleTop - requestBuffer : visibleBottom) - preloadTop) / grid.rowHeight;
@@ -423,7 +426,7 @@ return declare([List, _StoreMixin], {
 									grid.maxRowsPerPage, preload.count);
 				
 				if(count == 0){
-					preload = preload.next;
+					preload = traversePreload(preload, preloadSearchNext);
 					continue;
 				}
 				
