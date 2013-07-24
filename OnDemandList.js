@@ -421,9 +421,12 @@ return declare([List, _StoreMixin], {
 				}
 				count = Math.min(Math.max(count, grid.minRowsPerPage),
 									grid.maxRowsPerPage, preload.count);
+				
 				if(count == 0){
-					return;
+					preload = preload.next;
+					continue;
 				}
+				
 				count = Math.ceil(count);
 				offset = Math.min(Math.floor(offset), preload.count - count);
 				var options = lang.mixin(grid.get("queryOptions"), preload.options);
