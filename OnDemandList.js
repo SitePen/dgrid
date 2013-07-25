@@ -280,6 +280,12 @@ return declare([List, _StoreMixin], {
 		this.inherited(arguments);
 		this._processScroll();
 	},
+
+	// Returns a dom node that a new row should be inserted before.
+	getNewRowSibling: function(){
+		var preload = this.preload;
+		return preload && (preload.next && preload.next.node || preload.node);
+	},
 	
 	_calcRowHeight: function(rowElement){
 		// summary:
