@@ -568,9 +568,9 @@ return declare([List, _StoreMixin], {
 				observer && observer.cancel();
 				observers[thisIndex] = 0; // remove it so we don't call cancel twice
 			}
-			// Finish the row removal.
-			this.inherited(arguments);
 		}
+		// Finish the row removal.
+		this.inherited(arguments);
 	}
 });
 
