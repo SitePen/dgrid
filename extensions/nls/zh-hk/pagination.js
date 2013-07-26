@@ -1,5 +1,5 @@
 define({
-    status: "${start} - ${end} 共 ${total} 項結果",
+    status: "${start} - ${end} 共 ${total} 條結果",
 		gotoFirst: "首頁",
 		gotoNext: "上一頁",
 		gotoPrev: "下一頁",
