@@ -69,7 +69,7 @@ function(kernel, arrayUtil, on, aspect, has, put){
 				var row = grid.row(event),
 					lastRow = grid._lastSelected && grid.row(grid._lastSelected);
 
-				if (!grid.allowSelect(row)) {
+				if (row && !grid.allowSelect(row)) {
 					return;
 				}
 
