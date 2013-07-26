@@ -64,7 +64,10 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
   end with a hyphen followed by numbers. (#556)
 * The `ColumnResizer` extension now properly calls the grid's `resize` method,
   even on programmatically-triggered resize operations.
-* Added German localization for the `Pagination` extension. (#657, thanks tryte)
+* Added localizations for the `Pagination` extension:
+  * German (#657, thanks tryte)
+  * Traditional and Simplified Chinese (#671, thanks expando)
+  * Thai (#672, thanks dylans)
 
 # 0.3.8
 
