@@ -29,6 +29,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ### General/Core
 
+* Fixed an issue with `OnDemandList` involving where a new row is inserted in
+  the DOM when the relevant result set is currently empty. (#647)
 * Reworked logic in `List#adjustRowIndices` to not skip updating row indices
   even when `maintainOddEven` is `false`.
 * Fixed an edge case in `OnDemandList` where it would refuse to load additional
