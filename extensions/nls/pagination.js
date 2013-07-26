@@ -14,5 +14,7 @@ define({
 	pt: true,
 	ja: true,
 	sk: true,
-	th: true
+	th: true,
+	"zh-cn": true,
+	"zh-hk": true
 });
