@@ -13,5 +13,6 @@ define({
 	fr: true,
 	pt: true,
 	ja: true,
-	sk: true
+	sk: true,
+	th: true
 });
