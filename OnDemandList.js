@@ -280,6 +280,15 @@ return declare([List, _StoreMixin], {
 		this.inherited(arguments);
 		this._processScroll();
 	},
+
+	_getFirstRowSibling: function(container){
+		// summary:
+		//		Returns the DOM node that a new row should be inserted before
+		//		when there are no other rows in the current result set.
+		//		In the case of OnDemandList, this will always be the last child
+		//		of the container (which will be a trailing preload node).
+		return container.lastChild;
+	},
 	
 	_calcRowHeight: function(rowElement){
 		// summary:
