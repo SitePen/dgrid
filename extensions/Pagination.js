@@ -290,9 +290,16 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 			}
 		},
 		
-		renderArray: function(){
-			var rows = this.inherited(arguments);
+		renderArray: function(results, beforeNode){
+			var grid = this;
+			if (!beforeNode){
+				Deferred.when(results, function(){
+					cleanupContent(grid);
+				});
+			}
 			
+			var rows = this.inherited(arguments);
+
 			// Make sure _lastCollection is cleared (due to logic in List)
 			this._lastCollection = null;
 			
@@ -310,7 +317,7 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 			
 			return row;
 		},
-		
+
 		gotoPage: function(page, focusLink){
 			// summary:
 			//		Loads the given page.  Note that page numbers start at 1.
