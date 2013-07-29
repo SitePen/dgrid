@@ -34,6 +34,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ### General/Core
 
+* Fixed a potential issue in `Grid` in non-ES5 environments that augment the
+  Array prototype. (#624)
 * Fixed an issue with `OnDemandList` involving where a new row is inserted in
   the DOM when the relevant result set is currently empty. (#647)
 * Fixed issues involving `List` and `OnDemandList` not properly cleaning up
@@ -71,6 +73,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
   end with a hyphen followed by numbers. (#556)
 * The `ColumnResizer` extension now properly calls the grid's `resize` method,
   even on programmatically-triggered resize operations.
+* Fixed a potential issue in the `CompoundColumns` extension in non-ES5
+  environments that augment the Array prototype. (#624)
 * Added localizations for the `Pagination` extension:
   * German (#657, thanks tryte)
   * Traditional and Simplified Chinese (#671, thanks expando)
