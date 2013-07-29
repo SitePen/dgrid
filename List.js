@@ -529,7 +529,7 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 			}
 			function whenDone(resolvedRows){
 				container = beforeNode ? beforeNode.parentNode : self.contentNode;
-				if(container && container.parentNode && resolvedRows.length){
+				if(container && container.parentNode){
 					container.insertBefore(rowsFragment, beforeNode || null);
 					lastRow = resolvedRows[resolvedRows.length - 1];
 					lastRow && self.adjustRowIndices(lastRow);
