@@ -161,17 +161,20 @@ return declare([List, _StoreMixin], {
 			var total = typeof results.total === "undefined" ?
 				results.length : results.total;
 			return Deferred.when(total, function(total){
-				// remove loading node
+				var trCount = trs.length,
+					parentNode = preloadNode.parentNode,
+					noDataNode = self.noDataNode;
+				
 				put(loadingNode, "!");
 				// now we need to adjust the height and total count based on the first result set
-				var trCount = trs.length;
 				if(total === 0){
-					if(self.noDataNode){
-						put(self.noDataNode, "!");
+					if(noDataNode){
+						put(noDataNode, "!");
 						delete self.noDataNode;
 					}
-					self.noDataNode = put(self.contentNode, "div.dgrid-no-data");
-					self.noDataNode.innerHTML = self.noDataMessage;
+					self.noDataNode = noDataNode = put("div.dgrid-no-data");
+					parentNode.insertBefore(noDataNode, self._getFirstRowSibling(parentNode));
+					noDataNode.innerHTML = self.noDataMessage;
 				}
 				var height = 0;
 				for(var i = 0; i < trCount; i++){
