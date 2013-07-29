@@ -33,28 +33,30 @@ define(["dojo/_base/lang", "dojo/_base/declare", "xstyle/css!../css/extensions/C
 					i, column, children, hasChildLabels;
 				
 				for(i in columns){
-					column = columns[i];
-					children = column.children;
-					hasChildLabels = column.children && (column.showChildHeaders !== false);
-					if(children){
-						// it has children, recursively process the children
-						numColumns += (column.colSpan = processColumns(children, level + 1, hasChildLabels));
-					}else{
-						// it has no children, it is a normal header, add it to the content columns
-						contentColumns.push(column);
-						// add each one to the first spacer header row for proper layout of the header cells
-						headerRows[0].push(lang.delegate(column, {renderHeaderCell: noop}));
-						numColumns++;
+					if (columns.hasOwnProperty(i)) {
+						column = columns[i];
+						children = column.children;
+						hasChildLabels = column.children && (column.showChildHeaders !== false);
+						if(children){
+							// it has children, recursively process the children
+							numColumns += (column.colSpan = processColumns(children, level + 1, hasChildLabels));
+						}else{
+							// it has no children, it is a normal header, add it to the content columns
+							contentColumns.push(column);
+							// add each one to the first spacer header row for proper layout of the header cells
+							headerRows[0].push(lang.delegate(column, {renderHeaderCell: noop}));
+							numColumns++;
+						}
+						if(!hasChildLabels){
+							// create a header version of the column where we can define a specific rowSpan
+							// we define the rowSpan as a negative, the number of levels less than the total number of rows, which we don't know yet
+							column = lang.delegate(column, {rowSpan: -level});
+						}
+						// add the column to the header rows at the appropriate level
+						if(hasLabel){
+							(headerRows[level] || (headerRows[level] = [])).push(column);
+						}					
 					}
-					if(!hasChildLabels){
-						// create a header version of the column where we can define a specific rowSpan
-						// we define the rowSpan as a negative, the number of levels less than the total number of rows, which we don't know yet
-						column = lang.delegate(column, {rowSpan: -level});
-					}
-					// add the column to the header rows at the appropriate level
-					if(hasLabel){
-						(headerRows[level] || (headerRows[level] = [])).push(column);
-					}					
 				}
 				return numColumns;
 			}
