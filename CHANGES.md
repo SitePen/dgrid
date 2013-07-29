@@ -25,6 +25,11 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 * Fixed a regression in the `Selection` mixin where unselectable rows could still
   be selected via ctrl+click.
 
+### Column Plugins
+
+* Fixed a regression in `selector` which caused an error when clicking the
+  select-all checkbox. (#674)
+
 ## Other changes and fixes
 
 ### General/Core
