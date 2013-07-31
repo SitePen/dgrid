@@ -1,13 +1,14 @@
 define([
 	"intern!tdd",
 	"intern/assert",
+	"dojo/_base/array",
 	"dojo/_base/lang",
 	"dojo/store/Memory",
 	"dojo/store/Observable",
 	"dojo/query",
 	"dgrid/OnDemandList",
 	"put-selector/put"
-], function(test, assert, lang, Memory, Observable, query, OnDemandList, put){
+], function(test, assert, arrayUtil, lang, Memory, Observable, query, OnDemandList, put){
 
 	test.suite("removeRow", function(){
 
@@ -15,7 +16,7 @@ define([
 
 		function testInitialObservers(list, comment){
 			var observers = list.observers;
-			[true, true, true].forEach(function(test, i){
+			arrayUtil.forEach([true, true, true], function(test, i){
 				assert.isTrue(!!observers[i] === test, [comment, "index is " + i + ", Expected is " + test]);
 			});
 		}
@@ -74,7 +75,7 @@ define([
 			list.removeRow(document.getElementById("list1-row-9"), true);
 			assert.strictEqual(0, countRefs(0));
 			assert.strictEqual(10, countRefs(1));
-			[false, true, true].forEach(function(test, i){
+			arrayUtil.forEach([false, true, true], function(test, i){
 				var observers = list.observers;
 				assert.isTrue(!!observers[i] === test, ["i: " + i + ", test = " + test, observers]);
 			});
