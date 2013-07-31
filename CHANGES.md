@@ -1,7 +1,7 @@
 This document outlines changes since 0.3.0.  For older changelogs, see the
 [dgrid wiki](https://github.com/SitePen/dgrid/wiki).
 
-# master (0.3.9-dev)
+# 0.3.9
 
 ## Significant changes
 
