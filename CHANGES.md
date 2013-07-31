@@ -20,6 +20,9 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ### Mixins
 
+* The `Selection` mixin now uses MSPointer events where available, which avoids
+  issues in cases where something cancels a MSPointer event, preventing relevant
+  mouse events from firing (for example, `dojo/dnd` + `dojo/touch` in 1.9). (#658)
 * The `CellSelection` mixin now supports selecting or deselecting all columns
   in a row if a row object is passed.
 * Fixed a regression in the `Selection` mixin where unselectable rows could still
