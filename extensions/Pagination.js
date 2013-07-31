@@ -290,11 +290,32 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 			}
 		},
 		
-		renderArray: function(){
-			var rows = this.inherited(arguments);
+		renderArray: function(results, beforeNode){
+			var grid = this,
+				rows = this.inherited(arguments);
 			
 			// Make sure _lastCollection is cleared (due to logic in List)
 			this._lastCollection = null;
+			
+			if(!beforeNode){
+				if(this._topLevelRequest){
+					// Cancel previous async request that didn't finish
+					this._topLevelRequest.cancel();
+					delete this._topLevelRequest;
+				}
+				
+				if (typeof results.cancel === "function") {
+					// Store reference to new async request in progress
+					this._topLevelRequest = results;
+				}
+				
+				Deferred.when(results, function(){
+					if(grid._topLevelRequest){
+						// Remove reference to request now that it's finished
+						delete grid._topLevelRequest;
+					}
+				});
+			}
 			
 			return rows;
 		},
