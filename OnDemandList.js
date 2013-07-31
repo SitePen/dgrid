@@ -599,8 +599,11 @@ return declare([List, _StoreMixin], {
 				// This is the last row that references the observer index.  Cancel the observer.
 				var observers = this.observers;
 				var observer = observers[thisIndex];
-				observer && observer.cancel();
-				observers[thisIndex] = 0; // remove it so we don't call cancel twice
+				if(observer){
+					observer.cancel();
+					this._numObservers--;
+					observers[thisIndex] = 0; // remove it so we don't call cancel twice
+				}
 			}
 		}
 		// Finish the row removal.

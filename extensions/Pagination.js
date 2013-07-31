@@ -26,6 +26,7 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 			// Also remove the observer from the previous page, if there is one
 			if(grid._oldPageObserver){
 				grid._oldPageObserver.cancel();
+				grid._numObservers--;
 				delete grid._oldPageObserver;
 			}
 		}

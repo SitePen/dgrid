@@ -170,6 +170,7 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 			
 			// ensure arrays and hashes are initialized
 			this.observers = [];
+			this._numObservers = 0;
 			this._listeners = [];
 			this._rowIdToObject = {};
 			
@@ -374,6 +375,7 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 				observer && observer.cancel();
 			}
 			this.observers = [];
+			this._numObservers = 0;
 			this.preload = null;
 		},
 		destroy: function(){
@@ -450,6 +452,7 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 			}
 			if(results.observe){
 				// observe the results for changes
+				self._numObservers++;
 				observerIndex = observers.push(results.observe(function(object, from, to){
 					var firstRow, nextNode, parentNode;
 					// a change in the data took place
@@ -522,6 +525,7 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 				if(typeof observerIndex !== "undefined"){
 					observers[observerIndex].cancel();
 					observers[observerIndex] = 0;
+					self._numObservers--;
 				}
 				if(error){
 					throw error;
@@ -529,7 +533,8 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 			}
 			function whenDone(resolvedRows){
 				container = beforeNode ? beforeNode.parentNode : self.contentNode;
-				if(container && container.parentNode){
+				if(container && container.parentNode &&
+						(container !== self.contentNode || resolvedRows.length)){
 					container.insertBefore(rowsFragment, beforeNode || null);
 					lastRow = resolvedRows[resolvedRows.length - 1];
 					lastRow && self.adjustRowIndices(lastRow);
