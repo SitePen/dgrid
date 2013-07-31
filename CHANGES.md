@@ -30,6 +30,14 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 * Fixed a regression in `selector` which caused an error when clicking the
   select-all checkbox. (#674)
 
+### Extensions
+
+* Fixed a regression in the `Pagination` extension where duplicate rows could
+  be displayed if several paging/sorting requests are fired in quick succession
+  to an asynchronous store.  Note that the fix involves canceling old requests,
+  which may cause Deferred errors to be logged to the console; this is normal.
+  The `dgrid-error` event will *not* be emitted for canceled requests. (#635)
+
 ## Other changes and fixes
 
 ### General/Core
