@@ -27,11 +27,13 @@ function(lang, Deferred, Memory, Observable, QueryResults){
 	testStore = Observable(new Memory({data: data}));
 
 	function asyncQuery() {
-		var results = Memory.prototype.query.apply(this, arguments);
-		var def = new Deferred();
-		setTimeout(function(){
-			def.resolve(results);
-		}, 200);
+		var results = Memory.prototype.query.apply(this, arguments),
+			def = new Deferred(function(){
+				clearTimeout(timer);
+			}),
+			timer = setTimeout(function(){
+				def.resolve(results);
+			}, 200);
 		var promisedResults = QueryResults(def.promise);
 		promisedResults.total = results.total;
 		return promisedResults;
