@@ -94,6 +94,10 @@ define(["put-selector/put"], function(put){
 			
 			var i, len;
 			
+			if(!arrayOrObject){
+				return;
+			}
+			
 			if(typeof arrayOrObject.length === "number"){
 				for(i = 0, len = arrayOrObject.length; i < len; i++){
 					callback.call(context, arrayOrObject[i], i, arrayOrObject);
