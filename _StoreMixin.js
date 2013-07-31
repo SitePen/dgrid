@@ -12,6 +12,10 @@ function(kernel, declare, lang, Deferred, listen, aspect, put){
 		if(typeof err !== "object"){
 			// Ensure we actually have an error object, so we can attach a reference.
 			err = new Error(err);
+		}else if(err.dojoType === "cancel"){
+			// Don't fire dgrid-error events for errors due to canceled requests
+			// (unfortunately, the Deferred instrumentation will still log them)
+			return;
 		}
 		// TODO: remove this @ 0.4 (prefer grid property directly on event object)
 		err.grid = this;
