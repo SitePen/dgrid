@@ -166,6 +166,7 @@ return declare([List, _StoreMixin], {
 					noDataNode = self.noDataNode;
 				
 				put(loadingNode, "!");
+				self._total = total;
 				// now we need to adjust the height and total count based on the first result set
 				if(total === 0){
 					if(noDataNode){
@@ -493,6 +494,13 @@ return declare([List, _StoreMixin], {
 				loadingNode.count = count;
 				// use the query associated with the preload node to get the next "page"
 				options.query = preload.query;
+				
+				// Avoid spurious queries (ideally this should be unnecessary...)
+				if(options.start > grid._total || options.count < 0){
+					console.log("Skipping query", options, grid._total);
+					continue;
+				}
+				
 				// Query now to fill in these rows.
 				// Keep _trackError-wrapped results separate, since if results is a
 				// promise, it will lose QueryResults functions when chained by `when`
@@ -528,17 +536,21 @@ return declare([List, _StoreMixin], {
 								preserveMomentum: true
 							});
 						}
-						if(below){
-							// if it is below, we will use the total from the results to update
-							// the count of the last preload in case the total changes as later pages are retrieved
-							// (not uncommon when total counts are estimated for db perf reasons)
-							Deferred.when(results.total || results.length, function(total){
+						
+						Deferred.when(results.total || results.length, function(total){
+							grid._total = total;
+							if(below){
+								// if it is below, we will use the total from the results to update
+								// the count of the last preload in case the total changes as later pages are retrieved
+								// (not uncommon when total counts are estimated for db perf reasons)
+								
 								// recalculate the count
 								below.count = total - below.node.rowIndex;
 								// readjust the height
 								adjustHeight(below);
-							});
-						}
+							}
+						});
+						
 						// make sure we have covered the visible area
 						grid._processScroll();
 						return rows;
