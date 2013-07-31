@@ -1,6 +1,10 @@
 define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/Deferred", "dojo/on", "dojo/has", "dojo/aspect", "./List", "dojo/has!touch?./util/touch", "put-selector/put", "dojo/query", "dojo/_base/sniff"],
 function(kernel, declare, Deferred, on, has, aspect, List, touchUtil, put){
 
+has.add("mspointer", function(global, doc, element){
+	return "onmspointerdown" in element;
+});
+
 // Add feature test for user-select CSS property for optionally disabling
 // text selection.
 // (Can't use dom.setSelectable prior to 1.8.2 because of bad sniffs, see #15990)
@@ -27,7 +31,9 @@ has.add("css-user-select", function(global, doc, element){
 has.add("dom-selectstart", typeof document.onselectstart !== "undefined");
 
 var ctrlEquiv = has("mac") ? "metaKey" : "ctrlKey",
-	hasUserSelect = has("css-user-select");
+	hasUserSelect = has("css-user-select"),
+	downType = has("mspointer") ? "MSPointerDown" : "mousedown",
+	upType = has("mspointer") ? "MSPointerUp" : "mouseup";
 
 function makeUnselectable(node, unselectable){
 	// Utility function used in fallback path for recursively setting unselectable
@@ -103,7 +109,7 @@ return declare(null, {
 	// selectionEvents: String
 	//		Event (or events, comma-delimited) to listen on to trigger select logic.
 	//		Note: this is ignored in the case of touch devices.
-	selectionEvents: "mousedown,mouseup,dgrid-cellfocusin",
+	selectionEvents: downType + "," + upType + ",dgrid-cellfocusin",
 	
 	// deselectOnRefresh: Boolean
 	//		If true, the selection object will be cleared when refresh is called.
@@ -189,8 +195,8 @@ return declare(null, {
 		// Don't run if selection mode doesn't have a handler (incl. "none"),
 		// or if coming from a dgrid-cellfocusin from a mousedown
 		if(!this[this._selectionHandlerName] ||
-				(event.type == "dgrid-cellfocusin" && event.parentType == "mousedown") ||
-				(event.type == "mouseup" && target != this._waitForMouseUp)){
+				(event.type === "dgrid-cellfocusin" && event.parentType === "mousedown") ||
+				(event.type === upType && target != this._waitForMouseUp)){
 			return;
 		}
 		this._waitForMouseUp = null;
@@ -200,7 +206,7 @@ return declare(null, {
 		if(!event.keyCode || !event.ctrlKey || event.keyCode == 32){
 			// If clicking a selected item, wait for mouseup so that drag n' drop
 			// is possible without losing our selection
-			if(!event.shiftKey && event.type == "mousedown" && this.isSelected(target)){
+			if(!event.shiftKey && event.type === downType && this.isSelected(target)){
 				this._waitForMouseUp = target;
 			}else{
 				this[this._selectionHandlerName](event, target);
