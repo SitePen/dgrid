@@ -103,7 +103,7 @@ return declare(null, {
 	// selectionEvents: String
 	//		Event (or events, comma-delimited) to listen on to trigger select logic.
 	//		Note: this is ignored in the case of touch devices.
-	selectionEvents: "mousedown,mouseup,dgrid-cellfocusin",
+	selectionEvents: "MSPointerDown,mousedown,MSPointerUp,mouseup,dgrid-cellfocusin",
 	
 	// deselectOnRefresh: Boolean
 	//		If true, the selection object will be cleared when refresh is called.

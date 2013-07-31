@@ -185,6 +185,12 @@
         "parent": "extensions"
     },
     {
+        "name": "DnD_Selection_Keyboard_OnDemandGrid_IE10_Events.html",
+        "url": "extensions/DnD_Selection_Keyboard_OnDemandGrid_IE10_Events.html",
+        "title": "Test Grid DnD (mixed with Selection and Keyboard for IE-10 MSMouseXXX events)",
+        "parent": "extensions"
+    },
+    {
         "name": "DnD_touch.html",
         "url": "extensions/DnD_touch.html",
         "title": "Test Grid DnD on Touch Devices",
