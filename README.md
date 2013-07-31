@@ -49,12 +49,12 @@ directory structure like the following:
 * `util` (optional, e.g. if pursuing a custom build)
 
 dgrid works best with the latest revision of Dojo 1.7 or higher.  As of this
-writing, [Dojo 1.8.1](http://download.dojotoolkit.org/release-1.8.1/) is
+writing, [Dojo 1.9.1](http://download.dojotoolkit.org/release-1.9.1/) is
 recommended.
 
-Note that while dgrid supports Dojo 1.8 and may take advantage of features or
-fix issues specific to it where possible, it does not have any hard dependency
-on APIs new to 1.8, so as to maintain compatibility with 1.7.
+Note that while dgrid supports Dojo 1.8 and 1.9 and may take advantage of features
+or fix issues specific to them where possible, it does not have any hard dependency
+on APIs new to 1.8 or 1.9, so as to maintain compatibility with 1.7.
 
 # Documentation
 
@@ -82,7 +82,7 @@ Install the latest *geezer* version of Intern, which supports IE 6, 7, and 8
 in addition to modern browsers.
 
 ```
-npm install git+https://github.com/theintern/intern.git#1.1.0-geezer
+npm install git+https://github.com/theintern/intern.git#1.2.0-geezer
 ```
 
 ## Running via the browser
