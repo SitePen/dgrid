@@ -82,7 +82,7 @@ Install the latest *geezer* version of Intern, which supports IE 6, 7, and 8
 in addition to modern browsers.
 
 ```
-npm install git+https://github.com/theintern/intern.git#1.2.0-geezer
+npm install intern-geezer
 ```
 
 ## Running via the browser
@@ -102,7 +102,7 @@ export SAUCE_ACCESS_KEY=<your_sauce_access_key>
 Then kick off the runner with the following command:
 
 ```
-node node_modules/intern/runner config=dgrid/test/intern/intern
+node node_modules/intern-geezer/runner config=dgrid/test/intern/intern
 ```
 
 # Community
