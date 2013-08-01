@@ -191,12 +191,23 @@ function createEditor(column){
 			// also register a focus listener
 		}
 		
-		putstr = editor == "textarea" ? "textarea" :
+		putstr = editor == "select" ? "select" : "textarea" ? "textarea" :
 			"input[type=" + editor + "]";
-		cmp = node = put(putstr + ".dgrid-input", lang.mixin({
-			name: column.field,
-			tabIndex: isNaN(column.tabIndex) ? -1 : column.tabIndex
-		}, args));
+            cmp = node = put(putstr + ".dgrid-input", lang.mixin({
+                name: column.field,
+                tabIndex: isNaN(column.tabIndex) ? -1 : column.tabIndex
+            }, args));
+
+            if (putstr === "select") {
+                if (typeof args.options !== "undefined") {
+                    arrayUtil.forEach(args.options, function (option) {
+                        put(cmp, "option", {
+                            value: option.value,
+                            innerHTML: option.label ? option.label : option.value
+                        });
+                    });
+                }
+            }
 		
 		if(has("ie") < 9 || (has("ie") && has("quirks"))){
 			// IE<9 / quirks doesn't fire change events for all the right things,
