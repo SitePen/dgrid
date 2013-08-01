@@ -3,7 +3,10 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 # master (0.3.10-dev)
 
-Coming soon!
+## Significant changes
+
+* Updated the README and fixed the redirect in `test/intern/runTests.html` to
+  reference the correct path where intern-geezer installs to as of Intern 1.2.
 
 # 0.3.9
 
