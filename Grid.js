@@ -103,10 +103,10 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 					// iterate through the columns
 					column = subRow[i];
 					id = column.id;
-					extraClassName = column.className || (column.field && "field-" + column.field);
+					extraClassName = column.className || (column.field && "field-" + column.field.replace(".", "-"));
 					cell = put(tag + (
 							".dgrid-cell.dgrid-cell-padding" +
-							(id ? ".dgrid-column-" + id : "") +
+							(id ? ".dgrid-column-" + id.replace(".", "-") : "") +
 							(extraClassName ? "." + extraClassName : "")
 						).replace(invalidClassChars,"-") +
 						"[role=" + (tag === "th" ? "columnheader" : "gridcell") + "]");
@@ -151,7 +151,11 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 				if(column.get){
 					data = column.get(object);
 				}else if("field" in column && column.field != "_item"){
-					data = data[column.field];
+					//Get a property from a dot-separated string
+					var parts = column.field.split("."), i = 0;
+					while(data && (p = parts[i++])){
+						data = data[p];
+					}
 				}
 				
 				if(column.renderCell){
