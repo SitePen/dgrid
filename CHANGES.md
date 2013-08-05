@@ -5,10 +5,19 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ## Significant changes
 
+### General/Core
+
 * Updated the README and fixed the redirect in `test/intern/runTests.html` to
   reference the correct path where intern-geezer installs to as of Intern 1.2.
 * Fixed a regression in `_StoreMixin` (affecting `OnDemandList` and `Pagination`)
   where setting `store` to `null` would cause an error. (#688, thanks kilink)
+
+### Extensions
+
+* Improved accessibility of the `ColumnHider` extension, adding a tab stop for
+  the menu trigger, focusing the first checkbox within the menu when it opens,
+  allowing it to be dismissed by pressing escape (at which time focus returns
+  to the trigger), and adding ARIA role and label to the popup menu itself.
 
 # 0.3.9
 
