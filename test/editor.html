@@ -237,6 +237,7 @@
 						if(async){
 							store = new DeferredWrapper(store, 100);
 						}
+						store = Observable(store);
 						
 						require(deps, function(ctor){
 							var columnArgs = {
@@ -271,7 +272,7 @@
 								grid.set("columns", {
 									"editor": editor(lang.mixin({}, options.column, columnArgs))
 								});
-								grid.set("store", Observable(new TestStore({ data: data })));
+								grid.set("store", store);
 							}
 						});
 						
