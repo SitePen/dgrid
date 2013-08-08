@@ -11,6 +11,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
   reference the correct path where intern-geezer installs to as of Intern 1.2.
 * Fixed a regression in `_StoreMixin` (affecting `OnDemandList` and `Pagination`)
   where setting `store` to `null` would cause an error. (#688, thanks kilink)
+* Fixed a regression in `_StoreMixin` which caused an error when updating the
+  only row present in a list or grid. (#693)
 
 ### Extensions
 

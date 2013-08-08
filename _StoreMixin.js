@@ -326,11 +326,14 @@ function(kernel, declare, lang, Deferred, listen, aspect, put){
 		
 		newRow: function(){
 			// Override to remove no data message when a new row appears.
+			// Run inherited logic first to prevent confusion due to noDataNode
+			// no longer being present as a sibling.
+			var row = this.inherited(arguments);
 			if(this.noDataNode){
 				put(this.noDataNode, "!");
 				delete this.noDataNode;
 			}
-			return this.inherited(arguments);
+			return row;
 		},
 		removeRow: function(rowElement, justCleanup){
 			var row = {element: rowElement};
