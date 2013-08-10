@@ -151,6 +151,90 @@ var Keyboard = declare(null, {
 		enableNavigation(this.contentNode);
 	},
 	
+	removeRow: function(rowElement){
+		if(!this._focusedNode){
+			// Nothing special to do if we have no record of anything focused
+			return this.inherited(arguments);
+		}
+		
+		var self = this,
+			isActive = document.activeElement === this._focusedNode,
+			focusedTarget = this[this.cellNavigation ? "cell" : "row"](this._focusedNode),
+			focusedRow = focusedTarget.row || focusedTarget,
+			sibling;
+		rowElement = rowElement.element || rowElement;
+		
+		// If removed row previously had focus, temporarily store information
+		// to be handled in an immediately-following insertRow call, or next turn
+		if(rowElement === focusedRow.element){
+			sibling = this.down(focusedRow, true);
+			
+			// Check whether down call returned the same row, or failed to return
+			// any (e.g. during a partial unrendering)
+			if (!sibling || sibling.element === rowElement) {
+				sibling = this.up(focusedRow, true);
+			}
+			
+			this._removedFocus = {
+				active: isActive,
+				rowId: focusedRow.id,
+				columnId: focusedTarget.column && focusedTarget.column.id,
+				siblingId: !sibling || sibling.element === rowElement ? undefined : sibling.id
+			};
+			
+			// Call _restoreFocus on next turn, to restore focus to sibling
+			// if no replacement row was immediately inserted
+			setTimeout(function() {
+				if(self._removedFocus){
+					self._restoreFocus();
+				}
+			}, 0);
+			
+			// Clear _focusedNode until _restoreFocus is called, to avoid
+			// needlessly re-running this logic
+			this._focusedNode = null;
+		}
+		
+		this.inherited(arguments);
+	},
+	
+	insertRow: function(object){
+		var rowElement = this.inherited(arguments);
+		if(this._removedFocus){
+			this._restoreFocus(rowElement);
+		}
+		return rowElement;
+	},
+	
+	_restoreFocus: function(row) {
+		// summary:
+		//		Restores focus to the newly inserted row if it matches the
+		//		previously removed row, or to the nearest sibling otherwise.
+		
+		var focusInfo = this._removedFocus,
+			newTarget;
+		
+		row = row && this.row(row);
+		newTarget = row && row.id === focusInfo.rowId ? row :
+			typeof focusInfo.siblingId !== "undefined" && this.row(focusInfo.siblingId);
+		
+		if (newTarget && newTarget.element) {
+			newTarget = typeof focusInfo.columnId !== "undefined" ?
+				this.cell(newTarget, focusInfo.columnId) : newTarget;
+			if(focusInfo.active){
+				// Row/cell was previously focused, so focus the new one immediately
+				this.focus(newTarget);
+			}else{
+				// Row/cell was not focused, but we still need to update tabIndex
+				// and the element's class to be consistent with the old one
+				put(newTarget.element, ".dgrid-focus");
+				newTarget.element.tabIndex = this.tabIndex;
+			}
+		}
+		
+		delete this._removedFocus;
+	},
+	
 	addKeyHandler: function(key, callback, isHeader){
 		// summary:
 		//		Adds a handler to the keyMap on the instance.
