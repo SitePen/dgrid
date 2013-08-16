@@ -445,7 +445,7 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 			var self = this,
 				start = options.start || 0,
 				observers = this.observers,
-				row, rows, container, observerIndex;
+				rows, container, observerIndex;
 			
 			if(!beforeNode){
 				this._lastCollection = results;
@@ -454,7 +454,12 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 				// observe the results for changes
 				self._numObservers++;
 				observerIndex = observers.push(results.observe(function(object, from, to){
-					var firstRow, nextNode, parentNode;
+					var row, firstRow, nextNode, parentNode;
+					
+					function advanceNext() {
+						nextNode = (nextNode.connected || nextNode).nextSibling;
+					}
+					
 					// a change in the data took place
 					if(from > -1 && rows[from]){
 						// remove from old slot
@@ -484,13 +489,22 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 								if(nextNode){
 									// Make sure to skip connected nodes, so we don't accidentally
 									// insert a row in between a parent and its children.
-									nextNode = (nextNode.connected || nextNode).nextSibling;
+									advanceNext();
 								}
 							}
 						}else{
 							// There are no rows.  Allow for subclasses to insert new rows somewhere other than
 							// at the end of the parent node.
 							nextNode = self._getFirstRowSibling && self._getFirstRowSibling(container);
+						}
+						// Make sure we don't trip over a stale reference to a
+						// node that was removed, or try to place a node before
+						// itself (due to overlapped queries)
+						if(row && nextNode && row.id === nextNode.id){
+							advanceNext();
+						}
+						if(nextNode && !nextNode.parentNode){
+							nextNode = byId(nextNode.id);
 						}
 						parentNode = (beforeNode && beforeNode.parentNode) ||
 							(nextNode && nextNode.parentNode) || self.contentNode;
@@ -586,7 +600,7 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 						this.store.getIdentity(object) : this._autoId++),
 				row = byId(id),
 				previousRow = row && row.previousSibling;
-		
+			
 			if(row){// if it existed elsewhere in the DOM, we will remove it, so we can recreate it
 				this.removeRow(row);
 			}
