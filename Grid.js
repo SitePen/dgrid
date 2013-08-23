@@ -20,7 +20,7 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 		column: function(target){
 			// summary:
 			//		Get the column object by node, or event, or a columnId
-			if(typeof target == "string"){
+			if(typeof target != "object"){
 				return this.columns[target];
 			}else{
 				return this.cell(target).column;
