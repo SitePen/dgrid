@@ -16,6 +16,9 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
   where setting `store` to `null` would cause an error. (#688, thanks kilink)
 * Fixed a regression in `_StoreMixin` which caused an error when updating the
   only row present in a list or grid. (#693)
+* Updated the `put-selector` dependency to 0.3.5, which includes a fix for an
+  issue involving iOS Safari's JavaScript optimization, which was causing
+  errors in dgrid.
 
 ### Extensions
 
