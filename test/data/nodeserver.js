@@ -2,13 +2,12 @@ var http = require('http');
 var url = require('url');
 
 http.createServer(function (req, res) {    
-    var id_prefix = "";
-    var parent_id = ""; 
+    var id_prefix = "", parent_id = "";
 
     // Parse query for parent
     var url_parts = url.parse(req.url, true, true);
     var query = url_parts.query; 
-    if (query != undefined && query.hasOwnProperty('parent')){
+    if (typeof query !== 'undefined' && query.hasOwnProperty('parent')){
         parent_id = query.parent; 
     }
 
@@ -24,7 +23,7 @@ http.createServer(function (req, res) {
     }    
     if (typeof range !== 'undefined'){ 
         //Parse range  
-        var result = range.match('([0-9]+)-([0-9]+)')
+        var result = range.match('([0-9]+)-([0-9]+)');
         start = parseInt(result[1], 10);
         end = parseInt(result[2], 10);
         if (end > total){
