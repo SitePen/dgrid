@@ -27,6 +27,14 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
   allowing it to be dismissed by pressing escape (at which time focus returns
   to the trigger), and adding ARIA role and label to the popup menu itself.
 
+## Other changes and fixes
+
+### Mixins
+
+* The `Keyboard` mixin will now manage focus if a row is updated or removed;
+  in the former case, the new row will receive focus (assuming it is within
+  the currently-rendered area), otherwise the next row will receive focus. (#496)
+
 # 0.3.9
 
 ## Significant changes
