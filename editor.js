@@ -235,6 +235,21 @@ function createSharedEditor(column, originalRenderCell){
 			},
 		keyHandle;
 	
+	function blur(){
+		var element = activeCell;
+		focusNode.blur();
+		
+		if(typeof grid.focus === "function"){
+			// Dijit form widgets don't end up dismissed until the next turn,
+			// so wait before calling focus (otherwise Keyboard will focus the
+			// input again).  IE<9 needs to wait longer, otherwise the cell loses
+			// focus after we've set it.
+			setTimeout(function(){
+				grid.focus(element);
+			}, isWidget && has("ie") < 9 ? 15 : 0);
+		}
+	}
+	
 	function onblur(){
 		var parentNode = node.parentNode,
 			i = parentNode.children.length - 1,
@@ -274,10 +289,10 @@ function createSharedEditor(column, originalRenderCell){
 		if(key == 27){ // escape: revert + dismiss
 			reset();
 			activeValue = cmp._dgridLastValue;
-			focusNode.blur();
+			blur();
 		}else if(key == 13 && column.dismissOnEnter !== false){ // enter: dismiss
 			// FIXME: Opera is "reverting" even in this case
-			focusNode.blur();
+			blur();
 		}
 	}
 	
