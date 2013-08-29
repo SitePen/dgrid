@@ -34,6 +34,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 * The `Keyboard` mixin will now manage focus if a row is updated or removed;
   in the former case, the new row will receive focus (assuming it is within
   the currently-rendered area), otherwise the next row will receive focus. (#496)
+* The `editor` column plugin will now return focus to the parent cell when an
+  editor is dismissed, if the `Keyboard` mixin is also in use. (#263)
 
 # 0.3.9
 
