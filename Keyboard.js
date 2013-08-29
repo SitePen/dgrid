@@ -183,10 +183,12 @@ var Keyboard = declare(null, {
 			};
 			
 			// Call _restoreFocus on next turn, to restore focus to sibling
-			// if no replacement row was immediately inserted
+			// if no replacement row was immediately inserted.
+			// Pass original row's id in case it was re-inserted in a renderArray
+			// call (and thus was found, but couldn't be focused immediately)
 			setTimeout(function() {
 				if(self._removedFocus){
-					self._restoreFocus();
+					self._restoreFocus(focusedRow.id);
 				}
 			}, 0);
 			
@@ -200,7 +202,7 @@ var Keyboard = declare(null, {
 	
 	insertRow: function(object){
 		var rowElement = this.inherited(arguments);
-		if(this._removedFocus){
+		if(this._removedFocus && !this._removedFocus.wait){
 			this._restoreFocus(rowElement);
 		}
 		return rowElement;
@@ -215,10 +217,17 @@ var Keyboard = declare(null, {
 			newTarget;
 		
 		row = row && this.row(row);
-		newTarget = row && row.id === focusInfo.rowId ? row :
+		newTarget = row && row.element && row.id === focusInfo.rowId ? row :
 			typeof focusInfo.siblingId !== "undefined" && this.row(focusInfo.siblingId);
 		
-		if (newTarget && newTarget.element) {
+		if(newTarget && newTarget.element){
+			if(!newTarget.element.parentNode.parentNode){
+				// This was called from renderArray, so the row hasn't
+				// actually been placed in the DOM yet; handle it on the next
+				// turn (called from removeRow).
+				focusInfo.wait = true;
+				return;
+			}
 			newTarget = typeof focusInfo.columnId !== "undefined" ?
 				this.cell(newTarget, focusInfo.columnId) : newTarget;
 			if(focusInfo.active){
