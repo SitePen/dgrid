@@ -20,13 +20,6 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
   issue involving iOS Safari's JavaScript optimization, which was causing
   errors in dgrid.
 
-### Extensions
-
-* Improved accessibility of the `ColumnHider` extension, adding a tab stop for
-  the menu trigger, focusing the first checkbox within the menu when it opens,
-  allowing it to be dismissed by pressing escape (at which time focus returns
-  to the trigger), and adding ARIA role and label to the popup menu itself.
-
 ## Other changes and fixes
 
 ### Mixins
@@ -36,6 +29,13 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
   the currently-rendered area), otherwise the next row will receive focus. (#496)
 * The `editor` column plugin will now return focus to the parent cell when an
   editor is dismissed, if the `Keyboard` mixin is also in use. (#263)
+
+### Extensions
+
+* Improved accessibility of the `ColumnHider` extension, adding a tab stop for
+  the menu trigger, focusing the first checkbox within the menu when it opens,
+  allowing it to be dismissed by pressing escape (at which time focus returns
+  to the trigger), and adding ARIA role and label to the popup menu itself.
 
 # 0.3.9
 
