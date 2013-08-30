@@ -46,7 +46,7 @@
 					
 					getColumns = function(){
 						return {
-							col1: selector({ disabled: function(object){ return object.col1 == "note"; }}),
+							col1: selector(),
 							id: "ID",
 							col2: { label: 'Column 2', sortable: false },
 							col3: { label: 'Column 3' }
@@ -66,6 +66,9 @@
 					window.grid = new SelectionGrid({
 						store: testStore,
 						selectionMode: "none",
+						allowSelect: function(row){
+							return row.data.col1 !== "note";
+						},
 						columns: getColumns(),
 						allowSelectAll: true
 					}, "grid");
@@ -84,7 +87,9 @@
 					window.gridRadio = new SelectionGrid({
 						store: testStore,
 						selectionMode: "none",
-						allowSelect: function(row){ return row.data.col3 == "read"; },
+						allowSelect: function(row){
+							return row.data.col3 !== "read";
+						},
 						columns: {
 							col1: selector({ label: 'Radio' }, "radio"),
 							id: "ID",
@@ -101,10 +106,13 @@
 					
 					window.gridComplex = new (declare([Grid, ColumnSet, Selection, Keyboard]))({
 						store: testStore,
+						allowSelect: function(row){
+							return row.data.col1 !== "note";
+						},
 						columnSets: [
 							[
 								[
-									selector({ field: "col1", disabled: function(object){ return object.col1 == "note"; }})
+									selector({ field: "col1" })
 								]
 							], [
 								[

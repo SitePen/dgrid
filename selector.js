@@ -107,51 +107,23 @@ function(arrayUtil, on, aspect, has, put){
 				}
 			};
 			
-			// Set up disabled and grid.allowSelect to match each other's behaviors
-			if(typeof column.disabled == "function"){
-				var originalAllowSelect = grid.allowSelect,
-					originalDisabled = column.disabled;
-
-				// Wrap allowSelect to consult both the original allowSelect and disabled
-				grid.allowSelect = function(row){
-					var allow = originalAllowSelect.call(this, row);
-
-					if (originalDisabled === disabled) {
-						return allow;
-					} else {
-						return allow && !originalDisabled.call(column, row.data);
-					}
-				};
-
-				// Then wrap disabled to simply call the new allowSelect
-				column.disabled = disabled;
-			}else{
-				// If no disabled function was specified, institute a default one
-				// which honors allowSelect
-				column.disabled = disabled;
-			}
 			// register listeners to the select and deselect events to change the input checked value
 			listeners.push(grid.on("dgrid-select", changeInput(true)));
 			listeners.push(grid.on("dgrid-deselect", changeInput(false)));
 		}
 		
 		var renderInput = typeof type == "function" ? type : function(value, cell, object){
-			var parent = cell.parentNode,
-				disabled;
+			var parent = cell.parentNode;
 			
 			if(!grid._hasSelectorInputListener){
 				setupSelectionEvents();
 			}
 			
-			// column.disabled gets initialized or wrapped in setupSelectionEvents
-			disabled = column.disabled;
-
 			// must set the class name on the outer cell in IE for keystrokes to be intercepted
 			put(parent && parent.contents ? parent : cell, ".dgrid-selector");
 			var input = cell.input || (cell.input = put(cell, "input[type="+type + "]", {
 				tabIndex: isNaN(column.tabIndex) ? -1 : column.tabIndex,
-				disabled: disabled && (typeof disabled == "function" ?
-					disabled.call(column, object) : disabled),
+				disabled: !grid.allowSelect(grid.row(object)),
 				checked: value
 			}));
 			input.setAttribute("aria-checked", !!value);
