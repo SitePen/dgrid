@@ -1,5 +1,5 @@
-define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/Deferred", "dojo/on", "dojo/has", "dojo/aspect", "./List", "dojo/has!touch?./util/touch", "put-selector/put", "dojo/query", "dojo/_base/sniff"],
-function(kernel, declare, Deferred, on, has, aspect, List, touchUtil, put){
+define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/Deferred", "dojo/dom-class", "dojo/on", "dojo/has", "dojo/aspect", "./List", "dojo/has!touch?./util/touch", "put-selector/put", "dojo/query", "dojo/_base/sniff"],
+function(kernel, declare, Deferred, domClass, on, has, aspect, List, touchUtil, put){
 
 has.add("mspointer", function(global, doc, element){
 	return "onmspointerdown" in element;
@@ -310,9 +310,12 @@ return declare(null, {
 		// if selectionMode is changed post-init.)
 		if(this.allowSelectAll){
 			this.on("keydown", function(event) {
-				if (event[ctrlEquiv] && event.keyCode == 65) {
-					event.preventDefault();
-					grid[grid.allSelected ? "clearSelection" : "selectAll"]();
+				// Don't interrupt an input widget's select all functionality.
+				if (!domClass.contains(event.target, "dgrid-input")){
+					if (event[ctrlEquiv] && event.keyCode == 65) {
+						event.preventDefault();
+						grid[grid.allSelected ? "clearSelection" : "selectAll"]();
+					}
 				}
 			});
 		}
