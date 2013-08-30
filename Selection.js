@@ -311,8 +311,8 @@ return declare(null, {
 		if(this.allowSelectAll){
 			this.on("keydown", function(event) {
 				// Don't interrupt an input widget's select all functionality.
-				if (!domClass.contains(event.target, "dgrid-input")){
-					if (event[ctrlEquiv] && event.keyCode == 65) {
+				if(!domClass.contains(event.target, "dgrid-input")){
+					if(event[ctrlEquiv] && event.keyCode == 65){
 						event.preventDefault();
 						grid[grid.allSelected ? "clearSelection" : "selectAll"]();
 					}
