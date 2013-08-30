@@ -1,5 +1,4 @@
 define([
-	"dojo/_base/kernel",
 	"dojo/_base/lang",
 	"dojo/_base/array",
 	"dojo/_base/Deferred",
@@ -10,7 +9,7 @@ define([
 	"./Grid",
 	"put-selector/put",
 	"dojo/_base/sniff"
-], function(kernel, lang, arrayUtil, Deferred, on, aspect, has, query, Grid, put){
+], function(lang, arrayUtil, Deferred, on, aspect, has, query, Grid, put){
 
 // Variables to track info for cell currently being edited (editOn only).
 var activeCell, activeValue, activeOptions;
@@ -422,13 +421,6 @@ return function(column, editor, editOn){
 	column.editOn = editOn = editOn || column.editOn;
 	
 	isWidget = typeof editor != "string";
-	
-	// warn for widgetArgs -> editorArgs; TODO: remove @ 0.4
-	if(column.widgetArgs){
-		kernel.deprecated("column.widgetArgs", "use column.editorArgs instead",
-			"dgrid 0.4");
-		column.editorArgs = column.widgetArgs;
-	}
 	
 	aspect.after(column, "init", editOn ? function(){
 		var grid = column.grid;

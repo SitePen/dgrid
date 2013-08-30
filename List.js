@@ -1,5 +1,5 @@
-define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/on", "dojo/has", "./util/misc", "dojo/has!touch?./TouchScroll", "xstyle/has-class", "put-selector/put", "dojo/_base/sniff", "xstyle/css!./css/dgrid.css"], 
-function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
+define(["dojo/_base/declare", "dojo/on", "dojo/has", "./util/misc", "dojo/has!touch?./TouchScroll", "xstyle/has-class", "put-selector/put", "dojo/_base/sniff", "xstyle/css!./css/dgrid.css"], 
+function(declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 	// Add user agent/feature CSS classes 
 	hasClass("mozilla", "opera", "webkit", "ie", "ie-6", "ie-6-7", "quirks", "no-quirks", "touch");
 	
@@ -160,15 +160,10 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 				
 				// Check for initial class or className in params or on domNode
 				cls = params["class"] || params.className || domNode.className;
-				
-				// handle sort param - TODO: revise @ 0.4 when _sort -> sort
-				this._sort = params.sort || [];
-				delete this.sort; // ensure back-compat method isn't shadowed
-			}else{
-				this._sort = [];
 			}
 			
 			// ensure arrays and hashes are initialized
+			this.sort = this.sort || [];
 			this.observers = [];
 			this._numObservers = 0;
 			this._listeners = [];
@@ -266,7 +261,7 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 			this._started = true;
 			this.resize();
 			// apply sort (and refresh) now that we're ready to render
-			this.set("sort", this._sort);
+			this.set("sort", this.sort);
 		},
 		
 		configStructure: function(){
@@ -848,7 +843,7 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 			//		In the case where property is a string, this argument
 			//		specifies whether to sort ascending (false) or descending (true)
 			
-			this._sort = typeof property != "string" ? property :
+			this.sort = typeof property != "string" ? property :
 				[{attribute: property, descending: descending}];
 			
 			this.refresh();
@@ -873,14 +868,6 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 				this.renderArray(this._lastCollection);
 			}
 		},
-		// TODO: remove the following two (and rename _sort to sort) in 0.4
-		sort: function(property, descending){
-			kernel.deprecated("sort(...)", 'use set("sort", ...) instead', "dgrid 0.4");
-			this.set("sort", property, descending);
-		},
-		_getSort: function(){
-			return this._sort;
-		},
 		
 		_setShowHeader: function(show){
 			// this is in List rather than just in Grid, primarily for two reasons:
@@ -901,10 +888,6 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 				// Update scroll position of header to make sure it's in sync.
 				headerNode.scrollLeft = this.getScrollPosition().x;
 			}
-		},
-		setShowHeader: function(show){
-			kernel.deprecated("setShowHeader(...)", 'use set("showHeader", ...) instead', "dgrid 0.4");
-			this.set("showHeader", show);
 		},
 		
 		_setShowFooter: function(show){

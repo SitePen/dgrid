@@ -1,5 +1,5 @@
-define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/on", "dojo/aspect", "put-selector/put"],
-function(kernel, declare, lang, Deferred, listen, aspect, put){
+define(["dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/on", "dojo/aspect", "put-selector/put"],
+function(declare, lang, Deferred, listen, aspect, put){
 	// This module isolates the base logic required by store-aware list/grid
 	// components, e.g. OnDemandList/Grid and the Pagination extension.
 	
@@ -134,28 +134,19 @@ function(kernel, declare, lang, Deferred, listen, aspect, put){
 			this.query = query !== undefined ? query : this.query;
 			this.queryOptions = queryOptions || this.queryOptions;
 			
-			// If we have new sort criteria, pass them through sort
-			// (which will update _sort and call refresh in itself).
-			// Otherwise, just refresh.
+			// If we have new sort criteria, pass them through the sort setter
+			// (which call refresh in itself).  Otherwise, just refresh.
 			sort ? this.set("sort", sort) : this.refresh();
-		},
-		setStore: function(store, query, queryOptions){
-			kernel.deprecated("setStore(...)", 'use set("store", ...) instead', "dgrid 0.4");
-			this.set("store", store, query, queryOptions);
-		},
-		setQuery: function(query, queryOptions){
-			kernel.deprecated("setQuery(...)", 'use set("query", ...) instead', "dgrid 0.4");
-			this.set("query", query, queryOptions);
 		},
 		
 		_getQueryOptions: function(){
 			// summary:
 			//		Get a fresh queryOptions object, also including the current sort
 			var options = lang.delegate(this.queryOptions, {});
-			if(this._sort.length){
+			if(this.sort.length){
 				// Prevents SimpleQueryEngine from doing unnecessary "null" sorts (which can
 				// change the ordering in browsers that don't use a stable sort algorithm, eg Chrome)
-				options.sort = this._sort;
+				options.sort = this.sort;
 			}
 			return options;
 		},
@@ -216,10 +207,6 @@ function(kernel, declare, lang, Deferred, listen, aspect, put){
 				dirtyObj = dirty[id] = {};
 			}
 			dirtyObj[field] = value;
-		},
-		setDirty: function(id, field, value){
-			kernel.deprecated("setDirty(...)", "use updateDirty() instead", "dgrid 0.4");
-			this.updateDirty(id, field, value);
 		},
 		
 		save: function() {

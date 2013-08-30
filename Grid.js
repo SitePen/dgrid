@@ -1,5 +1,5 @@
-define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/on", "dojo/has", "put-selector/put", "./List", "./util/misc", "dojo/_base/sniff"],
-function(kernel, declare, listen, has, put, List, miscUtil){
+define(["dojo/_base/declare", "dojo/on", "dojo/has", "put-selector/put", "./List", "./util/misc", "dojo/_base/sniff"],
+function(declare, listen, has, put, List, miscUtil){
 	var contentBoxSizing = has("ie") < 8 && !has("quirks");
 	var invalidClassChars = /[^\._a-zA-Z0-9-]/g;
 	function appendIfNode(parent, subNode){
@@ -225,7 +225,7 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 							// reverse sort direction
 							newSort = [{
 								attribute: (field = target.field || target.columnId),
-								descending: (sort = grid._sort[0]) && sort.attribute == field &&
+								descending: (sort = grid.sort[0]) && sort.attribute == field &&
 									!sort.descending
 							}];
 							
@@ -292,9 +292,9 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 			// summary:
 			//		Extension of List.js sort to update sort arrow in UI
 			
-			// Normalize _sort first via inherited logic, then update the sort arrow
+			// Normalize sort first via inherited logic, then update the sort arrow
 			this.inherited(arguments);
-			this.updateSortArrow(this._sort);
+			this.updateSortArrow(this.sort);
 		},
 		
 		updateSortArrow: function(sort, updateSort){
@@ -309,7 +309,7 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 			//		Standard sort parameter - array of object(s) containing attribute
 			//		and optionally descending property
 			// updateSort: Boolean?
-			//		If true, will update this._sort based on the passed sort array
+			//		If true, will update this.sort based on the passed sort array
 			//		(i.e. to keep it in sync when custom logic is otherwise preventing
 			//		it from being updated); defaults to false
 			
@@ -322,7 +322,7 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 				delete this._lastSortedArrow;
 			}
 			
-			if(updateSort){ this._sort = sort; }
+			if(updateSort){ this.sort = sort; }
 			if(!sort[0]){ return; } // nothing to do if no sort is specified
 			
 			var prop = sort[0].attribute,
@@ -465,15 +465,6 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 			this._updateColumns();
 		},
 		
-		setColumns: function(columns){
-			kernel.deprecated("setColumns(...)", 'use set("columns", ...) instead', "dgrid 0.4");
-			this.set("columns", columns);
-		},
-		setSubRows: function(subrows){
-			kernel.deprecated("setSubRows(...)", 'use set("subRows", ...) instead', "dgrid 0.4");
-			this.set("subRows", subrows);
-		},
-		
 		_updateColumns: function(){
 			// summary:
 			//		Called when columns, subRows, or columnSets are reset
@@ -487,8 +478,8 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 			
 			// After re-rendering the header, re-apply the sort arrow if needed.
 			if(this._started){
-				if(this._sort && this._sort.length){
-					this.updateSortArrow(this._sort);
+				if(this.sort.length){
+					this.updateSortArrow(this.sort);
 				} else {
 					// Only call resize directly if we didn't call updateSortArrow,
 					// since that calls resize itself when it updates.

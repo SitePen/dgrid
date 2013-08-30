@@ -104,7 +104,7 @@ define([
 					setMatchingSubRow(grid, match, oldSubRow);
 					grid.renderHeader();
 					// After re-rendering the header, re-apply the sort arrow if needed.
-					if (this._sort && this._sort.length){
+					if (this.sort.length){
 						this.updateSortArrow(this._sort);
 					}
 				}

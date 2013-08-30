@@ -1,5 +1,5 @@
-define(["dojo/_base/kernel", "dojo/_base/array", "dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put"],
-function(kernel, arrayUtil, on, aspect, has, put){
+define(["dojo/_base/array", "dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put"],
+function(arrayUtil, on, aspect, has, put){
 	return function(column, type){
 		
 		var listeners = [],
@@ -7,10 +7,6 @@ function(kernel, arrayUtil, on, aspect, has, put){
 		
 		if(!column){ column = {}; }
 		
-		if(column.type){
-			column.selectorType = column.type;
-			kernel.deprecated("columndef.type", "use columndef.selectorType instead", "dgrid 0.4");
-		}
 		// accept type as argument to Selector function, or from column def
 		column.selectorType = type = type || column.selectorType || "checkbox";
 		column.sortable = false;

@@ -1,6 +1,12 @@
 This document outlines changes since 0.3.0.  For older changelogs, see the
 [dgrid wiki](https://github.com/SitePen/dgrid/wiki).
 
+# dev-0.4
+
+The following is a rough list of changes, to be outlined more presentably later.
+
+* Removed deprecated code marked for removal in 0.4
+
 # master (0.3.10-dev)
 
 ## Significant changes

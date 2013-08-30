@@ -1,5 +1,5 @@
-define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/Deferred", "dojo/on", "dojo/has", "dojo/aspect", "./List", "dojo/has!touch?./util/touch", "put-selector/put", "dojo/query", "dojo/_base/sniff"],
-function(kernel, declare, Deferred, on, has, aspect, List, touchUtil, put){
+define(["dojo/_base/declare", "dojo/_base/Deferred", "dojo/on", "dojo/has", "dojo/aspect", "./List", "dojo/has!touch?./util/touch", "put-selector/put", "dojo/query", "dojo/_base/sniff"],
+function(declare, Deferred, on, has, aspect, List, touchUtil, put){
 
 has.add("mspointer", function(global, doc, element){
 	return "onmspointerdown" in element;
@@ -176,10 +176,6 @@ return declare(null, {
 		
 		// Also re-run allowTextSelection setter in case it is in automatic mode.
 		this._setAllowTextSelection(this.allowTextSelection);
-	},
-	setSelectionMode: function(mode){
-		kernel.deprecated("setSelectionMode(...)", 'use set("selectionMode", ...) instead', "dgrid 0.4");
-		this.set("selectionMode", mode);
 	},
 	
 	_setAllowTextSelection: function(allow){
