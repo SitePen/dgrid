@@ -6,6 +6,7 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 The following is a rough list of changes, to be outlined more presentably later.
 
 * Removed deprecated code marked for removal in 0.4
+* Replaced `List#newRow(...)` with `List#highlightRow(row[, delay])`
 * Split out QueryResults/observe-specific code from `List#renderArray` to
   `_StoreMixin#renderQueryResults`
 * Renamed the `observers` instance property to `_observers`

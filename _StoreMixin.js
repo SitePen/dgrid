@@ -197,7 +197,8 @@ function(declare, lang, Deferred, listen, aspect, put){
 			var store = this.store,
 				dirty = this.dirty,
 				id = store && store.getIdentity(object),
-				dirtyObj;
+				dirtyObj,
+				row;
 			
 			if(id in dirty && !(id in this._updating)){ dirtyObj = dirty[id]; }
 			if(dirtyObj){
@@ -205,7 +206,18 @@ function(declare, lang, Deferred, listen, aspect, put){
 				// to provide protection for subsequent changes as well
 				object = lang.delegate(object, dirtyObj);
 			}
-			return this.inherited(arguments);
+			
+			row = this.inherited(arguments);
+			
+			// Remove no data message when a new row appears.
+			// Run after inherited logic to prevent confusion due to noDataNode
+			// no longer being present as a sibling.
+			if(this.noDataNode){
+				put(this.noDataNode, "!");
+				this.noDataNode = null;
+			}
+			
+			return row;
 		},
 		
 		updateDirty: function(id, field, value){
@@ -322,17 +334,6 @@ function(declare, lang, Deferred, listen, aspect, put){
 			return Deferred.when(result, noop, lang.hitch(this, emitError));
 		},
 		
-		newRow: function(){
-			// Override to remove no data message when a new row appears.
-			// Run inherited logic first to prevent confusion due to noDataNode
-			// no longer being present as a sibling.
-			var row = this.inherited(arguments);
-			if(this.noDataNode){
-				put(this.noDataNode, "!");
-				delete this.noDataNode;
-			}
-			return row;
-		},
 		removeRow: function(rowElement, justCleanup){
 			var row = {element: rowElement};
 			// Check to see if we are now empty...
@@ -433,7 +434,8 @@ function(declare, lang, Deferred, listen, aspect, put){
 						}
 						parentNode = (beforeNode && beforeNode.parentNode) ||
 							(nextNode && nextNode.parentNode) || self.contentNode;
-						row = self.newRow(object, parentNode, nextNode, options.start + to, options);
+						row = self.insertRow(object, parentNode, nextNode, options.start + to, options);
+						self.highlightRow(row);
 						
 						if(row){
 							row.observerIndex = observerIndex;

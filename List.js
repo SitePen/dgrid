@@ -100,6 +100,7 @@ function(declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 	
 	return declare(has("touch") ? TouchScroll : null, {
 		tabableHeader: false,
+		
 		// showHeader: Boolean
 		//		Whether to render header (sub)rows.
 		showHeader: false,
@@ -119,6 +120,11 @@ function(declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 		//		when the list is destroyed.  Note this is effective at the time of
 		//		the call to addCssRule, not at the time of destruction.
 		cleanAddedRules: true,
+		
+		// defaultHighlightDelay: Number
+		//		Default delay between applying and removing highlight when
+		//		calling highlightRow.
+		defaultHighlightDelay: 250,
 		
 		// useTouchScroll: Boolean
 		//		If touch support is available, this determines whether to
@@ -392,16 +398,24 @@ function(declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 			this.scrollTo({ x: 0, y: 0 });
 		},
 		
-		newRow: function(object, parentNode, beforeNode, i, options){
-			if(parentNode){
-				var row = this.insertRow(object, parentNode, beforeNode, i, options);
-				put(row, ".ui-state-highlight");
-				setTimeout(function(){
-					put(row, "!ui-state-highlight");
-				}, 250);
-				return row;
-			}
+		highlightRow: function(rowElement, delay){
+			// summary:
+			//		Highlights a row.  Used when updating rows due to store
+			//		notifications, but potentially also useful in other cases.
+			// rowElement: Object
+			//		Row element (or object returned from the row method) to
+			//		highlight.
+			// delay: Number
+			//		Number of milliseconds between adding and removing the
+			//		ui-state-highlight class.
+			
+			rowElement = rowElement.element || rowElement;
+			put(rowElement, ".ui-state-highlight");
+			setTimeout(function(){
+				put(rowElement, "!ui-state-highlight");
+			}, delay || this.defaultHighlightDelay);
 		},
+		
 		adjustRowIndices: function(firstRow){
 			// this traverses through rows to maintain odd/even classes on the rows when indexes shift;
 			var next = firstRow;
