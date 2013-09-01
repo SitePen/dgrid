@@ -164,8 +164,6 @@ function(declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 			
 			// ensure arrays and hashes are initialized
 			this.sort = this.sort || [];
-			this.observers = [];
-			this._numObservers = 0;
 			this._listeners = [];
 			this._rowIdToObject = {};
 			
@@ -354,8 +352,7 @@ function(declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 			// summary:
 			//		Clears out all rows currently in the list.
 			
-			var observers = this.observers,
-				i;
+			var i;
 			for(i in this._rowIdToObject){
 				if(this._rowIdToObject[i] != this.columns){
 					var rowElement = byId(i);
@@ -364,14 +361,6 @@ function(declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 					}
 				}
 			}
-			// remove any store observers
-			for(i = 0;i < observers.length; i++){
-				var observer = observers[i];
-				observer && observer.cancel();
-			}
-			this.observers = [];
-			this._numObservers = 0;
-			this.preload = null;
 		},
 		destroy: function(){
 			// summary:
@@ -433,148 +422,41 @@ function(declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 		},
 		renderArray: function(results, beforeNode, options){
 			// summary:
-			//		This renders an array or collection of objects as rows in the grid, before the
-			//		given node. This will listen for changes in the collection if an observe method
-			//		is available (as it should be if it comes from an Observable data store).
+			//		Renders an array of objects as rows, before the given node.
+			
 			options = options || {};
 			var self = this,
 				start = options.start || 0,
-				observers = this.observers,
-				rows, container, observerIndex;
+				rowsFragment = document.createDocumentFragment(),
+				rows = [],
+				lastRow,
+				container,
+				i = 0,
+				len = results.length;
 			
 			if(!beforeNode){
 				this._lastCollection = results;
 			}
-			if(results.observe){
-				// observe the results for changes
-				self._numObservers++;
-				observerIndex = observers.push(results.observe(function(object, from, to){
-					var row, firstRow, nextNode, parentNode;
-					
-					function advanceNext() {
-						nextNode = (nextNode.connected || nextNode).nextSibling;
-					}
-					
-					// a change in the data took place
-					if(from > -1 && rows[from]){
-						// remove from old slot
-						row = rows.splice(from, 1)[0];
-						// check to make the sure the node is still there before we try to remove it, (in case it was moved to a different place in the DOM)
-						if(row.parentNode == container){
-							firstRow = row.nextSibling;
-							if(firstRow){ // it's possible for this to have been already removed if it is in overlapping query results
-								if(from != to){ // if from and to are identical, it is an in-place update and we don't want to alter the rowIndex at all
-									firstRow.rowIndex--; // adjust the rowIndex so adjustRowIndices has the right starting point
-								}
-							}
-							self.removeRow(row); // now remove
-						}
-						// the removal of rows could cause us to need to page in more items
-						if(self._processScroll){
-							self._processScroll();
-						}
-					}
-					if(to > -1){
-						// Add to new slot (either before an existing row, or at the end)
-						// First determine the DOM node that this should be placed before.
-						if(rows.length){
-							nextNode = rows[to];
-							if(!nextNode){
-								nextNode = rows[to - 1];
-								if(nextNode){
-									// Make sure to skip connected nodes, so we don't accidentally
-									// insert a row in between a parent and its children.
-									advanceNext();
-								}
-							}
-						}else{
-							// There are no rows.  Allow for subclasses to insert new rows somewhere other than
-							// at the end of the parent node.
-							nextNode = self._getFirstRowSibling && self._getFirstRowSibling(container);
-						}
-						// Make sure we don't trip over a stale reference to a
-						// node that was removed, or try to place a node before
-						// itself (due to overlapped queries)
-						if(row && nextNode && row.id === nextNode.id){
-							advanceNext();
-						}
-						if(nextNode && !nextNode.parentNode){
-							nextNode = byId(nextNode.id);
-						}
-						parentNode = (beforeNode && beforeNode.parentNode) ||
-							(nextNode && nextNode.parentNode) || self.contentNode;
-						row = self.newRow(object, parentNode, nextNode, options.start + to, options);
-						
-						if(row){
-							row.observerIndex = observerIndex;
-							rows.splice(to, 0, row);
-							if(!firstRow || to < from){
-								// the inserted row is first, so we update firstRow to point to it
-								var previous = row.previousSibling;
-								// if we are not in sync with the previous row, roll the firstRow back one so adjustRowIndices can sync everything back up.
-								firstRow = !previous || previous.rowIndex + 1 == row.rowIndex || row.rowIndex == 0 ?
-									row : previous;
-							}
-						}
-						options.count++;
-					}
-					from != to && firstRow && self.adjustRowIndices(firstRow);
-					self._onNotification(rows, object, from, to);
-				}, true)) - 1;
-			}
-			var rowsFragment = document.createDocumentFragment(),
-				lastRow;
 			
-			function mapEach(object){
-				lastRow = self.insertRow(object, rowsFragment, null, start++, options);
-				lastRow.observerIndex = observerIndex;
-				return lastRow;
-			}
-			function whenError(error){
-				if(typeof observerIndex !== "undefined"){
-					observers[observerIndex].cancel();
-					observers[observerIndex] = 0;
-					self._numObservers--;
-				}
-				if(error){
-					throw error;
-				}
-			}
-			function whenDone(resolvedRows){
-				container = beforeNode ? beforeNode.parentNode : self.contentNode;
-				if(container && container.parentNode &&
-						(container !== self.contentNode || resolvedRows.length)){
-					container.insertBefore(rowsFragment, beforeNode || null);
-					lastRow = resolvedRows[resolvedRows.length - 1];
-					lastRow && self.adjustRowIndices(lastRow);
-				}else if(observers[observerIndex]){
-					// Remove the observer and don't bother inserting;
-					// rows are already out of view or there were none to track
-					whenError();
-				}
-				return (rows = resolvedRows);
+			if(!len){
+				return rows;
 			}
 			
-			// now render the results
-			if(results.map){
-				rows = results.map(mapEach, console.error);
-				if(rows.then){
-					return rows.then(whenDone, whenError);
-				}
-			}else{
-				rows = [];
-				for(var i = 0, l = results.length; i < l; i++){
-					rows[i] = mapEach(results[i]);
-				}
+			// Insert a row for each item into the document fragment
+			while(i < len){
+				rows[i] = this.insertRow(results[i], rowsFragment, null, start++, options);
+				i++;
 			}
 			
-			return whenDone(rows);
-		},
-
-		_onNotification: function(rows, object, from, to){
-			// summary:
-			//		Protected method called whenever a store notification is observed.
-			//		Intended to be extended as necessary by mixins/extensions.
+			// Insert the document fragment into the appropriate position
+			container = beforeNode ? beforeNode.parentNode : self.contentNode;
+			if(container && container.parentNode &&
+					(container !== self.contentNode || len)){
+				container.insertBefore(rowsFragment, beforeNode || null);
+				self.adjustRowIndices(rows[len - 1]);
+			}
+			
+			return rows;
 		},
 
 		renderHeader: function(){

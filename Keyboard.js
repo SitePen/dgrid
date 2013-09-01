@@ -91,32 +91,30 @@ var Keyboard = declare(null, {
 				initHeader();
 				aspect.after(grid, "renderHeader", initHeader, true);
 			}else{
-				aspect.after(grid, "renderArray", function(ret){
+				aspect.after(grid, "renderArray", function(rows){
 					// summary:
 					//		Ensures the first element of a grid is always keyboard selectable after data has been
 					//		retrieved if there is not already a valid focused element.
 					
-					return Deferred.when(ret, function(ret){
-						var focusedNode = grid._focusedNode || initialNode;
-						
-						// do not update the focused element if we already have a valid one
-						if(isFocusableClass.test(focusedNode.className) && contains(areaNode, focusedNode)){
-							return ret;
+					var focusedNode = grid._focusedNode || initialNode;
+					
+					// do not update the focused element if we already have a valid one
+					if(isFocusableClass.test(focusedNode.className) && contains(areaNode, focusedNode)){
+						return rows;
+					}
+					
+					// ensure that the focused element is actually a grid cell, not a
+					// dgrid-preload or dgrid-content element, which should not be focusable,
+					// even when data is loaded asynchronously
+					for(var i = 0, elements = areaNode.getElementsByTagName("*"), element; (element = elements[i]); ++i){
+						if(isFocusableClass.test(element.className)){
+							focusedNode = grid._focusedNode = element;
+							break;
 						}
-						
-						// ensure that the focused element is actually a grid cell, not a
-						// dgrid-preload or dgrid-content element, which should not be focusable,
-						// even when data is loaded asynchronously
-						for(var i = 0, elements = areaNode.getElementsByTagName("*"), element; (element = elements[i]); ++i){
-							if(isFocusableClass.test(element.className)){
-								focusedNode = grid._focusedNode = element;
-								break;
-							}
-						}
-						
-						focusedNode.tabIndex = grid.tabIndex;
-						return ret;
-					});
+					}
+					
+					focusedNode.tabIndex = grid.tabIndex;
+					return rows;
 				});
 			}
 			
@@ -415,8 +413,7 @@ var moveFocusEnd = Keyboard.moveFocusEnd = function(event, scrollToTop){
 	//		Handles requests to scroll to the beginning or end of the grid.
 	
 	// Assume scrolling to top unless event is specifically for End key
-	var self = this,
-		cellNavigation = this.cellNavigation,
+	var cellNavigation = this.cellNavigation,
 		contentNode = this.contentNode,
 		contentPos = scrollToTop ? 0 : contentNode.scrollHeight,
 		scrollPos = contentNode.scrollTop + contentPos,
@@ -455,15 +452,14 @@ var moveFocusEnd = Keyboard.moveFocusEnd = function(event, scrollToTop){
 		// the contentNode, we are using OnDemandList and need to wait for more
 		// data to render, then focus the first/last row in the new content.
 		handle = aspect.after(this, "renderArray", function(rows){
+			var target = rows[scrollToTop ? 0 : rows.length - 1];
+			if(cellNavigation){
+				// Preserve column that was currently focused
+				target = this.cell(target, this.cell(event).column.id);
+			}
+			this._focusOnNode(target, false, event);
 			handle.remove();
-			return Deferred.when(rows, function(rows){
-				var target = rows[scrollToTop ? 0 : rows.length - 1];
-				if(cellNavigation){
-					// Preserve column that was currently focused
-					target = self.cell(target, self.cell(event).column.id);
-				}
-				self._focusOnNode(target, false, event);
-			});
+			return rows;
 		});
 	}
 	

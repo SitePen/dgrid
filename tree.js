@@ -213,7 +213,7 @@ function tree(column){
 							grid._trackError(function(){
 								return grid.renderQuery(query, preloadNode, options);
 							}) :
-							grid.renderArray(query(options), preloadNode, {query: query}),
+							grid.renderQueryResults(query(options), preloadNode, {query: query}),
 						function(){
 							// Expand once results are retrieved, if the row is still expanded.
 							if(grid._expanded[row.id] && hasTransitionend){

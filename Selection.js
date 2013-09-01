@@ -517,20 +517,19 @@ return declare(null, {
 	},
 	
 	renderArray: function(){
-		var grid = this,
-			rows = this.inherited(arguments);
+		var rows = this.inherited(arguments),
+			selection = this.selection,
+			i,
+			row,
+			selected;
 		
-		Deferred.when(rows, function(rows){
-			var selection = grid.selection,
-				i, row, selected;
-			for(i = 0; i < rows.length; i++){
-				row = grid.row(rows[i]);
-				selected = row.id in selection ? selection[row.id] : grid.allSelected;
-				if(selected){
-					grid.select(row, null, selected);
-				}
+		for(i = 0; i < rows.length; i++){
+			row = this.row(rows[i]);
+			selected = row.id in selection ? selection[row.id] : this.allSelected;
+			if(selected){
+				this.select(row, null, selected);
 			}
-		});
+		}
 		return rows;
 	}
 });

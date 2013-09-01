@@ -15,7 +15,7 @@ define([
 		var list;
 
 		function testInitialObservers(list, comment){
-			var observers = list.observers;
+			var observers = list._observers;
 			arrayUtil.forEach([true, true, true], function(test, i){
 				assert.isTrue(!!observers[i] === test, [comment, "index is " + i + ", Expected is " + test]);
 			});
@@ -76,7 +76,7 @@ define([
 			assert.strictEqual(0, countRefs(0));
 			assert.strictEqual(10, countRefs(1));
 			arrayUtil.forEach([false, true, true], function(test, i){
-				var observers = list.observers;
+				var observers = list._observers;
 				assert.isTrue(!!observers[i] === test, ["i: " + i + ", test = " + test, observers]);
 			});
 		});

@@ -157,7 +157,7 @@ return declare([List, _StoreMixin], {
 		}
 		
 		// Render the result set
-		Deferred.when(self.renderArray(results, preloadNode, options), function(trs){
+		Deferred.when(self.renderQueryResults(results, preloadNode, options), function(trs){
 			var total = typeof results.total === "undefined" ?
 				results.length : results.total;
 			return Deferred.when(total, function(total){
@@ -283,6 +283,11 @@ return declare([List, _StoreMixin], {
 	resize: function(){
 		this.inherited(arguments);
 		this._processScroll();
+	},
+	
+	cleanup: function(){
+		this.inherited(arguments);
+		this.preload = null;
 	},
 
 	_getFirstRowSibling: function(container){
@@ -516,7 +521,7 @@ return declare([List, _StoreMixin], {
 				// Isolate the variables in case we make multiple requests
 				// (which can happen if we need to render on both sides of an island of already-rendered rows)
 				(function(loadingNode, scrollNode, below, keepScrollTo, results){
-					lastRows = Deferred.when(grid.renderArray(results, loadingNode, options), function(rows){
+					lastRows = Deferred.when(grid.renderQueryResults(results, loadingNode, options), function(rows){
 						lastResults = results;
 						
 						// can remove the loading node now
@@ -597,7 +602,7 @@ return declare([List, _StoreMixin], {
 			// Is this row's observer index different than those on either side?
 			if(thisIndex > -1 && thisIndex !== prevIndex && thisIndex !== nextIndex){
 				// This is the last row that references the observer index.  Cancel the observer.
-				var observers = this.observers;
+				var observers = this._observers;
 				var observer = observers[thisIndex];
 				if(observer){
 					observer.cancel();

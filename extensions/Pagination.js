@@ -291,12 +291,9 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 			}
 		},
 		
-		renderArray: function(results, beforeNode){
+		renderQueryResults: function(results, beforeNode){
 			var grid = this,
 				rows = this.inherited(arguments);
-			
-			// Make sure _lastCollection is cleared (due to logic in List)
-			this._lastCollection = null;
 			
 			if(!beforeNode){
 				if(this._topLevelRequest){
@@ -368,16 +365,16 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 						oldNodes[children[i].id] = children[i];
 					}
 					// Also reference the current page's observer (if any)
-					grid._oldPageObserver = grid.observers.pop();
+					grid._oldPageObserver = grid._observers.pop();
 				}
 				
 				// set flag to deactivate pagination event handlers until loaded
 				grid._isLoading = true;
 				
-				// Run new query and pass it into renderArray
+				// Run new query and pass it into renderQueryResults
 				results = grid.store.query(grid.query, options);
 				
-				Deferred.when(grid.renderArray(results, null, options), function(rows){
+				Deferred.when(grid.renderQueryResults(results, null, options), function(rows){
 					cleanupLoading(grid);
 					// Reset scroll Y-position now that new page is loaded.
 					grid.scrollTo({ y: 0 });
@@ -404,7 +401,7 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 						grid._rowsOnPage = rows.length;
 						
 						// It's especially important that _updateNavigation is called only
-						// after renderArray is resolved as well (to prevent jumping).
+						// after renderQueryResults is resolved as well (to prevent jumping).
 						grid._updateNavigation(focusLink);
 					});
 					

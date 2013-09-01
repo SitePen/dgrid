@@ -113,14 +113,11 @@ function(declare, lang, Deferred, listen, aspect, query, has, miscUtil, put, has
 			return row;
 		},
 		renderArray: function(){
-			var grid = this,
-				rows = this.inherited(arguments);
-
-			Deferred.when(rows, function(rows){
-				for(var i = 0; i < rows.length; i++){
-					adjustScrollLeft(grid, rows[i]);
-				}
-			});
+			var rows = this.inherited(arguments);
+			
+			for(var i = 0; i < rows.length; i++){
+				adjustScrollLeft(this, rows[i]);
+			}
 			return rows;
 		},
 
