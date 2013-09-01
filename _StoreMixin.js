@@ -184,6 +184,15 @@ function(declare, lang, Deferred, listen, aspect, put){
 			}
 		},
 		
+		row: function(target){
+			// Extend List#row with more appropriate lookup-by-id logic
+			var row = this.inherited(arguments);
+			if(row && row.data && typeof row.id !== "undefined"){
+				row.id = this.store.getIdentity(row.data);
+			}
+			return row;
+		},
+		
 		insertRow: function(object, parent, beforeNode, i, options){
 			var store = this.store,
 				dirty = this.dirty,

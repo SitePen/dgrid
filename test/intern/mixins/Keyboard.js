@@ -46,10 +46,9 @@ define([
 		}));
 		// trigger a focus with no argument, which should focus the first row
 		grid.focus();
-		// XXX: dgrid/List#row returns string ID when looking up DOM node
 		assert.strictEqual(document.activeElement, query(".dgrid-row", grid.contentNode)[0],
 			"focus() targeted the first row");
-		assert.strictEqual(rowId, "0",
+		assert.strictEqual(rowId, 0,
 			"dgrid-cellfocusin event triggered on first row on focus() call");
 	}
 	
@@ -66,7 +65,7 @@ define([
 		// make sure we got the right row
 		assert.strictEqual(document.activeElement, target,
 			"focus(...) targeted the expected row");
-		assert.strictEqual(rowId, "1",
+		assert.strictEqual(rowId, 1,
 			"dgrid-cellfocusin event triggered on expected row");
 	}
 	
@@ -86,7 +85,7 @@ define([
 		
 		grid.focus(targets[1]);
 		// make sure our handler was called
-		assert.strictEqual(blurredRow && blurredRow.id, "0",
+		assert.strictEqual(blurredRow && blurredRow.id, 0,
 			"dgrid-cellfocusout event triggered on expected row");
 	}
 	
@@ -205,7 +204,7 @@ define([
 			assert.strictEqual(document.activeElement, target,
 				"focus(...) targeted the expected cell");
 			assert.ok(focusedCell, "dgrid-cellfocusin event fired");
-			assert.strictEqual(focusedCell.row.id, "0",
+			assert.strictEqual(focusedCell.row.id, 0,
 				"dgrid-cellfocusin event triggered on expected row");
 			assert.strictEqual(focusedCell.column.id, "col3",
 				"dgrid-cellfocusin event triggered on second cell on focus(...) call");
@@ -244,7 +243,7 @@ define([
 			grid.focus(targets[1]);
 			// make sure our handler was called appropriately
 			assert.ok(blurredCell, "dgrid-cellfocusout event fired");
-			assert.strictEqual(blurredCell.row.id, "0",
+			assert.strictEqual(blurredCell.row.id, 0,
 				"dgrid-cellfocusout event triggered on expected row");
 			assert.strictEqual(blurredCell.column.id, "col1",
 				"dgrid-cellfocusout event triggered on expected column");
