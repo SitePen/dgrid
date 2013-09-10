@@ -181,6 +181,30 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 				this._pagingTextBoxHandle.remove();
 			}
 		},
+
+        _setRowsPerPage: function(rowsPerPage){
+            var sizeSelect = query('select.dgrid-page-size', this.domNode)[0],
+                options = query('option', sizeSelect),
+                opt;
+
+            for(var i = 0; i < options.length; i++){
+                if(rowsPerPage <= +options[i].value){
+                    if(rowsPerPage === +options[i].value){
+                        opt = options[i];
+                    }else{
+                        opt = put(options[i], '- option[value=' + rowsPerPage + ']', rowsPerPage);
+                    }
+                    break;
+                }
+            }
+            if(!opt) {
+                opt = put(sizeSelect, 'option[value=' + rowsPerPage + ']', rowsPerPage);
+            }
+
+            sizeSelect.value = opt.value;
+            this.rowsPerPage = rowsPerPage;
+            this.gotoPage(1);
+        },
 		
 		_updateNavigation: function(focusLink){
 			// summary:
