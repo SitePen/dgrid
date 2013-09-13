@@ -3,7 +3,12 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 # master (0.3.11-dev)
 
-Coming soon!
+## Other changes and fixes
+
+### Mixins
+
+* Fixed an issue in `Selection` where its select-all keybinding would prevent
+  select-all functionality within text editors. (#711)
 
 # 0.3.10
 
