@@ -300,8 +300,14 @@ return declare([List, _StoreMixin], {
 		//		plugins that add connected elements to a row, like the tree
 		
 		var sibling = rowElement.previousSibling;
-		return sibling && sibling.offsetTop != rowElement.offsetTop ?
-			rowElement.offsetHeight : 0;
+		sibling = sibling && !/\bdgrid-preload\b/.test(sibling.className) && sibling;
+		
+		// If a previous row exists, compare the top of this row with the
+		// previous one (in case "rows" are actually rendering side-by-side).
+		// If no previous row exists, this is either the first or only row,
+		// in which case we count its own height.
+		return sibling ? rowElement.offsetTop - sibling.offsetTop :
+			rowElement.offsetHeight;
 	},
 	
 	lastScrollTop: 0,
