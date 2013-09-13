@@ -5,6 +5,11 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ## Other changes and fixes
 
+### General/Core
+
+* Fixed an issue in `OnDemandList#_calcRowHeight` to properly calculate height
+  of the first row. (#552)
+
 ### Mixins
 
 * Fixed an issue in `Selection` where its select-all keybinding would prevent
