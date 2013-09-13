@@ -1,5 +1,5 @@
-define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/on", "dojo/has", "put-selector/put", "./List", "./util/misc", "dojo/_base/sniff"],
-function(kernel, declare, listen, has, put, List, miscUtil){
+define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/array", "dojo/on", "dojo/has", "put-selector/put", "./List", "./util/misc", "dojo/_base/sniff"],
+function(kernel, declare, array, listen, has, put, List, miscUtil){
 	var contentBoxSizing = has("ie") < 8 && !has("quirks");
 	var invalidClassChars = /[^\._a-zA-Z0-9-]/g;
 	function appendIfNode(parent, subNode){
@@ -17,6 +17,13 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 		cellNavigation: true,
 		tabableHeader: true,
 		showHeader: true,
+
+		// cleanAddedColumnRules: Boolean
+		//		Whether to track generated column style rules to be removed
+		//		when the grid is destroyed.  Note this is effective at the time
+		//		column style is set, not at the time of grid destruction.
+		cleanAddedColumnRules: true,
+
 		column: function(target){
 			// summary:
 			//		Get the column object by node, or event, or a columnId
@@ -144,7 +151,6 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 		},
 		
 		renderRow: function(object, options){
-			var self = this;
 			var row = this.createRowCells("td", function(td, column){
 				var data = object;
 				// Support get function or field property (similar to DataGrid)
@@ -277,6 +283,11 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 				}
 			}
 		},
+
+		postCreate: function(){
+			this.inherited(arguments);
+			this._columnRules = [];
+		},
 		
 		destroy: function(){
 			// Run _destroyColumns first to perform any column plugin tear-down logic.
@@ -353,13 +364,27 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 				this.resize();
 			}
 		},
-		
+
+		_addColumnRule: function(selector, css){
+			// summary:
+			//		Add a CSS rule that will be cleaned up when the columns are destroyed or when the grid is destroyed
+			//		if cleanAddedColumnRules is true.
+			// selector: String
+			//		The css selector to be included in the selector: eg. .dgrid-column-1 or .dgrid-column-name
+			// css: String
+			//		CSS that will be included in the new rule
+			//
+			var rule = miscUtil.addCssRule("#" + miscUtil.escapeCssIdentifier(this.domNode.id) + " " + selector, css);
+			if(this.cleanAddedColumnRules){
+				this._columnRules.push(rule);
+			}
+			return rule;
+		},
+
 		styleColumn: function(colId, css){
 			// summary:
 			//		Dynamically creates a stylesheet rule to alter a column's style.
-			
-			return this.addCssRule("#" + miscUtil.escapeCssIdentifier(this.domNode.id) +
-				" .dgrid-column-" + colId, css);
+			return this._addColumnRule(".dgrid-column-" + colId, css);
 		},
 		
 		/*=====
@@ -422,6 +447,13 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 					column = subRows[i][j];
 					if(typeof column.destroy === "function"){ column.destroy(); }
 				}
+			}
+
+			if(this._columnRules.length > 0){
+				array.forEach(this._columnRules, function(rule){
+					rule.remove();
+				});
+				this._columnRules = [];
 			}
 		},
 		

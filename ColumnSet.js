@@ -1,5 +1,5 @@
-define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/on", "dojo/aspect", "dojo/query", "dojo/has", "./util/misc", "put-selector/put", "xstyle/has-class", "./Grid", "dojo/_base/sniff", "xstyle/css!./css/columnset.css"],
-function(kernel, declare, lang, Deferred, listen, aspect, query, has, miscUtil, put, hasClass, Grid){
+define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/on", "dojo/aspect", "dojo/query", "dojo/has", "./util/misc", "put-selector/put", "xstyle/has-class", "dojo/_base/sniff", "xstyle/css!./css/columnset.css"],
+function(kernel, declare, lang, Deferred, listen, aspect, query, has, miscUtil, put, hasClass){
 	has.add("event-mousewheel", function(global, document, element){
 		return typeof element.onmousewheel !== "undefined";
 	});
@@ -166,8 +166,8 @@ function(kernel, declare, lang, Deferred, listen, aspect, query, has, miscUtil, 
 		styleColumnSet: function(colsetId, css){
 			// summary:
 			//		Dynamically creates a stylesheet rule to alter a columnset's style.
-			
-			var rule = this.addCssRule("#" + miscUtil.escapeCssIdentifier(this.domNode.id) + " .dgrid-column-set-" + colsetId, css);
+
+			var rule = this._addColumnRule(".dgrid-column-set-" + colsetId, css);
 			this._positionScrollers();
 			return rule;
 		},
