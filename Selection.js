@@ -305,12 +305,14 @@ return declare(null, {
 			});
 		}
 		
-		// If allowSelectAll is true, allow ctrl/cmd+A to (de)select all rows.
+		// If allowSelectAll is true, bind ctrl/cmd+A to (de)select all rows,
+		// unless the event was received from an editor component.
 		// (Handler further checks against _allowSelectAll, which may be updated
 		// if selectionMode is changed post-init.)
 		if(this.allowSelectAll){
 			this.on("keydown", function(event) {
-				if (event[ctrlEquiv] && event.keyCode == 65) {
+				if(event[ctrlEquiv] && event.keyCode == 65 &&
+						!/\bdgrid-input\b/.test(event.target.className)){
 					event.preventDefault();
 					grid[grid.allSelected ? "clearSelection" : "selectAll"]();
 				}
