@@ -103,14 +103,14 @@
 					form.onsubmit = function() {
 						var args = domForm.toObject(form);
 						args.pagingLinks = +args.pagingLinks;
-                        args.rowsPerPage = +args.rowsPerPage;
+						args.rowsPerPage = +args.rowsPerPage;
 						if (!args.previousNextArrows) { args.previousNextArrows = false; }
 						if (!args.showLoadingMessage) { args.showLoadingMessage = false; }
 						
 						// recreate grid using args from form
 						window.grid.destroy();
 						domConstruct.create("div", { id: "grid" }, form, "after");
-                        console.log('creating grid with', args);
+						console.log('creating grid with', args);
 						createGrid(args);
 						
 						return false;
@@ -134,7 +134,7 @@
 					var form2 = document.getElementById("configForm2");
 					form2.onsubmit = function() {
 						var args = domForm.toObject(form2);
-                        args.rowsPerPage = +args.rowsPerPage;
+						args.rowsPerPage = +args.rowsPerPage;
 						
 						// set the rowsPerPage in the grid
 						window.grid2.set('rowsPerPage', args.rowsPerPage);
@@ -164,6 +164,7 @@
 		</script>
 	</head>
 	<body>
+		<a name="basic"/>
 		<h2>A basic grid with the Pagination extension</h2>
 		<h3>Configuration</h3>
 		<form id="configForm">
@@ -205,6 +206,7 @@
 			<button onclick="grid.set('showFooter', !grid.get('showFooter'));">Toggle footer</button>
 		</div>
 		
+		<a name="declarative"/>
 		<h2>A grid with declarative structure, with the Pagination extension</h2>
 		<table id="gridfromhtml">
 			<thead><tr>
@@ -215,7 +217,8 @@
 				<th data-dgrid-column="{ field: 'col5' }">Column 5</th>
 			</tr></thead>
 		</table>
-		
+
+		<a name="autoheight"/>
 		<h2>An autoheight grid with the Pagination extension,
 			with a rows-per-page drop-down</h2>
 		<form id="configForm2">
@@ -227,6 +230,7 @@
 		</form>
 		<div id="grid2"></div>
 		
+		<a name="columnsets"/>
 		<h2>A grid with ColumnSets with the Pagination extension</h2>
 		<div id="gridColumnSet"></div>
 	</body>

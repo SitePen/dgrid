@@ -91,7 +91,7 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 			statusNode.tabIndex = 0;
 			
 			if(pageSizeOptions.length){
-				var sizeSelect = put(paginationNode, 'select.dgrid-page-size'),
+				var sizeSelect = this.sizeSelect = put(paginationNode, 'select.dgrid-page-size'),
 					i;
 				for(i = 0; i < pageSizeOptions.length; i++){
 					put(sizeSelect, 'option', pageSizeOptions[i], {
@@ -182,30 +182,30 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 			}
 		},
 
-        _setRowsPerPage: function(rowsPerPage){
-            var sizeSelect = query('select.dgrid-page-size', this.domNode)[0],
-                options = query('option', sizeSelect),
-                opt;
+		_setRowsPerPage: function(rowsPerPage){
+			var options = this.sizeSelect.childNodes,
+			opt;
 
-            for(var i = 0; i < options.length; i++){
-                if(rowsPerPage <= +options[i].value){
-                    if(rowsPerPage === +options[i].value){
-                        opt = options[i];
-                    }else{
-                        opt = put(options[i], '- option[value=' + rowsPerPage + ']', rowsPerPage);
-                    }
-                    break;
-                }
-            }
-            if(!opt) {
-                opt = put(sizeSelect, 'option[value=' + rowsPerPage + ']', rowsPerPage);
-            }
+			for(var i = 0; i < options.length; i++){
+				var value = +options[i].value;
+				if(rowsPerPage <= value){
+					if(rowsPerPage === value){
+						opt = options[i];
+					}else{
+						opt = put(options[i], '- option[value=' + rowsPerPage + ']', rowsPerPage);
+					}
+					break;
+				}
+			}
+			if(!opt){
+				opt = put(this.sizeSelect, 'option[value=' + rowsPerPage + ']', rowsPerPage);
+			}
 
-            sizeSelect.value = opt.value;
-            this.rowsPerPage = rowsPerPage;
-            this.gotoPage(1);
-        },
-		
+			this.sizeSelect.value = opt.value;
+			this.rowsPerPage = rowsPerPage;
+			this.gotoPage(1);
+		},
+
 		_updateNavigation: function(focusLink){
 			// summary:
 			//		Update status and navigation controls based on total count from query
