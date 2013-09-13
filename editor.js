@@ -327,6 +327,13 @@ function showEditor(cmp, column, cellElement, value){
 		// Set value, but ensure it isn't processed as a user-generated change.
 		// (Clear flag on a timeout to wait for delayed onChange to fire first)
 		cmp._dgridIgnoreChange = true;
+        // Call optional column property 'onEdit'. Both the row data object
+        // and the widget are passed. Useful if widget needs to change itself
+        // depending on particular cell's data.
+        if (column.onEdit) {
+            var obj = column.grid.cell(cellElement).row.data;
+            column.onEdit(obj, cmp);
+        }
 		cmp.set("value", value);
 		setTimeout(function(){ cmp._dgridIgnoreChange = false; }, 0);
 	}
