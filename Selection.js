@@ -346,7 +346,7 @@ return declare(null, {
 		if(store && store.notify){
 			this._deselectionSignal = aspect.after(store, "notify", function(object, idToUpdate){
 				var id = idToUpdate || (object && object[this.idProperty || "id"]);
-				if (id) {
+				if (id != null) {
 					var row = self.row(id),
 						selection = row && self.selection[row.id];
 					// Is the row currently in the selection list.
