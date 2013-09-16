@@ -145,7 +145,7 @@ return declare([List, _StoreMixin], {
 		// Establish query options, mixing in our own.
 		// (The getter returns a delegated object, so simply using mixin is safe.)
 		options = lang.mixin(this.get("queryOptions"), options, 
-			{start: 0, count: this.minRowsPerPage, query: query});
+			{start: 0, count: this.minRowsPerPage});
 		
 		// Protect the query within a _trackError call, but return the QueryResults
 		this._trackError(function(){ return results = query(options); });
