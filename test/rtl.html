@@ -46,8 +46,15 @@
 			data-dojo-config="async: true"></script>
 		<script>
 		
-			require(["dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dgrid/tree", "dgrid/editor", "dojo/_base/lang", "dojo/_base/declare", "dojo/on", "dojo/data/ObjectStore", "dijit/form/CheckBox", "dijit/form/TimeTextBox",  "dijit/form/Select", "dijit/form/FilteringSelect", "dgrid/test/data/base", "dojo/domReady!", "xstyle/css!../css/dgrid_rtl.css"], 
-				function(Grid, Selection, Keyboard, tree, editor, lang, declare, on, ObjectStore, CheckBox, TimeTextBox, Select, FilteringSelect, testStore){
+			require(["dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard",
+					"dgrid/tree", "dgrid/editor", "dojo/_base/lang",
+					"dojo/_base/declare", "dojo/on", "dojo/data/ObjectStore",
+					"dijit/form/CheckBox", "dijit/form/TimeTextBox",
+					"dijit/form/Select", "dijit/form/FilteringSelect",
+					"dgrid/extensions/Pagination", "dgrid/test/data/base", "dojo/domReady!", "xstyle/css!../css/dgrid_rtl.css"], 
+				function(Grid, Selection, Keyboard, tree, editor, lang, declare,
+						 on, ObjectStore, CheckBox, TimeTextBox, Select,
+						 FilteringSelect, Pagination, testStore){
 					var columns = [
 						{label: 'Column 1', field: 'col1'},
 						{label: 'Column 2', field: 'col2', sortable: false},
@@ -143,6 +150,12 @@
 						columns: columnsEditor,
 						selectionMode: "none"
 					}, "moreeditors");
+
+					window.paginationGrid = new declare([StandardGrid, Pagination])({
+						store: testTypesStore,
+						columns: columnsEditor,
+						selectionMode: 'none'
+					}, 'pagination');
 					
 				});
 		</script>
@@ -164,5 +177,8 @@
 		<h2>Grid with editors</h2>
 		<div id="moreeditors"></div>
 		<button type="button" id="save" onclick="moreeditors.save()">Save</button>
+
+		<h2>A basic grid with Pagination</h2>
+		<div id="pagination"></div>
 	</body>
 </html>
