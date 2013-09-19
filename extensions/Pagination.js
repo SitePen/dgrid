@@ -195,7 +195,7 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 				end = Math.ceil(this._total / this.rowsPerPage),
 				pagingTextBoxHandle = this._pagingTextBoxHandle;
 			
-			function pageLink(page){
+			function pageLink(page, addSpace){
 				var link;
 				if(grid.pagingTextBox && page == currentPage && end > 1){
 					// use a paging text box if enabled instead of just a number
@@ -211,7 +211,7 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 					// normal link
 					link = put(linksNode,
 						'span' + (page == currentPage ? '.dgrid-page-disabled' : '') + '.dgrid-page-link',
-						page);
+						page + (addSpace ? " " : ""));
 					link.setAttribute("aria-label", i18n.gotoPage);
 					link.tabIndex = 0;
 				}
@@ -232,7 +232,7 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 			
 			if(pagingLinks && end > 0){
 				// always include the first page (back to the beginning)
-				pageLink(1);
+				pageLink(1, true);
 				var start = currentPage - pagingLinks;
 				if(start > 2) {
 					// visual indication of skipped page links
@@ -242,7 +242,7 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 				}
 				// now iterate through all the page links we should show
 				for(var i = start; i < Math.min(currentPage + pagingLinks + 1, end); i++){
-					pageLink(i);
+					pageLink(i, true);
 				}
 				if(currentPage + pagingLinks + 1 < end){
 					put(linksNode, "span.dgrid-page-skip", "...");
