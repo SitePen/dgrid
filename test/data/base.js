@@ -1,6 +1,13 @@
 // example sample data and code
-define(["dojo/_base/lang", "dojo/_base/Deferred", "dojo/store/Memory", "dojo/store/Observable", "dojo/store/util/QueryResults"],
-function(lang, Deferred, Memory, Observable, QueryResults){
+define([
+	"dojo/_base/lang",
+	"dojo/_base/array",
+	"dojo/_base/Deferred",
+	"dojo/store/Memory",
+	"dojo/store/Observable",
+	"dojo/store/util/QueryResults"
+],
+function(lang, arrayUtil, Deferred, Memory, Observable, QueryResults){
 	// some sample data
 	// global var "data"
 	data = {
@@ -232,6 +239,31 @@ function(lang, Deferred, Memory, Observable, QueryResults){
 		}
 	}));
 	
+	var testTopHeavyData = arrayUtil.map(testStateStore.data, function (state) {
+		return {
+			abbreviation: state.abbreviation,
+			name: state.name,
+			children: [{
+				abbreviation: 'US',
+				name: 'United States of America'
+			}]
+		};
+	});
+	
+	// global var testTopHeavyStore
+	// Store with few children and many parents to exhibit any
+	// issues due to bugs related to total disregarding level
+	testTopHeavyStore = Observable(new Memory({
+		data: testTopHeavyData,
+		idProperty: "abbreviation",
+		getChildren: function(parent, options){
+			return parent.children;
+		},
+		mayHaveChildren: function(parent){
+			return !!parent.children;
+		}
+	}));
+
 	function calculateOrder(store, object, before, orderField){
 		// Calculates proper value of order for an item to be placed before another
 		var afterOrder, beforeOrder = 0;

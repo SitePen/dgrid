@@ -124,6 +124,15 @@
 						treeSelector.set("columns", getTreeSelectorColumns());
 					});
 					
+					window.treeTopHeavy = new StandardGrid({
+						store: testTopHeavyStore,
+						query: { parent: undefined },
+						columns: {
+							abbreviation: tree({ label: "Abbreviation", field: "abbreviation" }),
+							name: "Name"
+						}
+					}, "treeTopHeavy");
+					
 					window.treeSubRows = new StandardGrid({
 						store: testCountryStore,
 						query: {type: "continent"},
@@ -169,6 +178,8 @@
 		<h2>Tree grid with formatter on tree column, and a checkbox selector to test select-all on children</h2>
 		<div id="treeSelector"></div>
 		<button id="resetColumns">Reset Columns</button> (to test column.init/destroy)
+		<h2>Tree grid with more children than parents</h2>
+		<div id="treeTopHeavy"></div>
 		<h2>Tree grid with subRows</h2>
 		<div id="treeSubRows"></div>
 		<h2>Tree grid with columnSets</h2>

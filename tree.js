@@ -208,13 +208,16 @@ function tree(column){
 						options = { parentId: row.id };
 					}
 					// Include level information on query for renderQuery case
-					query.level = target.level;
+					if("level" in target){
+						query.level = target.level;
+					}
 					Deferred.when(
 						grid.renderQuery ?
 							grid._trackError(function(){
 								return grid.renderQuery(query, preloadNode, options);
 							}) :
-							grid.renderArray(query(options), preloadNode, { queryLevel: query.level }),
+							grid.renderArray(query(options), preloadNode,
+								"level" in query ? { queryLevel: query.level } : {}),
 						function(){
 							// Expand once results are retrieved, if the row is still expanded.
 							if(grid._expanded[row.id] && hasTransitionend){
