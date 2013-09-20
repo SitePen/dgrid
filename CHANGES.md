@@ -3,6 +3,14 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 # master (0.3.11-dev)
 
+## Significant changes
+
+### General/Core
+
+* Fixed a regression related to `OnDemandList` in conjunction with the `tree`
+  plugin, where queries would not fire due to confusion between different levels.
+  (#717)
+
 ## Other changes and fixes
 
 ### General/Core
