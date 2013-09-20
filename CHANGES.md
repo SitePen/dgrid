@@ -17,6 +17,11 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 * Fixed an issue in `Selection` where its select-all keybinding would prevent
   select-all functionality within text editors. (#711)
 
+### Extensions
+
+* The `Pagination` extension will now render its footer controls properly in RTL
+  locales (provided `dgrid_rtl.css` is loaded). (#707)
+
 # 0.3.10
 
 ## Significant changes
