@@ -9,6 +9,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 * Fixed an issue in `OnDemandList#_calcRowHeight` to properly calculate height
   of the first row. (#552)
+* Fixed a compatibility issue in `OnDemandList` and `dojo/store/DataStore` due
+  to a conflicting property in `queryOptions`. (#440)
 
 ### Mixins
 
