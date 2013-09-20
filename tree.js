@@ -201,19 +201,20 @@ function tree(column){
 					var query = function(options){
 						return grid.store.getChildren(row.data, options);
 					};
-					query.level = target.level;
 					if(column.allowDuplicates){
 						// If allowDuplicates is specified, include parentId in options
 						// in order to facilitate unique IDs for each occurrence of the
 						// same item under multiple different parents.
 						options = { parentId: row.id };
 					}
+					// Include level information on query for renderQuery case
+					query.level = target.level;
 					Deferred.when(
 						grid.renderQuery ?
 							grid._trackError(function(){
 								return grid.renderQuery(query, preloadNode, options);
 							}) :
-							grid.renderArray(query(options), preloadNode, {query: query}),
+							grid.renderArray(query(options), preloadNode, { queryLevel: query.level }),
 						function(){
 							// Expand once results are retrieved, if the row is still expanded.
 							if(grid._expanded[row.id] && hasTransitionend){
