@@ -16,6 +16,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 * Fixed an issue in `Selection` where its select-all keybinding would prevent
   select-all functionality within text editors. (#711)
+* Fixed an issue in `Selection` where the selection could fall out of sync for
+  an item with a falsy id. (#715)
 
 ### Extensions
 
