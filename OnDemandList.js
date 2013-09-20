@@ -145,7 +145,7 @@ return declare([List, _StoreMixin], {
 		// Establish query options, mixing in our own.
 		// (The getter returns a delegated object, so simply using mixin is safe.)
 		options = lang.mixin(this.get("queryOptions"), options, 
-			{start: 0, count: this.minRowsPerPage, query: query});
+			{start: 0, count: this.minRowsPerPage, queryLevel: query.level});
 		
 		// Protect the query within a _trackError call, but return the QueryResults
 		this._trackError(function(){ return results = query(options); });
@@ -499,7 +499,7 @@ return declare([List, _StoreMixin], {
 				innerNode.innerHTML = grid.loadingMessage;
 				loadingNode.count = count;
 				// use the query associated with the preload node to get the next "page"
-				options.query = preload.query;
+				options.queryLevel = preload.query.level;
 				
 				// Avoid spurious queries (ideally this should be unnecessary...)
 				if(options.start > grid._total || options.count < 0){

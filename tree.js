@@ -284,7 +284,7 @@ function tree(column){
 		//		Renders a cell that can be expanded, creating more rows
 		
 		var grid = column.grid,
-			level = Number(options && options.query && options.query.level) + 1,
+			level = Number(options && options.queryLevel) + 1,
 			mayHaveChildren = !grid.store.mayHaveChildren || grid.store.mayHaveChildren(object),
 			parentId = options.parentId,
 			expando, node;
