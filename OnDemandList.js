@@ -502,7 +502,7 @@ return declare([List, _StoreMixin], {
 				innerNode.innerHTML = grid.loadingMessage;
 				loadingNode.count = count;
 				// use the query associated with the preload node to get the next "page"
-				if(preload.query.level){
+				if("level" in preload.query){
 					options.queryLevel = preload.query.level;
 				}
 				
