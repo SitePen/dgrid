@@ -427,16 +427,22 @@ define([
 				grid._fireSelectionEvent();
 				assert.strictEqual(deselectEventFired, 0, "Deselect event not fired: " + deselectEventFired);
 
+				// Reset the select event counter.  It should not fire on remove.
+				selectEventFired = 0;
+
 				store.remove(3);
 				grid._fireSelectionEvent();
+				assert.strictEqual(selectEventFired, 0, "Select event not fired: " + selectEventFired);
 				assert.strictEqual(deselectEventFired, 1, "Deselect event fired once: " + deselectEventFired);
 
 				store.remove(5);
 				grid._fireSelectionEvent();
+				assert.strictEqual(selectEventFired, 0, "Select event not fired: " + selectEventFired);
 				assert.strictEqual(deselectEventFired, 1, "Deselect event not fired again: " + deselectEventFired);
 
 				store.remove(4);
 				grid._fireSelectionEvent();
+				assert.strictEqual(selectEventFired, 0, "Select event not fired: " + selectEventFired);
 				assert.strictEqual(deselectEventFired, 2, "Deselect event fired a second time: " + deselectEventFired);
 			}
 
