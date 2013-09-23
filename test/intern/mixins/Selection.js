@@ -175,7 +175,7 @@ define([
 			grid.startup();
 
 			function checkStyles(){
-				// Checks to see if the rendered rows that are selected have the dgrid-selected sytle
+				// Checks to see if the rendered rows that are selected have the dgrid-selected style
 				// and no unselected rows have that style
 				var selection = grid.selection;
 				for(var id in grid._rowIdToObject){
