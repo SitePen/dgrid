@@ -65,7 +65,7 @@ var Keyboard = declare(null, {
 	
 	postCreate: function(){
 		this.inherited(arguments);
-		var grid = this;
+		var self = this;
 		
 		function handledEvent(event){
 			// text boxes and other inputs that can use direction keys should be ignored and not affect cell/row navigation
@@ -74,70 +74,70 @@ var Keyboard = declare(null, {
 		}
 		
 		function enableNavigation(areaNode){
-			var cellNavigation = grid.cellNavigation,
+			var cellNavigation = self.cellNavigation,
 				isFocusableClass = cellNavigation ? hasGridCellClass : hasGridRowClass,
-				isHeader = areaNode === grid.headerNode,
+				isHeader = areaNode === self.headerNode,
 				initialNode = areaNode;
 			
 			function initHeader(){
-				grid._focusedHeaderNode = initialNode =
-					cellNavigation ? grid.headerNode.getElementsByTagName("th")[0] : grid.headerNode;
-				if(initialNode){ initialNode.tabIndex = grid.tabIndex; }
+				// The header rows are not built like the data rows.  The row id is on the table rather than
+				// the outside div. When cell navigation is off, set the tab stop on the inner table.
+				initialNode = cellNavigation ? self.headerNode.getElementsByTagName("th")[0] : self.headerNode.firstChild;
+				self._initTabStopNode(initialNode, true);
 			}
 			
 			if(isHeader){
 				// Initialize header now (since it's already been rendered),
 				// and aspect after future renderHeader calls to reset focus.
 				initHeader();
-				aspect.after(grid, "renderHeader", initHeader, true);
+				aspect.after(self, "renderHeader", initHeader, true);
 			}else{
-				aspect.after(grid, "renderArray", function(ret){
+				aspect.after(self, "renderArray", function(ret){
 					// summary:
 					//		Ensures the first element of a grid is always keyboard selectable after data has been
 					//		retrieved if there is not already a valid focused element.
 					
 					return Deferred.when(ret, function(ret){
-						var focusedNode = grid._focusedNode || initialNode;
+						initialNode = self._getFocusTracking().focusedNode || initialNode;
 						
-						// do not update the focused element if we already have a valid one
-						if(isFocusableClass.test(focusedNode.className) && contains(areaNode, focusedNode)){
+						// do not update the initial focusable element if we already have a valid one
+						if(isFocusableClass.test(initialNode.className) && contains(areaNode, initialNode)){
 							return ret;
 						}
 						
-						// ensure that the focused element is actually a grid cell, not a
+						// ensure that the focusable element is actually a grid cell, not a
 						// dgrid-preload or dgrid-content element, which should not be focusable,
 						// even when data is loaded asynchronously
 						for(var i = 0, elements = areaNode.getElementsByTagName("*"), element; (element = elements[i]); ++i){
 							if(isFocusableClass.test(element.className)){
-								focusedNode = grid._focusedNode = element;
+								initialNode = element;
 								break;
 							}
 						}
-						
-						focusedNode.tabIndex = grid.tabIndex;
+						self._initTabStopNode(initialNode);
 						return ret;
 					});
 				});
 			}
 			
-			grid._listeners.push(on(areaNode, "mousedown", function(event){
+			self._listeners.push(on(areaNode, "mousedown", function(event){
 				if(!handledEvent(event)){
-					grid._focusOnNode(event.target, isHeader, event);
+					self._focusOnNode(event.target, isHeader, event);
 				}
 			}));
 			
-			grid._listeners.push(on(areaNode, "keydown", function(event){
+			self._listeners.push(on(areaNode, "keydown", function(event){
 				// For now, don't squash browser-specific functionalities by letting
 				// ALT and META function as they would natively
 				if(event.metaKey || event.altKey) {
 					return;
 				}
 				
-				var handler = grid[isHeader ? "headerKeyMap" : "keyMap"][event.keyCode];
+				var handler = self[isHeader ? "headerKeyMap" : "keyMap"][event.keyCode];
 				
 				// Text boxes and other inputs that can use direction keys should be ignored and not affect cell/row navigation
 				if(handler && !handledEvent(event)){
-					handler.call(grid, event);
+					handler.call(self, event);
 				}
 			}));
 		}
@@ -145,21 +145,23 @@ var Keyboard = declare(null, {
 		if(this.tabableHeader){
 			enableNavigation(this.headerNode);
 			on(this.headerNode, "dgrid-cellfocusin", function(){
-				grid.scrollTo({ x: this.scrollLeft });
+				self.scrollTo({ x: this.scrollLeft });
 			});
 		}
 		enableNavigation(this.contentNode);
 	},
 	
 	removeRow: function(rowElement){
-		if(!this._focusedNode){
+		var focusTracking = this._getFocusTracking(),
+			focusedNode = focusTracking.focusedNode;
+		if(!focusedNode){
 			// Nothing special to do if we have no record of anything focused
 			return this.inherited(arguments);
 		}
 		
 		var self = this,
-			isActive = document.activeElement === this._focusedNode,
-			focusedTarget = this[this.cellNavigation ? "cell" : "row"](this._focusedNode),
+			isActive = document.activeElement === focusedNode,
+			focusedTarget = this[this.cellNavigation ? "cell" : "row"](focusedNode),
 			focusedRow = focusedTarget.row || focusedTarget,
 			sibling;
 		rowElement = rowElement.element || rowElement;
@@ -192,9 +194,9 @@ var Keyboard = declare(null, {
 				}
 			}, 0);
 			
-			// Clear _focusedNode until _restoreFocus is called, to avoid
+			// Clear focusedNode until _restoreFocus is called, to avoid
 			// needlessly re-running this logic
-			this._focusedNode = null;
+			focusTracking.focusedNode = null;
 		}
 		
 		this.inherited(arguments);
@@ -263,8 +265,8 @@ var Keyboard = declare(null, {
 	},
 	
 	_focusOnNode: function(element, isHeader, event){
-		var focusedNodeProperty = "_focused" + (isHeader ? "Header" : "") + "Node",
-			focusedNode = this[focusedNodeProperty],
+		var focusTracking = this._getFocusTracking(isHeader),
+			focusedNode = focusTracking.focusedNode,
 			cellOrRowType = this.cellNavigation ? "cell" : "row",
 			cell = this[cellOrRowType](element),
 			inputs,
@@ -274,8 +276,8 @@ var Keyboard = declare(null, {
 			i;
 		
 		element = cell && cell.element;
-		if(!element){ return; }
-		
+		if(!element || element === focusedNode){ return; }
+
 		if(this.cellNavigation){
 			inputs = element.getElementsByTagName("input");
 			for(i = 0, numInputs = inputs.length; i < numInputs; i++){
@@ -290,37 +292,14 @@ var Keyboard = declare(null, {
 				}
 			}
 		}
-		
-		event = lang.mixin({ grid: this }, event);
-		if(event.type){
-			event.parentType = event.type;
-		}
-		if(!event.bubbles){
-			// IE doesn't always have a bubbles property already true.
-			// Opera throws if you try to set it to true if it is already true.
-			event.bubbles = true;
-		}
+
 		if(focusedNode){
-			// Clean up previously-focused element
-			// Remove the class name and the tabIndex attribute
-			put(focusedNode, "!dgrid-focus[!tabIndex]");
-			if(has("ie") < 8){
-				// Clean up after workaround below (for non-input cases)
-				focusedNode.style.position = "";
-			}
-			
-			// Expose object representing focused cell or row losing focus, via
-			// event.cell or event.row; which is set depends on cellNavigation.
-			event[cellOrRowType] = this[cellOrRowType](focusedNode);
-			on.emit(element, "dgrid-cellfocusout", event);
+			// Clean up the old focus node's style and gererate events.
+			this._handleBlur(focusedNode, isHeader, this._createEvent(event, focusedNode));
 		}
-		focusedNode = this[focusedNodeProperty] = element;
-		
-		// Expose object representing focused cell or row gaining focus, via
-		// event.cell or event.row; which is set depends on cellNavigation.
-		// Note that yes, the same event object is being reused; on.emit
-		// performs a shallow copy of properties into a new event object.
-		event[cellOrRowType] = cell;
+		focusedNode = focusTracking.focusedNode = element;
+		// Set the new element as a tab stop node
+		this._changeTabStopNode(element, isHeader);
 		
 		if(!inputFocused){
 			if(has("ie") < 8){
@@ -329,19 +308,115 @@ var Keyboard = declare(null, {
 				// (can't be done a priori with CSS or screws up the entire table)
 				element.style.position = "relative";
 			}
-			element.tabIndex = this.tabIndex;
 			element.focus();
 		}
 		put(element, ".dgrid-focus");
-		on.emit(focusedNode, "dgrid-cellfocusin", event);
+		on.emit(focusedNode, "dgrid-cellfocusin", this._createEvent(event, cell));
 	},
 	
 	focusHeader: function(element){
-		this._focusOnNode(element || this._focusedHeaderNode, true);
+		this._focusOnNode(element || this._getFocusTracking(true).tabStopNode, true);
 	},
 	
 	focus: function(element){
-		this._focusOnNode(element || this._focusedNode, false);
+		this._focusOnNode(element || this._getFocusTracking().tabStopNode, false);
+	},
+
+	_createEvent: function(parentEvent, cellRowOrElement){
+		// Creates an event for the dgrid focus events that bubbles and contains a reference to
+		// a row or cell as appropriate.
+		var event = lang.mixin({ grid: this }, parentEvent),
+			cellOrRowType = this.cellNavigation ? "cell" : "row";
+		if(parentEvent && parentEvent.type){
+			event.parentType = parentEvent.type;
+		}
+		if(!event.bubbles){
+			// IE doesn't always have a bubbles property already true.
+			// Opera throws if you try to set it to true if it is already true.
+			event.bubbles = true;
+		}
+		// Expose object representing focused cell or row gaining focus, via
+		// event.cell or event.row; which is set depends on cellNavigation.
+		// Note that yes, the same event object is being reused; on.emit
+		// performs a shallow copy of properties into a new event object.
+		if(!cellRowOrElement.element){
+			cellRowOrElement = this[cellOrRowType](cellRowOrElement);
+		}
+		event[cellOrRowType] = cellRowOrElement;
+		return event;
+	},
+
+	_getFocusTracking: function(isHeader){
+		// Returns an object used to track the node that has focus and the tab stop node for either the
+		// rows or the header.
+		var property = "_focusNodes" + (isHeader ? "Header" : ""),
+			focusTracking = this[property];
+		return focusTracking || (this[property] = {});
+	},
+
+	_handleBlur: function(element, isHeader, event){
+		// Cleans up an element's style after losing focus, generates the dgrid-cellfocusout event
+		// and sets up a listener for focus.
+		var focusTracking;
+		if(element){
+			focusTracking = this._getFocusTracking(isHeader);
+
+			// Clean up previously-focused element
+			// Remove the class name
+			put(element, "!dgrid-focus");
+			if(has("ie") < 8){
+				// Clean up after workaround below (for non-input cases)
+				element.style.position = "";
+			}
+
+			// Remove the blur listener and add a focus listener.  This handles tabbing
+			// in and out of the grid.
+			focusTracking.signal.remove();
+			focusTracking.focusedNode = null;
+			focusTracking.signal = this._listenForFocus(element, isHeader);
+
+			on.emit(element, "dgrid-cellfocusout", event);
+		}
+	},
+
+	_listenForFocus: function(element, isHeader){
+		// Listen for focus from the user tabbing into the grid.
+		var self = this;
+		return on(element, "focus", function(event){
+			self._focusOnNode(element, isHeader, event);
+		});
+	},
+
+	_initTabStopNode: function(element, isHeader){
+		// Sets the first tab stop node.  Configures a focus listener in case focus arrives
+		// via the tab key.
+		var focusTracking;
+		if(element){
+			focusTracking = this._getFocusTracking(isHeader);
+			element.tabIndex = this.tabIndex;
+			focusTracking.tabStopNode = element;
+			focusTracking.signal = this._listenForFocus(element, isHeader);
+		}
+	},
+
+	_changeTabStopNode: function(element, isHeader){
+		// Change the tab stop node.  This method assumes the provided element is
+		// also receiving or has focus.
+		var self = this;
+		// Remove the current signal
+		var focusTracking = this._getFocusTracking(isHeader);
+		if(focusTracking.signal){
+			focusTracking.signal.remove();
+		}
+		// Remove the tabstop from the previous node
+		if(focusTracking.tabStopNode){
+			put(focusTracking.tabStopNode, "[!tabIndex]");
+		}
+		element.tabIndex = this.tabIndex;
+		focusTracking.tabStopNode = element;
+		focusTracking.signal = on(element, "blur", function(event){
+			self._handleBlur(element, isHeader, self._createEvent(event, element));
+		});
 	}
 });
 
@@ -351,7 +426,7 @@ var moveFocusVertical = Keyboard.moveFocusVertical = function(event, steps){
 	var cellNavigation = this.cellNavigation,
 		target = this[cellNavigation ? "cell" : "row"](event),
 		columnId = cellNavigation && target.column.id,
-		next = this.down(this._focusedNode, steps, true);
+		next = this.down(this._getFocusTracking().focusedNode, steps, true);
 	
 	// Navigate within same column if cell navigation is enabled
 	if(cellNavigation){ next = this.cell(next, columnId); }

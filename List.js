@@ -366,13 +366,13 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 			var observers = this.observers,
 				i;
 			for(i in this._rowIdToObject){
-				if(this._rowIdToObject[i] != this.columns){
-					var rowElement = byId(i);
-					if(rowElement){
-						this.removeRow(rowElement, true);
-					}
+				var rowElement = byId(i);
+				if(rowElement){
+					this.removeRow(rowElement, true);
 				}
 			}
+			this._rowIdToObject = {};
+
 			// remove any store observers
 			for(i = 0;i < observers.length; i++){
 				var observer = observers[i];
@@ -403,7 +403,6 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 			// summary:
 			//		refreshes the contents of the grid
 			this.cleanup();
-			this._rowIdToObject = {};
 			this._autoId = 0;
 			
 			// make sure all the content has been removed so it can be recreated
@@ -432,7 +431,7 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 					if(next.rowIndex > -1){
 						if(this.maintainOddEven){
 							if((next.className + ' ').indexOf("dgrid-row ") > -1){
-								put(next, '.' + (rowIndex % 2 == 1 ? oddClass : evenClass) + '!' + (rowIndex % 2 == 0 ? oddClass : evenClass));
+								put(next, '.' + (rowIndex % 2 == 1 ? oddClass : evenClass) + '!' + (rowIndex % 2 === 0 ? oddClass : evenClass));
 							}
 						}
 						next.rowIndex = rowIndex++;
@@ -521,7 +520,7 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 								// the inserted row is first, so we update firstRow to point to it
 								var previous = row.previousSibling;
 								// if we are not in sync with the previous row, roll the firstRow back one so adjustRowIndices can sync everything back up.
-								firstRow = !previous || previous.rowIndex + 1 == row.rowIndex || row.rowIndex == 0 ?
+								firstRow = !previous || previous.rowIndex + 1 == row.rowIndex || row.rowIndex === 0 ?
 									row : previous;
 							}
 						}
@@ -659,8 +658,12 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 				var object;
 				do{
 					var rowId = target.id;
-					if((object = this._rowIdToObject[rowId])){
-						return new this._Row(rowId.substring(this.id.length + 5), object, target); 
+					if (rowId){
+						if((object = this._rowIdToObject[rowId])){
+							return new this._Row(rowId.substring(this.id.length + 5), object, target);
+						}else if(rowId === (this.id + "-header")){
+							return new this._Row(rowId.substring(this.id.length + 5), object, target);
+						}
 					}
 					target = target.parentNode;
 				}while(target && target != this.domNode);
@@ -871,7 +874,7 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 						// fall back undefined values to "" for more consistent behavior
 						if(aVal === undefined){ aVal = ""; }
 						if(bVal === undefined){ bVal = ""; }
-						return aVal == bVal ? 0 : (aVal > bVal == !descending ? 1 : -1);
+						return aVal == bVal ? 0 : (aVal > bVal !== descending ? 1 : -1);
 					});
 				}
 				this.renderArray(this._lastCollection);
