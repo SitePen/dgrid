@@ -77,6 +77,8 @@ function tree(column){
 		var grid = column.grid,
 			colSelector = ".dgrid-content .dgrid-column-" + column.id,
 			listeners = []; // to be removed when this column is destroyed
+
+		grid.cleanupObservers = false;
 		
 		if(!grid.store){
 			throw new Error("dgrid tree column plugin requires a store to operate.");

@@ -607,7 +607,7 @@ return declare([List, _StoreMixin], {
 			}
 
 			// Is this row's observer index different than those on either side?
-			if(thisIndex > -1 && thisIndex !== prevIndex && thisIndex !== nextIndex){
+			if(this.cleanupObservers && thisIndex > -1 && thisIndex !== prevIndex && thisIndex !== nextIndex){
 				// This is the last row that references the observer index.  Cancel the observer.
 				var observers = this.observers;
 				var observer = observers[thisIndex];
