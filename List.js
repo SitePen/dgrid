@@ -125,6 +125,13 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 		//		incorporate logic from the TouchScroll module (at the expense of
 		//		normal desktop/mouse or native mobile scrolling functionality).
 		useTouchScroll: true,
+
+		// cleanupObservers: Boolean
+		//		Whether to cleanup the observers.
+		//		There exists an issue where the use of the tree column plugin
+		//		will add an observer for the children query, which will cause
+		//		the observer to be removed and not replaced for the grid query.
+		cleanupObservers: true,
 		
 		postscript: function(params, srcNodeRef){
 			// perform setup and invoke create in postScript to allow descendants to
@@ -536,7 +543,7 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 				return lastRow;
 			}
 			function whenError(error){
-				if(typeof observerIndex !== "undefined"){
+				if(self.cleanupObservers && typeof observerIndex !== "undefined"){
 					observers[observerIndex].cancel();
 					observers[observerIndex] = 0;
 					self._numObservers--;
