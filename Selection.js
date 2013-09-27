@@ -157,7 +157,7 @@ return declare(null, {
 		// Remove any extra handles added by Selection.
 		if(this._selectstartHandle){ this._selectstartHandle.remove(); }
 		if(this._unselectableHandle){ this._unselectableHandle.remove(); }
-		if(this._deselectionHandle){ this._deselectionHandle.remove(); }
+		if(this._removeDeselectSignals){ this._removeDeselectSignals(); }
 	},
 	
 	_setSelectionMode: function(mode){
@@ -335,30 +335,50 @@ return declare(null, {
 		//		or to the list/grid's removeRow method otherwise.
 		
 		var self = this,
-			store = this.store;
-		
-		// Remove anything previously configured
-		if(this._deselectionSignal){
-			this._deselectionSignal.remove();
+			store = this.store,
+			beforeSignal,
+			afterSignal;
+
+		function ifSelected(object, idToUpdate, methodName){
+			// Calls a method if the row corresponding to the object is selected.
+			var id = idToUpdate || (object && object[self.idProperty || "id"]);
+			if(id != null){
+				var row = self.row(id),
+					selection = row && self.selection[row.id];
+				// Is the row currently in the selection list.
+				if(selection){
+					self[methodName](row, null, selection);
+				}
+			}
 		}
 		
+		// Remove anything previously configured
+		if(this._removeDeselectSignals){
+			this._removeDeselectSignals();
+		}
+
 		// Is there currently an observable store?
 		if(store && store.notify){
-			this._deselectionSignal = aspect.after(store, "notify", function(object, idToUpdate){
-				var id = idToUpdate || (object && object[this.idProperty || "id"]);
-				if (id != null) {
-					var row = self.row(id),
-						selection = row && self.selection[row.id];
-					// Is the row currently in the selection list.
-					if(selection){
-						// Ensure consistency between DOM and state on add/put;
-						// prune from selection on remove
-						self[(object ? "" : "de") + "select"](row, null, selection);
-					}
+			beforeSignal = aspect.before(store, "notify", function(object, idToUpdate){
+				if(!object){
+					// Call deselect on the row if the object is being removed.  This allows the
+					// deselect event to reference the row element while it still exists in the DOM.
+					ifSelected(object, idToUpdate, "deselect");
 				}
+			});
+			afterSignal = aspect.after(store, "notify", function(object, idToUpdate){
+				// When List updates an item, the row element is removed and a new one inserted.
+				// If at this point the object is still in grid.selection, then call select on the row so the
+				// element's CSS is updated.  If the object was removed then the aspect-before has already deselected it.
+				ifSelected(object, idToUpdate, "select");
 			}, true);
+			
+			this._removeDeselectSignals = function(){
+				beforeSignal.remove();
+				afterSignal.remove();
+			};
 		}else{
-			this._deselectionSignal = aspect.before(this, "removeRow", function(rowElement, justCleanup){
+			beforeSignal = aspect.before(this, "removeRow", function(rowElement, justCleanup){
 				var row;
 				if(!justCleanup){
 					row = this.row(rowElement);
@@ -368,6 +388,9 @@ return declare(null, {
 					}
 				}
 			});
+			this._removeDeselectSignals = function(){
+				beforeSignal.remove();
+			};
 		}
 	},
 	
@@ -384,7 +407,7 @@ return declare(null, {
 			rows = this[event], // current event queue (actually cells for CellSelection)
 			trigger = this._selectionTriggerEvent;
 		
-		if (trigger) {
+		if(trigger) {
 			// If selection was triggered by another event, we want to know its type
 			// to report later.  Grab it ahead of the timeout to avoid
 			// "member not found" errors in IE < 9.
