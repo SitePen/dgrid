@@ -39,9 +39,9 @@ define([
 			var disabledLinks = query('span.dgrid-page-disabled', grid.paginationLinksNode);
 			var expectedText = string.substitute(grid.i18nPagination.status, {start: 1, end: 10, total: 100});
 			assert.strictEqual(grid.paginationStatusNode.innerHTML,
-							   expectedText, "incorrect initial status '" + status + "'");
+				expectedText, "incorrect initial status '" + status + "'");
 			assert.strictEqual(disabledLinks.length, 1, "wrong number of disable page links: " +
-							   disabledLinks.length)
+				disabledLinks.length)
 			assert.strictEqual(disabledLinks[0].innerHTML, "1", "wrong link is disabled");
 
 			grid.gotoPage(2);
@@ -49,10 +49,9 @@ define([
 			disabledLinks = query('span.dgrid-page-disabled', grid.paginationLinksNode);
 			expectedText = string.substitute(grid.i18nPagination.status, {start: 11, end: 20, total: 100});
 			assert.strictEqual(grid.paginationStatusNode.innerHTML,
-							   "11 - 20 of 100 results", "incorrect status '" +
-							   status + "'");
+				"11 - 20 of 100 results", "incorrect status '" + status + "'");
 			assert.strictEqual(disabledLinks.length, 1, "wrong number of disable page links: " +
-							   disabledLinks.length)
+				disabledLinks.length)
 			assert.strictEqual(disabledLinks[0].innerHTML, "2", "wrong link is disabled");
 		});
 	});
@@ -89,7 +88,7 @@ define([
 			var selector = grid.paginationSizeSelect;
 			grid.set("rowsPerPage", rowsPerPage);
 			assert.strictEqual(selector.value, String(rowsPerPage),
-							   "selector has invalid value " + selector.value);
+				"selector has invalid value " + selector.value);
 			verifyOptions(selector.options);
 		};
 
@@ -121,7 +120,7 @@ define([
 				value = getNonSelectedValue(selector.options);
 			grid.set("rowsPerPage", +value);
 			assert.strictEqual(selector.value, value,
-							   "selector has invalid value " + selector.value);
+				"selector has invalid value " + selector.value);
 			verifyOptions(selector.options, initialCount);
 		});
 
@@ -132,7 +131,7 @@ define([
 
 			selector.value = targetValue;
 			assert.strictEqual(selector.value, targetValue, "selector has invalid value " +
-							   selector.value);
+				selector.value);
 			verifyOptions(selector.options, initialCount);
 		});
 	});
