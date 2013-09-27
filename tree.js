@@ -77,6 +77,10 @@ function tree(column){
 		var grid = column.grid,
 			colSelector = ".dgrid-content .dgrid-column-" + column.id,
 			listeners = []; // to be removed when this column is destroyed
+
+		// Turn off automatic cleanup of empty observers, to prevent confusion
+		// due to observers operating at multiple hierarchy levels.
+		grid.cleanEmptyObservers = false;
 		
 		if(!grid.store){
 			throw new Error("dgrid tree column plugin requires a store to operate.");

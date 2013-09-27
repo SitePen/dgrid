@@ -125,6 +125,10 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 		//		incorporate logic from the TouchScroll module (at the expense of
 		//		normal desktop/mouse or native mobile scrolling functionality).
 		useTouchScroll: true,
+
+		// cleanEmptyObservers: Boolean
+		//		Whether to clean up observers for empty result sets.
+		cleanEmptyObservers: true,
 		
 		postscript: function(params, srcNodeRef){
 			// perform setup and invoke create in postScript to allow descendants to
@@ -552,7 +556,7 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 					container.insertBefore(rowsFragment, beforeNode || null);
 					lastRow = resolvedRows[resolvedRows.length - 1];
 					lastRow && self.adjustRowIndices(lastRow);
-				}else if(observers[observerIndex]){
+				}else if(observers[observerIndex] && self.cleanEmptyObservers){
 					// Remove the observer and don't bother inserting;
 					// rows are already out of view or there were none to track
 					whenError();
