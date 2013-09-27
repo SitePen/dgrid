@@ -91,16 +91,11 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 			statusNode.tabIndex = 0;
 			
 			if(pageSizeOptions.length){
-				var sizeSelect = this.sizeSelect = put(paginationNode, 'select.dgrid-page-size'),
+				var paginationSizeSelect = this.paginationSizeSelect = put(paginationNode, 'select.dgrid-page-size'),
 					i;
-				for(i = 0; i < pageSizeOptions.length; i++){
-					put(sizeSelect, 'option', pageSizeOptions[i], {
-						value: pageSizeOptions[i],
-						selected: this.rowsPerPage === pageSizeOptions[i]
-					});
-				}
-				this._listeners.push(on(sizeSelect, "change", function(){
-					grid.rowsPerPage = +sizeSelect.value;
+				this._updatePaginationSizeSelect();
+				this._listeners.push(on(paginationSizeSelect, "change", function(){
+					grid.rowsPerPage = +paginationSizeSelect.value;
 					grid.gotoPage(1);
 				}));
 			}
@@ -182,27 +177,45 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 			}
 		},
 
-		_setRowsPerPage: function(rowsPerPage){
-			var options = this.sizeSelect.childNodes,
-			opt;
+		_updatePaginationSizeSelect: function(){
+			//	summary:
+			//		Rebuild the pagination size selector based on the values in
+			//		pageSizeOptions
+			var pageSizeOptions = this.pageSizeOptions,
+				paginationSizeSelect = this.paginationSizeSelect;
 
-			for(var i = 0; i < options.length; i++){
-				var value = +options[i].value;
-				if(rowsPerPage <= value){
-					if(rowsPerPage === value){
-						opt = options[i];
-					}else{
-						opt = put(options[i], '- option[value=' + rowsPerPage + ']', rowsPerPage);
-					}
-					break;
+			paginationSizeSelect.options.length = 0;
+			for(i = 0; i < pageSizeOptions.length; i++){
+				put(paginationSizeSelect, 'option', pageSizeOptions[i], {
+					value: pageSizeOptions[i],
+					selected: this.rowsPerPage === pageSizeOptions[i]
+				});
+			}
+		},
+
+		_setPageSizeOptions: function(pageSizeOpts){
+			this.pageSizeOptions = pageSizeOpts.slice().sort(function(a, b){
+				return a - b;
+			});
+			if (this.paginationSizeSelect) {
+				this._updatePaginationSizeSelect();
+			}
+		},
+
+		_setRowsPerPage: function(rowsPerPage){
+			var pageSizeOptions = this.pageSizeOptions,
+				paginationSizeSelect = this.paginationSizeSelect;
+
+			this.rowsPerPage = rowsPerPage;
+
+			if (paginationSizeSelect) {
+				if (pageSizeOptions.indexOf(rowsPerPage) == -1) {
+					this._setPageSizeOptions(pageSizeOptions.concat([rowsPerPage])); 
+				}else{
+					paginationSizeSelect.value = String(rowsPerPage);
 				}
 			}
-			if(!opt){
-				opt = put(this.sizeSelect, 'option[value=' + rowsPerPage + ']', rowsPerPage);
-			}
 
-			this.sizeSelect.value = opt.value;
-			this.rowsPerPage = rowsPerPage;
 			this.gotoPage(1);
 		},
 

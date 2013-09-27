@@ -110,7 +110,6 @@
 						// recreate grid using args from form
 						window.grid.destroy();
 						domConstruct.create("div", { id: "grid" }, form, "after");
-						console.log('creating grid with', args);
 						createGrid(args);
 						
 						return false;
@@ -164,7 +163,6 @@
 		</script>
 	</head>
 	<body>
-		<a name="basic"/>
 		<h2>A basic grid with the Pagination extension</h2>
 		<h3>Configuration</h3>
 		<form id="configForm">
@@ -206,7 +204,6 @@
 			<button onclick="grid.set('showFooter', !grid.get('showFooter'));">Toggle footer</button>
 		</div>
 		
-		<a name="declarative"/>
 		<h2>A grid with declarative structure, with the Pagination extension</h2>
 		<table id="gridfromhtml">
 			<thead><tr>
@@ -218,7 +215,6 @@
 			</tr></thead>
 		</table>
 
-		<a name="autoheight"/>
 		<h2>An autoheight grid with the Pagination extension,
 			with a rows-per-page drop-down</h2>
 		<form id="configForm2">
@@ -230,7 +226,6 @@
 		</form>
 		<div id="grid2"></div>
 		
-		<a name="columnsets"/>
 		<h2>A grid with ColumnSets with the Pagination extension</h2>
 		<div id="gridColumnSet"></div>
 	</body>
