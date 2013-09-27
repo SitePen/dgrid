@@ -14,6 +14,11 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
   `tree` by adding a `cleanEmptyObservers` flag, which `tree` will set to false.
   (#713)
 
+### Mixins
+
+* Fixed a follow-up issue in `Selection` related to the fix for #226, where
+  deselect events were not firing for removed rows. (#684)
+
 ## Other changes and fixes
 
 ### General/Core
