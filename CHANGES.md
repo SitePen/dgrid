@@ -10,6 +10,9 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 * Fixed a regression related to `OnDemandList` in conjunction with the `tree`
   plugin, where queries would not fire due to confusion between different levels.
   (#717)
+* Fixed a regression related to `List` and `OnDemandList` in conjunction with
+  `tree` by adding a `cleanEmptyObservers` flag, which `tree` will set to false.
+  (#713)
 
 ## Other changes and fixes
 
