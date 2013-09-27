@@ -129,6 +129,11 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 		// cleanEmptyObservers: Boolean
 		//		Whether to clean up observers for empty result sets.
 		cleanEmptyObservers: true,
+
+		// highlightDuration: Integer
+		//		The amount of time (in milliseconds) that a row should remain
+		//		highlighted after it has been updated.
+		highlightDuration: 250,
 		
 		postscript: function(params, srcNodeRef){
 			// perform setup and invoke create in postScript to allow descendants to
@@ -418,7 +423,7 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 				put(row, ".ui-state-highlight");
 				setTimeout(function(){
 					put(row, "!ui-state-highlight");
-				}, 250);
+				}, this.highlightDuration);
 				return row;
 			}
 		},
