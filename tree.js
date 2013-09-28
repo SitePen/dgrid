@@ -195,7 +195,9 @@ function tree(column){
 					container,
 					containerStyle,
 					scrollHeight,
-					options;
+					options = {
+						originalQuery: this.query
+					};
 				
 				if(!preloadNode){
 					// if the children have not been created, create a container, a preload node and do the 
@@ -209,7 +211,7 @@ function tree(column){
 						// If allowDuplicates is specified, include parentId in options
 						// in order to facilitate unique IDs for each occurrence of the
 						// same item under multiple different parents.
-						options = { parentId: row.id };
+						options.parentId = row.id;
 					}
 					// Include level information on query for renderQuery case
 					if("level" in target){
