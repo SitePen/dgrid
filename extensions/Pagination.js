@@ -1,7 +1,7 @@
-define(["../_StoreMixin", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred",
+define(["../_StoreMixin", "dojo/_base/declare", "dojo/_base/array", "dojo/_base/lang", "dojo/_base/Deferred",
 	"dojo/on", "dojo/query", "dojo/string", "dojo/has", "put-selector/put", "dojo/i18n!./nls/pagination",
 	"dojo/_base/sniff", "xstyle/css!../css/extensions/Pagination.css"],
-function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n){
+function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has, put, i18n){
 	function cleanupContent(grid){
 		// Remove any currently-rendered rows, or noDataMessage
 		if(grid.noDataNode){
@@ -58,7 +58,7 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 		// pageSizeOptions: Array[Number]
 		//		This provides options for different page sizes in a drop-down.
 		//		If it is empty (default), no page size drop-down will be displayed.
-		pageSizeOptions: [],
+		pageSizeOptions: null,
 		
 		// showLoadingMessage: Boolean
 		//		If true, clears previous data and displays loading node when requesting
@@ -85,25 +85,24 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 				statusNode = this.paginationStatusNode =
 					put(paginationNode, "div.dgrid-status"),
 				pageSizeOptions = this.pageSizeOptions,
+				paginationSizeSelect,
 				i18n = this.i18nPagination,
-				navigationNode, node;
+				navigationNode,
+				node,
+				i;
 			
 			statusNode.tabIndex = 0;
 			
-			if(pageSizeOptions.length){
-				var sizeSelect = put(paginationNode, 'select.dgrid-page-size'),
-					i;
-				for(i = 0; i < pageSizeOptions.length; i++){
-					put(sizeSelect, 'option', pageSizeOptions[i], {
-						value: pageSizeOptions[i],
-						selected: this.rowsPerPage === pageSizeOptions[i]
-					});
-				}
-				this._listeners.push(on(sizeSelect, "change", function(){
-					grid.rowsPerPage = +sizeSelect.value;
+			if(pageSizeOptions && pageSizeOptions.length){
+				paginationSizeSelect = this.paginationSizeSelect =
+					put(paginationNode, "select.dgrid-page-size");
+				this._updatePaginationSizeSelect();
+				this._listeners.push(on(paginationSizeSelect, "change", function(){
+					grid.rowsPerPage = +paginationSizeSelect.value;
 					grid.gotoPage(1);
 				}));
 			}
+			this._setRowsPerPage(this.rowsPerPage);
 			
 			// initialize some content into paginationStatusNode, to ensure
 			// accurate results on initial resize call
@@ -181,7 +180,52 @@ function(_StoreMixin, declare, lang, Deferred, on, query, string, has, put, i18n
 				this._pagingTextBoxHandle.remove();
 			}
 		},
-		
+
+		_updatePaginationSizeSelect: function(){
+			// summary:
+			//		Rebuild the pagination size selector based on the values in
+			//		pageSizeOptions
+			
+			var pageSizeOptions = this.pageSizeOptions,
+				paginationSizeSelect = this.paginationSizeSelect;
+
+			paginationSizeSelect.options.length = 0;
+			for(i = 0; i < pageSizeOptions.length; i++){
+				put(paginationSizeSelect, "option", pageSizeOptions[i], {
+					value: pageSizeOptions[i],
+					selected: this.rowsPerPage === pageSizeOptions[i]
+				});
+			}
+		},
+
+		_setPageSizeOptions: function(pageSizeOptions){
+			this.pageSizeOptions = pageSizeOptions.sort(function(a, b){
+				return a - b;
+			});
+			if(this.paginationSizeSelect){
+				this._updatePaginationSizeSelect();
+			}
+		},
+
+		_setRowsPerPage: function(rowsPerPage){
+			var pageSizeOptions = this.pageSizeOptions,
+				paginationSizeSelect = this.paginationSizeSelect;
+
+			this.rowsPerPage = rowsPerPage;
+
+			if(paginationSizeSelect){
+				if(arrayUtil.indexOf(pageSizeOptions, rowsPerPage) === -1){
+					this._setPageSizeOptions(pageSizeOptions.concat([rowsPerPage])); 
+				}else{
+					paginationSizeSelect.value = "" + rowsPerPage;
+				}
+			}
+			
+			if(this._started){
+				this.gotoPage(1);
+			}
+		},
+
 		_updateNavigation: function(focusLink){
 			// summary:
 			//		Update status and navigation controls based on total count from query
