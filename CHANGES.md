@@ -25,6 +25,13 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
   `options` object passed to `getChildren`, allowing store implementations to
   re-apply query filters to queries for child items. (#145, #732)
 
+### Extensions
+
+* The `Pagination` extension now has proper setters for `rowsPerPage` and
+  `pageSizeOptions`.  If `rowsPerPage` is set to a value that is not present in
+  `pageSizeOptions`, an option will be added for the new value.  The drop-down's
+  options will always appear in ascending order. (#631)
+
 ## Other changes and fixes
 
 ### General/Core
