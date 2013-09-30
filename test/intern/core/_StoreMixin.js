@@ -1,6 +1,6 @@
 define([
 	"intern!tdd",
-	"intern/assert",
+	"intern/chai!assert",
 	"dojo/_base/lang",
 	"dojo/_base/declare",
 	// column.set can't be tested independently from a Grid,

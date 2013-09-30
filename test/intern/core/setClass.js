@@ -1,6 +1,6 @@
 define([
 	"intern!tdd",
-	"intern/assert",
+	"intern/chai!assert",
 	"dgrid/List",
 	"dgrid/Grid", 
 	"dgrid/GridFromHtml",

@@ -1,6 +1,6 @@
 define([
 	"intern!tdd",
-	"intern/assert",
+	"intern/chai!assert",
 	"dojo/dom-style",
 	"dojo/dom-construct",
 	"dojo/query",
