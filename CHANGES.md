@@ -13,6 +13,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 * Fixed a regression related to `List` and `OnDemandList` in conjunction with
   `tree` by adding a `cleanEmptyObservers` flag, which `tree` will set to false.
   (#713)
+* Added a `highlightDuration` property to `List` to allow customizing the length
+  of time that rows remain highlighted when modified. (#736, thanks Zarillion)
 
 ### Mixins
 
