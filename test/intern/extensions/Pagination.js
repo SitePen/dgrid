@@ -83,6 +83,39 @@ define([
 			document.body.appendChild(grid.domNode);
 			grid.startup();
 			
+			assert.strictEqual(grid.paginationSizeSelect.tagName, "SELECT",
+				"paginationSizeSelect should reference a SELECT element");
+			assert.lengthOf(grid.pageSizeOptions, 4,
+				"pageSizeOptions should have additional item for unique rowsPerPage");
+			assert.strictEqual(grid.pageSizeOptions[0], 5,
+				"pageSizeOptions should be sorted ascending");
+			
+			// Now empty pageSizeOptions and confirm that the select was removed
+			grid.set("pageSizeOptions", null);
+			assert.isNull(grid.paginationSizeSelect,
+				"paginationSizeSelect reference should be cleared after setting empty pageSizeOptions");
+			assert.strictEqual(query("select", grid.footerNode).length, 0,
+				"paginationSizeSelect node should have been destroyed");
+		});
+
+		test.test("pageSizeOptions added after creation", function(){
+			grid = new PaginationGrid({
+				store: testStore,
+				columns: getColumns(),
+				rowsPerPage: 10
+			});
+			document.body.appendChild(grid.domNode);
+			grid.startup();
+			
+			assert.isUndefined(grid.paginationSizeSelect,
+				"paginationSizeSelect should not exist yet (no options)");
+			
+			// Now add pageSizeOptions (purposely out of order) and confirm it
+			// is properly added
+			grid.set("pageSizeOptions", [25, 15, 5]);
+			
+			assert.strictEqual(grid.paginationSizeSelect.tagName, "SELECT",
+				"paginationSizeSelect should reference a SELECT element");
 			assert.lengthOf(grid.pageSizeOptions, 4,
 				"pageSizeOptions should have additional item for unique rowsPerPage");
 			assert.strictEqual(grid.pageSizeOptions[0], 5,

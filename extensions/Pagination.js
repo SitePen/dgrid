@@ -84,8 +84,6 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 					put(this.footerNode, "div.dgrid-pagination"),
 				statusNode = this.paginationStatusNode =
 					put(paginationNode, "div.dgrid-status"),
-				pageSizeOptions = this.pageSizeOptions,
-				paginationSizeSelect,
 				i18n = this.i18nPagination,
 				navigationNode,
 				node,
@@ -93,16 +91,9 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 			
 			statusNode.tabIndex = 0;
 			
-			if(pageSizeOptions && pageSizeOptions.length){
-				paginationSizeSelect = this.paginationSizeSelect =
-					put(paginationNode, "select.dgrid-page-size");
-				this._updatePaginationSizeSelect();
-				this._listeners.push(on(paginationSizeSelect, "change", function(){
-					grid.rowsPerPage = +paginationSizeSelect.value;
-					grid.gotoPage(1);
-				}));
-			}
-			this._setRowsPerPage(this.rowsPerPage);
+			// Initialize UI based on pageSizeOptions and rowsPerPage
+			this._updatePaginationSizeSelect();
+			this._updateRowsPerPageOption();
 			
 			// initialize some content into paginationStatusNode, to ensure
 			// accurate results on initial resize call
@@ -183,47 +174,75 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 
 		_updatePaginationSizeSelect: function(){
 			// summary:
-			//		Rebuild the pagination size selector based on the values in
-			//		pageSizeOptions
+			//		Creates or repopulates the pagination size selector based on
+			//		the values in pageSizeOptions. Called from buildRendering
+			//		and _setPageSizeOptions.
 			
 			var pageSizeOptions = this.pageSizeOptions,
-				paginationSizeSelect = this.paginationSizeSelect;
-
-			paginationSizeSelect.options.length = 0;
-			for(i = 0; i < pageSizeOptions.length; i++){
-				put(paginationSizeSelect, "option", pageSizeOptions[i], {
-					value: pageSizeOptions[i],
-					selected: this.rowsPerPage === pageSizeOptions[i]
-				});
+				paginationSizeSelect = this.paginationSizeSelect,
+				handle;
+			
+			if(pageSizeOptions && pageSizeOptions.length){
+				if(!paginationSizeSelect){
+					// First time setting page options; create the select
+					paginationSizeSelect = this.paginationSizeSelect =
+						put(this.paginationNode, "select.dgrid-page-size");
+					
+					handle = this._paginationSizeChangeHandle =
+						on(paginationSizeSelect, "change", lang.hitch(this, function(){
+							this.set("rowsPerPage", this.paginationSizeSelect.value);
+						}));
+					this._listeners.push(handle);
+				}
+				
+				// Repopulate options
+				paginationSizeSelect.options.length = 0;
+				for(i = 0; i < pageSizeOptions.length; i++){
+					put(paginationSizeSelect, "option", pageSizeOptions[i], {
+						value: pageSizeOptions[i],
+						selected: this.rowsPerPage === pageSizeOptions[i]
+					});
+				}
+				// Ensure current rowsPerPage value is in options
+				this._updateRowsPerPageOption();
+			}else if(!(pageSizeOptions && pageSizeOptions.length) && paginationSizeSelect){
+				// pageSizeOptions was removed; remove/unhook the drop-down
+				put(paginationSizeSelect, "!");
+				this.paginationSizeSelect = null;
+				this._paginationSizeChangeHandle.remove();
 			}
 		},
 
 		_setPageSizeOptions: function(pageSizeOptions){
-			this.pageSizeOptions = pageSizeOptions.sort(function(a, b){
+			this.pageSizeOptions = pageSizeOptions && pageSizeOptions.sort(function(a, b){
 				return a - b;
 			});
-			if(this.paginationSizeSelect){
-				this._updatePaginationSizeSelect();
-			}
+			this._updatePaginationSizeSelect();
 		},
 
-		_setRowsPerPage: function(rowsPerPage){
-			var pageSizeOptions = this.pageSizeOptions,
+		_updateRowsPerPageOption: function(){
+			// summary:
+			//		Ensures that an option for rowsPerPage's value exists in the
+			//		paginationSizeSelect drop-down (if one is rendered).
+			//		Called from buildRendering and _setRowsPerPage.
+			
+			var rowsPerPage = this.rowsPerPage,
+				pageSizeOptions = this.pageSizeOptions,
 				paginationSizeSelect = this.paginationSizeSelect;
-
-			this.rowsPerPage = rowsPerPage;
-
+			
 			if(paginationSizeSelect){
-				if(arrayUtil.indexOf(pageSizeOptions, rowsPerPage) === -1){
+				if(arrayUtil.indexOf(pageSizeOptions, rowsPerPage) < 0){
 					this._setPageSizeOptions(pageSizeOptions.concat([rowsPerPage])); 
 				}else{
 					paginationSizeSelect.value = "" + rowsPerPage;
 				}
 			}
-			
-			if(this._started){
-				this.gotoPage(1);
-			}
+		},
+		
+		_setRowsPerPage: function(rowsPerPage){
+			this.rowsPerPage = rowsPerPage;
+			this._updateRowsPerPageOption();
+			this.gotoPage(1);
 		},
 
 		_updateNavigation: function(focusLink){
