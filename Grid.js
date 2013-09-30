@@ -218,16 +218,11 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 				// respond to click, space keypress, or enter keypress
 				if(event.type == "click" || event.keyCode == 32 /* space bar */ || (!has("opera") && event.keyCode == 13) /* enter */){
 					var target = event.target,
-						field, sort, newSort, eventObj;
+						newSort, eventObj;
 					do{
 						if(target.sortable){
-							// If the click is on the same column as the active sort,
-							// reverse sort direction
-							newSort = [{
-								attribute: (field = target.field || target.columnId),
-								descending: (sort = grid._sort[0]) && sort.attribute == field &&
-									!sort.descending
-							}];
+							// Construct a new sort based on the targeted column
+							newSort = grid._constructSort(target);
 							
 							// Emit an event with the new sort
 							eventObj = {
@@ -286,6 +281,22 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 			}
 			
 			this.inherited(arguments);
+		},
+
+		_constructSort: function(columnHeader){
+			// summary:
+			//		Construct a new sort array from the given column header node. This
+			//		will be called after the header is clicked *if* the column in
+			//		question is sortable.
+
+			var field, sort;
+			// If the click is on the same column as the active sort,
+			// reverse sort direction
+			return [{
+				attribute: (field = columnHeader.field || columnHeader.columnId),
+				descending: (sort = this._sort[0]) && sort.attribute == field &&
+					!sort.descending
+			}];
 		},
 		
 		_setSort: function(property, descending){
