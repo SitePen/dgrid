@@ -19,6 +19,12 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 * Fixed a follow-up issue in `Selection` related to the fix for #226, where
   deselect events were not firing for removed rows. (#684)
 
+### Column Plugins
+
+* The `tree` column plugin will now include an `originalQuery` property in the
+  `options` object passed to `getChildren`, allowing store implementations to
+  re-apply query filters to queries for child items. (#145, #732)
+
 ## Other changes and fixes
 
 ### General/Core
