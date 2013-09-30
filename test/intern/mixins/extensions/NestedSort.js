@@ -1,6 +1,6 @@
 define([
 	"intern!tdd",
-	"intern/assert",
+	"intern/chai!assert",
 	"dgrid/Grid",
 	"dgrid/extensions/NestedSort",
 	"dojo/_base/declare",
