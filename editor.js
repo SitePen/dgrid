@@ -12,8 +12,9 @@ define([
 	"dojo/_base/sniff"
 ], function(kernel, lang, arrayUtil, Deferred, on, aspect, has, query, Grid, put){
 
-// Variables to track info for cell currently being edited (editOn only).
-var activeCell, activeValue, activeOptions;
+// Variables to track info for cell currently being edited
+// (active* variables are for editOn editors only)
+var activeCell, activeValue, activeOptions, focusedCell;
 
 function updateInputValue(input, value){
 	// common code for updating value of a standard input
@@ -414,6 +415,48 @@ return function(column, editor, editOn){
 		listeners = [],
 		isWidget;
 	
+	function commonInit(column) {
+		// Common initialization logic for both editOn and always-on editors
+		var grid = column.grid,
+			focusoutHandle;
+		if(!grid.edit){
+			// Only perform this logic once on a given grid
+			grid.edit = edit;
+			
+			listeners.push(on(grid.domNode, '.dgrid-input:focusin', function () {
+				focusedCell = grid.cell(this);
+			}));
+			focusoutHandle = grid._editorFocusoutHandle =
+				on.pausable(grid.domNode, '.dgrid-input:focusout', function () {
+					focusedCell = null;
+				});
+			listeners.push(focusoutHandle);
+			
+			listeners.push(aspect.before(grid, 'removeRow', function (row) {
+				row = grid.row(row);
+				if (focusedCell && focusedCell.row.id === row.id) {
+					// Pause the focusout handler until after this row has had
+					// time to re-render, if this removal is part of an update.
+					// A setTimeout is used here instead of resuming in the
+					// insertRow aspect below, since if a row were actually
+					// removed (not updated) while editing, the handler would
+					// not be properly hooked up again for future occurrences.
+					focusoutHandle.pause();
+					setTimeout(function () {
+						focusoutHandle.resume();
+					}, 0);
+				}
+			}));
+			listeners.push(aspect.after(grid, 'insertRow', function (rowElement) {
+				var row = grid.row(rowElement);
+				if (focusedCell && focusedCell.row.id === row.id) {
+					grid.edit(grid.cell(row, focusedCell.column.id));
+				}
+				return rowElement;
+			}));
+		}
+	}
+
 	if(!column){ column = {}; }
 	
 	// accept arguments as parameters to editor function, or from column def,
@@ -431,14 +474,12 @@ return function(column, editor, editOn){
 	}
 	
 	aspect.after(column, "init", editOn ? function(){
-		var grid = column.grid;
-		if(!grid.edit){ grid.edit = edit; }
-		
+		commonInit(column);
 		// Create one shared widget/input to be swapped into the active cell.
 		column.editorInstance = createSharedEditor(column, originalRenderCell);
 	} : function(){
 		var grid = column.grid;
-		if(!grid.edit){ grid.edit = edit; }
+		commonInit(column);
 		
 		if(isWidget){
 			// add advice for cleaning up widgets in this column
@@ -447,7 +488,10 @@ return function(column, editor, editOn){
 				// but don't trip over loading nodes from incomplete requests
 				var cellElement = grid.cell(rowElement, column.id).element,
 					widget = cellElement && (cellElement.contents || cellElement).widget;
-				if(widget){ widget.destroyRecursive(); }
+				if(widget){
+					grid._editorFocusoutHandle.pause();
+					widget.destroyRecursive();
+				}
 			}));
 		}
 	});
@@ -457,6 +501,10 @@ return function(column, editor, editOn){
 		if(column._editorBlurHandle){ column._editorBlurHandle.remove(); }
 		
 		if(editOn && isWidget){ column.editorInstance.destroyRecursive(); }
+		
+		// Remove the edit function, so that it (and other one-time listeners)
+		// will be re-added if editor columns are re-initialized
+		grid.edit = null;
 	});
 	
 	column.renderCell = editOn ? function(object, value, cell, options){
