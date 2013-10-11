@@ -286,7 +286,7 @@ return declare(null, {
 		var grid = this,
 			selector = this.selectionDelegate;
 		
-		if(has("touch")){
+		if(has("touch") && !has("mspointer")){
 			// listen for touch taps if available
 			on(this.contentNode, touchUtil.selector(selector, touchUtil.tap), function(evt){
 				grid._handleSelect(evt, this);

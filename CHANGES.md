@@ -3,7 +3,10 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 # master (0.3.12-dev)
 
-Coming soon!
+### Mixins
+
+* Fixed an issue in `Selection` code flow which caused devices supporting
+  MSPointer to behave incorrectly with recent versions of Dojo.
 
 # 0.3.11
 
