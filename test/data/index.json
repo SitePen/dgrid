@@ -1,77 +1,5 @@
 [
     {
-        "name": "GridFromHtml.html",
-        "url": "GridFromHtml.html",
-        "title": "GridFromHtml Tests",
-        "parent": ""
-    },
-    {
-        "name": "GridFromHtml_Editors.html",
-        "url": "GridFromHtml_Editors.html",
-        "title": "Test declarative cell editors ",
-        "parent": ""
-    },
-    {
-        "name": "Grid_headerless.html",
-        "url": "Grid_headerless.html",
-        "title": "Test Grid Common Cases with showHeader: false",
-        "parent": ""
-    },
-    {
-        "name": "Grid_mouseevents.html",
-        "url": "Grid_mouseevents.html",
-        "title": "Test delegated mouse events",
-        "parent": ""
-    },
-    {
-        "name": "Grid_rendering.html",
-        "url": "Grid_rendering.html",
-        "title": "Test get, formatter, and renderCell",
-        "parent": ""
-    },
-    {
-        "name": "JsonRest.html",
-        "url": "JsonRest.html",
-        "title": "Test JsonRest store",
-        "parent": ""
-    },
-    {
-        "name": "JsonRest_duplicates.html",
-        "url": "JsonRest_duplicates.html",
-        "title": "Test JsonRest Tree with objects repeated in different places in hierarchy",
-        "parent": ""
-    },
-    {
-        "name": "Keyboard.html",
-        "url": "Keyboard.html",
-        "title": "Test Keyboard Mixin",
-        "parent": ""
-    },
-    {
-        "name": "OnDemand.html",
-        "url": "OnDemand.html",
-        "title": "Test Grid Store Observation",
-        "parent": ""
-    },
-    {
-        "name": "OnDemand_promises.html",
-        "url": "OnDemand_promises.html",
-        "title": "Test OnDemandGrids with promise-based stores",
-        "parent": ""
-    },
-    {
-        "name": "OnDemand_tile.html",
-        "url": "OnDemand_tile.html",
-        "title": "Test Tile Layout in OnDemandList",
-        "parent": ""
-    },
-    {
-        "name": "Selection.html",
-        "url": "Selection.html",
-        "title": "Test Selection",
-        "parent": ""
-    },
-    {
         "name": "autoheight.html",
         "url": "autoheight.html",
         "title": "Test height:auto",
@@ -111,6 +39,12 @@
         "name": "editor.html",
         "url": "editor.html",
         "title": "Test Cell Editors",
+        "parent": ""
+    },
+    {
+        "name": "editor_autosave.html",
+        "url": "editor_autosave.html",
+        "title": "Test Dijit Cell Editors with autoSave",
         "parent": ""
     },
     {
@@ -215,6 +149,36 @@
         "parent": "extensions"
     },
     {
+        "name": "GridFromHtml.html",
+        "url": "GridFromHtml.html",
+        "title": "GridFromHtml Tests",
+        "parent": ""
+    },
+    {
+        "name": "GridFromHtml_Editors.html",
+        "url": "GridFromHtml_Editors.html",
+        "title": "Test declarative cell editors ",
+        "parent": ""
+    },
+    {
+        "name": "Grid_headerless.html",
+        "url": "Grid_headerless.html",
+        "title": "Test Grid Common Cases with showHeader: false",
+        "parent": ""
+    },
+    {
+        "name": "Grid_mouseevents.html",
+        "url": "Grid_mouseevents.html",
+        "title": "Test delegated mouse events",
+        "parent": ""
+    },
+    {
+        "name": "Grid_rendering.html",
+        "url": "Grid_rendering.html",
+        "title": "Test get, formatter, and renderCell",
+        "parent": ""
+    },
+    {
         "name": "has-css3.html",
         "url": "has-css3.html",
         "title": "has-css3 tests",
@@ -232,9 +196,45 @@
         "parent": "intern"
     },
     {
+        "name": "JsonRest.html",
+        "url": "JsonRest.html",
+        "title": "Test JsonRest store",
+        "parent": ""
+    },
+    {
+        "name": "JsonRest_duplicates.html",
+        "url": "JsonRest_duplicates.html",
+        "title": "Test JsonRest Tree with objects repeated in different places in hierarchy",
+        "parent": ""
+    },
+    {
+        "name": "Keyboard.html",
+        "url": "Keyboard.html",
+        "title": "Test Keyboard Mixin",
+        "parent": ""
+    },
+    {
         "name": "mobile_grid.html",
         "url": "mobile_grid.html",
         "title": "Mobile dgrid test",
+        "parent": ""
+    },
+    {
+        "name": "OnDemand.html",
+        "url": "OnDemand.html",
+        "title": "Test Grid Store Observation",
+        "parent": ""
+    },
+    {
+        "name": "OnDemand_promises.html",
+        "url": "OnDemand_promises.html",
+        "title": "Test OnDemandGrids with promise-based stores",
+        "parent": ""
+    },
+    {
+        "name": "OnDemand_tile.html",
+        "url": "OnDemand_tile.html",
+        "title": "Test Tile Layout in OnDemandList",
         "parent": ""
     },
     {
@@ -265,6 +265,12 @@
         "name": "rtl.html",
         "url": "rtl.html",
         "title": "Test Right-To-Left",
+        "parent": ""
+    },
+    {
+        "name": "Selection.html",
+        "url": "Selection.html",
+        "title": "Test Selection",
         "parent": ""
     },
     {
