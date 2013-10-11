@@ -118,7 +118,7 @@ define(["put-selector/put"], function(put){
 			
 			if(!extraSheet){
 				// First time, create an extra stylesheet for adding rules
-				extraSheet = put(document.getElementsByTagName("head")[0], "style");
+				extraSheet = put(document.getElementsByTagName("head")[0], "style[type='text/css']");
 				// Keep reference to actual StyleSheet object (`styleSheet` for IE < 9)
 				extraSheet = extraSheet.sheet || extraSheet.styleSheet;
 				// Store name of method used to remove rules (`removeRule` for IE < 9)
