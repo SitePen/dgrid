@@ -8,6 +8,11 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 * Fixed an issue in `Selection` code flow which caused devices supporting
   MSPointer to behave incorrectly with recent versions of Dojo.
 
+### Column Plugins
+
+* Added logic to `editor` to preserve editor focus when a row is updated
+  (particularly useful with always-on editors with autoSave enabled). (#579)
+
 # 0.3.11
 
 ## Significant changes
