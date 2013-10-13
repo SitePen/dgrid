@@ -504,7 +504,7 @@ return function(column, editor, editOn){
 		
 		// Remove the edit function, so that it (and other one-time listeners)
 		// will be re-added if editor columns are re-initialized
-		grid.edit = null;
+		column.grid.edit = null;
 	});
 	
 	column.renderCell = editOn ? function(object, value, cell, options){
