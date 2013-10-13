@@ -3,10 +3,18 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 # master (0.3.12-dev)
 
+## Significant changes
+
 ### Mixins
 
+* `Selection` and `CellSelection` now fire `dgrid-select` and `dgrid-deselect`
+  events on the same turn that `select` is called. The events still include
+  `rows` or `cells` containing all rows or cells selected at once; only the
+  timing of the events firing has changed.
 * Fixed an issue in `Selection` code flow which caused devices supporting
   MSPointer to behave incorrectly with recent versions of Dojo.
+
+## Other changes and fixes
 
 ### Column Plugins
 
