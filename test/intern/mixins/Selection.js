@@ -230,10 +230,10 @@ define([
 			grid.gotoPage(1);
 			store.put({ id: 1, first: "Updated First 1", last: "Updated Last 1"});
 			checkSelected(initSelection);
-			assert.strictEqual(grid.cell(1, "first").element.innerHTML, "Updated First 1");
+			assert.isTrue(grid.cell(1, "first").element.innerHTML.indexOf("Updated First 1") > -1);
 			store.put({ id: 4, first: "Updated First 4", last: "Updated Last 4"});
 			checkSelected(initSelection);
-			assert.strictEqual(grid.cell(4, "first").element.innerHTML, "Updated First 4");
+			assert.isTrue(grid.cell(4, "first").element.innerHTML.indexOf("Updated First 4") > -1);
 			
 			store.put({ id: 24, first: "Updated First", last: "Updated Last"});
 			checkSelected(initSelection);
