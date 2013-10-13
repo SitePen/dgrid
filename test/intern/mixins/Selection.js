@@ -20,10 +20,13 @@ define([
 			Selection: Selection,
 			CellSelection: CellSelection
 		},
-		notificationTests = {};
+		notificationTests = {},
+		grid;
 	
 	function _createTestData(size){
-		var data = [], aCode = "A".charCodeAt(0);
+		var data = [],
+			aCode = "A".charCodeAt(0),
+			i;
 		size = size || 15;
 		for(i = 0; i < size; i++){
 			data.push({
@@ -59,12 +62,13 @@ define([
 		notificationTests[name + " + update"] = function(){
 			var store = Observable(new Memory({
 					data: _createTestData()
-				})),
-				grid = new (declare([OnDemandGrid, SelectionMixin]))({
-					columns: getColumns(),
-					store: store,
-					sort: "id"
-				});
+				}));
+			
+			grid = new (declare([OnDemandGrid, SelectionMixin]))({
+				columns: getColumns(),
+				store: store,
+				sort: "id"
+			});
 			
 			document.body.appendChild(grid.domNode);
 			grid.startup();
@@ -110,7 +114,7 @@ define([
 		};
 		
 		notificationTests[name + " + update + no store"] = function(){
-			var grid = new (declare([Grid, SelectionMixin]))({
+			grid = new (declare([Grid, SelectionMixin]))({
 				columns: getColumns()
 			});
 			document.body.appendChild(grid.domNode);
@@ -167,11 +171,12 @@ define([
 			// Create a selection, trigger paging, notify
 			var store = Observable(new Memory({
 					data: _createTestData(100)
-				})),
-				grid = new (declare([Grid, SelectionMixin, Pagination]))({
-					store: store,
-					columns: getColumns()
-				});
+				}));
+			
+			grid = new (declare([Grid, SelectionMixin, Pagination]))({
+				store: store,
+				columns: getColumns()
+			});
 			
 			document.body.appendChild(grid.domNode);
 			grid.startup();
@@ -252,12 +257,13 @@ define([
 			// Create and remove selections, watch for events
 			var store = Observable(new Memory({
 					data: _createTestData()
-				})),
-				grid = new (declare([OnDemandGrid, SelectionMixin]))({
-					columns: getColumns(),
-					store: store,
-					sort: "id"
-				});
+				}));
+			
+			grid = new (declare([OnDemandGrid, SelectionMixin]))({
+				columns: getColumns(),
+				store: store,
+				sort: "id"
+			});
 			
 			document.body.appendChild(grid.domNode);
 			grid.startup();
@@ -274,33 +280,28 @@ define([
 			function testEvents() {
 				selectEventFired = 0;
 				deselectEventFired = 0;
+				
 				grid.select(3);
-				grid._fireSelectionEvent();
 				assert.strictEqual(selectEventFired, 1, "Select event fired once: " + selectEventFired);
 				assert.strictEqual(deselectEventFired, 0, "Deselect event not fired: " + deselectEventFired);
 				
 				grid.deselect(3);
-				grid._fireSelectionEvent();
 				assert.strictEqual(selectEventFired, 1, "Select event fired once: " + selectEventFired);
 				assert.strictEqual(deselectEventFired, 1, "Deselect event fired once: " + deselectEventFired);
 				
 				grid.select(3);
-				grid._fireSelectionEvent();
 				assert.strictEqual(selectEventFired, 2, "Select event fired twice: " + selectEventFired);
 				assert.strictEqual(deselectEventFired, 1, "Deselect event fired once: " + deselectEventFired);
 				
 				grid.select(4);
-				grid._fireSelectionEvent();
 				assert.strictEqual(selectEventFired, 3, "Select event fired three times: " + selectEventFired);
 				assert.strictEqual(deselectEventFired, 1, "Deselect event fired once: " + deselectEventFired);
 				
 				grid.deselect(3);
-				grid._fireSelectionEvent();
 				assert.strictEqual(selectEventFired, 3, "Select event fired three times: " + selectEventFired);
 				assert.strictEqual(deselectEventFired, 2, "Deselect event fired twice: " + deselectEventFired);
 				
 				grid.deselect(4);
-				grid._fireSelectionEvent();
 				assert.strictEqual(selectEventFired, 3, "Select event fired three times: " + selectEventFired);
 				assert.strictEqual(deselectEventFired, 3, "Deselect event fired three times: " + deselectEventFired);
 			}
@@ -320,11 +321,12 @@ define([
 		
 		notificationTests[name + " events + no store"] = function(){
 			// Create and remove selections, watch for events
-			var grid = new (declare([Grid, SelectionMixin]))({
-					columns: getColumns()
-				}),
-				selectEventFired = 0,
+			var selectEventFired = 0,
 				deselectEventFired = 0;
+			
+			grid = new (declare([Grid, SelectionMixin]))({
+				columns: getColumns()
+			});
 			
 			document.body.appendChild(grid.domNode);
 			grid.startup();
@@ -337,36 +339,27 @@ define([
 				deselectEventFired++;
 			});
 			
-			// These tests call _fireSelectionEvent directly to avoid the
-			// timeout that is usually performed to batch concurrent selections
-			
 			grid.select(3);
-			grid._fireSelectionEvent();
 			assert.strictEqual(selectEventFired, 1, "Select event fired once: " + selectEventFired);
 			assert.strictEqual(deselectEventFired, 0, "Deselect event not fired: " + deselectEventFired);
 			
 			grid.deselect(3);
-			grid._fireSelectionEvent();
 			assert.strictEqual(selectEventFired, 1, "Select event fired once: " + selectEventFired);
 			assert.strictEqual(deselectEventFired, 1, "Deselect event fired once: " + deselectEventFired);
 			
 			grid.select(3);
-			grid._fireSelectionEvent();
 			assert.strictEqual(selectEventFired, 2, "Select event fired twice: " + selectEventFired);
 			assert.strictEqual(deselectEventFired, 1, "Deselect event fired once: " + deselectEventFired);
 			
 			grid.select(4);
-			grid._fireSelectionEvent();
 			assert.strictEqual(selectEventFired, 3, "Select event fired three times: " + selectEventFired);
 			assert.strictEqual(deselectEventFired, 1, "Deselect event fired once: " + deselectEventFired);
 			
 			grid.deselect(3);
-			grid._fireSelectionEvent();
 			assert.strictEqual(selectEventFired, 3, "Select event fired three times: " + selectEventFired);
 			assert.strictEqual(deselectEventFired, 2, "Deselect event fired twice: " + deselectEventFired);
 			
 			grid.deselect(4);
-			grid._fireSelectionEvent();
 			assert.strictEqual(selectEventFired, 3, "Select event fired three times: " + selectEventFired);
 			assert.strictEqual(deselectEventFired, 3, "Deselect event fired three times: " + deselectEventFired);
 			
@@ -375,10 +368,11 @@ define([
 
 		notificationTests[name + " events + no store + remove"] = function(){
 			// Create selections, remove rows, watch for events
-			var grid = new (declare([Grid, SelectionMixin]))({
-					columns: getColumns()
-				}),
-				deselectEventFired = 0;
+			var deselectEventFired = 0;
+			
+			grid = new (declare([Grid, SelectionMixin]))({
+				columns: getColumns()
+			});
 			
 			document.body.appendChild(grid.domNode);
 			grid.startup();
@@ -390,19 +384,15 @@ define([
 			
 			grid.select(3);
 			grid.select(4);
-			grid._fireSelectionEvent();
 			assert.strictEqual(deselectEventFired, 0, "Deselect event not fired: " + deselectEventFired);
 			
 			grid.row(3).remove();
-			grid._fireSelectionEvent();
 			assert.strictEqual(deselectEventFired, 1, "Deselect event fired once: " + deselectEventFired);
 			
 			grid.row(5).remove();
-			grid._fireSelectionEvent();
 			assert.strictEqual(deselectEventFired, 1, "Deselect event not fired again: " + deselectEventFired);
 			
 			grid.row(4).remove();
-			grid._fireSelectionEvent();
 			assert.strictEqual(deselectEventFired, 2, "Deselect event fired a second time: " + deselectEventFired);
 			
 			grid.destroy();
@@ -413,13 +403,14 @@ define([
 			var store = Observable(new Memory({
 					data: _createTestData()
 				})),
-				grid = new (declare([OnDemandGrid, SelectionMixin]))({
-					columns: getColumns(),
-					store: store,
-					sort: "id"
-				}),
 				selectEventFired,
 				deselectEventFired;
+			
+			grid = new (declare([OnDemandGrid, SelectionMixin]))({
+				columns: getColumns(),
+				store: store,
+				sort: "id"
+			});
 			
 			document.body.appendChild(grid.domNode);
 			grid.startup();
@@ -436,24 +427,20 @@ define([
 				deselectEventFired = 0;
 				grid.select(3);
 				grid.select(4);
-				grid._fireSelectionEvent();
 				assert.strictEqual(deselectEventFired, 0, "Deselect event not fired: " + deselectEventFired);
 				
 				// Reset the select event counter.  It should not fire on remove.
 				selectEventFired = 0;
 				
 				store.remove(3);
-				grid._fireSelectionEvent();
 				assert.strictEqual(selectEventFired, 0, "Select event not fired: " + selectEventFired);
 				assert.strictEqual(deselectEventFired, 1, "Deselect event fired once: " + deselectEventFired);
 				
 				store.remove(5);
-				grid._fireSelectionEvent();
 				assert.strictEqual(selectEventFired, 0, "Select event not fired: " + selectEventFired);
 				assert.strictEqual(deselectEventFired, 1, "Deselect event not fired again: " + deselectEventFired);
 				
 				store.remove(4);
-				grid._fireSelectionEvent();
 				assert.strictEqual(selectEventFired, 0, "Select event not fired: " + selectEventFired);
 				assert.strictEqual(deselectEventFired, 2, "Deselect event fired a second time: " + deselectEventFired);
 			}
@@ -473,6 +460,10 @@ define([
 	});
 	
 	test.suite("Selection update handling", function(){
+		test.afterEach(function(){
+			grid.destroy();
+		});
+		
 		for(var name in notificationTests){
 			test.test(name, notificationTests[name]);
 		}
