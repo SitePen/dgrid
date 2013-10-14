@@ -504,7 +504,7 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 			var formatter = this.formatter,
 				formatterScope = this.grid.formatterScope;
 			td.innerHTML = typeof formatter === "string" && formatterScope ?
-				formatterScope[formatter](data, object) : formatter(data, object);
+				formatterScope[formatter](data, object) : this.formatter(data, object);
 		}else if(data != null){
 			td.appendChild(document.createTextNode(data)); 
 		}
