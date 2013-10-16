@@ -31,6 +31,9 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 * Added logic to `editor` to preserve editor focus when a row is updated
   (particularly useful with always-on editors with autoSave enabled). (#579)
+* Removed a `mousedown` event handler from `editor` which was interfering with
+  certain widget features such as `TextBox#selectOnClick`; this event handler
+  should no longer be necessary. (#704)
 
 # 0.3.11
 
