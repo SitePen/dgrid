@@ -210,11 +210,7 @@ function createEditor(column){
 			}
 		}
 	}
-	
-	// XXX: stop mousedown propagation to prevent confusing Keyboard mixin logic
-	// with certain widgets; perhaps revising KB's `handledEvent` would be better.
-	on(node, "mousedown", function(evt){ evt.stopPropagation(); });
-	
+
 	return cmp;
 }
 
