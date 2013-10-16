@@ -274,8 +274,10 @@ function createSharedEditor(column, originalRenderCell){
 			column.grid.row(parentNode).data, activeValue, parentNode,
 			activeOptions ? lang.delegate(options, activeOptions) : options));
 		
-		// reset state now that editor is deactivated
-		activeCell = activeValue = activeOptions = null;
+		// Reset state now that editor is deactivated;
+		// reset focusedCell as well since some browsers will not trigger the
+		// focusout event handler in this case
+		activeCell = activeValue = activeOptions = focusedCell = null;
 	}
 	
 	function dismissOnKey(evt){
