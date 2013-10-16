@@ -22,6 +22,11 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ## Other changes and fixes
 
+### Mixins
+
+* The `Keyboard` mixin now properly adds/removes header navigation when
+  `set("showHeader", ...)` is called. (#734)
+
 ### Column Plugins
 
 * Added logic to `editor` to preserve editor focus when a row is updated
