@@ -80,9 +80,16 @@ var Keyboard = declare(null, {
 				initialNode = areaNode;
 			
 			function initHeader(){
-				grid._focusedHeaderNode = initialNode =
-					cellNavigation ? grid.headerNode.getElementsByTagName("th")[0] : grid.headerNode;
-				if(initialNode){ initialNode.tabIndex = grid.tabIndex; }
+				if(grid._focusedHeaderNode){
+					// Remove the tab index for the node that previously had it.
+					grid._focusedHeaderNode.tabIndex = -1;
+				}
+				if(grid.showHeader){
+					// Set the tab index only if the header is visible.
+					grid._focusedHeaderNode = initialNode =
+						cellNavigation ? grid.headerNode.getElementsByTagName("th")[0] : grid.headerNode;
+					if(initialNode){ initialNode.tabIndex = grid.tabIndex; }
+				}
 			}
 			
 			if(isHeader){
