@@ -1,3 +1,4 @@
 define([
-	'./functional/Keyboard'
+	'./functional/Keyboard',
+	'./functional/KeyboardTab'
 ], function(){});
