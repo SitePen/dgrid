@@ -5,34 +5,40 @@ define([
 	"dgrid/OnDemandGrid",
 	"dgrid/Keyboard",
 	"dojo/_base/declare",
+	"dojo/dom-construct",
 	"dojo/on",
 	"dojo/query",
 	"put-selector/put",
 	"dgrid/test/data/base"
-], function(test, assert, OnDemandList, OnDemandGrid, Keyboard, declare, on, query, put){
+], function(test, assert, OnDemandList, OnDemandGrid, Keyboard, declare, domConstruct, on, query, put){
 	var handles = [],
-		columns = {
-			col1: "Column 1",
-			col3: "Column 3",
-			col5: "Column 5"
-		},
 		item = testStore.get(1),
-		grid;
+		grid, button;
 	
 	// Common functions run after each test and suite
 	
-	function afterEach(){
+	function removeHandles(){
 		for(var i = handles.length; i--;){
 			handles[i].remove && handles[i].remove();
 		}
 		handles = [];
 	}
 	
-	function after(){
+	function destoryGrid(){
+		removeHandles();
 		// Destroy list or grid
 		grid.destroy();
 		// Restore item that was removed for focus retention test
 		testStore.put(item);
+
+		if(button){
+			domConstruct.destroy(button);
+			button = null;
+		}
+	}
+
+	function makeButton(){
+		button = domConstruct.place("<button>Click</button>", document.body);
 	}
 	
 	// Common test functions for grid w/ cellNavigation: false and list
@@ -67,7 +73,7 @@ define([
 		assert.strictEqual(document.activeElement, target,
 			"focus(...) targeted the expected row");
 		assert.strictEqual(rowId, "1",
-			"dgrid-cellfocusin event triggered on expected row");
+			"dgrid-cellfocusin event triggered on expected row 1: " + rowId);
 	}
 	
 	function testRowBlur(){
@@ -87,7 +93,7 @@ define([
 		grid.focus(targets[1]);
 		// make sure our handler was called
 		assert.strictEqual(blurredRow && blurredRow.id, "0",
-			"dgrid-cellfocusout event triggered on expected row");
+			"dgrid-cellfocusout event triggered on expected row 0: " + (blurredRow && blurredRow.id));
 	}
 	
 	function testRowUpdate(){
@@ -137,8 +143,8 @@ define([
 	}
 	
 	function registerRowTests(name) {
-		test.afterEach(afterEach);
-		test.after(after);
+		test.afterEach(removeHandles);
+		test.after(destoryGrid);
 
 		test.test(name + ".focus + no args", testRowFocus);
 		test.test(name + ".focus + args", testRowFocusArgs);
@@ -147,19 +153,62 @@ define([
 		test.test(name + ".focus + item removal", testRowRemove);
 	}
 
+	function testFocusInOut(grid, focusFn){
+		var focusInCount = 0,
+			focusOutCount = 0;
+
+		makeButton();
+
+		// listen for a dgrid focus events
+		handles.push(on(document.body, "dgrid-cellfocusin", function(){
+			focusInCount++;
+		}));
+		handles.push(on(document.body, "dgrid-cellfocusout", function(){
+			focusOutCount++;
+		}));
+
+		focusFn.call(grid);
+		assert.strictEqual(focusInCount, 1,
+			"dgrid-cellfocusin event occurred once: " + focusInCount);
+		assert.strictEqual(focusOutCount, 0,
+			"dgrid-cellfocusout event occurred none: " + focusOutCount);
+
+		button.focus();
+		assert.strictEqual(focusInCount, 1,
+			"dgrid-cellfocusin event occurred once: " + focusInCount);
+		assert.strictEqual(focusOutCount, 1,
+			"dgrid-cellfocusout event occurred once: " + focusOutCount);
+
+		focusFn.call(grid);
+		assert.strictEqual(focusInCount, 2,
+			"dgrid-cellfocusin event occurred twice: " + focusInCount);
+		assert.strictEqual(focusOutCount, 1,
+			"dgrid-cellfocusout event occurred once: " + focusOutCount);
+	}
+
 	test.suite("Keyboard (Grid + cellNavigation:true)", function(){
-		test.before(function(){
+		test.beforeEach(function(){
 			grid = new (declare([OnDemandGrid, Keyboard]))({
-				columns: columns,
+				columns: {
+					col1: "Column 1",
+					col3: "Column 3",
+					col5: "Column 5"
+				},
 				sort: "id",
 				store: testStore
 			});
 			document.body.appendChild(grid.domNode);
 			grid.startup();
 		});
+		test.afterEach(destoryGrid);
 
-		test.afterEach(afterEach);
-		test.after(after);
+		test.test("grid.cellNavigation default value", function(){
+			assert.ok(grid.cellNavigation, "Grid cellNavigation is true by default");
+		});
+
+		test.test("grid.cellNavigation default value", function(){
+			assert.ok(grid.cellNavigation, "Grid cellNavigation is true by default");
+		});
 
 		test.test("grid.focus + no args", function(){
 			var colId;
@@ -206,7 +255,7 @@ define([
 				"focus(...) targeted the expected cell");
 			assert.ok(focusedCell, "dgrid-cellfocusin event fired");
 			assert.strictEqual(focusedCell.row.id, "0",
-				"dgrid-cellfocusin event triggered on expected row");
+				"dgrid-cellfocusin event triggered on expected row 0: " + focusedCell.row.id);
 			assert.strictEqual(focusedCell.column.id, "col3",
 				"dgrid-cellfocusin event triggered on second cell on focus(...) call");
 		});
@@ -245,11 +294,63 @@ define([
 			// make sure our handler was called appropriately
 			assert.ok(blurredCell, "dgrid-cellfocusout event fired");
 			assert.strictEqual(blurredCell.row.id, "0",
-				"dgrid-cellfocusout event triggered on expected row");
+				"dgrid-cellfocusout event triggered on expected row 0: " + blurredCell.row.id);
 			assert.strictEqual(blurredCell.column.id, "col1",
-				"dgrid-cellfocusout event triggered on expected column");
+				"dgrid-cellfocusout event triggered on expected column col1: " + blurredCell.column.id);
 		});
-		
+
+		test.test("grid.focus, repeated", function(){
+			var focusInCount = 0,
+				focusOutCount = 0,
+				target;
+
+			// listen for a dgrid focus events
+			handles.push(on(document.body, "dgrid-cellfocusin", function(){
+				focusInCount++;
+			}));
+			handles.push(on(document.body, "dgrid-cellfocusout", function(){
+				focusOutCount++;
+			}));
+			// Looking for two focus-in events and only one focus out event.
+			grid.focus();
+
+			// trigger a body focus with the second cell as the target
+			target = query(".dgrid-cell", grid.contentNode)[1];
+			grid.focus(target);
+			grid.focus(target);
+			grid.focus(target);
+			assert.strictEqual(focusInCount, 2,
+				"dgrid-cellfocusin event occurred twice: " + focusInCount);
+			assert.strictEqual(focusOutCount, 1,
+				"dgrid-cellfocusout event occurred only once: " + focusOutCount);
+		});
+
+		test.test("grid.focusHeader, repeated", function(){
+			var focusInCount = 0,
+				focusOutCount = 0,
+				target;
+
+			// listen for a dgrid focus events
+			handles.push(on(document.body, "dgrid-cellfocusin", function(){
+				focusInCount++;
+			}));
+			handles.push(on(document.body, "dgrid-cellfocusout", function(){
+				focusOutCount++;
+			}));
+			// Looking for two focus-in events and only one focus out event.
+			grid.focus();
+
+			// trigger a focus on the first header cell
+			target = query(".dgrid-cell", grid.headerNode)[1];
+			grid.focus(target);
+			grid.focus(target);
+			grid.focus(target);
+			assert.strictEqual(focusInCount, 2,
+				"dgrid-cellfocusin event occurred twice: " + focusInCount);
+			assert.strictEqual(focusOutCount, 1,
+				"dgrid-cellfocusout event occurred only once: " + focusOutCount);
+		});
+
 		test.test("grid.focus + item update", function(){
 			var element, elementId;
 			// Focus a row based on a store ID + column ID,
@@ -295,25 +396,54 @@ define([
 			
 			return dfd;
 		});
+
+		test.test("grid.focus, in and out of grid", function(){
+			testFocusInOut(grid, grid.focus);
+		});
+
+		test.test("grid.focusHeader, in and out of grid", function(){
+			testFocusInOut(grid, grid.focusHeader);
+		});
 	});
 
 	test.suite("Keyboard (Grid + cellNavigation:false)", function(){
-		test.before(function(){
+		test.beforeEach(function(){
 			grid = new (declare([OnDemandGrid, Keyboard]))({
 				cellNavigation: false,
-				columns: columns,
+				columns: {
+					col1: "Column 1",
+					col3: "Column 3",
+					col5: "Column 5"
+				},
 				sort: "id",
 				store: testStore
 			});
 			document.body.appendChild(grid.domNode);
 			grid.startup();
 		});
+		test.afterEach(destoryGrid);
+
+		test.test("grid.focus, in and out of grid", function(){
+			testFocusInOut(grid, grid.focus);
+		});
+
+		test.test("grid.focusHeader, in and out of grid", function(){
+			testFocusInOut(grid, grid.focusHeader);
+		});
+
+		test.test("grid.focus, in and out of grid", function(){
+			testFocusInOut(grid, grid.focus);
+		});
+
+		test.test("grid.focusHeader, in and out of grid", function(){
+			testFocusInOut(grid, grid.focusHeader);
+		});
 
 		registerRowTests("grid");
 	});
 
 	test.suite("Keyboard (List)", function(){
-		test.before(function(){
+		test.beforeEach(function(){
 			grid = new (declare([OnDemandList, Keyboard]))({
 				sort: "id",
 				store: testStore,
@@ -322,6 +452,7 @@ define([
 			document.body.appendChild(grid.domNode);
 			grid.startup();
 		});
+		test.afterEach(destoryGrid);
 
 		registerRowTests("list");
 	});

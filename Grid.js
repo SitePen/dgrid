@@ -37,9 +37,8 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 				// event
 				target = target.target;
 			}
-			var element;
+			var element, row, rowElement;
 			if(target.nodeType){
-				var object;
 				do{
 					if(this._rowIdToObject[target.id]){
 						break;
@@ -54,8 +53,8 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 				}while(target && target != this.domNode);
 			}
 			if(!element && typeof columnId != "undefined"){
-				var row = this.row(target),
-					rowElement = row && row.element;
+				row = this.row(target);
+				rowElement = row && row.element;
 				if(rowElement){
 					var elements = rowElement.getElementsByTagName("td");
 					for(var i = 0; i < elements.length; i++){
@@ -79,7 +78,6 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 			// summary:
 			//		Generates the grid for each row (used by renderHeader and and renderRow)
 			var row = put("table.dgrid-row-table[role=presentation]"),
-				cellNavigation = this.cellNavigation,
 				// IE < 9 needs an explicit tbody; other browsers do not
 				tbody = (has("ie") < 9 || has("quirks")) ? put(row, "tbody") : row,
 				tr,
@@ -144,7 +142,6 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 		},
 		
 		renderRow: function(object, options){
-			var self = this;
 			var row = this.createRowCells("td", function(td, column){
 				var data = object;
 				// Support get function or field property (similar to DataGrid)
@@ -172,7 +169,6 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 			//		Setup the headers for the grid
 			var
 				grid = this,
-				columns = this.columns,
 				headerNode = this.headerNode,
 				i = headerNode.childNodes.length;
 			
@@ -205,7 +201,7 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 					th.className += " dgrid-sortable";
 				}
 			}, this.subRows && this.subRows.headerRows);
-			this._rowIdToObject[row.id = this.id + "-header"] = this.columns;
+			row.id = this.id + "-header";
 			headerNode.appendChild(row);
 			
 			// If the columns are sortable, re-sort on clicks.
