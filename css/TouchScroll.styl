@@ -1,4 +1,5 @@
 @import "variables";
+@import "nib/vendor";
 
 /* styles for scrollbars during touch-scroll */
 
@@ -11,7 +12,7 @@
 }
 .touchscroll-fadeout .touchscroll-x, .touchscroll-fadeout .touchscroll-y {
 	opacity: 0;
-	opacity-transition: opacity 0.3s ease-out 0.1s
+	transition: opacity 0.3s ease-out 0.1s
 }
 
 .touchscroll-bar {
@@ -42,7 +43,7 @@
 
 .touchscroll-bar {
 	/* Establish transition property and timing function for scrollbars */
-	transition-transform: transform cubic-bezier(0.33, 0.66, 0.66, 1)
+	transition: transform cubic-bezier(0.33, 0.66, 0.66, 1)
 }
 
 /* indicator of a successful load */
