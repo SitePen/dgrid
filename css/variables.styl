@@ -1,4 +1,4 @@
-// Mixins
+/* Mixins */
 
 /* TODO: Better way to do this, perhaps with Nib? Do these numbers have a real meaning? */
 
@@ -14,7 +14,7 @@ border-function($width, $style, $color){
 	border: $width $style $color;
 }
 
-// General
+/* General */
 
 $border-color ?= #ddd
 $border-style ?= solid
@@ -30,39 +30,26 @@ $selected-color ?= #bfd6eb
 
 $ui-icon-image ?= url('images/ui-icons_222222_256x240.png')
 
-$header-background-color ?= #eee // TODO? lighten($border-color)
-
-// TODO: Should we change these to colors with opacity, or to a mixin function?
+$header-background-color ?= #eee
 
 $touchscroll-background-color ?= rgba(88,88,88,0.97)
 $touchscroll-border ?= $border-width $border-style rgba(88,88,88,1)
 $hacks-touchscroll-box-shadow ?= 0 0 $border-width rgba(88,88,88,0.4)
 
-
-// Extensions
+/* Extensions */
 
 $hider-toggle-background ?= transparent
 $hider-toggle-border ?= none
 $hider-menu-background ?= #fff
 $hider-menu-border ?= $border-width $border-style $border-color-alternate
 
-// TODO: Does it make sense for the dimensions to be based on the border-width? Probably not
-
-$reorder-dnd-border ?= $border-width*2 $outline-style $border-color-alternate !important
+$reorder-dnd-border ?= 2px $outline-style $border-color-alternate !important
 
 $resizer-background-color ?= #666
-$resizer-border ?= $border-width*5 $border-style transparent
-$resizer-touch-border ?= $border-width*20 $border-style transparent
+$resizer-border ?= 5px $border-style transparent
+$resizer-touch-border ?= 20px $border-style transparent
 
 $pagination-font-weight ?= bold
 $pagination-disabled-color ?= #aaa
 $pagination-page-input-width ?= 2em
 $pagination-page-input-text-align ?= center
-
-
-
-
-
-
-
-
