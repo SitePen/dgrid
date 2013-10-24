@@ -10,6 +10,11 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 * Fixed a regression in `Grid` since 0.3.7 where formatters were run in the
   global context by default instead of in the context of the column definition.
   (#748, thanks mbretter)
+* The `className` column definition property now supports being assigned a
+  function value, in which case the function will be called for each row in the
+  grid (including the header).  For rows in the body, the associated data object
+  (e.g. store item) will be passed, but for the header row, nothing will be
+  passed, so this will need to be handled in the function's logic.
 
 ### Mixins
 
