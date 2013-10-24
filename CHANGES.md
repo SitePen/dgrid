@@ -25,6 +25,12 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 * Fixed an issue in `Selection` code flow which caused devices supporting
   MSPointer to behave incorrectly with recent versions of Dojo.
 
+### Extensions
+
+* Fixed a regression in `Pagination` where `rowsPerPage` (and thus also
+  `queryOptions.count`) would be set to a string rather than a number when the
+  page size drop-down is used. (#752)
+
 ## Other changes and fixes
 
 ### Mixins
