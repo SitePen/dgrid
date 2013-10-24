@@ -5,52 +5,61 @@ define([
 	"dgrid/tree",
 	"dojo/_base/declare",
 	"dojo/_base/lang",
+	"dojo/_base/Deferred",
+	"dojo/on",
 	"dojo/store/Memory",
 	"dojo/store/util/QueryResults",
-	"dojo/dom-construct",
-	"dojo/query",
-	"dojo/Deferred"
-], function(test, assert, OnDemandGrid, tree, declare, lang, Memory, QueryResults, domConstruct, query, Deferred){
+	"dojo/query"
+], function(test, assert, OnDemandGrid, tree, declare, lang, Deferred, on,
+		Memory, QueryResults, query){
 
 	test.suite("tree (expand + promise)", function(){
-		var grid;
-		var SyncTreeStore = declare(Memory, {
-			// A memory store with methods to support a tree
-			getChildren: function(parent, options){
-				// Support persisting the original query via options.originalQuery
-				// so that child levels will filter the same way as the root level
-				return this.query(
-					lang.mixin({}, options && options.originalQuery || null,
-						{ parent: parent.id }),
-					options);
-			},
-			mayHaveChildren: function(parent){
-				return true;
-			},
-			query: function(query, options){
-				query = query || {};
-				options = options || {};
+		var grid,
+			TreeStore = declare(Memory, {
+				// A memory store with methods to support a tree
+				getChildren: function(parent, options){
+					// Support persisting the original query via options.originalQuery
+					// so that child levels will filter the same way as the root level
+					return this.query(
+						lang.mixin({}, options && options.originalQuery || null,
+							{ parent: parent.id }),
+						options);
+				},
+				mayHaveChildren: function(){
+					return true;
+				},
+				query: function(query, options){
+					query = query || {};
+					options = options || {};
 
-				if(!query.parent && !options.deep){
-					// Default to a single-level query for root items (no parent)
-					query.parent = undefined;
+					if(!query.parent && !options.deep){
+						// Default to a single-level query for root items (no parent)
+						query.parent = undefined;
+					}
+					return this.queryEngine(query, options)(this.data);
 				}
-				return this.queryEngine(query, options)(this.data);
-			}
-		});
-		var AsyncTreeStore = declare(SyncTreeStore, {
-			// SyncTreeStore with an asynchronous query method.
-			query: function(query, options){
-				this.dfd = new Deferred();
-				var promise = this.dfd.promise;
-				this.queryResults = this.inherited(arguments);
-				return QueryResults(promise);
-			},
-			resolve: function(){
-				// Allows the test to control when the store query is resolved.
-				this.dfd.resolve(this.queryResults);
-			}
-		});
+			}),
+			AsyncTreeStore = declare(TreeStore, {
+				// TreeStore with an asynchronous query method.
+				query: function(){
+					this.dfd = new Deferred();
+					this.queryResults = this.inherited(arguments);
+					var promise = this.dfd.promise,
+						results = new QueryResults(promise);
+					results.total = this.queryResults.total;
+					return results;
+				},
+				resolve: function(){
+					// Allows the test to control when the store query is resolved.
+					this.dfd.resolve(this.queryResults);
+				},
+				reject: function(error){
+					// Allows the test to control when the store query is rejected.
+					this.dfd.reject(error);
+				}
+			}),
+			syncStore = new TreeStore({ data: createData() }),
+			asyncStore = new AsyncTreeStore({ data: createData() });
 
 		function createData(){
 			return [
@@ -70,7 +79,7 @@ define([
 					{field: "value", label: "Value"}
 				]
 			});
-			domConstruct.place(grid.domNode, document.body);
+			document.body.appendChild(grid.domNode);
 			grid.startup();
 		}
 
@@ -81,23 +90,33 @@ define([
 			}
 		}
 
+		function createOnPromise(target, event) {
+			// Creates a promise based on an on.once call.
+			// Resolves to the event passed to the handler function.
+			var dfd = new Deferred(function () {
+					handle.remove();
+				}),
+				handle = on.once(target, event, function (event) {
+					dfd.resolve(event);
+				});
+
+			return dfd.promise;
+		}
+
+		function delayedResolve() {
+			setTimeout(function(){ grid.store.resolve(); }, 10);
+		}
+
 		test.suite("tree with sync store", function(){
 			test.beforeEach(function(){
-				var data = createData();
-				var store = new SyncTreeStore({
-					data: data
-				});
-				createGrid(store);
+				createGrid(syncStore);
 			});
-			test.afterEach(function(){
-				destroyGrid();
-			});
+			test.afterEach(destroyGrid);
 
 			// Tests
 			test.test("expand + no callback", function(){
 				assert.strictEqual(2, query(".dgrid-row", grid.domNode).length, "Grid has 2 rows");
 				grid.expand(1);
-				// The memory store is asynchronous
 				assert.strictEqual(3, query(".dgrid-row", grid.domNode).length, "Grid has 2 rows");
 			});
 
@@ -112,105 +131,160 @@ define([
 			test.test("expand + multiple callback", function(){
 				var dfd = this.async(1000);
 				assert.strictEqual(2, query(".dgrid-row", grid.domNode).length, "Grid has 2 rows");
-				grid.expand(1).then(dfd.callback(function(){
+				grid.expand(1).then(dfd.rejectOnError(function(){
 					assert.strictEqual(3, query(".dgrid-row", grid.domNode).length, "Grid has 3 rows");
-					grid.expand(2).then(dfd.callback(function(){
+					return grid.expand(2);
+				})).then(dfd.rejectOnError(function(){
 						assert.strictEqual(5, query(".dgrid-row", grid.domNode).length, "Grid has 5 rows");
-						grid.expand(4).then(dfd.callback(function(){
-							assert.strictEqual(5, query(".dgrid-row", grid.domNode).length, "Grid has 5 rows");
-						}));
-					}));
+						return grid.expand(4);
+				})).then(dfd.callback(function(){
+					assert.strictEqual(5, query(".dgrid-row", grid.domNode).length, "Grid has 5 rows");
 				}));
 			});
 
 			test.test("duplicate expand + callback", function(){
 				var dfd = this.async(1000);
 				assert.strictEqual(2, query(".dgrid-row", grid.domNode).length, "Grid has 2 rows");
-				grid.expand(1).then(dfd.callback(function(){
+				grid.expand(1).then(dfd.rejectOnError(function(){
 					assert.strictEqual(3, query(".dgrid-row", grid.domNode).length, "Grid has 3 rows");
-					grid.expand(1).then(dfd.callback(function(){
-						assert.strictEqual(3, query(".dgrid-row", grid.domNode).length, "Grid has 3 rows");
-					}));
+					return grid.expand(1);
+				})).then(dfd.callback(function(){
+					assert.strictEqual(3, query(".dgrid-row", grid.domNode).length, "Grid has 3 rows (no query)");
 				}));
 			});
 		});
 
 		test.suite("tree with async store", function(){
 			test.beforeEach(function(){
-				var data = createData();
-				var store = new AsyncTreeStore({
-					data: data
-				});
-				createGrid(store);
+				createGrid(asyncStore);
 			});
-			test.afterEach(function(){
-				destroyGrid();
-			});
+			test.afterEach(destroyGrid);
 
 			test.test("expand + callback", function(){
 				var dfd = this.async(1000);
-				grid.on("dgrid-refresh-complete", dfd.callback(function(){
+
+				createOnPromise(grid, "dgrid-refresh-complete").then(function(){
 					// Start testing when the grid is ready.
-					assert.strictEqual(2, query(".dgrid-row", grid.domNode).length, "Grid has 2 rows");
-					grid.expand(1).then(dfd.callback(function(){
-						assert.strictEqual(3, query(".dgrid-row", grid.domNode).length, "Grid has 3 rows");
-					}));
-					// The expand has not occurred yet.
-					assert.strictEqual(2, query(".dgrid-row", grid.domNode).length, "Grid has 2 rows");
-					grid.store.resolve();
+					assert.strictEqual(2, query(".dgrid-row", grid.domNode).length,
+						"Grid has 2 rows");
+					var promise = grid.expand(1);
+
+					// Verify that the result is the same before the query resolves.
+					assert.strictEqual(2, query(".dgrid-row", grid.domNode).length,
+						"Grid still has 2 rows before expand resolves");
+					delayedResolve();
+					return promise;
+				}, function(err){
+					dfd.reject(err);
+				}).then(dfd.callback(function(){
+					assert.strictEqual(3, query(".dgrid-row", grid.domNode).length,
+						"Grid has 3 rows");
 				}));
-				assert.strictEqual(0, query(".dgrid-row", grid.domNode).length, "Grid has 0 rows");
+
+				assert.strictEqual(0, query(".dgrid-row", grid.domNode).length,
+					"Grid has 0 rows before first async query resolves");
 				// Resolve the grid's initial store query.
-				grid.store.resolve();
+				delayedResolve();
 			});
 
 			test.test("expand + multiple callback", function(){
 				var dfd = this.async(1000);
-				grid.on("dgrid-refresh-complete", dfd.callback(function(){
+
+				function reject(err){ dfd.reject(err); }
+
+				createOnPromise(grid, "dgrid-refresh-complete").then(function(){
 					// Start testing when the grid is ready.
-					assert.strictEqual(2, query(".dgrid-row", grid.domNode).length, "Grid has 2 rows");
-					grid.expand(1).then(dfd.callback(function(){
-						assert.strictEqual(3, query(".dgrid-row", grid.domNode).length, "Grid has 3 rows");
-						grid.expand(2).then(dfd.callback(function(){
-							assert.strictEqual(5, query(".dgrid-row", grid.domNode).length, "Grid has 5 rows");
-							grid.expand(4).then(dfd.callback(function(){
-								assert.strictEqual(5, query(".dgrid-row", grid.domNode).length, "Grid has 5 rows");
-							}));
-							// Resolve expand(4) query
-							grid.store.resolve();
-						}));
-						// The expand has not occurred yet.
-						assert.strictEqual(3, query(".dgrid-row", grid.domNode).length, "Grid has 3 rows");
-						// Resolve expand(2) query
-						grid.store.resolve();
-					}));
-					// The expand has not occurred yet.
-					assert.strictEqual(2, query(".dgrid-row", grid.domNode).length, "Grid has 2 rows");
-					// Resolve expand(1) query
-					grid.store.resolve();
+					assert.strictEqual(2, query(".dgrid-row", grid.domNode).length,
+						"Grid has 2 rows");
+					var promise = grid.expand(1);
+
+					// Verify that the result is the same before the query resolves.
+					assert.strictEqual(2, query(".dgrid-row", grid.domNode).length,
+						"Grid still has 2 rows before expand resolves");
+					delayedResolve();
+					return promise;
+				}, reject).then(function(){
+					assert.strictEqual(3, query(".dgrid-row", grid.domNode).length,
+						"Grid has 3 rows");
+					var promise = grid.expand(2);
+
+					// Verify that the result is the same before the query resolves.
+					assert.strictEqual(3, query(".dgrid-row", grid.domNode).length,
+						"Grid still has 3 rows before expand resolves");
+					delayedResolve();
+					return promise;
+				}, reject).then(function(){
+					assert.strictEqual(5, query(".dgrid-row", grid.domNode).length,
+						"Grid has 5 rows");
+					var promise = grid.expand(4);
+					delayedResolve();
+					return promise;
+				}, reject).then(dfd.callback(function(){
+					assert.strictEqual(5, query(".dgrid-row", grid.domNode).length,
+						"Grid still has 5 rows after expanding item with no children");
 				}));
+
+				assert.strictEqual(0, query(".dgrid-row", grid.domNode).length,
+					"Grid has 0 rows before first async query resolves");
 				// Resolve the grid's initial store query.
-				grid.store.resolve();
+				delayedResolve();
 			});
 
 			test.test("duplicate expand + callback", function(){
 				var dfd = this.async(1000);
-				grid.on("dgrid-refresh-complete", dfd.callback(function(){
+				
+				function reject(err){ dfd.reject(err); }
+				
+				createOnPromise(grid, "dgrid-refresh-complete").then(function(){
 					// Start testing when the grid is ready.
-					assert.strictEqual(2, query(".dgrid-row", grid.domNode).length, "Grid has 2 rows");
-					grid.expand(1).then(dfd.callback(function(){
-						assert.strictEqual(3, query(".dgrid-row", grid.domNode).length, "Grid has 3 rows");
-						grid.expand(1).then(dfd.callback(function(){
-							assert.strictEqual(3, query(".dgrid-row", grid.domNode).length, "Grid has 3 rows");
-						}));
-					}));
-					grid.store.resolve();
+					assert.strictEqual(2, query(".dgrid-row", grid.domNode).length,
+						"Grid has 2 rows");
+					var promise = grid.expand(1);
+					delayedResolve();
+					return promise;
+				}, reject).then(function(){
+					assert.strictEqual(3, query(".dgrid-row", grid.domNode).length,
+						"Grid has 3 rows");
+					return grid.expand(1);
+				}, reject).then(dfd.callback(function(){
+					assert.strictEqual(3, query(".dgrid-row", grid.domNode).length,
+						"Grid still has 3 rows (no query)");
 				}));
+				
+				assert.strictEqual(0, query(".dgrid-row", grid.domNode).length,
+					"Grid has 0 rows before first async query resolves");
 				// Resolve the grid's initial store query.
-				grid.store.resolve();
+				delayedResolve();
+			});
+			
+			test.test("expand + callback, rejecting", function(){
+				var dfd = this.async(1000);
+
+				createOnPromise(grid, "dgrid-refresh-complete").then(function(){
+					// Start testing when the grid is ready.
+					assert.strictEqual(2, query(".dgrid-row", grid.domNode).length,
+						"Grid has 2 rows");
+					var promise = grid.expand(1);
+					
+					// Verify that the result is the same before the query resolves.
+					assert.strictEqual(2, query(".dgrid-row", grid.domNode).length,
+						"Grid still has 2 rows before expand resolves");
+					setTimeout(function(){ grid.store.reject("Rejected"); }, 10);
+					return promise;
+				}, function(err){
+					dfd.reject(err);
+				}).then(function () {
+					dfd.reject('Promise should have been rejected');
+				}, dfd.callback(function(){
+					assert.strictEqual(2, query(".dgrid-row", grid.domNode).length,
+						"Grid still has 2 rows after rejected promise");
+				}));
+
+				assert.strictEqual(0, query(".dgrid-row", grid.domNode).length,
+					"Grid has 0 rows before first async query resolves");
+				// Resolve the grid's initial store query.
+				delayedResolve();
 			});
 		});
-
-		// TODO make the query throw an error.
 	});
 });
