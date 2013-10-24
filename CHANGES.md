@@ -46,6 +46,12 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
   certain widget features such as `TextBox#selectOnClick`; this event handler
   should no longer be necessary. (#704)
 
+### Extensions
+
+* The `ColumnHider` extension's menu trigger node no longer reopens the menu if
+  the menu is already open; it will close it just like clicking anywhere else
+  outside the menu. (#755)
+
 # 0.3.11
 
 ## Significant changes

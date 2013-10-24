@@ -117,6 +117,10 @@ function(declare, has, listen, miscUtil, put, i18n){
 				hiderToggleNode = this.hiderToggleNode,
 				id;
 			
+			function stopPropagation(event){
+				event.stopPropagation();
+			}
+			
 			this.inherited(arguments);
 			
 			if(!hiderMenuNode){ // first run
@@ -154,11 +158,14 @@ function(declare, has, listen, miscUtil, put, i18n){
 							getColumnIdFromCheckbox(e.target, grid), !e.target.checked);
 					}
 				));
-				this._listeners.push(listen(hiderMenuNode, "mousedown", function(e){
-					// Stop click events from propagating here, so that we can simply
-					// track body clicks for hide without having to drill-up to check.
-					e.stopPropagation();
-				}));
+				
+				// Stop click events from propagating from menu or trigger nodes,
+				// so that we can simply track body clicks for hide without
+				// having to drill-up to check.
+				this._listeners.push(
+					listen(hiderMenuNode, "mousedown", stopPropagation),
+					listen(hiderToggleNode, "mousedown", stopPropagation)
+				);
 				
 				// Hook up top-level mousedown listener if it hasn't been yet.
 				if(!bodyListener){
