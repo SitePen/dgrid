@@ -5,13 +5,13 @@
 
 /* General rules */
 /*$border-color = #fff*/
-$cell-border-color ?= #bbc581
+/*$cell-border-color ?= #bbc581*/
 /*$legacy-highlight-background-color ?= #d6e5a5*/
 /*$primary-background-color ?= #000*/
 $primary-color ?= #fff
-$row-color ?= #333
-$row-hover-background-color ?= #c5dca6
-$row-text-shadow ?= 0 1px 0 rgba(255,255,255,.5)
+/*$row-color ?= #333*/
+$row-hover-background-color ?= #ddd
+/*$row-text-shadow ?= 0 1px 0 rgba(255,255,255,.5)*/
 
 /* ui-widget-content rules */
 $content-background-color ?= $primary-color
@@ -20,12 +20,12 @@ $content-color ?= #000
 $content-text-shadow ?= 0 1px 0 rgba(255,255,255,.9)
 
 /* Highlighting rules */
-$highlight-background-color ?= #d5e8bd
+$highlight-background-color ?= #999
 /*$highlight-color ?= #000*/
 
 /* Header/Footer rules */
-$footer-background-color = $row-color
-$footer-gradient ?= linear-gradient(top, #4e4e4e 0%,#555555 12%,#636363 25%,#505050 39%,#303030 49%,#000000 50%,#1c1c1c 60%,#292929 76%,#1e1e1e 91%,#141414 100%);
+$footer-background-color = #333
+$footer-gradient ?= linear-gradient(top, #4e4e4e 0%,#555555 12%,#636363 25%,#505050 39%,#303030 49%,#000000 50%,#1c1c1c 60%,#292929 76%,#1e1e1e 91%,#141414 100%)
 $header-border-color ?= #111
 /*$header-cell-border-color ?= #bbb*/
 /*$header-cell-hover-gradient ?= linear-gradient(top, #ffffff 0%,#d2e0eb 100%)*/
@@ -37,12 +37,12 @@ $ms-footer ?= unquote("progid:DXImageTransform.Microsoft.gradient( startColorstr
 $sort-image = url('../images/ui-icons_222222_256x240_white.png')
 
 /* Selection rules */
-$selected-background-color ?= #b3d18b
+/*$selected-background-color ?= #333*/
 /*$selected-color = #fff*/
-$selected-text-shadow ?= 0 1px 0 rgba(255,255,255,.6)
+/*$selected-text-shadow ?= 0 1px 0 rgba(255,255,255,.6)*/
 
 /* Odd-even rules */
-$legacy-row-odd-background ?= #f2f7e8
+$legacy-row-odd-background ?= #f7f7f7
 /*$ms-row-odd-filter ?= unquote("progid:DXImageTransform.Microsoft.gradient( startColorstr='#b9cb7f', endColorstr='#8fa05b',GradientType=0 )")*/
 /*$row-odd-border ?= 1px solid #ccd595*/
 /*$row-odd-border-cell ?= 1px solid #e9efbd*/
@@ -50,21 +50,20 @@ $legacy-row-odd-background ?= #f2f7e8
 /*$row-odd-text-shadow ?= 0 -1px 0 rgba(0,0,0,.3)*/
 
 /* ui-state rules */
-/*$active-background-color ?= #aec7e3*/
+$active-background-color ?= #555
 /*$active-hover-background-color ?= #8b6b4a*/
-/*$active-text-shadow ?= 0 -1px 0 rgba(0,0,0,.5)*/
+$active-text-shadow ?= 0 -1px 0 rgba(0,0,0,.5)
 /*$default-active-background-color ?= */
 /*$default-active-hover-background-color ?= */
-/*$default-background ?= url("images/row_back.png") #fff repeat-x */
+/*$default-background ?= */
 /*$default-hover-background-color ?= #ffe284*/
 
 /* ColumnReorder rules */
 $reorder-dnd-border = 2px dotted $primary-color !important
 
-.sage {
+.slate {
 	.ui-widget-content {
-		border: none;
-		background: $content-background-color;
+		background: $content-background-color; 
 		color: $content-color;
 		text-shadow: $content-text-shadow;
 	}
@@ -93,32 +92,19 @@ $reorder-dnd-border = 2px dotted $primary-color !important
 		text-transform: uppercase;
 	}
 
-	.dgrid-cell {
-		border-color: $cell-border-color;
-		border-top: none;
-		border-right: none;
-		border-left: none;
-	}
-
-	.dgrid-row-odd {
-		background: $legacy-row-odd-background;
+	.dgrid-row-odd { 
+		background-color: $legacy-row-odd-background;
 	}
 
 	.dgrid-row:hover {
-		background: $row-hover-background-color;
-		color: $row-color;
-		text-shadow: $row-text-shadow;
+		background-color: $row-hover-background-color;
 	}
 
-	.ui-state-default { 
-		transition-duration: 0.1s;
-		transition-property: background-color, border-color;
-	}
-
-	.dgrid-selected,
-	.dgrid-selected:hover {
-		background: $selected-background-color;
-		text-shadow: $selected-text-shadow;
+	.ui-state-active,
+	.ui-state-active:hover {
+		background-color: $active-background-color;
+		color: $primary-color;
+		text-shadow: $active-text-shadow;
 	}
 
 	.ui-state-highlight {
@@ -134,14 +120,15 @@ $reorder-dnd-border = 2px dotted $primary-color !important
 	.dgrid-header .dojoDndItemBefore {
 		border-left: $reorder-dnd-border;
 	}
-
+	
 	.dgrid-header .dojoDndItemAfter {
 		border-right: $reorder-dnd-border;
 	}
+
 }
 
 /* for pagination in IE < 8 + quirks, need additional rule to override link color */
-.has-ie-6-7 .sage .dgrid-navigation a,
-.has-ie.has-quirks .sage .dgrid-navigation a {
+.has-ie-6-7 .slate .dgrid-navigation a,
+.has-ie.has-quirks .slate .dgrid-navigation a {
 	color: $primary-color;
 }

@@ -5,36 +5,46 @@
 	padding: 2px;
 }
 
-.dgrid-pagination .dgrid-status {
-	float: left;
+.dgrid-pagination {
+	.dgrid-status {
+		float: left;
+	}
+
+	.dgrid-navigation {
+		float: right;
+
+		.dgrid-page-link {
+			cursor: pointer;
+			font-weight: $pagination-font-weight;
+			text-decoration: none;
+			color: inherit;
+			padding: 0 4px;
+		}
+
+	}
+
 }
 
-.dgrid-pagination .dgrid-navigation, .dgrid-pagination .dgrid-page-size {
+.dgrid-page-size {
 	float: right;
+	margin: 1px 4px 0 4px;
+}
 
-.dgrid-navigation .dgrid-page-link {
-	cursor: pointer;
-	font-weight: $pagination-font-weight;
-	text-decoration: none;
-	color: inherit;
-	padding: 0 4px;
-}
 .dgrid-first, .dgrid-last, .dgrid-next, .dgrid-previous {
-	font-size: @font-size*1.3; /* TODO: useful? */
+	font-size: 130%; /* TODO: useful? */
 }
+
 .dgrid-pagination .dgrid-page-disabled,
 .has-ie-6-7 .dgrid-navigation .dgrid-page-disabled,
 .has-ie.has-quirks .dgrid-navigation .dgrid-page-disabled {
 	color: $pagination-disabled-color;
 	cursor: default;
 }
+
 .dgrid-page-input {
 	margin-top: 1px;
 	width: $pagination-page-input-width;
 	text-align: $pagination-page-input-text-align;
-}
-.dgrid-page-size {
-	margin: 1px 4px 0 4px;
 }
 
 /* indicator of a successful load */

@@ -1,54 +1,48 @@
 /* Mixins */
 
-/* TODO: Better way to do this, perhaps with Nib? Do these numbers have a real meaning? */
-
-transform3d() {
-	@media (transform-3d) { .csstransforms3d { left: 9px;	} }
-	@media (-ms-transform-3d) { .csstransforms3d { left: 10px; } }
-	@media (-o-transform-3d) { .csstransforms3d { left: 11px; } }
-	@media (-moz-transform-3d) { .csstransforms3d { left: 12px; } }
-	@media (-webkit-transform-3d) { .csstransforms3d { left: 13px; } }
-}
-
 border-function($width, $style, $color){
 	border: $width $style $color;
 }
 
-/* General */
-
+/* General rules */
 $border-color ?= #ddd
+$border-color-alternate ?= #000
 $border-style ?= solid
 $border-width ?= 1px
 $border ?= $border-width $border-style $border-color
+$hacks-outline ?= $border-width $outline-style $border-color-alternate
 $height ?= 30em
 $outline-style ?= dotted
-$border-color-alternate ?= #000
 
-$hacks-outline ?= $border-width $outline-style $border-color-alternate
+/* Header/Footer rules */
+$footer-background-color = #eee
 
-$selected-color ?= #bfd6eb
+/* Selection rules */
+$selected-color = #bfd6eb
 
-$ui-icon-image ?= url('images/ui-icons_222222_256x240.png')
+/* Sorting rules */
+$sort-image = url('images/ui-icons_222222_256x240.png')
 
-$header-background-color ?= #eee
-
+/* Touch/scroll rules */
 $touchscroll-background-color ?= rgba(88,88,88,0.97)
 $touchscroll-border ?= $border-width $border-style rgba(88,88,88,1)
 $hacks-touchscroll-box-shadow ?= 0 0 $border-width rgba(88,88,88,0.4)
 
-/* Extensions */
-
+/* ColumnHider rules */
 $hider-toggle-background ?= transparent
 $hider-toggle-border ?= none
 $hider-menu-background ?= #fff
 $hider-menu-border ?= $border-width $border-style $border-color-alternate
 
-$reorder-dnd-border ?= 2px $outline-style $border-color-alternate !important
+/* ColumnReorder rules */
+$reorder-dnd-border = 2px $outline-style $border-color-alternate !important
 
+/* ColumnResizer rules */
 $resizer-background-color ?= #666
 $resizer-border ?= 5px $border-style transparent
 $resizer-touch-border ?= 20px $border-style transparent
 
+/* Pagination rules */
 $pagination-font-weight ?= bold
 $pagination-disabled-color ?= #aaa
 $pagination-page-input-width ?= 2em

@@ -1,24 +1,71 @@
 @import "nib/vendor";
 @import "../variables";
 
-/* TODO: theme-specific variables, and add base values for no theme provided? */
-/* TODO: Nesting of rules */
+/* Theme specific variables */
 
-$primary-text-color ?= #fff
+/* General rules */
+/*$border-color = */
+$cell-border-color ?= #bbc581
+$legacy-highlight-background-color ?= #d6e5a5
+/*$primary-background-color ?= */
+$primary-color ?= #fff
+/*$row-color ?= #333*/
+$row-hover-background-color ?= #555
+/*$row-text-shadow ?= 0 1px 0 rgba(255,255,255,.5)*/
 
-$sort-image ?= url('../images/ui-icons_222222_256x240_white.png')
+/* ui-widget-content rules */
+$content-background-color ?= #faffef
+/*$content-border ?= 1px solid #555*/
+$content-color ?= #000
+/*$content-text-shadow ?= 0 1px 0 rgba(255,255,255,.9)*/
 
-$selected-color ?= #fff
+/* Highlighting rules */
+/* $highlight-background-color */
+$highlight-color ?= $content-color
+
+/* Header/Footer rules */
+$footer-background-color = #333
+$footer-gradient ?= linear-gradient(top, #4e4e4e 0%,#555555 12%,#636363 25%,#505050 39%,#303030 49%,#000000 50%,#1c1c1c 60%,#292929 76%,#1e1e1e 91%,#141414 100%)
+$header-border-color ?= #111
+/*$header-cell-border-color ?= #bbb*/
+/*$header-cell-hover-background-color ?= #ebf1f6*/
+/*$header-cell-hover-gradient ?= linear-gradient(top, #ffffff 0%,#d2e0eb 100%)*/
+$header-text-shadow ?= 0 -1px 0 rgba(0,0,0,.9)
+$ms-footer ?= unquote("progid:DXImageTransform.Microsoft.gradient( startColorstr='#4e4e4e', endColorstr='#141414',GradientType=0 )")
+
+/* Sorting rules */
+$sort-image = url('../images/ui-icons_222222_256x240_white.png')
+
+/* Selection rules */
 $selected-background-color ?= #333
+$selected-color = $primary-color
+/*$selected-text-shadow ?= 0 1px 0 rgba(255,255,255,.6)*/
 
-$ms-dgrid-footer ?= unquote("progid:DXImageTransform.Microsoft.gradient( startColorstr='#4e4e4e', endColorstr='#141414',GradientType=0 )")
+/* Odd-even rules */
+$legacy-row-odd-background ?= #9a6
 $ms-row-odd-filter ?= unquote("progid:DXImageTransform.Microsoft.gradient( startColorstr='#b9cb7f', endColorstr='#8fa05b',GradientType=0 )")
+$row-odd-border ?= 1px solid #ccd595
+$row-odd-border-cell ?= 1px solid #e9efbd
+$row-odd-gradient ?= linear-gradient(top, rgba(185,203,127,1) 0%,rgba(143,160,91,1) 100%)
+$row-odd-text-shadow ?= 0 -1px 0 rgba(0,0,0,.3)
+
+/* ui-state rules */
+/*$active-background-color ?= #aec7e3*/
+/*$active-hover-background-color ?= #8b6b4a*/
+/*$active-text-shadow ?= 0 -1px 0 rgba(0,0,0,.5)*/
+/*$default-active-background-color ?= */
+/*$default-active-hover-background-color ?= */
+/*$default-background ?= */
+/*$default-hover-background-color ?= #ffe284*/
+
+/* ColumnReorder rules */
+$reorder-dnd-border = 2px dotted $primary-color !important
 
 .cactus {
 	.ui-widget-content {
 		border: none;
-		background: #faffef;
-		color: #000;
+		background: $content-background-color;
+		color: $content-color;
 	}
 
 	.dgrid-header-row {
@@ -27,60 +74,62 @@ $ms-row-odd-filter ?= unquote("progid:DXImageTransform.Microsoft.gradient( start
 
 	.ui-widget-header,
 	.dgrid-footer {
-		color: $primary-text-color;
-		background: #333; /* Old browsers */
-		background: linear-gradient(top, #4e4e4e 0%,#555555 12%,#636363 25%,#505050 39%,#303030 49%,#000000 50%,#1c1c1c 60%,#292929 76%,#1e1e1e 91%,#141414 100%); /* W3C */
-		filter: $ms-dgrid-footer; /* IE6-9 */
+		color: $primary-color;
+		/* Old browsers */
+		background: $footer-background-color;
+		/* W3C */
+		background: $footer-gradient;
+		/* IE6-8 */
+		filter: $ms-footer;
 	}
 
 	.ui-widget-header th {
 		padding: 7px 3px;
 		font-weight: bold;
-		color: #fff;
-		text-shadow: 0 -1px 0 rgba(0,0,0,.9);
-		border-color: #111;
+		color: $primary-color;
+		text-shadow: $header-text-shadow;
+		border-color: $header-border-color;
 		text-transform: uppercase;
 	}
 
 	.dgrid-cell {
-		border-color: #bbc581;
+		border-color: $cell-border-color;
 		border-top: none;
 		border-right: none;
 		border-left: none;
 	}
 
 	.dgrid-row-even {
-		border-top: 1px solid $primary-text-color;
+		border-top: 1px solid $primary-color;
 	}
 
 	.dgrid-row-odd {
-		background: #9a6;
-		background-image: linear-gradient(top, rgba(185,203,127,1) 0%,rgba(143,160,91,1) 100%);
+		background: $legacy-row-odd-background;
+		background-image: $row-odd-gradient;
 		filter: $ms-row-odd-filter;
-		text-shadow: 0 1px 0 rgba(255,255,255,.9);
-		border-top: 1px solid #ccd595;
-		color: #FFF;
-		text-shadow: 0 -1px 0 rgba(0,0,0,.3);
+		border-top: $row-odd-border;
+		color: $primary-color;
+		text-shadow: $row-odd-text-shadow;
 
 		.dgrid-cell {
-			border-top: 1px solid #e9efbd;
+			border-top: $row-odd-border-cell;
 		}
 
 	}
 
 	.dgrid-row:hover,
 	.dgrid-row:hover .dgrid-cell {
-		background: #555;
-		color: #fff;
-		text-shadow: 0 -1px 0 rgba(0,0,0,.9);
-		border-color: #555;
+		background: $row-hover-background-color;
+		color: $primary-color;
+		text-shadow: $header-text-shadow;
+		border-color: $row-hover-background-color;
 	}
 
 	.dgrid-selected,
 	.dgrid-selected .dgrid-cell {
 		background: $selected-background-color;
 		color: $selected-color;
-		text-shadow: 0 -1px 0 rgba(0,0,0,.9);
+		text-shadow: $header-text-shadow;
 		border-color: $selected-background-color;
 	}
 
@@ -90,9 +139,9 @@ $ms-row-odd-filter ?= unquote("progid:DXImageTransform.Microsoft.gradient( start
 	}
 
 	.ui-state-highlight {
-		background: #d6e5a5; /* background-color doesn't override CSS3 gradient */
+		background: $legacy-highlight-background-color; /* background-color doesn't override CSS3 gradient */
 		filter: none; /* override gradient in IE */
-		color: #000;
+		color: $highlight-color;
 		text-shadow: none;
 	}
 
@@ -103,17 +152,16 @@ $ms-row-odd-filter ?= unquote("progid:DXImageTransform.Microsoft.gradient( start
 
 	/* for ColumnReorder */
 	.dgrid-header .dojoDndItemBefore {
-		border-left: 2px dotted $primary-text-color !important;
+		border-left: $reorder-dnd-border;
 	}
 	.dgrid-header .dojoDndItemAfter {
-		border-right: 2px dotted $primary-text-color !important;
+		border-right: $reorder-dnd-border;
 	}
-
 
 }
 
 /* for pagination in IE < 8 + quirks, need additional rule to override link color */
 .has-ie-6-7 .cactus .dgrid-navigation a,
 .has-ie.has-quirks .cactus .dgrid-navigation a {
-	color: $primary-text-color;
+	color: $primary-color;
 }

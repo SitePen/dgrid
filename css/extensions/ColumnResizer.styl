@@ -19,10 +19,12 @@
 	border-left: $resizer-border;
 	outline: none;
 }
+
 html.has-ie-6 .dgrid-resize-handle {
 	border-color: pink;
 	filter: chroma(color=pink);
 }
+
 .dgrid-resize-header-container {
 	height:100%;
 }
@@ -31,6 +33,7 @@ html.has-ie-6 .dgrid-resize-handle {
 html.has-touch .dgrid-resize-handle {
 	border-left: $resizer-touch-border;
 }
+
 html.has-touch .dgrid-column-resizer {
 	width: 2px;
 }
@@ -40,18 +43,23 @@ html.has-no-quirks .dgrid-resize-header-container {
 		except when in quirks mode, where we have to use the th */
 	position: relative;
 }
+
 html.has-ie-6 .dgrid-resize-header-container {
 	position: static; /* and in IE6 we have to do the th hack */
 } 
+
 .dgrid-header .dgrid-cell-padding {
 	overflow: hidden;
 }
+
 html.has-ie-6 .dgrid-header .dgrid-cell-padding {
 	margin-right: 4px; /* for IE6, keep the resizer visible */
 }
+
 html.has-ie-6 .dgrid-header .dgrid-sort-arrow {
     margin-right: 0; /* for IE6, zero out the right margin due to the right margin for the container */
 }
+
 html.has-quirks .dgrid-header .dgrid-cell-padding, html.has-ie-6 .dgrid-header .dgrid-cell {
 	position:relative;
 }

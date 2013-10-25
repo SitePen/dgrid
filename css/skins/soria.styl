@@ -4,34 +4,34 @@
 /* Theme specific variables */
 
 /* General rules */
-$border-color = #aaa
-$cell-border-color ?= #edc
-/*$legacy-highlight-background-color ?= */
-$primary-background-color ?= #fff
-$primary-color ?= #000
+$border-color = #bba
+$cell-border-color ?= #ddc
+/*$legacy-highlight-background-color ?= #d6e5a5*/
+/*$primary-background-color ?= #000*/
+$primary-color ?= #fff
 /*$row-color ?= #333*/
 /*$row-hover-background-color ?= #c5dca6*/
 /*$row-text-shadow ?= 0 1px 0 rgba(255,255,255,.5)*/
 
 /* ui-widget-content rules */
-/*$content-background-color ?= */
+$content-background-color ?= $primary-color
 /*$content-border ?= 1px solid #555*/
-/*$content-color ?= */
+$content-color ?= #000
 /*$content-text-shadow ?= 0 1px 0 rgba(255,255,255,.9)*/
 
 /* Highlighting rules */
 $highlight-background-color ?= #ff6
-/* $highlight-color ?= */
+/*$highlight-color ?= #000*/
 
 /* Header/Footer rules */
-$footer-background-color = #ebf0f5
-$footer-gradient ?= linear-gradient(top, $footer-background-color 0%,#d5e0ea 100%)
+$footer-background-color = #f2f4fe
+$footer-gradient ?= linear-gradient(top, $footer-background-color 0%,#d0dff5 50%,#c6d8f0 51%,#c2d5ef 100%)
 /*$header-border-color ?= #111*/
-$header-cell-border-color ?= #bbb
-$header-cell-hover-background-color ?= #ebf1f6
-$header-cell-hover-gradient ?= linear-gradient(top, $primary-background-color 0%,#d2e0eb 100%)
+$header-cell-hover-background-color ?= #d4deec
+$header-cell-border-color ?= #bba
+$header-cell-hover-gradient ?= linear-gradient(top, #dae2ed 0%,#b2c7e8 49%,#a8c1eb 50%,#9ebaec 100%)
 /*$header-text-shadow ?= 0 -1px 0 rgba(0,0,0,.9)*/
-$ms-footer ?= unquote("progid:DXImageTransform.Microsoft.gradient( startColorstr='#ebf0f5', endColorstr='#d5e0ea',GradientType=0 )")
+$ms-footer ?= unquote("progid:DXImageTransform.Microsoft.gradient( startColorstr='#f2f4fe', endColorstr='#c2d5ef',GradientType=0 )")
 
 /* Sorting rules */
 /*$sort-image = url('../images/ui-icons_222222_256x240_white.png')*/
@@ -50,26 +50,25 @@ $ms-footer ?= unquote("progid:DXImageTransform.Microsoft.gradient( startColorstr
 /*$row-odd-text-shadow ?= 0 -1px 0 rgba(0,0,0,.3)*/
 
 /* ui-state rules */
-$active-background-color ?= #cee6fa
-$active-hover-background-color ?= #9bc6f2
+$active-background-color ?= #aec7e3
+/*$active-hover-background-color ?= #8b6b4a*/
 /*$active-text-shadow ?= 0 -1px 0 rgba(0,0,0,.5)*/
 /*$default-active-background-color ?= */
 /*$default-active-hover-background-color ?= */
-$default-background ?= url("images/row_back.png") #fff repeat-x
-$default-hover-background-color ?= #e9f2fe
+/*$default-background ?= */
+$default-hover-background-color ?= #60a1ea
 
 /* ColumnReorder rules */
 /*$reorder-dnd-border = 2px dotted $primary-color !important*/
 
-.claro {
+.soria {
 	.dgrid {
 		border-color: $border-color;
-		background: $primary-background-color;
-		color: $primary-color;
-	} 
+	}
 
-	.ui-widget-header {
-		font-weight: bold;
+	.ui-widget-content {
+		background: $content-background-color;
+		color: $content-color;
 	}
 
 	.ui-widget-header,
@@ -78,34 +77,24 @@ $default-hover-background-color ?= #e9f2fe
 		background: $footer-background-color;
 		/* W3C */
 		background: $footer-gradient;
-		/* IE6-9 */
+		/* IE6-8 */
 		filter: $ms-footer;
 	}
 
-	.ui-widget-header .dgrid-cell:hover {
+	.ui-widget-header th:hover {
 		/* Old browsers */
 		background: $header-cell-hover-background-color;
 		/* W3C */
 		background: $header-cell-hover-gradient;
-		/* TODO: This one did not have an IE6-8 specific filter. Oversight or intentional? */
-	}
-
-	.ui-state-default { 
-		transition-duration: 0.2s;
-		transition-property: background-color, border-color;
-		background: $default-background;
-	}
-
-	.ui-state-default:hover {
-		background-color: $default-hover-background-color;
+		/* TODO: Add IE 6-8 filter? */
 	}
 
 	.ui-state-active {
 		background-color: $active-background-color;
 	}
 
-	.ui-state-active:hover {
-		background-color: $active-hover-background-color;
+	.ui-state-default:hover {
+		background-color: $default-hover-background-color;
 	}
 
 	.ui-state-highlight {
@@ -119,8 +108,5 @@ $default-hover-background-color ?= #e9f2fe
 	.ui-widget-header .dgrid-cell {
 		border-color: $header-cell-border-color;
 	}
-}
 
-.has-ie-6 .claro .ui-state-default {
-	background-image: none;
 }
