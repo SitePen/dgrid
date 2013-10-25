@@ -1,48 +1,83 @@
+/* Theme specific variables */
+/* General rules */
+/*$legacy-highlight-background-color ?= #d6e5a5*/
+/*$primary-background-color ?= #000*/
+/*$row-color ?= #333*/
+/*$row-hover-background-color ?= #c5dca6*/
+/*$row-text-shadow ?= 0 1px 0 rgba(255,255,255,.5)*/
+/* ui-widget-content rules */
+/*$content-border ?= 1px solid #555*/
+/*$content-text-shadow ?= 0 1px 0 rgba(255,255,255,.9)*/
+/* Highlighting rules */
+/*$highlight-color ?= #000*/
+/* Header/Footer rules */
+/*$header-border-color ?= #bba*/
+/*$header-text-shadow ?= 0 -1px 0 rgba(0,0,0,.9)*/
+/* Sorting rules */
+/*$sort-image = url('../images/ui-icons_222222_256x240_white.png')*/
+/* Selection rules */
+/*$selected-background-color ?= #333*/
+/*$selected-color = #fff*/
+/*$selected-text-shadow ?= 0 1px 0 rgba(255,255,255,.6)*/
+/* Odd-even rules */
+/*$legacy-row-odd-background ?= #9a6*/
+/*$ms-row-odd-filter ?= unquote("progid:DXImageTransform.Microsoft.gradient( startColorstr='#b9cb7f', endColorstr='#8fa05b',GradientType=0 )")*/
+/*$row-odd-border ?= 1px solid #ccd595*/
+/*$row-odd-border-cell ?= 1px solid #e9efbd*/
+/*$row-odd-gradient ?= linear-gradient(top, rgba(185,203,127,1) 0%,rgba(143,160,91,1) 100%)*/
+/*$row-odd-text-shadow ?= 0 -1px 0 rgba(0,0,0,.3)*/
+/* ui-state rules */
+/*$active-hover-background-color ?= #8b6b4a*/
+/*$active-text-shadow ?= 0 -1px 0 rgba(0,0,0,.5)*/
+/*$default-active-background-color ?= */
+/*$default-active-hover-background-color ?= */
+/*$default-background ?= */
+/* ColumnReorder rules */
+/*$reorder-dnd-border = 2px dotted $primary-color !important*/
 .tundra .dgrid {
-	border-color: #bba;
+  border-color: #bba;
 }
-
 .tundra .ui-widget-content {
-	background: #fff;
-	color: #000;
+  background: #fff;
+  color: #000;
 }
-
-.tundra .ui-widget-header, .tundra .dgrid-footer {
-	background: #e8e8e8; /* Old browsers */
-	background: -moz-linear-gradient(top, #ffffff 0%, #e8e8e8 100%); /* FF3.6+ */
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,#e8e8e8)); /* Chrome,Safari4+ */
-	background: -webkit-linear-gradient(top, #ffffff 0%,#e8e8e8 100%); /* Chrome10+,Safari5.1+ */
-	background: -o-linear-gradient(top, #ffffff 0%,#e8e8e8 100%); /* Opera 11.10+ */
-	background: -ms-linear-gradient(top, #ffffff 0%,#e8e8e8 100%); /* IE10+ */
-	background: linear-gradient(top, #ffffff 0%,#e8e8e8 100%); /* W3C */
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#e8e8e8',GradientType=0 ); /* IE6-9 */
-	font-weight: bold;
+.tundra .ui-widget-header,
+.tundra .dgrid-footer {
+/* Old browsers */
+  background: #e8e8e8;
+/* W3C */
+  background: -webkit-linear-gradient(top, #fff 0%, #e8e8e8 100%);
+  background: -moz-linear-gradient(top, #fff 0%, #e8e8e8 100%);
+  background: -o-linear-gradient(top, #fff 0%, #e8e8e8 100%);
+  background: -ms-linear-gradient(top, #fff 0%, #e8e8e8 100%);
+  background: linear-gradient(to bottom, #fff 0%, #e8e8e8 100%);
+/* IE6-8 */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#e8e8e8',GradientType=0 );
+  font-weight: bold;
 }
 .tundra .ui-widget-header th:hover {
-	background: #f6f6f6; /* Old browsers */
-	background: -moz-linear-gradient(top, #ffffff 0%, #eeeeee 100%); /* FF3.6+ */
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,#eeeeee)); /* Chrome,Safari4+ */
-	background: -webkit-linear-gradient(top, #ffffff 0%,#eeeeee 100%); /* Chrome10+,Safari5.1+ */
-	background: -o-linear-gradient(top, #ffffff 0%,#eeeeee 100%); /* Opera 11.10+ */
-	background: -ms-linear-gradient(top, #ffffff 0%,#eeeeee 100%); /* IE10+ */
-	background: linear-gradient(top, #ffffff 0%,#eeeeee 100%); /* W3C */
+/* Old browsers */
+  background: #f6f6f6;
+/* W3C */
+  background: -webkit-linear-gradient(top, #fff 0%, #e8e8e8 100%);
+  background: -moz-linear-gradient(top, #fff 0%, #e8e8e8 100%);
+  background: -o-linear-gradient(top, #fff 0%, #e8e8e8 100%);
+  background: -ms-linear-gradient(top, #fff 0%, #e8e8e8 100%);
+  background: linear-gradient(to bottom, #fff 0%, #e8e8e8 100%);
+/* TODO: Add IE 6-8 filter? */
 }
-
 .tundra .ui-state-active {
-	background-color: #aec7e3;
+  background-color: #aec7e3;
 }
 .tundra .ui-state-default:hover {
-	background-color: #60a1ea;
+  background-color: #60a1ea;
 }
-
 .tundra .ui-state-highlight {
-	background-color: #ff6;
+  background-color: #ff6;
 }
-
 .tundra .dgrid-cell {
-	border-color: #ddc;
+  border-color: #ddc;
 }
-
 .tundra .ui-widget-header .dgrid-cell {
-	border-color: #bba;
+  border-color: #bba;
 }
