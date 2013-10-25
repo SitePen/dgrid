@@ -1,0 +1,87 @@
+@import "nib/vendor";
+@import "../variables";
+
+/* TODO: Color variables */
+
+$ms-dgrid-footer ?= unquote("progid:DXImageTransform.Microsoft.gradient( startColorstr='#4e4e4e', endColorstr='#141414',GradientType=0 )")
+
+.sage {
+	.ui-widget-content {
+		border: none;
+		background: #fff;
+		color: #000;
+		text-shadow: 0 1px 0 rgba(255,255,255,.9);
+	}
+
+	.dgrid-header-row {
+		border-bottom: none;
+	}
+
+	.ui-widget-header,
+	.dgrid-footer {
+		color: #fff;
+		background: #333; /* Old browsers */
+		background: linear-gradient(top, #4e4e4e 0%,#555555 12%,#636363 25%,#505050 39%,#303030 49%,#000000 50%,#1c1c1c 60%,#292929 76%,#1e1e1e 91%,#141414 100%); /* W3C */
+		filter: $ms-dgrid-footer; /* IE6-9 */
+	}
+
+	.ui-widget-header th {
+		padding: 7px 3px;
+		font-weight: bold;
+		color: #fff;
+		text-shadow: 0 -1px 0 rgba(0,0,0,.9);
+		border-color: #111;
+		text-transform: uppercase;
+	}
+
+	.dgrid-cell {
+		border-color: #bbc581;
+		border-top: none;
+		border-right: none;
+		border-left: none;
+	}
+
+	.dgrid-row-odd {
+		background: #f2f7e8;
+	}
+
+	.dgrid-row:hover {
+		background: #c5dca6;
+		color: #333;
+		text-shadow: 0 1px 0 rgba(255,255,255,.5);
+	}
+
+	.ui-state-default { 
+		transition-duration: 0.1s;
+		transition-property: background-color, border-color;
+	}
+
+	.dgrid-selected,
+	.dgrid-selected:hover {
+		background: #b3d18b;
+		text-shadow: 0 1px 0 rgba(255,255,255,.6);
+	}
+
+	.ui-state-highlight {
+		background-color: #d5e8bd;
+	}
+
+	/* need to use white-based image for sort arrow */
+	.dgrid-sort-arrow {
+		background-image: url("../images/ui-icons_222222_256x240_white.png");
+	}
+
+	/* for ColumnReorder */
+	.dgrid-header .dojoDndItemBefore {
+		border-left: 2px dotted #fff !important;
+	}
+	.dgrid-header .dojoDndItemAfter {
+		border-right: 2px dotted #fff !important;
+	}
+}
+
+/* for pagination in IE < 8 + quirks, need additional rule to override link color */
+.has-ie-6-7 .sage .dgrid-navigation a,
+.has-ie.has-quirks .sage .dgrid-navigation a {
+	color: #fff;
+}

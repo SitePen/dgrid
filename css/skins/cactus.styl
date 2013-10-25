@@ -5,7 +5,11 @@
 /* TODO: Nesting of rules */
 
 $primary-text-color ?= #fff
+
 $sort-image ?= url('../images/ui-icons_222222_256x240_white.png')
+
+$selected-color ?= #fff
+$selected-background-color ?= #333
 
 $ms-dgrid-footer ?= unquote("progid:DXImageTransform.Microsoft.gradient( startColorstr='#4e4e4e', endColorstr='#141414',GradientType=0 )")
 $ms-row-odd-filter ?= unquote("progid:DXImageTransform.Microsoft.gradient( startColorstr='#b9cb7f', endColorstr='#8fa05b',GradientType=0 )")
@@ -74,15 +78,15 @@ $ms-row-odd-filter ?= unquote("progid:DXImageTransform.Microsoft.gradient( start
 
 	.dgrid-selected,
 	.dgrid-selected .dgrid-cell {
-		background: #333;
-		color: #fff;
+		background: $selected-background-color;
+		color: $selected-color;
 		text-shadow: 0 -1px 0 rgba(0,0,0,.9);
-		border-color: #333;
+		border-color: $selected-background-color;
 	}
 
 	.ui-state-active:hover {
-		background: #333;
-		border-color: #333;
+		background: $selected-background-color;
+		border-color: $selected-background-color;
 	}
 
 	.ui-state-highlight {

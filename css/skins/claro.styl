@@ -1,0 +1,65 @@
+@import "nib/vendor";
+@import "../variables";
+
+/* TODO: Color variables */
+
+$ms-dgrid-footer ?= unquote("progid:DXImageTransform.Microsoft.gradient( startColorstr='#ebf0f5', endColorstr='#d5e0ea',GradientType=0 )")
+
+.claro {
+	.dgrid {
+		border: 1px solid #aaa;
+		background: #fff;
+		color: #000;
+	} 
+
+	.ui-widget-header {
+		font-weight: bold;
+	}
+	.ui-widget-header,
+	.dgrid-footer { 
+		background: #ebf0f5; /* Old browsers */
+		background: linear-gradient(top, #ebf0f5 0%,#d5e0ea 100%); /* W3C */
+		filter: $ms-dgrid-footer; /* IE6-9 */
+	}
+	.ui-widget-header .dgrid-cell:hover {
+		background: #ebf1f6; /* Old browsers */
+		background: linear-gradient(top, #ffffff 0%,#d2e0eb 100%); /* W3C */
+		/* TODO: This one did not have an IE6-8 specific filter? */
+	}
+
+	.ui-state-default { 
+		transition-duration: 0.2s;
+		transition-property: background-color, border-color;
+		background: url("images/row_back.png") #fff repeat-x;
+	}
+}
+
+.has-ie-6 .claro .ui-state-default {
+	background-image: none;
+}
+
+.claro {
+	.ui-state-default:hover {
+		background-color: #e9f2fe;
+	}
+
+	.ui-state-active {
+		background-color: #cee6fa;
+	}
+
+	.ui-state-active:hover {
+		background-color: #9bc6f2;
+	}
+
+	.ui-state-highlight {
+		background-color: #ff6;
+	}
+
+	.dgrid-cell {
+		border-color: #edc;
+	}
+
+	.ui-widget-header .dgrid-cell {
+		border-color: #bbb;
+	}
+}
