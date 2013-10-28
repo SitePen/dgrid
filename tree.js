@@ -221,21 +221,18 @@ function tree(column){
 					}
 					// Add the query to the promise chain.
 					promise = promise.then(function(){
-						return Deferred.when(
-							grid.renderQuery ?
-								grid._trackError(function(){
-									return grid.renderQuery(query, preloadNode, options);
-								}) :
-								grid.renderArray(query(options), preloadNode,
-									"level" in query ? { queryLevel: query.level } : {}),
-							function(){
-								// Expand once results are retrieved, if the row is still expanded.
-								if(grid._expanded[row.id] && hasTransitionend){
-									var scrollHeight = container.scrollHeight;
-									container.style.height = scrollHeight ? scrollHeight + "px" : "auto";
-								}
-							}
-						);
+						return grid.renderQuery ?
+							grid._trackError(function(){
+								return grid.renderQuery(query, preloadNode, options);
+							}) :
+							grid.renderArray(query(options), preloadNode,
+								"level" in query ? { queryLevel: query.level } : {});
+					}).then(function(){
+						// Expand once results are retrieved, if the row is still expanded.
+						if(grid._expanded[row.id] && hasTransitionend){
+							var scrollHeight = container.scrollHeight;
+							container.style.height = scrollHeight ? scrollHeight + "px" : "auto";
+						}
 					});
 					
 					if(hasTransitionend){
