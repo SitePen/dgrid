@@ -53,9 +53,9 @@ define([
 					// Allows the test to control when the store query is resolved.
 					this.dfd.resolve(this.queryResults);
 				},
-				reject: function(){
+				reject: function(error){
 					// Allows the test to control when the store query is rejected.
-					this.dfd.reject(this.queryResults);
+					this.dfd.reject(error);
 				}
 			}),
 			syncStore = new TreeStore({ data: createData() }),
@@ -162,13 +162,13 @@ define([
 
 			test.test("expand + callback", function(){
 				var dfd = this.async(1000);
-				
+
 				createOnPromise(grid, "dgrid-refresh-complete").then(function(){
 					// Start testing when the grid is ready.
 					assert.strictEqual(2, query(".dgrid-row", grid.domNode).length,
 						"Grid has 2 rows");
 					var promise = grid.expand(1);
-					
+
 					// Verify that the result is the same before the query resolves.
 					assert.strictEqual(2, query(".dgrid-row", grid.domNode).length,
 						"Grid still has 2 rows before expand resolves");
@@ -189,9 +189,9 @@ define([
 
 			test.test("expand + multiple callback", function(){
 				var dfd = this.async(1000);
-				
+
 				function reject(err){ dfd.reject(err); }
-				
+
 				createOnPromise(grid, "dgrid-refresh-complete").then(function(){
 					// Start testing when the grid is ready.
 					assert.strictEqual(2, query(".dgrid-row", grid.domNode).length,
@@ -256,8 +256,35 @@ define([
 				// Resolve the grid's initial store query.
 				delayedResolve();
 			});
-		});
+			
+			test.test("expand + callback, rejecting", function(){
+				var dfd = this.async(1000);
 
-		// TODO make the query throw an error.
+				createOnPromise(grid, "dgrid-refresh-complete").then(function(){
+					// Start testing when the grid is ready.
+					assert.strictEqual(2, query(".dgrid-row", grid.domNode).length,
+						"Grid has 2 rows");
+					var promise = grid.expand(1);
+					
+					// Verify that the result is the same before the query resolves.
+					assert.strictEqual(2, query(".dgrid-row", grid.domNode).length,
+						"Grid still has 2 rows before expand resolves");
+					setTimeout(function(){ grid.store.reject("Rejected"); }, 10);
+					return promise;
+				}, function(err){
+					dfd.reject(err);
+				}).then(function () {
+					dfd.reject('Promise should have been rejected');
+				}, dfd.callback(function(){
+					assert.strictEqual(2, query(".dgrid-row", grid.domNode).length,
+						"Grid still has 2 rows after rejected promise");
+				}));
+
+				assert.strictEqual(0, query(".dgrid-row", grid.domNode).length,
+					"Grid has 0 rows before first async query resolves");
+				// Resolve the grid's initial store query.
+				delayedResolve();
+			});
+		});
 	});
 });
