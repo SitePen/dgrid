@@ -7,16 +7,16 @@
 $border-color = #bba
 $cell-border-color ?= #ddc
 /*$legacy-highlight-background-color ?= #d6e5a5*/
-/*$primary-background-color ?= #000*/
+$primary-background-color ?= #000
 $primary-color ?= #fff
 /*$row-color ?= #333*/
 /*$row-hover-background-color ?= #c5dca6*/
 /*$row-text-shadow ?= 0 1px 0 rgba(255,255,255,.5)*/
 
 /* ui-widget-content rules */
-$content-background-color ?= $primary-color
+$content-background-color ?= invert($primary-background-color)
 /*$content-border ?= 1px solid #555*/
-$content-color ?= #000
+$content-color ?= invert($primary-color)
 /*$content-text-shadow ?= 0 1px 0 rgba(255,255,255,.9)*/
 
 /* Highlighting rules */
@@ -66,9 +66,9 @@ $default-hover-background-color ?= #ffe284
 		border-color: $border-color;
 	}
 
-	.ui-widget-content {
+	.dgrid-scroller {
 		background: $content-background-color;
-		color: $content-color;;
+		color: $content-color;
 	}
 
 	.ui-widget-header {

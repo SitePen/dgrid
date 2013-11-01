@@ -1,7 +1,6 @@
 /* Theme specific variables */
 /* General rules */
 /*$border-color = */
-/*$primary-background-color ?= */
 /*$row-color ?= #333*/
 /*$row-text-shadow ?= 0 1px 0 rgba(255,255,255,.5)*/
 /* ui-widget-content rules */
@@ -28,8 +27,10 @@
 /* ColumnReorder rules */
 .cactus .ui-widget-content {
   border: none;
+}
+.cactus .dgrid-scroller {
   background: #faffef;
-  color: #000;
+  color: #fff;
 }
 .cactus .dgrid-header-row {
   border-bottom: none;
@@ -103,7 +104,7 @@
 /* background-color doesn't override CSS3 gradient */
   filter: none;
 /* override gradient in IE */
-  color: #000;
+  color: #fff;
   text-shadow: none;
 }
 .cactus .dgrid-sort-arrow {

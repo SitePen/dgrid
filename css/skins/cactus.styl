@@ -7,7 +7,7 @@
 /*$border-color = */
 $cell-border-color ?= #bbc581
 $legacy-highlight-background-color ?= #d6e5a5
-/*$primary-background-color ?= */
+$primary-background-color ?= #000
 $primary-color ?= #fff
 /*$row-color ?= #333*/
 $row-hover-background-color ?= #555
@@ -16,7 +16,7 @@ $row-hover-background-color ?= #555
 /* ui-widget-content rules */
 $content-background-color ?= #faffef
 /*$content-border ?= 1px solid #555*/
-$content-color ?= #000
+$content-color ?= invert($primary-background-color)
 /*$content-text-shadow ?= 0 1px 0 rgba(255,255,255,.9)*/
 
 /* Highlighting rules */
@@ -64,6 +64,9 @@ $reorder-dnd-border = 2px dotted $primary-color !important
 .cactus {
 	.ui-widget-content {
 		border: none;
+	}
+
+	.dgrid-scroller {
 		background: $content-background-color;
 		color: $content-color;
 	}

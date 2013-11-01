@@ -2,7 +2,6 @@
 /* General rules */
 /*$border-color = #fff*/
 /*$legacy-highlight-background-color ?= #d6e5a5*/
-/*$primary-background-color ?= #000*/
 /*$row-color ?= #333*/
 /*$row-hover-background-color ?= #c5dca6*/
 /*$row-text-shadow ?= 0 1px 0 rgba(255,255,255,.5)*/
@@ -31,9 +30,11 @@
 /* ColumnReorder rules */
 .squid .ui-widget-content {
   border: 1px solid #555;
+  text-shadow: 0 1px 0 rgba(0,0,0,0.7);
+}
+.squid .dgrid-scroller {
   background: #000;
   color: #fff;
-  text-shadow: 0 1px 0 rgba(0,0,0,0.7);
 }
 .squid .ui-icon {
   background-image: url("../images/ui-icons_222222_256x240_white.png");

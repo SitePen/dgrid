@@ -1,7 +1,6 @@
 /* Theme specific variables */
 /* General rules */
 /*$legacy-highlight-background-color ?= #d6e5a5*/
-/*$primary-background-color ?= #000*/
 /*$row-color ?= #333*/
 /*$row-hover-background-color ?= #c5dca6*/
 /*$row-text-shadow ?= 0 1px 0 rgba(255,255,255,.5)*/
@@ -37,7 +36,7 @@
 .tundra .dgrid {
   border-color: #bba;
 }
-.tundra .ui-widget-content {
+.tundra .dgrid-scroller {
   background: #fff;
   color: #000;
 }

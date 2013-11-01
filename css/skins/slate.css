@@ -3,7 +3,6 @@
 /*$border-color = #fff*/
 /*$cell-border-color ?= #bbc581*/
 /*$legacy-highlight-background-color ?= #d6e5a5*/
-/*$primary-background-color ?= #000*/
 /*$row-color ?= #333*/
 /*$row-text-shadow ?= 0 1px 0 rgba(255,255,255,.5)*/
 /* ui-widget-content rules */
@@ -33,9 +32,11 @@
 /*$default-hover-background-color ?= #ffe284*/
 /* ColumnReorder rules */
 .slate .ui-widget-content {
+  text-shadow: 0 1px 0 rgba(255,255,255,0.9);
+}
+.slate .dgrid-scroller {
   background: #fff;
   color: #000;
-  text-shadow: 0 1px 0 rgba(255,255,255,0.9);
 }
 .slate .dgrid-header-row {
   border-bottom: none;

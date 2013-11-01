@@ -2,7 +2,6 @@
 /* General rules */
 /*$border-color = #fff*/
 /*$legacy-highlight-background-color ?= #d6e5a5*/
-/*$primary-background-color ?= #000*/
 /* ui-widget-content rules */
 /*$content-border ?= 1px solid #555*/
 /* Highlighting rules */
@@ -31,9 +30,11 @@
 /* ColumnReorder rules */
 .sage .ui-widget-content {
   border: none;
-  background: #fff;
-  color: #000;
   text-shadow: 0 1px 0 rgba(255,255,255,0.9);
+}
+.sage .dgrid-scroller {
+  background: #000;
+  color: #fff;
 }
 .sage .dgrid-header-row {
   border-bottom: none;

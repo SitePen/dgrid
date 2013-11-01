@@ -7,16 +7,16 @@
 /*$border-color = #fff*/
 $cell-border-color ?= #bbc581
 /*$legacy-highlight-background-color ?= #d6e5a5*/
-/*$primary-background-color ?= #000*/
+$primary-background-color ?= #000
 $primary-color ?= #fff
 $row-color ?= #333
 $row-hover-background-color ?= #c5dca6
 $row-text-shadow ?= 0 1px 0 rgba(255,255,255,.5)
 
 /* ui-widget-content rules */
-$content-background-color ?= $primary-color
+$content-background-color ?= invert($primary-color)
 /*$content-border ?= 1px solid #555*/
-$content-color ?= #000
+$content-color ?= invert($primary-background-color)
 $content-text-shadow ?= 0 1px 0 rgba(255,255,255,.9)
 
 /* Highlighting rules */
@@ -64,9 +64,12 @@ $reorder-dnd-border = 2px dotted $primary-color !important
 .sage {
 	.ui-widget-content {
 		border: none;
+		text-shadow: $content-text-shadow;
+	}
+
+	.dgrid-scroller {
 		background: $content-background-color;
 		color: $content-color;
-		text-shadow: $content-text-shadow;
 	}
 
 	.dgrid-header-row {
