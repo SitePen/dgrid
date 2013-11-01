@@ -42,7 +42,7 @@ $selected-color = $primary-color
 /*$selected-text-shadow ?= 0 1px 0 rgba(255,255,255,.6)*/
 
 /* Odd-even rules */
-$legacy-row-odd-background ?= #9a6
+$row-odd-background ?= #9a6
 $ms-row-odd-filter ?= unquote("progid:DXImageTransform.Microsoft.gradient( startColorstr='#b9cb7f', endColorstr='#8fa05b',GradientType=0 )")
 $row-odd-border ?= 1px solid #ccd595
 $row-odd-border-cell ?= 1px solid #e9efbd
@@ -104,7 +104,7 @@ $reorder-dnd-border = 2px dotted $primary-color !important
 	}
 
 	.dgrid-row-odd {
-		background: $legacy-row-odd-background;
+		background: $row-odd-background;
 		background-image: $row-odd-gradient;
 		filter: $ms-row-odd-filter;
 		border-top: $row-odd-border;
