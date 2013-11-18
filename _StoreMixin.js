@@ -203,6 +203,12 @@ function(kernel, declare, lang, Deferred, listen, aspect, put){
 				// to provide protection for subsequent changes as well
 				object = lang.delegate(object, dirtyObj);
 			}
+
+            if(this.noDataNode){
+                put(this.noDataNode, "!");
+                delete this.noDataNode;
+            }
+            
 			return this.inherited(arguments);
 		},
 		
