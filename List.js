@@ -582,6 +582,10 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 				}
 			}
 			
+			if(rows.length > 0 && this.noDataNode){
+				put(this.noDataNode, '!');
+			}
+
 			return whenDone(rows);
 		},
 
