@@ -1,0 +1,112 @@
+@import "nib/vendor";
+@import "../variables";
+
+/* Theme specific variables */
+
+/* General rules */
+$border-color = #bba
+$cell-border-color ?= #ddc
+/*$legacy-highlight-background-color ?= #d6e5a5*/
+$primary-background-color ?= #000
+$primary-color ?= #fff
+/*$row-color ?= #333*/
+/*$row-hover-background-color ?= #c5dca6*/
+/*$row-text-shadow ?= 0 1px 0 rgba(255,255,255,.5)*/
+
+/* ui-widget-content rules */
+$content-background-color ?= invert($primary-background-color)
+/*$content-border ?= 1px solid #555*/
+$content-color ?= invert($primary-color)
+/*$content-text-shadow ?= 0 1px 0 rgba(255,255,255,.9)*/
+
+/* Highlighting rules */
+$highlight-background-color ?= #ff6
+/*$highlight-color ?= #000*/
+
+/* Header/Footer rules */
+$footer-background-color = #f2f4fe
+$footer-gradient ?= linear-gradient(top, $footer-background-color 0%,#d0dff5 50%,#c6d8f0 51%,#c2d5ef 100%)
+/*$header-border-color ?= #111*/
+$header-cell-hover-background-color ?= #d4deec
+$header-cell-border-color ?= #bba
+$header-cell-hover-gradient ?= linear-gradient(top, #dae2ed 0%,#b2c7e8 49%,#a8c1eb 50%,#9ebaec 100%)
+/*$header-text-shadow ?= 0 -1px 0 rgba(0,0,0,.9)*/
+$ms-footer ?= unquote("progid:DXImageTransform.Microsoft.gradient( startColorstr='#f2f4fe', endColorstr='#c2d5ef',GradientType=0 )")
+
+/* Sorting rules */
+/*$sort-image = url('../images/ui-icons_222222_256x240_white.png')*/
+
+/* Selection rules */
+/*$selected-background-color ?= #333*/
+/*$selected-color = #fff*/
+/*$selected-text-shadow ?= 0 1px 0 rgba(255,255,255,.6)*/
+
+/* Odd-even rules */
+/*$row-odd-background ?= #9a6*/
+/*$ms-row-odd-filter ?= unquote("progid:DXImageTransform.Microsoft.gradient( startColorstr='#b9cb7f', endColorstr='#8fa05b',GradientType=0 )")*/
+/*$row-odd-border ?= 1px solid #ccd595*/
+/*$row-odd-border-cell ?= 1px solid #e9efbd*/
+/*$row-odd-gradient ?= linear-gradient(top, rgba(185,203,127,1) 0%,rgba(143,160,91,1) 100%)*/
+/*$row-odd-text-shadow ?= 0 -1px 0 rgba(0,0,0,.3)*/
+
+/* ui-state rules */
+$active-background-color ?= #aec7e3
+/*$active-hover-background-color ?= #8b6b4a*/
+/*$active-text-shadow ?= 0 -1px 0 rgba(0,0,0,.5)*/
+/*$default-active-background-color ?= */
+/*$default-active-hover-background-color ?= */
+/*$default-background ?= */
+$default-hover-background-color ?= #60a1ea
+
+/* ColumnReorder rules */
+/*$reorder-dnd-border = 2px dotted $primary-color !important*/
+
+.soria {
+	.dgrid {
+		border-color: $border-color;
+	}
+
+	.dgrid-scroller {
+		background: $content-background-color;
+		color: $content-color;
+	}
+
+	.ui-widget-header,
+	.dgrid-footer {
+		 /* Old browsers */
+		background: $footer-background-color;
+		/* W3C */
+		background: $footer-gradient;
+		/* IE6-8 */
+		filter: $ms-footer;
+	}
+
+	.ui-widget-header th:hover {
+		/* Old browsers */
+		background: $header-cell-hover-background-color;
+		/* W3C */
+		background: $header-cell-hover-gradient;
+		/* TODO: Add IE 6-8 filter? */
+	}
+
+	.ui-state-active {
+		background-color: $active-background-color;
+	}
+
+	.ui-state-default:hover {
+		background-color: $default-hover-background-color;
+	}
+
+	.ui-state-highlight {
+		background-color: $highlight-background-color;
+	}
+
+	.dgrid-cell {
+		border-color: $cell-border-color;
+	}
+
+	.ui-widget-header .dgrid-cell {
+		border-color: $header-cell-border-color;
+	}
+
+}

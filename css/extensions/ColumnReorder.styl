@@ -1,0 +1,18 @@
+@import "../variables";
+@import "nib/vendor";
+
+.dgrid-header .dgrid-cell {
+	display: table-cell; /* override any spurious dojoDndItem settings elsewhere */
+}
+
+.dgrid-header .dojoDndItemBefore {
+	border-left: $reorder-dnd-border;
+}
+
+.dgrid-header .dojoDndItemAfter {
+	border-right: $reorder-dnd-border;
+}
+
+#dgrid-css-extensions-ColumnReorder-loaded { /* load indicator for xstyle */
+	display: none;
+}

@@ -1,67 +1,101 @@
+/* Theme specific variables */
+/* General rules */
+/*$legacy-highlight-background-color ?= */
+/*$row-color ?= #333*/
+/*$row-hover-background-color ?= #c5dca6*/
+/*$row-text-shadow ?= 0 1px 0 rgba(255,255,255,.5)*/
+/* ui-widget-content rules */
+/*$content-background-color ?= */
+/*$content-border ?= 1px solid #555*/
+/*$content-color ?= */
+/*$content-text-shadow ?= 0 1px 0 rgba(255,255,255,.9)*/
+/* Highlighting rules */
+/* $highlight-color ?= */
+/* Header/Footer rules */
+/*$header-border-color ?= #111*/
+/*$header-text-shadow ?= 0 -1px 0 rgba(0,0,0,.9)*/
+/* Sorting rules */
+/*$sort-image = url('../images/ui-icons_222222_256x240_white.png')*/
+/* Selection rules */
+/*$selected-background-color ?= #333*/
+/*$selected-color = #fff*/
+/*$selected-text-shadow ?= 0 1px 0 rgba(255,255,255,.6)*/
+/* Odd-even rules */
+/*$row-odd-background ?= #9a6*/
+/*$ms-row-odd-filter ?= unquote("progid:DXImageTransform.Microsoft.gradient( startColorstr='#b9cb7f', endColorstr='#8fa05b',GradientType=0 )")*/
+/*$row-odd-border ?= 1px solid #ccd595*/
+/*$row-odd-border-cell ?= 1px solid #e9efbd*/
+/*$row-odd-gradient ?= linear-gradient(top, rgba(185,203,127,1) 0%,rgba(143,160,91,1) 100%)*/
+/*$row-odd-text-shadow ?= 0 -1px 0 rgba(0,0,0,.3)*/
+/* ui-state rules */
+/*$active-text-shadow ?= 0 -1px 0 rgba(0,0,0,.5)*/
+/*$default-active-background-color ?= */
+/*$default-active-hover-background-color ?= */
+/* ColumnReorder rules */
+/*$reorder-dnd-border = 2px dotted $primary-color !important*/
 .claro .dgrid {
-	border: 1px solid #aaa;
-	background: #fff;
-	color: #000;
+  border-color: #aaa;
+  background: #fff;
+  color: #000;
 }
-
 .claro .ui-widget-header {
-	font-weight: bold;
+  font-weight: bold;
 }
 .claro .ui-widget-header,
-.claro .dgrid-footer { 
-	background: #ebf0f5; /* Old browsers */
-	background: -moz-linear-gradient(top, #ebf0f5 0%, #d5e0ea 100%); /* FF3.6+ */
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ebf0f5), color-stop(100%,#d5e0ea)); /* Chrome,Safari4+ */
-	background: -webkit-linear-gradient(top, #ebf0f5 0%,#d5e0ea 100%); /* Chrome10+,Safari5.1+ */
-	background: -o-linear-gradient(top, #ebf0f5 0%,#d5e0ea 100%); /* Opera 11.10+ */
-	background: -ms-linear-gradient(top, #ebf0f5 0%,#d5e0ea 100%); /* IE10+ */
-	background: linear-gradient(top, #ebf0f5 0%,#d5e0ea 100%); /* W3C */
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ebf0f5', endColorstr='#d5e0ea',GradientType=0 ); /* IE6-9 */
+.claro .dgrid-footer {
+/* Old browsers */
+  background: #ebf0f5;
+/* W3C */
+  background: -webkit-linear-gradient(top, #ebf0f5 0%, #d5e0ea 100%);
+  background: -moz-linear-gradient(top, #ebf0f5 0%, #d5e0ea 100%);
+  background: -o-linear-gradient(top, #ebf0f5 0%, #d5e0ea 100%);
+  background: -ms-linear-gradient(top, #ebf0f5 0%, #d5e0ea 100%);
+  background: linear-gradient(to bottom, #ebf0f5 0%, #d5e0ea 100%);
+/* IE6-9 */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ebf0f5', endColorstr='#d5e0ea',GradientType=0 );
 }
 .claro .ui-widget-header .dgrid-cell:hover {
-	background: #ebf1f6; /* Old browsers */
-	background: -moz-linear-gradient(top, #ffffff 0%, #d2e0eb 100%); /* FF3.6+ */
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,#d2e0eb)); /* Chrome,Safari4+ */
-	background: -webkit-linear-gradient(top, #ffffff 0%,#d2e0eb 100%); /* Chrome10+,Safari5.1+ */
-	background: -o-linear-gradient(top, #ffffff 0%,#d2e0eb 100%); /* Opera 11.10+ */
-	background: -ms-linear-gradient(top, #ffffff 0%,#d2e0eb 100%); /* IE10+ */
-	background: linear-gradient(top, #ffffff 0%,#d2e0eb 100%); /* W3C */
+/* Old browsers */
+  background: #ebf1f6;
+/* W3C */
+  background: -webkit-linear-gradient(top, #fff 0%, #d2e0eb 100%);
+  background: -moz-linear-gradient(top, #fff 0%, #d2e0eb 100%);
+  background: -o-linear-gradient(top, #fff 0%, #d2e0eb 100%);
+  background: -ms-linear-gradient(top, #fff 0%, #d2e0eb 100%);
+  background: linear-gradient(to bottom, #fff 0%, #d2e0eb 100%);
+/* TODO: This one did not have an IE6-8 specific filter. Oversight or intentional? */
 }
-
-.claro .ui-state-default { 
-	-webkit-transition-duration: 0.2s;
-	-moz-transition-duration: 0.2s;
-	-o-transition-duration: 0.2s;
-	transition-duration: 0.2s;
-	-webkit-transition-property: background-color, border-color;
-	-moz-transition-property: background-color, border-color;
-	-o-transition-property: background-color, border-color;
-	transition-property: background-color, border-color;
-	background: url("images/row_back.png") #fff repeat-x;
-}
-.has-ie-6 .claro .ui-state-default {
-	background-image: none;
+.claro .ui-state-default {
+  -webkit-transition-duration: 0.2s;
+  -moz-transition-duration: 0.2s;
+  -o-transition-duration: 0.2s;
+  -ms-transition-duration: 0.2s;
+  transition-duration: 0.2s;
+  -webkit-transition-property: background-color, border-color;
+  -moz-transition-property: background-color, border-color;
+  -o-transition-property: background-color, border-color;
+  -ms-transition-property: background-color, border-color;
+  transition-property: background-color, border-color;
+  background: url("images/row_back.png") #fff repeat-x;
 }
 .claro .ui-state-default:hover {
-	background-color: #e9f2fe;
+  background-color: #e9f2fe;
 }
-
 .claro .ui-state-active {
-	background-color: #cee6fa;
+  background-color: #cee6fa;
 }
-
 .claro .ui-state-active:hover {
-	background-color: #9bc6f2;
+  background-color: #9bc6f2;
 }
-
 .claro .ui-state-highlight {
-	background-color: #ff6;
+  background-color: #ff6;
 }
-
 .claro .dgrid-cell {
-	border-color: #edc;
+  border-color: #edc;
 }
-
 .claro .ui-widget-header .dgrid-cell {
-	border-color: #bbb;
+  border-color: #bbb;
+}
+.has-ie-6 .claro .ui-state-default {
+  background-image: none;
 }

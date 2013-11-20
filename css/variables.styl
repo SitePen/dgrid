@@ -1,0 +1,49 @@
+/* Mixins */
+
+border-function($width, $style, $color){
+	border: $width $style $color;
+}
+
+/* General rules */
+$border-color ?= #ddd
+$border-color-alternate ?= #000
+$border-style ?= solid
+$border-width ?= 1px
+$border ?= $border-width $border-style $border-color
+$hacks-outline ?= $border-width $outline-style $border-color-alternate
+$height ?= 30em
+$outline-style ?= dotted
+
+/* Header/Footer rules */
+$footer-background-color = #eee
+
+/* Selection rules */
+$selected-color = #bfd6eb
+
+/* Sorting rules */
+$sort-image = url('images/ui-icons_222222_256x240.png')
+
+/* Touch/scroll rules */
+$touchscroll-background-color ?= rgba(88,88,88,0.97)
+$touchscroll-border ?= $border-width $border-style rgba(88,88,88,1)
+$hacks-touchscroll-box-shadow ?= 0 0 $border-width rgba(88,88,88,0.4)
+
+/* ColumnHider rules */
+$hider-toggle-background ?= transparent
+$hider-toggle-border ?= none
+$hider-menu-background ?= #fff
+$hider-menu-border ?= $border-width $border-style $border-color-alternate
+
+/* ColumnReorder rules */
+$reorder-dnd-border = 2px $outline-style $border-color-alternate !important
+
+/* ColumnResizer rules */
+$resizer-background-color ?= #666
+$resizer-border ?= 5px $border-style transparent
+$resizer-touch-border ?= 20px $border-style transparent
+
+/* Pagination rules */
+$pagination-font-weight ?= bold
+$pagination-disabled-color ?= #aaa
+$pagination-page-input-width ?= 2em
+$pagination-page-input-text-align ?= center

@@ -1,0 +1,149 @@
+@import "nib/vendor";
+@import "../variables";
+
+/* Theme specific variables */
+
+/* General rules */
+/*$border-color = #fff*/
+$cell-border-color ?= #ccc
+/*$legacy-highlight-background-color ?= #d6e5a5*/
+$primary-background-color ?= #000
+$primary-color ?= #fff
+/*$row-color ?= #333*/
+/*$row-hover-background-color ?= #c5dca6*/
+/*$row-text-shadow ?= 0 1px 0 rgba(255,255,255,.5)*/
+
+/* ui-widget-content rules */
+$content-background-color ?= $primary-background-color
+$content-border ?= 1px solid #555
+$content-color ?= $primary-color
+$content-text-shadow ?= 0 1px 0 rgba(0,0,0,.7)
+
+/* Highlighting rules */
+$highlight-background-color ?= #666
+/*$highlight-color ?= #000*/
+
+/* Header/Footer rules */
+$footer-background-color = #2d1f14
+$footer-gradient ?= linear-gradient(top, #140e09 0%,$footer-background-color 100%)
+/*$header-border-color ?= #111*/
+/*$header-cell-border-color ?= #bbb*/
+$header-cell-hover-background-color ?= #000
+$header-cell-hover-gradient ?= linear-gradient(top, $header-cell-hover-background-color 0%,$footer-background-color 100%)
+/*$header-text-shadow ?= 0 -1px 0 rgba(0,0,0,.9)*/
+$ms-footer ?= unquote("progid:DXImageTransform.Microsoft.gradient( startColorstr='#140e09', endColorstr='#2d1f14',GradientType=0 )")
+
+/* Sorting rules */
+$sort-image = url('../images/ui-icons_222222_256x240_white.png')
+
+/* Selection rules */
+/*$selected-background-color ?= #333*/
+/*$selected-color = #fff*/
+/*$selected-text-shadow ?= 0 1px 0 rgba(255,255,255,.6)*/
+
+/* Odd-even rules */
+/*$row-odd-background ?= #9a6*/
+/*$ms-row-odd-filter ?= unquote("progid:DXImageTransform.Microsoft.gradient( startColorstr='#b9cb7f', endColorstr='#8fa05b',GradientType=0 )")*/
+/*$row-odd-border ?= 1px solid #ccd595*/
+/*$row-odd-border-cell ?= 1px solid #e9efbd*/
+/*$row-odd-gradient ?= linear-gradient(top, rgba(185,203,127,1) 0%,rgba(143,160,91,1) 100%)*/
+/*$row-odd-text-shadow ?= 0 -1px 0 rgba(0,0,0,.3)*/
+
+/* ui-state rules */
+$active-background-color ?= #64390d
+$active-hover-background-color ?= #8b6b4a
+$active-text-shadow ?= 0 -1px 0 rgba(0,0,0,.3)
+/*$default-active-background-color ?= */
+/*$default-active-hover-background-color ?= */
+$default-background ?= url("images/row_back.png") #000 repeat-x
+$default-hover-background-color ?= #444
+
+/* ColumnReorder rules */
+$reorder-dnd-border = 2px dotted $primary-color !important
+
+.squid {
+	.ui-widget-content {
+		border: $content-border;
+		text-shadow: $content-text-shadow;
+	}
+
+	.dgrid-scroller {
+		background: $content-background-color;
+		color: $content-color;
+	}
+
+	.ui-icon {
+		background-image: $sort-image;
+	}
+
+	.dgrid-header {
+		padding: 0 1px; /* add side padding to align with borders on content area */
+	}
+
+	.ui-widget-header,
+	.dgrid-footer {
+		color: $primary-color;
+		 /* Old browsers */
+		background: $footer-background-color;
+		/* W3C */
+		background: $footer-gradient;
+		/* IE6-8 */
+		filter: $ms-footer;
+		font-weight: bold;
+	}
+
+	.ui-widget-header:hover {
+		/* Old browsers */
+		background: $header-cell-hover-background-color;
+		/* W3C */
+		background: $header-cell-hover-gradient;
+		/* TODO: Add IE 6-8 filter? */
+	}
+
+	.ui-state-default {
+		transition-duration: 0.2s;
+		transition-property: background-color, border-color;
+		background: $default-background;
+	}
+
+	.ui-state-default:hover {
+		background-color: $default-hover-background-color;
+	}
+
+	.ui-state-active {
+		background-color: $active-background-color;
+		text-shadow: $active-text-shadow;
+	}
+
+	.ui-state-active:hover {
+		background-color: $active-hover-background-color;
+	}
+
+	.ui-state-highlight {
+		background-color: $highlight-background-color;
+	}
+
+	.dgrid-cell {
+		border-color: $cell-border-color;
+	}
+
+	/* for ColumnReorder */
+	.dgrid-header .dojoDndItemBefore {
+		border-left: $reorder-dnd-border;
+	}
+
+	.dgrid-header .dojoDndItemAfter {
+		border-right: $reorder-dnd-border;
+	}
+
+}
+
+.has-ie-6 .squid .ui-state-default {
+	background-image: none;
+}
+
+/* for pagination in IE < 8 + quirks, need additional rule to override link color */
+.has-ie-6-7 .squid .dgrid-navigation a,
+.has-ie.has-quirks .squid .dgrid-navigation a {
+	color: $primary-color;
+}

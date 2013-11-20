@@ -1,0 +1,137 @@
+@import "nib/vendor";
+@import "../variables";
+
+/* Theme specific variables */
+
+/* General rules */
+/*$border-color = #fff*/
+/*$cell-border-color ?= #bbc581*/
+/*$legacy-highlight-background-color ?= #d6e5a5*/
+$primary-background-color ?= #000
+$primary-color ?= #fff
+/*$row-color ?= #333*/
+$row-hover-background-color ?= #ddd
+/*$row-text-shadow ?= 0 1px 0 rgba(255,255,255,.5)*/
+
+/* ui-widget-content rules */
+$content-background-color ?= invert($primary-background-color)
+/*$content-border ?= 1px solid #555*/
+$content-color ?= invert($primary-color)
+$content-text-shadow ?= 0 1px 0 rgba(255,255,255,.9)
+
+/* Highlighting rules */
+$highlight-background-color ?= #999
+/*$highlight-color ?= #000*/
+
+/* Header/Footer rules */
+$footer-background-color = #333
+$footer-gradient ?= linear-gradient(top, #4e4e4e 0%,#555555 12%,#636363 25%,#505050 39%,#303030 49%,#000000 50%,#1c1c1c 60%,#292929 76%,#1e1e1e 91%,#141414 100%)
+$header-border-color ?= #111
+/*$header-cell-border-color ?= #bbb*/
+/*$header-cell-hover-gradient ?= linear-gradient(top, #ffffff 0%,#d2e0eb 100%)*/
+$header-text-shadow ?= 0 -1px 0 rgba(0,0,0,.9)
+/*$header-cell-hover-background-color ?= #ebf1f6*/
+$ms-footer ?= unquote("progid:DXImageTransform.Microsoft.gradient( startColorstr='#4e4e4e', endColorstr='#141414',GradientType=0 )")
+
+/* Sorting rules */
+$sort-image = url('../images/ui-icons_222222_256x240_white.png')
+
+/* Selection rules */
+/*$selected-background-color ?= #333*/
+/*$selected-color = #fff*/
+/*$selected-text-shadow ?= 0 1px 0 rgba(255,255,255,.6)*/
+
+/* Odd-even rules */
+$row-odd-background ?= #f7f7f7
+/*$ms-row-odd-filter ?= unquote("progid:DXImageTransform.Microsoft.gradient( startColorstr='#b9cb7f', endColorstr='#8fa05b',GradientType=0 )")*/
+/*$row-odd-border ?= 1px solid #ccd595*/
+/*$row-odd-border-cell ?= 1px solid #e9efbd*/
+/*$row-odd-gradient ?= linear-gradient(top, rgba(185,203,127,1) 0%,rgba(143,160,91,1) 100%)*/
+/*$row-odd-text-shadow ?= 0 -1px 0 rgba(0,0,0,.3)*/
+
+/* ui-state rules */
+$active-background-color ?= #555
+/*$active-hover-background-color ?= #8b6b4a*/
+$active-text-shadow ?= 0 -1px 0 rgba(0,0,0,.5)
+/*$default-active-background-color ?= */
+/*$default-active-hover-background-color ?= */
+/*$default-background ?= */
+/*$default-hover-background-color ?= #ffe284*/
+
+/* ColumnReorder rules */
+$reorder-dnd-border = 2px dotted $primary-color !important
+
+.slate {
+	.ui-widget-content {
+		text-shadow: $content-text-shadow;
+	}
+
+	.dgrid-scroller {
+		background: $content-background-color;
+		color: $content-color;
+	}
+
+	.dgrid-header-row {
+		border-bottom: none;
+	}
+
+	.ui-widget-header,
+	.dgrid-footer {
+		color: $primary-color;
+		/* Old browsers */
+		background: $footer-background-color;
+		/* W3C */
+		background: $footer-gradient;
+		/* IE6-8 */
+		filter: $ms-footer;
+	}
+
+	.ui-widget-header th {
+		padding: 7px 3px;
+		font-weight: bold;
+		color: $primary-color;
+		text-shadow: $header-text-shadow;
+		border-color: $header-border-color;
+		text-transform: uppercase;
+	}
+
+	.dgrid-row-odd { 
+		background-color: $row-odd-background;
+	}
+
+	.dgrid-row:hover {
+		background-color: $row-hover-background-color;
+	}
+
+	.ui-state-active,
+	.ui-state-active:hover {
+		background-color: $active-background-color;
+		color: $primary-color;
+		text-shadow: $active-text-shadow;
+	}
+
+	.ui-state-highlight {
+		background-color: $highlight-background-color;
+	}
+
+	/* need to use white-based image for sort arrow */
+	.dgrid-sort-arrow {
+		background-image: $sort-image;
+	}
+
+	/* for ColumnReorder */
+	.dgrid-header .dojoDndItemBefore {
+		border-left: $reorder-dnd-border;
+	}
+	
+	.dgrid-header .dojoDndItemAfter {
+		border-right: $reorder-dnd-border;
+	}
+
+}
+
+/* for pagination in IE < 8 + quirks, need additional rule to override link color */
+.has-ie-6-7 .slate .dgrid-navigation a,
+.has-ie.has-quirks .slate .dgrid-navigation a {
+	color: $primary-color;
+}
