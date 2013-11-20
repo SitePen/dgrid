@@ -58,7 +58,7 @@ function(has){
 		// Apply csstransforms3d class to test transform-3d media queries.
 		element.className = "has-csstransforms3d";
 		// Add to body to allow measurement.
-		document.body.appendChild(element);
+		document.querySelector("body").appendChild(element);
 		left = element.offsetLeft;
 		
 		if (left === 9) {
@@ -68,7 +68,7 @@ function(has){
 			prefix = cssPrefixes[left - 10];
 			return prefix || false;
 		}
-		document.body.removeChild(element);
+		element.parentNode.removeChild(element);
 		element.className = "";
 		
 		return false; // otherwise, not supported
