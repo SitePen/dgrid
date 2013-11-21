@@ -8,7 +8,14 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 ### General/Core
 
 * Fixed a long-standing regression in the `util/has-css3` module's
-  `css-transforms3d` test due to a modified classname.  (#776, thanks amuraco)
+  `css-transforms3d` test due to a modified classname. (#776, thanks amuraco)
+
+## Other changes and fixes
+
+### General/Core
+
+* Fixed an issue where `sort` would be ignored if it was a function with 0 arity,
+  such as a hitched function being passed to a Memory store. (#771)
 
 # 0.3.12
 
