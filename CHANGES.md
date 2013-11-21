@@ -17,6 +17,11 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 * Fixed an issue where `sort` would be ignored if it was a function with 0 arity,
   such as a hitched function being passed to a Memory store. (#771)
 
+### Extensions
+
+* The `Pagination` extension now includes an Arabic localization bundle.
+  (#770, thanks elombashy)
+
 # 0.3.12
 
 ## Significant changes
