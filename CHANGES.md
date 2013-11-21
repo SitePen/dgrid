@@ -3,7 +3,12 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 # master (0.3.13-dev)
 
-Coming soon!
+## Significant changes
+
+### General/Core
+
+* Fixed a long-standing regression in the `util/has-css3` module's
+  `css-transforms3d` test due to a modified classname.  (#776, thanks amuraco)
 
 # 0.3.12
 
