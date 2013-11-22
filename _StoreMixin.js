@@ -87,6 +87,15 @@ function(kernel, declare, lang, Deferred, listen, aspect, put){
 				this._notifyHandle.remove();
 			}
 		},
+
+		refresh: function(){
+			this.inherited(arguments);
+			if(!this.store){
+				this.noDataNode = put(this.contentNode, "div.dgrid-no-data");
+				this.noDataNode.innerHTML = this.noDataMessage;
+			}
+			console.log('done refreshing');
+		},
 		
 		_configColumn: function(column){
 			// summary:
