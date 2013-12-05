@@ -9,11 +9,15 @@ function(kernel, arrayUtil, on, aspect, has, put){
 		
 		if(column.type){
 			column.selectorType = column.type;
-			kernel.deprecated("columndef.type", "use columndef.selectorType instead", "dgrid 1.0");
+			kernel.deprecated("columndef.type", "use columndef.selectorType instead", "dgrid 0.4");
 		}
 		// accept type as argument to Selector function, or from column def
 		column.selectorType = type = type || column.selectorType || "checkbox";
 		column.sortable = false;
+
+		function disabled(item) {
+			return !grid.allowSelect(grid.row(item));
+		}
 		
 		function changeInput(value){
 			// creates a function that modifies the input on an event
@@ -27,7 +31,7 @@ function(kernel, arrayUtil, on, aspect, has, put){
 					var element = grid.cell(rows[i], column.id).element;
 					if(!element){ continue; } // skip if row has been entirely removed
 					element = (element.contents || element).input;
-					if(!element.disabled){
+					if(element && !element.disabled){
 						// only change the value if it is not disabled
 						element.checked = value;
 						element.setAttribute("aria-checked", value);
@@ -64,6 +68,7 @@ function(kernel, arrayUtil, on, aspect, has, put){
 			if(event.type == "click" || event.keyCode == 32 || (!has("opera") && event.keyCode == 13) || event.keyCode === 0){
 				var row = grid.row(event),
 					lastRow = grid._lastSelected && grid.row(grid._lastSelected);
+
 				grid._selectionTriggerEvent = event;
 				
 				if(type == "radio"){
@@ -97,10 +102,7 @@ function(kernel, arrayUtil, on, aspect, has, put){
 		function setupSelectionEvents(){
 			// register one listener at the top level that receives events delegated
 			grid._hasSelectorInputListener = true;
-			listeners.push(aspect.before(grid, "_initSelectionEvents", function(){
-				// listen for clicks and keydown as the triggers
-				this.on(".dgrid-selector:click,.dgrid-selector:keydown", onSelect);
-			}));
+			listeners.push(grid.on(".dgrid-selector:click,.dgrid-selector:keydown", onSelect));
 			var handleSelect = grid._handleSelect;
 			grid._handleSelect = function(event){
 				// ignore the default select handler for events that originate from the selector column
@@ -116,20 +118,21 @@ function(kernel, arrayUtil, on, aspect, has, put){
 
 				// Wrap allowSelect to consult both the original allowSelect and disabled
 				grid.allowSelect = function(row){
-					return originalAllowSelect.call(this, row) &&
-						!originalDisabled.call(column, row.data);
+					var allow = originalAllowSelect.call(this, row);
+
+					if (originalDisabled === disabled) {
+						return allow;
+					} else {
+						return allow && !originalDisabled.call(column, row.data);
+					}
 				};
 
 				// Then wrap disabled to simply call the new allowSelect
-				column.disabled = function(item){
-					return !grid.allowSelect(grid.row(item));
-				};
+				column.disabled = disabled;
 			}else{
 				// If no disabled function was specified, institute a default one
 				// which honors allowSelect
-				column.disabled = function(item){
-					return !grid.allowSelect(grid.row(item));
-				};
+				column.disabled = disabled;
 			}
 			// register listeners to the select and deselect events to change the input checked value
 			listeners.push(grid.on("dgrid-select", changeInput(true)));
@@ -175,7 +178,8 @@ function(kernel, arrayUtil, on, aspect, has, put){
 			renderInput(value, cell, object);
 		};
 		column.renderHeaderCell = function(th){
-			var label = column.label || column.field || "";
+			var label = "label" in column ? column.label :
+				column.field || "";
 			
 			if(type == "radio" || !grid.allowSelectAll){
 				th.appendChild(document.createTextNode(label));

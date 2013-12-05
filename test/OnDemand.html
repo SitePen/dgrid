@@ -69,12 +69,42 @@
 				"dojo/_base/lang",
 				"dojo/_base/declare",
 				"dojo/_base/array",
+				"dojo/Stateful",
+				"dojo/store/Memory",
 				"put-selector/put",
 				"dgrid/test/data/errorStores",
 				"dgrid/test/data/base",
 				"dojo/domReady!"
 			], function(on, List, Grid, Keyboard, Selection, editor, DateTextBox, Slider, NumberSpinner,
-					lang, declare, arrayUtil, put, errorStores){
+					lang, declare, arrayUtil, Stateful, Memory, put, errorStores){
+				
+				function createStatefulStore() {
+					var data = [],
+						states = testStateStore.data,
+						state,
+						statefulState,
+						i,
+						total = states.length;
+					
+					function watcher(name, oldValue, value) {
+						console.log(name, " updating from ", oldValue, " to ", value);
+					}
+					
+					for (i = 0; i < total; i++) {
+						state = states[i];
+						statefulState = new Stateful({
+							abbreviation: state.abbreviation,
+							name: state.name
+						});
+						statefulState.watch(watcher);
+						data.push(statefulState);
+					}
+
+					return new Memory({
+						data: data,
+						idProperty: "abbreviation"
+					});
+				}
 				
 				var columns = {
 					col1: 'Column 1',
@@ -148,6 +178,24 @@
 					}
 				}, "listAddDel");
 				
+				window.statefulGrid = new StandardGrid({
+					store: createStatefulStore(),
+					columns: [
+						editor({
+							label: "Abbreviation",
+							field: "abbreviation",
+							editor: "text",
+							editOn: "dblclick"
+						}),
+						editor({
+							label: "Name",
+							field: "name",
+							editor: "text",
+							editOn: "dblclick"
+						})
+					]
+				}, "statefulGrid");
+				
 				// buttons / listeners for 1st grid
 				
 				grid.on("dgrid-error", function(evt) {
@@ -205,6 +253,9 @@
 
 				on(document.getElementById("empty"), "click", function(){
 					grid.set("store", emptyStore, {});
+				});
+				on(document.getElementById("emptyAsync"), "click", function(){
+					grid.set("store", emptyAsyncStore, {});
 				});
 				on(document.getElementById("error"), "click", function(){
 					grid.set("store", errorStores.query, {});
@@ -288,8 +339,9 @@
 		<button id="setstore">Set Color Store</button>
 		<button id="restore">Set Original Store</button>
 		<button id="empty">Set to empty store</button>
+		<button id="emptyAsync">Set to empty store (async)</button>
 		<button id="error">Set to error store</button>
-		<button id="error2">Set to error store (def)</button>
+		<button id="error2">Set to error store (async)</button>
 
 		<br><br>
 		<h2>Simple test to show editor effect on store data</h2>
@@ -306,10 +358,11 @@
 			as they see fit.  However, modifying an editor field with autoSave enabled
 			will cause an error event to be emitted, since in this case it is
 			the grid which initiated the operation.</p>
-		<button id="setorigeditstore">Set to original store</button>
-		<button id="seterrorputstore">Set to store which causes error on put</button>
-		<button id="setdeferrorputstore">Set to store which rejects Deferred on put</button>
-		<br>
+		<div>
+			<button id="setorigeditstore">Set to original store</button>
+			<button id="seterrorputstore">Set to store which causes error on put</button>
+			<button id="setdeferrorputstore">Set to store which rejects Deferred on put</button>
+		</div>
 		<h2>Simple test to show adding/deleting items</h2>
 		<p>(With an OnDemandList alongside, also observing the changes)</p>
 		<div id="gridAddDel"></div>
@@ -318,5 +371,8 @@
 			<button id="add">Add Color</button>
 			<button id="delete">Delete Selected</button>
 		</div>
+		<h2>OnDemandGrid using store with Stateful objects</h2>
+		<div id="statefulGrid"></div>
+		<button type="button" onclick="statefulGrid.save()">Save</button>
 	</body>
 </html>

@@ -1,8 +1,6 @@
 define(["dojo/_base/declare", "dojo/on", "dojo/query", "dojo/_base/lang", "dojo/dom", "dojo/dom-geometry", "dojo/has", "../util/misc", "put-selector/put", "dojo/_base/html", "xstyle/css!../css/extensions/ColumnResizer.css"],
 function(declare, listen, query, lang, dom, geom, has, miscUtil, put){
 
-var hasPointFromNode = has("touch") && webkitConvertPointFromNodeToPage;
-
 function addRowSpan(table, span, startRow, column, id){
 	// loop through the rows of the table and add this column's id to
 	// the rows' column
@@ -85,7 +83,7 @@ function resizeColumnWidth(grid, colId, width, parentType){
 		event.parentType = parentType;
 	}
 	
-	if(grid._resizedColumns && listen.emit(grid.headerNode, "dgrid-columnresize", event)){
+	if(!grid._resizedColumns || listen.emit(grid.headerNode, "dgrid-columnresize", event)){
 		// Update width on column object, then convert value for CSS
 		if(width === "auto"){
 			delete column.width;
@@ -107,6 +105,7 @@ function resizeColumnWidth(grid, colId, width, parentType){
 
 		// keep a reference for future removal
 		grid._columnSizes[colId] = rule;
+		grid.resize();
 		return true;
 	}
 }
@@ -377,7 +376,6 @@ return declare(null, {
 					resizeColumnWidth(this, lastCol, this.minWidth, e.type);
 				}
 			}
-			this.resize();
 		}
 		resizer.hide();
 		

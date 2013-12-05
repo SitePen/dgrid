@@ -1,6 +1,14 @@
 // example sample data and code
-define(["dojo/_base/lang", "dojo/_base/Deferred", "dojo/store/Memory", "dojo/store/Observable", "dojo/store/util/QueryResults"],
-function(lang, Deferred, Memory, Observable, QueryResults){
+define([
+	"dojo/_base/lang",
+	"dojo/_base/array",
+	"dojo/_base/Deferred",
+	"dojo/store/Memory",
+	"dojo/store/Observable",
+	"dojo/store/util/QueryResults",
+	"./DeferredWrapper"
+],
+function(lang, arrayUtil, Deferred, Memory, Observable, QueryResults, DeferredWrapper){
 	// some sample data
 	// global var "data"
 	data = {
@@ -26,18 +34,22 @@ function(lang, Deferred, Memory, Observable, QueryResults){
 	// global var testStore
 	testStore = Observable(new Memory({data: data}));
 
-	testAsyncStore = Observable(new Memory({
-		data: data,
-		query: function(){
-			var results = Memory.prototype.query.apply(this, arguments);
-			var def = new Deferred();
-			setTimeout(function(){
+	function asyncQuery() {
+		var results = Memory.prototype.query.apply(this, arguments),
+			def = new Deferred(function(){
+				clearTimeout(timer);
+			}),
+			timer = setTimeout(function(){
 				def.resolve(results);
 			}, 200);
-			var promisedResults = QueryResults(def.promise);
-			promisedResults.total = results.total;
-			return promisedResults;
-		}
+		var promisedResults = QueryResults(def.promise);
+		promisedResults.total = results.total;
+		return promisedResults;
+	}
+	
+	testAsyncStore = Observable(new Memory({
+		data: data,
+		query: asyncQuery
 	}));
 	//sample color data
 	data2 = {
@@ -67,8 +79,11 @@ function(lang, Deferred, Memory, Observable, QueryResults){
 	}
 	smallColorStore = Observable(new Memory({data: data2}));
 	//empty store
-	emptyData = { identifier: 'id', label: 'id', items:[]};
-	emptyStore = Observable(new Memory({data: emptyData}));
+	emptyStore = Observable(new Memory({ data: [] }));
+	emptyAsyncStore = Observable(new Memory({
+		data: [],
+		query: asyncQuery
+	}));
 
 	//store with non-existent url
 	//errorStore = Observable(Memory({data: junk}));
@@ -194,37 +209,60 @@ function(lang, Deferred, Memory, Observable, QueryResults){
 				{ id: 'BuenosAires', name:'Buenos Aires', type:'city', parent: 'AR' }
 	];
 	
-	// global var testCountryStore
-	testCountryStore = Observable(new Memory({
-		data: testCountryData,
-		getChildren: function(parent, options){
-			return this.query({parent: parent.id}, options);
-		},
-		mayHaveChildren: function(parent){
-			return parent.type != "city";
-		},
-		query: function(query, options){
-			var def = new Deferred();
-			var immediateResults = this.queryEngine(query, options)(this.data);
-			setTimeout(function(){
-				def.resolve(immediateResults);
-			}, 200);
-			var results = QueryResults(def.promise);
-			return results;
-		}
-	}));
-	
 	// global var testSyncCountryStore
 	testSyncCountryStore = Observable(new Memory({
 		data: testCountryData,
 		getChildren: function(parent, options){
-			return this.query({parent: parent.id}, options);
+			// Support persisting the original query via options.originalQuery
+			// so that child levels will filter the same way as the root level
+			return this.query(
+				lang.mixin({}, options && options.originalQuery || null,
+					{ parent: parent.id }),
+				options);
 		},
 		mayHaveChildren: function(parent){
 			return parent.type != "city";
+		},
+		query: function (query, options){
+			query = query || {};
+			options = options || {};
+			
+			if (!query.parent && !options.deep) {
+				// Default to a single-level query for root items (no parent)
+				query.parent = undefined;
+			}
+			return this.queryEngine(query, options)(this.data);
 		}
 	}));
 	
+	// global var testCountryStore
+	testCountryStore = new DeferredWrapper(testSyncCountryStore);
+	
+	var testTopHeavyData = arrayUtil.map(testStateStore.data, function (state) {
+		return {
+			abbreviation: state.abbreviation,
+			name: state.name,
+			children: [{
+				abbreviation: 'US',
+				name: 'United States of America'
+			}]
+		};
+	});
+	
+	// global var testTopHeavyStore
+	// Store with few children and many parents to exhibit any
+	// issues due to bugs related to total disregarding level
+	testTopHeavyStore = Observable(new Memory({
+		data: testTopHeavyData,
+		idProperty: "abbreviation",
+		getChildren: function(parent, options){
+			return parent.children;
+		},
+		mayHaveChildren: function(parent){
+			return !!parent.children;
+		}
+	}));
+
 	function calculateOrder(store, object, before, orderField){
 		// Calculates proper value of order for an item to be placed before another
 		var afterOrder, beforeOrder = 0;
@@ -256,9 +294,7 @@ function(lang, Deferred, Memory, Observable, QueryResults){
 		return Observable(new Memory(lang.mixin({data: data,
 			idProperty: "name",
 			put: function(object, options){
-				if(options && options.before){
-					object.order = calculateOrder(this, object, options.before);
-				}
+				object.order = calculateOrder(this, object, options && options.before);
 				return Memory.prototype.put.call(this, object, options);
 			},
 			// Memory's add does not need to be augmented since it calls put

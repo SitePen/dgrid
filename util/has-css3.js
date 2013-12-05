@@ -53,7 +53,8 @@ function(has){
 	});
 	
 	has.add("css-transforms3d", function(global, doc, element){
-		var left, prefix;
+		var left,
+			result = false;
 		
 		// Apply csstransforms3d class to test transform-3d media queries.
 		element.className = "has-csstransforms3d";
@@ -62,16 +63,15 @@ function(has){
 		left = element.offsetLeft;
 		
 		if (left === 9) {
-			return true; // standard, no prefix
+			result = true; // standard, no prefix
 		} else if (left > 9){
 			// Matched one of the vendor prefixes; offset indicates which.
-			prefix = cssPrefixes[left - 10];
-			return prefix || false;
+			result = cssPrefixes[left - 10] || false;
 		}
 		document.body.removeChild(element);
 		element.className = "";
 		
-		return false; // otherwise, not supported
+		return result;
 	});
 	
 	return has;

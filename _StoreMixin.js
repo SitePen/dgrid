@@ -1,5 +1,5 @@
-define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/on", "put-selector/put"],
-function(kernel, declare, lang, Deferred, listen, put){
+define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/on", "dojo/aspect", "put-selector/put"],
+function(kernel, declare, lang, Deferred, listen, aspect, put){
 	// This module isolates the base logic required by store-aware list/grid
 	// components, e.g. OnDemandList/Grid and the Pagination extension.
 	
@@ -12,8 +12,12 @@ function(kernel, declare, lang, Deferred, listen, put){
 		if(typeof err !== "object"){
 			// Ensure we actually have an error object, so we can attach a reference.
 			err = new Error(err);
+		}else if(err.dojoType === "cancel"){
+			// Don't fire dgrid-error events for errors due to canceled requests
+			// (unfortunately, the Deferred instrumentation will still log them)
+			return;
 		}
-		// TODO: remove this @ 1.0 (prefer grid property directly on event object)
+		// TODO: remove this @ 0.4 (prefer grid property directly on event object)
 		err.grid = this;
 		
 		if(listen.emit(this.domNode, "dgrid-error", {
@@ -61,7 +65,27 @@ function(kernel, declare, lang, Deferred, listen, put){
 			this.query = {};
 			this.queryOptions = {};
 			this.dirty = {};
-			this._updating = {}; // tracks rows that are mid-update
+			this._updating = {}; // Tracks rows that are mid-update
+			this._columnsWithSet = {};
+
+			// Reset _columnsWithSet whenever column configuration is reset
+			aspect.before(this, "configStructure", lang.hitch(this, function(){
+				this._columnsWithSet = {};
+			}));
+		},
+		
+		postCreate: function(){
+			this.inherited(arguments);
+			if(this.store){
+				this._updateNotifyHandle(this.store);
+			}
+		},
+		
+		destroy: function(){
+			this.inherited(arguments);
+			if(this._notifyHandle){
+				this._notifyHandle.remove();
+			}
 		},
 		
 		_configColumn: function(column){
@@ -69,22 +93,33 @@ function(kernel, declare, lang, Deferred, listen, put){
 			//		Implements extension point provided by Grid to store references to
 			//		any columns with `set` methods, for use during `save`.
 			if (column.set){
-				if(!this._columnsWithSet){ this._columnsWithSet = {}; }
 				this._columnsWithSet[column.field] = column;
 			}
 		},
 		
-		_configColumns: function(){
+		_updateNotifyHandle: function(store){
 			// summary:
-			//		Extends Grid to reset _StoreMixin's hash when columns are updated
-			this._columnsWithSet = null;
-			return this.inherited(arguments);
+			//		Unhooks any previously-existing store.notify handle, and
+			//		hooks up a new one for the given store.
+			
+			if(this._notifyHandle){
+				// Unhook notify handler from previous store
+				this._notifyHandle.remove();
+				delete this._notifyHandle;
+			}
+			if(store && typeof store.notify === "function"){
+				this._notifyHandle = aspect.after(store, "notify",
+					lang.hitch(this, "_onNotify"), true);
+			}
 		},
 		
 		_setStore: function(store, query, queryOptions){
 			// summary:
 			//		Assigns a new store (and optionally query/queryOptions) to the list,
 			//		and tells it to refresh.
+			
+			this._updateNotifyHandle(store);
+			
 			this.store = store;
 			this.dirty = {}; // discard dirty map, as it applied to a previous store
 			this.set("query", query, queryOptions);
@@ -105,11 +140,11 @@ function(kernel, declare, lang, Deferred, listen, put){
 			sort ? this.set("sort", sort) : this.refresh();
 		},
 		setStore: function(store, query, queryOptions){
-			kernel.deprecated("setStore(...)", 'use set("store", ...) instead', "dgrid 1.0");
+			kernel.deprecated("setStore(...)", 'use set("store", ...) instead', "dgrid 0.4");
 			this.set("store", store, query, queryOptions);
 		},
 		setQuery: function(query, queryOptions){
-			kernel.deprecated("setQuery(...)", 'use set("query", ...) instead', "dgrid 1.0");
+			kernel.deprecated("setQuery(...)", 'use set("query", ...) instead', "dgrid 0.4");
 			this.set("query", query, queryOptions);
 		},
 		
@@ -117,7 +152,7 @@ function(kernel, declare, lang, Deferred, listen, put){
 			// summary:
 			//		Get a fresh queryOptions object, also including the current sort
 			var options = lang.delegate(this.queryOptions, {});
-			if(this._sort.length){
+			if(typeof(this._sort) === "function" || this._sort.length){
 				// Prevents SimpleQueryEngine from doing unnecessary "null" sorts (which can
 				// change the ordering in browsers that don't use a stable sort algorithm, eg Chrome)
 				options.sort = this._sort;
@@ -140,6 +175,20 @@ function(kernel, declare, lang, Deferred, listen, put){
 			// prevent default storeless sort logic as long as we have a store
 			if(this.store){ this._lastCollection = null; }
 			this.inherited(arguments);
+		},
+		
+		_onNotify: function(object, existingId){
+			// summary:
+			//		Method called when the store's notify method is called.
+			
+			// Call inherited in case anything was mixed in earlier
+			this.inherited(arguments);
+			
+			// For adds/puts, check whether any observers are hooked up;
+			// if not, force a refresh to properly hook one up now that there is data
+			if(object && this._numObservers < 1){
+				this.refresh({ keepScrollPosition: true });
+			}
 		},
 		
 		insertRow: function(object, parent, beforeNode, i, options){
@@ -169,7 +218,7 @@ function(kernel, declare, lang, Deferred, listen, put){
 			dirtyObj[field] = value;
 		},
 		setDirty: function(id, field, value){
-			kernel.deprecated("setDirty(...)", "use updateDirty() instead", "dgrid 1.0");
+			kernel.deprecated("setDirty(...)", "use updateDirty() instead", "dgrid 0.4");
 			this.updateDirty(id, field, value);
 		},
 		
@@ -195,19 +244,23 @@ function(kernel, declare, lang, Deferred, listen, put){
 					var colsWithSet = self._columnsWithSet,
 						updating = self._updating,
 						key, data;
-					// Copy dirty props to the original, applying setters if applicable
-					for(key in dirtyObj){
-						object[key] = dirtyObj[key];
-					}
-					if(colsWithSet){
-						// Apply any set methods in column definitions.
-						// Note that while in the most common cases column.set is intended
-						// to return transformed data for the key in question, it is also
-						// possible to directly modify the object to be saved.
-						for(key in colsWithSet){
-							data = colsWithSet[key].set(object);
-							if(data !== undefined){ object[key] = data; }
+
+					if (typeof object.set === "function") {
+						object.set(dirtyObj);
+					} else {
+						// Copy dirty props to the original, applying setters if applicable
+						for(key in dirtyObj){
+							object[key] = dirtyObj[key];
 						}
+					}
+
+					// Apply any set methods in column definitions.
+					// Note that while in the most common cases column.set is intended
+					// to return transformed data for the key in question, it is also
+					// possible to directly modify the object to be saved.
+					for(key in colsWithSet){
+						data = colsWithSet[key].set(object);
+						if(data !== undefined){ object[key] = data; }
 					}
 					
 					updating[id] = true;
@@ -273,11 +326,14 @@ function(kernel, declare, lang, Deferred, listen, put){
 		
 		newRow: function(){
 			// Override to remove no data message when a new row appears.
+			// Run inherited logic first to prevent confusion due to noDataNode
+			// no longer being present as a sibling.
+			var row = this.inherited(arguments);
 			if(this.noDataNode){
 				put(this.noDataNode, "!");
 				delete this.noDataNode;
 			}
-			return this.inherited(arguments);
+			return row;
 		},
 		removeRow: function(rowElement, justCleanup){
 			var row = {element: rowElement};

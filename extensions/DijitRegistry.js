@@ -46,6 +46,11 @@ function(declare, domGeometry, registry){
 			return [];
 		},
 		
+		isLeftToRight: function(){
+			// Implement method expected by Dijit layout widgets
+			return !this.isRTL;
+		},
+		
 		resize: function(changeSize){
 			// Honor changeSize parameter used by layout widgets, and resize grid
 			if(changeSize){
@@ -66,6 +71,13 @@ function(declare, domGeometry, registry){
 			// summary:
 			//		dgrid doesn't support watch; this is a no-op for compatibility with
 			//		some Dijit layout widgets which assume its existence.
+		},
+		
+		getParent: function(){
+			// summary:
+			//		Analogue of _WidgetBase#getParent for compatibility with for example
+			//		dijit._KeyNavContainer.
+			return registry.getEnclosingWidget(this.domNode.parentNode);
 		}
 	});
 });

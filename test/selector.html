@@ -52,6 +52,14 @@
 							col3: { label: 'Column 3' }
 						};
 					};
+					getColumnsWithoutSelector = function(){
+						return {
+							col1: "Note",
+							id: "ID",
+							col2: { label: 'Column 2', sortable: false },
+							col3: { label: 'Column 3' }
+						};
+					}
 					
 					var SelectionGrid = declare([Grid, Selection, Keyboard]);
 					
@@ -65,7 +73,7 @@
 						store: testStore,
 						selectionMode: "none",
 						columns: {
-							col1: selector({ label: "Select" }),
+							col1: selector({ label: "" }), // Test blank label
 							id: "ID",
 							col2: {label: 'Column 2', sortable: false},
 							col3: {label: 'Column 3'}
@@ -76,13 +84,20 @@
 					window.gridRadio = new SelectionGrid({
 						store: testStore,
 						selectionMode: "none",
+						allowSelect: function(row){ return row.data.col3 == "read"; },
 						columns: {
-							col1: selector({ label: 'Radio', disabled: function(object){ return object.col3 == "read"; } }, "radio"),
+							col1: selector({ label: 'Radio' }, "radio"),
 							id: "ID",
 							col2: {label: 'Column 2', sortable: false},
 							col3: {label: 'Column 3'}
 						}
 					}, "grid-radio");
+					
+					window.gridNoSelector = new SelectionGrid({
+						store: testStore,
+						selectionMode: "none",
+						columns: getColumnsWithoutSelector()
+					}, "gridNoSelector");
 					
 					window.gridComplex = new (declare([Grid, ColumnSet, Selection, Keyboard]))({
 						store: testStore,
@@ -118,9 +133,12 @@
 				Set selection mode to "extended"</button>
 		</div>
 		<div id="grid"></div>
-		<div>
+		<div> Tests for resetting columns (should not cause errors):
 			<button type="button" onclick="grid.set('columns', getColumns());">
-				Reset columns (should not cause errors)
+				Reset columns, including selector
+			</button>
+			<button type="button" onclick="grid.set('columns', getColumnsWithoutSelector());">
+				Reset columns, without selector
 			</button>
 		</div>
 		<h2>A grid with radio selectors</h2>
@@ -131,8 +149,18 @@
 				Set selection mode to "single" (to test sync)</button>
 		</div>
 		<div id="grid-radio"></div>
-		<h2>A grid with checkbox selectors, with select-all disabled</h2>
+		<h2>A grid with checkbox selectors, with select-all disabled, blank label in selector column</h2>
 		<div id="grid2"></div>
+		<h2>A grid, initially without a selector column</h2>
+		<div id="gridNoSelector"></div>
+		<div> Tests for resetting columns (should not cause errors, and selectors should work):
+			<button type="button" onclick="gridNoSelector.set('columns', getColumns());">
+				Reset columns, including selector
+			</button>
+			<button type="button" onclick="gridNoSelector.set('columns', getColumnsWithoutSelector());">
+				Reset columns, without selector
+			</button>
+		</div>
 		<h2>A grid with checkbox selectors and column sets</h2>
 		<div id="grid-complex"></div>
 	</body>

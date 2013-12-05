@@ -17,7 +17,7 @@
 			}
 
 			/* add styles to size this grid appropriately */
-			#grid {
+			#grid, #grid2, #grid-99 {
 				height: 20em;
 			}
 			.field-order {
@@ -77,6 +77,11 @@
 							evt);
 						if(prevent){ evt.preventDefault(); }
 					});
+
+                    window.gridDash1 = new (declare([Grid, ColumnReorder]))({
+                        columns: columns1
+                    }, "grid-99");
+                    gridDash1.renderArray(data);
 				});
 				
 		</script>
@@ -93,5 +98,8 @@
 		</div>
 		<h2>A grid with column re-ordering and resizing, and a non-reorderable Step field</h2>
 		<div id="grid2"></div>
+
+        <h2>A basic grid with a dash and a number at the end of the id</h2>
+        <div id="grid-99"></div>
 	</body>
 </html>
