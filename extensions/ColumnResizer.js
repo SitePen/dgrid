@@ -88,8 +88,10 @@ function resizeColumnWidth(grid, colId, width, parentType){
 		if(width === "auto"){
 			delete column.width;
 		}else{
-			column.width = width;
-			width += "px";
+			if(column) {
+				column.width = width;
+				width += "px";
+			}
 		}
 		
 		rule = grid._columnSizes[colId];
