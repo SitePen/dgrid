@@ -122,7 +122,7 @@ define(["dojo/_base/declare", "dojo/html", "dojo/has", "dojo/dom-construct", "di
 			}
 			return cell;
 		},
-		addSelectionButtons: function(button, index) {
+		setPositionSelectorWidget: function(button, index) {
 			// summary:
 			//		Set Button Position
 			// index: integer
@@ -130,9 +130,9 @@ define(["dojo/_base/declare", "dojo/html", "dojo/has", "dojo/dom-construct", "di
 			// button: selector button widget
 			this.selectorNode.children[index].appendChild(button.domNode)
 		},
-		addAllSelectionButtons: function(posSelectAll, posSelectNone, posSelectInverse) {
+		setPositionAllSelectorWidgets: function(posSelectAll, posSelectNone, posSelectInverse) {
 			// summary:
-			//		set position of  all selector buttons
+			//		set position of  all selector buttons 
 			// posSelectAll: integer
 			//		position of the Select All button in selectorNode
 			// posSelectNone: integer
