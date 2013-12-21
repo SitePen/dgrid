@@ -500,13 +500,17 @@ return declare(null, {
 				if(!toRow.element){
 					toRow = this.row(toRow);
 				}
-				toElement = toRow.element;
-				// find if it is earlier or later in the DOM
-				traverser = (toElement && (toElement.compareDocumentPosition ? 
-					toElement.compareDocumentPosition(element) == 2 :
-					toElement.sourceIndex > element.sourceIndex)) ? "down" : "up";
-				while(row.element != toElement && (row = this[traverser](row))){
-					this._select(row, null, value);
+				if(toRow){
+					toElement = toRow.element;
+					// find if it is earlier or later in the DOM
+					traverser = (toElement && (toElement.compareDocumentPosition ? 
+						toElement.compareDocumentPosition(element) == 2 :
+						toElement.sourceIndex > element.sourceIndex)) ? "down" : "up";
+					while(row.element != toElement && (row = this[traverser](row))){
+						this._select(row, null, value);
+					}
+				}else{
+					console.warn('select range too large')
 				}
 			}
 		}
