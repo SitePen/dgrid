@@ -59,7 +59,7 @@ function(has){
 		// Apply csstransforms3d class to test transform-3d media queries.
 		element.className = "has-csstransforms3d";
 		// Add to body to allow measurement.
-		document.body.appendChild(element);
+		doc.documentElement.appendChild(element);
 		left = element.offsetLeft;
 		
 		if (left === 9) {
@@ -68,7 +68,7 @@ function(has){
 			// Matched one of the vendor prefixes; offset indicates which.
 			result = cssPrefixes[left - 10] || false;
 		}
-		document.body.removeChild(element);
+		element.parentNode.removeChild(element);
 		element.className = "";
 		
 		return result;
