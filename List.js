@@ -493,7 +493,10 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 						// First determine the DOM node that this should be placed before.
 						if(rows.length){
 							nextNode = rows[to];
-							if(!nextNode){
+							if(nextNode){
+								// Re-retrieve the element in case we are referring to an orphan
+								nextNode = correctElement(nextNode);
+							}else{
 								nextNode = rows[to - 1];
 								if(nextNode){
 									// Make sure to skip connected nodes, so we don't accidentally
@@ -532,12 +535,40 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 						}
 						options.count++;
 					}
+					
+					if(from === 0){
+						overlapRows([1,1]);
+					}
+					else if(from === results.length - 1){
+						overlapRows([0,0]);
+					}
+					
 					from != to && firstRow && self.adjustRowIndices(firstRow);
 					self._onNotification(rows, object, from, to);
 				}, true)) - 1;
 			}
 			var rowsFragment = document.createDocumentFragment(),
 				lastRow;
+
+			function overlapRows(sides){
+				// Only perform row overlap in the case of observable results
+				if(observerIndex > -1){
+					for(var i = 0; i < sides.length; i++){
+						var top = sides[i];
+						var lastRow = correctElement(rows[top ? 0 : rows.length-1]); 
+						var row = self[top ? "up" : "down"](self.row(lastRow));
+						if(row && row.element != lastRow){
+							var method = top ? "unshift" : "push";
+							results[method](row.data);
+							rows[method](row.element);
+						}
+					}
+				}
+			}
+			function correctElement(row){
+				// if a node has been orphaned, this will retrieve the correct, in-document, element.
+				return self.row(row.id.slice(self.id.length + 5)).element;
+			}
 			
 			function mapEach(object){
 				lastRow = self.insertRow(object, rowsFragment, null, start++, options);
@@ -573,7 +604,12 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 			if(results.map){
 				rows = results.map(mapEach, console.error);
 				if(rows.then){
-					return rows.then(whenDone, whenError);
+					results.then(function(resultsArray){
+						results = resultsArray;
+						// overlap rows in the results array when using observable so that we can determine page boundary changes
+						overlapRows([1,1,0,0]);
+					});
+					return rows.then(whenDone);
 				}
 			}else{
 				rows = [];
@@ -582,7 +618,9 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 				}
 			}
 			
-			return whenDone(rows);
+			whenDone(rows);
+			overlapRows([1,1,0,0]);
+			return rows;
 		},
 
 		_onNotification: function(rows, object, from, to){
@@ -611,6 +649,9 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 				previousRow = row && row.previousSibling;
 			
 			if(row){// if it existed elsewhere in the DOM, we will remove it, so we can recreate it
+				if(row === beforeNode){
+					beforeNode = (beforeNode.connected || beforeNode).nextSibling;
+				}
 				this.removeRow(row);
 			}
 			row = this.renderRow(object, options);
