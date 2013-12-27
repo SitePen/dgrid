@@ -14,8 +14,8 @@ define([
 	// Helper method used to set column set() methods for various grid compositions
 	function testSetMethod(grid, dfd){
 		var store = lang.clone(testStore); // clone test store so we can make modifications
-		grid.set("store", store);
 		document.body.appendChild(grid.domNode);
+		grid.set("store", store);
 		grid.startup();
 		
 		var changes = [
