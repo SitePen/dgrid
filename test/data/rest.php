@@ -30,7 +30,7 @@ for ($i = $start; $i <= $end; $i++) {
 	if($i != $start){
 		echo ',';
 	}
-    echo '{"id":"'.$id_prefix.$i.'","name":"Item '.$i.'","comment":"hello"}';
+    echo '{"id":'.$id_prefix.$i.',"name":"Item '.$i.'","comment":"hello"}';
 }
 echo ']';
 ?>

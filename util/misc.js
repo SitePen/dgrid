@@ -126,7 +126,6 @@ define(["put-selector/put"], function(put){
 				// Store name of property used to access rules (`rules` for IE < 9)
 				rulesProperty = extraSheet.cssRules ? "cssRules" : "rules";
 			}
-			
 			var index = extraRules.length;
 			extraRules[index] = (extraSheet.cssRules || extraSheet.rules).length;
 			extraSheet.addRule ?
@@ -147,7 +146,6 @@ define(["put-selector/put"], function(put){
 				}
 			};
 		},
-		
 		escapeCssIdentifier: function(id){
 			// summary:
 			//		Escapes normally-invalid characters in a CSS identifier (such as .);
