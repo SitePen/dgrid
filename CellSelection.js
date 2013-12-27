@@ -83,10 +83,20 @@ return declare(Selection, {
 				this._selectionEventQueues[(value ? "" : "de") + "select"].push(cell);
 			}
 			if(toCell){
-				// a range
 				if(!toCell.element){
 					toCell = this.cell(toCell);
 				}
+				
+				if(!toCell || !toCell.row){
+					this._lastSelected = element;
+					console.warn("The selection range has been reset because the " +
+						"beginning of the selection is no longer in the DOM. " +
+						"If you are using OnDemandList, you may wish to increase " +
+						"farOffRemoval to avoid this, but note that keeping more nodes " +
+						"in the DOM may impact performance.");
+					return;
+				}
+				
 				var toElement = toCell.element;
 				var fromElement = cell.element;
 				// find if it is earlier or later in the DOM
