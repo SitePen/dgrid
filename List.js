@@ -483,6 +483,7 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 							}
 							self.removeRow(row); // now remove
 						}
+						options.count--;
 						// the removal of rows could cause us to need to page in more items
 						if(self._processScroll){
 							self._processScroll();
@@ -551,16 +552,30 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 				lastRow;
 
 			function overlapRows(sides){
-				// Only perform row overlap in the case of observable results
+				// This is responsible for setting row overlaps in result
+				// sets to ensure that observable can always properly determine which page
+				// an object belongs to.
+				// This is function uses kind of an esoteric argument optimized for
+				// performance and size, since it is called quite frequently
+				// The sides is an array of overlapping operations, with a falsy item indicating
+				// to add an overlap to the top, and a truthy item means to add an overlap
+				// to the bottom (so [0, 1] adds one overlap to the top and the bottom)
 				if(observerIndex > -1){
+					// Only perform row overlap in the case of observable results
+					// now iterate through the sides operations
 					for(var i = 0; i < sides.length; i++){
 						var top = sides[i];
+						// make sure we have the correct row element
 						var lastRow = correctElement(rows[top ? 0 : rows.length-1]); 
 						var row = self[top ? "up" : "down"](self.row(lastRow));
 						if(row && row.element != lastRow){
 							var method = top ? "unshift" : "push";
+							// now take the row and data from the adjacent page and unshift to the
+							// top or push to the bottom of our array of rows and results
 							results[method](row.data);
 							rows[method](row.element);
+							// and adjust the count
+							options.count++;
 						}
 					}
 				}
