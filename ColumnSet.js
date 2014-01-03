@@ -9,10 +9,10 @@ function(kernel, declare, lang, Deferred, listen, aspect, query, has, miscUtil, 
 		try{
 			WheelEvent("wheel");
 			supported = true;
-		}catch(e){ // empty catch block; prevent debuggers from snagging
-		}finally{
-			return supported;
+		}catch(e){
+			// empty catch block; prevent debuggers from snagging
 		}
+		return supported;
 	});
 
 	var colsetidAttr = "data-dgrid-column-set-id";
@@ -40,7 +40,29 @@ function(kernel, declare, lang, Deferred, listen, aspect, query, has, miscUtil, 
 
 		scroller.scrollLeft = scrollLeft < 0 ? 0 : scrollLeft;
 	}
-	
+
+	function getColumnSetSubRows(subRows, columnSetId){
+		// Builds a subRow collection that only contains columns that correspond to
+		// a given column set id.
+		if(!subRows || !subRows.length){
+			return;
+		}
+		var subset = [];
+		for(var i = 0, lRows = subRows.length; i < lRows; i++){
+			var row = subRows[i];
+			var subsetRow = [];
+			subsetRow.className = row.className;
+			for(var k = 0, lCols = row.length; k < lCols; k++){
+				var column = row[k];
+				if(column.columnSetId === columnSetId){
+					subsetRow.push(column);
+				}
+			}
+			subset.push(subsetRow);
+		}
+		return subset;
+	}
+
 	var horizMouseWheel;
 	if(!has("touch")){
 		horizMouseWheel = has("event-mousewheel") || has("event-wheel") ? function(grid){
@@ -108,7 +130,8 @@ function(kernel, declare, lang, Deferred, listen, aspect, query, has, miscUtil, 
 				// iterate through the columnSets
 				var cell = put(tr, tag + ".dgrid-column-set-cell.dgrid-column-set-" + i +
 					" div.dgrid-column-set[" + colsetidAttr + "=" + i + "]");
-				cell.appendChild(this.inherited(arguments, [tag, each, this.columnSets[i], object]));
+				var subset = getColumnSetSubRows(subRows || this.subRows , i) || this.columnSets[i];
+				cell.appendChild(this.inherited(arguments, [tag, each, subset, object]));
 			}
 			return row;
 		},
@@ -187,15 +210,37 @@ function(kernel, declare, lang, Deferred, listen, aspect, query, has, miscUtil, 
 			}
 			this.inherited(arguments);
 		},
+
 		configStructure: function(){
+			// Combine the column sets into one column config so the other extensions can do their thing.
+			function columnSetIdFn(columnSetId){
+				// Returns a function that adds a column set id property to
+				// each column definition.  The column set id property is also
+				// added to all of the child column definitions.  This id property is needed so
+				// createRowCells can figure out which cells are in which column sets.
+				function setColumnSetId(column){
+					column.columnSetId = i;
+					if(column.children){
+						miscUtil.each(column.children, setColumnSetId);
+					}
+				}
+
+				return setColumnSetId;
+			}
+
+			// Squash the column sets together so the grid and other dgrid extensions and mixins can
+			// properly configure the columns and create any needed subrows.  Later in createRowCells,
+			// the column set definitions will be used to group columns together.
 			this.columns = {};
+			this.subRows = [];
 			for(var i = 0, l = this.columnSets.length; i < l; i++){
-				// iterate through the columnSets
 				var columnSet = this.columnSets[i];
 				for(var j = 0; j < columnSet.length; j++){
 					columnSet[j] = this._configColumns(i + "-" + j + "-", columnSet[j]);
+					miscUtil.each(columnSet[j], columnSetIdFn(i), this);
 				}
 			}
+			this.inherited(arguments);
 		},
 
 		_positionScrollers: function (){

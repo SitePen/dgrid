@@ -1,7 +1,7 @@
 define([
 	"dojo/_base/lang",
 	"dojo/_base/declare",
-	"dgrid/util/misc",
+	"../util/misc",
 	"xstyle/css!../css/extensions/CompoundColumns.css"
 ], function(lang, declare, miscUtil){
 	return declare(null, {
