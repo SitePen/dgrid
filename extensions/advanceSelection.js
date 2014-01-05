@@ -155,7 +155,7 @@ define(["dojo/_base/declare", "dojo/html", "dojo/has", "dojo/dom-construct", "di
 				_this.selectAll();
 			})
 			// by default Place Select all at first cell
-			this.addSelectionButtons(this.selectAllButton, 0)
+			this.setPositionSelectorWidget(this.selectAllButton, 0)
 		},
 		_createSelectNoneButton: function() {
 			// summary:
@@ -168,7 +168,7 @@ define(["dojo/_base/declare", "dojo/html", "dojo/has", "dojo/dom-construct", "di
 				_this.clearSelection();
 			})
 			// by default Place Select None at second cell
-			this.addSelectionButtons(this.selectNoneButton, 1)
+			this.setPositionSelectorWidget(this.selectNoneButton, 1)
 		},
 		_createSelectInverseButton: function() {
 			// summary:
@@ -181,12 +181,11 @@ define(["dojo/_base/declare", "dojo/html", "dojo/has", "dojo/dom-construct", "di
 				if (_this.allSelected) {
 					_this.clearSelection();
 				} else {
-					for (var i in _this._rowIdToObject) {
-						if (_this.isSelected(_this._rowIdToObject[i])) {
-							_this.select(_this._rowIdToObject[i], null, false)
-						} else {
-							_this.select(_this._rowIdToObject[i], null, true)
-						}
+					// summary:
+					//		Selection handler for "toggle" mode which simply toggles the selection
+					//		of the given target.  Primarily useful for touch input.
+					for (var _row in _this._rowIdToObject) {
+						_this.select(_this._rowIdToObject[_row], null, null);
 					}
 				}
 				if (_this._fireSelectionEvents) {
@@ -194,7 +193,7 @@ define(["dojo/_base/declare", "dojo/html", "dojo/has", "dojo/dom-construct", "di
 				}
 			})
 			// by default Place Select Inverse at third cell
-			this.addSelectionButtons(this.selectInverseButton, 2)
+			this.setPositionSelectorWidget(this.selectInverseButton, 2)
 		}
 	});
 });
