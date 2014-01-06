@@ -188,7 +188,7 @@ var Keyboard = declare(null, {
 				columnId: focusedTarget.column && focusedTarget.column.id,
 				siblingId: !sibling || sibling.element === rowElement ? undefined : sibling.id
 			};
-			
+
 			// Call _restoreFocus on next turn, to restore focus to sibling
 			// if no replacement row was immediately inserted.
 			// Pass original row's id in case it was re-inserted in a renderArray
@@ -240,7 +240,7 @@ var Keyboard = declare(null, {
 			if(focusInfo.active){
 				// Row/cell was previously focused, so focus the new one immediately
 				this.focus(newTarget);
-			}else{
+			}else if(newTarget.element){
 				// Row/cell was not focused, but we still need to update tabIndex
 				// and the element's class to be consistent with the old one
 				put(newTarget.element, ".dgrid-focus");

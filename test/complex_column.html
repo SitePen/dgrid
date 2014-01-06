@@ -12,10 +12,10 @@
 				font-weight: bold;
 				padding-bottom: 0.25em;
 			}
-			.grid { 
+			.grid {
 				width: 700px;
 			}
-			.grid .dgrid-column-set-0 { 
+			.grid .dgrid-column-set-0 {
 				width: 50%;
 			}
 			.grid .field-col1 {
@@ -33,13 +33,22 @@
 			.dgrid-sort-arrow {
 				float: left;
 			}
+
+			.gridcscc .field-col4 {
+				white-space: nowrap;
+			}
+
+			.gridcscc .dgrid-header .dgrid-row-table {
+				height: 45px;
+			}
+
 		</style>
 
 		<script src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script>
-			require(["dgrid/OnDemandGrid", "dgrid/GridWithColumnSetsFromHtml", "dgrid/ColumnSet", "dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dojo/on", "dojo/parser", "dgrid/test/data/base", "dgrid/test/data/DeferredWrapper", "dojo/domReady!"],
-				function(OnDemandGrid, GridFromHtml, ColumnSet, Selection, Keyboard, declare, on, parser, testStore, DeferredWrapper){
+			require(["dgrid/OnDemandGrid", "dgrid/GridWithColumnSetsFromHtml", "dgrid/ColumnSet", "dgrid/extensions/CompoundColumns", "dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dojo/on", "dojo/parser", "dgrid/test/data/base", "dgrid/test/data/DeferredWrapper", "dojo/domReady!"],
+				function(OnDemandGrid, GridFromHtml, ColumnSet, CompoundColumns, Selection, Keyboard, declare, on, parser, testStore, DeferredWrapper){
 					var columnSets1 = [
 							[
 								[{label: 'Column 1', field: 'col1'},
@@ -102,11 +111,89 @@
 									{label: 'Column 1', field: 'col1'},
 									{label: 'Column 4', field: 'col4'}
 								]
-							]];
-					
+							]],
+						ccColumnSets1 = [
+							[
+								[
+									{
+										label: 'Columns 1 and 2',
+										children:
+											[
+												{label: 'Column 1', field: 'col1'},
+												{label: 'Column 2', field: 'col2', sortable: false}
+											]
+									},
+									{ label: 'Column 4', field: 'col4'}
+								]
+							],
+							[
+								[
+									{label: 'Column 1', field: 'col1'},
+									{label: 'Column 4', field: 'col4'}
+								]
+							]
+						],
+						ccColumnSets2 = [
+							[
+								[
+									{label: 'Column 1', field: 'col1'},
+									{label: 'Column 3', field: 'col3'}
+								]
+							],
+							[
+								[
+									{
+										label: "Columns 4 and 5",
+										children: [
+											{label: 'Column 4', field: 'col4'},
+											{label: 'Column 5', field: 'col5'}
+										]
+									}
+								]
+							]
+						],
+						ccColumnSets3 = [
+							[
+								[
+									{
+										label: 'Columns 1 and 2',
+										children:
+												[
+													{label: 'Column 1', field: 'col1'},
+													{label: 'Column 2', field: 'col2', sortable: false}
+												]
+									}
+								]
+							],
+							[
+								[
+									{
+										label: "Columns 3 and 4",
+										children: [
+											{label: 'Column 3', field: 'col3'},
+											{label: 'Column 4', field: 'col4'}
+										]
+									}
+								]
+							],
+							[
+								[
+									{
+										label: "Columns 4 and 5",
+										children: [
+											{label: 'Column 4', field: 'col4'},
+											{label: 'Column 5', field: 'col5'}
+										]
+									}
+								]
+							]
+						];
+
 					function byId(id){ return document.getElementById(id); }
 
 					var ComplexGrid = declare([OnDemandGrid, ColumnSet, Selection, Keyboard]);
+
+					var ComplexCompoundGrid = declare([OnDemandGrid, CompoundColumns, ColumnSet, Selection, Keyboard]);
 
 					window.gridNoColumnSets = new (declare([OnDemandGrid, Selection, Keyboard]))({
 						store: DeferredWrapper(testStore),
@@ -122,6 +209,11 @@
 						store: DeferredWrapper(testStore),
 						columnSets: columnSets1
 					}, "grid");
+
+					window.gridcscc = new ComplexCompoundGrid({
+						store: DeferredWrapper(testStore),
+						columnSets: ccColumnSets1
+					}, "gridcscc");
 					
 					// hook up buttons for testing setSubRows / setColumnSets
 					on(byId("btnSubRows1"), "click", function(){
@@ -139,6 +231,16 @@
 					});
 					on(byId("btnColumnSets3"), "click", function(){
 						grid.set("columnSets", columnSets3);
+					});
+
+					on(byId("btnCsccColumnSets1"), "click", function(){
+						gridcscc.set("columnSets", ccColumnSets1);
+					});
+					on(byId("btnCsccColumnSets2"), "click", function(){
+						gridcscc.set("columnSets", ccColumnSets2);
+					});
+					on(byId("btnCsccColumnSets3"), "click", function(){
+						gridcscc.set("columnSets", ccColumnSets3);
 					});
 
 					var HtmlGrid = declare([OnDemandGrid, GridFromHtml, Selection, Keyboard]);
@@ -260,5 +362,14 @@
 				</tr>
 			</thead>
 		</table>
+
+		<h2>A Grid with column sets and compound columns</h2>
+		<div id="gridcscc" class="gridcscc"></div>
+		<p>Buttons to test resetting columnSets:
+			<button id="btnCsccColumnSets1">set 1</button>
+			<button id="btnCsccColumnSets2">set 2</button>
+			<button id="btnCsccColumnSets3">set 3</button>
+		</p>
+
 	</body>
 </html>
