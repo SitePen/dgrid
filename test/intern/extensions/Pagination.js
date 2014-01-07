@@ -2,6 +2,7 @@ define([
 	"intern!tdd",
 	"intern/chai!assert",
 	"dojo/_base/declare",
+	"dojo/on",
 	"dojo/query",
 	"dojo/string",
 	"put-selector/put",
@@ -9,7 +10,7 @@ define([
 	"dgrid/extensions/Pagination",
 	"dojo/domReady!",
 	"dgrid/test/data/base"
-], function(test, assert, declare, query, string, put, Grid, Pagination){
+], function(test, assert, declare, on, query, string, put, Grid, Pagination){
 	var grid,
 		handles = [],
 		PaginationGrid = declare([Grid, Pagination]);
@@ -200,9 +201,14 @@ define([
 				initialCount = selector.options.length,
 				targetValue = getNonSelectedValue(selector.options);
 
+			// TODO: this would do better as a functional test;
+			// as-is, we need to emit a change event manually
 			selector.value = targetValue;
+			on.emit(selector, "change", {});
 			assert.strictEqual(selector.value, targetValue,
 				"size select should have expected value " + selector.value);
+			assert.strictEqual(+targetValue, grid.rowsPerPage,
+				"rowsPerPage should have numeric value equivalent to the selected value");
 			verifyOptions(selector.options, initialCount);
 		});
 	});

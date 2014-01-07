@@ -101,14 +101,14 @@ function(declare, lang, Deferred, listen, aspect, query, has, miscUtil, put, has
 			}
 		},
 		columnSets: [],
-		createRowCells: function(tag, each){
+		createRowCells: function(tag, each, subRows, object){
 			var row = put("table.dgrid-row-table");
 			var tr = put(row, "tbody tr");
 			for(var i = 0, l = this.columnSets.length; i < l; i++){
 				// iterate through the columnSets
 				var cell = put(tr, tag + ".dgrid-column-set-cell.dgrid-column-set-" + i +
 					" div.dgrid-column-set[" + colsetidAttr + "=" + i + "]");
-				cell.appendChild(this.inherited(arguments, [tag, each, this.columnSets[i]]));
+				cell.appendChild(this.inherited(arguments, [tag, each, this.columnSets[i], object]));
 			}
 			return row;
 		},

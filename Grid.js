@@ -75,7 +75,7 @@ function(declare, listen, has, put, List, miscUtil){
 			}
 		},
 		
-		createRowCells: function(tag, each, subRows){
+		createRowCells: function(tag, each, subRows, object){
 			// summary:
 			//		Generates the grid for each row (used by renderHeader and and renderRow)
 			var row = put("table.dgrid-row-table[role=presentation]"),
@@ -84,7 +84,8 @@ function(declare, listen, has, put, List, miscUtil){
 				tbody = (has("ie") < 9 || has("quirks")) ? put(row, "tbody") : row,
 				tr,
 				si, sl, i, l, // iterators
-				subRow, column, id, extraClassName, cell, innerCell, colSpan, rowSpan; // used inside loops
+				subRow, column, id, extraClasses, className,
+				cell, innerCell, colSpan, rowSpan; // used inside loops
 			
 			// Allow specification of custom/specific subRows, falling back to
 			// those defined on the instance.
@@ -98,16 +99,23 @@ function(declare, listen, has, put, List, miscUtil){
 				if(subRow.className){
 					put(tr, "." + subRow.className);
 				}
-				
+
 				for(i = 0, l = subRow.length; i < l; i++){
 					// iterate through the columns
 					column = subRow[i];
 					id = column.id;
-					extraClassName = column.className || (column.field && "field-" + column.field);
+
+					extraClasses = column.field ? ".field-" + column.field : "";
+					className = typeof column.className === "function" ?
+						column.className(object) : column.className;
+					if(className){
+						extraClasses += "." + className;
+					}
+
 					cell = put(tag + (
 							".dgrid-cell.dgrid-cell-padding" +
 							(id ? ".dgrid-column-" + id : "") +
-							(extraClassName ? "." + extraClassName : "")
+							extraClasses.replace(/ +/g, ".")
 						).replace(invalidClassChars,"-") +
 						"[role=" + (tag === "th" ? "columnheader" : "gridcell") + "]");
 					cell.columnId = id;
@@ -161,7 +169,7 @@ function(declare, listen, has, put, List, miscUtil){
 				}else{
 					defaultRenderCell.call(column, object, data, td, options);
 				}
-			}, options && options.subRows);
+			}, options && options.subRows, object);
 			// row gets a wrapper div for a couple reasons:
 			//	1. So that one can set a fixed height on rows (heights can't be set on <table>'s AFAICT)
 			// 2. So that outline style can be set on a row when it is focused, and Safari's outline style is broken on <table>

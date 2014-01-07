@@ -12,7 +12,35 @@ The following is a rough list of changes, to be outlined more presentably later.
 * Renamed the `observers` instance property to `_observers`
 * Desupported `selector`'s `disabled` property (use `Selection#allowSelect`)
 
-# master (0.3.12-dev)
+# master (0.3.13-dev)
+
+## Significant changes
+
+### General/Core
+
+* Fixed a long-standing regression in the `util/has-css3` module's
+  `css-transforms3d` test due to a modified classname. (#776, thanks amuraco)
+
+## Other changes and fixes
+
+### General/Core
+
+* Fixed an issue where `sort` would be ignored if it was a function with 0 arity,
+  such as a hitched function being passed to a Memory store. (#771)
+
+### Mixins
+
+* Fixed an issue in `Selection` and `CellSelection` which would cause errors when
+  selecting very long ranges spanning beyond the currently-rendered rows in an
+  OnDemandList. Note that while errors will no longer be thrown, the selection
+  range will still be reset. (#705)
+
+### Extensions
+
+* The `Pagination` extension now includes an Arabic localization bundle.
+  (#770, thanks elombashy)
+
+# 0.3.12
 
 ## Significant changes
 
@@ -21,6 +49,11 @@ The following is a rough list of changes, to be outlined more presentably later.
 * Fixed a regression in `Grid` since 0.3.7 where formatters were run in the
   global context by default instead of in the context of the column definition.
   (#748, thanks mbretter)
+* The `className` column definition property now supports being assigned a
+  function value, in which case the function will be called for each row in the
+  grid (including the header).  For rows in the body, the associated data object
+  (e.g. store item) will be passed, but for the header row, nothing will be
+  passed, so this will need to be handled in the function's logic.
 
 ### Mixins
 
@@ -30,6 +63,12 @@ The following is a rough list of changes, to be outlined more presentably later.
   timing of the events firing has changed.
 * Fixed an issue in `Selection` code flow which caused devices supporting
   MSPointer to behave incorrectly with recent versions of Dojo.
+
+### Extensions
+
+* Fixed a regression in `Pagination` where `rowsPerPage` (and thus also
+  `queryOptions.count`) would be set to a string rather than a number when the
+  page size drop-down is used. (#752)
 
 ## Other changes and fixes
 
@@ -42,6 +81,15 @@ The following is a rough list of changes, to be outlined more presentably later.
 
 * Added logic to `editor` to preserve editor focus when a row is updated
   (particularly useful with always-on editors with autoSave enabled). (#579)
+* Removed a `mousedown` event handler from `editor` which was interfering with
+  certain widget features such as `TextBox#selectOnClick`; this event handler
+  should no longer be necessary. (#704)
+
+### Extensions
+
+* The `ColumnHider` extension's menu trigger node no longer reopens the menu if
+  the menu is already open; it will close it just like clicking anywhere else
+  outside the menu. (#755)
 
 # 0.3.11
 

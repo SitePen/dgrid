@@ -496,6 +496,17 @@ return declare(null, {
 				if(!toRow.element){
 					toRow = this.row(toRow);
 				}
+				
+				if(!toRow){
+					this._lastSelected = element;
+					console.warn("The selection range has been reset because the " +
+						"beginning of the selection is no longer in the DOM. " +
+						"If you are using OnDemandList, you may wish to increase " +
+						"farOffRemoval to avoid this, but note that keeping more nodes " +
+						"in the DOM may impact performance.");
+					return;
+				}
+				
 				toElement = toRow.element;
 				// find if it is earlier or later in the DOM
 				traverser = (toElement && (toElement.compareDocumentPosition ? 

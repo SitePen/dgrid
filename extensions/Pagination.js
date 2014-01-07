@@ -190,7 +190,7 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 					
 					handle = this._paginationSizeChangeHandle =
 						on(paginationSizeSelect, "change", lang.hitch(this, function(){
-							this.set("rowsPerPage", this.paginationSizeSelect.value);
+							this.set("rowsPerPage", +this.paginationSizeSelect.value);
 						}));
 					this._listeners.push(handle);
 				}
