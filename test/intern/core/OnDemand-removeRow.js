@@ -1,6 +1,6 @@
 define([
 	"intern!tdd",
-	"intern/assert",
+	"intern/chai!assert",
 	"dojo/_base/array",
 	"dojo/_base/lang",
 	"dojo/store/Memory",

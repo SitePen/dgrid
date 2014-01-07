@@ -1,6 +1,6 @@
 define([
 	"intern!object",
-	"intern/assert",
+	"intern/chai!assert",
 	"require"
 ], function(test, assert, require){
 	var keys = {

@@ -60,6 +60,10 @@ function(declare, lang, Deferred, listen, aspect, put){
 		//		Defined by _StoreMixin, but to be implemented by subclasses.
 		loadingMessage: "",
 		
+		// cleanEmptyObservers: Boolean
+		//		Whether to clean up observers for empty result sets.
+		cleanEmptyObservers: true,
+		
 		constructor: function(){
 			// Create empty objects on each instance, not the prototype
 			this.query = {};
@@ -373,6 +377,7 @@ function(declare, lang, Deferred, listen, aspect, put){
 			options = options || {};
 			var self = this,
 				start = options.start || 0,
+				observers = this._observers,
 				observer,
 				rows,
 				container,
@@ -455,6 +460,17 @@ function(declare, lang, Deferred, listen, aspect, put){
 				}, true);
 			}
 			
+			function whenError(error) {
+				if(typeof observerIndex !== "undefined"){
+					observers[observerIndex].cancel();
+					observers[observerIndex] = 0;
+					self._numObservers--;
+				}
+				if(error){
+					throw error;
+				}
+			}
+			
 			// Render the results, asynchronously or synchronously
 			return Deferred.when(results, function(resolvedResults){
 				var resolvedRows,
@@ -470,11 +486,15 @@ function(declare, lang, Deferred, listen, aspect, put){
 					
 					if(observer){
 						// Push observer since it will actually be used
-						observerIndex = self._observers.push(observer) - 1;
+						observerIndex = observers.push(observer) - 1;
 						self._numObservers++;
 						while(i--){
 							resolvedRows[i].observerIndex = observerIndex;
 						}
+					}else if(observers[observerIndex] && self.cleanEmptyObservers){
+						// Remove the observer and don't bother inserting;
+						// rows are already out of view or there were none to track
+						whenError();
 					}
 				}else{
 					// Don't bother inserting; rows are already out of view
@@ -482,7 +502,7 @@ function(declare, lang, Deferred, listen, aspect, put){
 					resolvedRows = [];
 				}
 				return (rows = resolvedRows);
-			});
+			}, whenError);
 		},
 		
 		_onNotification: function(rows, object, from, to){

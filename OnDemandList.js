@@ -145,7 +145,8 @@ return declare([List, _StoreMixin], {
 		// Establish query options, mixing in our own.
 		// (The getter returns a delegated object, so simply using mixin is safe.)
 		options = lang.mixin(this.get("queryOptions"), options, 
-			{start: 0, count: this.minRowsPerPage, query: query});
+			{ start: 0, count: this.minRowsPerPage },
+			"level" in query ? { queryLevel: query.level } : null);
 		
 		// Protect the query within a _trackError call, but return the QueryResults
 		this._trackError(function(){ return results = query(options); });
@@ -166,7 +167,9 @@ return declare([List, _StoreMixin], {
 					noDataNode = self.noDataNode;
 				
 				put(loadingNode, "!");
-				self._total = total;
+				if(!("queryLevel" in options)){
+					self._total = total;
+				}
 				// now we need to adjust the height and total count based on the first result set
 				if(total === 0){
 					if(noDataNode){
@@ -305,8 +308,14 @@ return declare([List, _StoreMixin], {
 		//		plugins that add connected elements to a row, like the tree
 		
 		var sibling = rowElement.previousSibling;
-		return sibling && sibling.offsetTop != rowElement.offsetTop ?
-			rowElement.offsetHeight : 0;
+		sibling = sibling && !/\bdgrid-preload\b/.test(sibling.className) && sibling;
+		
+		// If a previous row exists, compare the top of this row with the
+		// previous one (in case "rows" are actually rendering side-by-side).
+		// If no previous row exists, this is either the first or only row,
+		// in which case we count its own height.
+		return sibling ? rowElement.offsetTop - sibling.offsetTop :
+			rowElement.offsetHeight;
 	},
 	
 	lastScrollTop: 0,
@@ -498,11 +507,12 @@ return declare([List, _StoreMixin], {
 				innerNode.innerHTML = grid.loadingMessage;
 				loadingNode.count = count;
 				// use the query associated with the preload node to get the next "page"
-				options.query = preload.query;
+				if("level" in preload.query){
+					options.queryLevel = preload.query.level;
+				}
 				
 				// Avoid spurious queries (ideally this should be unnecessary...)
-				if(options.start > grid._total || options.count < 0){
-					console.log("Skipping query", options, grid._total);
+				if(!("queryLevel" in options) && (options.start > grid._total || options.count < 0)){
 					continue;
 				}
 				
@@ -543,7 +553,9 @@ return declare([List, _StoreMixin], {
 						}
 						
 						Deferred.when(results.total || results.length, function(total){
-							grid._total = total;
+							if(!("queryLevel" in options)){
+								grid._total = total;
+							}
 							if(below){
 								// if it is below, we will use the total from the results to update
 								// the count of the last preload in case the total changes as later pages are retrieved
@@ -600,7 +612,7 @@ return declare([List, _StoreMixin], {
 			}
 
 			// Is this row's observer index different than those on either side?
-			if(thisIndex > -1 && thisIndex !== prevIndex && thisIndex !== nextIndex){
+			if(this.cleanEmptyObservers && thisIndex > -1 && thisIndex !== prevIndex && thisIndex !== nextIndex){
 				// This is the last row that references the observer index.  Cancel the observer.
 				var observers = this._observers;
 				var observer = observers[thisIndex];

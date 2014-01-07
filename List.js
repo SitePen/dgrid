@@ -121,16 +121,16 @@ function(declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 		//		the call to addCssRule, not at the time of destruction.
 		cleanAddedRules: true,
 		
-		// defaultHighlightDelay: Number
-		//		Default delay between applying and removing highlight when
-		//		calling highlightRow.
-		defaultHighlightDelay: 250,
-		
 		// useTouchScroll: Boolean
 		//		If touch support is available, this determines whether to
 		//		incorporate logic from the TouchScroll module (at the expense of
 		//		normal desktop/mouse or native mobile scrolling functionality).
 		useTouchScroll: true,
+
+		// highlightDuration: Integer
+		//		The amount of time (in milliseconds) that a row should remain
+		//		highlighted after it has been updated.
+		highlightDuration: 250,
 		
 		postscript: function(params, srcNodeRef){
 			// perform setup and invoke create in postScript to allow descendants to
@@ -413,7 +413,7 @@ function(declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 			put(rowElement, ".ui-state-highlight");
 			setTimeout(function(){
 				put(rowElement, "!ui-state-highlight");
-			}, delay || this.defaultHighlightDelay);
+			}, delay || this.highlightDuration);
 		},
 		
 		adjustRowIndices: function(firstRow){

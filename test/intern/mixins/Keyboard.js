@@ -1,6 +1,6 @@
 define([
 	"intern!tdd",
-	"intern/assert",
+	"intern/chai!assert",
 	"dgrid/OnDemandList",
 	"dgrid/OnDemandGrid",
 	"dgrid/Keyboard",

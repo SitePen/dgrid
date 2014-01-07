@@ -12,7 +12,92 @@ The following is a rough list of changes, to be outlined more presentably later.
 * Renamed the `observers` instance property to `_observers`
 * Desupported `selector`'s `disabled` property (use `Selection#allowSelect`)
 
-# master (0.3.10-dev)
+# master (0.3.12-dev)
+
+## Significant changes
+
+### General/Core
+
+* Fixed a regression in `Grid` since 0.3.7 where formatters were run in the
+  global context by default instead of in the context of the column definition.
+  (#748, thanks mbretter)
+
+### Mixins
+
+* `Selection` and `CellSelection` now fire `dgrid-select` and `dgrid-deselect`
+  events on the same turn that `select` is called. The events still include
+  `rows` or `cells` containing all rows or cells selected at once; only the
+  timing of the events firing has changed.
+* Fixed an issue in `Selection` code flow which caused devices supporting
+  MSPointer to behave incorrectly with recent versions of Dojo.
+
+## Other changes and fixes
+
+### Mixins
+
+* The `Keyboard` mixin now properly adds/removes header navigation when
+  `set("showHeader", ...)` is called. (#734)
+
+### Column Plugins
+
+* Added logic to `editor` to preserve editor focus when a row is updated
+  (particularly useful with always-on editors with autoSave enabled). (#579)
+
+# 0.3.11
+
+## Significant changes
+
+### General/Core
+
+* Fixed a regression related to `OnDemandList` in conjunction with the `tree`
+  plugin, where queries would not fire due to confusion between different levels.
+  (#717)
+* Fixed a regression related to `List` and `OnDemandList` in conjunction with
+  `tree` by adding a `cleanEmptyObservers` flag, which `tree` will set to false.
+  (#713)
+* Added a `highlightDuration` property to `List` to allow customizing the length
+  of time that rows remain highlighted when modified. (#736, thanks Zarillion)
+
+### Mixins
+
+* Fixed a follow-up issue in `Selection` related to the fix for #226, where
+  deselect events were not firing for removed rows. (#684)
+
+### Column Plugins
+
+* The `tree` column plugin will now include an `originalQuery` property in the
+  `options` object passed to `getChildren`, allowing store implementations to
+  re-apply query filters to queries for child items. (#145, #732)
+
+### Extensions
+
+* The `Pagination` extension now has proper setters for `rowsPerPage` and
+  `pageSizeOptions`.  If `rowsPerPage` is set to a value that is not present in
+  `pageSizeOptions`, an option will be added for the new value.  The drop-down's
+  options will always appear in ascending order. (#631)
+
+## Other changes and fixes
+
+### General/Core
+
+* Fixed an issue in `OnDemandList#_calcRowHeight` to properly calculate height
+  of the first row. (#552)
+* Fixed a compatibility issue in `OnDemandList` and `dojo/store/DataStore` due
+  to a conflicting property in `queryOptions`. (#440)
+
+### Mixins
+
+* Fixed an issue in `Selection` where its select-all keybinding would prevent
+  select-all functionality within text editors. (#711)
+* Fixed an issue in `Selection` where the selection could fall out of sync for
+  an item with a falsy id. (#715)
+
+### Extensions
+
+* The `Pagination` extension will now render its footer controls properly in RTL
+  locales (provided `dgrid_rtl.css` is loaded). (#707)
+
+# 0.3.10
 
 ## Significant changes
 
@@ -31,13 +116,6 @@ The following is a rough list of changes, to be outlined more presentably later.
   issue involving iOS Safari's JavaScript optimization, which was causing
   errors in dgrid.
 
-### Extensions
-
-* Improved accessibility of the `ColumnHider` extension, adding a tab stop for
-  the menu trigger, focusing the first checkbox within the menu when it opens,
-  allowing it to be dismissed by pressing escape (at which time focus returns
-  to the trigger), and adding ARIA role and label to the popup menu itself.
-
 ## Other changes and fixes
 
 ### Mixins
@@ -47,6 +125,13 @@ The following is a rough list of changes, to be outlined more presentably later.
   the currently-rendered area), otherwise the next row will receive focus. (#496)
 * The `editor` column plugin will now return focus to the parent cell when an
   editor is dismissed, if the `Keyboard` mixin is also in use. (#263)
+
+### Extensions
+
+* Improved accessibility of the `ColumnHider` extension, adding a tab stop for
+  the menu trigger, focusing the first checkbox within the menu when it opens,
+  allowing it to be dismissed by pressing escape (at which time focus returns
+  to the trigger), and adding ARIA role and label to the popup menu itself.
 
 # 0.3.9
 
