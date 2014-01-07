@@ -20,9 +20,9 @@ define([
 	// Requirements
 	// * requires a store (sounds obvious, but not all Lists/Grids have stores...)
 	// * must support options.before in put calls
-	//	 (if undefined, put at end)
+	//   (if undefined, put at end)
 	// * should support copy
-	//	 (copy should also support options.before as above)
+	//   (copy should also support options.before as above)
 	
 	// TODOs
 	// * consider sending items rather than nodes to onDropExternal/Internal
@@ -63,7 +63,7 @@ define([
 			
 			Deferred.when(targetRow && store.get(targetRow.id), function(target){
 				// Note: if dropping after the last row, or into an empty grid,
-				// target will be undefined.	Thus, it is important for store to place
+				// target will be undefined.  Thus, it is important for store to place
 				// item last in order if options.before is undefined.
 				
 				// Delegate to onDropInternal or onDropExternal for rest of logic.
@@ -123,7 +123,7 @@ define([
 			var self = this;
 
 			// Note: this default implementation expects that two grids do not
-			// share the same store.	There may be more ideal implementations in the
+			// share the same store.  There may be more ideal implementations in the
 			// case of two grids using the same store (perhaps differentiated by
 			// query), dragging to each other.
 			var store = this.grid.store,
