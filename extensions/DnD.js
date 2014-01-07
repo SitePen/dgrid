@@ -1,3 +1,4 @@
+
 define([
 	"dojo/_base/declare",
 	"dojo/_base/lang",
@@ -19,9 +20,9 @@ define([
 	// Requirements
 	// * requires a store (sounds obvious, but not all Lists/Grids have stores...)
 	// * must support options.before in put calls
-	//   (if undefined, put at end)
+	//	 (if undefined, put at end)
 	// * should support copy
-	//   (copy should also support options.before as above)
+	//	 (copy should also support options.before as above)
 	
 	// TODOs
 	// * consider sending items rather than nodes to onDropExternal/Internal
@@ -62,7 +63,7 @@ define([
 			
 			Deferred.when(targetRow && store.get(targetRow.id), function(target){
 				// Note: if dropping after the last row, or into an empty grid,
-				// target will be undefined.  Thus, it is important for store to place
+				// target will be undefined.	Thus, it is important for store to place
 				// item last in order if options.before is undefined.
 				
 				// Delegate to onDropInternal or onDropExternal for rest of logic.
@@ -99,44 +100,94 @@ define([
 					// For copy DnD operations, copy object, if supported by store;
 					// otherwise settle for put anyway.
 					// (put will relocate an existing item with the same id, i.e. move).
-					store[copy && store.copy ? "copy" : "put"](object, {
+					Deferred.when(store[copy && store.copy ? "copy" : "put"](object, {
 						before: targetItem
+					})).then( function(e){ return(e) }, function(err){
+
+						if( on.emit(destGrid.domNode, "dgrid-error", {
+							grid: destGrid,
+							error: err,
+							cancelable: true,
+							bubbles: true })){
+							console.error(err);
+						}
+						throw( err );
 					});
+
+
 				});
 			});
 		},
 		onDropExternal: function(sourceSource, nodes, copy, targetItem){
+
+			var self = this;
+
 			// Note: this default implementation expects that two grids do not
-			// share the same store.  There may be more ideal implementations in the
+			// share the same store.	There may be more ideal implementations in the
 			// case of two grids using the same store (perhaps differentiated by
 			// query), dragging to each other.
 			var store = this.grid.store,
-				sourceGrid = sourceSource.grid;
+				sourceGrid = sourceSource.grid,
+				destGrid = this.grid;
+			
 			
 			// TODO: bail out if sourceSource.getObject isn't defined?
 			nodes.forEach(function(node, i){
 				Deferred.when(sourceSource.getObject(node), function(object){
-					if(!copy){
-						if(sourceGrid){
-							// Remove original in the case of inter-grid move.
-							// (Also ensure dnd source is cleaned up properly)
-							Deferred.when(sourceGrid.store.getIdentity(object), function(id){
-								!i && sourceSource.selectNone(); // deselect all, one time
-								sourceSource.delItem(node.id);
-								sourceGrid.store.remove(id);
-							});
-						}else{
-							sourceSource.deleteSelectedNodes();
-						}
-					}
+
 					// Copy object, if supported by store; otherwise settle for put
 					// (put will relocate an existing item with the same id).
 					// Note that we use store.copy if available even for non-copy dnd:
 					// since this coming from another dnd source, always behave as if
 					// it is a new store item if possible, rather than replacing existing.
-					store[store.copy ? "copy" : "put"](object, {
+			
+					Deferred.when(store[store.copy ? "copy" : "put"](object, {
 						before: targetItem
-					});
+					})).then(
+						function(e){ 
+
+							if(!copy){
+								if(sourceGrid){
+									// Remove original in the case of inter-grid move.
+									// (Also ensure dnd source is cleaned up properly)
+									Deferred.when(sourceGrid.store.getIdentity(object), function(id){
+										!i && sourceSource.selectNone(); // deselect all, one time
+										sourceSource.delItem(node.id);
+										Deferred.when( sourceGrid.store.remove(id) ).then(
+											function(e){ return(e) },
+											function(err){
+												if( on.emit(destGrid.domNode, "dgrid-error", {
+													grid: destGrid,
+													error: err,
+													cancelable: true,
+													bubbles: true })){
+													console.error(err);
+												}
+												throw(err);
+											}
+										);
+
+									});
+								}else{
+									sourceSource.deleteSelectedNodes();
+								}
+							}
+
+							return(e) 
+						},
+						function(err){
+
+							if( on.emit(destGrid.domNode, "dgrid-error", {
+								grid: destGrid,
+								error: err,
+								cancelable: true,
+								bubbles: true })){
+								console.error(err);
+							}
+							throw( err );
+						}
+					);
+
 				});
 			});
 		},
