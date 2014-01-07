@@ -49,11 +49,11 @@ function(kernel, declare, lang, Deferred, listen, aspect, query, has, miscUtil, 
 		}
 		var subset = [];
 		var idPrefix = columnSetId + "-";
-		for(var i = 0, lRows = subRows.length; i < lRows; i++){
+		for(var i = 0, numRows = subRows.length; i < numRows; i++){
 			var row = subRows[i];
 			var subsetRow = [];
 			subsetRow.className = row.className;
-			for(var k = 0, lCols = row.length; k < lCols; k++){
+			for(var k = 0, numCols = row.length; k < numCols; k++){
 				var column = row[k];
 				// The column id begins with the column set id.
 				if(column.id != null && column.id.indexOf(idPrefix) === 0){
