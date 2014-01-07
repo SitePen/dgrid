@@ -48,13 +48,15 @@ function(kernel, declare, lang, Deferred, listen, aspect, query, has, miscUtil, 
 			return;
 		}
 		var subset = [];
+		var idPrefix = columnSetId + "-";
 		for(var i = 0, lRows = subRows.length; i < lRows; i++){
 			var row = subRows[i];
 			var subsetRow = [];
 			subsetRow.className = row.className;
 			for(var k = 0, lCols = row.length; k < lCols; k++){
 				var column = row[k];
-				if(column.columnSetId === columnSetId){
+				// The column id begins with the column set id.
+				if(column.id != null && column.id.indexOf(idPrefix) === 0){
 					subsetRow.push(column);
 				}
 			}
@@ -212,32 +214,14 @@ function(kernel, declare, lang, Deferred, listen, aspect, query, has, miscUtil, 
 		},
 
 		configStructure: function(){
-			// Combine the column sets into one column config so the other extensions can do their thing.
-			function columnSetIdFn(columnSetId){
-				// Returns a function that adds a column set id property to
-				// each column definition.  The column set id property is also
-				// added to all of the child column definitions.  This id property is needed so
-				// createRowCells can figure out which cells are in which column sets.
-				function setColumnSetId(column){
-					column.columnSetId = i;
-					if(column.children){
-						miscUtil.each(column.children, setColumnSetId);
-					}
-				}
-
-				return setColumnSetId;
-			}
-
 			// Squash the column sets together so the grid and other dgrid extensions and mixins can
-			// properly configure the columns and create any needed subrows.  Later in createRowCells,
-			// the column set definitions will be used to group columns together.
+			// configure the columns and create any needed subrows.
 			this.columns = {};
 			this.subRows = [];
 			for(var i = 0, l = this.columnSets.length; i < l; i++){
 				var columnSet = this.columnSets[i];
 				for(var j = 0; j < columnSet.length; j++){
 					columnSet[j] = this._configColumns(i + "-" + j + "-", columnSet[j]);
-					miscUtil.each(columnSet[j], columnSetIdFn(i), this);
 				}
 			}
 			this.inherited(arguments);
