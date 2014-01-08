@@ -101,7 +101,8 @@ define([
 					// otherwise settle for put anyway.
 					// (put will relocate an existing item with the same id, i.e. move).
 					Deferred.when(store[copy && store.copy ? "copy" : "put"](object, {
-						before: targetItem
+						before: targetItem || null,
+						relocation: true
 					})).then( function(e){ return(e) }, function(err){
 
 						if( on.emit(destGrid.domNode, "dgrid-error", {
@@ -142,7 +143,7 @@ define([
 					// it is a new store item if possible, rather than replacing existing.
 			
 					Deferred.when(store[store.copy ? "copy" : "put"](object, {
-						before: targetItem
+						before: targetItem || null
 					})).then(
 						function(e){ 
 
