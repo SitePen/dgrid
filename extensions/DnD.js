@@ -105,8 +105,8 @@ define([
 						relocation: true
 					})).then( function(e){ return(e) }, function(err){
 
-						if( on.emit(destGrid.domNode, "dgrid-error", {
-							grid: destGrid,
+						if( on.emit(grid.domNode, "dgrid-error", {
+							grid: grid,
 							error: err,
 							cancelable: true,
 							bubbles: true })){
