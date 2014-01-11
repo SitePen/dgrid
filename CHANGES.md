@@ -9,6 +9,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 * Added logic to account for `dojo/store/Observable`'s propensity to drop items
   at page boundaries, primarily in the `List` module. (#701, #714)
+* Items added to stores which should appear at the end of a list or grid will now
+  appear correctly. (#363)
 * Fixed a long-standing regression in the `util/has-css3` module's
   `css-transforms3d` test due to a modified classname. (#776, thanks amuraco)
 
