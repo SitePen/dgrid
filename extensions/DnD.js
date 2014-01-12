@@ -157,8 +157,8 @@ define([
 										Deferred.when( sourceGrid.store.remove(id) ).then(
 											function(e){ return(e) },
 											function(err){
-												if( on.emit(destGrid.domNode, "dgrid-error", {
-													grid: destGrid,
+												if( on.emit(sourceGrid.domNode, "dgrid-error", {
+													grid: sourceGrid,
 													error: err,
 													cancelable: true,
 													bubbles: true })){
