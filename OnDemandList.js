@@ -144,7 +144,7 @@ return declare([List, _StoreMixin], {
 
 		// Establish query options, mixing in our own.
 		// (The getter returns a delegated object, so simply using mixin is safe.)
-		options = lang.mixin(this.get("queryOptions"), options, 
+		options = lang.mixin(options,
 			{ start: 0, count: this.minRowsPerPage },
 			"level" in query ? { queryLevel: query.level } : null);
 		
@@ -242,13 +242,13 @@ return declare([List, _StoreMixin], {
 		if(keep){ this._previousScrollPosition = this.getScrollPosition(); }
 		
 		this.inherited(arguments);
-		if(this.store){
+		if(this.collection){
 			// render the query
 			dfd = this._refreshDeferred = new Deferred();
 			
 			// renderQuery calls _trackError internally
 			results = self.renderQuery(function(queryOptions){
-				return self.store.query(self.query, queryOptions);
+				return self.collection.range(queryOptions.start, queryOptions.start + queryOptions.count);
 			});
 			if(typeof results === "undefined"){
 				// Synchronous error occurred; reject the refresh promise.
@@ -522,6 +522,7 @@ return declare([List, _StoreMixin], {
 				// Keep _trackError-wrapped results separate, since if results is a
 				// promise, it will lose QueryResults functions when chained by `when`
 				var results = preload.query(options),
+					// TODO: Is there any need for trackedResults now?
 					trackedResults = grid._trackError(function(){ return results; });
 				
 				if(trackedResults === undefined){
@@ -590,43 +591,6 @@ return declare([List, _StoreMixin], {
 				refreshDfd.resolve(lastResults);
 			});
 		}
-	},
-
-	removeRow: function(rowElement, justCleanup){
-		function chooseIndex(index1, index2){
-			return index1 != null ? index1 : index2;
-		}
-
-		if(rowElement){
-			// Clean up observers that need to be cleaned up.
-			var previousNode = rowElement.previousSibling,
-				nextNode = rowElement.nextSibling,
-				prevIndex = previousNode && chooseIndex(previousNode.observerIndex, previousNode.previousObserverIndex),
-				nextIndex = nextNode && chooseIndex(nextNode.observerIndex, nextNode.nextObserverIndex),
-				thisIndex = rowElement.observerIndex;
-
-			// Clear the observerIndex on the node being removed so it will not be considered any longer.
-			rowElement.observerIndex = undefined;
-			if(justCleanup){
-				// Save the indexes from the siblings for future calls to removeRow.
-				rowElement.nextObserverIndex = nextIndex;
-				rowElement.previousObserverIndex = prevIndex;
-			}
-
-			// Is this row's observer index different than those on either side?
-			if(this.cleanEmptyObservers && thisIndex > -1 && thisIndex !== prevIndex && thisIndex !== nextIndex){
-				// This is the last row that references the observer index.  Cancel the observer.
-				var observers = this._observers;
-				var observer = observers[thisIndex];
-				if(observer){
-					observer.cancel();
-					this._numObservers--;
-					observers[thisIndex] = 0; // remove it so we don't call cancel twice
-				}
-			}
-		}
-		// Finish the row removal.
-		this.inherited(arguments);
 	}
 });
 

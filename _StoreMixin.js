@@ -30,19 +30,12 @@ function(declare, lang, Deferred, listen, aspect, put){
 	}
 	
 	return declare(null, {
-		// store: Object
-		//		The object store (implementing the dojo/store API) from which data is
+		// collection: Object
+		//		The object collection (implementing the dstore/api/Store API) from which data is
 		//		to be fetched.
-		store: null,
-		
-		// query: Object
-		//		Specifies query parameter(s) to pass to store.query calls.
-		query: null,
-		
-		// queryOptions: Object
-		//		Specifies additional query options to mix in when calling store.query;
-		//		sort, start, and count are already handled.
-		queryOptions: null,
+		collection: null,
+
+		rows: null,
 		
 		// getBeforePut: boolean
 		//		If true, a get request will be performed to the store before each put
@@ -50,7 +43,7 @@ function(declare, lang, Deferred, listen, aspect, put){
 		getBeforePut: true,
 		
 		// noDataMessage: String
-		//		Message to be displayed when no results exist for a query, whether at
+		//		Message to be displayed when no results exist for a collection, whether at
 		//		the time of the initial query or upon subsequent observed changes.
 		//		Defined by _StoreMixin, but to be implemented by subclasses.
 		noDataMessage: "",
@@ -60,19 +53,11 @@ function(declare, lang, Deferred, listen, aspect, put){
 		//		Defined by _StoreMixin, but to be implemented by subclasses.
 		loadingMessage: "",
 		
-		// cleanEmptyObservers: Boolean
-		//		Whether to clean up observers for empty result sets.
-		cleanEmptyObservers: true,
-		
 		constructor: function(){
 			// Create empty objects on each instance, not the prototype
-			this.query = {};
-			this.queryOptions = {};
 			this.dirty = {};
 			this._updating = {}; // Tracks rows that are mid-update
 			this._columnsWithSet = {};
-			this._observers = [];
-			this._numObservers = 0;
 
 			// Reset _columnsWithSet whenever column configuration is reset
 			aspect.before(this, "configStructure", lang.hitch(this, function(){
@@ -80,18 +65,16 @@ function(declare, lang, Deferred, listen, aspect, put){
 			}));
 		},
 		
-		postCreate: function(){
+		// TODO: What should be done about specifying `collection` in the constructor kwArgs
+		postscript: function(kwArgs){
 			this.inherited(arguments);
-			if(this.store){
-				this._updateNotifyHandle(this.store);
-			}
+			this.collection && this.set('collection', this.collection);
 		},
 		
 		destroy: function(){
 			this.inherited(arguments);
-			if(this._notifyHandle){
-				this._notifyHandle.remove();
-			}
+
+			// TODO: Remove observer if any
 		},
 		
 		_configColumn: function(column){
@@ -104,66 +87,41 @@ function(declare, lang, Deferred, listen, aspect, put){
 			this.inherited(arguments);
 		},
 		
-		_updateNotifyHandle: function(store){
+		_setCollection: function(collection){
 			// summary:
-			//		Unhooks any previously-existing store.notify handle, and
-			//		hooks up a new one for the given store.
-			
-			if(this._notifyHandle){
-				// Unhook notify handler from previous store
-				this._notifyHandle.remove();
-				delete this._notifyHandle;
-			}
-			if(store && typeof store.notify === "function"){
-				this._notifyHandle = aspect.after(store, "notify",
-					lang.hitch(this, "_onNotify"), true);
-			}
-		},
-		
-		_setStore: function(store, query, queryOptions){
-			// summary:
-			//		Assigns a new store (and optionally query/queryOptions) to the list,
+			//		Assigns a new collection to the list,
 			//		and tells it to refresh.
 			
-			this._updateNotifyHandle(store);
+			// Remove observer and existing rows so any sub-row observers will be cleaned up
+			if(this._observerHandle){
+				this._observerHandle.remove();
+				this._observerHandle = this.rows = null;
+			}
+			this.cleanup();
+
+			this.dirty = {}; // discard dirty map, as it applied to a previous collection
 			
-			this.store = store;
-			this.dirty = {}; // discard dirty map, as it applied to a previous store
-			this.set("query", query, queryOptions);
-		},
-		_setQuery: function(query, queryOptions){
-			// summary:
-			//		Assigns a new query (and optionally queryOptions) to the list,
-			//		and tells it to refresh.
+			if(collection.track){
+				this.collection = collection.track();
+				this.rows = [];
 			
-			var sort = queryOptions && queryOptions.sort;
+				// TODO: How is the total number of items tracked?
+				// TODO: Should total include or consider the number of visible child nodes?
+				this._observerHandle = this._observeCollection(this.collection, this.contentNode, this.rows);
+			}else{
+				this.collection = collection;
+			}
 			
-			this.query = query !== undefined ? query : this.query;
-			this.queryOptions = queryOptions || this.queryOptions;
+			collection.on("refresh", lang.hitch(this, "refresh"));
 			
 			// If we have new sort criteria, pass them through the sort setter
 			// (which call refresh in itself).  Otherwise, just refresh.
-			sort ? this.set("sort", sort) : this.refresh();
-		},
-		
-		_getQueryOptions: function(){
-			// summary:
-			//		Get a fresh queryOptions object, also including the current sort
-			var options = lang.delegate(this.queryOptions, {});
-			if(typeof(this.sort) === "function" || this.sort.length){
-				// Prevents SimpleQueryEngine from doing unnecessary "null" sorts (which can
-				// change the ordering in browsers that don't use a stable sort algorithm, eg Chrome)
-				options.sort = this.sort;
+			// TODO: Are there any legitimate cases where this.sort will be falsy and you want to set it?
+			if(this.sort){
+				this.set('sort', this.sort);
+			}else{
+				this.refresh();
 			}
-			return options;
-		},
-		_getQuery: function(){
-			// summary:
-			//		Implemented consistent with _getQueryOptions so that if query is
-			//		an object, this returns a protected (delegated) object instead of
-			//		the original.
-			var q = this.query;
-			return typeof q == "object" && q != null ? lang.delegate(q, {}) : q;
 		},
 		
 		_setSort: function(property, descending){
@@ -171,21 +129,11 @@ function(declare, lang, Deferred, listen, aspect, put){
 			//		Sort the content
 			
 			// prevent default storeless sort logic as long as we have a store
-			if(this.store){ this._lastCollection = null; }
+			if(this.collection){ this._lastCollection = null; }
 			this.inherited(arguments);
-		},
 		
-		_onNotify: function(object, existingId){
-			// summary:
-			//		Method called when the store's notify method is called.
-			
-			// Call inherited in case anything was mixed in earlier
-			this.inherited(arguments);
-			
-			// For adds/puts, check whether any observers are hooked up;
-			// if not, force a refresh to properly hook one up now that there is data
-			if(object && this._numObservers < 1){
-				this.refresh({ keepScrollPosition: true });
+			if(this.sort){
+				this.collection && this.collection.sort(this.sort);
 			}
 		},
 		
@@ -193,13 +141,13 @@ function(declare, lang, Deferred, listen, aspect, put){
 			// Extend List#row with more appropriate lookup-by-id logic
 			var row = this.inherited(arguments);
 			if(row && row.data && typeof row.id !== "undefined"){
-				row.id = this.store.getIdentity(row.data);
+				row.id = this.collection.getIdentity(row.data);
 			}
 			return row;
 		},
 		
 		insertRow: function(object, parent, beforeNode, i, options){
-			var store = this.store,
+			var store = this.collection,
 				dirty = this.dirty,
 				id = store && store.getIdentity(object),
 				dirtyObj,
@@ -240,7 +188,7 @@ function(declare, lang, Deferred, listen, aspect, put){
 		save: function() {
 			// Keep track of the store and puts
 			var self = this,
-				store = this.store,
+				store = this.collection,
 				dirty = this.dirty,
 				dfd = new Deferred(), promise = dfd.promise,
 				getFunc = function(id){
@@ -352,23 +300,7 @@ function(declare, lang, Deferred, listen, aspect, put){
 			return this.inherited(arguments);
 		},
 		
-		cleanup: function(){
-			var observers = this._observers,
-				observer;
-			
-			this.inherited(arguments);
-			
-			// Remove any store observers
-			for(i = 0; i < observers.length; i++){
-				observer = observers[i];
-				if(observer){
-					observer.cancel();
-				}
-			}
-			this._observers = [];
-			this._numObservers = 0;
-		},
-		
+		// TODO: We probably want to rename this to renderCollection
 		renderQueryResults: function(results, beforeNode, options){
 			// summary:
 			//		Renders objects from QueryResults as rows, before the given node.
@@ -378,40 +310,71 @@ function(declare, lang, Deferred, listen, aspect, put){
 			options = options || {};
 			var self = this,
 				start = options.start || 0,
-				observers = this._observers,
-				observer,
-				rows,
-				container,
-				observerIndex;
+				rows = options.rows || this.rows,
+				container;
 			
-			if(results.observe){
-				observer = results.observe(function(object, from, to){
-					var row, firstRow, nextNode, parentNode;
+			// Render the results, asynchronously or synchronously
+			return Deferred.when(results.fetch(), function(resolvedResults){
+				var resolvedRows,
+					i;
 					
-					function advanceNext() {
-						nextNode = (nextNode.connected || nextNode).nextSibling;
+				container = beforeNode ? beforeNode.parentNode : self.contentNode;
+				if(container && container.parentNode &&
+						(container !== self.contentNode || resolvedResults.length)){
+					resolvedRows = self.renderArray(resolvedResults, beforeNode, options);
+					i = resolvedRows.length;
+
+					if(rows){
+						for (var itemIndex = 0; itemIndex < resolvedRows.length; ++itemIndex){
+							rows[start + itemIndex] = resolvedRows[itemIndex];
+						}
 					}
 					
-					// a change in the data took place
-					if(from > -1 && rows[from]){
+					delete self._lastCollection; // used only for non-store List/Grid
+				}else{
+					// TODO: _StoreMixin shouldn't have a concept of "out of view"
+
+					// Don't bother inserting; rows are already out of view
+					// or there were none to track
+					resolvedRows = [];
+				}
+				return resolvedRows;
+			});
+		},
+
+		_observeCollection: function(collection, container, rows){
+			var self = this, row;
+
+			var handles = [
+				collection.on("remove, update", function(event){
+					var from = event.previousIndex;
+					if(from !== undefined && rows[from]){
 						// remove from old slot
 						row = rows.splice(from, 1)[0];
+
+						// adjust the rowIndex so adjustRowIndices has the right starting point
+						rows[from] && rows[from].rowIndex--;
+
 						// check to make the sure the node is still there before we try to remove it, (in case it was moved to a different place in the DOM)
 						if(row.parentNode == container){
-							firstRow = row.nextSibling;
-							if(firstRow){ // it's possible for this to have been already removed if it is in overlapping query results
-								if(from != to){ // if from and to are identical, it is an in-place update and we don't want to alter the rowIndex at all
-									firstRow.rowIndex--; // adjust the rowIndex so adjustRowIndices has the right starting point
-								}
-							}
 							self.removeRow(row); // now remove
 						}
+
 						// the removal of rows could cause us to need to page in more items
 						if(self._processScroll){
 							self._processScroll();
 						}
 					}
-					if(to > -1){
+				}),
+
+				collection.on("add, update", function(event){
+					var to = event.index, nextNode;
+
+					function advanceNext() {
+						nextNode = (nextNode.connected || nextNode).nextSibling;
+					}
+
+					if(to !== undefined){
 						// Add to new slot (either before an existing row, or at the end)
 						// First determine the DOM node that this should be placed before.
 						if(rows.length){
@@ -427,7 +390,8 @@ function(declare, lang, Deferred, listen, aspect, put){
 						}else{
 							// There are no rows.  Allow for subclasses to insert new rows somewhere other than
 							// at the end of the parent node.
-							nextNode = self._getFirstRowSibling && self._getFirstRowSibling(container);
+							// TODO: This seems generally useful. Why not move _getFirstRowSibling to List?
+							nextNode = /*self._getFirstRowSibling &&*/ self._getFirstRowSibling(container);
 						}
 						// Make sure we don't trip over a stale reference to a
 						// node that was removed, or try to place a node before
@@ -438,78 +402,36 @@ function(declare, lang, Deferred, listen, aspect, put){
 						if(nextNode && !nextNode.parentNode){
 							nextNode = document.getElementById(nextNode.id);
 						}
-						parentNode = (beforeNode && beforeNode.parentNode) ||
-							(nextNode && nextNode.parentNode) || self.contentNode;
-						row = self.insertRow(object, parentNode, nextNode, options.start + to, options);
+						// TODO: What to do about this? Is this necessary?
+						//parentNode = (beforeNode && beforeNode.parentNode) ||
+						//	(nextNode && nextNode.parentNode) || self.contentNode;
+						// TODO: What do we need from options?
+						row = self.insertRow(event.target, container, nextNode, to, /*options*/ {});
 						self.highlightRow(row);
 						
+						// TODO: When would row be falsy?
 						if(row){
-							row.observerIndex = observerIndex;
 							rows.splice(to, 0, row);
-							if(!firstRow || to < from){
-								// the inserted row is first, so we update firstRow to point to it
-								var previous = row.previousSibling;
-								// if we are not in sync with the previous row, roll the firstRow back one so adjustRowIndices can sync everything back up.
-								firstRow = !previous || previous.rowIndex + 1 == row.rowIndex || row.rowIndex == 0 ?
-									row : previous;
-							}
 						}
-						options.count++;
 					}
-					from != to && firstRow && self.adjustRowIndices(firstRow);
-					self._onNotification(rows, object, from, to);
-				}, true);
-			}
-			
-			function whenError(error) {
-				if(typeof observerIndex !== "undefined"){
-					observers[observerIndex].cancel();
-					observers[observerIndex] = 0;
-					self._numObservers--;
-				}
-				if(error){
-					throw error;
-				}
-			}
-			
-			// Render the results, asynchronously or synchronously
-			return Deferred.when(results, function(resolvedResults){
-				var resolvedRows,
-					i;
-				
-				container = beforeNode ? beforeNode.parentNode : self.contentNode;
-				if(container && container.parentNode &&
-						(container !== self.contentNode || resolvedResults.length)){
-					resolvedRows = self.renderArray(resolvedResults, beforeNode, options);
-					i = resolvedRows.length;
-					
-					delete self._lastCollection; // used only for non-store List/Grid
-					
-					if(observer){
-						// Push observer since it will actually be used
-						observerIndex = observers.push(observer) - 1;
-						self._numObservers++;
-						while(i--){
-							resolvedRows[i].observerIndex = observerIndex;
-						}
-					}else if(observers[observerIndex] && self.cleanEmptyObservers){
-						// Remove the observer and don't bother inserting;
-						// rows are already out of view or there were none to track
-						whenError();
+				}),
+
+				// TODO: Should the event names be the same as the store CRUD method names?
+				collection.on("add, remove, update", function(event){
+					var from = event.previousIndex || Infinity,
+						to = event.index || Infinity,
+						adjustAtIndex = Math.min(from, to);
+					from !== to && rows[adjustAtIndex] && self.adjustRowIndices(rows[adjustAtIndex]);
+				})
+			];
+
+			return {
+				remove: function(){
+					while(handles.length > 0){
+						handles.pop().remove();
 					}
-				}else{
-					// Don't bother inserting; rows are already out of view
-					// or there were none to track
-					resolvedRows = [];
 				}
-				return (rows = resolvedRows);
-			}, whenError);
+			};
 		},
-		
-		_onNotification: function(rows, object, from, to){
-			// summary:
-			//		Protected method called whenever a store notification is observed.
-			//		Intended to be extended as necessary by mixins/extensions.
-		}
 	});
 });

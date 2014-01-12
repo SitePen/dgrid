@@ -741,23 +741,23 @@ function(declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 			//		Sort the content
 			// property: String|Array
 			//		String specifying field to sort by, or actual array of objects
-			//		with attribute and descending properties
+			//		with property and descending properties
 			// descending: boolean
 			//		In the case where property is a string, this argument
 			//		specifies whether to sort ascending (false) or descending (true)
 			
 			this.sort = typeof property != "string" ? property :
-				[{attribute: property, descending: descending}];
+				[{property: property, descending: descending}];
 			
 			this.refresh();
 			
 			if(this._lastCollection){
 				if(property.length){
-					// if an array was passed in, flatten to just first sort attribute
+					// if an array was passed in, flatten to just first sort property
 					// for default array sort logic
 					if(typeof property != "string"){
 						descending = property[0].descending;
-						property = property[0].attribute;
+						property = property[0].property;
 					}
 					
 					this._lastCollection.sort(function(a,b){
@@ -800,6 +800,15 @@ function(declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 			put(this.footerNode, (show ? "!" : ".") + "dgrid-footer-hidden");
 			
 			this.resize(); // to account for (dis)appearance of footer
-		}
+		},
+
+		_getFirstRowSibling: function(container){
+			// summary:
+			//		Returns the DOM node that a new row should be inserted before
+			//		when there are no other rows in the current result set.
+			//		In the case of OnDemandList, this will always be the last child
+			//		of the container (which will be a trailing preload node).
+			return container.lastChild;
+		},
 	});
 });

@@ -232,8 +232,8 @@ function(declare, listen, has, put, List, miscUtil){
 							// If the click is on the same column as the active sort,
 							// reverse sort direction
 							newSort = [{
-								attribute: (field = target.field || target.columnId),
-								descending: (sort = grid.sort[0]) && sort.attribute == field &&
+								property: (field = target.field || target.columnId),
+								descending: (sort = grid.sort[0]) && sort.property == field &&
 									!sort.descending
 							}];
 							
@@ -314,8 +314,8 @@ function(declare, listen, has, put, List, miscUtil){
 			//		by reacting to the dgrid-sort event, canceling it, then
 			//		performing logic and calling this manually).
 			// sort: Array
-			//		Standard sort parameter - array of object(s) containing attribute
-			//		and optionally descending property
+			//		Standard sort parameter - array of object(s) containing property name
+			//		and optional descending flag
 			// updateSort: Boolean?
 			//		If true, will update this.sort based on the passed sort array
 			//		(i.e. to keep it in sync when custom logic is otherwise preventing
@@ -333,7 +333,7 @@ function(declare, listen, has, put, List, miscUtil){
 			if(updateSort){ this.sort = sort; }
 			if(!sort[0]){ return; } // nothing to do if no sort is specified
 			
-			var prop = sort[0].attribute,
+			var prop = sort[0].property,
 				desc = sort[0].descending,
 				target = this._sortNode, // stashed if invoked from header click
 				columns, column, i;
