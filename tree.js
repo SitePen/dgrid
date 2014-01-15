@@ -227,9 +227,7 @@ function tree(column){
 					// Add the query to the promise chain.
 					promise = promise.then(function(){
 						return grid.renderQuery ?
-							grid._trackError(function(){
-								return grid.renderQuery(query, preloadNode, options);
-							}) :
+							grid.renderQuery(query, preloadNode, options) :
 							grid.renderArray(query(options), preloadNode,
 								"level" in query ? { queryLevel: query.level } : {});
 					}).then(function(){
