@@ -8,5 +8,6 @@ define([
 	'intern/node_modules/dojo/has!host-browser?./core/stores',
 	'intern/node_modules/dojo/has!host-browser?./core/_StoreMixin',
 	'intern/node_modules/dojo/has!host-browser?./core/OnDemand-removeRow',
+	'intern/node_modules/dojo/has!host-browser?./core/tree-expand-promise',
 	'intern/node_modules/dojo/has!host-browser?./extensions/Pagination'
 ], function(){});
