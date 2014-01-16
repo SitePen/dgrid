@@ -75,12 +75,27 @@ define([
 				}
 			});
 		},
+
+		_emitEventForGrid: function( grid, eventName, err ){
+      var opt = { cancelable: true, bubbles: true, grid: grid };
+      if( err ){
+				opt.error = err;
+	  		if( on.emit(grid.domNode, eventName, opt )){
+					console.error(err);
+				} 
+			} else {
+				on.emit( grid.domNode, eventName, opt );
+			}
+    },
+
 		onDropInternal: function(nodes, copy, targetItem){
 			var store = this.grid.store,
 				targetSource = this,
 				grid = this.grid,
 				anchor = targetSource._targetAnchor,
 				targetRow;
+
+      var self = this;
 			
 			if(anchor){ // (falsy if drop occurred in empty space after rows)
 				targetRow = this.before ? anchor.previousSibling : anchor.nextSibling;
@@ -96,24 +111,27 @@ define([
 			}
 			
 			nodes.forEach(function(node){
+				self._emitEventForGrid( grid, "dgrid-drop-started" );
+
 				Deferred.when(targetSource.getObject(node), function(object){
 					// For copy DnD operations, copy object, if supported by store;
 					// otherwise settle for put anyway.
 					// (put will relocate an existing item with the same id, i.e. move).
+
 					Deferred.when(store[copy && store.copy ? "copy" : "put"](object, {
 						before: targetItem || null,
 						relocation: true
-					})).then( function(e){ return(e) }, function(err){
-
-						if( on.emit(grid.domNode, "dgrid-error", {
-							grid: grid,
-							error: err,
-							cancelable: true,
-							bubbles: true })){
-							console.error(err);
+					})).then(
+						function(e){ 
+							self._emitEventForGrid(grid, "dgrid-drop-completed");
+							return(e) 
+						},
+						function(err){
+							self._emitEventForGrid(grid, "dgrid-drop-failed", err);
+							self._emitEventForGrid(grid, "dgrid-error", err);
+							throw( err );
 						}
-						throw( err );
-					});
+					);
 
 
 				});
@@ -134,62 +152,79 @@ define([
 			
 			// TODO: bail out if sourceSource.getObject isn't defined?
 			nodes.forEach(function(node, i){
-				Deferred.when(sourceSource.getObject(node), function(object){
 
-					// Copy object, if supported by store; otherwise settle for put
-					// (put will relocate an existing item with the same id).
-					// Note that we use store.copy if available even for non-copy dnd:
-					// since this coming from another dnd source, always behave as if
-					// it is a new store item if possible, rather than replacing existing.
+				if(sourceGrid && !copy){
+					self._emitEventForGrid(sourceGrid, "dgrid-drop-removal-started");
+				}
+				self._emitEventForGrid(destGrid, "dgrid-drop-started");
+
+				Deferred.when(sourceSource.getObject(node),
+					function(object){
+
+						// Copy object, if supported by store; otherwise settle for put
+						// (put will relocate an existing item with the same id).
+						// Note that we use store.copy if available even for non-copy dnd:
+						// since this coming from another dnd source, always behave as if
+						// it is a new store item if possible, rather than replacing existing.
 			
-					Deferred.when(store[store.copy ? "copy" : "put"](object, {
-						before: targetItem || null
-					})).then(
-						function(e){ 
 
-							if(!copy){
-								if(sourceGrid){
-									// Remove original in the case of inter-grid move.
-									// (Also ensure dnd source is cleaned up properly)
-									Deferred.when(sourceGrid.store.getIdentity(object), function(id){
-										!i && sourceSource.selectNone(); // deselect all, one time
-										sourceSource.delItem(node.id);
-										Deferred.when( sourceGrid.store.remove(id) ).then(
-											function(e){ return(e) },
-											function(err){
-												if( on.emit(sourceGrid.domNode, "dgrid-error", {
-													grid: sourceGrid,
-													error: err,
-													cancelable: true,
-													bubbles: true })){
-													console.error(err);
+						Deferred.when(store[store.copy ? "copy" : "put"](object, {
+							before: targetItem || null
+						})).then(
+							function(e){ 
+
+								self._emitEventForGrid(destGrid, "dgrid-drop-completed");
+
+								if(!copy){
+									if(sourceGrid){
+										// Remove original in the case of inter-grid move.
+										// (Also ensure dnd source is cleaned up properly)
+
+										Deferred.when(sourceGrid.store.getIdentity(object), function(id){
+											!i && sourceSource.selectNone(); // deselect all, one time
+											sourceSource.delItem(node.id);
+											Deferred.when( sourceGrid.store.remove(id) ).then(
+												function(e){
+													self._emitEventForGrid(sourceGrid, "dgrid-removal-completed");
+	                        return(e) 
+  	                    },
+												function(err){
+													self._emitEventForGrid(sourceGrid, "dgrid-removal-failed", err);
+													self._emitEventForGrid(sourceGrid, "dgrid-error", err);
+													throw(err);
 												}
-												throw(err);
-											}
-										);
+											);
 
-									});
-								}else{
-									sourceSource.deleteSelectedNodes();
+										});
+									}else{
+										sourceSource.deleteSelectedNodes();
+									}
 								}
-							}
+								return(e) 
+							},
 
-							return(e) 
-						},
-						function(err){
 
-							if( on.emit(destGrid.domNode, "dgrid-error", {
-								grid: destGrid,
-								error: err,
-								cancelable: true,
-								bubbles: true })){
-								console.error(err);
+							// If store.put fails, emit -failed events for both since they
+							// were both initiated
+							function(err){
+								self._emitEventForGrid(destGrid, "dgrid-error", err);
+								self._emitEventForGrid(destGrid, "dgrid-drop-failed", err);
+								if(sourceGrid && !copy){
+									self._emitEventForGrid(sourceGrid, "dgrid-drop-removal-failed", err);
+								}
+								throw( err );
 							}
-							throw( err );
+						);
+					},
+					// If initial sourceSource.getObject() fails, emit -failed events for both
+					// (although the sourceGrid is conditional, it may not have been initiated)
+  	      function(err ){
+						if(sourceGrid && !copy){
+							self._emitEventForGrid(sourceGrid, "dgrid-drop-removal-failed", err);
 						}
-					);
-
-				});
+						self._emitEventForGrid(destGrid, "dgrid-drop-failed", err);
+    	    }
+        );
 			});
 		},
 		
