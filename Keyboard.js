@@ -237,10 +237,17 @@ var Keyboard = declare(null, {
 			}
 			newTarget = typeof focusInfo.columnId !== "undefined" ?
 				this.cell(newTarget, focusInfo.columnId) : newTarget;
+			// The focused columnId can be changed when reconfiguring columns
+			// so in these cases we can grab the cell from the first column
+			// TODO is there a more sound way to detect this case?
+			if (!newTarget.element) {
+				var firstCol = Object.keys(this.columns)[0];
+				newTarget = this.cell(newTarget, this.columns[firstCol].id);
+			}
 			if(focusInfo.active){
 				// Row/cell was previously focused, so focus the new one immediately
 				this.focus(newTarget);
-			}else{
+			}else if(newTarget.element){
 				// Row/cell was not focused, but we still need to update tabIndex
 				// and the element's class to be consistent with the old one
 				put(newTarget.element, ".dgrid-focus");
