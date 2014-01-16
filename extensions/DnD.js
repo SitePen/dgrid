@@ -77,16 +77,16 @@ define([
 		},
 
 		_emitEventForGrid: function( grid, eventName, err ){
-      var opt = { cancelable: true, bubbles: true, grid: grid };
-      if( err ){
+			var opt = { cancelable: true, bubbles: true, grid: grid };
+			if( err ){
 				opt.error = err;
-	  		if( on.emit(grid.domNode, eventName, opt )){
+				if( on.emit(grid.domNode, eventName, opt )){
 					console.error(err);
 				} 
 			} else {
 				on.emit( grid.domNode, eventName, opt );
 			}
-    },
+		},
 
 		onDropInternal: function(nodes, copy, targetItem){
 			var store = this.grid.store,
@@ -95,7 +95,7 @@ define([
 				anchor = targetSource._targetAnchor,
 				targetRow;
 
-      var self = this;
+			var self = this;
 			
 			if(anchor){ // (falsy if drop occurred in empty space after rows)
 				targetRow = this.before ? anchor.previousSibling : anchor.nextSibling;
@@ -186,8 +186,8 @@ define([
 											Deferred.when( sourceGrid.store.remove(id) ).then(
 												function(e){
 													self._emitEventForGrid(sourceGrid, "dgrid-removal-completed");
-	                        return(e) 
-  	                    },
+													return(e) 
+												},
 												function(err){
 													self._emitEventForGrid(sourceGrid, "dgrid-removal-failed", err);
 													self._emitEventForGrid(sourceGrid, "dgrid-error", err);
@@ -218,13 +218,13 @@ define([
 					},
 					// If initial sourceSource.getObject() fails, emit -failed events for both
 					// (although the sourceGrid is conditional, it may not have been initiated)
-  	      function(err ){
+					function(err ){
 						if(sourceGrid && !copy){
 							self._emitEventForGrid(sourceGrid, "dgrid-drop-removal-failed", err);
 						}
 						self._emitEventForGrid(destGrid, "dgrid-drop-failed", err);
-    	    }
-        );
+					}
+				);
 			});
 		},
 		
