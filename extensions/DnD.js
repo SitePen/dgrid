@@ -147,8 +147,7 @@ define([
 			var store = this.grid.store,
 				sourceGrid = sourceSource.grid,
 				destGrid = this.grid;
-			
-			
+
 			// TODO: bail out if sourceSource.getObject isn't defined?
 			nodes.forEach(function(node, i){
 
