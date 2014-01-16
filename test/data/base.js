@@ -3,12 +3,12 @@ define([
 	"dojo/_base/lang",
 	"dojo/_base/array",
 	"dojo/_base/Deferred",
-	"dojo/store/Memory",
-	"dojo/store/Observable",
-	"dojo/store/util/QueryResults",
+	"dojo/_base/declare",
+	"dstore/Memory",
+	"dstore/Observable",
 	"./DeferredWrapper"
 ],
-function(lang, arrayUtil, Deferred, Memory, Observable, QueryResults, DeferredWrapper){
+function(lang, arrayUtil, Deferred, declare, Memory, Observable, DeferredWrapper){
 	// some sample data
 	// global var "data"
 	data = {
@@ -16,7 +16,7 @@ function(lang, arrayUtil, Deferred, Memory, Observable, QueryResults, DeferredWr
 		label: 'id',
 		items: []
 	};
-	data_list = [ 
+	data_list = [
 		{ col1: "normal", col2: false, col3: "new", col4: 'But are not followed by two hexadecimal', col5: 29.91, col6: 10, col7: false },
 		{ col1: "important", col2: false, col3: "new", col4: 'Because a % sign always indicates', col5: 9.33, col6: -5, col7: false },
 		{ col1: "important", col2: false, col3: "read", col4: 'Signs can be selectively', col5: 19.34, col6: 0, col7: true },
@@ -31,26 +31,26 @@ function(lang, arrayUtil, Deferred, Memory, Observable, QueryResults, DeferredWr
 		data.items.push(lang.mixin({ id: i }, data_list[i%l]));
 	}
 
-	// global var testStore
-	testStore = Observable(new Memory({data: data}));
+	var ObservableMemory = declare([ Memory, Observable ]);
 
-	function asyncQuery() {
-		var results = Memory.prototype.query.apply(this, arguments),
+	// global var testStore
+	testStore = new ObservableMemory({data: data});
+
+	function asyncFetch() {
+		var results = ObservableMemory.prototype.fetch.apply(this, arguments),
 			def = new Deferred(function(){
 				clearTimeout(timer);
 			}),
 			timer = setTimeout(function(){
 				def.resolve(results);
 			}, 200);
-		var promisedResults = QueryResults(def.promise);
-		promisedResults.total = results.total;
-		return promisedResults;
+		return def.promise;
 	}
-	
-	testAsyncStore = Observable(new Memory({
+
+	testAsyncStore = new ObservableMemory({
 		data: data,
-		query: asyncQuery
-	}));
+		fetch: asyncFetch
+	});
 	//sample color data
 	data2 = {
 		identifier: 'id',
@@ -72,22 +72,22 @@ function(lang, arrayUtil, Deferred, Memory, Observable, QueryResults, DeferredWr
 	}
 
 	// global var colorStore
-	colorStore = Observable(new Memory({data: data2}));
+	colorStore = new ObservableMemory({data: data2});
 	data2.items= [];
 	for(var i=0; i<colors.length; i++){
 		data2.items.push(lang.mixin({ id: i }, colors[i]));
 	}
-	smallColorStore = Observable(new Memory({data: data2}));
+	smallColorStore = new ObservableMemory({data: data2});
 	//empty store
-	emptyStore = Observable(new Memory({ data: [] }));
-	emptyAsyncStore = Observable(new Memory({
+	emptyStore = new ObservableMemory({ data: [] });
+	emptyAsyncStore = new ObservableMemory({
 		data: [],
-		query: asyncQuery
-	}));
+		fetch: asyncFetch
+	});
 
 	//store with non-existent url
 	//errorStore = Observable(Memory({data: junk}));
-	testStateStore = Observable(new Memory({
+	testStateStore = new ObservableMemory({
 			idProperty: "abbreviation",
 			data: [
 			{ "abbreviation": "AL", "name": "Alabama" },
@@ -141,7 +141,7 @@ function(lang, arrayUtil, Deferred, Memory, Observable, QueryResults, DeferredWr
 			{ "abbreviation": "WI", "name": "Wisconsin" },
 			{ "abbreviation": "WY", "name": "Wyoming" }
 		]
-		}));
+		});
 	var typesData = [];
 	for(var i = 0; i < 12; i++){
 		typesData.push({
@@ -159,7 +159,7 @@ function(lang, arrayUtil, Deferred, Memory, Observable, QueryResults, DeferredWr
 		});
 	}
 	// global var testTypesStore
-	testTypesStore = Observable(new Memory({data: typesData}));
+	testTypesStore = new ObservableMemory({data: typesData});
 
 
 	var testCountryData = [
@@ -208,36 +208,37 @@ function(lang, arrayUtil, Deferred, Memory, Observable, QueryResults, DeferredWr
 			{ id: 'AR', name:'Argentina', type:'country', population:'40 million', parent: 'SA' },
 				{ id: 'BuenosAires', name:'Buenos Aires', type:'city', parent: 'AR' }
 	];
-	
+
 	// global var testSyncCountryStore
-	testSyncCountryStore = Observable(new Memory({
+	testSyncCountryStore = new ObservableMemory({
 		data: testCountryData,
-		getChildren: function(parent, options){
-			// Support persisting the original query via options.originalQuery
-			// so that child levels will filter the same way as the root level
-			return this.query(
-				lang.mixin({}, options && options.originalQuery || null,
-					{ parent: parent.id }),
-				options);
+		getChildren: function(parent){
+			var filteredCollection = (this.store || this).filter({ parent: parent.id });
+
+			if(this.filtered){
+				// filter the child levels the same way as the root level
+				arrayUtil.forEach(this.filtered, function(filter){
+					filter = lang.mixin({}, filter);
+					('parent' in filter) && delete filter.parent;
+					filteredCollection = filteredCollection.filter(filter);
+				});
+			}
+
+			return filteredCollection;
 		},
 		mayHaveChildren: function(parent){
 			return parent.type != "city";
 		},
-		query: function (query, options){
-			query = query || {};
-			options = options || {};
-			
-			if (!query.parent && !options.deep) {
-				// Default to a single-level query for root items (no parent)
-				query.parent = undefined;
-			}
-			return this.queryEngine(query, options)(this.data);
+		fetch: function (){
+			return this.filtered
+				? ObservableMemory.prototype.fetch.call(this)
+				: this.filter({ parent: undefined }).fetch();
 		}
-	}));
-	
+	});
+
 	// global var testCountryStore
 	testCountryStore = new DeferredWrapper(testSyncCountryStore);
-	
+
 	var testTopHeavyData = arrayUtil.map(testStateStore.data, function (state) {
 		return {
 			abbreviation: state.abbreviation,
@@ -248,30 +249,33 @@ function(lang, arrayUtil, Deferred, Memory, Observable, QueryResults, DeferredWr
 			}]
 		};
 	});
-	
+
 	// global var testTopHeavyStore
 	// Store with few children and many parents to exhibit any
 	// issues due to bugs related to total disregarding level
-	testTopHeavyStore = Observable(new Memory({
+	testTopHeavyStore = new ObservableMemory({
 		data: testTopHeavyData,
 		idProperty: "abbreviation",
 		getChildren: function(parent, options){
-			return parent.children;
+			return this._createSubCollection({
+				data: parent.children,
+				total: parent.children.length
+			});
 		},
 		mayHaveChildren: function(parent){
 			return !!parent.children;
 		}
-	}));
+	});
 
 	function calculateOrder(store, object, before, orderField){
 		// Calculates proper value of order for an item to be placed before another
 		var afterOrder, beforeOrder = 0;
 		if (!orderField) { orderField = "order"; }
-		
+
 		if(before){
 			// calculate midpoint between two items' orders to fit this one
 			afterOrder = before[orderField];
-			store.query({}, {}).forEach(function(object){
+			store.forEach(function(object){
 				var ord = object[orderField];
 				if(ord > beforeOrder && ord < afterOrder){
 					beforeOrder = ord;
@@ -281,7 +285,7 @@ function(lang, arrayUtil, Deferred, Memory, Observable, QueryResults, DeferredWr
 		}else{
 			// find maximum order and place this one after it
 			afterOrder = 0;
-			store.query({}, {}).forEach(function(object){
+			store.forEach(function(object){
 				var ord = object[orderField];
 				if(ord > afterOrder){ afterOrder = ord; }
 			});
@@ -291,11 +295,11 @@ function(lang, arrayUtil, Deferred, Memory, Observable, QueryResults, DeferredWr
 	// global function createOrderedStore
 	createOrderedStore = function(data, options){
 		// Instantiate a Memory store modified to support ordering.
-		return Observable(new Memory(lang.mixin({data: data,
+		return new ObservableMemory(lang.mixin({data: data,
 			idProperty: "name",
 			put: function(object, options){
 				object.order = calculateOrder(this, object, options && options.before);
-				return Memory.prototype.put.call(this, object, options);
+				return ObservableMemory.prototype.put.call(this, object, options);
 			},
 			// Memory's add does not need to be augmented since it calls put
 			copy: function(object, options){
@@ -318,12 +322,11 @@ function(lang, arrayUtil, Deferred, Memory, Observable, QueryResults, DeferredWr
 				}
 				this.add(obj, options);
 			},
-			query: function(query, options){
-				options = options || {};
-				options.sort = [{attribute:"order"}];
-				return Memory.prototype.query.call(this, query, options);
+			fetch: function(){
+				this.sort("order");
+				return ObservableMemory.prototype.fetch.call(this);
 			}
-		}, options)));
+		}, options));
 	};
 	// global var testOrderedData
 	testOrderedData = [
