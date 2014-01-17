@@ -399,6 +399,7 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 				delete this._listeners;
 			}
 			
+			this._started = false;
 			this.cleanup();
 			// destroy DOM
 			put(this.domNode, "!");
