@@ -619,6 +619,15 @@ return declare([List, _StoreMixin], {
 				var observers = this.observers;
 				var observer = observers[thisIndex];
 				if(observer){
+					// First we need to verify that all the rows really have been removed. If there
+					// are overlapping rows, it is possible another element exists
+					var rows = observer.rows;
+					for(var i = 0; i < rows.length; i++){
+						if(rows[i] != rowElement && rows[i].offsetParent){
+							// still rows in this list, abandon
+							return this.inherited(arguments);
+						}
+					}
 					observer.cancel();
 					this._numObservers--;
 					observers[thisIndex] = 0; // remove it so we don't call cancel twice

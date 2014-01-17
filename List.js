@@ -462,7 +462,7 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 			if(results.observe){
 				// observe the results for changes
 				self._numObservers++;
-				observerIndex = observers.push(results.observe(function(object, from, to){
+				var observer = results.observe(function(object, from, to){
 					var row, firstRow, nextNode, parentNode;
 					
 					function advanceNext() {
@@ -504,6 +504,7 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 								// result from our own array, so go from the previous row and advance one
 								nextNode = rows[to - 1];
 								if(nextNode){
+									nextNode = correctElement(nextNode);
 									// Make sure to skip connected nodes, so we don't accidentally
 									// insert a row in between a parent and its children.
 									advanceNext();
@@ -551,7 +552,8 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 					
 					from != to && firstRow && self.adjustRowIndices(firstRow);
 					self._onNotification(rows, object, from, to);
-				}, true)) - 1;
+				}, true);
+				observerIndex = observers.push(observer) - 1;
 			}
 			var rowsFragment = document.createDocumentFragment(),
 				lastRow;
@@ -578,7 +580,8 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 							// Make sure we have the correct row element
 							// (not one that was previously removed)
 							lastRow = correctElement(lastRow);
-							var row = self[top ? "up" : "down"](self.row(lastRow));
+							var row = self.row(lastRow);
+							row = row && self[top ? "up" : "down"](row);
 							if(row && row.element != lastRow){
 								var method = top ? "unshift" : "push";
 								// Take the row and data from the adjacent page and unshift to the
@@ -632,6 +635,9 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 					whenError();
 				}
 				rows = resolvedRows;
+				if(observer){
+					observer.rows = rows;
+				}
 			}
 			
 			// Now render the results
