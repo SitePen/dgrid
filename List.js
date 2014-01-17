@@ -390,7 +390,7 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 		destroy: function(){
 			// summary:
 			//		Destroys this grid
-			
+
 			// Remove any event listeners and other such removables
 			if(this._listeners){ // Guard against accidental subsequent calls to destroy
 				for(var i = this._listeners.length; i--;){
@@ -401,6 +401,7 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 			
 			this._started = false;
 			this.cleanup();
+			this._started = false;
 			// destroy DOM
 			put(this.domNode, "!");
 			this.inherited(arguments);
