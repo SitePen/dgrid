@@ -11,7 +11,7 @@ define([
 	"dojo/aspect"
 ], function(test, assert, declare, query, Memory, Observable, OnDemandList, OnDemandGrid, put, aspect){
 
-	var widget, itemsPerQuery = 3,
+	var widget,
 		storeCounter = 0;
 
 	function destroyWidget(){
@@ -36,20 +36,14 @@ define([
 
 	function createStore(numStoreItems){
 		storeCounter++;
-		var store = Observable(new Memory({
+		return Observable(new Memory({
 			data: createData(numStoreItems)
 		}));
-		aspect.after(store, "query", function(results){
-			// Inspect the query calls to make sure that query results are what we expected.
-			assert.strictEqual(itemsPerQuery, results.length, "Query results should include " + itemsPerQuery + " items");
-			return results;
-		});
-		return store;
 	}
 
 	var cnt = 0;
 
-	function createGrid(numStoreItems, overlap){
+	function createGrid(numStoreItems, itemsPerQuery, overlap){
 		widget = new OnDemandGrid({
 			store: createStore(numStoreItems),
 			minRowsPerPage: itemsPerQuery,
@@ -64,7 +58,7 @@ define([
 		widget.startup();
 	}
 
-	function createList(numStoreItems, overlap){
+	function createList(numStoreItems, itemsPerQuery, overlap){
 		widget = new OnDemandList({
 			store: createStore(numStoreItems),
 			minRowsPerPage: itemsPerQuery,
@@ -130,41 +124,43 @@ define([
 		});
 	}
 
-	function itemTestSuite(widgetClassName, createWidget, numStoreItems, maxItemsToModifyPerTest, itemAction, overlap){
-		// Create a test suite that performs one action type (itemAction) on 1 to maxItemsToModifyPerTest with
+	function itemTestSuite(widgetClassName, createWidget, config){
+		// Create a test suite that performs one action type (itemAction) on 1 to config.itemsModifiedMax with
 		// a given amount of overlap.
-		var index, numToModify;
+		var index, numToModify,
+			overlap = config.overlap;
 
 		test.suite(widgetClassName + " with " + overlap + " overlap", function(){
 
+			var storeSize = config.storeSize;
 			test.beforeEach(function(){
-				createWidget(numStoreItems, overlap);
+				createWidget(storeSize, config.itemsPerQuery, config.overlap);
 			});
 
 			test.afterEach(destroyWidget);
 
 			// Modify items counting up.
-			for(numToModify = 1; numToModify <= maxItemsToModifyPerTest; numToModify++){
-				for(index = 0; index <= (numStoreItems - numToModify); index++){
-					itemTest(itemAction, index, numToModify);
+			for(numToModify = 1; numToModify <= config.itemsModifiedMax; numToModify++){
+				for(index = 0; index <= (storeSize - numToModify); index++){
+					itemTest(config.itemAction, index, numToModify);
 				}
 			}
 			// Modify items counting down.  Starting at a count of 2 because
 			// single item modification were tested above.
-			for(numToModify = 2; numToModify <= maxItemsToModifyPerTest; numToModify++){
-				for(index = numToModify - 1; index < numStoreItems; index++){
-					itemTest(itemAction, index, numToModify, true);
+			for(numToModify = 2; numToModify <= config.itemsModifiedMax; numToModify++){
+				for(index = numToModify - 1; index < storeSize; index++){
+					itemTest(config.itemAction, index, numToModify, true);
 				}
 			}
 		});
 	}
 
-	function itemActionTestSuite(description, itemAction, itemOverlapMax, itemsModifiedMax){
+	function itemActionTestSuite(description, itemAction, config){
 		// Creates multiple item test suites for a given action (itemAction):
 		// - a grid that executes a single query
 		// - a list that executes a single query
-		// - grids with overlap from 0 to itemOverlapMax
-		// - lists with overlap from 0 to itemOverlapMax
+		// - grids with overlap from 0 to config.itemOverlapMax
+		// - lists with overlap from 0 to config.itemOverlapMax
 
 		// Note: for debugging, comment out the contents of destroyWidget so the dgrid widgets are not destroyed.
 		// Each widget uses a different store id and those ids are used in the row contents allowing you to
@@ -173,22 +169,28 @@ define([
 		// with the correct widget on the page.
 
 		var overlap;
+		config.itemAction = itemAction;
 
 		test.suite(description, function(){
 			// Test widgets with only one query: total item count equals item count per query.
-			itemTestSuite("OnDemandGrid one query", createGrid, itemsPerQuery, itemsModifiedMax, itemAction, 0);
-			itemTestSuite("OnDemandList one query", createList, itemsPerQuery, itemsModifiedMax, itemAction, 0);
+			config.overlap = 0;
+			config.storeSize = config.storeSizeMuliplier;
+			itemTestSuite("OnDemandGrid one query", createGrid, config);
+			itemTestSuite("OnDemandList one query", createList, config);
 
 			// Test widgets that make multple query requests: twice as many items as items per query so multiple
 			// queries will create multiple observers.
-			for(overlap = 0; overlap <= itemOverlapMax; overlap++){
+			config.storeSize = config.storeSizeMuliplier * 2;
+			for(overlap = 0; overlap <= config.itemOverlapMax; overlap++){
 				// Test with OnDemandGrid with varying overlap values
-				itemTestSuite("OnDemandGrid multiple queries", createGrid, itemsPerQuery * 2, itemsModifiedMax, itemAction, overlap);
+				config.overlap = overlap;
+				itemTestSuite("OnDemandGrid multiple queries", createGrid, config);
 			}
 
-			for(overlap = 0; overlap <= itemOverlapMax; overlap++){
+			for(overlap = 0; overlap <= config.itemOverlapMax; overlap++){
 				// Test with OnDemandGrid with varying overlap values
-				itemTestSuite("OnDemandList multiple queries", createList, itemsPerQuery * 2, itemsModifiedMax, itemAction, overlap);
+				config.overlap = overlap;
+				itemTestSuite("OnDemandList multiple queries", createList, config);
 			}
 		});
 	}
@@ -243,9 +245,29 @@ define([
 		};
 		addAfterAction.actionName = "Add after";
 
-		itemActionTestSuite("Modify store items", modifyAction, 2, 2);
-		itemActionTestSuite("Remove store items", removeAction, 2, 2);
-		itemActionTestSuite("Insert store items before", addBeforeAction, 2, 2);
-		itemActionTestSuite("Insert store items after", addAfterAction, 2, 2);
+		test.suite("store size a multiple of items per query", function(){
+			var config = {
+				itemsPerQuery: 3,
+				storeSizeMuliplier: 3,
+				itemOverlapMax: 2,
+				itemsModifiedMax: 2
+			};
+			itemActionTestSuite("Modify store items", modifyAction, config);
+			itemActionTestSuite("Remove store items", removeAction, config);
+			itemActionTestSuite("Insert store items before", addBeforeAction, config);
+			itemActionTestSuite("Insert store items after", addAfterAction, config);
+		});
+		test.suite("store size not a multiple of items per query", function(){
+			var config = {
+				itemsPerQuery: 2,
+				storeSizeMuliplier: 3,
+				itemOverlapMax: 2,
+				itemsModifiedMax: 2
+			};
+			itemActionTestSuite("Modify store items", modifyAction, config);
+			itemActionTestSuite("Remove store items", removeAction, config);
+			itemActionTestSuite("Insert store items before", addBeforeAction, config);
+			itemActionTestSuite("Insert store items after", addAfterAction, config);
+		});
 	});
 });
