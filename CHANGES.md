@@ -7,6 +7,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ### General/Core
 
+* `List#destroy` now resets `_started` to `false` to safeguard against debounced
+  rendering-sensitive code running after the instance's DOM is no longer relevant. (#792)
 * Added logic to account for `dojo/store/Observable`'s propensity to drop items
   at page boundaries, primarily in the `List` module. (#701, #714)
 * Items added to stores which should appear at the end of a list or grid will now
