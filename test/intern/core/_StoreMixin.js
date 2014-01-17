@@ -7,17 +7,19 @@ define([
 	// so we are testing through OnDemandGrid for now.
 	"dgrid/OnDemandGrid",
 	"dgrid/ColumnSet",
-	"dgrid/test/data/base",
+	"dgrid/test/data/createSyncStore",
+	"dgrid/test/data/genericData",
 	"dojo/domReady!"
-], function(test, assert, lang, declare, OnDemandGrid, ColumnSet, testStore){
-	
+], function(test, assert, lang, declare, OnDemandGrid, ColumnSet, createSyncStore, genericData){
+
 	// Helper method used to set column set() methods for various grid compositions
 	function testSetMethod(grid, dfd){
-		var store = lang.clone(testStore); // clone test store so we can make modifications
+		var store = createSyncStore({ data: genericData });
+		grid.set("collection", store);
 		document.body.appendChild(grid.domNode);
 		grid.set("store", store);
 		grid.startup();
-		
+
 		var changes = [
 				{
 					objectId: 0,
@@ -41,12 +43,12 @@ define([
 			len = changes.length,
 			i,
 			change;
-		
+
 		for(i = 0; i < len; i++){
 			change = changes[i];
 			grid.updateDirty(change.objectId, change.field, change.newValue);
 		}
-		
+
 		grid.save().then(
 			dfd.callback(function(){
 				for(var i = 0, change; i < changes.length; i++){
@@ -57,22 +59,22 @@ define([
 			}),
 			lang.hitch(dfd, "reject")
 		);
-		
+
 		return dfd;
 	}
-	
+
 	// the set() method to use for column.set() tests
 	function sampleSetMethod(item){
 		return item[this.field].toUpperCase();
 	}
-	
+
 	test.suite("_StoreMixin#save / column.set tests", function(){
 		var grid; // Reused for each test and common afterEach logic
-		
+
 		test.afterEach(function(){
 			grid.destroy();
 		});
-		
+
 		test.test("column.set in subRows", function(){
 			grid = new OnDemandGrid({
 				subRows: [
@@ -90,7 +92,7 @@ define([
 			});
 			testSetMethod(grid, this.async());
 		});
-			
+
 		test.test("column.set in columnSets", function(){
 			grid = new (declare([OnDemandGrid, ColumnSet]))({
 				columnSets: [

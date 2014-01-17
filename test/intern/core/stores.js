@@ -7,8 +7,10 @@ define([
 	"dgrid/OnDemandGrid",
 	"dgrid/extensions/Pagination",
 	"dgrid/test/data/errorStores",
-	"dgrid/test/data/base"
-], function (test, assert, declare, on, Grid, OnDemandGrid, Pagination, errorStores) {
+	"dgrid/test/data/createSyncStore",
+	"dgrid/test/data/createAsyncStore",
+	"dgrid/test/data/genericData"
+], function (test, assert, declare, on, Grid, OnDemandGrid, Pagination, errorStores, createSyncStore, createAsyncStore, genericData) {
 	
 	var PaginationGrid = declare([Grid, Pagination]),
 		grid;
@@ -18,7 +20,7 @@ define([
 		var expectedEvent = expectSuccess ? "dgrid-refresh-complete" : "dgrid-error",
 			unexpectedEvent = !expectSuccess ? "dgrid-refresh-complete" : "dgrid-error";
 			grid = new CustomGrid({
-				store: store
+				collection: store
 			});
 		
 		// Hook up event handler before calling startup, to be able to
@@ -52,11 +54,11 @@ define([
 
 		// Tests
 		test.test("OnDemandGrid + sync store", function(){
-			storeTest(OnDemandGrid, testStore, true, this.async());
+			storeTest(OnDemandGrid, createSyncStore({ data: genericData }), true, this.async());
 		});
 
 		test.test("OnDemandGrid + async store", function(){
-			storeTest(OnDemandGrid, testAsyncStore, true, this.async());
+			storeTest(OnDemandGrid, createAsyncStore({ data: genericData }), true, this.async());
 		});
 
 		test.test("OnDemandGrid + sync store w/ error", function(){
@@ -68,11 +70,11 @@ define([
 		});
 
 		test.test("PaginationGrid + sync store", function(){
-			storeTest(PaginationGrid, testStore, true, this.async());
+			storeTest(PaginationGrid, createSyncStore({ data: genericData }), true, this.async());
 		});
 
 		test.test("PaginationGrid + async store", function(){
-			storeTest(PaginationGrid, testAsyncStore, true, this.async());
+			storeTest(PaginationGrid, createAsyncStore({ data: genericData }), true, this.async());
 		});
 
 		test.test("PaginationGrid + sync store w/ error", function(){

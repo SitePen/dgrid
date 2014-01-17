@@ -8,35 +8,37 @@ define([
 	"dojo/on",
 	"dojo/query",
 	"put-selector/put",
-	"dgrid/test/data/base"
-], function(test, assert, OnDemandList, OnDemandGrid, Keyboard, declare, on, query, put){
+	"dgrid/test/data/createSyncStore",
+	"dgrid/test/data/genericData"
+], function(test, assert, OnDemandList, OnDemandGrid, Keyboard, declare, on, query, put, createSyncStore, genericData){
 	var handles = [],
 		columns = {
 			col1: "Column 1",
 			col3: "Column 3",
 			col5: "Column 5"
 		},
+		testStore = createSyncStore({ data: genericData }),
 		item = testStore.get(1),
 		grid;
-	
+
 	// Common functions run after each test and suite
-	
+
 	function afterEach(){
 		for(var i = handles.length; i--;){
 			handles[i].remove && handles[i].remove();
 		}
 		handles = [];
 	}
-	
+
 	function after(){
 		// Destroy list or grid
 		grid.destroy();
 		// Restore item that was removed for focus retention test
 		testStore.put(item);
 	}
-	
+
 	// Common test functions for grid w/ cellNavigation: false and list
-	
+
 	function testRowFocus(){
 		var rowId;
 		// listen for a dgrid-cellfocusin event
@@ -51,7 +53,7 @@ define([
 		assert.strictEqual(rowId, 0,
 			"dgrid-cellfocusin event triggered on first row on focus() call");
 	}
-	
+
 	function testRowFocusArgs(){
 		var rowId, target;
 		// listen for a dgrid-cellfocusin event
@@ -68,61 +70,61 @@ define([
 		assert.strictEqual(rowId, 1,
 			"dgrid-cellfocusin event triggered on expected row");
 	}
-	
+
 	function testRowBlur(){
 		var blurredRow,
 			targets = query(".dgrid-row", grid.contentNode);
-		
-		// call one focus event, followed by a subsequent focus event, 
+
+		// call one focus event, followed by a subsequent focus event,
 		// thus triggering a dgrid-cellfocusout event
 		grid.focus(targets[0]);
-		
+
 		// listen for a dgrid-cellfocusout event
 		handles.push(on(document.body, "dgrid-cellfocusout", function(e){
 			blurredRow = e.row;
 			assert.ok(blurredRow, "dgrid-cellfocusout event got a non-null row value");
 		}));
-		
+
 		grid.focus(targets[1]);
 		// make sure our handler was called
 		assert.strictEqual(blurredRow && blurredRow.id, 0,
 			"dgrid-cellfocusout event triggered on expected row");
 	}
-	
+
 	function testRowUpdate(){
 		var element, elementId;
 		// Focus a row based on a store ID, then issue an update and make sure
 		// the same id is still focused
 		grid.focus(1);
-		
+
 		element = document.activeElement;
 		assert.ok(element && element.className && element.className.indexOf("dgrid-row") > -1,
 			"focus(id) call focused a row");
-		
+
 		elementId = element.id;
-		grid.store.put(item);
+		grid.collection.put(item);
 		assert.notStrictEqual(element, document.activeElement,
 			"A different DOM element is focused after updating the item");
 		assert.strictEqual(elementId, document.activeElement.id,
 			"The item's new row is focused after updating the item");
 	}
-	
+
 	function testRowRemove(){
 		var dfd = this.async(1000),
 			element,
 			nextElement;
-		
+
 		// Focus a row based on a store ID, then remove the item and
 		// make sure the corresponding cell is eventually focused
 		grid.focus(1);
-		
+
 		element = document.activeElement;
 		assert.ok(element && element.className && element.className.indexOf("dgrid-row") > -1,
 			"focus(id) call focused a row");
-		
+
 		nextElement = element.nextSibling;
-		grid.store.remove(1);
-		
+		grid.collection.remove(1);
+
 		// The logic responsible for moving to the next row runs on next turn,
 		// since it operates as a fallback that is run only if a replacement
 		// is not immediately inserted.  Therefore we need to execute our
@@ -131,10 +133,10 @@ define([
 			assert.strictEqual(nextElement, document.activeElement,
 				"The next row is focused after removing the item");
 		}), 0);
-		
+
 		return dfd;
 	}
-	
+
 	function registerRowTests(name) {
 		test.afterEach(afterEach);
 		test.after(after);
@@ -151,7 +153,7 @@ define([
 			grid = new (declare([OnDemandGrid, Keyboard]))({
 				columns: columns,
 				sort: "id",
-				store: testStore
+				collection: testStore
 			});
 			document.body.appendChild(grid.domNode);
 			grid.startup();
@@ -229,17 +231,17 @@ define([
 		test.test("dgrid-cellfocusout event", function(){
 			var blurredCell,
 				targets = query(".dgrid-cell", grid.contentNode);
-			
-			// call one focus event, followed by a subsequent focus event, 
+
+			// call one focus event, followed by a subsequent focus event,
 			// thus triggering a dgrid-cellfocusout event
 			grid.focus(targets[0]);
-			
+
 			// listen for a dgrid-cellfocusout event
 			handles.push(on(document.body, "dgrid-cellfocusout", function(e){
 				blurredCell = e.cell;
 				assert.ok(blurredCell, "dgrid-cellfocusout event got a non-null cell value");
 			}));
-			
+
 			grid.focus(targets[1]);
 			// make sure our handler was called appropriately
 			assert.ok(blurredCell, "dgrid-cellfocusout event fired");
@@ -248,41 +250,41 @@ define([
 			assert.strictEqual(blurredCell.column.id, "col1",
 				"dgrid-cellfocusout event triggered on expected column");
 		});
-		
+
 		test.test("grid.focus + item update", function(){
 			var element, elementId;
 			// Focus a row based on a store ID + column ID,
 			// then issue an update and make sure the same id is still focused
 			grid.focus(grid.cell(1, "col1"));
-			
+
 			element = document.activeElement;
 			assert.ok(element && element.className && element.className.indexOf("dgrid-cell") > -1,
 				"focus(id) call focused a cell");
-			
+
 			elementId = element.id;
-			grid.store.put(item);
+			grid.collection.put(item);
 			assert.notStrictEqual(element, document.activeElement,
 				"A different DOM element is focused after updating the item");
 			assert.strictEqual(grid.cell(1, "col1").element, document.activeElement,
 				"The item's new cell is focused after updating the item");
 		});
-		
+
 		test.test("grid.focus + item removal", function(){
 			var dfd = this.async(1000),
 				element,
 				nextElement;
-			
+
 			// Focus a cell based on a store ID, then remove the item and
 			// make sure the corresponding cell is eventually focused
 			grid.focus(grid.cell(1, "col1"));
-			
+
 			element = document.activeElement;
 			assert.ok(element && element.className && element.className.indexOf("dgrid-cell") > -1,
 				"focus(id) call focused a cell");
-			
+
 			nextElement = grid.cell(2, "col1").element;
-			grid.store.remove(1);
-			
+			grid.collection.remove(1);
+
 			// The logic responsible for moving to the next row runs on next turn,
 			// since it operates as a fallback that is run only if a replacement
 			// is not immediately inserted.  Therefore we need to execute our
@@ -291,7 +293,7 @@ define([
 				assert.strictEqual(nextElement, document.activeElement,
 					"The next row is focused after removing the item");
 			}), 0);
-			
+
 			return dfd;
 		});
 	});
@@ -302,7 +304,7 @@ define([
 				cellNavigation: false,
 				columns: columns,
 				sort: "id",
-				store: testStore
+				collection: testStore
 			});
 			document.body.appendChild(grid.domNode);
 			grid.startup();
@@ -315,7 +317,7 @@ define([
 		test.before(function(){
 			grid = new (declare([OnDemandList, Keyboard]))({
 				sort: "id",
-				store: testStore,
+				collection: testStore,
 				renderRow: function(item){ return put("div", item.col5); }
 			});
 			document.body.appendChild(grid.domNode);

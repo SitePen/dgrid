@@ -1,4 +1,4 @@
-define(["dojo/store/Memory", "dojo/store/Observable"],function(Memory, Observable){
+define(["dojo/_base/declare", "dstore/Memory", "dstore/Observable"],function(declare, Memory, Observable){
 	var perfData = [], today = new Date().getTime();
 	for(var i = 0; i < 20000; i++){
 		perfData.push({
@@ -14,5 +14,5 @@ define(["dojo/store/Memory", "dojo/store/Observable"],function(Memory, Observabl
 			today: new Date(today)
 		});
 	}
-	return Observable(new Memory({data: perfData}));
+	return new declare([ Memory, Observable ])({data: perfData});
 });

@@ -5,25 +5,25 @@ define([
 	"dojo/query",
 	"dgrid/Grid",
 	"dgrid/ColumnSet",
-	"dgrid/test/data/base"
-], function(test, assert, declare, query, Grid, ColumnSet){
-	
+	"dgrid/test/data/orderedData"
+], function(test, assert, declare, query, Grid, ColumnSet, orderedData){
+
 	var grid;
-	
+
 	function runClassNameTests(){
 		var domNode = grid.domNode,
 			node;
-		
+
 		assert.strictEqual(query(".dgrid-cell.field-order", domNode).length, 10,
 			"Each row (including header) should contain a cell with the field-order class");
 		assert.strictEqual(query(".dgrid-cell.field-name", domNode).length, 10,
 			"Each row (including header) should contain a cell with the field-name class");
 		assert.strictEqual(query(".dgrid-cell.field-description", domNode).length, 10,
 			"Each row (including header) should contain a cell with the field-description class");
-		
+
 		assert.strictEqual(query(".dgrid-cell.field-name.name-column.main-column", domNode).length, 10,
 			"Each row's (including header's) field-name cell should also have the name-column and main-column classes");
-		
+
 		assert.strictEqual(query(".dgrid-cell.field-description.desc-row", domNode).length, 9,
 			"Each body row's description cell should also have the desc-row class");
 		node = query(".dgrid-header .dgrid-cell.field-description", domNode)[0];
@@ -34,12 +34,12 @@ define([
 			}),
 			"Each body row's description cell has two desc-* classes (one being desc-row)");
 	}
-	
+
 	test.suite("columns", function(){
 		test.afterEach(function(){
 			grid.destroy();
 		});
-		
+
 		test.test("className property", function(){
 			grid = new Grid({
 				columns: {
@@ -60,16 +60,16 @@ define([
 			});
 			document.body.appendChild(grid.domNode);
 			grid.startup();
-			grid.renderArray(testOrderedData);
+			grid.renderArray(orderedData.items);
 			runClassNameTests();
 		});
 	});
-	
+
 	test.suite("columnSets", function(){
 		test.afterEach(function(){
 			grid.destroy();
 		});
-		
+
 		test.test("className property", function(){
 			grid = new (declare([Grid, ColumnSet]))({
 				columnSets: [
@@ -95,7 +95,7 @@ define([
 			});
 			document.body.appendChild(grid.domNode);
 			grid.startup();
-			grid.renderArray(testOrderedData);
+			grid.renderArray(orderedData.items);
 			runClassNameTests();
 		});
 	});

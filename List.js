@@ -491,8 +491,8 @@ function(declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 			// multiple parents.)
 			var parentId = options.parentId,
 				id = this.id + "-row-" + (parentId ? parentId + "-" : "") + 
-					((this.store && this.store.getIdentity) ? 
-						this.store.getIdentity(object) : this._autoId++),
+					((this.collection && this.collection.getIdentity) ?
+						this.collection.getIdentity(object) : this._autoId++),
 				row = byId(id),
 				previousRow = row && row.previousSibling;
 			
@@ -561,8 +561,8 @@ function(declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 				return;
 			}
 			if(typeof target == "object"){
-				// assume target represents a store item
-				id = this.store.getIdentity(target);
+				// assume target represents a collection item
+				id = this.collection.getIdentity(target);
 			}else{
 				// assume target is a row ID
 				id = target;
@@ -800,15 +800,6 @@ function(declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 			put(this.footerNode, (show ? "!" : ".") + "dgrid-footer-hidden");
 			
 			this.resize(); // to account for (dis)appearance of footer
-		},
-
-		_getFirstRowSibling: function(container){
-			// summary:
-			//		Returns the DOM node that a new row should be inserted before
-			//		when there are no other rows in the current result set.
-			//		In the case of OnDemandList, this will always be the last child
-			//		of the container (which will be a trailing preload node).
-			return container.lastChild;
-		},
+		}
 	});
 });

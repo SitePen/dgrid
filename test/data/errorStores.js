@@ -2,16 +2,16 @@ define([
 	"dojo/_base/lang",
 	"dojo/_base/Deferred",
 	"dstore/Memory",
-	"./base"
-], function(lang, Deferred, Memory){
+	"./typesData"
+], function(lang, Deferred, Memory, typesData){
 	// summary:
 	//		Returns a hash containing stores which generate errors on specific
 	//		methods, synchronously or asynchronously.
 
 	var queryStore = new Memory(),
 		asyncQueryStore = new Memory(),
-		putStore = new Memory({ data: lang.clone(testTypesStore.data) }),
-		asyncPutStore = new Memory({ data: lang.clone(testTypesStore.data) });
+		putStore = new Memory({ data: lang.clone(typesData) }),
+		asyncPutStore = new Memory({ data: lang.clone(typesData) });
 
 	queryStore.fetch = function() {
 		throw new Error("Error on sync query");

@@ -14,7 +14,7 @@ define([
 function defaultRenderExpando(level, hasChildren, expanded, object){
 	// summary:
 	//		Provides default implementation for column.renderExpando.
-	
+
 	var dir = this.grid.isRTL ? "right" : "left",
 		cls = ".dgrid-expando-icon",
 		node;
@@ -35,7 +35,7 @@ function ontransitionend(event){
 		// after collapse, set display to none to improve performance
 		this.style.display = height == "0px" ? "none" : "block";
 	}
-	
+
 	// Reset height to be auto, so future height changes (from children
 	// expansions, for example), will expand to the right height.
 	if(event){
@@ -55,49 +55,49 @@ function ontransitionend(event){
 function tree(column){
 	// summary:
 	//		Adds tree navigation capability to a column.
-	
+
 	var originalRenderCell = column.renderCell || Grid.defaultRenderCell;
-	
+
 	var currentLevel, // tracks last rendered item level (for aspected insertRow)
 		clicked; // tracks row that was clicked (for expand dblclick event handling)
-		
+
 	if(!column){ column = {}; }
-	
+
 	column.shouldExpand = column.shouldExpand || function(row, level, previouslyExpanded){
 		// summary:
 		//		Function called after each row is inserted to determine whether
 		//		expand(rowElement, true) should be automatically called.
 		//		The default implementation re-expands any rows that were expanded
 		//		the last time they were rendered (if applicable).
-		
+
 		return previouslyExpanded;
 	};
-	
+
 	aspect.after(column, "init", function(){
 		var grid = column.grid,
 			colSelector = ".dgrid-content .dgrid-column-" + column.id,
 			listeners = []; // to be removed when this column is destroyed
 
 		if(!grid.collection){
-			throw new Error("dgrid tree column plugin requires a store to operate.");
+			throw new Error("dgrid tree column plugin requires a collection to operate.");
 		}
-		
+
 		if (!column.renderExpando){
 			column.renderExpando = defaultRenderExpando;
 		}
-		
+
 		// Set up the event listener once and use event delegation for better memory use.
 		listeners.push(grid.on(
 			column.expandOn || ".dgrid-expando-icon:click," + colSelector + ":dblclick," + colSelector + ":keydown",
 			function(event){
-				var row = grid.row(event);	
+				var row = grid.row(event);
 				if((!grid.collection.mayHaveChildren || grid.collection.mayHaveChildren(row.data)) &&
 						(event.type != "keydown" || event.keyCode == 32) &&
 						!(event.type == "dblclick" && clicked && clicked.count > 1 &&
 							row.id == clicked.id && event.target.className.indexOf("dgrid-expando-icon") > -1)){
 					grid.expand(row);
 				}
-				
+
 				// If the expando icon was clicked, update clicked object to prevent
 				// potential over-triggering on dblclick (all tested browsers but IE < 9).
 				if(event.target.className.indexOf("dgrid-expando-icon") > -1){
@@ -112,25 +112,25 @@ function tree(column){
 				}
 			})
 		);
-		
+
 		if(has("touch")){
 			// Also listen on double-taps of the cell.
 			listeners.push(grid.on(touchUtil.selector(colSelector, touchUtil.dbltap),
 				function(){ grid.expand(this); }));
 		}
-		
+
 		// Set up hash to store IDs of expanded rows
 		if(!grid._expanded){ grid._expanded = {}; }
-		
+
 		listeners.push(aspect.after(grid, "insertRow", function(rowElement){
 			// Auto-expand (shouldExpand) considerations
 			var row = this.row(rowElement),
 				expanded = column.shouldExpand(row, currentLevel, this._expanded[row.id]);
-			
+
 			if(expanded){ this.expand(rowElement, true, true); }
 			return rowElement; // pass return value through
 		}));
-		
+
 		listeners.push(aspect.before(grid, "removeRow", function(rowElement, justCleanup){
 			var connected = rowElement.connected;
 			if(connected){
@@ -149,7 +149,7 @@ function tree(column){
 				}
 			}
 		}));
-		
+
 		if(column.collapseOnRefresh){
 			// Clear out the _expanded hash on each call to cleanup
 			// (which generally coincides with refreshes, as well as destroy).
@@ -157,15 +157,15 @@ function tree(column){
 				this._expanded = {};
 			}));
 		}
-		
+
 		grid._calcRowHeight = function(rowElement){
 			// we override this method so we can provide row height measurements that
 			// include the children of a row
 			var connected = rowElement.connected;
 			// if connected, need to consider this in the total row height
-			return rowElement.offsetHeight + (connected ? connected.offsetHeight : 0); 
+			return rowElement.offsetHeight + (connected ? connected.offsetHeight : 0);
 		};
-		
+
 		grid.expand = function(target, expand, noTransition){
 			// summary:
 			//		Expands the row corresponding to the given target.
@@ -174,39 +174,39 @@ function tree(column){
 			// expand: Boolean?
 			//		If specified, designates whether to expand or collapse the row;
 			//		if unspecified, toggles the current state.
-			
+
 			var row = target.element ? target : grid.row(target),
 				hasTransitionend = has("transitionend"),
 				dfd = new Deferred(),
 				promise = dfd.promise;
-			
+
 			// Resolve initial promise immediately;
 			// promise will be reassigned later if necessary to only resolve
 			// after data is retrieved
 			dfd.resolve();
-			
+
 			target = row.element;
 			target = target.className.indexOf("dgrid-expando-icon") > -1 ? target :
 				querySelector(".dgrid-expando-icon", target)[0];
-			
+
 			if(target && target.mayHaveChildren &&
 					(noTransition || expand !== !!this._expanded[row.id])){
 				// toggle or set expand/collapsed state based on optional 2nd argument
 				var expanded = expand === undefined ? !this._expanded[row.id] : expand;
-				
+
 				// update the expando display
 				put(target, ".ui-icon-triangle-1-" + (expanded ? "se" : "e") +
 					"!ui-icon-triangle-1-" + (expanded ? "e" : "se"));
-				
+
 				var preloadNode = target.preloadNode,
 					rowElement = row.element,
 					container,
 					containerStyle,
 					scrollHeight,
 					options = {};
-				
+
 				if(!preloadNode){
-					// if the children have not been created, create a container, a preload node and do the 
+					// if the children have not been created, create a container, a preload node and do the
 					// query for the children
 					container = rowElement.connected = put('div.dgrid-tree-container');//put(rowElement, '+...
 					preloadNode = target.preloadNode = put(rowElement, '+', container, 'div.dgrid-preload');
@@ -232,10 +232,12 @@ function tree(column){
 					if("level" in target){
 						query.level = target.level;
 					}
-					// Add the query to the promise chain.
-					promise = promise.then(function(){
-						return grid.renderQuery ?
-							grid.renderQuery(query, preloadNode, options) :
+					Deferred.when(
+						grid.renderQuery ?
+							// TODO: Does trackError need to be applied here when renderQuery also uses trackError
+							grid._trackError(function(){
+								return grid.renderQuery(query, preloadNode, options);
+							}) :
 							grid.renderQueryResults(query(options), preloadNode,
 								"level" in query ? { queryLevel: query.level } : {});
 					}).then(function(){
@@ -245,20 +247,20 @@ function tree(column){
 							container.style.height = scrollHeight ? scrollHeight + "px" : "auto";
 						}
 					});
-					
+
 					if(hasTransitionend){
 						on(container, hasTransitionend, ontransitionend);
 					}else{
 						ontransitionend.call(container);
 					}
 				}
-				
+
 				// Show or hide all the children.
-				
+
 				container = rowElement.connected;
 				container.hidden = !expanded;
 				containerStyle = container.style;
-				
+
 				// make sure it is visible so we can measure it
 				if(!hasTransitionend || noTransition){
 					containerStyle.display = expanded ? "block" : "none";
@@ -282,7 +284,7 @@ function tree(column){
 							expanded ? (scrollHeight ? scrollHeight + "px" : "auto") : "0px";
 					});
 				}
-				
+
 				// Update _expanded map.
 				if(expanded){
 					this._expanded[row.id] = true;
@@ -292,7 +294,7 @@ function tree(column){
 			}
 			return promise;
 		}; // end function grid.expand
-		
+
 		// Set up a destroy function on column to tear down the listeners/aspects
 		// established above if the grid's columns are redefined later.
 		aspect.after(column, "destroy", function(){
@@ -302,23 +304,23 @@ function tree(column){
 			delete grid._calcRowHeight;
 		});
 	});
-	
+
 	column.renderCell = function(object, value, td, options){
 		// summary:
 		//		Renders a cell that can be expanded, creating more rows
-		
+
 		var grid = column.grid,
 			level = Number(options && options.queryLevel) + 1,
 			mayHaveChildren = !grid.collection.mayHaveChildren || grid.collection.mayHaveChildren(object),
 			parentId = options.parentId,
 			expando, node;
-		
+
 		level = currentLevel = isNaN(level) ? 0 : level;
 		expando = column.renderExpando(level, mayHaveChildren,
 			grid._expanded[(parentId ? parentId + "-" : "") + grid.collection.getIdentity(object)], object);
 		expando.level = level;
 		expando.mayHaveChildren = mayHaveChildren;
-		
+
 		node = originalRenderCell.call(column, object, value, td, options);
 		if(node && node.nodeType){
 			put(td, expando);

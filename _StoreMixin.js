@@ -93,6 +93,7 @@ function(declare, lang, Deferred, listen, aspect, put){
 			//		and tells it to refresh.
 			
 			// Remove observer and existing rows so any sub-row observers will be cleaned up
+			// TODO: declare _observerHandle on the prototype
 			if(this._observerHandle){
 				this._observerHandle.remove();
 				this._observerHandle = this.rows = null;
@@ -106,7 +107,6 @@ function(declare, lang, Deferred, listen, aspect, put){
 				this.rows = [];
 			
 				// TODO: How is the total number of items tracked?
-				// TODO: Should total include or consider the number of visible child nodes?
 				this._observerHandle = this._observeCollection(this.collection, this.contentNode, this.rows);
 			}else{
 				this.collection = collection;
@@ -116,7 +116,7 @@ function(declare, lang, Deferred, listen, aspect, put){
 			
 			// If we have new sort criteria, pass them through the sort setter
 			// (which call refresh in itself).  Otherwise, just refresh.
-			// TODO: Are there any legitimate cases where this.sort will be falsy and you want to set it?
+			// TODO: Are there any cases where this.sort will be truthy but we don't to set it?
 			if(this.sort){
 				this.set('sort', this.sort);
 			}else{
@@ -260,6 +260,7 @@ function(declare, lang, Deferred, listen, aspect, put){
 			this.refresh();
 		},
 		
+		// TODO: Add unit test for _trackError
 		_trackError: function(func){
 			// summary:
 			//		Utility function to handle emitting of error events.
@@ -272,19 +273,21 @@ function(declare, lang, Deferred, listen, aspect, put){
 			// tags:
 			//		protected
 			
-			var result;
-			
 			if(typeof func == "string"){ func = lang.hitch(this, func); }
 			
+			var dfd = new Deferred();
 			try{
-				result = func();
+				Deferred.when(func(), dfd.resolve, dfd.reject);
 			}catch(err){
 				// report sync error
-				emitError.call(this, err);
+				dfd.reject(err);
 			}
 			
-			// wrap in when call to handle reporting of potential async error
-			return Deferred.when(result, noop, lang.hitch(this, emitError));
+			var self = this;
+			dfd.then(null, function(err){
+				emitError.call(self, err);
+			});
+			return dfd.promise;
 		},
 		
 		removeRow: function(rowElement, justCleanup){
@@ -314,7 +317,8 @@ function(declare, lang, Deferred, listen, aspect, put){
 				container;
 			
 			// Render the results, asynchronously or synchronously
-			return Deferred.when(results.fetch(), function(resolvedResults){
+			var fetch = lang.hitch(results, "fetch");
+			return this._trackError(fetch).then(function(resolvedResults){
 				var resolvedRows,
 					i;
 					
@@ -390,8 +394,7 @@ function(declare, lang, Deferred, listen, aspect, put){
 						}else{
 							// There are no rows.  Allow for subclasses to insert new rows somewhere other than
 							// at the end of the parent node.
-							// TODO: This seems generally useful. Why not move _getFirstRowSibling to List?
-							nextNode = /*self._getFirstRowSibling &&*/ self._getFirstRowSibling(container);
+							nextNode = self._getFirstRowSibling && self._getFirstRowSibling(container);
 						}
 						// Make sure we don't trip over a stale reference to a
 						// node that was removed, or try to place a node before
@@ -405,7 +408,7 @@ function(declare, lang, Deferred, listen, aspect, put){
 						// TODO: What to do about this? Is this necessary?
 						//parentNode = (beforeNode && beforeNode.parentNode) ||
 						//	(nextNode && nextNode.parentNode) || self.contentNode;
-						// TODO: What do we need from options?
+						// TODO: `options` is likely needed here for `tree` to function properly
 						row = self.insertRow(event.target, container, nextNode, to, /*options*/ {});
 						self.highlightRow(row);
 						
@@ -418,8 +421,8 @@ function(declare, lang, Deferred, listen, aspect, put){
 
 				// TODO: Should the event names be the same as the store CRUD method names?
 				collection.on("add, remove, update", function(event){
-					var from = event.previousIndex || Infinity,
-						to = event.index || Infinity,
+					var from = (typeof event.previousIndex !== "undefined") ? event.previousIndex : Infinity,
+						to = (typeof event.index !== "undefined") ? event.index : Infinity,
 						adjustAtIndex = Math.min(from, to);
 					from !== to && rows[adjustAtIndex] && self.adjustRowIndices(rows[adjustAtIndex]);
 				})

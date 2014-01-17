@@ -1,22 +1,21 @@
-define(["dojo/_base/lang", "dojo/_base/Deferred", "dojo/store/util/QueryResults"],function(lang, Deferred, QueryResults){
+define(["dojo/_base/lang", "dojo/_base/Deferred"],function(lang, Deferred){
 	// summary:
 	//		Creates a store that wraps the delegate store's query results and total in Deferred
 	//		instances. If delay is set, the Deferreds will be resolved asynchronously after delay +/-50%
 	//		milliseconds to simulate network requests that may come back out of order.
 	return function(store, delay){
 		return lang.delegate(store, {
-			query: function(query, options){
-				var queryResult = store.query(query, options);
-
+			fetch: function(){
 				var totalDeferred = new Deferred();
 				var resultsDeferred = new Deferred();
 				resultsDeferred.total = totalDeferred;
 
+				var results = store.fetch.call(this);
 				var resolveTotal = function(){
-					totalDeferred.resolve(queryResult.total);
+					totalDeferred.resolve(this.total);
 				};
 				var resolveResults = function(){
-					resultsDeferred.resolve(queryResult);
+					resultsDeferred.resolve(results);
 				};
 
 				if(delay){
@@ -27,8 +26,8 @@ define(["dojo/_base/lang", "dojo/_base/Deferred", "dojo/store/util/QueryResults"
 					resolveTotal();
 					resolveResults();
 				}
-					
-				return QueryResults(resultsDeferred);
+
+				return resultsDeferred;
 			}
 		});
 	}
