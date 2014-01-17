@@ -47,6 +47,7 @@ define([
 		widget = new OnDemandGrid({
 			store: createStore(numStoreItems),
 			minRowsPerPage: itemsPerQuery,
+			maxRowsPerPage: itemsPerQuery,
 			overlap: overlap,
 			columns: {
 				id: "ID",
@@ -62,6 +63,7 @@ define([
 		widget = new OnDemandList({
 			store: createStore(numStoreItems),
 			minRowsPerPage: itemsPerQuery,
+			maxRowsPerPage: itemsPerQuery,
 			overlap: overlap,
 			renderRow: function(object){
 				return put("div", object.value);
