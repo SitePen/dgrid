@@ -12,10 +12,10 @@
 				font-weight: bold;
 				padding-bottom: 0.25em;
 			}
-			.grid { 
+			.grid {
 				width: 700px;
 			}
-			.grid .dgrid-column-set-0 { 
+			.grid .dgrid-column-set-0 {
 				width: 50%;
 			}
 			.grid .field-col1 {
@@ -33,6 +33,15 @@
 			.dgrid-sort-arrow {
 				float: left;
 			}
+
+			.gridcscc .field-col4 {
+				white-space: nowrap;
+			}
+
+			.gridcscc .dgrid-header .dgrid-row-table {
+				height: 45px;
+			}
+
 		</style>
 
 		<script src="../../dojo/dojo.js" 
@@ -103,7 +112,7 @@
 									{label: 'Column 4', field: 'col4'}
 								]
 							]];
-					
+
 					function byId(id){ return document.getElementById(id); }
 
 					var ComplexGrid = declare([OnDemandGrid, ColumnSet, Selection, Keyboard]);
@@ -122,7 +131,7 @@
 						store: DeferredWrapper(testStore),
 						columnSets: columnSets1
 					}, "grid");
-					
+
 					// hook up buttons for testing setSubRows / setColumnSets
 					on(byId("btnSubRows1"), "click", function(){
 						gridNoColumnSets.set("subRows", subRows1);

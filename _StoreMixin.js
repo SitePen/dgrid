@@ -95,6 +95,7 @@ function(kernel, declare, lang, Deferred, listen, aspect, put){
 			if (column.set){
 				this._columnsWithSet[column.field] = column;
 			}
+			this.inherited(arguments);
 		},
 		
 		_updateNotifyHandle: function(store){
