@@ -14,6 +14,12 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 * Fixed a long-standing regression in the `util/has-css3` module's
   `css-transforms3d` test due to a modified classname. (#776, thanks amuraco)
 
+### Extensions
+
+* The `CompoundColumns` extension is now capable of interoperating with the
+  `ColumnSet` mixin; see `test/extensions/CompoundColumns.html` for examples.
+  (#383)
+
 ## Other changes and fixes
 
 ### General/Core
