@@ -48,7 +48,7 @@ define([
 			store: createStore(numStoreItems),
 			minRowsPerPage: itemsPerQuery,
 			maxRowsPerPage: itemsPerQuery,
-			overlap: overlap,
+			queryRowsOverlap: overlap,
 			columns: {
 				id: "ID",
 				value: "Value"
@@ -64,7 +64,7 @@ define([
 			store: createStore(numStoreItems),
 			minRowsPerPage: itemsPerQuery,
 			maxRowsPerPage: itemsPerQuery,
-			overlap: overlap,
+			queryRowsOverlap: overlap,
 			renderRow: function(object){
 				return put("div", object.value);
 			},
@@ -129,32 +129,32 @@ define([
 	function itemTestSuite(widgetClassName, createWidget, config){
 		// Create a test suite that performs one action type (itemAction) on 1 to config.itemsModifiedMax with
 		// a given amount of overlap.
-		var index, numToModify,
-			overlap = config.overlap;
+		var index, numToModify;
 
-		test.suite(widgetClassName + " with " + overlap + " overlap", function(){
+		(function(storeSize, itemsPerQuery, overlap){
+			test.suite(widgetClassName + " with " + overlap + " overlap", function(){
 
-			var storeSize = config.storeSize;
-			test.beforeEach(function(){
-				createWidget(storeSize, config.itemsPerQuery, config.overlap);
+				test.beforeEach(function(){
+					createWidget(storeSize, itemsPerQuery, overlap);
+				});
+
+				test.afterEach(destroyWidget);
+
+				// Modify items counting up.
+				for(numToModify = 1; numToModify <= config.itemsModifiedMax; numToModify++){
+					for(index = 0; index <= (storeSize - numToModify); index++){
+						itemTest(config.itemAction, index, numToModify);
+					}
+				}
+				// Modify items counting down.  Starting at a count of 2 because
+				// single item modification were tested above.
+				for(numToModify = 2; numToModify <= config.itemsModifiedMax; numToModify++){
+					for(index = numToModify - 1; index < storeSize; index++){
+						itemTest(config.itemAction, index, numToModify, true);
+					}
+				}
 			});
-
-			test.afterEach(destroyWidget);
-
-			// Modify items counting up.
-			for(numToModify = 1; numToModify <= config.itemsModifiedMax; numToModify++){
-				for(index = 0; index <= (storeSize - numToModify); index++){
-					itemTest(config.itemAction, index, numToModify);
-				}
-			}
-			// Modify items counting down.  Starting at a count of 2 because
-			// single item modification were tested above.
-			for(numToModify = 2; numToModify <= config.itemsModifiedMax; numToModify++){
-				for(index = numToModify - 1; index < storeSize; index++){
-					itemTest(config.itemAction, index, numToModify, true);
-				}
-			}
-		});
+		})(config.storeSize, config.itemsPerQuery, config.overlap);
 	}
 
 	function itemActionTestSuite(description, itemAction, config){
@@ -180,7 +180,7 @@ define([
 			itemTestSuite("OnDemandGrid one query", createGrid, config);
 			itemTestSuite("OnDemandList one query", createList, config);
 
-			// Test widgets that make multple query requests: twice as many items as items per query so multiple
+			// Test widgets that make multiple query requests: twice as many items as items per query so multiple
 			// queries will create multiple observers.
 			config.storeSize = config.storeSizeMuliplier * 2;
 			for(overlap = 0; overlap <= config.itemOverlapMax; overlap++){
@@ -263,7 +263,7 @@ define([
 			var config = {
 				itemsPerQuery: 2,
 				storeSizeMuliplier: 3,
-				itemOverlapMax: 2,
+				itemOverlapMax: 1,
 				itemsModifiedMax: 2
 			};
 			itemActionTestSuite("Modify store items", modifyAction, config);
