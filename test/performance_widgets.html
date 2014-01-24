@@ -27,8 +27,8 @@
 		<script src="../../dojo/dojo.js" data-dojo-config="async: true"></script>
 		<script>
 			var countWidgets; // function, defined within require callback
-			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dgrid/editor", "dijit/form/TextBox", "dijit/registry", "dojo/aspect", "dojo/_base/declare", "dgrid/test/data/perf", "dojo/domReady!"], 
-				function(List, Grid, Selection, Keyboard, editor, TextBox, registry, aspect, declare, testPerfStore){
+			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dgrid/editor", "dijit/form/TextBox", "dijit/registry", "dojo/aspect", "dojo/_base/declare", "dgrid/test/data/testPerformanceStore", "dojo/domReady!"], 
+				function(List, Grid, Selection, Keyboard, editor, TextBox, registry, aspect, declare, testPerformanceStore){
 					var
 						columns = [
 							{ name: 'Column 0', field: 'id', width: '10%' },
@@ -59,18 +59,18 @@
 					});
 					
 					// add logging to store put
-					aspect.after(testPerfStore, "put", function(id){
+					aspect.after(testPerformanceStore, "put", function(id){
 						console.log("put id: ", id);
 					});
 					
 					console.time("grid construction");
 					window.grid = new (declare([Grid, Selection, Keyboard]))({
-						store: testPerfStore,
+						collection: testPerformanceStore,
 						columns: columns
 					}, "grid");
 					console.timeEnd("grid construction");
 					
-					window.store = testPerfStore; // for tinkering
+					window.collection = testPerformanceStore; // for tinkering
 			});
 			
 			function logDirty(){

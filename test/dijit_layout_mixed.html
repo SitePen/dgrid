@@ -33,7 +33,7 @@
 				"dijit/layout/BorderContainer",
 				"dijit/layout/TabContainer",
 				"dojo/parser",
-				"dgrid/test/data/base",
+				"dgrid/test/data/testStore",
 				"dijit/layout/ContentPane",
 				"dojo/domReady!"
 			], function(Grid, Selection, DijitRegistry, registry, lang, declare, BC, TC, parser, testStore){
@@ -53,7 +53,7 @@
 				// Add grids to TabContainer parsed within page
 				grid1 = window.grid1 = new CustomGrid({
 					id: "grid1",
-					store: testStore,
+					collection: testStore,
 					columns: lang.clone(gridCols),
 					selectionMode: "single",
 					title: "Tab 1"
@@ -62,7 +62,7 @@
 				
 				grid2 = window.grid2 = new CustomGrid({
 					id: "grid2",
-					store: testStore,
+					collection: testStore,
 					columns: lang.clone(gridCols),
 					selectionMode: "single",
 					title: "Tab 2"

@@ -26,5 +26,5 @@ define([
 		});
 	}
 
-	return typesData;
+	return { items: typesData };
 });

@@ -1,5 +1,5 @@
 define([
-]. function(){
+], function(){
 	return {
 		identifier: "id",
 		items: [

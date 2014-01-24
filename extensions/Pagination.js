@@ -341,14 +341,14 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 			});
 		},
 
-		_onNotification: function(rows){
-			if(rows.length !== this._rowsOnPage){
+		_onNotification: function(){
+			if(this._rows.length !== this._rowsOnPage){
 				// Refresh the current page to maintain correct number of rows on page
 				this.gotoPage(this._currentPage);
 			}
 		},
 
-		renderQueryResults: function(results, beforeNode){
+		renderCollection: function(collection, beforeNode){
 			var grid = this,
 				rows = this.inherited(arguments);
 
@@ -424,10 +424,10 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 				// set flag to deactivate pagination event handlers until loaded
 				grid._isLoading = true;
 
-				// Run new query and pass it into renderQueryResults
+				// Run new query and pass it into renderCollection
 				results = grid.collection.range(start, start + count);
 
-				return Deferred.when(grid.renderQueryResults(results, null, options)).then(function(rows){
+				return Deferred.when(grid.renderCollection(results, null, options)).then(function(rows){
 					cleanupLoading(grid);
 					// Reset scroll Y-position now that new page is loaded.
 					grid.scrollTo({ y: 0 });
@@ -454,7 +454,7 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 						grid._rowsOnPage = rows.length;
 
 						// It's especially important that _updateNavigation is called only
-						// after renderQueryResults is resolved as well (to prevent jumping).
+						// after renderCollection is resolved as well (to prevent jumping).
 						grid._updateNavigation(focusLink);
 					});
 

@@ -51,9 +51,10 @@
 			
 			require([skinDep, "dgrid/Grid", "dgrid/extensions/Pagination",
 					"dojo/i18n!dgrid/extensions/nls/pagination", "dgrid/Selection", "dgrid/Keyboard",
-					"dojo/_base/lang", "dojo/_base/declare", "dojo/dom-construct", "dojo/dom-form", "dgrid/test/data/base", "dojo/domReady!"],
+					"dojo/_base/lang", "dojo/_base/declare", "dojo/dom-construct", "dojo/dom-form",
+					"dgrid/test/data/createAsyncStore", "dgrid/test/data/genericData", "dojo/domReady!"],
 				function(skinResource, Grid, Pagination, i18nPagination, Selection, Keyboard,
-						lang, declare, domConstruct, domForm, testStore){
+						lang, declare, domConstruct, domForm, createAsyncStore, genericData){
 					
 					// Create a custom Pagination class with a distinct i18n bundle
 					// In this case, we're overriding just one value, so we're
@@ -71,7 +72,7 @@
 					document.body.className = skin;
 					
 					window.grid = new CustomGrid({
-						store: testAsyncStore,
+						collection: createAsyncStore({ data: genericData }),
 						columns: {
 							col1: 'Column 1',
 							col2: {label: 'Column2', sortable: false},

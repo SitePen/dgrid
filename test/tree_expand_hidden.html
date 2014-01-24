@@ -21,8 +21,13 @@
 		<script src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script>
-			require(["dojo/on", "dgrid/OnDemandGrid", "dgrid/tree", "dgrid/Keyboard", "dgrid/Selection", "dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!"], 
-				function(on, Grid, tree, Keyboard, Selection, declare, testStore){
+			require([
+				"dojo/on", "dgrid/OnDemandGrid", "dgrid/tree", "dgrid/Keyboard", "dgrid/Selection", 
+				"dojo/_base/declare", "dgrid/test/data/createAsyncHierarchicalStore",
+				"dgrid/test/data/hierarchicalCountryData", "dojo/domReady!"
+			], function(
+				on, Grid, tree, Keyboard, Selection, declare, createAsyncHierarchicalStore, hierarchicalCountryData
+			){
 					var columns = [
 						tree({label:'Name', field:'name', sortable: false}),
 						{label:'Type', field:'type', sortable: false},
@@ -31,7 +36,7 @@
 					];
 					
 					var grid = window.grid = new (declare([Grid, Keyboard, Selection]))({
-						store: testCountryStore,
+						collection: createAsyncHierarchicalStore({ data: hierarchicalCountryData }),
 						columns: columns
 					}, "grid");
 

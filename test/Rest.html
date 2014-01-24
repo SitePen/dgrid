@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="utf-8">
-		<title>Test JsonRest store</title>
+		<title>Test Rest store</title>
 		<meta name="viewport" content="width=570">
 		<style>
 			@import "../../dojo/resources/dojo.css";
@@ -21,24 +21,17 @@
 		<script src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script>
-			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/editor", "dgrid/Keyboard", "dgrid/tree", "dojo/_base/declare", "dojo/store/JsonRest", "dojo/store/Observable", "dojo/store/Cache", "dojo/store/Memory", "dojo/domReady!"], 
-				function(List, Grid, Selection, editor, Keyboard, tree, declare, JsonRest, Observable, Cache, Memory){
-					var testStore = Observable(Cache(JsonRest({
-						target:"./data/rest.php?", 
+			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/editor", "dgrid/Keyboard", "dgrid/tree", "dojo/_base/declare", "dstore/Rest", "dstore/Observable", "dstore/Cache", "dojo/domReady!"], 
+				function(List, Grid, Selection, editor, Keyboard, tree, declare, Rest, Observable, Cache){
+					var testStore = new declare([ Rest, Observable, Cache ])({
+						target:"./data/rest.php", 
 						idProperty: "id",
-						query: function(query, options){
-							// have to manually adjust the query to get rid of the double ?? that trips php up
-							if(query.parent){
-								query = "parent=" + query.parent;
-							}
-							return JsonRest.prototype.query.call(this, query, options);
-						},
 						put: function(object){
 							return object;
 						}
-					}), Memory()));
-					testStore.getChildren = function(parent, options){
-						return testStore.query({parent: parent.id}, options);
+					});
+					testStore.getChildren = function(parent){
+						return testStore.filter({parent: parent.id});
 					};
 					var columns = [
 						tree({label:'Name', field:'name', sortable: false}),
@@ -48,7 +41,7 @@
 					];
 
 					window.grid = new (declare([Grid, Selection, Keyboard]))({
-						store: testStore,
+						collection: testStore.filter({ parent: undefined }),
 						sort: "id",
 						getBeforePut: false,
 						columns: columns
@@ -70,7 +63,7 @@
 		</script>
 	</head>
 	<body class="claro">
-		<h2>A basic grid with JsonRest store</h2>
+		<h2>A basic grid with Rest store</h2>
 		<div id="grid"></div>
 		<button onclick='deleteSelected()'>Delete Page</div>
 		<button onclick='addPage()'>Add Page</div>

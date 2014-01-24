@@ -50,15 +50,22 @@
 		<script src="../../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script>
-			require(["dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/extensions/DnD", "dgrid/Keyboard", "dojo/dnd/Source", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/Deferred",  "dgrid/test/data/base", "dojo/domReady!"],
-				function(Grid, Selection, DnD, Keyboard, DnDSource, declare, lang, arrayUtil, Deferred){
+			require([
+				"dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/extensions/DnD", "dgrid/Keyboard", "dojo/dnd/Source",
+				"dojo/_base/declare", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/Deferred",
+				"dgrid/test/data/createOrderedStore", "dgrid/test/data/orderedData",
+				"dojo/domReady!"],
+				function(
+					Grid, Selection, DnD, Keyboard, DnDSource, declare, lang, arrayUtil, Deferred, 
+					createOrderedStore, orderedData
+				){
 					var DnDGrid = declare([Grid, Selection, DnD, Keyboard]);
 					
-					// Create a custom data array based on testOrderedData, but looping
+					// Create a custom data array based on orderedData, but looping
 					// several times to create enough items to reasonably test node removal,
 					// and also adding an extra item to test item-specific DnD types.
 					var orderedData = [],
-						len = testOrderedData.length,
+						len = orderedData.length,
 						i, j, obj;
 					
 					orderedData.push({
@@ -70,7 +77,7 @@
 					
 					for(i = 0; i < 10; i++){
 						for(j = 0; j < len; j++){
-							obj = lang.clone(testOrderedData[j]);
+							obj = lang.clone(orderedData[j]);
 							obj.order = obj.id = i * len + j + 2;
 							orderedData.push(obj);
 						}
@@ -81,7 +88,7 @@
 					window.grid1 = new DnDGrid({
 						bufferRows: 5,
 						farOffRemoval: 400,
-						store: store = createOrderedStore(orderedData, { idProperty: "id" }),
+						collection: store = createOrderedStore({ data: orderedData }),
 						columns: [
 							{label:"Name", field:"name", sortable: false},
 							{label:"Description", field:"description", sortable: false}
@@ -91,7 +98,7 @@
 						}
 					}, "grid1");
 					window.grid2 = new DnDGrid({
-						store: createOrderedStore([]),
+						collection: createOrderedStore(),
 						columns: [
 							{label:"Name", field:"name", sortable: false}
 						]
@@ -188,16 +195,16 @@
 						postMixInProperties: function(){
 							this.inherited(arguments);
 							// Filter according to which "side" is represented
-							this.query.added = this.addedSide;
+							this.collection = this.collection.filter({ added: this.addedSide });
 						}
 					});
 					
 					// set up store to use for these grids
-					var sharedStore = createOrderedStore(lang.clone(testOrderedData));
+					var sharedStore = createOrderedStore({ data: orderedData });
 					
 					window.grid3 = new SharedDnDGrid({
 						dndSourceType: "dgrid-row-swap",
-						store: sharedStore,
+						collection: sharedStore,
 						columns: [
 							{label:"Name", field:"name", sortable: false},
 							{label:"Description", field:"description", sortable: false}
@@ -206,7 +213,7 @@
 					window.grid4 = new SharedDnDGrid({
 						dndSourceType: "dgrid-row-swap", // same as grid3
 						addedSide: true, // flag to extension above
-						store: sharedStore,
+						collection: sharedStore,
 						columns: [
 							{label:"Name", field:"name", sortable: false},
 							{label:"Description", field:"description", sortable: false}

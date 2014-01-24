@@ -32,7 +32,7 @@
 			var getColumns;
 			
 			require(["dojo/on", "dgrid/OnDemandGrid", "dgrid/selector", "dgrid/Selection", "dgrid/Keyboard", "dgrid/ColumnSet",
-					"dojo/_base/declare", "dojo/_base/array", "dojo/json", "dgrid/test/data/base", "dojo/domReady!"], 
+					"dojo/_base/declare", "dojo/_base/array", "dojo/json", "dgrid/test/data/testStore", "dojo/domReady!"], 
 				function(on, Grid, selector, Selection, Keyboard, ColumnSet, declare, arrayUtil, json, testStore){
 					on(document.body, "dgrid-select,dgrid-deselect",
 						function(event){
@@ -64,7 +64,7 @@
 					var SelectionGrid = declare([Grid, Selection, Keyboard]);
 					
 					window.grid = new SelectionGrid({
-						store: testStore,
+						collection: testStore,
 						selectionMode: "none",
 						allowSelect: function(row){
 							return row.data.col1 !== "note";
@@ -73,7 +73,7 @@
 						allowSelectAll: true
 					}, "grid");
 					window.grid2 = new SelectionGrid({
-						store: testStore,
+						collection: testStore,
 						selectionMode: "none",
 						columns: {
 							col1: selector({ label: "" }), // Test blank label
@@ -85,7 +85,7 @@
 					}, "grid2");
 
 					window.gridRadio = new SelectionGrid({
-						store: testStore,
+						collection: testStore,
 						selectionMode: "none",
 						allowSelect: function(row){
 							return row.data.col3 !== "read";
@@ -99,13 +99,13 @@
 					}, "grid-radio");
 					
 					window.gridNoSelector = new SelectionGrid({
-						store: testStore,
+						collection: testStore,
 						selectionMode: "none",
 						columns: getColumnsWithoutSelector()
 					}, "gridNoSelector");
 					
 					window.gridComplex = new (declare([Grid, ColumnSet, Selection, Keyboard]))({
-						store: testStore,
+						collection: testStore,
 						allowSelect: function(row){
 							return row.data.col1 !== "note";
 						},

@@ -42,10 +42,10 @@
 		<script src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script>
-			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!"], 
-				function(List, Grid, Selection, Keyboard, declare){
+			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dgrid/test/data/testStore", "dojo/domReady!"], 
+				function(List, Grid, Selection, Keyboard, declare, testStore){
 					window.grid = new (declare([Grid, Selection, Keyboard]))({
-						store: testStore,
+						collection: testStore,
 						columns: {
 							col1: "Column 1",
 							col2: { label: "Column 2", sortable: false },

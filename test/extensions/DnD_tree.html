@@ -33,9 +33,14 @@
 			data-dojo-config="async: true"></script>
 		<script>
 			require(["dojo/_base/declare",
-				"dgrid/OnDemandList", "dgrid/OnDemandGrid", "dgrid/Keyboard", "dgrid/Selection", "dgrid/extensions/DnD", "dgrid/tree",
-				"put-selector/put", "dgrid/test/data/base", "dojo/domReady!"],
-			function(declare, OnDemandList, OnDemandGrid, Keyboard, Selection, DnD, tree, put){
+				"dgrid/OnDemandList", "dgrid/OnDemandGrid", "dgrid/Keyboard", "dgrid/Selection",
+				"dgrid/extensions/DnD", "dgrid/tree", "put-selector/put", 
+				"dgrid/test/data/createAsyncHierarchicalStore", "dgrid/test/data/hierarchicalCountryData",
+				"dgrid/test/data/createOrderedStore", "dojo/domReady!"],
+			function(
+				declare, OnDemandList, OnDemandGrid, Keyboard, Selection, DnD, tree, put,
+				createAsyncHierarchicalStore, hierarchicalCountryData, createOrderedStore
+			){
 				var DnDList = declare([OnDemandList, Keyboard, Selection, DnD]),
 					DnDGrid = declare([OnDemandGrid, Keyboard, Selection, DnD]);
 				
@@ -47,7 +52,7 @@
 						{label:"Population", field:"population"},
 						{label:"Timezone", field:"timezone"}
 					],
-					store: testCountryStore,
+					collection: createAsyncHierarchicalStore({ data: hierarchicalCountryData }),
 					dndParams: {
 						allowNested: true, // also pick up indirect children w/ dojoDndItem class
 						checkAcceptance: function(source, nodes) {
@@ -58,7 +63,7 @@
 				
 				// Create the target list.
 				window.targetgrid = new DnDList({
-					store: createOrderedStore(),
+					collection: createOrderedStore(),
 					renderRow: function(object) {
 						return put("div", object.name);
 					},

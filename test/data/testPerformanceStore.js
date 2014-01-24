@@ -1,4 +1,4 @@
-define(["dojo/_base/declare", "dstore/Memory", "dstore/Observable"],function(declare, Memory, Observable){
+define([ "./createSyncStore" ],function(createSyncStore){
 	var perfData = [], today = new Date().getTime();
 	for(var i = 0; i < 20000; i++){
 		perfData.push({
@@ -14,5 +14,5 @@ define(["dojo/_base/declare", "dstore/Memory", "dstore/Observable"],function(dec
 			today: new Date(today)
 		});
 	}
-	return new declare([ Memory, Observable ])({data: perfData});
+	return createSyncStore({data: perfData});
 });

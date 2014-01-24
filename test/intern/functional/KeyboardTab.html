@@ -16,7 +16,22 @@
 <div id="grid1"></div>
 <div id="grid2"></div>
 
-<script src="../../../../dojo/dojo.js" data-dojo-config="async: true"></script>
+
+		<script>
+			var dojoConfig = {
+				async: true,
+				baseUrl: "../../../../",
+				packages: [
+				{ name: "dojo", location: "./dtk/dojo" },
+				{ name: "dijit", location: "./dtk/dijit" },
+				{ name: "dojox", location: "./dtk/dojox" },
+					"put-selector",
+					"xstyle"
+				],
+			};
+	  }
+</script>
+<script src="../../../../dtk/dojo/dojo.js"></script>
 <script>
 var ready;
 require([

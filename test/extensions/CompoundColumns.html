@@ -51,10 +51,8 @@
 		</style>
 		<script src="../../../dojo/dojo.js" data-dojo-config="async: true"></script>
 		<script>
-			require(["dgrid/OnDemandGrid", "dgrid/extensions/CompoundColumns", "dgrid/ColumnSet", "dgrid/Selection", "dgrid/Keyboard",
-				"dojo/_base/declare", "dojo/_base/lang", "dojo/on", "dojo/dom", "dgrid/test/data/base",
-				"dojo/domReady!"],
-				function(Grid, CompoundColumns, ColumnSet, Selection, Keyboard, declare, lang, on, dom, testStore){
+			require(["dgrid/OnDemandGrid", "dgrid/extensions/CompoundColumns", "dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dojo/_base/lang", "dgrid/test/data/testStore", "dojo/domReady!"],
+				function(Grid, CompoundColumns, Selection, Keyboard, declare, lang, testStore){
 
 					var CompoundedGrid = declare([Grid, CompoundColumns, Selection, Keyboard]),
 						CompoundedColumnSetGrid = declare([Grid, CompoundColumns, ColumnSet, Selection, Keyboard]),
@@ -174,7 +172,7 @@
 							]
 						];
 					window.grid = new CompoundedGrid({
-						store: testStore,
+						collection: testStore,
 						columns: [
 							{field: 'col1', label: 'First Column'},
 							{label: "Full Name", children: [

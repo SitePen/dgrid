@@ -49,12 +49,20 @@
 			require(["dgrid/Grid", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard",
 					"dgrid/tree", "dgrid/editor", "dojo/_base/lang",
 					"dojo/_base/declare", "dojo/on", "dojo/data/ObjectStore",
+					"dojo/store/Memory", "dojo/store/Observable",
+					"dgrid/test/data/createSyncStore", "dgrid/test/data/createAsyncHierarchicalStore",
+					"dgrid/test/data/testStore", "dgrid/test/data/stateData", "dgrid/test/data/typesData",
+					"dgrid/test/data/hierarchicalCountryData",
 					"dijit/form/CheckBox", "dijit/form/TimeTextBox",
 					"dijit/form/Select", "dijit/form/FilteringSelect",
-					"dgrid/extensions/Pagination", "dgrid/test/data/base", "dojo/domReady!", "xstyle/css!../css/dgrid_rtl.css"], 
-				function(Grid, OnDemandGrid, Selection, Keyboard, tree, editor, lang, declare,
-						 on, ObjectStore, CheckBox, TimeTextBox, Select,
-						 FilteringSelect, Pagination, testStore){
+					"dgrid/extensions/Pagination", "dojo/domReady!", "xstyle/css!../css/dgrid_rtl.css"], 
+				function(
+					Grid, OnDemandGrid, Selection, Keyboard, tree, editor, lang, declare, on, ObjectStore,
+					LegacyMemory, LegacyObservable, createSyncStore, createAsyncHierarchicalStore,
+					testStore, stateData, typesData, hierarchicalCountryData,
+					CheckBox, TimeTextBox, Select,
+					FilteringSelect, Pagination
+				){
 					var columns = [
 						{label: 'Column 1', field: 'col1'},
 						{label: 'Column 2', field: 'col2', sortable: false},
@@ -65,12 +73,12 @@
 					var StandardGrid = declare([OnDemandGrid, Selection, Keyboard]);
 
 					window.grid = new StandardGrid({
-						store: testStore,
+						collection: testStore,
 						columns: lang.clone(columns)
 					}, "grid");
 					
 					window.scrollgrid = new StandardGrid({
-						store: testStore,
+						collection: testStore,
 						columns: lang.clone(columns)
 					}, "scrollgrid");
 					
@@ -83,7 +91,7 @@
 					];
 					
 					window.tree = new StandardGrid({
-						store: testCountryStore,
+						collection: createAsyncHierarchicalStore({ data: hierarchicalCountryData }),
 						columns: columnsTree
 					}, "tree");
 					
@@ -96,14 +104,14 @@
 					};
 
 					window.headerless = new StandardGrid({
-						store: testStore,
+						collection: testStore,
 						columns: columnsHeaderless,
 						showHeader: false
 						
 					}, "headerless");
 						
 					stateStore = new ObjectStore({
-						objectStore:testStateStore,
+						objectStore: LegacyObservable(new LegacyMemory({ data: lang.clone(stateData) })),
 						labelProperty: "name"
 					});
 
@@ -145,13 +153,13 @@
 					];
 					
 					window.moreeditors = new StandardGrid({
-						store: testTypesStore,
+						collection: createSyncStore({ data: typesData }),
 						columns: columnsEditor,
 						selectionMode: "none"
 					}, "moreeditors");
 
 					window.paginationGrid = new declare([Grid, Selection, Keyboard, Pagination])({
-						store: testStore,
+						collection: testStore,
 						columns: lang.clone(columns)
 					}, 'pagination');
 					

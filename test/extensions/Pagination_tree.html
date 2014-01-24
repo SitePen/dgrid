@@ -50,25 +50,18 @@
 			
 			require([skinDep, "dgrid/Grid", "dgrid/extensions/Pagination", "dgrid/Selection", "dgrid/tree",
 					"dojo/_base/lang", "dojo/_base/declare", "dojo/dom-construct", "dojo/dom-form", 
-					"dojo/store/Memory", "dojo/store/JsonRest", "dojo/store/Cache", "dojo/store/Observable", "dojo/domReady!"],
+					"dstore/Rest", "dstore/Cache", "dstore/Observable", "dojo/domReady!"],
 				function(skinResource, Grid, Pagination, Selection, tree,
 						lang, declare, domConstruct, domForm, 
-						Memory, JsonRest, Cache, Observable){
+						Rest, Cache, Observable){
 					
 					var CustomGrid = declare([Grid, Selection, Pagination]);
 					
-					var testStore = window.testStore = Observable(new Cache(new JsonRest({
-						target:"../data/rest.php?", 
-						query: function(query, options){
-							// have to manually adjust the query to get rid of the double ?? that trips php up
-							if(query.parent){
-								query = "parent=" + query.parent;
-							}
-							return JsonRest.prototype.query.call(this, query, options);
-						}
-					}), new Memory()));
-					testStore.getChildren = function(parent, options){
-						return testStore.query({parent: parent.id}, options);
+					var testStore = window.testStore = new declare([ Rest, Cache, Observable ])({
+						target:"../data/rest.php?"
+					});
+					testStore.getChildren = function(parent){
+						return testStore.filter({parent: parent.id});
 					};
 					
 					function getColumns(){
@@ -82,7 +75,7 @@
 					document.body.className = skin;
 					
 					window.grid2 = new CustomGrid({
-						store: testStore,
+						collection: testStore,
 						columns: getColumns(),
 						pagingLinks: false,
 						pagingTextBox: true,
@@ -92,7 +85,7 @@
 					
 					function createGrid(args){
 						window.grid = new CustomGrid(lang.mixin({
-									store: testStore,
+									collection: testStore,
 									columns: getColumns()
 								}, args),
 							"grid");

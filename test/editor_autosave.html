@@ -22,8 +22,12 @@
 			require(["dojo/_base/declare", "dojo/_base/array", "dgrid/List", "dgrid/OnDemandGrid", "dgrid/Keyboard",
 					"dgrid/editor", "dijit/form/CheckBox", "dijit/form/DateTextBox",
 					"dijit/form/HorizontalSlider", "dijit/form/NumberSpinner",
-					"dgrid/test/data/base", "dojo/domReady!"],
-				function(declare, arrayUtil, List, Grid, Keyboard, editor, CheckBox, DateTextBox, Slider, NumberSpinner){
+					"dgrid/test/data/createSyncStore", "dgrid/test/data/typesData", "dojo/domReady!"
+				], function(
+					declare, arrayUtil, List, Grid, Keyboard, editor,
+					CheckBox, DateTextBox, Slider, NumberSpinner, createSyncStore, typesData
+				){
+					var testTypesStore = createSyncStore({ data: typesData });
 					var getColumns = window.getColumns = function(editOn){
 						return arrayUtil.map([
 							{ label: "Date", field: "date", editor: DateTextBox },
@@ -42,7 +46,7 @@
 					}
 
 					window.grid = new (declare([Grid, Keyboard]))({
-						store: testTypesStore,
+						collection: testTypesStore,
 						columns: getColumns()
 					}, "grid");
 					

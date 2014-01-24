@@ -37,10 +37,10 @@
 			
 			require(["dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Keyboard", "dgrid/editor", "put-selector/put",
 					"dojo/_base/lang", "dojo/_base/declare", "dojo/on", "dojo/dom-construct",
-					"dojo/store/Memory", "dojo/store/Observable", "dojo/data/ObjectStore",
+					"dojo/store/Memory", "dstore/Memory", "dstore/Observable", "dojo/data/ObjectStore",
 					"dgrid/test/data/DeferredWrapper", "dojo/domReady!"],
 				function(Grid, Selection, Keyboard, editor, put,
-						lang, declare, on, domConstruct, Memory, Observable, ObjectStore, DeferredWrapper){
+						lang, declare, on, domConstruct, LegacyMemory, Memory, Observable, ObjectStore, DeferredWrapper){
 					var today = new Date(),
 						form = document.getElementById("editorForm"),
 						typesArea = document.getElementById("editorComponentTypes"),
@@ -52,13 +52,13 @@
 							{ id: "5", name: "five" }
 						],
 						optionsLength = optionsData.length,
-						optionsStore = new Memory({ data: optionsData }),
+						optionsStore = new LegacyMemory({ data: optionsData }),
 						optionsDataStore = new ObjectStore({
 							objectStore: optionsStore,
 							labelProperty: "name"
 						}),
 						CustomGrid = declare([Grid, Selection, Keyboard]),
-						TestStore = declare(Memory, {
+						TestStore = declare([ Memory, Observable ], {
 							put: function(object, options){
 								console.log("put called for ID: ", object.id, object);
 								this.inherited(arguments);
@@ -237,7 +237,6 @@
 						if(async){
 							store = new DeferredWrapper(store, 100);
 						}
-						store = Observable(store);
 						
 						require(deps, function(ctor){
 							var columnArgs = {
@@ -260,7 +259,7 @@
 							
 							if(!grid){
 								grid = new CustomGrid({
-									store: store,
+									collection: store,
 									columns: {
 										"editor": editor(lang.mixin({}, options.column, columnArgs))
 									},

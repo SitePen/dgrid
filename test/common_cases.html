@@ -64,11 +64,27 @@
 		<script src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script>
-			require(["dojo/on", "dgrid/List", "dgrid/OnDemandGrid", "dgrid/tree", "dgrid/editor", "dgrid/Selection", "dgrid/Keyboard", "dgrid/test/data/base", "dojo/_base/declare", "dojo/_base/array", "dojo/domReady!"], 
-				function(on, List, Grid, tree, editor, Selection, Keyboard, testStore, declare, arrayUtil){
+			require([
+				"dojo/on",
+				"dgrid/List",
+				"dgrid/OnDemandGrid",
+				"dgrid/tree",
+				"dgrid/editor",
+				"dgrid/Selection",
+				"dgrid/Keyboard",
+				"dgrid/test/data/createSyncStore",
+				"dgrid/test/data/genericData",
+				"dgrid/test/data/createSyncHierarchicalStore",
+				"dgrid/test/data/hierarchicalCountryData",
+				"dojo/_base/declare",
+				"dojo/_base/array",
+				"dojo/domReady!"
+			], function(on, List, Grid, tree, editor, Selection, Keyboard, createSyncStore, genericData, createSyncHierarchicalStore, hierarchicalCountryData, declare, arrayUtil){
 					console.log("loaded in " + (new Date().getTime() - start));
 
-					var StandardGrid = declare([Grid, Selection, Keyboard]);
+					var StandardGrid = declare([Grid, Selection, Keyboard]),
+						store = createSyncStore({ data: genericData }),
+						countryStore = createSyncHierarchicalStore({ data: hierarchicalCountryData });
 					
 					function getColumns(){
 						return { // you can declare columns as an object hash (key translates to field)
@@ -80,18 +96,18 @@
 						};
 					}
 					window.grid = new StandardGrid({
-						store: testStore,
+						collection: store,
 						columns: getColumns()
 					}, "grid");
 					
 					window.scrollgrid = new StandardGrid({
-						store: testStore,
+						collection: store,
 						columns: getColumns()
 					}, "scrollgrid");
 					
 					window.tree = new StandardGrid({
 						tabIndex: 2,
-						store: testCountryStore,
+						collection: countryStore,
 						selectionMode: "single",
 						columns: {
 							name: tree({label:'Name', sortable: false}),
@@ -104,7 +120,7 @@
 					window.list = new (declare([List, Selection, Keyboard]))({
 						tabIndex: 1
 					}, "list");
-					list.renderArray(arrayUtil.map(testCountryStore.data, function(country){
+					list.renderArray(arrayUtil.map(hierarchicalCountryData.items, function(country){
 						return country.name;
 					}));
 					on(document.getElementById("save"), "click", function(){

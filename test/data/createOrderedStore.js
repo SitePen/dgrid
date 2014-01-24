@@ -1,6 +1,7 @@
 define([
+	"dojo/_base/lang",
 	"./createSyncStore"
-], function(createSyncStore){
+], function(lang, createSyncStore){
 	function calculateOrder(store, object, before, orderField){
 		// Calculates proper value of order for an item to be placed before another
 		var afterOrder, beforeOrder = 0;
@@ -32,10 +33,6 @@ define([
 
 		kwArgs = lang.mixin({
 			idProperty: "name",
-			put: function(object, options){
-				object.order = calculateOrder(this, object, options && options.before);
-				return ObservableMemory.prototype.put.call(this, object, options);
-			},
 			// Memory's add does not need to be augmented since it calls put
 			copy: function(object, options){
 				// summary:
@@ -61,10 +58,16 @@ define([
 
 		var store = createSyncStore(kwArgs);
 
+		var originalPut = store.put;
+		store.put = function(object, options){
+			object.order = calculateOrder(this, object, options && options.before);
+			return originalPut.call(this, object, options);
+		};
+
 		var originalFetch = store.fetch;
 		store.fetch = function(){
 			this.sort("order");
-			return ObservableMemory.prototype.fetch.call(this);
+			return originalFetch.call(this);
 		};
 
 		return store;

@@ -34,6 +34,7 @@ define([
 		return dfd.promise;
 	};
 
+	// TODO: Rename query to fetch and update dependent tests
 	return {
 		query: queryStore,
 		put: putStore,

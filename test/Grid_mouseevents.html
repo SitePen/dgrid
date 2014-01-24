@@ -33,8 +33,9 @@
 				description: {label: "what to do", sortable: false}
 			};
 			require(["dgrid/Grid", "dgrid/OnDemandGrid", "dgrid/tree", "dgrid/util/mouse", "dojo/on",
-				"dgrid/test/data/base", "dojo/query", "dojo/domReady!"],
-			function(Grid, OnDemandGrid, tree, mouseUtil, on){
+				"dgrid/test/data/createAsyncHierarchicalStore", "dgrid/test/data/hierarchicalCountryData",
+				"dojo/query", "dojo/domReady!"],
+			function(Grid, OnDemandGrid, tree, mouseUtil, on, createAsyncHierarchicalStore, hierarchicalCountryData){
 				var data = [
 					{order: 1, name:"preheat", description:"Preheat your oven to 350F"},
 					{order: 2, name:"mix dry", description:"In a medium bowl, combine flour, salt, and baking soda"},
@@ -74,7 +75,7 @@
 				grid.on(mouseUtil.leaveHeaderCell, makeHeaderCellHandler(grid, "left"));
 				
 				var treegrid = window.treegrid = new OnDemandGrid({
-					store: testCountryStore,
+					collection: createAsyncHierarchicalStore({ data: hierarchicalCountryData }),
 					columns: [
 						tree({label: "Name", field:"name", sortable: false}),
 						{label:"Type", field:"type", sortable: false},

@@ -28,9 +28,11 @@ define([
 
 		var originalFetch = store.fetch;
 		store.fetch = function (){
-			return this.filtered
-				? originalFetch.call(this)
-				: this.filter({ parent: undefined }).fetch();
+			return originalFetch.call(
+				this.filtered
+					? this
+					: this.filter({ parent: undefined })
+			);
 		};
 
 		return store;

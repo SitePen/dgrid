@@ -84,7 +84,7 @@ return declare([List, _StoreMixin], {
 				options: options
 			},
 			priorPreload = this.preload,
-			results;
+			renderedCollection;
 
 		if(!preloadNode){
 			// Initial query; set up top and bottom preload nodes
@@ -138,13 +138,13 @@ return declare([List, _StoreMixin], {
 		return this._trackError(
 			function(){ return query(options); }
 		).then(function(resolvedCollection){
-			results = resolvedCollection;
+			renderedCollection = resolvedCollection;
 
 			// Render the result set
-			return self.renderQueryResults(results, preloadNode, options);
+			return self.renderCollection(renderedCollection, preloadNode, options);
 		}).then(function(trs){
-			var total = typeof results.total === "undefined" ?
-				results.length : results.total;
+			var total = typeof renderedCollection.total === "undefined" ?
+				renderedCollection.length : renderedCollection.total;
 			return Deferred.when(total, function(total){
 				var trCount = trs.length,
 					parentNode = preloadNode.parentNode,
@@ -324,7 +324,7 @@ return declare([List, _StoreMixin], {
 			searchBuffer = requestBuffer - grid.rowHeight, // Avoid rounding causing multiple queries
 			// References related to emitting dgrid-refresh-complete if applicable
 			refreshDfd,
-			lastResults,
+			lastCollection,
 			lastRows,
 			preloadSearchNext = true;
 
@@ -440,7 +440,7 @@ return declare([List, _StoreMixin], {
 
 				count = Math.ceil(count);
 				offset = Math.min(Math.floor(offset), preload.count - count);
-				var options = lang.mixin(grid.get("queryOptions"), preload.options);
+				var options = preload.options || {};
 				preload.count -= count;
 				var beforeNode = preloadNode,
 					keepScrollTo, queryRowsOverlap = grid.queryRowsOverlap,
@@ -511,12 +511,12 @@ return declare([List, _StoreMixin], {
 				// Query now to fill in these rows.
 				grid._trackError(
 					function(){ return preload.query(options); }
-				).then(function(results){
+				).then(function(rangeCollection){
 					// Use function to isolate the variables in case we make multiple requests
 					// (which can happen if we need to render on both sides of an island of already-rendered rows)
-					(function(loadingNode, scrollNode, below, keepScrollTo, results){
-						lastRows = Deferred.when(grid.renderQueryResults(results, loadingNode, options), function(rows){
-							lastResults = results;
+					(function(loadingNode, scrollNode, below, keepScrollTo, rangeCollection){
+						lastRows = Deferred.when(grid.renderCollection(rangeCollection, loadingNode, options), function(rows){
+							lastCollection = rangeCollection;
 
 							// can remove the loading node now
 							beforeNode = loadingNode.nextSibling;
@@ -536,12 +536,13 @@ return declare([List, _StoreMixin], {
 								});
 							}
 
-							Deferred.when(results.total || results.length, function(total){
+							var total = "total" in rangeCollection ? rangeCollection.total : rangeCollection.length;
+							Deferred.when(total, function(total){
 								if(!("queryLevel" in options)){
 									grid._total = total;
 								}
 								if(below){
-									// if it is below, we will use the total from the results to update
+									// if it is below, we will use the total from the collection to update
 									// the count of the last preload in case the total changes as later pages are retrieved
 									// (not uncommon when total counts are estimated for db perf reasons)
 
@@ -559,7 +560,7 @@ return declare([List, _StoreMixin], {
 							put(loadingNode, "!");
 							throw e;
 						});
-					})(loadingNode, scrollNode, below, keepScrollTo, results)
+					})(loadingNode, scrollNode, below, keepScrollTo, rangeCollection)
 				});
 
 				preload = preload.previous;
@@ -572,7 +573,7 @@ return declare([List, _StoreMixin], {
 		if (lastRows && (refreshDfd = this._refreshDeferred)) {
 			delete this._refreshDeferred;
 			Deferred.when(lastRows, function() {
-				refreshDfd.resolve(lastResults);
+				refreshDfd.resolve(lastCollection);
 			});
 		}
 	}

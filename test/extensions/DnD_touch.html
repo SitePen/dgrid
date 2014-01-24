@@ -62,14 +62,17 @@
 					return {
 						bufferRows: 5,
 						farOffRemoval: 400,
-						store: createOrderedStore(orderedData, { idProperty: "id" }),
+						collection: createOrderedStore({
+							data: orderedData, 
+							idProperty: "id"
+						}),
 						getObjectDndType: function(item){
 							return [item.type ? item.type : this.dndSourceType];
 						}
 					};
 				}
 				
-				// Note: testOrderedStore hard-wires sorting anyway,
+				// Note: createOrderedStore hard-wires sorting anyway,
 				// so leaving sort disabled on columns in this grid.
 				var grid = window.grid = new DnDGrid(lang.mixin(getCommonProperties(), {
 					columns: [

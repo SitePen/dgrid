@@ -30,8 +30,8 @@
 		<script src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script>
-			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dgrid/test/data/perf", "dojo/domReady!"], 
-				function(List, Grid, Selection, Keyboard, declare, testPerfStore){
+			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dgrid/test/data/testPerformanceStore", "dojo/domReady!"], 
+				function(List, Grid, Selection, Keyboard, declare, testPerformanceStore){
 					var columns = [
 						{ name: 'Column 0', field: 'id', width: '10%' },
 						{ name: 'Column 1', field: 'integer', width: '10%' },
@@ -46,7 +46,7 @@
 					];
 					var start = new Date();
 					var grid = window.grid = new (declare([Grid, Selection, Keyboard]))({
-						store: testPerfStore,
+						collection: testPerformanceStore,
 						columns: columns
 					}, "grid");
 					console.log("startup time: " + (new Date() - start) + "ms");

@@ -25,23 +25,28 @@
 		<script>
 			require(["dgrid/GridFromHtml", "dgrid/OnDemandList", "dgrid/Keyboard",
 				"dojo/store/Memory", "dojo/store/Observable",
-				"dojo/_base/declare", "dojo/parser", "dojo/query",
+				"dojo/_base/declare", "dojo/_base/lang", "dojo/parser", "dojo/query",
 				"dijit/form/Select", "dgrid/editor", "dijit/form/DateTextBox",
-				"dijit/form/HorizontalSlider", "dijit/form/NumberSpinner",
-				"dojo/data/ObjectStore", "dgrid/test/data/base", "dojo/domReady!"],
-			function(GridFromHtml, OnDemandList, Keyboard, Memory, Observable, declare, parser, query, Select, editor, DateTextBox, Slider, NumberSpinner, ObjectStore){
-
+				"dijit/form/HorizontalSlider", "dijit/form/NumberSpinner", "dojo/data/ObjectStore", 
+				"dgrid/test/data/createSyncStore", "dgrid/test/data/typesData", "dgrid/test/data/stateData",
+				"dojo/domReady!"],
+			function(
+				GridFromHtml, OnDemandList, Keyboard, LegacyMemory, LegacyObservable, declare, lang, parser, query,
+				Select, editor, DateTextBox, Slider, NumberSpinner, ObjectStore,
+				createSyncStore, typesData, stateData
+			){
 				window.dgrid = {
 					GridFromHtml: declare([GridFromHtml, OnDemandList]),
 					editor: editor
 				};
 				window.stateStore = new ObjectStore({
-						objectStore:testStateStore,
+						objectStore: LegacyObservable(new LegacyMemory({ data: lang.clone(stateData) })),
 						labelProperty: "name"
 					});
 				// GridFromHtml tests
+				window.testTypesStore = createSyncStore({ data: typesData });
 				window.gridProgrammatic = new dgrid.GridFromHtml({
-					store: testTypesStore
+					collection: testTypesStore
 				}, "gridProgrammatic");
 				parser.parse();
 			});
@@ -72,7 +77,7 @@
 	<h2>2: Fully declarative GridFromHtml,
 		with columns using editor plugin</h2>
 	<table id="gridDeclarative" data-dojo-id="gridDeclarative"
-			data-dojo-type="dgrid.GridFromHtml" data-dojo-props="store: testTypesStore">
+			data-dojo-type="dgrid.GridFromHtml" data-dojo-props="collection: testTypesStore">
 			<tr>
 				<th data-dgrid-column="dgrid.editor({field:'date'}, dijit.form.DateTextBox)">Date</th>
 				<th data-dgrid-column="dgrid.editor({field: 'text'}, 'text', 'dblclick')">Text editable on dblclick</th>

@@ -59,7 +59,7 @@
 				// then add the rest of the dependencies for the test...
 				deps = deps.concat("dgrid/List", "dgrid/OnDemandGrid", "dgrid/tree",
 					"dgrid/Selection", "dgrid/Keyboard", "dgrid/editor",
-					"dojo/_base/declare", "dojo/dom-construct", "dgrid/test/data/base", "dojo/domReady!");
+					"dojo/_base/declare", "dojo/dom-construct", "dgrid/test/data/testStore", "dojo/domReady!");
 				
 				require(deps, 
 				function(css1, css2, css3, List, Grid, tree, Selection, Keyboard, editor, declare, domConstruct, testStore){
@@ -95,7 +95,7 @@
 					byId("skinfirst").innerHTML = sfhtml.join(" / ");
 					
 					window.grid = new (declare([Grid, Selection, Keyboard]))({
-						store: testStore,
+						collection: testStore,
 						columns: columns
 					}, "grid");
 				}); // end of inner require (dgrid, etc.)

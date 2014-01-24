@@ -35,7 +35,14 @@ function(declare, lang, Deferred, listen, aspect, put){
 		//		to be fetched.
 		collection: null,
 
-		rows: null,
+		// _rows: Array
+		//		A sparse array of row nodes, used to maintain the grid in response to events from a tracked collection.
+		//		Each node's index corresponds to the index of its data object in the collection.
+		_rows: null,
+
+		// _observerHandle: Object
+		//		The observer handle for the current collection, if trackable.
+		_observerHandle: null,
 		
 		// getBeforePut: boolean
 		//		If true, a get request will be performed to the store before each put
@@ -74,7 +81,8 @@ function(declare, lang, Deferred, listen, aspect, put){
 		destroy: function(){
 			this.inherited(arguments);
 
-			// TODO: Remove observer if any
+			// Set collection to null to clean up after existing collection
+			this.set("collection", null);
 		},
 		
 		_configColumn: function(column){
@@ -92,35 +100,41 @@ function(declare, lang, Deferred, listen, aspect, put){
 			//		Assigns a new collection to the list,
 			//		and tells it to refresh.
 			
-			// Remove observer and existing rows so any sub-row observers will be cleaned up
-			// TODO: declare _observerHandle on the prototype
-			if(this._observerHandle){
-				this._observerHandle.remove();
-				this._observerHandle = this.rows = null;
+			if(this.collection){
+				if(this.collection.tracking){
+					this.collection.tracking.remove();
+				}
+			
+				// Remove observer and existing rows so any sub-row observers will be cleaned up
+				if(this._observerHandle){
+					this._observerHandle.remove();
+					this._observerHandle = this._rows = null;
+				}
+				this.cleanup();
+			
+				this.dirty = {}; // discard dirty map, as it applied to a previous collection
 			}
-			this.cleanup();
+			
+			if(collection){
+				if(collection.track){
+					collection = this.collection = collection.track();
+					this._rows = [];
+			
+					// TODO: How is the total number of items tracked?
+					this._observerHandle = this._observeCollection(collection, this.contentNode, this._rows);
+				}else{
+					this.collection = collection;
+				}
 
-			this.dirty = {}; // discard dirty map, as it applied to a previous collection
-			
-			if(collection.track){
-				this.collection = collection.track();
-				this.rows = [];
-			
-				// TODO: How is the total number of items tracked?
-				this._observerHandle = this._observeCollection(this.collection, this.contentNode, this.rows);
-			}else{
-				this.collection = collection;
-			}
-			
-			collection.on("refresh", lang.hitch(this, "refresh"));
-			
-			// If we have new sort criteria, pass them through the sort setter
-			// (which call refresh in itself).  Otherwise, just refresh.
-			// TODO: Are there any cases where this.sort will be truthy but we don't to set it?
-			if(this.sort){
-				this.set('sort', this.sort);
-			}else{
-				this.refresh();
+				collection.on("refresh", lang.hitch(this, "refresh"));
+
+				// If we have new sort criteria, pass them through the sort setter
+				// (which call refresh in itself).  Otherwise, just refresh.
+				if(this.sort && this.sort.length > 0){
+					this.set('sort', this.sort);
+				}else{
+					this.refresh();
+				}
 			}
 		},
 		
@@ -260,7 +274,6 @@ function(declare, lang, Deferred, listen, aspect, put){
 			this.refresh();
 		},
 		
-		// TODO: Add unit test for _trackError
 		_trackError: function(func){
 			// summary:
 			//		Utility function to handle emitting of error events.
@@ -303,21 +316,19 @@ function(declare, lang, Deferred, listen, aspect, put){
 			return this.inherited(arguments);
 		},
 		
-		// TODO: We probably want to rename this to renderCollection
-		renderQueryResults: function(results, beforeNode, options){
+		renderCollection: function(collection, beforeNode, options){
 			// summary:
-			//		Renders objects from QueryResults as rows, before the given node.
+			//		Renders objects from a collection as rows, before the given node.
 			//		This will listen for changes in the collection if an observe method
 			//		is available (i.e. from an Observable data store).
 			
 			options = options || {};
 			var self = this,
 				start = options.start || 0,
-				rows = options.rows || this.rows,
+				rows = options.rows || this._rows,
 				container;
 			
-			// Render the results, asynchronously or synchronously
-			var fetch = lang.hitch(results, "fetch");
+			var fetch = lang.hitch(collection, "fetch");
 			return this._trackError(fetch).then(function(resolvedResults){
 				var resolvedRows,
 					i;
@@ -336,18 +347,19 @@ function(declare, lang, Deferred, listen, aspect, put){
 					
 					delete self._lastCollection; // used only for non-store List/Grid
 				}else{
-					// TODO: _StoreMixin shouldn't have a concept of "out of view"
-
 					// Don't bother inserting; rows are already out of view
 					// or there were none to track
+					// TODO: Should _StoreMixin even have a concept of "out of view"? This seems like a design smell.
 					resolvedRows = [];
 				}
 				return resolvedRows;
 			});
 		},
 
-		_observeCollection: function(collection, container, rows){
+		_observeCollection: function(collection, container, rows, options){
 			var self = this, row;
+
+			options = options || {};
 
 			var handles = [
 				collection.on("remove, update", function(event){
@@ -405,11 +417,10 @@ function(declare, lang, Deferred, listen, aspect, put){
 						if(nextNode && !nextNode.parentNode){
 							nextNode = document.getElementById(nextNode.id);
 						}
-						// TODO: What to do about this? Is this necessary?
+						// TODO: This was taken from the previous observe listener where each range request was observed individually. Is this still necessary?
 						//parentNode = (beforeNode && beforeNode.parentNode) ||
 						//	(nextNode && nextNode.parentNode) || self.contentNode;
-						// TODO: `options` is likely needed here for `tree` to function properly
-						row = self.insertRow(event.target, container, nextNode, to, /*options*/ {});
+						row = self.insertRow(event.target, container, nextNode, to, options);
 						self.highlightRow(row);
 						
 						// TODO: When would row be falsy?
@@ -419,12 +430,13 @@ function(declare, lang, Deferred, listen, aspect, put){
 					}
 				}),
 
-				// TODO: Should the event names be the same as the store CRUD method names?
 				collection.on("add, remove, update", function(event){
 					var from = (typeof event.previousIndex !== "undefined") ? event.previousIndex : Infinity,
 						to = (typeof event.index !== "undefined") ? event.index : Infinity,
 						adjustAtIndex = Math.min(from, to);
 					from !== to && rows[adjustAtIndex] && self.adjustRowIndices(rows[adjustAtIndex]);
+
+					self._onNotification(rows, event);
 				})
 			];
 
@@ -436,5 +448,15 @@ function(declare, lang, Deferred, listen, aspect, put){
 				}
 			};
 		},
+
+		_onNotification: function(rows, event){
+			// summary:
+			//		Protected method called whenever a store notification is observed.
+			//		Intended to be extended as necessary by mixins/extensions.
+			// rows: Array
+			//		A sparse array of row nodes corresponding to data objects in the collection.
+			// event: Object
+			//		The notification event
+		}
 	});
 });

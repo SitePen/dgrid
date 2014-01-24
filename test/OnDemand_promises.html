@@ -17,16 +17,23 @@
 		and an instance of dojo/store/Memory with a promise returned from query.</p>
 		<h2>Grid w/ ItemFileWriteStore via DataStore</h2>
 		<div>
-			<button onclick="grid.set('query', { name: 'foo' })">Show only items named 'foo'</button>
-			<button onclick="grid.set('query', {})">Reset query</button>
+			<button onclick="grid.set('collection', grid.collection.filter({ name: 'foo' }))">Show only items named 'foo'</button>
+			<button onclick="grid.set('collection', grid.collection.store || grid.collection)">Reset query</button>
 		</div>
 		<div id="grid"></div>
 		<h2>Grid w/ dojo/store w/ async query results</h2>
 		<div id="grid2"></div>
 		<script src="../../dojo/dojo.js" data-dojo-config="async:true"></script>
 		<script>
-require(["dgrid/OnDemandGrid", "dojo/store/Memory", "dojo/store/Observable", "dojo/store/util/QueryResults", "dojo/data/ItemFileWriteStore", "dojo/store/DataStore", "dojo/_base/Deferred", "dojo/_base/lang"],
-function(Grid, Memory, Observable, QueryResults, ItemFileWriteStore, DataStore, Deferred, lang){
+require([
+	"dojo/_base/declare", 
+	"dojo/_base/lang", 
+	"dgrid/OnDemandGrid", 
+	"dgrid/test/data/createAsyncStore", 
+	"dojo/store/Memory",
+	"dstore/legacy/StoreAdapter", 
+	"dstore/Observable",
+], function(declare, lang, OnDemandGrid, createAsyncStore, LegacyMemory, StoreAdapter, Observable){
 	var items = [], ifws, datastore, asyncstore, grid, grid2, i,
 		names = ["sasquatch", "foo", "bar", "zaphod", "beeblebrox"];
 	
@@ -37,33 +44,17 @@ function(Grid, Memory, Observable, QueryResults, ItemFileWriteStore, DataStore, 
 			name: names[i%5]
 		});
 	}
+
+	var AdaptedLegacyStore = declare([ LegacyMemory, StoreAdapter, Observable ]);
 	
-	ifws = new ItemFileWriteStore({ data: { identifier: "id", items: lang.clone(items) } });
-	datastore = window.datastore = Observable(new DataStore({store: ifws}));
-	
-	var grid = window.grid = new Grid({
+	var grid = window.grid = new OnDemandGrid({
 		columns: { id: "id", name: "name" },
-		store: datastore
+		collection: new AdaptedLegacyStore({ data: lang.clone(items) })
 	}, "grid");
 	
-	var asyncstore = window.asyncstore = Observable(new Memory({
-		data: items,
-		query: function(query, options){
-			var results, def, promisedResults;
-			results = Memory.prototype.query.apply(this, arguments);
-			def = new Deferred();
-			setTimeout(function(){
-				def.resolve(results);
-			}, 200);
-			promisedResults = QueryResults(def.promise);
-			promisedResults.total = results.total;
-			return promisedResults;
-		}
-	}));
-	
-	var grid2 = window.grid2 = new Grid({
+	var grid2 = window.grid2 = new OnDemandGrid({
 		columns: { id: "id", name: "name" },
-		store: asyncstore
+		collection: createAsyncStore({ data: items })
 	}, "grid2");
 });
 		</script>

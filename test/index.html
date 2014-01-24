@@ -53,7 +53,7 @@
 				"dojo/_base/xhr",
 				"dojo/on",
 				"dojo/json",
-				"dojo/store/Memory",
+				"dstore/Memory",
 				"dojo/cookie",
 				"dgrid/OnDemandGrid",
 				"dgrid/tree",
@@ -68,8 +68,8 @@
 					var store = window.store = new Memory({
 						data: data,
 						idProperty: "url",
-						getChildren: function(parent, options){
-							return this.query({ parent: parent.url }, options);
+						getChildren: function(parent){
+							return this.filter({ parent: parent.url });
 						},
 						mayHaveChildren: function(parent){
 							return !parent.title; // Items with title are html pages, leaves
@@ -105,9 +105,8 @@
 						renderHeader: function(){
 							put(this.headerNode, "div.header-title", "dgrid Tests");
 						},
-						query: { parent: "" },
 						sort: "name",
-						store: store
+						collection: store.filter({ parent: "" })
 					}, "grid");
 					
 					if(persistedInfo.scroll){

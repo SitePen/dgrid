@@ -17,6 +17,8 @@
 		<script src="../../dojo/dojo.js"
 			data-dojo-config="async: true"></script>
 		<script>
+			var testStore;
+
 			function deleteSelected(){
 				for(var i in grid.selection){
 					testStore.remove(i);
@@ -31,20 +33,15 @@
 			
 			require(["dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Keyboard",
 				"dgrid/editor", "dgrid/tree", "dojo/_base/declare",
-				"dojo/store/JsonRest", "dojo/store/Observable", "dojo/store/Cache", "dojo/store/Memory",
-				"dojo/store/util/SimpleQueryEngine", "dojo/domReady!"], 
-			function(Grid, Selection, Keyboard, editor, tree, declare, JsonRest, Observable, Cache, Memory, SimpleQueryEngine){
-				var testStore = window.testStore = Observable(Cache(JsonRest({
+				"dstore/Rest", "dstore/Observable", "dstore/Cache", 
+				"dstore/SimpleQuery", "dojo/domReady!"], 
+			function(Grid, Selection, Keyboard, editor, tree, declare, Rest, Observable, Cache, SimpleQuery){
+				testStore = new declare([ Rest, SimpleQuery, Observable, Cache])({
 					target:"./data/rest.php?", 
-					idProperty: "id",
-					queryEngine: SimpleQueryEngine,
-					query: function(query, options){
-						query = "";
-						return JsonRest.prototype.query.call(this, query, options);
-					}
-				}), Memory()));
-				testStore.getChildren = function(parent, options){
-					return testStore.query({parent: parent.id}, options);
+					idProperty: "id"
+				});
+				testStore.getChildren = function(parent){
+					return testStore.filter({parent: parent.id});
 				};
 				var columns = [
 					tree({label:'Name', field:'name', sortable: false, allowDuplicates: true}),
@@ -54,7 +51,7 @@
 				];
 
 				var grid = window.grid = new (declare([Grid, Selection, Keyboard]))({
-					store: testStore,
+					collection: testStore,
 					getBeforePut: false,
 					columns: columns
 				}, "grid");

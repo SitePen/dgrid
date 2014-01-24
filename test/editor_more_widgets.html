@@ -28,11 +28,20 @@
 		<script src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script>
-			require(["dgrid/List", "dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Keyboard", "dgrid/editor", "dijit/form/CheckBox", "dijit/form/TimeTextBox",  "dijit/form/Select","dojo/data/ObjectStore", "dijit/form/FilteringSelect", "dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!"],
-				function(List, Grid, Selection, Keyboard, editor, CheckBox, TimeTextBox, Select, ObjectStore, FilteringSelect, declare){
+			require([
+				"dgrid/List", "dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Keyboard",
+				"dgrid/editor", "dijit/form/CheckBox", "dijit/form/TimeTextBox",  "dijit/form/Select",
+				"dojo/data/ObjectStore", "dijit/form/FilteringSelect", "dojo/_base/declare", "dojo/_base/lang",
+				"dojo/store/Memory", "dojo/store/Observable",
+				"dgrid/test/data/createSyncStore", "dgrid/test/data/typesData", "dgrid/test/data/stateData",
+				"dojo/domReady!"
+			], function(
+				List, Grid, Selection, Keyboard, editor, CheckBox, TimeTextBox, Select, ObjectStore, FilteringSelect,
+				declare, lang, LegacyMemory, LegacyObservable, createSyncStore, typesData, stateData
+			){
 
 					stateStore = new ObjectStore({
-						objectStore:testStateStore,
+						objectStore: LegacyObservable(new LegacyMemory({ data: lang.clone(stateData) })),
 						labelProperty: "name"
 					});
 
@@ -76,7 +85,7 @@
 
 
 					window.grid = new (declare([Grid, Selection, Keyboard]))({
-						store: testTypesStore,
+						collection: createSyncStore({ data: typesData }),
 						columns: columns,
 						selectionMode: "none"
 					}, "grid");
