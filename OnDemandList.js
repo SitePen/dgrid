@@ -195,6 +195,9 @@ return declare([List, _StoreMixin], {
 				}else{
 					// if total is 0, IE quirks mode can't handle 0px height for some reason, I don't know why, but we are setting display: none for now
 					preloadNode.style.display = "none";
+					// This is a hack to get Observable to recognize that this is the
+					// last page, like is done in the processScroll function
+					options.count++;
 				}
 				
 				if (self._previousScrollPosition) {
