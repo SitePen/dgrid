@@ -1,15 +1,14 @@
 define([
 	"intern!tdd",
 	"intern/chai!assert",
-	"dojo/on",
 	"dijit/form/TextBox",
 	"dgrid/Grid",
 	"dgrid/editor"
-], function(test, assert, on, TextBox, Grid, editor){
+], function(test, assert, TextBox, Grid, editor){
 
 	var grid;
 
-	test.suite("editor plug-in", function(){
+	test.suite("editor plugin", function(){
 
 		test.afterEach(function(){
 			if(grid){
@@ -17,7 +16,7 @@ define([
 			}
 		});
 
-		test.test("canEdit - not shared editor", function(){
+		test.test("canEdit - always-on (instance-per-row) editor", function(){
 			var results = {};
 			var data = [
 				{id: 1, data1: "Data 1.a", data2: "Data 2.a"},
@@ -43,12 +42,15 @@ define([
 			grid.startup();
 			grid.renderArray(data);
 
-			assert.strictEqual(results[1], "Data 2.a");
-			assert.strictEqual(results[2], "Data 2.b");
-			assert.strictEqual(results[3], "Data 2.c");
+			assert.strictEqual(results[1], "Data 2.a",
+				"canEdit should have been called (item 1)");
+			assert.strictEqual(results[2], "Data 2.b",
+				"canEdit should have been called (item 2)");
+			assert.strictEqual(results[3], "Data 2.c",
+				"canEdit should have been called (item 3)");
 		});
 
-		test.test("canEdit - shared editor", function(){
+		test.test("canEdit - editOn (shared) editor", function(){
 			var results = {};
 			var data = [
 				{id: 1, data1: "Data 1.a", data2: "Data 2.a"},
@@ -76,24 +78,36 @@ define([
 			grid.startup();
 			grid.renderArray(data);
 
-			assert.isUndefined(results[1]);
-			assert.isUndefined(results[2]);
-			assert.isUndefined(results[3]);
+			assert.isUndefined(results[1],
+				"canEdit should not have been called yet for editOn editor (item 1)");
+			assert.isUndefined(results[2],
+				"canEdit should not have been called yet for editOn editor (item 2)");
+			assert.isUndefined(results[3],
+				"canEdit should not have been called yet for editOn editor (item 3)");
 
-			on.emit(grid.cell(1, "data2").element, "click", {});
-			assert.isUndefined(results[1]);
-			assert.strictEqual(results[2], "Data 2.b");
-			assert.isUndefined(results[3]);
+			grid.edit(grid.cell(1, "data2"));
+			assert.isUndefined(results[1],
+				"canEdit should not have been called yet for editOn editor (item 1)");
+			assert.strictEqual(results[2], "Data 2.b",
+				"canEdit should have been called for editOn editor (item 2)");
+			assert.isUndefined(results[3],
+				"canEdit should not have been called yet for editOn editor (item 3)");
 
-			on.emit(grid.cell(0, "data2").element, "click", {});
-			assert.strictEqual(results[1], "Data 2.a");
-			assert.strictEqual(results[2], "Data 2.b");
-			assert.isUndefined(results[3]);
+			grid.edit(grid.cell(0, "data2"));
+			assert.strictEqual(results[1], "Data 2.a",
+				"canEdit should have been called for editOn editor (item 1)");
+			assert.strictEqual(results[2], "Data 2.b",
+				"canEdit should have been called for editOn editor (item 2)");
+			assert.isUndefined(results[3],
+				"canEdit should not have been called yet for editOn editor (item 3)");
 
-			on.emit(grid.cell(2, "data2").element, "click", {});
-			assert.strictEqual(results[1], "Data 2.a");
-			assert.strictEqual(results[2], "Data 2.b");
-			assert.strictEqual(results[3], "Data 2.c");
+			grid.edit(grid.cell(2, "data2"));
+			assert.strictEqual(results[1], "Data 2.a",
+				"canEdit should have been called for editOn editor (item 1)");
+			assert.strictEqual(results[2], "Data 2.b",
+				"canEdit should have been called for editOn editor (item 2)");
+			assert.strictEqual(results[3], "Data 2.c",
+				"canEdit should have been called for editOn editor (item 3)");
 		});
 	});
 });
