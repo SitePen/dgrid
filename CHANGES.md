@@ -26,10 +26,12 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ### General/Core
 
-* Fixed an accessibility bug in non-Firefox browsers by only overriding
-  `bodyNode.tabIndex` specifically for Firefox. (#823)
 * Fixed an issue where `sort` would be ignored if it was a function with 0 arity,
   such as a hitched function being passed to a Memory store. (#771)
+* Fixed an accessibility bug in non-Firefox browsers by only overriding
+  `bodyNode.tabIndex` specifically for Firefox. (#823)
+* Fixed a `loadingMessage` regression in `OnDemandList` which manifested
+  particularly when `total` is not properly set in `QueryResults`. (#769)
 
 ### Mixins
 
