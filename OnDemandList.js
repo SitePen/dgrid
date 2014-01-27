@@ -496,21 +496,23 @@ return declare([List, _StoreMixin], {
 				}
 
 				adjustHeight(preload);
+
+				// use the query associated with the preload node to get the next "page"
+				if("level" in preload.query){
+					options.queryLevel = preload.query.level;
+				}
+
+				// Avoid spurious queries (ideally this should be unnecessary...)
+				if(!("queryLevel" in options) && (options.start > grid._total || options.count < 0)){
+					continue;
+				}
+
 				// create a loading node as a placeholder while the data is loaded
 				var loadingNode = put(beforeNode, "-div.dgrid-loading[style=height:" + count * grid.rowHeight + "px]"),
 					innerNode = put(loadingNode, "div.dgrid-" + (below ? "below" : "above"));
 				innerNode.innerHTML = grid.loadingMessage;
 				loadingNode.count = count;
-				// use the query associated with the preload node to get the next "page"
-				if("level" in preload.query){
-					options.queryLevel = preload.query.level;
-				}
-				
-				// Avoid spurious queries (ideally this should be unnecessary...)
-				if(!("queryLevel" in options) && (options.start > grid._total || options.count < 0)){
-					continue;
-				}
-				
+
 				// Query now to fill in these rows.
 				// Keep _trackError-wrapped results separate, since if results is a
 				// promise, it will lose QueryResults functions when chained by `when`
