@@ -1,9 +1,10 @@
 define([
 	"dojo/_base/lang",
 	"dojo/_base/declare",
+	"dojo/sniff",
 	"../util/misc",
 	"xstyle/css!../css/extensions/CompoundColumns.css"
-], function(lang, declare, miscUtil){
+], function(lang, declare, has, miscUtil){
 	return declare(null, {
 		// summary:
 		//		Extension allowing for specification of columns with additional
@@ -35,11 +36,12 @@ define([
 			function processColumns(columns, level, hasLabel, parent){
 				var numColumns = 0,
 					noop = function(){},
-					column, children, hasChildLabels;
+					children,
+					hasChildLabels;
 				
-				function processColumn(column, i){
+				function processColumn(column){
 					children = column.children;
-					hasChildLabels = column.children && (column.showChildHeaders !== false);
+					hasChildLabels = children && (column.showChildHeaders !== false);
 					// Set a reference to the parent column so later the children's ids can
 					// be updated to indicate the parent-child relationship.
 					column.parentColumn = parent;
@@ -49,8 +51,6 @@ define([
 						if(column.id == null){
 							column.id = ((parent && parent.id) || level-1) + "-" + topHeaderRow.length;
 						}
-						// recursively process the children
-						numColumns += (column.colSpan = processColumns(children, level + 1, hasChildLabels, column));
 					}else{
 						// it has no children, it is a normal header, add it to the content columns
 						contentColumns.push(column);
@@ -63,6 +63,15 @@ define([
 						// we define the rowSpan as a negative, the number of levels less than the total number of rows, which we don't know yet
 						column = lang.delegate(column, {rowSpan: -level});
 					}
+					
+					if(children){
+						// Recursively process the children; this is specifically
+						// performed *after* any potential lang.delegate calls
+						// so the parent reference will receive additional info
+						numColumns += (column.colSpan =
+							processColumns(children, level + 1, hasChildLabels, column));
+					}
+					
 					// add the column to the header rows at the appropriate level
 					if(hasLabel){
 						(headerRows[level] || (headerRows[level] = [])).push(column);
@@ -88,11 +97,27 @@ define([
 			}
 			// we need to set this to be used for subRows, so we make it a single row
 			contentColumns = [contentColumns];
-			// set our header rows so that the grid will use the alternate header row 
+			// set our header rows so that the grid will use the alternate header row
 			// configuration for rendering the headers
-			contentColumns.headerRows = headerRows;  
+			contentColumns.headerRows = headerRows;
 			this.subRows = contentColumns;
 			this.inherited(arguments);
+		},
+		
+		renderHeader: function(){
+			var i,
+				columns = this.subRows[0],
+				headerColumns = this.subRows.headerRows[0];
+			
+			this.inherited(arguments);
+			
+			// The object delegation performed in configStructure unfortunately
+			// "protects" the original column definition objects (referenced by
+			// columns and subRows) from obtaining headerNode information, so
+			// copy them back in.
+			for(i = columns.length; i--;){
+				columns[i].headerNode = headerColumns[i].headerNode;
+			}
 		},
 
 		_configColumn: function(column, columnId, rowColumns, prefix){
@@ -107,6 +132,76 @@ define([
 				columnId = column.id = prefix + id;
 			}
 			this.inherited(arguments, [column, columnId, rowColumns, prefix]);
+		},
+		
+		_updateCompoundHiddenStates: function(id, hidden){
+			// summary:
+			//		Called from _hideColumn and _showColumn (for ColumnHider)
+			//		to adjust parent header cells
+			
+			var column = this.columns[id],
+				colSpan;
+			
+			if(column && column.hidden == hidden){
+				// Avoid redundant processing (since it would cause colSpan skew)
+				return;
+			}
+			
+			// column will be undefined when this is called for parents
+			while(column && column.parentColumn){
+				// Update colSpans / hidden state of parents
+				column = column.parentColumn;
+				colSpan = column.colSpan = column.colSpan + (hidden ? -1 : 1);
+				
+				if(colSpan){
+					column.headerNode.colSpan = colSpan;
+				}
+				if(colSpan === 1 && !hidden){
+					this._showColumn(column.id);
+				}else if(!colSpan && hidden){
+					this._hideColumn(column.id);
+				}
+			}
+		},
+		
+		_hideColumn: function(id){
+			var self = this;
+			
+			this._updateCompoundHiddenStates(id, true);
+			this.inherited(arguments);
+			
+			if(has("ff")){
+				// Firefox causes display quirks in certain situations;
+				// avoid them by forcing reflow of the header
+				this.headerNode.style.display = "none";
+				setTimeout(function(){
+					self.headerNode.style.display = "";
+					self.resize();
+				}, 0);
+			}
+		},
+		
+		_showColumn: function(id){
+			this._updateCompoundHiddenStates(id, false);
+			this.inherited(arguments);
+		},
+		
+		_getResizedColumnWidths: function(){
+			// Overrides ColumnResizer method to report the total width and
+			// last column correctly for CompoundColumns structures
+			
+			var total = 0,
+				columns = this.columns,
+				id;
+			
+			for(id in columns){
+				total += columns[id].headerNode.offsetWidth;
+			}
+			
+			return {
+				totalWidth: total,
+				lastColId: this.subRows[0][this.subRows[0].length - 1].id
+			};
 		}
 	});
 });

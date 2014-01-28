@@ -70,14 +70,20 @@ function resizeColumnWidth(grid, colId, width, parentType, doResize){
 	if(width <= 0){ return; }
 
 	var column = grid.columns[colId],
-		event = {
-			grid: grid,
-			columnId: colId,
-			width: width,
-			bubbles: true,
-			cancelable: true
-		},
+		event,
 		rule;
+	
+	if(!column){
+		return;
+	}
+	
+	event = {
+		grid: grid,
+		columnId: colId,
+		width: width,
+		bubbles: true,
+		cancelable: true
+	};
 	
 	if(parentType){
 		event.parentType = parentType;

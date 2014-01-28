@@ -65,7 +65,7 @@ function(declare, has, listen, miscUtil, put, i18n){
 			
 			var subRows = this.subRows,
 				first = true,
-				srLength, cLength, sr, c, checkbox;
+				srLength, cLength, sr, c;
 			
 			delete this._columnHiderFirstCheckbox;
 			
@@ -86,8 +86,10 @@ function(declare, has, listen, miscUtil, put, i18n){
 				div, checkId, checkbox;
 			
 			if(col.hidden){
-				// Hidden state is true; hide the column.
+				// Hide the column (reset first to avoid short-circuiting logic)
+				col.hidden = false;
 				this._hideColumn(id);
+				col.hidden = true;
 			}
 			
 			// Allow cols to opt out of the hider (e.g. for selector column).
