@@ -17,7 +17,7 @@ define([
 		function testInitialObservers(list, comment){
 			var observers = list.observers;
 			arrayUtil.forEach([true, true, true], function(test, i){
-				assert.isTrue(!!observers[i] === test, [comment, "index is " + i + ", Expected is " + test]);
+				assert.strictEqual(!!observers[i], test, [comment, "index is " + i + ", Expected is " + test]);
 			});
 		}
 
@@ -57,6 +57,29 @@ define([
 			list.destroy();
 		});
 
+		test.test("OnDemandList w/observers - remove all", function(){
+			var countRefs = lang.partial(countObserverReferences, "list1");
+			testInitialObservers(list, "Initial");
+			assert.strictEqual(10, countRefs(0));
+			assert.strictEqual(10, countRefs(1));
+			for(var i = 0; i < 9; i++){
+				var rowNode = document.getElementById("list1-row-" + i);
+				assert.strictEqual(0, rowNode.observerIndex, "Row's observerIndex");
+				assert.strictEqual(10 - i, countRefs(0), "Iteration " + i + ": observer reference count");
+				list.removeRow(rowNode);
+				testInitialObservers(list, "Iteration " + i);
+				assert.strictEqual(9 - i, countRefs(0), "Iteration " + i + ": observer reference count");
+				assert.strictEqual(10, countRefs(1));
+			}
+
+			list.removeRow(document.getElementById("list1-row-9"));
+			assert.strictEqual(0, countRefs(0));
+			assert.strictEqual(10, countRefs(1));
+			assert.isFalse(!!list.observers[0], "First observer should not exist.");
+			assert.isTrue(!!list.observers[1], "Second observer should exist.");
+			assert.isTrue(!!list.observers[2], "Third observer should exist.");
+		});
+
 		test.test("OnDemandList w/observers - remove all, clean up only", function(){
 			var countRefs = lang.partial(countObserverReferences, "list1");
 			testInitialObservers(list, "Initial");
@@ -75,10 +98,9 @@ define([
 			list.removeRow(document.getElementById("list1-row-9"), true);
 			assert.strictEqual(0, countRefs(0));
 			assert.strictEqual(10, countRefs(1));
-			arrayUtil.forEach([false, true, true], function(test, i){
-				var observers = list.observers;
-				assert.isTrue(!!observers[i] === test, ["i: " + i + ", test = " + test, observers]);
-			});
+			assert.isFalse(!!list.observers[0], "First observer should not exist.");
+			assert.isTrue(!!list.observers[1], "Second observer should exist.");
+			assert.isTrue(!!list.observers[2], "Third observer should exist.");
 		});
 
 		test.test("OnDemandList w/observers - remove last 2, clean up only", function(){
