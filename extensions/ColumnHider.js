@@ -266,17 +266,23 @@ function(declare, has, listen, miscUtil, put, i18n){
 			}
 		},
 		
+		_showColumn: function(id){
+			// summary:
+			//		Shows the column indicated by the given id
+			//		(by removing the rule responsible for hiding it).
+			
+			if(this._columnHiderRules[id]){
+				this._columnHiderRules[id].remove();
+				delete this._columnHiderRules[id];
+			}
+		},
+		
 		_updateColumnHiddenState: function(id, hidden){
 			// summary:
 			//		Performs internal work for toggleColumnHiddenState; see the public
 			//		method for more information.
 			
-			if(!hidden){
-				this._columnHiderRules[id] && this._columnHiderRules[id].remove();
-				delete this._columnHiderRules[id];
-			}else{
-				this._hideColumn(id);
-			}
+			this[hidden ? '_hideColumn' : '_showColumn'](id);
 			
 			// Update hidden state in actual column definition,
 			// in case columns are re-rendered.
