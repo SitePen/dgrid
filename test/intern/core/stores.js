@@ -39,6 +39,7 @@ define([
 				unexpectedEvent + " fired instead."));
 		});
 
+		document.body.appendChild(grid.domNode);
 		grid.startup();
 		return dfd;
 	}

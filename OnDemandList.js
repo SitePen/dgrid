@@ -38,7 +38,7 @@ return declare([List, _StoreMixin], {
 	//		Indicates the number of rows to overlap queries. This helps keep
 	//		continuous data when underlying data changes (and thus pages don't
 	//		exactly align)
-	queryRowsOverlap: 1,
+	queryRowsOverlap: 0,
 	
 	// pagingMethod: String
 	//		Method (from dgrid/util/misc) to use to either throttle or debounce
@@ -496,11 +496,7 @@ return declare([List, _StoreMixin], {
 				}
 
 				adjustHeight(preload);
-				// create a loading node as a placeholder while the data is loaded
-				var loadingNode = put(beforeNode, "-div.dgrid-loading[style=height:" + count * grid.rowHeight + "px]"),
-					innerNode = put(loadingNode, "div.dgrid-" + (below ? "below" : "above"));
-				innerNode.innerHTML = grid.loadingMessage;
-				loadingNode.count = count;
+				
 				// use the query associated with the preload node to get the next "page"
 				if("level" in preload.query){
 					options.queryLevel = preload.query.level;
@@ -510,6 +506,12 @@ return declare([List, _StoreMixin], {
 				if(!("queryLevel" in options) && (options.start > grid._total || options.count < 0)){
 					continue;
 				}
+				
+				// create a loading node as a placeholder while the data is loaded
+				var loadingNode = put(beforeNode, "-div.dgrid-loading[style=height:" + count * grid.rowHeight + "px]"),
+					innerNode = put(loadingNode, "div.dgrid-" + (below ? "below" : "above"));
+				innerNode.innerHTML = grid.loadingMessage;
+				loadingNode.count = count;
 				
 				// Query now to fill in these rows.
 				// Keep _trackError-wrapped results separate, since if results is a
@@ -558,6 +560,13 @@ return declare([List, _StoreMixin], {
 								
 								// recalculate the count
 								below.count = total - below.node.rowIndex;
+								// check to see if we are on the last page
+								if(below.count === 0){
+									// This is a hack to get Observable to recognize that this is the
+									// last page; if the count doesn't match results.length, Observable
+									// will think this is the last page and properly handle additions to the bottom
+									options.count++;
+								}
 								// readjust the height
 								adjustHeight(below);
 							}
@@ -612,6 +621,15 @@ return declare([List, _StoreMixin], {
 				var observers = this.observers;
 				var observer = observers[thisIndex];
 				if(observer){
+					// First we need to verify that all the rows really have been removed. If there
+					// are overlapping rows, it is possible another element exists
+					var rows = observer.rows;
+					for(var i = 0; i < rows.length; i++){
+						if(rows[i] != rowElement && rows[i].offsetParent){
+							// still rows in this list, abandon
+							return this.inherited(arguments);
+						}
+					}
 					observer.cancel();
 					this._numObservers--;
 					observers[thisIndex] = 0; // remove it so we don't call cancel twice
