@@ -18,6 +18,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ### Column Plugins
 
+* The `expand` method added by the `tree` plugin will now return a promise,
+  resolving after child data has loaded. (#739)
 * The `canEdit` function supported by `editor` columns is now passed the proper
   up-to-date `value`. (#751)
 
