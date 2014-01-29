@@ -247,7 +247,8 @@ function(declare, has, listen, miscUtil, put, i18n){
 			//		Hides the column indicated by the given id.
 			
 			// Use miscUtil function directly, since we clean these up ourselves anyway
-			var selectorPrefix = "#" + miscUtil.escapeCssIdentifier(this.domNode.id) + " .dgrid-column-",
+			var grid = this,
+				selectorPrefix = "#" + miscUtil.escapeCssIdentifier(this.domNode.id) + " .dgrid-column-",
 				tableRule; // used in IE8 code path
 
 			if (this._columnHiderRules[id]) {
@@ -262,6 +263,7 @@ function(declare, has, listen, miscUtil, put, i18n){
 
 				window.setTimeout(function(){
 					tableRule.remove();
+					grid.resize();
 				}, 0);
 			}
 		},
