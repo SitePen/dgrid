@@ -1,5 +1,5 @@
-define(["./List", "./_StoreMixin", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/on", "./util/misc", "put-selector/put"],
-function(List, _StoreMixin, declare, lang, Deferred, listen, miscUtil, put){
+define(["./List", "./_StoreMixin", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/dom", "dojo/on", "./util/misc", "put-selector/put"],
+function(List, _StoreMixin, declare, lang, Deferred, dom, listen, miscUtil, put){
 
 return declare([List, _StoreMixin], {
 	// summary:
@@ -632,7 +632,7 @@ return declare([List, _StoreMixin], {
 					// are overlapping rows, it is possible another element exists
 						var rows = observer.rows;
 						for(var i = 0; i < rows.length; i++){
-							if(rows[i] != rowElement && rows[i].offsetParent){
+							if(rows[i] != rowElement && dom.isDescendant(rows[i], this.domNode)){
 								// still rows in this list, abandon
 								return this.inherited(arguments);
 							}
