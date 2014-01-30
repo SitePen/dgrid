@@ -9,13 +9,7 @@ define([
 		kwArgs = kwArgs || {};
 
 		if(kwArgs.data){
-			kwArgs = lang.mixin({}, kwArgs);
-
-			if(kwArgs.data.items){
-				kwArgs.data.items = kwArgs.data.items.slice(0);
-			}else{
-				kwArgs.data = kwArgs.data.slice(0);
-			}
+			kwArgs = lang.mixin({}, kwArgs, { data: lang.clone(kwArgs.data) });
 		}
 
 		return new ObservableMemory(kwArgs);

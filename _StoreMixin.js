@@ -72,12 +72,6 @@ function(declare, lang, Deferred, listen, aspect, put){
 			}));
 		},
 		
-		// TODO: What should be done about specifying `collection` in the constructor kwArgs
-		postscript: function(kwArgs){
-			this.inherited(arguments);
-			this.collection && this.set('collection', this.collection);
-		},
-		
 		destroy: function(){
 			this.inherited(arguments);
 
@@ -116,6 +110,10 @@ function(declare, lang, Deferred, listen, aspect, put){
 			}
 			
 			if(collection){
+				if(this.sort && this.sort.length > 0){
+					collection = collection.sort(this.sort);
+				}
+
 				if(collection.track){
 					collection = this.collection = collection.track();
 					this._rows = [];
@@ -126,28 +124,13 @@ function(declare, lang, Deferred, listen, aspect, put){
 					this.collection = collection;
 				}
 
-				collection.on("refresh", lang.hitch(this, "refresh"));
-
-				// If we have new sort criteria, pass them through the sort setter
-				// (which call refresh in itself).  Otherwise, just refresh.
-				if(this.sort && this.sort.length > 0){
-					this.set('sort', this.sort);
-				}else{
-					this.refresh();
-				}
+				this.refresh();
 			}
 		},
 		
-		_setSort: function(property, descending){
-			// summary:
-			//		Sort the content
-			
-			// prevent default storeless sort logic as long as we have a store
-			if(this.collection){ this._lastCollection = null; }
-			this.inherited(arguments);
-		
-			if(this.sort){
-				this.collection && this.collection.sort(this.sort);
+		_applySort: function(){
+			if(this.collection){
+				this.set('collection', this.collection);
 			}
 		},
 		

@@ -749,6 +749,11 @@ function(declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 			this.sort = typeof property != "string" ? property :
 				[{property: property, descending: descending}];
 			
+			this._applySort();
+		},
+
+		_applySort: function(){
+			// TODO: Document if Ken approves this method
 			this.refresh();
 			
 			if(this._lastCollection){

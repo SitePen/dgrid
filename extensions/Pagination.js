@@ -359,12 +359,12 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 					delete this._topLevelRequest;
 				}
 
-				if (typeof results.cancel === "function") {
+				if (typeof rows.cancel === "function") {
 					// Store reference to new async request in progress
-					this._topLevelRequest = results;
+					this._topLevelRequest = rows;
 				}
 
-				Deferred.when(results, function(){
+				Deferred.when(rows, function(){
 					if(grid._topLevelRequest){
 						// Remove reference to request now that it's finished
 						delete grid._topLevelRequest;

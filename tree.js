@@ -134,10 +134,12 @@ function tree(column){
 		listeners.push(aspect.before(grid, "removeRow", function(rowElement, justCleanup){
 			var connected = rowElement.connected;
 			if(connected){
-
-				// TODO: Consider creating symmetrical _populateChildRows and _removeChildRows methods for this.
-				connected._observerHandle && connected._observerHandle.remove();
-				delete connected._observerHandle;
+				if(connected._handles){
+					arrayUtil.forEach(connected._handles, function(handle){
+						handle.remove();
+					});
+					delete connected._handles;
+				}
 
 				// if it has a connected expando node, we process the children
 				querySelector(">.dgrid-row", connected).forEach(function(element){
@@ -217,10 +219,14 @@ function tree(column){
 						}
 						if(childCollection.track){
 							options.rows = [];
+
 							childCollection = childCollection.track();
-							container._observerHandle = grid._observeCollection(
-								childCollection, container, options.rows, options
-							);
+
+							// remember observation handles so they can be removed when the parent row is destroyed
+							container._handles = [
+								childCollection.tracking,
+								grid._observeCollection(childCollection, container, options.rows, options)
+							];
 						}
 						return childCollection;
 					};

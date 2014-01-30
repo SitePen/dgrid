@@ -88,6 +88,8 @@ define([
 					lastNotificationEvent = event;
 				}
 			});
+			document.body.appendChild(grid.domNode);
+			grid.startup();
 
 			var item = store.get(1);
 			store.remove(item.id);
