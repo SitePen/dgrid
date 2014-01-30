@@ -6,10 +6,8 @@ define([
 	"dojo/store/Memory",
 	"dojo/store/Observable",
 	"dgrid/OnDemandList",
-	"dgrid/OnDemandGrid",
-	"put-selector/put",
-	"dojo/aspect"
-], function(test, assert, declare, query, Memory, Observable, OnDemandList, OnDemandGrid, put, aspect){
+	"put-selector/put"
+], function(test, assert, declare, query, Memory, Observable, OnDemandList, put){
 
 	var widget,
 		storeCounter = 0;
@@ -41,24 +39,6 @@ define([
 		}));
 	}
 
-	var cnt = 0;
-
-	function createGrid(numStoreItems, itemsPerQuery, overlap){
-		widget = new OnDemandGrid({
-			store: createStore(numStoreItems),
-			minRowsPerPage: itemsPerQuery,
-			maxRowsPerPage: itemsPerQuery,
-			queryRowsOverlap: overlap,
-			columns: {
-				id: "ID",
-				value: "Value"
-			},
-			sort: "id"
-		});
-		document.body.appendChild(widget.domNode);
-		widget.startup();
-	}
-
 	function createList(numStoreItems, itemsPerQuery, overlap){
 		widget = new OnDemandList({
 			store: createStore(numStoreItems),
@@ -77,18 +57,20 @@ define([
 	function itemTest(itemAction, index, numToModify, backwards){
 		// Creates a single test case for performing an action on numToModify rows/items.
 		var description = itemAction.actionName + " " + numToModify + " item" + (numToModify > 1 ? "s" : "") +
-			" starting at index " + index + " going " + (backwards ? "down" : "up");
+			" starting at index " + index + ", in " + (backwards ? "decreasing" : "increasing") + " order";
 
 		numToModify = numToModify || 1;
 
 		test.test(description, function(){
-			var i, cnt, store = widget.store,
+			var i,
+				cnt,
 				step = function(){
 					cnt++;
 					backwards ? i-- : i++;
 				},
-				tmp, expectedValues = [],
-				msgPrefix, queryStr;
+				tmp,
+				expectedValues = [],
+				msgPrefix;
 
 			function testRow(element, i){
 				var expectedValue = expectedValues[i];
@@ -113,7 +95,7 @@ define([
 			for(i = 0; i < expectedValues.length; i++){
 				var expectedValue = expectedValues[i],
 					expectedId = expectedValue.id;
-				testRow(widget.columns ? widget.cell(expectedId, "value").element : widget.row(expectedId).element, i);
+				testRow(widget.row(expectedId).element, i);
 				if(!expectedValue.deleted){
 					tmp.push(expectedValue);
 				}
@@ -126,42 +108,38 @@ define([
 		});
 	}
 
-	function itemTestSuite(widgetClassName, createWidget, config){
+	function itemTestSuite(widgetClassName, storeSize, itemsPerQuery, overlap, config){
 		// Create a test suite that performs one action type (itemAction) on 1 to config.itemsModifiedMax with
 		// a given amount of overlap.
 		var index, numToModify;
 
-		(function(storeSize, itemsPerQuery, overlap){
-			test.suite(widgetClassName + " with " + overlap + " overlap", function(){
+		test.suite(widgetClassName + " with " + overlap + " overlap", function(){
 
-				test.beforeEach(function(){
-					createWidget(storeSize, itemsPerQuery, overlap);
-				});
-
-				test.afterEach(destroyWidget);
-
-				// Modify items counting up.
-				for(numToModify = 1; numToModify <= config.itemsModifiedMax; numToModify++){
-					for(index = 0; index <= (storeSize - numToModify); index++){
-						itemTest(config.itemAction, index, numToModify);
-					}
-				}
-				// Modify items counting down.  Starting at a count of 2 because
-				// single item modification were tested above.
-				for(numToModify = 2; numToModify <= config.itemsModifiedMax; numToModify++){
-					for(index = numToModify - 1; index < storeSize; index++){
-						itemTest(config.itemAction, index, numToModify, true);
-					}
-				}
+			test.beforeEach(function(){
+				createList(storeSize, itemsPerQuery, overlap);
 			});
-		})(config.storeSize, config.itemsPerQuery, config.overlap);
+
+			test.afterEach(destroyWidget);
+
+			// Modify items counting up.
+			for(numToModify = 1; numToModify <= config.itemsModifiedMax; numToModify++){
+				for(index = 0; index <= (storeSize - numToModify); index++){
+					itemTest(config.itemAction, index, numToModify);
+				}
+			}
+			// Modify items counting down.  Starting at a count of 2 because
+			// single item modification were tested above.
+			for(numToModify = 2; numToModify <= config.itemsModifiedMax; numToModify++){
+				for(index = numToModify - 1; index < storeSize; index++){
+					itemTest(config.itemAction, index, numToModify, true);
+				}
+			}
+		});
 	}
 
 	function itemActionTestSuite(description, itemAction, config){
 		// Creates multiple item test suites for a given action (itemAction):
-		// - a grid that executes a single query
 		// - a list that executes a single query
-		// - grids with overlap from 0 to config.itemOverlapMax
 		// - lists with overlap from 0 to config.itemOverlapMax
 
 		// Note: for debugging, comment out the contents of destroyWidget so the dgrid widgets are not destroyed.
@@ -169,36 +147,24 @@ define([
 		// easily match up an error message like
 		//  "Error: dgrid API: row at index 2 with an expected value of "Value 30 / Store 10 / Changed!" is missing"
 		// with the correct widget on the page.
-
-		var overlap;
 		config.itemAction = itemAction;
 
 		test.suite(description, function(){
 			// Test widgets with only one query: total item count equals item count per query.
-			config.overlap = 0;
-			config.storeSize = config.storeSizeMuliplier;
-			itemTestSuite("OnDemandGrid one query", createGrid, config);
-			itemTestSuite("OnDemandList one query", createList, config);
+			itemTestSuite("OnDemandList one query", config.itemsPerQuery, config.itemsPerQuery, 0, config);
 
 			// Test widgets that make multiple query requests: twice as many items as items per query so multiple
 			// queries will create multiple observers.
-			config.storeSize = config.storeSizeMuliplier * 2;
-			for(overlap = 0; overlap <= config.itemOverlapMax; overlap++){
-				// Test with OnDemandGrid with varying overlap values
-				config.overlap = overlap;
-				itemTestSuite("OnDemandGrid multiple queries", createGrid, config);
-			}
-
-			for(overlap = 0; overlap <= config.itemOverlapMax; overlap++){
-				// Test with OnDemandGrid with varying overlap values
-				config.overlap = overlap;
-				itemTestSuite("OnDemandList multiple queries", createList, config);
+			var storeSize = config.itemsPerQuery * 2;
+			// Test with OnDemandList with varying overlap values
+			for(var overlap = 0; overlap <= config.itemOverlapMax; overlap++){
+				itemTestSuite("OnDemandList multiple queries", storeSize, config.itemsPerQuery, overlap, config);
 			}
 		});
 	}
 
-	test.suite("observable grids", function(){
-		// Creates test suites that execute the following actions on grids and lists with varying amount of
+	test.suite("observable lists", function(){
+		// Creates test suites that execute the following actions on OnDemandLists with varying amount of
 		// overlap and modifying varying number of items:
 		// - modify existing items
 		// - remove existing items
@@ -247,29 +213,24 @@ define([
 		};
 		addAfterAction.actionName = "Add after";
 
-		test.suite("store size a multiple of items per query", function(){
-			var config = {
-				itemsPerQuery: 3,
-				storeSizeMuliplier: 3,
-				itemOverlapMax: 2,
-				itemsModifiedMax: 2
-			};
-			itemActionTestSuite("Modify store items", modifyAction, config);
-			itemActionTestSuite("Remove store items", removeAction, config);
-			itemActionTestSuite("Insert store items before", addBeforeAction, config);
-			itemActionTestSuite("Insert store items after", addAfterAction, config);
-		});
-		test.suite("store size not a multiple of items per query", function(){
-			var config = {
-				itemsPerQuery: 2,
-				storeSizeMuliplier: 3,
-				itemOverlapMax: 1,
-				itemsModifiedMax: 2
-			};
-			itemActionTestSuite("Modify store items", modifyAction, config);
-			itemActionTestSuite("Remove store items", removeAction, config);
-			itemActionTestSuite("Insert store items before", addBeforeAction, config);
-			itemActionTestSuite("Insert store items after", addAfterAction, config);
-		});
+		// Run a test case with each action (modify, remove, add before, add after) and vary the amount of
+		// queryRowsOverlap and vary the number of items modified during each test case.  A configuration
+		// object controls the amount of variation.  The properties are:
+		// itemsPerQuery - The OnDemandList is configured to request this number of items per query.
+		//		This property also determines the size of the store.  Test cases run with a store size
+		//		equal to this number and test cases run with a store size twice this number.
+		// itemOverlapMax - Each test case is executed with a queryRowsOverap value of 0 up to this number.
+		// itemsModifiedMax - Each test is executed where the number of items modified, deleted or added is
+		//		1 up to this number; all of the test cases are run where 1 item is modified and then again
+		//		with 2 items being modified and so on.
+		var config = {
+			itemsPerQuery: 3,
+			itemOverlapMax: 2,
+			itemsModifiedMax: 2
+		};
+		itemActionTestSuite("Modify store items", modifyAction, config);
+		itemActionTestSuite("Remove store items", removeAction, config);
+		itemActionTestSuite("Insert store items before", addBeforeAction, config);
+		itemActionTestSuite("Insert store items after", addAfterAction, config);
 	});
 });
