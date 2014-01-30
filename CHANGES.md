@@ -16,6 +16,13 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 * Fixed a long-standing regression in the `util/has-css3` module's
   `css-transforms3d` test due to a modified classname. (#776, thanks amuraco)
 
+### Mixins
+
+* Updated `Selection` to prefer `pointer` over `MSPointer` where available.
+  This fixes ctrl+clicking behavior in IE11. Note that this change replaces the
+  `has("mspointer")` feature with `has("pointer")`, which returns `"pointer"`,
+  `"MSPointer"`, or `false`. (#794)
+
 ### Column Plugins
 
 * The `expand` method added by the `tree` plugin will now return a promise,
