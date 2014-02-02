@@ -579,7 +579,15 @@ return declare(null, {
 		}
 		this._fireSelectionEvents();
 	},
-	
+	selectInverse: function() {
+		if (this.allSelected) {
+			this.clearSelection();
+		} else {
+			for (var each in this._rowIdToObject) {
+				this.select(this._rowIdToObject[each], null, null)
+			}
+		}
+	},
 	isSelected: function(object){
 		// summary:
 		//		Returns true if the indicated row is selected.
