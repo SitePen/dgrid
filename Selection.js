@@ -1,9 +1,8 @@
 define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/Deferred", "dojo/on", "dojo/has", "dojo/aspect", "./List", "dojo/has!touch?./util/touch", "put-selector/put", "dojo/query", "dojo/_base/sniff"],
 function(kernel, declare, Deferred, on, has, aspect, List, touchUtil, put){
 
-has.add("pointer", function(global, doc, element){
-	return "onpointerdown" in element ? "pointer" :
-		"onmspointerdown" in element ? "MSPointer" : false;
+has.add("mspointer", function(global, doc, element){
+	return "onmspointerdown" in element;
 });
 
 // Add feature test for user-select CSS property for optionally disabling
@@ -33,10 +32,8 @@ has.add("dom-selectstart", typeof document.onselectstart !== "undefined");
 
 var ctrlEquiv = has("mac") ? "metaKey" : "ctrlKey",
 	hasUserSelect = has("css-user-select"),
-	hasPointer = has("pointer"),
-	hasMSPointer = hasPointer && hasPointer.slice(0, 2) === "MS",
-	downType = hasPointer ? hasPointer + (hasMSPointer ? "Down" : "down") : "mousedown",
-	upType = hasPointer ? hasPointer + (hasMSPointer ? "Up" : "up") : "mouseup";
+	downType = has("mspointer") ? "MSPointerDown" : "mousedown",
+	upType = has("mspointer") ? "MSPointerUp" : "mouseup";
 
 function makeUnselectable(node, unselectable){
 	// Utility function used in fallback path for recursively setting unselectable
@@ -299,7 +296,7 @@ return declare(null, {
 			select: []
 		};
 		
-		if(has("touch") && !has("pointer")){
+		if(has("touch") && !has("mspointer")){
 			// listen for touch taps if available
 			on(this.contentNode, touchUtil.selector(selector, touchUtil.tap), function(evt){
 				grid._handleSelect(evt, this);
@@ -503,17 +500,6 @@ return declare(null, {
 				if(!toRow.element){
 					toRow = this.row(toRow);
 				}
-				
-				if(!toRow){
-					this._lastSelected = element;
-					console.warn("The selection range has been reset because the " +
-						"beginning of the selection is no longer in the DOM. " +
-						"If you are using OnDemandList, you may wish to increase " +
-						"farOffRemoval to avoid this, but note that keeping more nodes " +
-						"in the DOM may impact performance.");
-					return;
-				}
-				
 				toElement = toRow.element;
 				// find if it is earlier or later in the DOM
 				traverser = (toElement && (toElement.compareDocumentPosition ? 
