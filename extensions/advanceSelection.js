@@ -65,7 +65,7 @@ define(["dojo/_base/declare", "dojo/html", "dojo/has", "dojo/dom-construct", "di
 				trTag = row.children[0];
 			}
 			this.selectorNode = trTag;
-
+			
 			// first Cell
 			this._createSelectAllButton();
 			// second Cell
@@ -122,7 +122,7 @@ define(["dojo/_base/declare", "dojo/html", "dojo/has", "dojo/dom-construct", "di
 			}
 			return cell;
 		},
-		setPositionSelectorWidget: function(button, index) {
+		addSelectionButtons: function(button, index) {
 			// summary:
 			//		Set Button Position
 			// index: integer
@@ -130,9 +130,9 @@ define(["dojo/_base/declare", "dojo/html", "dojo/has", "dojo/dom-construct", "di
 			// button: selector button widget
 			this.selectorNode.children[index].appendChild(button.domNode)
 		},
-		setPositionAllSelectorWidgets: function(posSelectAll, posSelectNone, posSelectInverse) {
+		addAllSelectionButtons: function(posSelectAll, posSelectNone, posSelectInverse) {
 			// summary:
-			//		set position of  all selector buttons 
+			//		set position of  all selector buttons
 			// posSelectAll: integer
 			//		position of the Select All button in selectorNode
 			// posSelectNone: integer
@@ -155,7 +155,7 @@ define(["dojo/_base/declare", "dojo/html", "dojo/has", "dojo/dom-construct", "di
 				_this.selectAll();
 			})
 			// by default Place Select all at first cell
-			this.setPositionSelectorWidget(this.selectAllButton, 0)
+			this.addSelectionButtons(this.selectAllButton, 0)
 		},
 		_createSelectNoneButton: function() {
 			// summary:
@@ -168,7 +168,7 @@ define(["dojo/_base/declare", "dojo/html", "dojo/has", "dojo/dom-construct", "di
 				_this.clearSelection();
 			})
 			// by default Place Select None at second cell
-			this.setPositionSelectorWidget(this.selectNoneButton, 1)
+			this.addSelectionButtons(this.selectNoneButton, 1)
 		},
 		_createSelectInverseButton: function() {
 			// summary:
@@ -182,11 +182,7 @@ define(["dojo/_base/declare", "dojo/html", "dojo/has", "dojo/dom-construct", "di
 					_this.clearSelection();
 				} else {
 					for (var i in _this._rowIdToObject) {
-						if (_this.isSelected(_this._rowIdToObject[i])) {
-							_this.select(_this._rowIdToObject[i], null, false)
-						} else {
-							_this.select(_this._rowIdToObject[i], null, true)
-						}
+						_this.select(_this._rowIdToObject[i], null, null)
 					}
 				}
 				if (_this._fireSelectionEvents) {
@@ -194,7 +190,7 @@ define(["dojo/_base/declare", "dojo/html", "dojo/has", "dojo/dom-construct", "di
 				}
 			})
 			// by default Place Select Inverse at third cell
-			this.setPositionSelectorWidget(this.selectInverseButton, 2)
+			this.addSelectionButtons(this.selectInverseButton, 2)
 		}
 	});
 });
