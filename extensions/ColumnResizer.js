@@ -92,7 +92,7 @@ function resizeColumnWidth(grid, colId, width, parentType){
 			// columns it gives an error Cannot set property 'width' of undefined,
 			// Added if condition when column is undefined then not to update column width.
 			// This extension consider columns created for placing Select All/Inverse/None Buttons
-			// as grid column because they all share same class name. But we don't need
+			// as grid's column because they all share same class name. But we don't need
 			// to make them resizable atleast for now.
 			if(column) {
 				column.width = width;
