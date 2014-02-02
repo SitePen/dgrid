@@ -1,14 +1,44 @@
 This document outlines changes since 0.3.0.  For older changelogs, see the
 [dgrid wiki](https://github.com/SitePen/dgrid/wiki).
 
-# master (0.3.13-dev)
+# master (0.3.14-dev)
+
+Coming soon!
+
+# 0.3.13
 
 ## Significant changes
 
 ### General/Core
 
+* `List#destroy` now resets `_started` to `false` to safeguard against debounced
+  rendering-sensitive code running after the instance's DOM is no longer relevant. (#792)
+* Added logic to account for `dojo/store/Observable`'s propensity to drop items
+  at page boundaries, primarily in the `List` module. (#701, #714)
+* Items added to stores which should appear at the end of a list or grid will now
+  appear correctly. (#363)
 * Fixed a long-standing regression in the `util/has-css3` module's
   `css-transforms3d` test due to a modified classname. (#776, thanks amuraco)
+
+### Mixins
+
+* Updated `Selection` to prefer `pointer` over `MSPointer` where available.
+  This fixes ctrl+clicking behavior in IE11. Note that this change replaces the
+  `has("mspointer")` feature with `has("pointer")`, which returns `"pointer"`,
+  `"MSPointer"`, or `false`. (#794)
+
+### Column Plugins
+
+* The `expand` method added by the `tree` plugin will now return a promise,
+  resolving after child data has loaded. (#739)
+* The `canEdit` function supported by `editor` columns is now passed the proper
+  up-to-date `value`. (#751)
+
+### Extensions
+
+* The `CompoundColumns` extension is now capable of interoperating with the
+  `ColumnSet` mixin; see `test/extensions/CompoundColumns.html` for examples.
+  (#383)
 
 ## Other changes and fixes
 
@@ -16,6 +46,17 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 * Fixed an issue where `sort` would be ignored if it was a function with 0 arity,
   such as a hitched function being passed to a Memory store. (#771)
+* Fixed an accessibility bug in non-Firefox browsers by only overriding
+  `bodyNode.tabIndex` specifically for Firefox. (#823)
+* Fixed a `loadingMessage` regression in `OnDemandList` which manifested
+  particularly when `total` is not properly set in `QueryResults`. (#769)
+
+### Mixins
+
+* Fixed an issue in `Selection` and `CellSelection` which would cause errors when
+  selecting very long ranges spanning beyond the currently-rendered rows in an
+  OnDemandList. Note that while errors will no longer be thrown, the selection
+  range will still be reset. (#705)
 
 ### Extensions
 
