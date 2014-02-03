@@ -102,7 +102,8 @@ return declare(Selection, {
 				// find if it is earlier or later in the DOM
 				var traverser = (toElement && (toElement.compareDocumentPosition ? 
 					toElement.compareDocumentPosition(fromElement) == 2 :
-					toElement.sourceIndex > fromElement.sourceIndex)) ? "nextSibling" : "previousSibling";
+					toElement.sourceIndex > fromElement.sourceIndex)) ? "down" : "up";
+
 				// now we determine which columns are in the range 
 				var idFrom = cell.column.id, idTo = toCell.column.id, started, columnIds = [];
 				for(id in this.columns){
@@ -120,19 +121,19 @@ return declare(Selection, {
 					}
 				}
 				// now we iterate over rows
-				var row = cell.row, nextNode = row.element;
+				var row = cell.row;
 				toElement = toCell.row.element;
 				do{
 					// looping through each row..
 					// and now loop through each column to be selected
 					for(i = 0; i < columnIds.length; i++){
-						cell = this.cell(nextNode, columnIds[i]);
+						cell = this.cell(row, columnIds[i]);
 						this._select(cell, null, value);
 					}
-					if(nextNode == toElement){
+					if(row.element == toElement){
 						break;
 					}
-				}while((nextNode = cell.row.element[traverser]));
+				}while(row = this[traverser](row));
 			}
 		}
 	},
