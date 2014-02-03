@@ -367,29 +367,33 @@ function edit(cell) {
 	cellElement = cell.element.contents || cell.element;
 	
 	if((cmp = column.editorInstance)){ // shared editor (editOn used)
-		if(activeCell != cellElement &&
-				(!column.canEdit || column.canEdit(cell.row.data, value))){
-			activeCell = cellElement;
+		if(activeCell != cellElement){
+			// get the cell value
 			row = cell.row;
 			dirty = this.dirty && this.dirty[row.id];
 			value = (dirty && field in dirty) ? dirty[field] :
 				column.get ? column.get(row.data) : row.data[field];
-			
-			showEditor(column.editorInstance, column, cellElement, value);
-			
-			// focus / blur-handler-resume logic is surrounded in a setTimeout
-			// to play nice with Keyboard's dgrid-cellfocusin as an editOn event
-			dfd = new Deferred();
-			setTimeout(function(){
-				// focus the newly-placed control (supported by form widgets and HTML inputs)
-				if(cmp.focus){ cmp.focus(); }
-				// resume blur handler once editor is focused
-				if(column._editorBlurHandle){ column._editorBlurHandle.resume(); }
-				dfd.resolve(cmp);
-			}, 0);
-			
-			return dfd.promise;
+			// check to see if the cell can be edited
+			if(!column.canEdit || column.canEdit(cell.row.data, value)){
+				activeCell = cellElement;
+
+				showEditor(column.editorInstance, column, cellElement, value);
+
+				// focus / blur-handler-resume logic is surrounded in a setTimeout
+				// to play nice with Keyboard's dgrid-cellfocusin as an editOn event
+				dfd = new Deferred();
+				setTimeout(function(){
+					// focus the newly-placed control (supported by form widgets and HTML inputs)
+					if(cmp.focus){ cmp.focus(); }
+					// resume blur handler once editor is focused
+					if(column._editorBlurHandle){ column._editorBlurHandle.resume(); }
+					dfd.resolve(cmp);
+				}, 0);
+
+				return dfd.promise;
+			}
 		}
+
 	}else if(column.editor){ // editor but not shared; always-on
 		cmp = cellElement.widget || cellElement.input;
 		if(cmp){

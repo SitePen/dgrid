@@ -101,6 +101,7 @@ function(declare, lang, Deferred, listen, aspect, put){
 			if (column.set){
 				this._columnsWithSet[column.field] = column;
 			}
+			this.inherited(arguments);
 		},
 		
 		_updateNotifyHandle: function(store){
@@ -435,7 +436,7 @@ function(declare, lang, Deferred, listen, aspect, put){
 							advanceNext();
 						}
 						if(nextNode && !nextNode.parentNode){
-							nextNode = byId(nextNode.id);
+							nextNode = document.getElementById(nextNode.id);
 						}
 						parentNode = (beforeNode && beforeNode.parentNode) ||
 							(nextNode && nextNode.parentNode) || self.contentNode;

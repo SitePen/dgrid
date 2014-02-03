@@ -391,13 +391,14 @@ function(declare, listen, has, put, List, miscUtil){
 					column.field = columnId;
 				}
 				columnId = column.id = column.id || (isNaN(columnId) ? columnId : (prefix + columnId));
-				if(isArray){ this.columns[columnId] = column; }
-				
 				// allow further base configuration in subclasses
 				if(this._configColumn){
 					this._configColumn(column, columnId, rowColumns, prefix);
+					// Allow the subclasses to modify the column id.
+					columnId = column.id;
 				}
-				
+				if(isArray){ this.columns[columnId] = column; }
+
 				// add grid reference to each column object for potential use by plugins
 				column.grid = this;
 				if(typeof column.init === "function"){ column.init(); }

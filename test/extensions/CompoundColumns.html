@@ -10,7 +10,7 @@
 			.dgrid {
 				margin: 10px;
 			}
-			#grid { 
+			#grid {
 				width: 80%;
 			}
 			#grid .field-col1 {
@@ -28,24 +28,157 @@
 			#grid .field-col5 {
 				width: 50px;
 			}
-		</style>
-		<script>
-			var start= new Date().getTime();
-		</script>
-		<script src="../../../dojo/dojo.js" 
-			data-dojo-config="async: true"></script>
-		<script>
-			require(["dgrid/OnDemandGrid", "dgrid/extensions/CompoundColumns", "dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dojo/_base/lang", "dgrid/test/data/base", "dojo/domReady!"],
-				function(Grid, CompoundColumns, Selection, Keyboard, declare, lang, testStore){
-					//columns1 = lang.clone(columns);
 
-					var CompoundedGrid = declare([Grid, CompoundColumns, Selection, Keyboard]);
+			#gridcscc {
+				width: 800px;
+			}
+
+			#gridcscc .field-col1,
+			#gridcscc .field-col2,
+			#gridcscc .field-col3,
+			#gridcscc .field-col4,
+			#gridcscc .field-col5 {
+				width: 300px;
+			}
+
+			#gridcscc .dgrid-column-set-0 {
+				width: 50%;
+			}
+			
+			#gridcscc .dgrid-header .dgrid-row-table {
+				height: 45px; /* For IE */
+			}
+		</style>
+		<script src="../../../dojo/dojo.js" data-dojo-config="async: true"></script>
+		<script>
+			require(["dgrid/OnDemandGrid", "dgrid/extensions/CompoundColumns", "dgrid/ColumnSet", "dgrid/Selection", "dgrid/Keyboard",
+				"dojo/_base/declare", "dojo/_base/lang", "dojo/on", "dojo/dom", "dgrid/test/data/base",
+				"dojo/domReady!"],
+				function(Grid, CompoundColumns, ColumnSet, Selection, Keyboard, declare, lang, on, dom, testStore){
+
+					var CompoundedGrid = declare([Grid, CompoundColumns, Selection, Keyboard]),
+						CompoundedColumnSetGrid = declare([Grid, CompoundColumns, ColumnSet, Selection, Keyboard]),
+						ccColumnSets1 = [
+							[
+								[
+									{
+										label: 'Columns 1 and 2',
+										children:
+												[
+													{label: 'Column 1', field: 'col1'},
+													{label: 'Column 2', field: 'col2', sortable: false}
+												]
+									},
+									{ label: 'Column 4', field: 'col4'}
+								]
+							],
+							[
+								[
+									{label: 'Column 1', field: 'col1'},
+									{label: 'Column 4', field: 'col4'}
+								]
+							]
+						],
+						ccColumnSets2 = [
+							[
+								[
+									{label: 'Column 1', field: 'col1'},
+									{label: 'Column 3', field: 'col3'}
+								]
+							],
+							[
+								[
+									{
+										label: "Columns 4 and 5",
+										children: [
+											{label: 'Column 4', field: 'col4'},
+											{label: 'Column 5', field: 'col5'}
+										]
+									}
+								]
+							]
+						],
+						ccColumnSets3 = [
+							[
+								[
+									{
+										label: 'Columns 1 and 2',
+										children:
+												[
+													{label: 'Column 1', field: 'col1'},
+													{label: 'Column 2', field: 'col2', sortable: false}
+												]
+									}
+								]
+							],
+							[
+								[
+									{
+										label: "Columns 3 and 4",
+										children: [
+											{label: 'Column 3', field: 'col3'},
+											{label: 'Column 4', field: 'col4'}
+										]
+									}
+								]
+							],
+							[
+								[
+									{
+										label: "Columns 4 and 5",
+										children: [
+											{label: 'Column 4', field: 'col4'},
+											{label: 'Column 5', field: 'col5'}
+										]
+									}
+								]
+							]
+						],
+						ccColumnSets4 = [
+							[
+								[
+									{
+										label: 'Columns 1 and 2',
+										children:
+												[
+													{label: 'Column 1', field: 'col1'},
+													{label: 'Column 2', field: 'col2', sortable: false}
+												]
+									}
+								]
+							],
+							[
+								[
+									{
+										label: "Columns 4 & 5, 3, 4, 4 & 5",
+										children: [
+											{
+												label: "Columns 4 and 5",
+												children: [
+													{label: 'Column 4', field: 'col4'},
+													{label: 'Column 5', field: 'col5'}
+												]
+											},
+											{label: 'Column 3', field: 'col3'},
+											{label: 'Column 4', field: 'col4'},
+											{
+												label: "Columns 4 and 5",
+												children: [
+													{label: 'Column 4', field: 'col4'},
+													{label: 'Column 5', field: 'col5'}
+												]
+											}
+										]
+									}
+								]
+							]
+						];
 					window.grid = new CompoundedGrid({
 						store: testStore,
 						columns: [
-							{field: 'col1', label: 'First Column'}, 
+							{field: 'col1', label: 'First Column'},
 							{label: "Full Name", children: [
-								{label: 'Given', children:[ 
+								{label: 'Given', children:[
 									{field: 'col2', label: 'First'},
 									{field: 'col5', label: 'Middle', sortable: false}]},
 								{field: 'col3', label: 'Last'}]},
@@ -56,11 +189,38 @@
 							{field:'col1', label: 'Last Column'}
 						]
 					}, "grid");
+
+					window.gridcscc = new CompoundedColumnSetGrid({
+						store: testStore,
+						columnSets: ccColumnSets1
+					}, "gridcscc");
+
+					on(dom.byId("btnCsccColumnSets1"), "click", function(){
+						gridcscc.set("columnSets", ccColumnSets1);
+					});
+					on(dom.byId("btnCsccColumnSets2"), "click", function(){
+						gridcscc.set("columnSets", ccColumnSets2);
+					});
+					on(dom.byId("btnCsccColumnSets3"), "click", function(){
+						gridcscc.set("columnSets", ccColumnSets3);
+					});
+					on(dom.byId("btnCsccColumnSets4"), "click", function(){
+						gridcscc.set("columnSets", ccColumnSets4);
+					});
 				});
 		</script>
 	</head>
 	<body class="claro">
 		<h2>A basic grid with compound columns</h2>
 		<div id="grid"></div>
+
+		<h2>A Grid with column sets and compound columns</h2>
+		<div id="gridcscc"></div>
+		<p>Buttons to test resetting columnSets:
+			<button id="btnCsccColumnSets1">set 1</button>
+			<button id="btnCsccColumnSets2">set 2</button>
+			<button id="btnCsccColumnSets3">set 3</button>
+			<button id="btnCsccColumnSets4">set 4</button>
+		</p>
 	</body>
 </html>

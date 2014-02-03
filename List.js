@@ -1,4 +1,4 @@
-define(["dojo/_base/declare", "dojo/on", "dojo/has", "./util/misc", "dojo/has!touch?./TouchScroll", "xstyle/has-class", "put-selector/put", "dojo/_base/sniff", "xstyle/css!./css/dgrid.css"], 
+define(["dojo/_base/declare", "dojo/on", "dojo/has", "./util/misc", "dojo/has!touch?./TouchScroll", "xstyle/has-class", "put-selector/put", "dojo/_base/sniff", "xstyle/css!./css/dgrid.css"],
 function(declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 	// Add user agent/feature CSS classes 
 	hasClass("mozilla", "opera", "webkit", "ie", "ie-6", "ie-6-7", "quirks", "no-quirks", "touch");
@@ -216,9 +216,12 @@ function(declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 			}
 			bodyNode = this.bodyNode = put(domNode, "div.dgrid-scroller");
 			
-			// firefox 4 until at least 10 adds overflow: auto elements to the tab index by default for some
-			// reason; force them to be not tabbable
-			bodyNode.tabIndex = -1;
+			// Firefox 4+ adds overflow: auto elements to the tab index by default;
+			// force them to not be tabbable, but restrict this to Firefox,
+			// since it breaks accessibility support in other browsers
+			if(has("ff")){
+				bodyNode.tabIndex = -1;
+			}
 			
 			this.headerScrollNode = put(domNode, "div.dgrid-header-scroll.dgrid-scrollbar-width.ui-widget-header");
 			
@@ -380,6 +383,7 @@ function(declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 				delete this._listeners;
 			}
 			
+			this._started = false;
 			this.cleanup();
 			// destroy DOM
 			put(this.domNode, "!");
@@ -493,6 +497,9 @@ function(declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 				previousRow = row && row.previousSibling;
 			
 			if(row){// if it existed elsewhere in the DOM, we will remove it, so we can recreate it
+				if(row === beforeNode){
+					beforeNode = (beforeNode.connected || beforeNode).nextSibling;
+				}
 				this.removeRow(row);
 			}
 			row = this.renderRow(object, options);
@@ -593,7 +600,7 @@ function(declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 					}while((nextSibling = (!visible || !current.hidden) && current[steps < 0 ? "lastChild" : "firstChild"]));
 				}else{
 					current = current.parentNode;
-					if(current === this.bodyNode || current === this.headerNode){
+					if(!current || current === this.bodyNode || current === this.headerNode){
 						// Break out if we step out of the navigation area entirely.
 						break;
 					}

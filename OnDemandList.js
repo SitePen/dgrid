@@ -38,7 +38,7 @@ return declare([List, _StoreMixin], {
 	//		Indicates the number of rows to overlap queries. This helps keep
 	//		continuous data when underlying data changes (and thus pages don't
 	//		exactly align)
-	queryRowsOverlap: 1,
+	queryRowsOverlap: 0,
 	
 	// pagingMethod: String
 	//		Method (from dgrid/util/misc) to use to either throttle or debounce
@@ -501,11 +501,7 @@ return declare([List, _StoreMixin], {
 				}
 
 				adjustHeight(preload);
-				// create a loading node as a placeholder while the data is loaded
-				var loadingNode = put(beforeNode, "-div.dgrid-loading[style=height:" + count * grid.rowHeight + "px]"),
-					innerNode = put(loadingNode, "div.dgrid-" + (below ? "below" : "above"));
-				innerNode.innerHTML = grid.loadingMessage;
-				loadingNode.count = count;
+				
 				// use the query associated with the preload node to get the next "page"
 				if("level" in preload.query){
 					options.queryLevel = preload.query.level;
@@ -515,6 +511,12 @@ return declare([List, _StoreMixin], {
 				if(!("queryLevel" in options) && (options.start > grid._total || options.count < 0)){
 					continue;
 				}
+				
+				// create a loading node as a placeholder while the data is loaded
+				var loadingNode = put(beforeNode, "-div.dgrid-loading[style=height:" + count * grid.rowHeight + "px]"),
+					innerNode = put(loadingNode, "div.dgrid-" + (below ? "below" : "above"));
+				innerNode.innerHTML = grid.loadingMessage;
+				loadingNode.count = count;
 				
 				// Query now to fill in these rows.
 				// Keep _trackError-wrapped results separate, since if results is a

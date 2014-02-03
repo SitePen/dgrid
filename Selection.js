@@ -1,8 +1,9 @@
 define(["dojo/_base/declare", "dojo/_base/Deferred", "dojo/on", "dojo/has", "dojo/aspect", "./List", "dojo/has!touch?./util/touch", "put-selector/put", "dojo/query", "dojo/_base/sniff"],
 function(declare, Deferred, on, has, aspect, List, touchUtil, put){
 
-has.add("mspointer", function(global, doc, element){
-	return "onmspointerdown" in element;
+has.add("pointer", function(global, doc, element){
+	return "onpointerdown" in element ? "pointer" :
+		"onmspointerdown" in element ? "MSPointer" : false;
 });
 
 // Add feature test for user-select CSS property for optionally disabling
@@ -32,8 +33,10 @@ has.add("dom-selectstart", typeof document.onselectstart !== "undefined");
 
 var ctrlEquiv = has("mac") ? "metaKey" : "ctrlKey",
 	hasUserSelect = has("css-user-select"),
-	downType = has("mspointer") ? "MSPointerDown" : "mousedown",
-	upType = has("mspointer") ? "MSPointerUp" : "mouseup";
+	hasPointer = has("pointer"),
+	hasMSPointer = hasPointer && hasPointer.slice(0, 2) === "MS",
+	downType = hasPointer ? hasPointer + (hasMSPointer ? "Down" : "down") : "mousedown",
+	upType = hasPointer ? hasPointer + (hasMSPointer ? "Up" : "up") : "mouseup";
 
 function makeUnselectable(node, unselectable){
 	// Utility function used in fallback path for recursively setting unselectable
@@ -292,7 +295,7 @@ return declare(null, {
 			select: []
 		};
 		
-		if(has("touch") && !has("mspointer")){
+		if(has("touch") && !has("pointer")){
 			// listen for touch taps if available
 			on(this.contentNode, touchUtil.selector(selector, touchUtil.tap), function(evt){
 				grid._handleSelect(evt, this);

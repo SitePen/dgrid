@@ -238,7 +238,7 @@ var Keyboard = declare(null, {
 			if(focusInfo.active){
 				// Row/cell was previously focused, so focus the new one immediately
 				this.focus(newTarget);
-			}else{
+			}else if(newTarget.element){
 				// Row/cell was not focused, but we still need to update tabIndex
 				// and the element's class to be consistent with the old one
 				put(newTarget.element, ".dgrid-focus");
