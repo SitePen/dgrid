@@ -3,7 +3,9 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 # master (0.3.14-dev)
 
-Coming soon!
+### Extensions
+
+* Improved performance of first resize with `ColumnResizer`. (#832)
 
 # 0.3.13
 
