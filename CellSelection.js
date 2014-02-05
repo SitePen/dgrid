@@ -122,17 +122,35 @@ return declare(Selection, {
 				// now we iterate over rows
 				var row = cell.row, nextNode = row.element;
 				toElement = toCell.row.element;
-				do{
+				while(1){
+					if(nextNode.className === 'dgrid-tree-container'){
+						if(traverser === "nextSibling"){
+							nextNode = nextNode.firstChild;
+						}else{
+							nextNode = nextNode.lastChild.previousSibling; //last node is the preload node
+						}
+					}
 					// looping through each row..
 					// and now loop through each column to be selected
-					for(i = 0; i < columnIds.length; i++){
-						cell = this.cell(nextNode, columnIds[i]);
-						this._select(cell, null, value);
+					if(nextNode.getAttribute('role') === 'row'){
+						for(i = 0; i < columnIds.length; i++){
+							cell = this.cell(nextNode, columnIds[i]);
+							this._select(cell, null, value);
+						}
 					}
-					if(nextNode == toElement){
+					if(nextNode === toElement){
 						break;
 					}
-				}while((nextNode = cell.row.element[traverser]));
+					var parentNode = nextNode.parentNode;
+					nextNode = nextNode[traverser];
+					if(!nextNode){
+						if(parentNode !== this.contentNode){
+							nextNode = parentNode[traverser];
+						}else{
+							break;
+						}
+					}
+				}
 			}
 		}
 	},
