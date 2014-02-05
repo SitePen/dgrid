@@ -89,111 +89,42 @@
 			], function (declare, lang, OnDemandGrid, Selection, selector, testStore) {
 				var SelectionGrid = declare([OnDemandGrid, Selection]);
 
-				var columns = {
-					col1: "Column 1",
-					col2: "Column 2",
-					col5: "Column 5"
-				};
-
-				var selectorConfig = {
-					label: "Select",
-					disabled: function (rowData) {
-						return rowData.id % 2;
+				function allowSelect(row) {
+					return !row.id || row.id % 2 === 0;
+				}
+				
+				function createGrid(selectionMode) {
+					var id = "grid" + selectionMode.slice(0, 1).toUpperCase() + selectionMode.slice(1),
+						selectorConfig = {
+							label: "Select"
+						};
+					
+					if (selectionMode === "single") {
+						selectorConfig.selectorType = "radio";
 					}
-				};
-
-				gridExtended = new SelectionGrid({
-					store: testStore,
-					columns: lang.delegate(columns, {
-						select: selector(lang.clone(selectorConfig))
-					}),
-					selectionMode: "extended",
-					allowSelectAll: true
-				}, "gridExtended");
-
-				gridMultiple = new SelectionGrid({
-					store: testStore,
-					columns: lang.delegate(columns, {
-						select: selector(lang.clone(selectorConfig))
-					}),
-					selectionMode: "multiple",
-					allowSelectAll: true
-				}, "gridMultiple");
-
-				gridSingle = new SelectionGrid({
-					store: testStore,
-					columns: lang.delegate(columns, {
-						select: selector({
-							label: "Select",
-							selectorType: "radio",
-							disabled: function (rowData) {
-								return rowData.id % 2;
-							}
-						})
-					}),
-					selectionMode: "single",
-					allowSelectAll: true
-				}, "gridSingle");
-
-				gridToggle = new SelectionGrid({
-					store: testStore,
-					columns: lang.delegate(columns, {
-						select: selector(lang.clone(selectorConfig))
-					}),
-					selectionMode: "toggle",
-					allowSelectAll: true
-				}, "gridToggle");
-
-				gridNone = new SelectionGrid({
-					store: testStore,
-					columns: lang.delegate(columns, {
-						select: selector(lang.clone(selectorConfig))
-					}),
-					selectionMode: "none",
-					allowSelectAll: true
-				}, "gridNone");
+					
+					return new SelectionGrid({
+						store: testStore,
+						columns: {
+							select: selector(selectorConfig),
+							col1: "Column 1",
+							col2: "Column 2",
+							col5: "Column 5"
+						},
+						selectionMode: selectionMode,
+						allowSelect: allowSelect,
+						allowSelectAll: selectionMode !== "single"
+					}, id);
+				}
+				
+				gridExtended = createGrid("extended");
+				gridMultiple = createGrid("multiple");
+				gridSingle = createGrid("single");
+				gridToggle = createGrid("toggle");
+				gridNone = createGrid("none");
 
 				ready = true;
 			});
-		</script>
-
-		<script>
-		// Debugging code for troubleshooting WebDriver behavior.
-		// In Chrome, with ChromeDriver, using the WebDriver API to send:
-		// Shift (down)
-		// Mouse click
-		// Shift (up)
-		// results in a shift+click.
-		// In Firefox, with Selenium's built-in driver (Selenium server 2.39, Firefox 26.0, Windows 7 SP1),
-		// the same sequence results in an un-shifted click (although the keydown and keyup for the shift
-		// key are registered).
-
-		(function () {
-			// Comment out the following line to enable debug event listeners:
-			return;
-
-			var log = function (msg) {
-				var node = document.createElement('p');
-				node.innerHTML = msg;
-				document.body.appendChild(node);
-			}
-
-			document.body.addEventListener('keydown', function (event) {
-				log('keydown: ' + event.keyCode);
-			});
-			document.body.addEventListener('keyup', function (event) {
-				log('keyup: ' + event.keyCode);
-			});
-			document.body.addEventListener('mousedown', function (event){
-				log('mousedown' + (event.shiftKey ? '(shift)' : ''));
-			});
-			document.body.addEventListener('mouseup', function (event){
-				log('mouseup' + (event.shiftKey ? '(shift)' : ''));
-			});
-			document.body.addEventListener('click', function (event) {
-				log('click' + (event.shiftKey ? '(shift)' : ''));
-			});
-		}());
 		</script>
 	</body>
 </html>
