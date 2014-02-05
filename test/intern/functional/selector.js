@@ -1,7 +1,7 @@
 define([
 	"intern!object",
 	"intern/chai!assert",
-	"../util",
+	"./util",
 	"dojo/node!wd/lib/special-keys",
 	"require"
 ], function (test, assert, util, specialKeys, require) {
