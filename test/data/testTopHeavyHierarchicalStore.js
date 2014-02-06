@@ -4,7 +4,7 @@ define([
 	"dojo/_base/array"
 ], function(createSyncStore, stateData, arrayUtil){
 
-	var topHeavyData = arrayUtil.map(stateData, function (state) {
+	var topHeavyData = arrayUtil.map(stateData.items, function (state) {
 		return {
 			abbreviation: state.abbreviation,
 			name: state.name,

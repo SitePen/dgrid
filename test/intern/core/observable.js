@@ -3,11 +3,10 @@ define([
 	"intern/chai!assert",
 	"dojo/_base/declare",
 	"dojo/query",
-	"dojo/store/Memory",
-	"dojo/store/Observable",
+	"../../data/createSyncStore",
 	"dgrid/OnDemandList",
 	"put-selector/put"
-], function(test, assert, declare, query, Memory, Observable, OnDemandList, put){
+], function(test, assert, declare, query, createSyncStore, OnDemandList, put){
 
 	var widget,
 		storeCounter = 0;
@@ -34,14 +33,14 @@ define([
 
 	function createStore(numStoreItems){
 		storeCounter++;
-		return Observable(new Memory({
+		return createSyncStore({
 			data: createData(numStoreItems)
-		}));
+		});
 	}
 
 	function createList(numStoreItems, itemsPerQuery, overlap){
 		widget = new OnDemandList({
-			store: createStore(numStoreItems),
+			collection: createStore(numStoreItems),
 			minRowsPerPage: itemsPerQuery,
 			maxRowsPerPage: itemsPerQuery,
 			queryRowsOverlap: overlap,
@@ -84,7 +83,7 @@ define([
 			}
 
 			// Perform the actions and update the array of expected values.
-			expectedValues = createData(widget.store.data.length);
+			expectedValues = createData(widget.collection.data.length);
 			for(i = index, cnt = 0; cnt < numToModify; step()){
 				itemAction(indexToId(i), expectedValues);
 			}
@@ -185,13 +184,13 @@ define([
 			var index = findIndex(id, expectedValues);
 			var value = expectedValues[index].value + " / Changed!";
 			var dataObj = {id: id, value: value};
-			widget.store.put(dataObj);
+			widget.collection.put(dataObj);
 			expectedValues[index] = dataObj;
 		};
 		modifyAction.actionName = "Modify";
 
 		var removeAction = function(id, expectedValues){
-			widget.store.remove(id);
+			widget.collection.remove(id);
 			var index = findIndex(id, expectedValues);
 			expectedValues[index].deleted = true;
 		};
@@ -200,7 +199,7 @@ define([
 		var addBeforeAction = function(id, expectedValues){
 			var index = findIndex(id, expectedValues);
 			var obj = {id: id - 5, value: expectedValues[index].value + " / Added before!"};
-			widget.store.add(obj);
+			widget.collection.add(obj);
 			expectedValues.splice(index, 0, obj);
 		};
 		addBeforeAction.actionName = "Add before";
@@ -208,7 +207,7 @@ define([
 		var addAfterAction = function(id, expectedValues){
 			var index = findIndex(id, expectedValues);
 			var obj = {id: id + 5, value: expectedValues[index].value + " / Added after!"};
-			widget.store.add(obj);
+			widget.collection.add(obj);
 			expectedValues.splice(index + 1, 0, obj);
 		};
 		addAfterAction.actionName = "Add after";

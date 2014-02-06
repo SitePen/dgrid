@@ -1,7 +1,8 @@
 define([
 	"dojo/_base/lang",
+	"dojo/_base/array",
 	"./createSyncStore"
-], function(lang, createSyncStore){
+], function(lang, arrayUtil, createSyncStore){
 
 	return function createSyncHierarchicalStore(kwArgs){
 		kwArgs = lang.mixin({
@@ -19,22 +20,12 @@ define([
 
 				return filteredCollection;
 			},
+			// TODO: Can we fix this? It isn't very generic.
 			mayHaveChildren: function(parent){
 				return parent.type != "city";
 			}
 		}, kwArgs);
 
-		var store = createSyncStore(kwArgs);
-
-		var originalFetch = store.fetch;
-		store.fetch = function (){
-			return originalFetch.call(
-				this.filtered
-					? this
-					: this.filter({ parent: undefined })
-			);
-		};
-
-		return store;
+		return createSyncStore(kwArgs).filter({ parent: undefined });
 	};
 });
