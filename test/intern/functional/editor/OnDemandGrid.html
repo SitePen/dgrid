@@ -10,94 +10,65 @@
 		</style>
 	</head>
 
-	<body>
+	<body class="claro">
+		<h2>OnDemandGrid with editors</h2>
 		<div id="grid"></div>
 
 		<script src="../../../../../dojo/dojo.js" data-dojo-config="async: 1"></script>
 
 		<script>
-			var grid;
-			var gridSaveStack = [];
-			var ready = false;
-			// Toggled with each grid.save call to signal test module that a save is complete
-			var saveComplete = false;
-			var preRefreshActiveElement;
-			var postRefreshActiveElement;
+			var grid,
+				gridSaveStack = [],
+				ready,
+				// Toggled with each grid.save call to signal test module that a save is complete
+				saveComplete;
 
 			require([
 				"dojo/aspect",
+				"dojo/store/Memory",
+				"dojo/store/Observable",
 				"dgrid/OnDemandGrid",
-				"dgrid/Keyboard",
-				"dgrid/Selection",
-				"dgrid/editor",
-				"dgrid/test/data/base"
-			], function (aspect, OnDemandGrid, Keyboard, Selection, editor, testStore) {
-				var columns = {
-					col1: "Priority",
-					col3: editor({
-						label: "Status",
-						editor: "text",
-						autoSave: true
-					}),
-					col4: editor({
-						label: "Description",
-						editor: "text",
-						editOn: "click",
-						autoSave: true
-					})
-				};
+				"dgrid/editor"
+			], function (aspect, Memory, Observable, OnDemandGrid, editor) {
+				var store = new Observable(new Memory({ data: [
+					{ id: 0, name: "1", description: "one" },
+					{ id: 1, name: "2", description: "two" },
+					{ id: 2, name: "3", description: "three" }
+				]}));
 
 				grid = new OnDemandGrid({
-					store: testStore,
-					columns: columns
+					store: store,
+					columns: {
+						id: "ID",
+						name: editor({
+							label: "Name",
+							editor: "text",
+							autoSave: true
+						}),
+						description: editor({
+							label: "Description",
+							editor: "text",
+							editOn: "click",
+							autoSave: true
+						})
+					}
 				}, "grid");
-
-				document.addEventListener("change", function () {
-					console.log('DOM change event');
-				});
-				grid.on("dgrid-datachange", function () {
-					console.group("dgrid cell edit-blur-save");
-					console.log("dgrid-datachange event");
-				});
-				document.addEventListener("blur", function () {
-					console.group("DOM blur event");
-					console.log("grid.dirty: " + JSON.stringify(grid.dirty));
-					console.groupEnd();
-				}, true);
 
 				aspect.before(grid, "save", function () {
 					var dirtyRowId;
 
-					console.log("grid.save called");
 					saveComplete = false;
 					for (dirtyRowId in grid.dirty) {
 						// col3 and col4 are the only columns with edit enabled; push the edited value
 						// into 'gridSaveStack'
-						gridSaveStack.push(grid.dirty[dirtyRowId].col3 || grid.dirty[dirtyRowId].col4);
+						gridSaveStack.push(grid.dirty[dirtyRowId].name || grid.dirty[dirtyRowId].description);
 					}
 				});
 
 				aspect.after(grid, "save", function (savePromise) {
 					savePromise.then(function () {
-						console.log("grid.save completed");
-						console.groupEnd();
 						saveComplete = true;
 					});
-				});
-
-				// This method paired with the "dgrid-refresh-complete" event handler save the document's
-				// activeElement before and after refresh, enabling the test module to check that the
-				// activeElement persists after a grid refresh.
-				// (Only applicable for click-to-edit cells - always-on editors do not maintain focus
-				// after grid.refresh)
-				aspect.before(grid, "refresh", function () {
-					ready = false;
-					preRefreshActiveElement = document.activeElement;
-				});
-
-				grid.on("dgrid-refresh-complete", function () {
-					postRefreshActiveElement = document.activeElement;
-					ready = true;
 				});
 
 				ready = true;

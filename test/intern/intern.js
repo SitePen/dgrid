@@ -12,8 +12,8 @@ define({
 	// Note that the `build` capability will be filled in with the current commit ID from the Travis CI environment
 	// automatically
 	capabilities: {
-		// Limit test runs to 3 minutes
-		'max-duration': 180,
+		// Limit duration of each job to avoid waste of resources during hangs
+		'max-duration': 600,
 		// Increase timeout if Sauce Labs receives no new commands
 		// (no commands are sent during non-functional unit tests)
 		'idle-timeout': 180,

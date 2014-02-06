@@ -8,17 +8,14 @@ define([
 	"dijit/form/TextBox",
 	"dgrid/Grid",
 	"dgrid/OnDemandGrid",
-	"dgrid/Selection",
-	"dgrid/Keyboard",
 	"dgrid/editor",
 	"dgrid/test/data/base"
-], function (test, assert, declare, on, query, registry, TextBox, Grid, OnDemandGrid, Selection, Keyboard, editor, testStore) {
-	var CustomGrid = declare([OnDemandGrid, Selection, Keyboard]);
+], function (test, assert, declare, on, query, registry, TextBox, Grid, OnDemandGrid, editor) {
 	var grid;
 
 	// testOrderedData: global from dgrid/test/data/base.js
 
-	test.suite("editor column plugin", function(){
+	test.suite("editor column plugin", function () {
 
 		test.afterEach(function () {
 			if (grid) {
@@ -123,27 +120,27 @@ define([
 
 
 		test.test("canEdit: suppress on false", function () {
-			var rowIndex;
-			var cell;
-			var matchedNodes;
+			var rowIndex,
+				cell,
+				matchedNodes;
 
-			grid = new CustomGrid({
+			function canEdit(data) {
+				return data.order % 2;
+			}
+			
+			grid = new OnDemandGrid({
 				columns: {
 					order: "step",
 					name: editor({
 						label: "Name",
 						editor: "text",
-						canEdit: function (rowData) {
-							return rowData.order % 2;
-						}
+						canEdit: canEdit
 					}),
 					description: editor({
 						label: "Description",
 						editor: "text",
 						editOn: "click",
-						canEdit: function (rowData) {
-							return rowData.order % 2;
-						}
+						canEdit: canEdit
 					})
 				}
 			});
@@ -158,7 +155,7 @@ define([
 				grid.edit(cell);
 				matchedNodes = query("input", cell.element);
 
-				if (cell.row.data.order % 2) {
+				if (canEdit(cell.row.data)) {
 					assert.strictEqual(1, matchedNodes.length,
 						"Cell with canEdit=>true should have an editor element");
 				}
@@ -172,7 +169,7 @@ define([
 				grid.edit(cell);
 				matchedNodes = query("input", cell.element);
 
-				if (cell.row.data.order % 2) {
+				if (canEdit(cell.row.data)) {
 					assert.strictEqual(1, matchedNodes.length,
 						"Cell with canEdit=>true should have an editor element");
 				}
@@ -191,7 +188,7 @@ define([
 			assert.strictEqual(0, matchedNodes.length,
 				"Before grid is created there should be 0 input elements on the page");
 
-			grid = new CustomGrid({
+			grid = new OnDemandGrid({
 				columns: {
 					order: "step",
 					name: editor({
@@ -223,9 +220,9 @@ define([
 
 		test.test("destroy editor widgets: Dijit", function () {
 			assert.strictEqual(0, registry.length,
-				"Before grid is created there should be 0 input elements on the page");
+				"Before grid is created there should be 0 widgets on the page");
 
-			grid = new CustomGrid({
+			grid = new OnDemandGrid({
 				columns: {
 					order: "step",
 					name: editor({
@@ -243,39 +240,37 @@ define([
 			grid.startup();
 			grid.renderArray(testOrderedData);
 
+			// Expected is data length + 1 due to widget for editOn editor
 			assert.strictEqual(testOrderedData.length + 1, registry.length,
-				"There should be " + (testOrderedData.length + 1) + " input elements for the grid's editors");
+				"There should be " + (testOrderedData.length + 1) + " widgets for the grid's editors");
 
 			grid.destroy();
 
 			assert.strictEqual(0, registry.length,
-				"After grid is destroyed there should be 0 input elements on the page");
+				"After grid is destroyed there should be 0 widgets on the page");
 		});
 
 
 		// Goal: test that when "grid.edit(cell)" is called the cell gets an editor with focus
 		//
 		// Observed behavior:
-		// In manual testing & debugging, I noticed that in a cell without an always-on editor
-		// if you call "grid.edit(cell)" repeatedly the previously edited cell loses its content
-		// (not just its editor). In manual testing I was able to fix this by executing:
-		// document.activeElement.blur()
-		// between calls of "grid.edit".
-		// In this automated test, the same approach does not seem to work (though I don't think it is
-		// of any consequence since this test is simply testing the editor's presence, not its after-effects).
+		// In a cell without an always-on editor, if you call "grid.edit(cell)"
+		// repeatedly, the previously edited cell loses its content (not just its editor).
+		// document.activeElement.blur() between calls of "grid.edit" does not
+		// seem to work in this automated test, though it is of no consequence
+		// since this test is simply testing the editor's presence, not its after-effects.
 		//
 		// grid.edit:
-		//		In a cell with an always-on editor, the editor's "focus" event is fired and "document.activeElement"
-		//		is set to the editor.
-		//		In a cell with a click-to-activate editor, no "focus" event is fired and "document.activeElement"
-		//		is the body.
+		//		In a cell with an always-on editor, the editor's "focus" event is fired and
+		//		"document.activeElement" is set to the editor.
+		//		In a cell with a click-to-activate editor, no "focus" event is fired and
+		//		"document.activeElement" is the body.
 		test.test("editor focus", function () {
-			var dfd = this.async();
-			var rowIndex;
-			var cell;
-			var cellEditor;
+			var rowIndex,
+				cell,
+				cellEditor;
 
-			grid = new CustomGrid({
+			grid = new OnDemandGrid({
 				columns: {
 					order: "step",
 					name: editor({
@@ -307,18 +302,19 @@ define([
 					"Editing a cell should make the cell's editor active");
 
 				document.activeElement.blur();
+
 				cell = grid.cell(rowIndex, "description");
-				// The rendering and focus of an edit cell without always-on editing is
-				// asynchronous. Respond to the "dgrid-editor-show" event to ensure the
-				// correct cell has an editor.
-				on.once(grid.domNode, "dgrid-editor-show", dfd.callback(function (event) {
-					// document.activeElement is the body... for some reason.
+				// Respond to the "dgrid-editor-show" event to ensure the
+				// correct cell has an editor.  This event actually fires
+				// synchronously, so we don't need to use this.async.
+				on.once(grid.domNode, "dgrid-editor-show", function (event) {
+					// document.activeElement is the body for some reason.
 					// So at least check to ensure that the cell we called edit on
 					// is the same as the cell passed to the "dgrid-editor-show" event.
 					assert.strictEqual(cell.element, event.cell.element,
 						"The activated cell should be being edited"
 					);
-				}));
+				});
 
 				grid.edit(cell);
 			}

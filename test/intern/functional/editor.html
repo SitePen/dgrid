@@ -10,47 +10,46 @@
 		</style>
 	</head>
 
-	<body>
+	<body class="claro">
+		<h2>Grid with editors</h2>
 		<div id="grid"></div>
 
 		<script src="../../../../dojo/dojo.js" data-dojo-config="async: 1"></script>
 
 		<script>
-			var grid;
-			var datachangeStack = [];
-			var ready = false;
+			var grid,
+				datachangeStack = [],
+				ready = false;
 
 			require([
 				"dojo/_base/declare",
-				"dijit/form/TextBox",
 				"dgrid/Grid",
 				"dgrid/OnDemandList",
-				"dgrid/Keyboard",
-				"dgrid/Selection",
-				"dgrid/editor",
-				"dgrid/test/data/base"
-			], function (declare, TextBox, Grid, OnDemandList, Keyboard, Selection, editor, testStore) {
+				"dgrid/editor"
+			], function (declare, Grid, OnDemandList, editor) {
 				// global from dgrid/test/data/base
 				// testOrderedData
 
-				var columns = {
-					order: "Step",
-					name: editor({
-						label: "Name",
-						editor: "text"
-					}),
-					description: editor({
-						label: "Description",
-						editor: "text",
-						editOn: "click"
-					})
-				};
-
 				grid = new Grid({
-					columns: columns
+					columns: {
+						id: "ID",
+						name: editor({
+							label: "Name",
+							editor: "text"
+						}),
+						description: editor({
+							label: "Description",
+							editor: "text",
+							editOn: "click"
+						})
+					}
 				}, "grid");
 
-				grid.renderArray(testOrderedData);
+				grid.renderArray([
+					{ name: "1", description: "one" },
+					{ name: "2", description: "two" },
+					{ name: "3", description: "three" }
+				]);
 
 				// Push values received by the "dgrid-datachange" event into a global stack.
 				// The functional test can read from this stack to verify the values it is
