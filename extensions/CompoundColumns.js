@@ -35,9 +35,18 @@ define([
 			function processColumns(columns, level, hasLabel, parent){
 				var numColumns = 0,
 					noop = function(){},
-					column, children, hasChildLabels;
+					column, children, hasChildLabels,
+					isArray = columns instanceof Array;
 				
 				function processColumn(column, i){
+					// Handle the column config when it is an object rather
+					// than an array.
+					if(typeof column === "string"){
+						column = {label: column};
+					}
+					if(!isArray && !column.field){
+						column.field = i;
+					}
 					children = column.children;
 					hasChildLabels = column.children && (column.showChildHeaders !== false);
 					// Set a reference to the parent column so later the children's ids can
@@ -48,6 +57,10 @@ define([
 						// make sure the column has an id
 						if(column.id == null){
 							column.id = ((parent && parent.id) || level-1) + "-" + topHeaderRow.length;
+						}else if (parent && parent.id){
+							// Make sure nested compound columns have ids that are prefixed with
+							// their parent's ids.
+							column.id = parent.id + "-" + column.id;
 						}
 						// recursively process the children
 						numColumns += (column.colSpan = processColumns(children, level + 1, hasChildLabels, column));
@@ -107,6 +120,32 @@ define([
 				columnId = column.id = prefix + id;
 			}
 			this.inherited(arguments, [column, columnId, rowColumns, prefix]);
+		},
+
+		cell: function(target, columnId){
+			// summary:
+			//		Get the cell object by node, or event, id, plus a columnId.  This extension,
+			//		prefixes children's column ids with the parents' column ids.  Take that into account
+			//		when looking for a column id.
+
+			// Try the super's cell function to see if it can find a match.
+			var result = this.inherited(arguments);
+			if(!result.element && typeof columnId != "undefined"){
+				// Find a column id that ends with the provided column id.  This will locate a child column
+				// by an id that was provided in the original column configuration.  For example, if a compound column
+				// was given the id "compound" and a child column was given the id "child", this will find the column
+				// using only "child".  If "compound-child" was being searched for, the call to the super
+				// above would have found the cell.
+				var suffix = "-" + columnId;
+				var suffixLength = suffix.length;
+				for(var completeId in this.columns){
+					if(completeId.indexOf(suffix, completeId.length - suffixLength) !== -1){
+						var result2 = this.inherited(arguments, [target, completeId]);
+						return result2.element && result2 || result;
+					}
+				}
+			}
+			return result;
 		}
 	});
 });
