@@ -35,7 +35,8 @@ define([
 			function processColumns(columns, level, hasLabel, parent){
 				var numColumns = 0,
 					noop = function(){},
-					column, children, hasChildLabels;
+					column, children, hasChildLabels,
+					isArray = columns instanceof Array;
 				
 				function processColumn(column, i){
 					// Handle the column config when it is an object rather
@@ -43,7 +44,7 @@ define([
 					if(typeof column === "string"){
 						column = {label: column};
 					}
-					if(!column.field){
+					if(!isArray && !column.field){
 						column.field = i;
 					}
 					children = column.children;
@@ -135,17 +136,12 @@ define([
 				// was given the id "compound" and a child column was given the id "child", this will find the column
 				// using only "child".  If "compound-child" was being searched for, the call to the super
 				// above would have found the cell.
-				var topHeaderRow = this.subRows.headerRows[0];
 				var suffix = "-" + columnId;
 				var suffixLength = suffix.length;
-				for(var i = 0, l = topHeaderRow.length; i < l; i++ ){
-					var id = topHeaderRow[i].headerNode.columnId;
-					if(id.indexOf(suffix, id.length - suffixLength) !== -1){
-						var result2 = this.inherited(arguments, [target, id]);
-						if (result2.element){
-							result = result2;
-						}
-						break;
+				for(var completeId in this.columns){
+					if(completeId.indexOf(suffix, completeId.length - suffixLength) !== -1){
+						var result2 = this.inherited(arguments, [target, completeId]);
+						return result2.element && result2 || result;
 					}
 				}
 			}
