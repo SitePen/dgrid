@@ -240,14 +240,13 @@ function tree(column){
 					if("level" in target){
 						query.level = target.level;
 					}
-					Deferred.when(
-						grid.renderQuery ?
-							grid._trackError(function(){
-								return grid.renderQuery(query, preloadNode, options);
-							}) :
+					// Add the query to the promise chain
+					promise = promise.then(function(){
+						return grid.renderQuery ?
+							grid.renderQuery(query, preloadNode, options) :
 							grid.renderCollection(query(options), preloadNode,
-								"level" in query ? { queryLevel: query.level } : {})
-					).then(function(){
+								"level" in query ? { queryLevel: query.level } : {});
+					}).then(function(){
 						// Expand once results are retrieved, if the row is still expanded.
 						if(grid._expanded[row.id] && hasTransitionend){
 							var scrollHeight = container.scrollHeight;
