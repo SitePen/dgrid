@@ -5,6 +5,9 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ### Extensions
 
+* The `CompoundColumns` extension is now capable of interoperating with the
+  `ColumnHider` and `ColumnResizer` extensions; note that it must be mixed in
+  after these extensions in order to work properly. (#834)
 * Improved performance of first resize with `ColumnResizer`. (#832)
 
 # 0.3.13
