@@ -28,37 +28,39 @@ define([
 		// Click the checkbox/radio in the first NUM_VISIBLE_ROWS of a grid.
 		// After each click the row will be tested for the "dgrid-selected" class.
 		function clickAndTestEachRow(remote, gridId) {
-			var rowSelector = "#" + gridId + "-row-";
-			var rowIndex;
+			var rowSelector = "#" + gridId + "-row-",
+				rowIndex;
+
+			function each(rowIndex) {
+				// Click the dgrid/selector checkbox/radio
+				remote.elementByCssSelector(rowSelector + rowIndex + " .field-select input")
+						.clickElement()
+						.end()
+					// Check the row for the "dgrid-selected" class
+					.elementByCssSelector(rowSelector + rowIndex)
+						.getAttribute("class")
+						.then(function (classString) {
+							var classNames,
+								isSelected;
+
+							if (rowIndex % 2) {
+								classNames = classString.split(" ");
+								isSelected = classNames.indexOf("dgrid-selected") !== -1;
+								assert.isFalse(isSelected,
+									gridId + ": Row " + rowIndex + " should NOT be selected");
+							}
+							else {
+								assert.include(classString, "dgrid-selected",
+									gridId + ": Row " + rowIndex + " should be selected after click");
+							}
+						})
+						.end();
+			}
 
 			for (rowIndex = 0; rowIndex < NUM_VISIBLE_ROWS; rowIndex++) {
 				// The code in this loop is async and might run after the loop has updated
-				// rowIndex, so run the code in an IIFE with its own non-closure reference
-				(function (rowIndex) {
-					// Click the dgrid/selector checkbox/radio
-					remote.elementByCssSelector(rowSelector + rowIndex + " .field-select input")
-						.clickElement()
-						.end();
-
-					// Check the row for the "dgrid-selected" class
-					remote.elementByCssSelector(rowSelector + rowIndex);
-					remote.getAttribute("class").then(function (classString) {
-						var classNames;
-						var isSelected;
-
-						if (rowIndex % 2) {
-							classNames = classString.split(" ");
-							isSelected = classNames.indexOf("dgrid-selected") !== -1;
-							assert.isFalse(isSelected,
-								gridId + ": Row " + rowIndex + " should NOT be selected");
-						}
-						else {
-							assert.include(classString, "dgrid-selected",
-								gridId + ": Row " + rowIndex + " should be selected after click");
-						}
-					});
-					remote.end();
-				}(rowIndex));
+				// rowIndex, so run the code in a function with its own value
+				each(rowIndex);
 			}
 		}
 
@@ -67,13 +69,13 @@ define([
 			var rowSelector = "#" + gridId + "-row-";
 
 			remote.elementByCssSelector(rowSelector + "0" + " .field-select input")
-				.clickElement()
-				.end()
+					.clickElement()
+					.end()
 				.keys(specialKeys.Shift)
 				.elementByCssSelector(rowSelector + "4" + " .field-select input")
-				.clickElement()
-				.keys(specialKeys.NULL)
-				.end();
+					.clickElement()
+					.keys(specialKeys.NULL)
+					.end();
 		}
 
 		// Click the "Select All" checkbox in the grid header
@@ -87,25 +89,19 @@ define([
 
 		function createRowSelectionTest(gridId, allowMultiple, selectTestFunction) {
 			return function () {
+				if (selectTestFunction === shiftClickAndTestRows && !isShiftClickSupported) {
+					return;
+				}
+
 				var selector = "#" + gridId + "-row-",
 					remote = this.get("remote"),
 					rowIndex;
 
-				if (selectTestFunction === shiftClickAndTestRows && !isShiftClickSupported) {
-					return;
-				}
-				
-				selectTestFunction(remote, gridId);
-
-				// Loop through all rows to verify selection state
-				for (rowIndex = 0; rowIndex < NUM_VISIBLE_ROWS; rowIndex++) {
-					// The code in this loop is async and might run after the loop has updated
-					// rowIndex, so run the code in an IIFE with its own non-closure reference
-					(function (rowIndex) {
-						remote.elementByCssSelector(selector + rowIndex);
-						remote.getAttribute("class").then(function (classString) {
-							var classNames;
-							var isSelected;
+				function each(rowIndex) {
+					remote.elementByCssSelector(selector + rowIndex)
+						.getAttribute("class").then(function (classString) {
+							var classNames,
+								isSelected;
 
 							if (expectedSelectState[gridId][rowIndex]) {
 								assert.include(classString, "dgrid-selected",
@@ -117,9 +113,17 @@ define([
 								assert.isFalse(isSelected,
 									gridId + ": Row " + rowIndex + " should NOT be selected");
 							}
-						});
-						remote.end();
-					}(rowIndex));
+						})
+						.end();
+				}
+
+				selectTestFunction(remote, gridId);
+
+				// Loop through all rows to verify selection state
+				for (rowIndex = 0; rowIndex < NUM_VISIBLE_ROWS; rowIndex++) {
+					// The code in this loop is async and might run after the loop has updated
+					// rowIndex, so run the code in a function with its own value
+					each(rowIndex);
 				}
 
 				return remote.end();
