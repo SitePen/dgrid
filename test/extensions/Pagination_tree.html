@@ -58,7 +58,8 @@
 					var CustomGrid = declare([Grid, Selection, Pagination]);
 					
 					var testStore = window.testStore = new declare([ Rest, Cache, Observable ])({
-						target:"../data/rest.php?"
+						target:"../data/rest.php",
+						rangeParam: "range"
 					});
 					testStore.getChildren = function(parent){
 						return testStore.filter({parent: parent.id});

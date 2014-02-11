@@ -64,22 +64,18 @@
 					// Create a custom data array based on orderedData, but looping
 					// several times to create enough items to reasonably test node removal,
 					// and also adding an extra item to test item-specific DnD types.
-					var orderedData = [],
-						len = orderedData.length,
-						i, j, obj;
-					
-					orderedData.push({
+					var data = [{
 						order: 1,
 						name: "grue",
 						description: "A grue! Run away!",
 						type: "grue"
-					});
+					}];
 					
-					for(i = 0; i < 10; i++){
-						for(j = 0; j < len; j++){
-							obj = lang.clone(orderedData[j]);
+					for(var i = 0, len = orderedData.items.length; i < 10; i++){
+						for(var j = 0, obj; j < len; j++){
+							obj = lang.clone(orderedData.items[j]);
 							obj.order = obj.id = i * len + j + 2;
-							orderedData.push(obj);
+							data.push(obj);
 						}
 					}
 					
@@ -88,7 +84,7 @@
 					window.grid1 = new DnDGrid({
 						bufferRows: 5,
 						farOffRemoval: 400,
-						collection: store = createOrderedStore({ data: orderedData }),
+						collection: store = createOrderedStore({ data: data }),
 						columns: [
 							{label:"Name", field:"name", sortable: false},
 							{label:"Description", field:"description", sortable: false}
@@ -179,7 +175,7 @@
 									object.added = grid.addedSide;
 									// If we wanted to support copy, we would probably want
 									// to check the copy flag and call copy instead of put here.
-									grid.store.put(object, { before: targetItem });
+									grid.collection.put(object, { before: targetItem });
 								});
 							});
 						}

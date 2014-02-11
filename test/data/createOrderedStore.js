@@ -32,7 +32,6 @@ define([
 		// Instantiate a Memory store modified to support ordering.
 
 		kwArgs = lang.mixin({
-			idProperty: "name",
 			// Memory's add does not need to be augmented since it calls put
 			copy: function(object, options){
 				// summary:
@@ -64,11 +63,12 @@ define([
 			return originalPut.call(this, object, options);
 		};
 
-		var originalFetch = store.fetch;
-		store.fetch = function(){
-			this.sort("order");
-			return originalFetch.call(this);
-		};
+		var sortedCollection = store.sort("order");
+		lang.mixin(store, {
+			sorted: sortedCollection.sorted,
+			queryer: sortedCollection.queryer,
+			data: sortedCollection.data
+		});
 
 		return store;
 	};

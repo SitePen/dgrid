@@ -6,28 +6,30 @@ define(["dojo/_base/lang", "dojo/_base/Deferred"],function(lang, Deferred){
 	return function(store, delay){
 		return lang.delegate(store, {
 			fetch: function(){
-				var totalDeferred = new Deferred();
-				var resultsDeferred = new Deferred();
-				resultsDeferred.total = totalDeferred;
+				if(!this.data || !this.data.then){
+					var results = store.fetch.call(this);
 
-				var results = store.fetch.call(this);
-				var resolveTotal = function(){
-					totalDeferred.resolve(this.total);
-				};
-				var resolveResults = function(){
-					resultsDeferred.resolve(results);
-				};
+					var resultsDeferred = this.data = new Deferred();
+					var totalDeferred = this.total = new Deferred();
 
-				if(delay){
-					setTimeout(resolveTotal, delay * (Math.random() + 0.5));
-					setTimeout(resolveResults, delay * (Math.random() + 0.5));
+					var resolveTotal = function(){
+						totalDeferred.resolve(results.length);
+					};
+					var resolveResults = function(){
+						resultsDeferred.resolve(results);
+					};
+
+					if(delay){
+						setTimeout(resolveTotal, delay * (Math.random() + 0.5));
+						setTimeout(resolveResults, delay * (Math.random() + 0.5));
+					}
+					else{
+						resolveTotal();
+						resolveResults();
+					}
 				}
-				else{
-					resolveTotal();
-					resolveResults();
-				}
 
-				return resultsDeferred;
+				return this.data;
 			}
 		});
 	}

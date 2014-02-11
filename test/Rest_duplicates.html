@@ -37,8 +37,9 @@
 				"dstore/SimpleQuery", "dojo/domReady!"], 
 			function(Grid, Selection, Keyboard, editor, tree, declare, Rest, Observable, Cache, SimpleQuery){
 				testStore = new declare([ Rest, SimpleQuery, Observable, Cache])({
-					target:"./data/rest.php?", 
-					idProperty: "id"
+					target:"./data/rest.php", 
+					idProperty: "id",
+					rangeParam: "range"
 				});
 				testStore.getChildren = function(parent){
 					return testStore.filter({parent: parent.id});

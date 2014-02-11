@@ -26,6 +26,7 @@
 					var testStore = new declare([ Rest, Observable, Cache ])({
 						target:"./data/rest.php", 
 						idProperty: "id",
+						rangeParam: "range",
 						put: function(object){
 							return object;
 						}
