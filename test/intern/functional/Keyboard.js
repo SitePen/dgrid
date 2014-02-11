@@ -68,19 +68,14 @@ define([
 					.clickElement()
 					.type([specialKeys.End])
 					.end()
-				.elementByCssSelector("#" + gridId + " .dgrid-content>" + (onDemand ? ":nth-last-child(2)" : ":last-child") + (cellNavigation ? " .dgrid-column-col1" : ""))
+				.setImplicitWaitTimeout(1000)
+				// Note that this assumes the list is always 100 items, 0-99
+				.elementByCssSelector("#" + gridId + "-row-99" + (cellNavigation ? " .dgrid-column-col1" : ""))
 					.getAttribute("class")
 					.then(function(classNames){
 						var arr = classNames.split(" "),
-							containsClass;
-						if(onDemand){
-							//TODO we should check for the class with the right store item id...
-							containsClass = (arr.indexOf("dgrid-focus") !== -1);
-							assert.ok(containsClass, "the end key should move focus to the last element in the list");
-						}else{
-							containsClass = (arr.indexOf("dgrid-focus") !== -1);
-							assert.ok(containsClass, "the end key should move focus to the last element in the list");
-						}
+						containsClass = arr.indexOf("dgrid-focus") !== -1;
+						assert.ok(containsClass, "the end key should move focus to the last element in the list");
 					})
 					.type([specialKeys.Home])
 					.end()
