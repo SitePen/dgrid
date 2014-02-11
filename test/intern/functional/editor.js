@@ -150,7 +150,7 @@ define([
 							.end();
 				}
 
-				remote.get(require.toUrl("./editor/OnDemandGrid.html"))
+				remote.get(require.toUrl("./editor-OnDemand.html"))
 					.waitForCondition("ready", 15000);
 
 				for (rowIndex = 0; rowIndex < GRID_ROW_COUNT; rowIndex++) {
@@ -277,7 +277,7 @@ define([
 					});
 			}
 
-			remote.get(require.toUrl("./editor/OnDemandGrid.html"))
+			remote.get(require.toUrl("./editor-OnDemand.html"))
 				.waitForCondition("ready", 15000);
 
 			for (rowIndex = 0; rowIndex < GRID_ROW_COUNT; rowIndex++) {
