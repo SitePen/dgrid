@@ -1,4 +1,4 @@
-define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/dom", "dojo/on", "dojo/has", "./util/misc", "dojo/has!touch?./TouchScroll", "xstyle/has-class", "put-selector/put", "dojo/_base/sniff", "xstyle/css!./css/dgrid.css"],
+define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/dom", "dojo/on", "./has", "./util/misc", "./has!only-touch?./TouchScroll", "xstyle/has-class", "put-selector/put", "dojo/_base/sniff", "xstyle/css!./css/dgrid.css"],
 function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put){
 	// Add user agent/feature CSS classes 
 	hasClass("mozilla", "opera", "webkit", "ie", "ie-6", "ie-6-7", "quirks", "no-quirks", "touch");
@@ -10,26 +10,6 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 	function byId(id){
 		return document.getElementById(id);
 	}
-	
-	function getScrollbarSize(node, dimension){
-		// Used by has tests for scrollbar width/height
-		var body = document.body,
-			size;
-		
-		put(body, node, ".dgrid-scrollbar-measure");
-		size = node["offset" + dimension] - node["client" + dimension];
-		
-		put(node, "!dgrid-scrollbar-measure");
-		body.removeChild(node);
-		
-		return size;
-	}
-	has.add("dom-scrollbar-width", function(global, doc, element){
-		return getScrollbarSize(element, "Width");
-	});
-	has.add("dom-scrollbar-height", function(global, doc, element){
-		return getScrollbarSize(element, "Height");
-	});
 	
 	// var and function for autogenerating ID when one isn't provided
 	var autogen = 0;
@@ -98,7 +78,7 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 		}
 	}
 	
-	return declare(has("touch") ? TouchScroll : null, {
+	return declare(has("only-touch") ? TouchScroll : null, {
 		tabableHeader: false,
 		// showHeader: Boolean
 		//		Whether to render header (sub)rows.
@@ -262,7 +242,7 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 				miscUtil.throttleDelayed(winResizeHandler, this)));
 		},
 		
-		postCreate: has("touch") ? function(){
+		postCreate: has("only-touch") ? function(){
 			if(this.useTouchScroll){
 				this.inherited(arguments);
 			}
@@ -851,13 +831,13 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 			return this.row(this._move(row, steps || 1, "dgrid-row", visible));
 		},
 		
-		scrollTo: has("touch") ? function(options){
+		scrollTo: has("only-touch") ? function(options){
 			// If TouchScroll is the superclass, defer to its implementation.
 			return this.useTouchScroll ? this.inherited(arguments) :
 				desktopScrollTo.call(this, options);
 		} : desktopScrollTo,
 		
-		getScrollPosition: has("touch") ? function(){
+		getScrollPosition: has("only-touch") ? function(){
 			// If TouchScroll is the superclass, defer to its implementation.
 			return this.useTouchScroll ? this.inherited(arguments) :
 				desktopGetScrollPosition.call(this);
