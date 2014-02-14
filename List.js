@@ -1,5 +1,5 @@
-define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/on", "dojo/has", "./util/misc", "dojo/has!touch?./TouchScroll", "xstyle/has-class", "put-selector/put", "dojo/_base/sniff", "xstyle/css!./css/dgrid.css"], 
-function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
+define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/dom", "dojo/on", "dojo/has", "./util/misc", "dojo/has!touch?./TouchScroll", "xstyle/has-class", "put-selector/put", "dojo/_base/sniff", "xstyle/css!./css/dgrid.css"],
+function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put){
 	// Add user agent/feature CSS classes 
 	hasClass("mozilla", "opera", "webkit", "ie", "ie-6", "ie-6-7", "quirks", "no-quirks", "touch");
 	
@@ -226,9 +226,12 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 			}
 			bodyNode = this.bodyNode = put(domNode, "div.dgrid-scroller");
 			
-			// firefox 4 until at least 10 adds overflow: auto elements to the tab index by default for some
-			// reason; force them to be not tabbable
-			bodyNode.tabIndex = -1;
+			// Firefox 4+ adds overflow: auto elements to the tab index by default;
+			// force them to not be tabbable, but restrict this to Firefox,
+			// since it breaks accessibility support in other browsers
+			if(has("ff")){
+				bodyNode.tabIndex = -1;
+			}
 			
 			this.headerScrollNode = put(domNode, "div.dgrid-header-scroll.dgrid-scrollbar-width.ui-widget-header");
 			
@@ -399,6 +402,7 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 				delete this._listeners;
 			}
 			
+			this._started = false;
 			this.cleanup();
 			// destroy DOM
 			put(this.domNode, "!");
@@ -596,8 +600,9 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 				}
 			}
 			function correctElement(row){
-				// If a node has been orphaned, try to retrieve the correct, in-document, element
-				if(!row.offsetParent && byId(row.id)){
+				// If a node has been orphaned, try to retrieve the correct in-document element
+				// (use isDescendant since offsetParent is faulty in IE<9)
+				if(!dom.isDescendant(row, self.domNode) && byId(row.id)){
 					return self.row(row.id.slice(self.id.length + 5)).element;
 				}
 				// Fall back to the originally-specified element
