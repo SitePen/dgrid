@@ -499,7 +499,7 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 						// Add to new slot (either before an existing row, or at the end)
 						// First determine the DOM node that this should be placed before.
 						if(rows.length){
-							if(to < 2){ // if it is one of the first rows, we can safely get the next item
+							if(to === 0){ // if it is the first row, we can safely get the next item
 								nextNode = rows[to];
 								// Re-retrieve the element in case we are referring to an orphan
 								nextNode = nextNode && correctElement(nextNode);
