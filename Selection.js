@@ -1,4 +1,4 @@
-define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/Deferred", "dojo/on", "dojo/has", "dojo/aspect", "./List", "dojo/has!touch?./util/touch", "put-selector/put", "dojo/query", "dojo/_base/sniff"],
+define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/Deferred", "dojo/on", "dojo/has", "dojo/aspect", "./List", "./has!only-touch?./util/touch", "put-selector/put", "dojo/query", "dojo/_base/sniff"],
 function(kernel, declare, Deferred, on, has, aspect, List, touchUtil, put){
 
 has.add("pointer", function(global, doc, element){
@@ -299,7 +299,7 @@ return declare(null, {
 			select: []
 		};
 		
-		if(has("touch") && !has("pointer")){
+		if(has("only-touch") && !has("pointer")){
 			// listen for touch taps if available
 			on(this.contentNode, touchUtil.selector(selector, touchUtil.tap), function(evt){
 				grid._handleSelect(evt, this);

@@ -159,7 +159,7 @@ define([
 		onMouseDown: function(evt){
 			// Cancel the drag operation on presence of more than one contact point.
 			// (This check will evaluate to false under non-touch circumstances.)
-			if(has("touch") && this.isDragging &&
+			if(has("only-touch") && this.isDragging &&
 					touchUtil.countCurrentTouches(evt, this.grid.touchNode) > 1){
 				topic.publish("/dnd/cancel");
 				DnDManager.manager().stopDrag();
@@ -170,7 +170,7 @@ define([
 		
 		onMouseMove: function(evt){
 			// If we're handling touchmove, only respond to single-contact events.
-			if(!has("touch") || touchUtil.countCurrentTouches(evt, this.grid.touchNode) === 1){
+			if(!has("only-touch") || touchUtil.countCurrentTouches(evt, this.grid.touchNode) === 1){
 				this.inherited(arguments);
 			}
 		},
