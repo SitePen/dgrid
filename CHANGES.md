@@ -3,6 +3,11 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 # master (0.3.14-dev)
 
+### General/Core
+
+* Fixed a regression in `OnDemandList` where items added to an empty list or
+  grid would be inserted in the wrong position. (#840)
+
 ### Extensions
 
 * The `CompoundColumns` extension is now capable of interoperating with the
