@@ -1,5 +1,5 @@
-define(["dojo/_base/declare", "dojo/on", "dojo/has", "./util/misc", "dojo/has!touch?./TouchScroll", "xstyle/has-class", "put-selector/put", "dojo/_base/sniff", "xstyle/css!./css/dgrid.css"],
-function(declare, listen, has, miscUtil, TouchScroll, hasClass, put){
+define(["dojo/_base/declare", "dojo/on", "dojo/has", "./util/misc", "xstyle/has-class", "put-selector/put", "dojo/_base/sniff", "xstyle/css!./css/dgrid.css"],
+function(declare, listen, has, miscUtil, hasClass, put){
 	// Add user agent/feature CSS classes 
 	hasClass("mozilla", "opera", "webkit", "ie", "ie-6", "ie-6-7", "quirks", "no-quirks", "touch");
 	
@@ -79,26 +79,7 @@ function(declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 		if(this._started){ this.resize(); }
 	};
 	
-	// Desktop versions of functions, deferred to when there is no touch support,
-	// or when the useTouchScroll instance property is set to false
-	
-	function desktopGetScrollPosition(){
-		return {
-			x: this.bodyNode.scrollLeft,
-			y: this.bodyNode.scrollTop
-		};
-	}
-	
-	function desktopScrollTo(options){
-		if(typeof options.x !== "undefined"){
-			this.bodyNode.scrollLeft = options.x;
-		}
-		if(typeof options.y !== "undefined"){
-			this.bodyNode.scrollTop = options.y;
-		}
-	}
-	
-	return declare(has("touch") ? TouchScroll : null, {
+	return declare(null, {
 		tabableHeader: false,
 		
 		// showHeader: Boolean
@@ -121,12 +102,6 @@ function(declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 		//		the call to addCssRule, not at the time of destruction.
 		cleanAddedRules: true,
 		
-		// useTouchScroll: Boolean
-		//		If touch support is available, this determines whether to
-		//		incorporate logic from the TouchScroll module (at the expense of
-		//		normal desktop/mouse or native mobile scrolling functionality).
-		useTouchScroll: !has("dom-scrollbar-width"),
-
 		// highlightDuration: Integer
 		//		The amount of time (in milliseconds) that a row should remain
 		//		highlighted after it has been updated.
@@ -252,11 +227,8 @@ function(declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 				miscUtil.throttleDelayed(winResizeHandler, this)));
 		},
 		
-		postCreate: has("touch") ? function(){
-			if(this.useTouchScroll){
-				this.inherited(arguments);
-			}
-		} : function(){},
+		postCreate: function(){
+		},
 		
 		startup: function(){
 			// summary:
@@ -652,17 +624,21 @@ function(declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 			return this.row(this._move(row, steps || 1, "dgrid-row", visible));
 		},
 		
-		scrollTo: has("touch") ? function(options){
-			// If TouchScroll is the superclass, defer to its implementation.
-			return this.useTouchScroll ? this.inherited(arguments) :
-				desktopScrollTo.call(this, options);
-		} : desktopScrollTo,
+		scrollTo: function(options){
+			if(typeof options.x !== "undefined"){
+				this.bodyNode.scrollLeft = options.x;
+			}
+			if(typeof options.y !== "undefined"){
+				this.bodyNode.scrollTop = options.y;
+			}
+		},
 		
-		getScrollPosition: has("touch") ? function(){
-			// If TouchScroll is the superclass, defer to its implementation.
-			return this.useTouchScroll ? this.inherited(arguments) :
-				desktopGetScrollPosition.call(this);
-		} : desktopGetScrollPosition,
+		getScrollPosition: function(){
+			return {
+				x: this.bodyNode.scrollLeft,
+				y: this.bodyNode.scrollTop
+			};
+		},
 		
 		get: function(/*String*/ name /*, ... */){
 			// summary:
