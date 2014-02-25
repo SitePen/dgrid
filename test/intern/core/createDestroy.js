@@ -8,7 +8,7 @@ define([
 	"dijit/form/TextBox",
 	"dgrid/test/data/orderedData"
 ], function (test, assert, List, Grid, editor, registry, TextBox, orderedData) {
-
+	
 	test.suite("createDestroy", function(){
 		// Tests
 		test.test("no params list", function(){

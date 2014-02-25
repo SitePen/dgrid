@@ -24,11 +24,11 @@ define([
 			col5: "Column 5"
 		};
 	}
-
+	
 	function createTestStore(){
 		return createSyncStore({ data: genericData });
 	}
-
+	
 	test.suite("Pagination", function(){
 		test.before(function(){
 			grid = new PaginationGrid({
@@ -41,14 +41,14 @@ define([
 		test.after(function(){
 			grid.destroy();
 		});
-
+		
 		test.test("pagination info updates on page switch", function(){
 			// switch pages and ensure that the status message and links are
 			// updated
 			var disabledLinks = query("span.dgrid-page-disabled", grid.paginationLinksNode),
 				expectedText = string.substitute(grid.i18nPagination.status,
 					{ start: 1, end: 10, total: 100 });
-
+			
 			assert.strictEqual(grid.paginationStatusNode.innerHTML, expectedText,
 				"should find expected status message; received '" + status + "'");
 			assert.strictEqual(disabledLinks.length, 1,
@@ -56,11 +56,11 @@ define([
 				disabledLinks.length);
 			assert.strictEqual(string.trim(disabledLinks[0].innerHTML), "1",
 				"link for active page (1) should be disabled");
-
+			
 			grid.gotoPage(2);
 			disabledLinks = query("span.dgrid-page-disabled", grid.paginationLinksNode);
 			expectedText = string.substitute(grid.i18nPagination.status, {start: 11, end: 20, total: 100});
-
+			
 			assert.strictEqual(grid.paginationStatusNode.innerHTML, expectedText,
 				"should find expected status message; received '" + status + "'");
 			assert.strictEqual(disabledLinks.length, 1,
@@ -70,13 +70,13 @@ define([
 				"link for active page (2) should be disabled");
 		});
 	});
-
+	
 	test.suite("Pagination size selector initialization tests", function(){
 		// Each test in this suite is responsible for instantiating the grid
 		test.afterEach(function(){
 			grid.destroy();
 		});
-
+		
 		test.test("pageSizeOptions + unique rowsPerPage during creation", function(){
 			grid = new PaginationGrid({
 				collection: createTestStore(),
@@ -88,14 +88,14 @@ define([
 			});
 			document.body.appendChild(grid.domNode);
 			grid.startup();
-
+			
 			assert.strictEqual(grid.paginationSizeSelect.tagName, "SELECT",
 				"paginationSizeSelect should reference a SELECT element");
 			assert.lengthOf(grid.pageSizeOptions, 4,
 				"pageSizeOptions should have additional item for unique rowsPerPage");
 			assert.strictEqual(grid.pageSizeOptions[0], 5,
 				"pageSizeOptions should be sorted ascending");
-
+			
 			// Now empty pageSizeOptions and confirm that the select was removed
 			grid.set("pageSizeOptions", null);
 			assert.isNull(grid.paginationSizeSelect,
@@ -112,14 +112,14 @@ define([
 			});
 			document.body.appendChild(grid.domNode);
 			grid.startup();
-
+			
 			assert.isUndefined(grid.paginationSizeSelect,
 				"paginationSizeSelect should not exist yet (no options)");
-
+			
 			// Now add pageSizeOptions (purposely out of order) and confirm it
 			// is properly added
 			grid.set("pageSizeOptions", [25, 15, 5]);
-
+			
 			assert.strictEqual(grid.paginationSizeSelect.tagName, "SELECT",
 				"paginationSizeSelect should reference a SELECT element");
 			assert.lengthOf(grid.pageSizeOptions, 4,
@@ -128,7 +128,7 @@ define([
 				"pageSizeOptions should be sorted ascending");
 		});
 	});
-
+	
 	test.suite("Pagination size selector", function(){
 		test.before(function(){
 			grid = new PaginationGrid({
@@ -142,7 +142,7 @@ define([
 		test.after(function(){
 			grid.destroy();
 		});
-
+		
 		function verifyOptions(options, expectedCount){
 			// verify that the values of the given set of options are in increasing order
 			// optionally verify that there are the expected number of options
@@ -158,7 +158,7 @@ define([
 					"selector should have expected number of options");
 			}
 		}
-
+		
 		function rowsPerPageTest(rowsPerPage) {
 			// update the grid's rowsPerPage and ensure that the selector value
 			// is correct afterwards
@@ -168,7 +168,7 @@ define([
 				"size select should have expected value " + select.value);
 			verifyOptions(select.options);
 		}
-
+		
 		function getNonSelectedValue(options){
 			// return a value that isn't selected, assuming there are at least
 			// two options and unique option values
@@ -178,19 +178,19 @@ define([
 				return options[0].value;
 			}
 		}
-
+		
 		test.test("setting rowsPerPage to a low value properly updates select", function(){
 			rowsPerPageTest(2);
 		});
-
+		
 		test.test("setting rowsPerPage properly updates select", function(){
 			rowsPerPageTest(7);
 		});
-
+		
 		test.test("setting rowsPerPage to a high value properly updates select", function(){
 			rowsPerPageTest(20);
 		});
-
+		
 		test.test("setting rowsPerPage to an existing value doesn't add a value", function(){
 			var selector = grid.paginationSizeSelect,
 				initialCount = selector.options.length,
@@ -200,7 +200,7 @@ define([
 				"size select should have expected value " + selector.value);
 			verifyOptions(selector.options, initialCount);
 		});
-
+		
 		test.test("selecting a value from the selector doesn't change the selector options", function(){
 			var selector = grid.paginationSizeSelect,
 				initialCount = selector.options.length,

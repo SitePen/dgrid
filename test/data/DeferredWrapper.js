@@ -28,9 +28,9 @@ define(["dojo/_base/lang", "dojo/_base/Deferred"],function(lang, Deferred){
 						resolveResults();
 					}
 				}
-
+				
 				return this.data;
 			}
 		});
-	}
+	};
 });
