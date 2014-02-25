@@ -14,6 +14,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
   `ColumnHider` and `ColumnResizer` extensions; note that it must be mixed in
   after these extensions in order to work properly. (#834)
 * Improved performance of first resize with `ColumnResizer`. (#832)
+* The `ColumnHider` and `Pagination` extensions now include Romanian localization
+  bundles. (#850, thanks websoftix)
 
 # 0.3.13
 
