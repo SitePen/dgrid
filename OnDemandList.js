@@ -306,14 +306,16 @@ return declare([List, _StoreMixin], {
 		//		plugins that add connected elements to a row, like the tree
 		
 		var sibling = rowElement.previousSibling;
-		sibling = sibling && !/\bdgrid-preload\b/.test(sibling.className) && sibling;
 		
 		// If a previous row exists, compare the top of this row with the
 		// previous one (in case "rows" are actually rendering side-by-side).
 		// If no previous row exists, this is either the first or only row,
 		// in which case we count its own height.
-		return sibling ? rowElement.offsetTop - sibling.offsetTop :
-			rowElement.offsetHeight;
+		if(sibling && !/\bdgrid-preload\b/.test(sibling.className)){
+			return rowElement.offsetTop - sibling.offsetTop;
+		}
+		
+		return rowElement.offsetHeight;
 	},
 	
 	lastScrollTop: 0,
@@ -530,7 +532,7 @@ return declare([List, _StoreMixin], {
 
 				// Isolate the variables in case we make multiple requests
 				// (which can happen if we need to render on both sides of an island of already-rendered rows)
-				(function(loadingNode, scrollNode, below, keepScrollTo, results){
+				(function(loadingNode, below, keepScrollTo, results){
 					lastRows = Deferred.when(grid.renderArray(results, loadingNode, options), function(rows){
 						lastResults = results;
 						
@@ -582,7 +584,7 @@ return declare([List, _StoreMixin], {
 						put(loadingNode, "!");
 						throw e;
 					});
-				}).call(this, loadingNode, scrollNode, below, keepScrollTo, results);
+				}).call(this, loadingNode, below, keepScrollTo, results);
 				preload = preload.previous;
 			}
 		}
