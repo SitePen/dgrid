@@ -113,7 +113,7 @@ define([
 				.get(require.toUrl("./Keyboard.html"))
 				.waitForCondition("ready", 5000);
 		},
-/*
+
 		"grid (cellNavigation: true) -> up + down arrow keys" : testUpDownKeys("grid", true),
 
 		"grid (cellNavigation: false) -> up + down arrow keys" : testUpDownKeys("rowGrid"),
@@ -127,7 +127,7 @@ define([
 		"simple grid (cellNavigation: true) -> home + end keys" : testHomeEndKeys("grid", true),
 
 		"simple grid (cellNavigation: false) -> home + end keys" : testHomeEndKeys("rowGrid"),
-*/
+
 		"simple list -> home + end keys" : testHomeEndKeys("list"),
 
 		"on-demand grid (cellNavigation: true) -> home + end keys" : testHomeEndKeys("grid-ondemand", true, true),
