@@ -753,18 +753,18 @@ function(declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 		},
 
 		_applySort: function(){
-			// TODO: Document if Ken approves this method
+			// summary:
+			//		Applies the current sort
+			// description:
+			//		This is an extension point to allow specializations to apply the sort differently
+
 			this.refresh();
 			
 			if(this._lastCollection){
-				if(property.length){
-					// if an array was passed in, flatten to just first sort property
-					// for default array sort logic
-					if(typeof property != "string"){
-						descending = property[0].descending;
-						property = property[0].property;
-					}
-					
+				var sort = this.sort;
+				if(sort && sort.length > 0){
+					var property = sort[0].property,
+						descending = sort[0].descending;
 					this._lastCollection.sort(function(a,b){
 						var aVal = a[property], bVal = b[property];
 						// fall back undefined values to "" for more consistent behavior
