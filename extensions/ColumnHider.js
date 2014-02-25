@@ -65,7 +65,7 @@ function(declare, has, listen, miscUtil, put, i18n){
 			
 			var subRows = this.subRows,
 				first = true,
-				srLength, cLength, sr, c, checkbox;
+				srLength, cLength, sr, c;
 			
 			delete this._columnHiderFirstCheckbox;
 			
@@ -86,8 +86,10 @@ function(declare, has, listen, miscUtil, put, i18n){
 				div, checkId, checkbox;
 			
 			if(col.hidden){
-				// Hidden state is true; hide the column.
+				// Hide the column (reset first to avoid short-circuiting logic)
+				col.hidden = false;
 				this._hideColumn(id);
+				col.hidden = true;
 			}
 			
 			// Allow cols to opt out of the hider (e.g. for selector column).
@@ -247,7 +249,8 @@ function(declare, has, listen, miscUtil, put, i18n){
 			//		Hides the column indicated by the given id.
 			
 			// Use miscUtil function directly, since we clean these up ourselves anyway
-			var selectorPrefix = "#" + miscUtil.escapeCssIdentifier(this.domNode.id) + " .dgrid-column-",
+			var grid = this,
+				selectorPrefix = "#" + miscUtil.escapeCssIdentifier(this.domNode.id) + " .dgrid-column-",
 				tableRule; // used in IE8 code path
 
 			if (this._columnHiderRules[id]) {
@@ -262,7 +265,19 @@ function(declare, has, listen, miscUtil, put, i18n){
 
 				window.setTimeout(function(){
 					tableRule.remove();
+					grid.resize();
 				}, 0);
+			}
+		},
+		
+		_showColumn: function(id){
+			// summary:
+			//		Shows the column indicated by the given id
+			//		(by removing the rule responsible for hiding it).
+			
+			if(this._columnHiderRules[id]){
+				this._columnHiderRules[id].remove();
+				delete this._columnHiderRules[id];
 			}
 		},
 		
@@ -271,12 +286,7 @@ function(declare, has, listen, miscUtil, put, i18n){
 			//		Performs internal work for toggleColumnHiddenState; see the public
 			//		method for more information.
 			
-			if(!hidden){
-				this._columnHiderRules[id] && this._columnHiderRules[id].remove();
-				delete this._columnHiderRules[id];
-			}else{
-				this._hideColumn(id);
-			}
+			this[hidden ? '_hideColumn' : '_showColumn'](id);
 			
 			// Update hidden state in actual column definition,
 			// in case columns are re-rendered.

@@ -27,32 +27,5 @@ define([
 			assert.notStrictEqual(document.body, list.parentNode,
 				"List is removed from body after destroy");
 		});
-
-		test.test("editor grid", function(){
-			// make sure the registry is initially empty
-			assert.strictEqual(0, registry.length,
-				"dijit registry should have no entries before creating grid");
-
-			// build a grid with editors, place it, and render
-			var grid = new Grid({
-				columns: {
-					order: "step",
-					name: editor({}, TextBox, "dblclick"),
-					description: editor({ label: "what to do", sortable: false }, TextBox)
-				}
-			});
-			document.body.appendChild(grid.domNode);
-			grid.startup();
-			grid.renderArray(orderedData.items);
-
-			// check the registry
-			assert.strictEqual(orderedData.items.length + 1, registry.length,
-				"dijit registry has 1 entry per row plus 1 shared editor widget");
-
-			// kill and check the registry again
-			grid.destroy();
-			assert.strictEqual(0, registry.length,
-				"dijit registry has 0 entries after destroy");
-		});
 	});
 });

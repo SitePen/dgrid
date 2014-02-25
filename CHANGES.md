@@ -14,7 +14,17 @@ The following is a rough list of changes, to be outlined more presentably later.
 
 # master (0.3.14-dev)
 
-Coming soon!
+### General/Core
+
+* Fixed a regression in `OnDemandList` where items added to an empty list or
+  grid would be inserted in the wrong position. (#840)
+
+### Extensions
+
+* The `CompoundColumns` extension is now capable of interoperating with the
+  `ColumnHider` and `ColumnResizer` extensions; note that it must be mixed in
+  after these extensions in order to work properly. (#834)
+* Improved performance of first resize with `ColumnResizer`. (#832)
 
 # 0.3.13
 

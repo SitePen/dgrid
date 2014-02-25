@@ -7,6 +7,7 @@ define([
 	'intern/node_modules/dojo/has!host-browser?./core/_StoreMixin',
 	'intern/node_modules/dojo/has!host-browser?./core/observable',
 	'intern/node_modules/dojo/has!host-browser?./plugins/editor',
+	'intern/node_modules/dojo/has!host-browser?./plugins/selector',
 	'intern/node_modules/dojo/has!host-browser?./plugins/tree-expand-promise',
 	'intern/node_modules/dojo/has!host-browser?./extensions/Pagination',
 	'intern/node_modules/dojo/has!host-browser?./mixins/Keyboard',
