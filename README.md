@@ -26,12 +26,17 @@ running:
 
     cpm install dijit
 
+dgrid 0.4 also uses [dstore](https://github.com/SitePen/dstore) for store-backed grids.
+dstore is not listed in cpm's repository, so it will need to be obtained manually.
+We are still investigating options in regard to package managers for new releases.
+
 ## Manual Download
 
 Alternatively, dgrid and its dependencies can be downloaded individually:
 
 * [xstyle](https://github.com/kriszyp/xstyle)
 * [put-selector](https://github.com/kriszyp/put-selector)
+* [dstore](https://github.com/SitePen/dstore) for store-backed grids
 * [The Dojo Toolkit](http://dojotoolkit.org) SDK version 1.7 or higher
     * Out of the DTK components, Dojo core is the only hard dependency for dgrid;
       however, some of the test pages also use components from Dijit, and
@@ -44,6 +49,7 @@ directory structure like the following:
 * `dijit` (optional, dependency of some dgrid tests)
 * `dojo`
 * `dojox` (optional, dependency of some dgrid tests)
+* `dstore`
 * `put-selector`
 * `xstyle`
 * `util` (optional, e.g. if pursuing a custom build)

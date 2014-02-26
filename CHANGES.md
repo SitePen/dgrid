@@ -5,12 +5,13 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 The following is a rough list of changes, to be outlined more presentably later.
 
-* Removed deprecated code marked for removal in 0.4
+* Split out store-specific code from `List#renderArray` to
+  `_StoreMixin#renderCollection`
+* Switched from dojo/store to dstore
+* Removed observer tracking logic and workarounds now irrelevant with dstore
 * Replaced `List#newRow(...)` with `List#highlightRow(row[, delay])`
-* Split out QueryResults/observe-specific code from `List#renderArray` to
-  `_StoreMixin#renderQueryResults`
-* Renamed the `observers` instance property to `_observers`
 * Desupported `selector`'s `disabled` property (use `Selection#allowSelect`)
+* Removed deprecated code marked for removal in 0.4
 
 # master (0.3.14-dev)
 
