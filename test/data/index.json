@@ -196,18 +196,6 @@
         "parent": "intern"
     },
     {
-        "name": "JsonRest.html",
-        "url": "JsonRest.html",
-        "title": "Test JsonRest store",
-        "parent": ""
-    },
-    {
-        "name": "JsonRest_duplicates.html",
-        "url": "JsonRest_duplicates.html",
-        "title": "Test JsonRest Tree with objects repeated in different places in hierarchy",
-        "parent": ""
-    },
-    {
         "name": "Keyboard.html",
         "url": "Keyboard.html",
         "title": "Test Keyboard Mixin",
@@ -259,6 +247,18 @@
         "name": "performance_widgets.html",
         "url": "performance_widgets.html",
         "title": "Test Performance with Editors",
+        "parent": ""
+    },
+    {
+        "name": "Rest.html",
+        "url": "Rest.html",
+        "title": "Test Rest store",
+        "parent": ""
+    },
+    {
+        "name": "Rest_duplicates.html",
+        "url": "Rest_duplicates.html",
+        "title": "Test JsonRest Tree with objects repeated in different places in hierarchy",
         "parent": ""
     },
     {
