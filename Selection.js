@@ -1,6 +1,10 @@
 define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/Deferred", "dojo/on", "dojo/has", "dojo/aspect", "./List", "dojo/has!touch?./util/touch", "put-selector/put", "dojo/query", "dojo/_base/sniff"],
 function(kernel, declare, Deferred, on, has, aspect, List, touchUtil, put){
 
+has.add("dom-comparedocumentposition", function(global, doc, element){
+	return !!element.compareDocumentPosition;
+});
+
 has.add("pointer", function(global, doc, element){
 	return "onpointerdown" in element ? "pointer" :
 		"onmspointerdown" in element ? "MSPointer" : false;
@@ -459,7 +463,7 @@ return declare(null, {
 			previousValue,
 			element,
 			toElement,
-			traverser;
+			direction;
 		
 		if(typeof value === "undefined"){
 			// default to true
@@ -515,15 +519,34 @@ return declare(null, {
 				}
 				
 				toElement = toRow.element;
-				// find if it is earlier or later in the DOM
-				traverser = (toElement && (toElement.compareDocumentPosition ? 
-					toElement.compareDocumentPosition(element) == 2 :
-					toElement.sourceIndex > element.sourceIndex)) ? "down" : "up";
-				while(row.element != toElement && (row = this[traverser](row))){
-					this._select(row, null, value);
+				if(toElement){
+					direction = this._determineSelectionDirection(element, toElement);
+					if(!direction){
+						// The original element was actually replaced
+						toElement = document.getElementById(toElement.id);
+						direction = this._determineSelectionDirection(element, toElement);
+					}
+					while(row.element != toElement && (row = this[direction](row))){
+						this._select(row, null, value);
+					}
 				}
 			}
 		}
+	},
+	
+	// Implement _determineSelectionDirection differently based on whether the
+	// browser supports element.compareDocumentPosition; use sourceIndex for IE<9
+	_determineSelectionDirection: has("dom-comparedocumentposition") ? function (from, to) {
+		var result = to.compareDocumentPosition(from);
+		if(result & 1){
+			return false; // Out of document
+		}
+		return result === 2 ? "down" : "up";
+	} : function(from, to) {
+		if(to.sourceIndex < 1){
+			return false; // Out of document
+		}
+		return to.sourceIndex > from.sourceIndex ? "down" : "up";
 	},
 	
 	select: function(row, toRow, value){
