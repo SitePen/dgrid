@@ -8,6 +8,12 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 * Fixed a regression in `OnDemandList` where items added to an empty list or
   grid would be inserted in the wrong position. (#840)
 
+### Mixins
+
+* Fixed issues in the `Selection` and `CellSelection` mixins when the row
+  representing the starting point of a ranged selection is replaced (due to an
+  observed store modification) prior to the end point being selected. (#858)
+
 ### Extensions
 
 * The `CompoundColumns` extension is now capable of interoperating with the
