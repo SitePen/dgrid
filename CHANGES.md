@@ -14,6 +14,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ### Extensions
 
+* Fixed a regression in `CompoundColumns` involving the ability to look up
+  columns by their originally-specified IDs. (#820)
 * The `CompoundColumns` extension is now capable of interoperating with the
   `ColumnHider` and `ColumnResizer` extensions; note that it must be mixed in
   after these extensions in order to work properly. (#834)
