@@ -3,10 +3,24 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 # master (0.3.14-dev)
 
+## Significant changes
+
 ### General/Core
 
 * Fixed a regression in `OnDemandList` where items added to an empty list or
   grid would be inserted in the wrong position. (#840)
+* Fixed ordering of inserted preload nodes in the linked list in `OnDemandList`,
+  particularly affecting `tree`. (#817)
+
+### Extensions
+
+* The `CompoundColumns` extension is now capable of interoperating with the
+  `ColumnHider` and `ColumnResizer` extensions; note that it must be mixed in
+  after these extensions in order to work properly. (#834)
+* The `ColumnHider` and `Pagination` extensions now include Romanian localization
+  bundles. (#850, thanks websoftix)
+
+## Other changes and fixes
 
 ### Mixins
 
@@ -16,14 +30,9 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ### Extensions
 
-* The `CompoundColumns` extension is now capable of interoperating with the
-  `ColumnHider` and `ColumnResizer` extensions; note that it must be mixed in
-  after these extensions in order to work properly. (#834)
 * Improved performance of first resize with `ColumnResizer`. (#832)
 * The `Pagination` extension will no longer cancel an ongoing async request if
   another call is performed with the same request promise. (#847, thanks jandppw)
-* The `ColumnHider` and `Pagination` extensions now include Romanian localization
-  bundles. (#850, thanks websoftix)
 
 # 0.3.13
 
