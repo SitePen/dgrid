@@ -5,22 +5,65 @@ define([
 	"dgrid/tree",
 	"dgrid/util/has-css3",
 	"dojo/_base/lang",
+	"dojo/_base/Deferred",
+	"dojo/aspect",
+	"dojo/on",
 	"dojo/store/Memory",
 	"put-selector/put"
-], function(test, assert, OnDemandGrid, tree, has, lang, Memory, put){
+], function(test, assert, OnDemandGrid, tree, has, lang, Deferred, aspect, on, Memory, put){
 
-	var grid, next;
+	var grid,
+		testDelay = 15,
+		hasTransitionEnd = has("transitionend");
 
-	var testDelay = 25;
-
-	function testRowExists(dataItemId){
-		assert.isNotNull(document.getElementById(grid.id + "-row-" + dataItemId), "Could not find a row for " +
-			dataItemId + " in the grid.");
+	function testRowExists(dataItemId, exists){
+		// Tests existence of a row for a given item ID;
+		// if `exists` is false, tests for nonexistence instead
+		exists = exists !== false;
+		assert[exists ? "isNotNull" : "isNull"](document.getElementById(grid.id + "-row-" + dataItemId),
+			"A row for " + dataItemId + " should " + (exists ? "" : "not ") + "exist in the grid.");
 	}
 
-	function testRowDoesNotExist(dataItemId){
-		assert.isNull(document.getElementById(grid.id + "-row-" + dataItemId), "Found a row for " +
-			dataItemId + " in the grid.");
+	function wait(delay){
+		// Returns a promise resolving after the given number of ms (or testDelay by default)
+		var dfd = new Deferred();
+		setTimeout(function(){
+			dfd.resolve();
+		}, delay || testDelay);
+		return dfd.promise;
+	}
+
+	// Define a function returning a promise resolving once children are expanded.
+	// On browsers which support CSS3 transitions, this occurs when transitionend fires;
+	// otherwise it occurs immediately.
+	var expand = hasTransitionEnd ? function(grid, id){
+		var dfd = new Deferred();
+
+		on.once(grid, hasTransitionEnd, function(){
+			dfd.resolve();
+		});
+
+		grid.expand(id);
+		return dfd.promise;
+	} : function(grid, id){
+		var dfd = new Deferred();
+		grid.expand(id);
+		dfd.resolve();
+		return dfd.promise;
+	};
+
+	function scrollToEnd(grid){
+		var dfd = new Deferred(),
+			handle;
+
+		handle = aspect.after(grid, "renderArray", function(){
+			handle.remove();
+			dfd.resolve();
+		});
+
+		grid.scrollTo({ y: grid.bodyNode.scrollHeight });
+
+		return dfd.promise;
 	}
 
 	test.suite("tree", function(){
@@ -72,6 +115,10 @@ define([
 				});
 				put(document.body, grid.domNode);
 				grid.startup();
+
+				// Firefox in particular seems to skip transitions sometimes
+				// if we don't wait a bit after creating and placing the grid
+				return wait();
 			});
 
 			test.afterEach(function(){
@@ -80,73 +127,48 @@ define([
 			});
 
 			test.test("expand first row", function(){
-				var dfd = this.async();
-				// Scroll to the bottom of the grid once the row expansion transition is finished.
-				grid.on(has("transitionend"), dfd.callback(function(){
+				return expand(grid, 0).then(function(){
 					testRowExists("0:0");
-					testRowDoesNotExist("0:99");
-				}));
-				grid.expand(0);
+					testRowExists("0:99", false);
+				});
 			});
 
 			test.test("expand first row + scroll to bottom", function(){
-				var dfd = this.async();
-				// Scroll to the bottom of the grid once the row expansion transition is finished.
-				grid.on(has("transitionend"), dfd.rejectOnError(function(){
-					var scrollNode = grid.bodyNode;
-					scrollNode.scrollTop = scrollNode.scrollHeight;
-					setTimeout(dfd.callback(function(){
-						testRowExists("0:0");
-						testRowExists("0:99");
-					}), testDelay);
-				}));
-				grid.expand(0);
+				return expand(grid, 0).then(function(){
+					return scrollToEnd(grid);
+				}).then(function(){
+					testRowExists("0:0");
+					testRowExists("0:99");
+				});
 			});
 
 			test.test("expand last row", function(){
-				var dfd = this.async();
-				// Scroll to the bottom of the grid once the row expansion transition is finished.
-				grid.on(has("transitionend"), dfd.callback(function(){
+				return expand(grid, 4).then(function(){
 					testRowExists("4:0");
-					testRowDoesNotExist("4:99");
-				}));
-				grid.expand(4);
+					testRowExists("4:99", false);
+				});
 			});
 
 			test.test("expand last row + scroll to bottom", function(){
-				var dfd = this.async();
-				// Scroll to the bottom of the grid once the row expansion transition is finished.
-				grid.on(has("transitionend"), dfd.rejectOnError(function(){
-					var scrollNode = grid.bodyNode;
-					scrollNode.scrollTop = scrollNode.scrollHeight;
-					setTimeout(dfd.callback(function(){
-						testRowExists("4:0");
-						testRowExists("4:99");
-					}), testDelay);
-				}));
-				grid.expand(4);
+				return expand(grid, 4).then(function(){
+					return scrollToEnd(grid);
+				}).then(function(){
+					testRowExists("4:0");
+					testRowExists("4:99");
+				});
 			});
 
 			test.test("expand first and last rows + scroll to bottom", function(){
-				var dfd = this.async();
-				// Scroll to the bottom of the grid once the row expansion transition is finished.
-				grid.on(has("transitionend"), dfd.rejectOnError(function(){
-					var scrollNode = grid.bodyNode;
-					scrollNode.scrollTop = scrollNode.scrollHeight;
-					// Execute the next step if there is one.  Add a delay to allow the grid to update.
-					next && setTimeout(next, testDelay);
-				}));
-
-				var next = dfd.rejectOnError(function(){
-					// After the first row is expanded, expand the last row.
-					next = dfd.callback(function(){
-						// Did all of the rows load?
-						testRowExists("4:0");
-						testRowExists("4:99");
-					});
-					grid.expand(4);
+				return expand(grid, 0).then(function(){
+					return scrollToEnd(grid);
+				}).then(function(){
+					return expand(grid, 4);
+				}).then(function(){
+					return scrollToEnd(grid);
+				}).then(function(){
+					testRowExists("4:0");
+					testRowExists("4:99");
 				});
-				grid.expand(0);
 			});
 		});
 	});
