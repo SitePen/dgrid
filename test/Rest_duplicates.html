@@ -42,7 +42,8 @@
 					rangeParam: "range"
 				});
 				testStore.getChildren = function(parent){
-					return testStore.filter({parent: parent.id});
+					// Return collection representing same items so we may test rendering duplicates
+					return testStore.filter({});
 				};
 				var columns = [
 					tree({label:'Name', field:'name', sortable: false, allowDuplicates: true}),
