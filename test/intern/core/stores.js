@@ -62,11 +62,11 @@ define([
 		});
 
 		test.test("OnDemandGrid + sync store w/ error", function(){
-			storeTest(OnDemandGrid, errorStores.query, false, this.async());
+			storeTest(OnDemandGrid, errorStores.fetch, false, this.async());
 		});
 
 		test.test("OnDemandGrid + async store w/ error", function(){
-			storeTest(OnDemandGrid, errorStores.asyncQuery, false, this.async());
+			storeTest(OnDemandGrid, errorStores.asyncFetch, false, this.async());
 		});
 
 		test.test("PaginationGrid + sync store", function(){
@@ -78,11 +78,11 @@ define([
 		});
 
 		test.test("PaginationGrid + sync store w/ error", function(){
-			storeTest(PaginationGrid, errorStores.query, false, this.async());
+			storeTest(PaginationGrid, errorStores.fetch, false, this.async());
 		});
 
 		test.test("PaginationGrid + async store w/ error", function(){
-			storeTest(PaginationGrid, errorStores.asyncQuery, false, this.async());
+			storeTest(PaginationGrid, errorStores.asyncFetch, false, this.async());
 		});
 	});
 });

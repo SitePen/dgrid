@@ -251,11 +251,11 @@
 					grid.set("collection", emptyAsyncStore, {});
 				});
 				on(document.getElementById("error"), "click", function(){
-					grid.set("collection", errorStores.query, {});
+					grid.set("collection", errorStores.fetch, {});
 				});
 				
 				on(document.getElementById("error2"), "click", function(){
-					grid.set("collection", errorStores.asyncQuery, {});
+					grid.set("collection", errorStores.asyncFetch, {});
 				});
 				
 				// buttons / listeners for 2nd grid
