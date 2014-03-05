@@ -201,7 +201,7 @@ return declare([List, _StoreMixin], {
 				
 				return trs;
 			});
-		}, function (err) {
+		}).otherwise(function (err) {
 			// Used as errback for when calls;
 			// remove the loadingNode and re-throw if an error was passed
 			put(loadingNode, "!");
