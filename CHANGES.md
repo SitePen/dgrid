@@ -7,6 +7,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ### General/Core
 
+* Fixed issue where `List#destroy` would throw an error if `useTouchScroll` is
+  set to `false` on a device with touch support. (#867)
 * Fixed a regression in `OnDemandList` where items added to an empty list or
   grid would be inserted in the wrong position. (#840)
 * Fixed ordering of inserted preload nodes in the linked list in `OnDemandList`,
