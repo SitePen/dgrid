@@ -406,7 +406,11 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 			this.cleanup();
 			// destroy DOM
 			put(this.domNode, "!");
-			this.inherited(arguments);
+			
+			if(this.useTouchScroll){
+				// Only call TouchScroll#destroy if we also initialized it
+				this.inherited(arguments);
+			}
 		},
 		refresh: function(){
 			// summary:
