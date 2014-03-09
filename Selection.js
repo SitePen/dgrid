@@ -113,10 +113,15 @@ return declare(null, {
 	//		Selector to delegate to as target of selection events.
 	selectionDelegate: ".dgrid-row",
 	
-	// selectionEvents: String
-	//		Event (or events, comma-delimited) to listen on to trigger select logic.
-	//		Note: this is ignored in the case of touch devices.
+	// selectionEvents: String|Function
+	//		Event (or comma-delimited events, or extension event) to listen on
+	//		to trigger select logic.
 	selectionEvents: downType + "," + upType + ",dgrid-cellfocusin",
+	
+	// selectionTouchEvents: String|Function
+	//		Event (or comma-delimited events, or extension event) to listen on
+	//		in addition to selectionEvents for touch devices.
+	selectionTouchEvents: has("touch") ? touchUtil.tap : null,
 	
 	// deselectOnRefresh: Boolean
 	//		If true, the selection object will be cleared when refresh is called.
@@ -296,6 +301,7 @@ return declare(null, {
 		//		required for selection to operate.
 		
 		var grid = this,
+			contentNode = this.contentNode,
 			selector = this.selectionDelegate;
 		
 		this._selectionEventQueues = {
@@ -303,14 +309,23 @@ return declare(null, {
 			select: []
 		};
 		
-		if(has("touch") && !has("pointer")){
-			// listen for touch taps if available
-			on(this.contentNode, touchUtil.selector(selector, touchUtil.tap), function(evt){
+		if(has("touch") && !has("pointer") && this.selectionTouchEvents){
+			// Listen for taps, and also for mouse/keyboard, making sure not
+			// to trigger both for the same interaction
+			on(contentNode, touchUtil.selector(selector, this.selectionTouchEvents), function(evt){
 				grid._handleSelect(evt, this);
+				grid._ignoreMouseSelect = this;
+			});
+			on(contentNode, on.selector(selector, this.selectionEvents), function(event){
+				if(grid._ignoreMouseSelect !== this){
+					grid._handleSelect(event, this);
+				}else if(event.type === upType){
+					grid._ignoreMouseSelect = null;
+				}
 			});
 		}else{
-			// listen for actions that should cause selections
-			on(this.contentNode, on.selector(selector, this.selectionEvents), function(event){
+			// Listen for mouse/keyboard actions that should cause selections
+			on(contentNode, on.selector(selector, this.selectionEvents), function(event){
 				grid._handleSelect(event, this);
 			});
 		}
