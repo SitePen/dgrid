@@ -583,13 +583,15 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 					for(var i = 0; i < sides.length; i++){
 						var top = sides[i];
 						var lastRow = rows[top ? 0 : rows.length-1];
+						lastRow = lastRow && correctElement(lastRow);
 						// check to make sure we have a row, we won't if we don't have any rows
 						if(lastRow){
 							// Make sure we have the correct row element
 							// (not one that was previously removed)
-							lastRow = correctElement(lastRow);
-							var row = self.row(lastRow);
-							row = row && self[top ? "up" : "down"](row);
+							var row = lastRow[top ? "previousSibling" : "nextSibling"];
+							if(row){
+								row = self.row(row);
+							}
 							if(row && row.element != lastRow){
 								var method = top ? "unshift" : "push";
 								// Take the row and data from the adjacent page and unshift to the
