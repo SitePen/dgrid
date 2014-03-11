@@ -9,12 +9,71 @@ define([
 	"dojo/aspect",
 	"dojo/on",
 	"dojo/store/Memory",
+	"dojo/store/Observable",
 	"put-selector/put"
-], function(test, assert, OnDemandGrid, tree, has, lang, Deferred, aspect, on, Memory, put){
+], function(test, assert, OnDemandGrid, tree, has, lang, Deferred, aspect, on, Memory, Observable, put){
 
 	var grid,
 		testDelay = 15,
 		hasTransitionEnd = has("transitionend");
+
+	function createGrid(){
+		var data = [],
+			store,
+			i,
+			k;
+
+		for(i = 0; i < 5; i++){
+			var parentId = "" + i;
+			data.push({
+				id: parentId,
+				value: "Root " + i
+			});
+			for(k = 0; k < 100; k++){
+				data.push({
+					id: i + ":" + k,
+					parentId: parentId,
+					value: "Child " + k
+				});
+			}
+		}
+
+		store = new Observable(new Memory({
+			data: data,
+			getChildren: function(parent, options){
+				return this.query(
+					lang.mixin({}, options.originalQuery || null, { parentId: parent.id }), options);
+			},
+			mayHaveChildren: function(parent){
+				return parent.parentId == null;
+			},
+			query: function(query, options){
+				query = query || {};
+				options = options || {};
+
+				if(!query.parentId && !options.deep){
+					query.parentId = undefined;
+				}
+				return this.queryEngine(query, options)(this.data);
+			}
+		}));
+		
+		grid = new OnDemandGrid({
+			sort: "id",
+			store: store,
+			columns: [
+				tree({ label: "id", field: "id" }),
+				{ label: "value", field: "value"}
+			]
+		});
+		put(document.body, grid.domNode);
+		grid.startup();
+	}
+	
+	function destroyGrid(){
+		grid.destroy();
+		grid = null;
+	}
 
 	function testRowExists(dataItemId, exists){
 		// Tests existence of a row for a given item ID;
@@ -67,64 +126,17 @@ define([
 	}
 
 	test.suite("tree", function(){
-		test.suite("large family", function(){
+		test.suite("large family expansion", function(){
 
 			test.beforeEach(function(){
-				var data = [], i, k;
-				for(i = 0; i < 5; i++){
-					var parentId = "" + i;
-					data.push({
-						id: parentId,
-						value: "Root " + i
-					});
-					for(k = 0; k < 100; k++){
-						data.push({
-							id: i + ":" + k,
-							parentId: parentId,
-							value: "Child " + k
-						});
-					}
-				}
-
-				var store = new Memory({
-					data: data,
-					getChildren: function(parent, options){
-						return this.query(
-							lang.mixin({}, options.originalQuery || null, { parentId: parent.id }), options);
-					},
-					mayHaveChildren: function(parent){
-						return parent.parentId == null;
-					},
-					query: function(query, options){
-						query = query || {};
-						options = options || {};
-
-						if(!query.parentId && !options.deep){
-							query.parentId = undefined;
-						}
-						return this.queryEngine(query, options)(this.data);
-					}
-				});
-
-				grid = new OnDemandGrid({
-					store: store,
-					columns: [
-						tree({ label: "id", field: "id" }),
-						{ label: "value", field: "value"}
-					]
-				});
-				put(document.body, grid.domNode);
-				grid.startup();
+				createGrid();
 
 				// Firefox in particular seems to skip transitions sometimes
 				// if we don't wait a bit after creating and placing the grid
 				return wait();
 			});
 
-			test.afterEach(function(){
-				grid.destroy();
-				grid = null;
-			});
+			test.afterEach(destroyGrid);
 
 			test.test("expand first row", function(){
 				return expand(grid, 0).then(function(){
@@ -171,5 +183,24 @@ define([
 				});
 			});
 		});
+
+		test.suite("tree + observable", function(){
+			test.beforeEach(createGrid);
+			//test.afterEach(destroyGrid);
+
+			test.test("child modification", function(){
+				return expand(grid, 0).then(function(){
+					testRowExists("0:0");
+					assert.doesNotThrow(function(){
+						grid.store.put({
+							id: "0:0",
+							value: "Modified",
+							parentId: "0"
+						});
+					}, null, 'Modification of child should not throw error');
+				});
+			});
+		});
+		
 	});
 });
