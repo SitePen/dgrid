@@ -69,6 +69,10 @@ define([
 			storeTest(OnDemandGrid, errorStores.asyncFetch, false, this.async());
 		});
 
+		test.test("OnDemandGrid + async store w/ total error", function(){
+			storeTest(OnDemandGrid, errorStores.asyncFetchTotal, false, this.async());
+		});
+
 		test.test("PaginationGrid + sync store", function(){
 			storeTest(PaginationGrid, createSyncStore({ data: genericData }), true, this.async());
 		});

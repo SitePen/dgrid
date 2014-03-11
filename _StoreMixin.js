@@ -310,9 +310,8 @@ function(declare, lang, Deferred, listen, aspect, put){
 				start = options.start || 0,
 				rows = options.rows || this._rows,
 				container;
-			
-			var fetch = lang.hitch(collection, "fetch");
-			return this._trackError(fetch).then(function(resolvedResults){
+
+			return Deferred.when(collection.fetch(), function(resolvedResults){
 				var resolvedRows,
 					i;
 					

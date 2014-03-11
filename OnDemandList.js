@@ -83,9 +83,8 @@ return declare([List, _StoreMixin], {
 				node: preloadNode,
 				options: options
 			},
-			priorPreload = this.preload,
-			renderedCollection;
-		
+			priorPreload = this.preload;
+
 		if(!preloadNode){
 			// Initial query; set up top and bottom preload nodes
 			var topPreload = {
@@ -135,84 +134,81 @@ return declare([List, _StoreMixin], {
 			"level" in query ? { queryLevel: query.level } : null);
 		
 		// Protect the query within a _trackError call, but return the resulting collection
-		return this._trackError(
-			function(){ return query(options); }
-		).then(function(resolvedCollection){
-			renderedCollection = resolvedCollection;
-			
+		return this._trackError(function(){
+			var renderedCollection = query(options);
+
 			// Render the result set
-			return self.renderCollection(renderedCollection, preloadNode, options);
-		}).then(function(trs){
-			var total = typeof renderedCollection.total === "undefined" ?
-				renderedCollection.length : renderedCollection.total;
-			return Deferred.when(total, function(total){
-				var trCount = trs.length,
-					parentNode = preloadNode.parentNode,
-					noDataNode = self.noDataNode;
-				
-				put(loadingNode, "!");
-				if(!("queryLevel" in options)){
-					self._total = total;
-				}
-				// now we need to adjust the height and total count based on the first result set
-				if(total === 0){
-					if(noDataNode){
-						put(noDataNode, "!");
-						delete self.noDataNode;
+			return Deferred.when(self.renderCollection(renderedCollection, preloadNode, options), function(trs){
+				var total = typeof renderedCollection.total === "undefined" ?
+					renderedCollection.length : renderedCollection.total;
+				return Deferred.when(total, function(total){
+					var trCount = trs.length,
+						parentNode = preloadNode.parentNode,
+						noDataNode = self.noDataNode;
+
+					put(loadingNode, "!");
+					if(!("queryLevel" in options)){
+						self._total = total;
 					}
-					self.noDataNode = noDataNode = put("div.dgrid-no-data");
-					parentNode.insertBefore(noDataNode, self._getFirstRowSibling(parentNode));
-					noDataNode.innerHTML = self.noDataMessage;
+					// now we need to adjust the height and total count based on the first result set
+					if(total === 0){
+						if(noDataNode){
+							put(noDataNode, "!");
+							delete self.noDataNode;
+						}
+						self.noDataNode = noDataNode = put("div.dgrid-no-data");
+						parentNode.insertBefore(noDataNode, self._getFirstRowSibling(parentNode));
+						noDataNode.innerHTML = self.noDataMessage;
+					}
+					var height = 0;
+					for(var i = 0; i < trCount; i++){
+						height += self._calcRowHeight(trs[i]);
+					}
+					// only update rowHeight if we actually got results and are visible
+					if(trCount && height){ self.rowHeight = height / trCount; }
+
+					total -= trCount;
+					preload.count = total;
+					preloadNode.rowIndex = trCount;
+					if(total){
+						preloadNode.style.height = Math.min(total * self.rowHeight, self.maxEmptySpace) + "px";
+					}else{
+						// if total is 0, IE quirks mode can't handle 0px height for some reason, I don't know why, but we are setting display: none for now
+						preloadNode.style.display = "none";
+					}
+
+					if (self._previousScrollPosition) {
+						// Restore position after a refresh operation w/ keepScrollPosition
+						self.scrollTo(self._previousScrollPosition);
+						delete self._previousScrollPosition;
+					}
+
+					// Redo scroll processing in case the query didn't fill the screen,
+					// or in case scroll position was restored
+					self._processScroll();
+
+					// If _refreshDeferred is still defined after calling _processScroll,
+					// resolve it now (_processScroll will remove it and resolve it itself
+					// otherwise)
+					if(self._refreshDeferred){
+						self._refreshDeferred.resolve(results);
+						delete self._refreshDeferred;
+					}
+
+					return trs;
+				});
+			}).otherwise(function (err) {
+				// remove the loadingNode and re-throw if an error was passed
+				put(loadingNode, "!");
+
+				if(err){
+					if(self._refreshDeferred){
+						self._refreshDeferred.reject(err);
+						delete self._refreshDeferred;
+					}
+					throw err;
 				}
-				var height = 0;
-				for(var i = 0; i < trCount; i++){
-					height += self._calcRowHeight(trs[i]);
-				}
-				// only update rowHeight if we actually got results and are visible
-				if(trCount && height){ self.rowHeight = height / trCount; }
-				
-				total -= trCount;
-				preload.count = total;
-				preloadNode.rowIndex = trCount;
-				if(total){
-					preloadNode.style.height = Math.min(total * self.rowHeight, self.maxEmptySpace) + "px";
-				}else{
-					// if total is 0, IE quirks mode can't handle 0px height for some reason, I don't know why, but we are setting display: none for now
-					preloadNode.style.display = "none";
-				}
-				
-				if (self._previousScrollPosition) {
-					// Restore position after a refresh operation w/ keepScrollPosition
-					self.scrollTo(self._previousScrollPosition);
-					delete self._previousScrollPosition;
-				}
-				
-				// Redo scroll processing in case the query didn't fill the screen,
-				// or in case scroll position was restored
-				self._processScroll();
-				
-				// If _refreshDeferred is still defined after calling _processScroll,
-				// resolve it now (_processScroll will remove it and resolve it itself
-				// otherwise)
-				if(self._refreshDeferred){
-					self._refreshDeferred.resolve(results);
-					delete self._refreshDeferred;
-				}
-				
-				return trs;
 			});
-		}).otherwise(function (err) {
-			// Used as errback for when calls;
-			// remove the loadingNode and re-throw if an error was passed
-			put(loadingNode, "!");
-			
-			if(err){
-				if(self._refreshDeferred){
-					self._refreshDeferred.reject(err);
-					delete self._refreshDeferred;
-				}
-				throw err;
-			}
 		});
 	},
 	
@@ -511,9 +507,9 @@ return declare([List, _StoreMixin], {
 				loadingNode.count = count;
 				
 				// Query now to fill in these rows.
-				grid._trackError(
-					function(){ return preload.query(options); }
-				).then(function(rangeCollection){
+				grid._trackError(function(){
+					var rangeCollection = preload.query(options);
+
 					// Use function to isolate the variables in case we make multiple requests
 					// (which can happen if we need to render on both sides of an island of already-rendered rows)
 					(function(loadingNode, below, keepScrollTo, rangeCollection){

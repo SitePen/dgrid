@@ -244,8 +244,10 @@ function tree(column){
 					promise = promise.then(function(){
 						return grid.renderQuery ?
 							grid.renderQuery(query, preloadNode, options) :
-							grid.renderCollection(query(options), preloadNode,
+							grid._trackError(function(){
+								grid.renderCollection(query(options), preloadNode,
 								"level" in query ? { queryLevel: query.level } : {});
+							});
 					}).then(function(){
 						// Expand once results are retrieved, if the row is still expanded.
 						if(grid._expanded[row.id] && hasTransitionend){

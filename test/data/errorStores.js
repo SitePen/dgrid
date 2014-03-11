@@ -10,6 +10,7 @@ define([
 
 	var fetchStore = new Memory(),
 		asyncFetchStore = new Memory(),
+		asyncFetchTotalStore = new Memory(),
 		putStore = new Memory({ data: lang.clone(typesData) }),
 		asyncPutStore = new Memory({ data: lang.clone(typesData) });
 
@@ -28,6 +29,12 @@ define([
 		return dfd;
 	};
 
+	asyncFetchTotalStore.fetch = function () {
+		this.total = new Deferred();
+		this.total.reject("Error getting the total");
+		return [];
+	};
+
 	asyncPutStore.put = function() {
 		var dfd = new Deferred();
 		setTimeout(function() { dfd.reject("Error on async put"); }, 200);
@@ -38,6 +45,7 @@ define([
 		fetch: fetchStore,
 		put: putStore,
 		asyncFetch: asyncFetchStore,
+		asyncFetchTotal: asyncFetchTotalStore,
 		asyncPut: asyncPutStore
 	};
 });
