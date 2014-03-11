@@ -186,7 +186,7 @@ define([
 
 		test.suite("tree + observable", function(){
 			test.beforeEach(createGrid);
-			//test.afterEach(destroyGrid);
+			test.afterEach(destroyGrid);
 
 			test.test("child modification", function(){
 				return expand(grid, 0).then(function(){
