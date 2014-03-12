@@ -138,7 +138,7 @@ return declare([List, _StoreMixin], {
 			var renderedCollection = query(options);
 
 			// Render the result set
-			return Deferred.when(self.renderCollection(renderedCollection, preloadNode, options)).then(function(trs){
+			return self.renderCollection(renderedCollection, preloadNode, options).then(function(trs){
 				var total = typeof renderedCollection.total === "undefined" ?
 					renderedCollection.length : renderedCollection.total;
 				return Deferred.when(total, function(total){
@@ -480,7 +480,7 @@ return declare([List, _StoreMixin], {
 					// Use function to isolate the variables in case we make multiple requests
 					// (which can happen if we need to render on both sides of an island of already-rendered rows)
 					(function(loadingNode, below, keepScrollTo, rangeCollection){
-						lastRows = Deferred.when(grid.renderCollection(rangeCollection, loadingNode, options), function(rows){
+						lastRows = grid.renderCollection(rangeCollection, loadingNode, options).then(function(rows){
 							lastCollection = rangeCollection;
 							
 							// can remove the loading node now

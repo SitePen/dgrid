@@ -427,7 +427,7 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 				// Run new query and pass it into renderCollection
 				results = grid.collection.range(start, start + count);
 
-				return Deferred.when(grid.renderCollection(results, null, options)).then(function(rows){
+				return grid.renderCollection(results, null, options).then(function(rows){
 					cleanupLoading(grid);
 					// Reset scroll Y-position now that new page is loaded.
 					grid.scrollTo({ y: 0 });

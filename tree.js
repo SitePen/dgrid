@@ -211,6 +211,13 @@ function tree(column){
 						if(grid.sort){
 							childCollection = childCollection.sort(grid.sort);
 						}
+						if('start' in options){
+							var rangeArgs = [ options.start ];
+							if('count' in options){
+								rangeArgs.push(options.start + options.count);
+							}
+							childCollection = childCollection.range.apply(childCollection, rangeArgs);
+						}
 						if(childCollection.track){
 							options.rows = [];
 							
@@ -238,8 +245,9 @@ function tree(column){
 					promise = (grid.renderQuery ?
 						grid.renderQuery(query, preloadNode, options) :
 						grid._trackError(function(){
-							return grid.renderCollection(query(options), preloadNode,
-							"level" in query ? { queryLevel: query.level } : {});
+							return grid.renderCollection(
+								query(options), preloadNode, "level" in query ? { queryLevel: query.level } : {}
+							);
 						})
 					).then(function(){
 						// Expand once results are retrieved, if the row is still expanded.
