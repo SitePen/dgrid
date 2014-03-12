@@ -311,7 +311,7 @@ function(declare, lang, Deferred, listen, aspect, put){
 				rows = options.rows || this._rows,
 				container;
 
-			return Deferred.when(collection.fetch(), function(resolvedResults){
+			return Deferred.when(collection.fetch()).then(function(resolvedResults){
 				var resolvedRows,
 					i;
 					

@@ -138,7 +138,7 @@ return declare([List, _StoreMixin], {
 			var renderedCollection = query(options);
 
 			// Render the result set
-			return Deferred.when(self.renderCollection(renderedCollection, preloadNode, options), function(trs){
+			return Deferred.when(self.renderCollection(renderedCollection, preloadNode, options)).then(function(trs){
 				var total = typeof renderedCollection.total === "undefined" ?
 					renderedCollection.length : renderedCollection.total;
 				return Deferred.when(total, function(total){
@@ -185,29 +185,14 @@ return declare([List, _StoreMixin], {
 
 					// Redo scroll processing in case the query didn't fill the screen,
 					// or in case scroll position was restored
-					self._processScroll();
-
-					// If _refreshDeferred is still defined after calling _processScroll,
-					// resolve it now (_processScroll will remove it and resolve it itself
-					// otherwise)
-					if(self._refreshDeferred){
-						self._refreshDeferred.resolve(results);
-						delete self._refreshDeferred;
-					}
-
-					return trs;
+					return Deferred.when(self._processScroll()).then(function(){
+						return trs;
+					});
 				});
 			}).otherwise(function (err) {
-				// remove the loadingNode and re-throw if an error was passed
+				// remove the loadingNode and re-throw
 				put(loadingNode, "!");
-
-				if(err){
-					if(self._refreshDeferred){
-						self._refreshDeferred.reject(err);
-						delete self._refreshDeferred;
-					}
-					throw err;
-				}
+				throw err;
 			});
 		});
 	},
@@ -222,9 +207,8 @@ return declare([List, _StoreMixin], {
 		//			property's value for this specific refresh call only.
 		
 		var self = this,
-			keep = (options && options.keepScrollPosition),
-			dfd;
-		
+			keep = (options && options.keepScrollPosition);
+
 		// Fall back to instance property if option is not defined
 		if(typeof keep === "undefined"){ keep = this.keepScrollPosition; }
 		
@@ -234,37 +218,20 @@ return declare([List, _StoreMixin], {
 		this.inherited(arguments);
 		if(this.collection){
 			// render the query
-			dfd = this._refreshDeferred = new Deferred();
-			
+
 			// renderQuery calls _trackError internally
-			self.renderQuery(function(queryOptions){
+			return this.renderQuery(function(queryOptions){
 				return self.collection.range(queryOptions.start, queryOptions.start + queryOptions.count);
-			});
-			
-			// Internally, _refreshDeferred will always be resolved with an object
-			// containing `results` (QueryResults) and `rows` (the rendered rows);
-			// externally the promise will resolve simply with the QueryResults, but
-			// the event will be emitted with both under respective properties.
-			return dfd.then(function(results){
+			}).then(function(){
 				// Emit on a separate turn to enable event to be used consistently for
 				// initial render, regardless of whether the backing store is async
 				setTimeout(function() {
 					listen.emit(self.domNode, "dgrid-refresh-complete", {
 						bubbles: true,
 						cancelable: false,
-						grid: self,
-						results: results // QueryResults object (may be a wrapped promise)
+						grid: self
 					});
 				}, 0);
-				
-				// Delete the Deferred immediately so nothing tries to re-resolve
-				delete self._refreshDeferred;
-				
-				// Resolve externally with just the QueryResults
-				return results;
-			}, function(err){
-				delete self._refreshDeferred;
-				throw err;
 			});
 		}
 	},
@@ -565,15 +532,9 @@ return declare([List, _StoreMixin], {
 				
 			}
 		}
-		
-		// After iterating, if additional requests have been made mid-refresh,
-		// resolve the refresh promise based on the latest results obtained
-		if (lastRows && (refreshDfd = this._refreshDeferred)) {
-			delete this._refreshDeferred;
-			Deferred.when(lastRows, function() {
-				refreshDfd.resolve(lastCollection);
-			});
-		}
+
+		// return the promise from the last render
+		return lastRows;
 	}
 });
 

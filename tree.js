@@ -179,14 +179,8 @@ function tree(column){
 			
 			var row = target.element ? target : grid.row(target),
 				hasTransitionend = has("transitionend"),
-				dfd = new Deferred(),
-				promise = dfd.promise;
-			
-			// Resolve initial promise immediately;
-			// promise will be reassigned later if necessary to only resolve
-			// after data is retrieved
-			dfd.resolve();
-			
+				promise;
+
 			target = row.element;
 			target = target.className.indexOf("dgrid-expando-icon") > -1 ? target :
 				querySelector(".dgrid-expando-icon", target)[0];
@@ -241,14 +235,13 @@ function tree(column){
 						query.level = target.level;
 					}
 					// Add the query to the promise chain
-					promise = promise.then(function(){
-						return grid.renderQuery ?
-							grid.renderQuery(query, preloadNode, options) :
-							grid._trackError(function(){
-								grid.renderCollection(query(options), preloadNode,
-								"level" in query ? { queryLevel: query.level } : {});
-							});
-					}).then(function(){
+					promise = (grid.renderQuery ?
+						grid.renderQuery(query, preloadNode, options) :
+						grid._trackError(function(){
+							return grid.renderCollection(query(options), preloadNode,
+							"level" in query ? { queryLevel: query.level } : {});
+						})
+					).then(function(){
 						// Expand once results are retrieved, if the row is still expanded.
 						if(grid._expanded[row.id] && hasTransitionend){
 							var scrollHeight = container.scrollHeight;
@@ -300,7 +293,9 @@ function tree(column){
 					delete this._expanded[row.id];
 				}
 			}
-			return promise;
+
+			// Always return a promise
+			return Deferred.when(promise);
 		}; // end function grid.expand
 		
 		// Set up a destroy function on column to tear down the listeners/aspects
