@@ -124,7 +124,7 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 		//		If touch support is available, this determines whether to
 		//		incorporate logic from the TouchScroll module (at the expense of
 		//		normal desktop/mouse or native mobile scrolling functionality).
-		useTouchScroll: true,
+		useTouchScroll: !has("dom-scrollbar-width"),
 
 		// cleanEmptyObservers: Boolean
 		//		Whether to clean up observers for empty result sets.
