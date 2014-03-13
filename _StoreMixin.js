@@ -117,8 +117,7 @@ function(declare, lang, Deferred, listen, aspect, put){
 				if(collection.track){
 					collection = this.collection = collection.track();
 					this._rows = [];
-			
-					// TODO: How is the total number of items tracked?
+
 					this._observerHandle = this._observeCollection(collection, this.contentNode, this._rows);
 				}else{
 					this.collection = collection;
@@ -329,9 +328,8 @@ function(declare, lang, Deferred, listen, aspect, put){
 					
 					delete self._lastCollection; // used only for non-store List/Grid
 				}else{
-					// Don't bother inserting; rows are already out of view
-					// or there were none to track
-					// TODO: Should _StoreMixin even have a concept of "out of view"? This seems like a design smell.
+					// Don't bother inserting; the container has been removed from the DOM
+					// or there were no rows to render
 					resolvedRows = [];
 				}
 				return resolvedRows;
