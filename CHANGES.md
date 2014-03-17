@@ -15,6 +15,15 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
   grid would be inserted in the wrong position. (#840)
 * Fixed ordering of inserted preload nodes in the linked list in `OnDemandList`,
   particularly affecting `tree`. (#817)
+* `List#useTouchScroll` now defaults to `false` on platforms which render tangible
+  scrollbars (namely, desktop browsers on touch-enabled devices such as the Surface).
+
+### Mixins
+
+* The `Selection` mixin will now listen for both touch and mouse events, rather
+  than one or the other exclusively. (#757)
+* The touch event(s) that `Selection` listens for can now be overridden via the
+  `selectionTouchEvents` property. (#846)
 
 ### Extensions
 
@@ -33,10 +42,13 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 * Fixed issues in the `Selection` and `CellSelection` mixins when the row
   representing the starting point of a ranged selection is replaced (due to an
   observed store modification) prior to the end point being selected. (#858)
+* The `ColumnSet` mixin no longer excludes touch devices when registering
+  wheel listener logic (for combination mouse+touch devices).
 
 ### Extensions
 
 * Improved performance of first resize with `ColumnResizer`. (#832)
+* Fixed errors in the `DnD` extension when using a mouse on a mouse+touch device.
 * The `Pagination` extension will no longer cancel an ongoing async request if
   another call is performed with the same request promise. (#847, thanks jandppw)
 
