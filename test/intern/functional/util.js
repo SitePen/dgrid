@@ -1,5 +1,5 @@
 define([
-	"dojo/node!wd/lib/special-keys",
+	"dojo/node!wd/lib/special-keys"
 ], function (specialKeys) {
 	return {
 		isShiftClickSupported: function (remote) {
