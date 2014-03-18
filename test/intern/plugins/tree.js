@@ -57,7 +57,7 @@ define([
 				return this.queryEngine(query, options)(this.data);
 			}
 		}));
-		
+
 		grid = new OnDemandGrid({
 			sort: "id",
 			store: store,
@@ -69,7 +69,7 @@ define([
 		put(document.body, grid.domNode);
 		grid.startup();
 	}
-	
+
 	function destroyGrid(){
 		grid.destroy();
 		grid = null;
@@ -95,7 +95,7 @@ define([
 	// Define a function returning a promise resolving once children are expanded.
 	// On browsers which support CSS3 transitions, this occurs when transitionend fires;
 	// otherwise it occurs immediately.
-	var expand = hasTransitionEnd ? function(grid, id){
+	var expand = hasTransitionEnd ? function(id){
 		var dfd = new Deferred();
 
 		on.once(grid, hasTransitionEnd, function(){
@@ -111,18 +111,9 @@ define([
 		return dfd.promise;
 	};
 
-	function scrollToEnd(grid){
-		var dfd = new Deferred(),
-			handle;
-
-		handle = aspect.after(grid, "renderArray", function(){
-			handle.remove();
-			dfd.resolve();
-		});
-
+	function scrollToEnd(){
 		grid.scrollTo({ y: grid.bodyNode.scrollHeight });
-
-		return dfd.promise;
+		return wait(50);
 	}
 
 	test.suite("tree", function(){
@@ -139,48 +130,50 @@ define([
 			test.afterEach(destroyGrid);
 
 			test.test("expand first row", function(){
-				return expand(grid, 0).then(function(){
-					testRowExists("0:0");
-					testRowExists("0:99", false);
-				});
+				return expand(0)
+					.then(function(){
+						testRowExists("0:0");
+						testRowExists("0:99", false);
+					});
 			});
 
 			test.test("expand first row + scroll to bottom", function(){
-				return expand(grid, 0).then(function(){
-					return scrollToEnd(grid);
-				}).then(function(){
-					testRowExists("0:0");
-					testRowExists("0:99");
-				});
+				return expand(0)
+					.then(scrollToEnd)
+					.then(function(){
+						testRowExists("0:0");
+						testRowExists("0:99");
+					});
 			});
 
 			test.test("expand last row", function(){
-				return expand(grid, 4).then(function(){
-					testRowExists("4:0");
-					testRowExists("4:99", false);
-				});
+				return expand(4)
+					.then(function(){
+						testRowExists("4:0");
+						testRowExists("4:99", false);
+					});
 			});
 
 			test.test("expand last row + scroll to bottom", function(){
-				return expand(grid, 4).then(function(){
-					return scrollToEnd(grid);
-				}).then(function(){
-					testRowExists("4:0");
-					testRowExists("4:99");
-				});
+				return expand(4)
+					.then(scrollToEnd)
+					.then(function(){
+						testRowExists("4:0");
+						testRowExists("4:99");
+					});
 			});
 
 			test.test("expand first and last rows + scroll to bottom", function(){
-				return expand(grid, 0).then(function(){
-					return scrollToEnd(grid);
-				}).then(function(){
-					return expand(grid, 4);
-				}).then(function(){
-					return scrollToEnd(grid);
-				}).then(function(){
-					testRowExists("4:0");
-					testRowExists("4:99");
-				});
+				return expand(0)
+					.then(scrollToEnd)
+					.then(function(){
+						return expand(4);
+					})
+					.then(scrollToEnd)
+					.then(function(){
+						testRowExists("4:0");
+						testRowExists("4:99");
+					});
 			});
 		});
 
@@ -189,18 +182,19 @@ define([
 			test.afterEach(destroyGrid);
 
 			test.test("child modification", function(){
-				return expand(grid, 0).then(function(){
-					testRowExists("0:0");
-					assert.doesNotThrow(function(){
-						grid.store.put({
-							id: "0:0",
-							value: "Modified",
-							parentId: "0"
-						});
-					}, null, 'Modification of child should not throw error');
-				});
+				return expand(0)
+					.then(function(){
+						testRowExists("0:0");
+						assert.doesNotThrow(function(){
+							grid.store.put({
+								id: "0:0",
+								value: "Modified",
+								parentId: "0"
+							});
+						}, null, 'Modification of child should not throw error');
+					});
 			});
 		});
-		
+
 	});
 });
