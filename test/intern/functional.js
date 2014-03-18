@@ -1,6 +1,6 @@
 define([
 	'./functional/Keyboard',
 	'./functional/KeyboardTab',
-	'./functional/selector',
+	'./functional/Selector',
 	'./functional/editor'
 ], function(){});

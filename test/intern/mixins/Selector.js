@@ -5,19 +5,17 @@ define([
 	"dojo/query",
 	"dgrid/OnDemandGrid",
 	"dgrid/Selection",
-	"dgrid/selector",
+	"dgrid/Selector",
 	"dgrid/test/data/testStore"
-], function (test, assert, declare, query, OnDemandGrid, Selection, selector, testStore) {
+], function (test, assert, declare, query, OnDemandGrid, Selection, Selector, testStore) {
 	test.suite("selector column plugin", function () {
 		var grid;
 		
 		test.beforeEach(function () {
-			grid = new declare([OnDemandGrid, Selection])({
+			grid = new declare([OnDemandGrid, Selection, Selector])({
 				collection: testStore,
 				columns: {
-					select: selector({
-						label: "Select"
-					}),
+					select: { selector: true, label: "Select" },
 					col1: "Column 1",
 					col2: "Column 2",
 					col5: "Column 5"

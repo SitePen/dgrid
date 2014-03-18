@@ -72,6 +72,12 @@
         "parent": ""
     },
     {
+        "name": "Selector.html",
+        "url": "Selector.html",
+        "title": "Test Grid Selectors",
+        "parent": ""
+    },
+    {
         "name": "TouchScroll.html",
         "url": "TouchScroll.html",
         "title": "Test TouchScroll Mixin",
@@ -277,12 +283,6 @@
         "name": "rtl.html",
         "url": "rtl.html",
         "title": "Test Right-To-Left",
-        "parent": ""
-    },
-    {
-        "name": "selector.html",
-        "url": "selector.html",
-        "title": "Test Grid Selectors",
         "parent": ""
     },
     {

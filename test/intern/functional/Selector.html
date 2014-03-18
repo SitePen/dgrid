@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="utf-8">
-		<title>Test dgrid/selector module</title>
+		<title>Test dgrid row selector module</title>
 
 		<link rel="stylesheet" href="../../../css/dgrid.css">
 
@@ -65,7 +65,7 @@
 					"dgrid",
 					"put-selector",
 					"xstyle"
-				],
+				]
 			};
 		</script>
 
@@ -84,29 +84,26 @@
 				"dojo/_base/lang",
 				"dgrid/OnDemandGrid",
 				"dgrid/Selection",
-				"dgrid/selector",
+				"dgrid/Selector",
 				"dgrid/test/data/testStore"
-			], function (declare, lang, OnDemandGrid, Selection, selector, testStore) {
-				var SelectionGrid = declare([OnDemandGrid, Selection]);
+			], function (declare, lang, OnDemandGrid, Selection, Selector, testStore) {
+				var SelectionGrid = declare([OnDemandGrid, Selection, Selector]);
 
 				function allowSelect(row) {
 					return !row.id || row.id % 2 === 0;
 				}
 				
 				function createGrid(selectionMode) {
-					var id = "grid" + selectionMode.slice(0, 1).toUpperCase() + selectionMode.slice(1),
-						selectorConfig = {
-							label: "Select"
-						};
-					
+					var id = "grid" + selectionMode.slice(0, 1).toUpperCase() + selectionMode.slice(1);
+					var selectColumn = { label: "Select", selector : true };
 					if (selectionMode === "single") {
-						selectorConfig.selectorType = "radio";
+						selectColumn.selector = "radio";
 					}
 					
 					return new SelectionGrid({
 						collection: testStore,
 						columns: {
-							select: selector(selectorConfig),
+							select: selectColumn,
 							col1: "Column 1",
 							col2: "Column 2",
 							col5: "Column 5"

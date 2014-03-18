@@ -132,7 +132,7 @@ define([
 		
 		test.before(function () {
 			var remote = this.get("remote");
-			remote.get(require.toUrl("./selector.html"));
+			remote.get(require.toUrl("./Selector.html"));
 			return remote.waitForCondition("ready", 15000).then(function () {
 				return util.isShiftClickSupported(remote).then(function (isSupported) {
 					isShiftClickSupported = isSupported;

@@ -28,11 +28,11 @@
 			data-dojo-config="async: true"></script>
 		<script>
 			require(["dojo/on", "dgrid/OnDemandGrid","dgrid/tree","dgrid/editor", "dgrid/Keyboard",
-					"dgrid/Selection", "dgrid/selector", "dgrid/ColumnSet", "dojo/_base/declare",
+					"dgrid/Selection", "dgrid/Selector", "dgrid/ColumnSet", "dojo/_base/declare",
 					"dgrid/test/data/createAsyncHierarchicalStore", "dgrid/test/data/hierarchicalCountryData",
 					"dgrid/test/data/testTopHeavyHierarchicalStore", "dojo/domReady!"], 
 				function(
-					on, Grid, tree, editor, Keyboard, Selection, selector, ColumnSet, declare,
+					on, Grid, tree, editor, Keyboard, Selection, Selector, ColumnSet, declare,
 					createAsyncHierarchicalStore, hierarchicalCountryData, testTopHeavyHierarchicalStore
 					){
 					var count = 0; // for incrementing edits from button under 1st grid
@@ -46,7 +46,7 @@
 						return value === undefined || value === "" ? "&nbsp;" : value;
 					}
 
-					var StandardGrid = declare([Grid, Keyboard, Selection]);
+					var StandardGrid = declare([Grid, Keyboard, Selection, Selector]);
 					var testCountryStore = createAsyncHierarchicalStore({ data: hierarchicalCountryData });
 					
 					var treeGrid = window.treeGrid = new StandardGrid({
@@ -102,7 +102,7 @@
 					
 					function getTreeSelectorColumns(){
 						return [
-							selector({className: "selector"}),
+							{selector: 'checkbox', className: "selector"},
 							tree({
 								label: "Name",
 								field: "name",
