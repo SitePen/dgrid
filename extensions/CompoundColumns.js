@@ -39,7 +39,15 @@ define([
 					children,
 					hasChildLabels;
 				
-				function processColumn(column){
+				function processColumn(column, i){
+					// Handle the column config when it is an object rather
+					// than an array.
+					if(typeof column === "string"){
+						column = {label: column};
+					}
+					if(!(columns instanceof Array) && !column.field){
+						column.field = i;
+					}
 					children = column.children;
 					hasChildLabels = children && (column.showChildHeaders !== false);
 					// Set a reference to the parent column so later the children's ids can
@@ -50,6 +58,10 @@ define([
 						// make sure the column has an id
 						if(column.id == null){
 							column.id = ((parent && parent.id) || level-1) + "-" + topHeaderRow.length;
+						}else if(parent && parent.id){
+							// Make sure nested compound columns have ids that are prefixed with
+							// their parent's ids.
+							column.id = parent.id + "-" + column.id;
 						}
 					}else{
 						// it has no children, it is a normal header, add it to the content columns
@@ -77,9 +89,11 @@ define([
 						(headerRows[level] || (headerRows[level] = [])).push(column);
 					}
 				}
+				
 				miscUtil.each(columns, processColumn, this);
 				return numColumns;
 			}
+			
 			processColumns(columns, 1, true);
 			
 			var numHeaderRows = headerRows.length,
@@ -132,6 +146,45 @@ define([
 				columnId = column.id = prefix + id;
 			}
 			this.inherited(arguments, [column, columnId, rowColumns, prefix]);
+		},
+		
+		cell: function(target, columnId){
+			// summary:
+			//		Get the cell object by node, event, or id, plus a columnId.
+			//		This extension prefixes children's column ids with the parents' column ids,
+			//		so cell takes that into account when looking for a column id.
+
+			if(typeof columnId != "object"){
+				// Find the columnId that corresponds with the provided id.
+				// The provided id may be a suffix of the actual id.
+				var column = this.column(columnId);
+				if(column){
+					columnId = column.id;
+				}
+			}
+			return this.inherited(arguments, [target, columnId]);
+		},
+
+		column: function(target){
+			// summary:
+			//		Get the column object by node, event, or column id.  Take into account parent column id
+			//		prefixes that may be added by this extension.
+			var results = this.inherited(arguments);
+			if(results == null && typeof target != "object"){
+				// Find a column id that ends with the provided column id.  This will locate a child column
+				// by an id that was provided in the original column configuration.  For example, if a compound column
+				// was given the id "compound" and a child column was given the id "child", this will find the column
+				// using only "child".  If "compound-child" was being searched for, the inherited call
+				// above would have found the cell.
+				var suffix = "-" + target,
+					suffixLength = suffix.length;
+				for(var completeId in this.columns){
+					if(completeId.indexOf(suffix, completeId.length - suffixLength) !== -1){
+						return this.columns[completeId];
+					}
+				}
+			}
+			return results;
 		},
 		
 		_updateCompoundHiddenStates: function(id, hidden){

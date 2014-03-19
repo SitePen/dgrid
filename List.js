@@ -125,7 +125,7 @@ function(declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 		//		If touch support is available, this determines whether to
 		//		incorporate logic from the TouchScroll module (at the expense of
 		//		normal desktop/mouse or native mobile scrolling functionality).
-		useTouchScroll: true,
+		useTouchScroll: !has("dom-scrollbar-width"),
 
 		// highlightDuration: Integer
 		//		The amount of time (in milliseconds) that a row should remain
@@ -387,7 +387,11 @@ function(declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 			this.cleanup();
 			// destroy DOM
 			put(this.domNode, "!");
-			this.inherited(arguments);
+			
+			if(this.useTouchScroll){
+				// Only call TouchScroll#destroy if we also initialized it
+				this.inherited(arguments);
+			}
 		},
 		refresh: function(){
 			// summary:

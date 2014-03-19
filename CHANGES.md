@@ -16,21 +16,54 @@ The following is a rough list of changes, to be outlined more presentably later.
 
 # master (0.3.14-dev)
 
+## Significant changes
+
 ### General/Core
 
+* Fixed issue where `List#destroy` would throw an error if `useTouchScroll` is
+  set to `false` on a device with touch support. (#867)
+* Fixed a regression in `List` which would cause observed modifications to tree
+  children to throw errors. (#862)
 * Fixed a regression in `OnDemandList` where items added to an empty list or
   grid would be inserted in the wrong position. (#840)
+* Fixed ordering of inserted preload nodes in the linked list in `OnDemandList`,
+  particularly affecting `tree`. (#817)
+* `List#useTouchScroll` now defaults to `false` on platforms which render tangible
+  scrollbars (namely, desktop browsers on touch-enabled devices such as the Surface).
+
+### Mixins
+
+* The `Selection` mixin will now listen for both touch and mouse events, rather
+  than one or the other exclusively. (#757)
+* The touch event(s) that `Selection` listens for can now be overridden via the
+  `selectionTouchEvents` property. (#846)
 
 ### Extensions
 
+* Fixed a regression in `CompoundColumns` involving the ability to look up
+  columns by their originally-specified IDs. (#820)
 * The `CompoundColumns` extension is now capable of interoperating with the
   `ColumnHider` and `ColumnResizer` extensions; note that it must be mixed in
   after these extensions in order to work properly. (#834)
-* Improved performance of first resize with `ColumnResizer`. (#832)
-* The `Pagination` extension will no longer cancel an ongoing async request if
-  another call is performed with the same request promise. (#847, thanks jandppw)
 * The `ColumnHider` and `Pagination` extensions now include Romanian localization
   bundles. (#850, thanks websoftix)
+
+## Other changes and fixes
+
+### Mixins
+
+* Fixed issues in the `Selection` and `CellSelection` mixins when the row
+  representing the starting point of a ranged selection is replaced (due to an
+  observed store modification) prior to the end point being selected. (#858)
+* The `ColumnSet` mixin no longer excludes touch devices when registering
+  wheel listener logic (for combination mouse+touch devices).
+
+### Extensions
+
+* Improved performance of first resize with `ColumnResizer`. (#832)
+* Fixed errors in the `DnD` extension when using a mouse on a mouse+touch device.
+* The `Pagination` extension will no longer cancel an ongoing async request if
+  another call is performed with the same request promise. (#847, thanks jandppw)
 
 # 0.3.13
 

@@ -99,10 +99,15 @@ return declare(Selection, {
 				
 				var toElement = toCell.element;
 				var fromElement = cell.element;
-				// find if it is earlier or later in the DOM
-				var traverser = (toElement && (toElement.compareDocumentPosition ? 
-					toElement.compareDocumentPosition(fromElement) == 2 :
-					toElement.sourceIndex > fromElement.sourceIndex)) ? "nextSibling" : "previousSibling";
+				// Find if it is earlier or later in the DOM
+				var direction = this._determineSelectionDirection(fromElement, toElement);
+				if(!direction){
+					// The original element was actually replaced
+					toCell = this.cell(
+						document.getElementById(toCell.row.element.id), toElement.columnId);
+					toElement = toCell && toCell.element;
+					direction = this._determineSelectionDirection(fromElement, toElement);
+				}
 				// now we determine which columns are in the range 
 				var idFrom = cell.column.id, idTo = toCell.column.id, started, columnIds = [];
 				for(id in this.columns){
@@ -132,10 +137,24 @@ return declare(Selection, {
 					if(nextNode == toElement){
 						break;
 					}
-				}while((nextNode = cell.row.element[traverser]));
+				}while((nextNode = cell.row.element[direction]));
 			}
 		}
 	},
+	
+	_determineSelectionDirection: function () {
+		// Extend Selection to return next/previousSibling instead of down/up,
+		// given how CellSelection#_select is written
+		var result = this.inherited(arguments);
+		if(result === "down"){
+			return "nextSibling";
+		}
+		if(result === "up"){
+			return "previousSibling";
+		}
+		return result;
+	},
+	
 	isSelected: function(object, columnId){
 		// summary:
 		//		Returns true if the indicated cell is selected.

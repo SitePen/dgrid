@@ -8,7 +8,9 @@ define([
 	'intern/node_modules/dojo/has!host-browser?./core/observable',
 	'intern/node_modules/dojo/has!host-browser?./plugins/editor',
 	'intern/node_modules/dojo/has!host-browser?./plugins/selector',
+	'intern/node_modules/dojo/has!host-browser?./plugins/tree',
 	'intern/node_modules/dojo/has!host-browser?./plugins/tree-expand-promise',
+	'intern/node_modules/dojo/has!host-browser?./extensions/CompoundColumns',
 	'intern/node_modules/dojo/has!host-browser?./extensions/Pagination',
 	'intern/node_modules/dojo/has!host-browser?./mixins/Keyboard',
 	'intern/node_modules/dojo/has!host-browser?./mixins/Selection'
