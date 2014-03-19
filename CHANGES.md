@@ -6,9 +6,10 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 The following is a rough list of changes, to be outlined more presentably later.
 
 * Split out store-specific code from `List#renderArray` to
-  `_StoreMixin#renderCollection`
+  `_StoreMixin#renderCollection`, which always returns a promise
 * Switched from dojo/store to dstore
 * Removed observer tracking logic and workarounds now irrelevant with dstore
+* Removed `results` property from `dgrid-refresh-complete` event
 * Replaced `List#newRow(...)` with `List#highlightRow(row[, delay])`
 * Desupported `selector`'s `disabled` property (use `Selection#allowSelect`)
 * Removed deprecated code marked for removal in 0.4
