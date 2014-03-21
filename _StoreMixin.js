@@ -270,19 +270,22 @@ function(declare, lang, Deferred, listen, aspect, put){
 			
 			if(typeof func == "string"){ func = lang.hitch(this, func); }
 			
-			var dfd = new Deferred();
+			var self = this,
+				promise;
+			
 			try{
-				Deferred.when(func(), dfd.resolve, dfd.reject);
+				promise = Deferred.when(func());
 			}catch(err){
 				// report sync error
+				var dfd = new Deferred();
 				dfd.reject(err);
+				promise = dfd.promise;
 			}
 			
-			var self = this;
-			dfd.then(null, function(err){
+			promise.otherwise(function(err){
 				emitError.call(self, err);
 			});
-			return dfd.promise;
+			return promise;
 		},
 		
 		removeRow: function(rowElement, justCleanup){
