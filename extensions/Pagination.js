@@ -353,7 +353,8 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 				rows = this.inherited(arguments);
 
 			if(!beforeNode){
-				if(this._topLevelRequest && this._topLevelRequest !== results){
+				// TODO: !== rows is probably not the check we want, but what is?
+				if(this._topLevelRequest && this._topLevelRequest !== rows){
 					// Cancel previous async request that didn't finish
 					this._topLevelRequest.cancel();
 					delete this._topLevelRequest;
