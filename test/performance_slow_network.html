@@ -58,8 +58,8 @@
 					}, "grid");
 					console.log(new Date().getTime() - start);
 					
-					grid.on("dgrid-refresh-complete", function(evt) {
-						console.log("Refresh completed", evt.results);
+					grid.on("dgrid-refresh-complete", function() {
+						console.log("Refresh completed");
 					});
 				});
 				

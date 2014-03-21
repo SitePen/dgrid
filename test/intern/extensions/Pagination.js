@@ -13,7 +13,6 @@ define([
 	"dojo/domReady!"
 ], function(test, assert, declare, on, query, string, put, Grid, Pagination, createSyncStore, genericData){
 	var grid,
-		handles = [],
 		PaginationGrid = declare([Grid, Pagination]);
 
 	function getColumns(){

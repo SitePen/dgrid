@@ -25,13 +25,13 @@
 		<script>
 			require(["dgrid/GridFromHtml", "dgrid/OnDemandList", "dgrid/Keyboard",
 				"dojo/store/Memory", "dojo/store/Observable",
-				"dojo/_base/declare", "dojo/_base/lang", "dojo/parser", "dojo/query",
+				"dojo/_base/declare", "dojo/parser",
 				"dijit/form/Select", "dgrid/editor", "dijit/form/DateTextBox",
 				"dijit/form/HorizontalSlider", "dijit/form/NumberSpinner", "dojo/data/ObjectStore", 
 				"dgrid/test/data/createSyncStore", "dgrid/test/data/typesData", "dgrid/test/data/stateData",
 				"dojo/domReady!"],
 			function(
-				GridFromHtml, OnDemandList, Keyboard, LegacyMemory, LegacyObservable, declare, lang, parser, query,
+				GridFromHtml, OnDemandList, Keyboard, LegacyMemory, LegacyObservable, declare, parser,
 				Select, editor, DateTextBox, Slider, NumberSpinner, ObjectStore,
 				createSyncStore, typesData, stateData
 			){
@@ -40,7 +40,7 @@
 					editor: editor
 				};
 				window.stateStore = new ObjectStore({
-						objectStore: LegacyObservable(new LegacyMemory({ data: lang.clone(stateData) })),
+						objectStore: LegacyObservable(new LegacyMemory({ data: stateData })),
 						labelProperty: "name"
 					});
 				// GridFromHtml tests

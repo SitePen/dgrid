@@ -45,14 +45,16 @@
 				"dgrid/Keyboard",
 				"dojo/_base/declare",
 				"dgrid/test/data/createAsyncStore",
-				"dgrid/test/data/hierarchicalCountryData",
+				"dgrid/test/data/smallColorData",
 				"dojo/domReady!"
-			], function(List, Grid, Selection, Keyboard, declare, createAsyncStore, hierarchicalCountryData){
+			], function(List, Grid, Selection, Keyboard, declare, createAsyncStore, smallColorData){
 					window.grid = new (declare([Grid, Selection, Keyboard]))({
-						collection: createAsyncStore({ data: hierarchicalCountryData }),
+						collection: createAsyncStore({ data: smallColorData }),
 						columns: {
-							name: "Name",
-							type: "Type"
+							col1: "Color",
+							col5: "R",
+							col6: "G",
+							col7: "B"
 						}
 					}, "grid");
 				});

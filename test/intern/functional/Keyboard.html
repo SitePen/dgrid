@@ -41,9 +41,7 @@
 					KeyboardList = declare([List, Keyboard]),
 					KeyboardOnDemandGrid = declare([OnDemandGrid, Keyboard]),
 					KeyboardOnDemandList = declare([OnDemandList, Keyboard]),
-					createTestStore = function(){
-						return createSyncStore({ data: genericData });
-					};
+					store = createSyncStore({ data: genericData });
 					
 				// Simple Grid, List, and cell navigation Grid
 				list = new KeyboardList({
@@ -62,15 +60,15 @@
 
 				// OnDemand Grid, List, and cell navigation Grid
 				onDemandList = new KeyboardOnDemandList({
-					collection: createTestStore(),
+					collection: store,
 					renderRow: function(item){ return put("div", item.col5); }
 				}, "list-ondemand");
 				onDemandGrid = new KeyboardOnDemandGrid({
-					collection: createTestStore(),
+					collection: store,
 					columns: columns
 				}, "grid-ondemand");
 				onDemandRowGrid = new KeyboardOnDemandGrid({
-					collection: createTestStore(),
+					collection: store,
 					columns: columns,
 					cellNavigation: false
 				}, "rowGrid-ondemand");
