@@ -5,14 +5,20 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 The following is a rough list of changes, to be outlined more presentably later.
 
+* dgrid now interacts with the dstore API rather than the dojo/store API
+* dgrid now requires Dojo 1.8 at minimum (since that is also dstore's minimum requirement)
 * Split out store-specific code from `List#renderArray` to
   `_StoreMixin#renderCollection`, which always returns a promise
-* Switched from dojo/store to dstore
 * Removed observer tracking logic and workarounds now irrelevant with dstore
+  (this includes removal of the `cleanEmptyObservers` flag)
 * Removed `results` property from `dgrid-refresh-complete` event
+* Removed `grid` property from error attached to `dgrid-error` event
+  (use `grid` property directly on event instead)
 * Replaced `List#newRow(...)` with `List#highlightRow(row[, delay])`
+  (i.e. the equivalent of `newRow` is to call `insertRow` then `highlightRow`)
 * Desupported `selector`'s `disabled` property (use `Selection#allowSelect`)
-* Removed deprecated code marked for removal in 0.4
+* Removed deprecated functions marked for removal in 0.4; most of these have had
+  `set(...)` equivalents for a long time already
 
 # master (0.3.14-dev)
 
