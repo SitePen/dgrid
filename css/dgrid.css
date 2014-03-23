@@ -9,6 +9,9 @@
 
 .dgrid-header {
 	background-color: #eee;
+}
+
+.dgrid-header-row {
 	position: absolute;
 	right: 17px; /* scrollbar width; revised in List.js if necessary */
 	left: 0;

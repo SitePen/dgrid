@@ -6,7 +6,7 @@
 	.dgrid-rtl-nonwebkit is also added to the domNode if
 		the grid's isRTL is true AND the client isn't WebKit
 */
-.dgrid-rtl-nonwebkit .dgrid-header {
+.dgrid-rtl-nonwebkit .dgrid-header-row {
 	right: 0;
 	left: 17px;
 }
@@ -50,7 +50,7 @@
 .dgrid-rtl.dgrid-autoheight .dgrid-header {
 	left: 0;
 }
-.has-ie-6 .dgrid-rtl .dgrid-header {
+.has-ie-6 .dgrid-rtl .dgrid-header-row {
 	left: auto;
 	right: auto;
 }

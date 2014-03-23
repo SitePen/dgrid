@@ -125,6 +125,10 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 		//		incorporate logic from the TouchScroll module (at the expense of
 		//		normal desktop/mouse or native mobile scrolling functionality).
 		useTouchScroll: !has("dom-scrollbar-width"),
+		
+		// addUiClasses: Boolean
+		//		Whether to add jQuery UI classes to various elements in dgrid's DOM.
+		addUiClasses: true,
 
 		// cleanEmptyObservers: Boolean
 		//		Whether to clean up observers for empty result sets.
@@ -204,6 +208,7 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 		},
 		buildRendering: function(){
 			var domNode = this.domNode,
+				addUiClasses = this.addUiClasses,
 				self = this,
 				headerNode, spacerNode, bodyNode, footerNode, isRTL;
 			
@@ -215,11 +220,13 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 			// class / className setter), then apply standard classes/attributes
 			domNode.className = "";
 			
-			put(domNode, "[role=grid].ui-widget.dgrid.dgrid-" + this.listType);
+			put(domNode, "[role=grid].dgrid.dgrid-" + this.listType +
+				(addUiClasses ? ".ui-widget" : ""));
 			
 			// Place header node (initially hidden if showHeader is false).
 			headerNode = this.headerNode = put(domNode, 
-				"div.dgrid-header.dgrid-header-row.ui-widget-header" +
+				"div.dgrid-header.dgrid-header-row" +
+				(addUiClasses ? ".ui-widget-header" : "") +
 				(this.showHeader ? "" : ".dgrid-header-hidden"));
 			if(has("quirks") || has("ie") < 8){
 				spacerNode = put(domNode, "div.dgrid-spacer");
@@ -233,7 +240,8 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 				bodyNode.tabIndex = -1;
 			}
 			
-			this.headerScrollNode = put(domNode, "div.dgrid-header-scroll.dgrid-scrollbar-width.ui-widget-header");
+			this.headerScrollNode = put(domNode, "div.dgrid-header.dgrid-header-scroll.dgrid-scrollbar-width" +
+				(addUiClasses ? ".ui-widget-header" : ""));
 			
 			// Place footer node (initially hidden if showFooter is false).
 			footerNode = this.footerNode = put("div.dgrid-footer" +
@@ -256,7 +264,8 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 			this.configStructure();
 			this.renderHeader();
 			
-			this.contentNode = this.touchNode = put(this.bodyNode, "div.dgrid-content.ui-widget-content");
+			this.contentNode = this.touchNode = put(this.bodyNode,
+				"div.dgrid-content" + (addUiClasses ? ".ui-widget-content" : ""));
 			// add window resize handler, with reference for later removal if needed
 			this._listeners.push(this._resizeHandle = listen(window, "resize",
 				miscUtil.throttleDelayed(winResizeHandler, this)));
@@ -329,9 +338,9 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 				if(scrollbarWidth != 17 && !quirks){
 					// for modern browsers, we can perform a one-time operation which adds
 					// a rule to account for scrollbar width in all grid headers.
-					miscUtil.addCssRule(".dgrid-header", "right: " + scrollbarWidth + "px");
+					miscUtil.addCssRule(".dgrid-header-row", "right: " + scrollbarWidth + "px");
 					// add another for RTL grids
-					miscUtil.addCssRule(".dgrid-rtl-nonwebkit .dgrid-header", "left: " + scrollbarWidth + "px");
+					miscUtil.addCssRule(".dgrid-rtl-nonwebkit .dgrid-header-row", "left: " + scrollbarWidth + "px");
 				}
 			}
 			
@@ -428,9 +437,10 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 		newRow: function(object, parentNode, beforeNode, i, options){
 			if(parentNode){
 				var row = this.insertRow(object, parentNode, beforeNode, i, options);
-				put(row, ".ui-state-highlight");
+				put(row, ".dgrid-highlight" +
+					(this.addUiClasses ? ".ui-state-highlight" : ""));
 				setTimeout(function(){
-					put(row, "!ui-state-highlight");
+					put(row, "!dgrid-highlight!ui-state-highlight");
 				}, this.highlightDuration);
 				return row;
 			}
@@ -712,7 +722,9 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 				this.removeRow(row);
 			}
 			row = this.renderRow(object, options);
-			row.className = (row.className || "") + " ui-state-default dgrid-row " + (i % 2 == 1 ? oddClass : evenClass);
+			row.className = (row.className || "") + " dgrid-row " +
+				(i % 2 == 1 ? oddClass : evenClass) +
+				(this.addUiClasses ? " ui-state-default" : "");
 			// get the row id for easy retrieval
 			this._rowIdToObject[row.id = id] = object;
 			parent.insertBefore(row, beforeNode || null);
