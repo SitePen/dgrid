@@ -363,7 +363,7 @@ return declare(null, {
 		//		or to the list/grid's removeRow method otherwise.
 		
 		var self = this,
-			signals = [];
+			signals;
 
 		function ifSelected(rowArg, methodName){
 			// Calls a method if the row corresponding to the object is selected.
@@ -381,7 +381,7 @@ return declare(null, {
 		}
 
 		if(collection && collection.track && this._observeCollection){
-			signals.push(
+			signals = [
 				aspect.before(this, "_observeCollection", function(collection){
 					signals.push(
 						collection.on("remove", function(event){
@@ -405,9 +405,9 @@ return declare(null, {
 						})
 					);
 				}, true)
-			);
+			];
 		}else{
-			signals.push(
+			signals = [
 				aspect.before(this, "removeRow", function(rowElement, justCleanup){
 					var row;
 					if(!justCleanup){
@@ -418,7 +418,7 @@ return declare(null, {
 						}
 					}
 				})
-			);
+			];
 		}
 
 		this._removeDeselectSignals = function(){
