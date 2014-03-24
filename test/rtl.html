@@ -65,11 +65,13 @@
 					var StandardGrid = declare([OnDemandGrid, Selection, Keyboard]);
 
 					window.grid = new StandardGrid({
+						sort: "id",
 						store: testStore,
 						columns: lang.clone(columns)
 					}, "grid");
 					
 					window.scrollgrid = new StandardGrid({
+						sort: "id",
 						store: testStore,
 						columns: lang.clone(columns)
 					}, "scrollgrid");
@@ -83,6 +85,7 @@
 					];
 					
 					window.tree = new StandardGrid({
+						sort: "id",
 						store: testCountryStore,
 						columns: columnsTree
 					}, "tree");
@@ -96,6 +99,7 @@
 					};
 
 					window.headerless = new StandardGrid({
+						sort: "id",
 						store: testStore,
 						columns: columnsHeaderless,
 						showHeader: false
@@ -145,12 +149,14 @@
 					];
 					
 					window.moreeditors = new StandardGrid({
+						sort: "id",
 						store: testTypesStore,
 						columns: columnsEditor,
 						selectionMode: "none"
 					}, "moreeditors");
 
 					window.paginationGrid = new declare([Grid, Selection, Keyboard, Pagination])({
+						sort: "id",
 						store: testStore,
 						columns: lang.clone(columns)
 					}, 'pagination');

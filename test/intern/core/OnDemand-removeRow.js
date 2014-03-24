@@ -40,6 +40,7 @@ define([
 			var store = Observable(new Memory({ data: data }));
 			list = new OnDemandList({
 				id: "list1",
+				sort: "id",
 				store: store,
 				queryRowsOverlap: 2,
 				renderRow: function(object){

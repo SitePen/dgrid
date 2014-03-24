@@ -13,6 +13,7 @@ define([
 		
 		test.beforeEach(function () {
 			grid = new declare([OnDemandGrid, Selection])({
+				sort: "id",
 				store: testStore,
 				columns: {
 					select: selector({

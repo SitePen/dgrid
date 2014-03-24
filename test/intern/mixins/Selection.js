@@ -66,8 +66,8 @@ define([
 			
 			grid = new (declare([OnDemandGrid, SelectionMixin]))({
 				columns: getColumns(),
-				store: store,
-				sort: "id"
+				sort: "id",
+				store: store
 			});
 			
 			document.body.appendChild(grid.domNode);
@@ -174,6 +174,7 @@ define([
 				}));
 			
 			grid = new (declare([Grid, SelectionMixin, Pagination]))({
+				sort: "id",
 				store: store,
 				columns: getColumns()
 			});
@@ -261,8 +262,8 @@ define([
 			
 			grid = new (declare([OnDemandGrid, SelectionMixin]))({
 				columns: getColumns(),
-				store: store,
-				sort: "id"
+				sort: "id",
+				store: store
 			});
 			
 			document.body.appendChild(grid.domNode);
@@ -408,8 +409,8 @@ define([
 			
 			grid = new (declare([OnDemandGrid, SelectionMixin]))({
 				columns: getColumns(),
-				store: store,
-				sort: "id"
+				sort: "id",
+				store: store
 			});
 			
 			document.body.appendChild(grid.domNode);

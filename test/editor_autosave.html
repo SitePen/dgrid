@@ -42,6 +42,7 @@
 					}
 
 					window.grid = new (declare([Grid, Keyboard]))({
+						sort: "id",
 						store: testTypesStore,
 						columns: getColumns()
 					}, "grid");

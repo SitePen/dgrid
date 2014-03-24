@@ -18,6 +18,7 @@ define([
 		var expectedEvent = expectSuccess ? "dgrid-refresh-complete" : "dgrid-error",
 			unexpectedEvent = !expectSuccess ? "dgrid-refresh-complete" : "dgrid-error";
 			grid = new CustomGrid({
+				sort: "id",
 				store: store
 			});
 		

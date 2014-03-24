@@ -74,6 +74,7 @@
 						document.body.insertBefore(put("div#grid"), next);
 					}
 					grid = window.grid = new (declare([Grid, Keyboard, Selection, ColumnHider]))({
+						sort: "id",
 						store: testStore,
 						columns: getColumns()
 					}, "grid");
@@ -87,10 +88,12 @@
 				createGrid();
 				
 				gridResize = window.gridResize = new (declare([Grid, Selection, ColumnHider, ColumnResizer]))({
+					sort: "id",
 					store: testStore,
 					columns: lang.clone(columns)
 				}, "gridresize");
 				gridReorder = window.gridReorder = new (declare([Grid, Selection, ColumnReorder, ColumnHider]))({
+					sort: "id",
 					store: testStore,
 					columns: lang.clone(columns)
 				}, "gridreorder");

@@ -41,6 +41,7 @@
 			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!"], 
 				function(List, Grid, Selection, Keyboard, declare){
 					window.grid = new (declare([Grid, Selection, Keyboard]))({
+						sort: "id",
 						store: testCountryStore,
 						columns: {
 							name: "Name",

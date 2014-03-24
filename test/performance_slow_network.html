@@ -51,6 +51,7 @@
 
 					var start = new Date().getTime();
 					window.grid = new (declare([Grid, Selection, Keyboard]))({
+						sort: "id",
 						store: DeferredWrapper(testPerfStore, 500),
 						columns: columns,
 						selection: selection,

@@ -46,6 +46,7 @@
 					];
 					var start = new Date();
 					var grid = window.grid = new (declare([Grid, Selection, Keyboard]))({
+						sort: "id",
 						store: testPerfStore,
 						columns: columns
 					}, "grid");

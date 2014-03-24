@@ -90,6 +90,7 @@
 					
 					function createGrid(args){
 						window.grid = new CustomGrid(lang.mixin({
+									sort: "id",
 									store: testAsyncStore,
 									columns: getColumns(),
 									noDataMessage: "No results.",
@@ -121,6 +122,7 @@
 					
 					// auto-height grid
 					var grid2 = window.grid2 = new CustomGrid({
+						sort: "id",
 						store: testStore,
 						columns: getColumns2(),
 						pagingLinks: false,
@@ -142,11 +144,13 @@
 					
 					// GridFromHtml
 					window.gridfromhtml = new (declare([GridFromHtml, Keyboard, Selection, Pagination]))({
+						sort: "id",
 						store: testStore
 					}, "gridfromhtml");
 					
 					// ColumnSet grid
 					window.gridColumnSet = new (declare([Grid, Keyboard, Selection, ColumnSet, Pagination]))({
+						sort: "id",
 						store: testStore,
 						columnSets: [
 							[[

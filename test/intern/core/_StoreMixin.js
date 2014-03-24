@@ -86,7 +86,8 @@ define([
 						{ label: "Column 3", field: "col3", colSpan: 2, set: sampleSetMethod },
 						{ label: "Column 5", field: "col5" }
 					]
-				]
+				],
+				sort: "id"
 			});
 			testSetMethod(grid, this.async());
 		});
@@ -112,7 +113,8 @@ define([
 							{ label: "Column 5", field: "col5" }
 						]
 					]
-				]
+				],
+				sort: "id"
 			});
 			testSetMethod(grid, this.async());
 		});

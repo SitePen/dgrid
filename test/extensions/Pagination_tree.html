@@ -82,6 +82,7 @@
 					document.body.className = skin;
 					
 					window.grid2 = new CustomGrid({
+						sort: "id",
 						store: testStore,
 						columns: getColumns(),
 						pagingLinks: false,
@@ -92,6 +93,7 @@
 					
 					function createGrid(args){
 						window.grid = new CustomGrid(lang.mixin({
+									sort: "id",
 									store: testStore,
 									columns: getColumns()
 								}, args),
