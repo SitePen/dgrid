@@ -135,7 +135,7 @@ define([
 							}
 
 							var activeId = getRowId(document.activeElement);
-							grid.collection.notify(grid.collection.get(id), id);
+							grid.collection.emit("update", { target: grid.collection.get(id) });
 							// Need to wait until next turn for refocus
 							setTimeout(function () {
 								done(activeId === getRowId(document.activeElement));
