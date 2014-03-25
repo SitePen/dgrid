@@ -1,17 +1,16 @@
 define([
 	"intern!tdd",
 	"intern/chai!assert",
-	"../../../OnDemandGrid",
+	"dgrid/OnDemandGrid",
 	"dgrid/tree",
 	"dgrid/util/has-css3",
 	"dojo/_base/lang",
 	"dojo/_base/Deferred",
 	"dojo/aspect",
 	"dojo/on",
-	"dojo/store/Memory",
-	"dojo/store/Observable",
-	"put-selector/put"
-], function(test, assert, OnDemandGrid, tree, has, lang, Deferred, aspect, on, Memory, Observable, put){
+	"put-selector/put",
+	"dgrid/test/data/createSyncHierarchicalStore"
+], function(test, assert, OnDemandGrid, tree, has, lang, Deferred, aspect, on, put, createSyncHierarchicalStore){
 
 	var grid,
 		testDelay = 15,
@@ -32,35 +31,22 @@ define([
 			for(k = 0; k < 100; k++){
 				data.push({
 					id: i + ":" + k,
-					parentId: parentId,
+					parent: parentId,
 					value: "Child " + k
 				});
 			}
 		}
 
-		store = new Observable(new Memory({
+		store = createSyncHierarchicalStore({
 			data: data,
-			getChildren: function(parent, options){
-				return this.query(
-					lang.mixin({}, options.originalQuery || null, { parentId: parent.id }), options);
-			},
 			mayHaveChildren: function(parent){
-				return parent.parentId == null;
-			},
-			query: function(query, options){
-				query = query || {};
-				options = options || {};
-
-				if(!query.parentId && !options.deep){
-					query.parentId = undefined;
-				}
-				return this.queryEngine(query, options)(this.data);
+				return parent.parent == null;
 			}
-		}));
+		});
 		
 		grid = new OnDemandGrid({
 			sort: "id",
-			store: store,
+			collection: store,
 			columns: [
 				tree({ label: "id", field: "id" }),
 				{ label: "value", field: "value"}
@@ -192,7 +178,7 @@ define([
 				return expand(grid, 0).then(function(){
 					testRowExists("0:0");
 					assert.doesNotThrow(function(){
-						grid.store.put({
+						grid.collection.put({
 							id: "0:0",
 							value: "Modified",
 							parentId: "0"
