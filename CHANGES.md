@@ -47,6 +47,12 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 * The `ColumnSet` mixin no longer excludes touch devices when registering
   wheel listener logic (for combination mouse+touch devices).
 
+### Column Plugins
+
+* Fixed an issue in `editor` where the wrong column would be referenced from
+  the `change` event handler for native inputs, particularly affecting radio
+  buttons. (#876)
+
 ### Extensions
 
 * Improved performance of first resize with `ColumnResizer`. (#832)
