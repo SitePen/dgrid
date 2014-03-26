@@ -93,7 +93,7 @@ Mode | Description
 `multiple` | Like `extended`, except that clicks or keypresses without holding Shift or Ctrl/Cmd will add to the existing selection.
 `single` | Allows only one row to be selected at a time.
 `toggle` | (New in 0.3.7) Toggles the selected state of the row being acted upon; useful for touch input.
-`none` | Does not allow direct selection of rows via keyboard or mouse events, but still allows selection via direct API calls, or via a [selector](../column-plugins/selector.md) column.
+`none` | Does not allow direct selection of rows via keyboard or mouse events, but still allows selection via direct API calls, or via a [Selector](Selector.md) column.
 
 ### Implementing a Custom Selection Mode
 

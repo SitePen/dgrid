@@ -15,7 +15,7 @@ becomes part of these options when queries are issued.
 
 ### rowSelector and indirect selection
 
-Indirect selection is available in dgrid via the selector column plugin.  This
+Indirect selection is available in dgrid via the Selector mixin.  This
 achieves similar effects to the DataGrid's `_CheckBoxSelector` and
 `_RadioButtonSelector` view types, and EnhancedGrid's IndirectSelection plugin.
 

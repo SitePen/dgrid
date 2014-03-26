@@ -17,10 +17,10 @@ default functionality.
     * [Selection](components/mixins/Selection.md)
     * [CellSelection](components/mixins/CellSelection.md)
     * [Keyboard](components/mixins/Keyboard.md)
+    * [Selector](components/mixins/Selector.md)
 * Column Plugins
     * [editor](components/column-plugins/editor.md)
     * [tree](components/column-plugins/tree.md)
-    * [selector](components/column-plugins/selector.md)
 * Extensions
     * [ColumnReorder](components/extensions/ColumnReorder.md)
     * [ColumnResizer](components/extensions/ColumnResizer.md)
