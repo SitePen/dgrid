@@ -201,6 +201,29 @@ function(declare, has, listen, miscUtil, put, i18n){
 			}
 		},
 		
+		left: function(cell, steps){
+			return this.right(cell, -steps);
+		},
+		
+		right: function(cell, steps){
+			if(!cell.element){
+				cell = this.cell(cell);
+			}
+			var nextCell = this.inherited(arguments),
+				prevCell = cell;
+			
+			// Skip over hidden cells
+			while(nextCell.column.hidden){
+				nextCell = this.inherited(arguments, [nextCell, steps > 0 ? 1 : -1]);
+				if(prevCell.element === nextCell.element){
+					// No further visible cell found - return original
+					return cell;
+				}
+				prevCell = nextCell;
+			}
+			return nextCell;
+		},
+		
 		isColumnHidden: function(id){
 			// summary:
 			//		Convenience method to determine current hidden state of a column
