@@ -7,6 +7,9 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ### General/Core
 
+* Added styles for a `dgrid-autoheight` class, which can be added to any list/grid
+  via the `className` property to make the grid automatically size based on its
+  contents.
 * Fixed issue where `List#destroy` would throw an error if `useTouchScroll` is
   set to `false` on a device with touch support. (#867)
 * Fixed a regression in `List` which would cause observed modifications to tree
