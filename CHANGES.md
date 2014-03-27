@@ -55,6 +55,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ### Extensions
 
+* Added logic to `ColumnHider` to skip hidden columns when calling `left` and
+  `right` (which affects e.g. `Keyboard` navigation).
 * Improved performance of first resize with `ColumnResizer`. (#832)
 * Fixed errors in the `DnD` extension when using a mouse on a mouse+touch device.
 * The `Pagination` extension will no longer cancel an ongoing async request if
