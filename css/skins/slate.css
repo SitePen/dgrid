@@ -51,7 +51,7 @@
 
 /* need to use white-based image for sort arrow */
 .slate .dgrid-sort-arrow {
-	background-image: url("../images/ui-icons_222222_256x240_white.png");
+	background-image: url("../images/ui-icons_ffffff_256x240.png");
 }
 
 /* for ColumnReorder */
