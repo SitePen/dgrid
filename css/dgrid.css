@@ -202,6 +202,21 @@ html.has-mozilla .dgrid-focus {
 	top: -9999px;
 }
 
+/* Styles for auto-height grids; simply add the dgrid-autoheight class */
+.dgrid-autoheight {
+	height: auto;
+}
+.dgrid-autoheight .dgrid-scroller {
+	position: relative;
+	overflow-y: hidden;
+}
+.dgrid-autoheight .dgrid-header-scroll {
+	display: none;
+}
+.dgrid-autoheight .dgrid-header {
+	right: 0;
+}
+
 /* indicator of a successful load */
 #dgrid-css-dgrid-loaded {
 	display: none;
