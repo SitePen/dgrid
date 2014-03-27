@@ -119,7 +119,7 @@ define([
 
 					Deferred.when(store[copy && store.copy ? "copy" : "put"](object, {
 						before: targetItem || null,
-						reposition: true
+						justReposition: true
 					})).then(
 						function(e){ 
 							self._emitEventForGrid(grid, "dgrid-drop-completed");
