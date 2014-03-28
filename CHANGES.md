@@ -7,6 +7,12 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ### General/Core
 
+* Added a `List#addUiClasses` property which can be set to `false` on any
+  instance to prevent it from adding `ui-` classes to various elements, which
+  can help when using disparate jQuery UI and dgrid themes/skins on the same page.
+  The option defaults to `true` for consistency with previous versions.
+  Note that some selectors in various dgrid skins have been updated to not use
+  `ui-` classes, to prevent undesired overriding of jQuery UI themes.  (#873)
 * Added styles for a `dgrid-autoheight` class, which can be added to any list/grid
   via the `className` property to make the grid automatically size based on its
   contents.
