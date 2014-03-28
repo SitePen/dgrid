@@ -16,7 +16,7 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 * Added styles for a `dgrid-autoheight` class, which can be added to any list/grid
   via the `className` property to make the grid automatically size based on its
   contents.
-* Fixed issue where `List#destroy` would throw an error if `useTouchScroll` is
+* Fixed an issue where `List#destroy` would throw an error if `useTouchScroll` is
   set to `false` on a device with touch support. (#867)
 * Fixed a regression in `List` which would cause observed modifications to tree
   children to throw errors. (#862)
@@ -31,6 +31,9 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ### Mixins
 
+* Fixed a regression in the `Keyboard` mixin which would cause errors when
+  attempting to re-focus an updated row/cell when it (or the entire grid) is
+  currently hidden. (#866)
 * The `Selection` mixin will now listen for both touch and mouse events, rather
   than one or the other exclusively. (#757)
 * The touch event(s) that `Selection` listens for can now be overridden via the
