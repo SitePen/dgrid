@@ -359,11 +359,6 @@ function(declare, listen, has, miscUtil, hasClass, put){
 			this.cleanup();
 			// destroy DOM
 			put(this.domNode, "!");
-			
-			if(this.useTouchScroll){
-				// Only call TouchScroll#destroy if we also initialized it
-				this.inherited(arguments);
-			}
 		},
 		refresh: function(){
 			// summary:
