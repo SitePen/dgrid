@@ -7,12 +7,11 @@ define([
 	"dgrid/util/misc",
 	"dojo/_base/lang",
 	"dojo/_base/Deferred",
-	"dojo/aspect",
 	"dojo/on",
 	"dojo/store/Memory",
 	"dojo/store/Observable",
 	"put-selector/put"
-], function(test, assert, OnDemandGrid, tree, has, miscUtil, lang, Deferred, aspect, on, Memory, Observable, put){
+], function(test, assert, OnDemandGrid, tree, has, miscUtil, lang, Deferred, on, Memory, Observable, put){
 
 	var grid,
 		testDelay = 15,
