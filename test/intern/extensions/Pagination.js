@@ -7,12 +7,11 @@ define([
 	"dojo/string",
 	"put-selector/put",
 	"dgrid/Grid",
-	"dgrid/extensions/Pagination"
+	"dgrid/extensions/Pagination",
 	"dgrid/test/data/base",
 	"dojo/domReady!"
 ], function(test, assert, declare, on, query, string, put, Grid, Pagination, testStore){
 	var grid,
-		handles = [],
 		PaginationGrid = declare([Grid, Pagination]);
 
 	function getColumns(){
