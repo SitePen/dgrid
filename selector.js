@@ -61,13 +61,14 @@ function(kernel, arrayUtil, on, aspect, has, put){
 		}
 		
 		function onSelect(event){
+			var row = grid.row(event);
 			// we would really only care about click, since other input sources, like spacebar
 			// trigger a click, but the click event doesn't provide access to the shift key in firefox, so
 			// listen for keydown's as well to get an event in firefox that we can properly retrieve
 			// the shiftKey property from
-			if(event.type == "click" || event.keyCode == 32 || (!has("opera") && event.keyCode == 13) || event.keyCode === 0){
-				var row = grid.row(event),
-					lastRow = grid._lastSelected && grid.row(grid._lastSelected);
+			if(grid.allowSelect(row) &&
+				(event.type == "click" || event.keyCode == 32 || (!has("opera") && event.keyCode == 13) || event.keyCode === 0)){
+				var lastRow = grid._lastSelected && grid.row(grid._lastSelected);
 
 				grid._selectionTriggerEvent = event;
 				
@@ -105,8 +106,9 @@ function(kernel, arrayUtil, on, aspect, has, put){
 			listeners.push(grid.on(".dgrid-selector:click,.dgrid-selector:keydown", onSelect));
 			var handleSelect = grid._handleSelect;
 			grid._handleSelect = function(event){
+				var cell = this.cell(event);
 				// ignore the default select handler for events that originate from the selector column
-				if(this.cell(event).column != column){
+				if(grid.allowSelect(cell.row) && cell.column != column){
 					handleSelect.apply(this, arguments);
 				}
 			};
