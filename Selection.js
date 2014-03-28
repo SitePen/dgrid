@@ -209,9 +209,9 @@ return declare(null, {
 	},
 	
 	_handleSelect: function(event, target){
-		// Don't run if selection mode doesn't have a handler (incl. "none"),
+		// Don't run if selection mode doesn't have a handler (incl. "none"), target can't be selected,
 		// or if coming from a dgrid-cellfocusin from a mousedown
-		if(!this[this._selectionHandlerName] ||
+		if(!this[this._selectionHandlerName] || !this.allowSelect(this.row(target)) ||
 				(event.type === "dgrid-cellfocusin" && event.parentType === "mousedown") ||
 				(event.type === upType && target != this._waitForMouseUp)){
 			return;
