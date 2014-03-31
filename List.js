@@ -11,17 +11,16 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 		return document.getElementById(id);
 	}
 	
-	function getScrollbarSize(node, dimension){
+	function cleanupTestElement(element){
+		element.className = "";
+		document.body.removeChild(element);
+	}
+	
+	function getScrollbarSize(element, dimension){
 		// Used by has tests for scrollbar width/height
-		var body = document.body,
-			size;
-		
-		put(body, node, ".dgrid-scrollbar-measure");
-		size = node["offset" + dimension] - node["client" + dimension];
-		
-		put(node, "!dgrid-scrollbar-measure");
-		body.removeChild(node);
-		
+		put(document.body, element, ".dgrid-scrollbar-measure");
+		var size = element["offset" + dimension] - element["client" + dimension];
+		cleanupTestElement(element);
 		return size;
 	}
 	has.add("dom-scrollbar-width", function(global, doc, element){
@@ -29,6 +28,23 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 	});
 	has.add("dom-scrollbar-height", function(global, doc, element){
 		return getScrollbarSize(element, "Height");
+	});
+	
+	has.add("dom-rtl-scrollbar-left", function(global, doc, element){
+		var div = put("div"),
+			isLeft;
+		
+		put(document.body, element, ".dgrid-scrollbar-measure[dir=rtl]");
+		put(element, div);
+		
+		// position: absolute makes IE always report child's offsetLeft as 0,
+		// but it conveniently makes other browsers reset to 0 as base, and all
+		// versions of IE are known to move the scrollbar to the left side for rtl
+		isLeft = !!has("ie") || div.offsetLeft >= has("dom-scrollbar-width");
+		cleanupTestElement(element);
+		put(div, "!");
+		element.removeAttribute("dir");
+		return isLeft;
 	});
 	
 	// var and function for autogenerating ID when one isn't provided
@@ -249,7 +265,8 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 			put(domNode, footerNode);
 			
 			if(isRTL){
-				domNode.className += " dgrid-rtl" + (has("webkit") ? "" : " dgrid-rtl-nonwebkit");
+				domNode.className += " dgrid-rtl" +
+					(has("dom-rtl-scrollbar-left") ? " dgrid-rtl-swap" : "");
 			}
 			
 			listen(bodyNode, "scroll", function(event){
@@ -340,7 +357,7 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 					// a rule to account for scrollbar width in all grid headers.
 					miscUtil.addCssRule(".dgrid-header-row", "right: " + scrollbarWidth + "px");
 					// add another for RTL grids
-					miscUtil.addCssRule(".dgrid-rtl-nonwebkit .dgrid-header-row", "left: " + scrollbarWidth + "px");
+					miscUtil.addCssRule(".dgrid-rtl-swap .dgrid-header-row", "left: " + scrollbarWidth + "px");
 				}
 			}
 			
