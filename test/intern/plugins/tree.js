@@ -4,14 +4,14 @@ define([
 	"../../../OnDemandGrid",
 	"dgrid/tree",
 	"dgrid/util/has-css3",
+	"dgrid/util/misc",
 	"dojo/_base/lang",
 	"dojo/_base/Deferred",
-	"dojo/aspect",
 	"dojo/on",
 	"dojo/store/Memory",
 	"dojo/store/Observable",
 	"put-selector/put"
-], function(test, assert, OnDemandGrid, tree, has, lang, Deferred, aspect, on, Memory, Observable, put){
+], function(test, assert, OnDemandGrid, tree, has, miscUtil, lang, Deferred, on, Memory, Observable, put){
 
 	var grid,
 		testDelay = 15,
@@ -57,7 +57,7 @@ define([
 				return this.queryEngine(query, options)(this.data);
 			}
 		}));
-		
+
 		grid = new OnDemandGrid({
 			sort: "id",
 			store: store,
@@ -69,7 +69,7 @@ define([
 		put(document.body, grid.domNode);
 		grid.startup();
 	}
-	
+
 	function destroyGrid(){
 		grid.destroy();
 		grid = null;
@@ -80,7 +80,7 @@ define([
 		// if `exists` is false, tests for nonexistence instead
 		exists = exists !== false;
 		assert[exists ? "isNotNull" : "isNull"](document.getElementById(grid.id + "-row-" + dataItemId),
-			"A row for " + dataItemId + " should " + (exists ? "" : "not ") + "exist in the grid.");
+				"A row for " + dataItemId + " should " + (exists ? "" : "not ") + "exist in the grid.");
 	}
 
 	function wait(delay){
@@ -95,7 +95,7 @@ define([
 	// Define a function returning a promise resolving once children are expanded.
 	// On browsers which support CSS3 transitions, this occurs when transitionend fires;
 	// otherwise it occurs immediately.
-	var expand = hasTransitionEnd ? function(grid, id){
+	var expand = hasTransitionEnd ? function(id){
 		var dfd = new Deferred();
 
 		on.once(grid, hasTransitionEnd, function(){
@@ -104,21 +104,20 @@ define([
 
 		grid.expand(id);
 		return dfd.promise;
-	} : function(grid, id){
+	} : function(id){
 		var dfd = new Deferred();
 		grid.expand(id);
 		dfd.resolve();
 		return dfd.promise;
 	};
 
-	function scrollToEnd(grid){
+	function scrollToEnd(){
 		var dfd = new Deferred(),
 			handle;
 
-		handle = aspect.after(grid, "renderArray", function(){
-			handle.remove();
+		handle = on.once(grid.bodyNode, "scroll", miscUtil.debounce(function(){
 			dfd.resolve();
-		});
+		}));
 
 		grid.scrollTo({ y: grid.bodyNode.scrollHeight });
 
@@ -139,48 +138,49 @@ define([
 			test.afterEach(destroyGrid);
 
 			test.test("expand first row", function(){
-				return expand(grid, 0).then(function(){
-					testRowExists("0:0");
-					testRowExists("0:99", false);
-				});
+				return expand(0)
+					.then(function(){
+						testRowExists("0:0");
+						testRowExists("0:99", false);
+					});
 			});
 
 			test.test("expand first row + scroll to bottom", function(){
-				return expand(grid, 0).then(function(){
-					return scrollToEnd(grid);
-				}).then(function(){
-					testRowExists("0:0");
-					testRowExists("0:99");
-				});
+				return expand(0)
+					.then(scrollToEnd)
+					.then(function(){
+						testRowExists("0:0");
+						testRowExists("0:99");
+					});
 			});
 
 			test.test("expand last row", function(){
-				return expand(grid, 4).then(function(){
+				return expand(4).then(function(){
 					testRowExists("4:0");
 					testRowExists("4:99", false);
 				});
 			});
 
 			test.test("expand last row + scroll to bottom", function(){
-				return expand(grid, 4).then(function(){
-					return scrollToEnd(grid);
-				}).then(function(){
-					testRowExists("4:0");
-					testRowExists("4:99");
-				});
+				return expand(4)
+					.then(scrollToEnd)
+					.then(function(){
+						testRowExists("4:0");
+						testRowExists("4:99");
+					});
 			});
 
 			test.test("expand first and last rows + scroll to bottom", function(){
-				return expand(grid, 0).then(function(){
-					return scrollToEnd(grid);
-				}).then(function(){
-					return expand(grid, 4);
-				}).then(function(){
-					return scrollToEnd(grid);
-				}).then(function(){
-					testRowExists("4:0");
-					testRowExists("4:99");
-				});
+				return expand(0)
+					.then(scrollToEnd)
+					.then(function(){
+						return expand(4);
+					})
+					.then(scrollToEnd)
+					.then(function(){
+						testRowExists("4:0");
+						testRowExists("4:99");
+					});
 			});
 
 			test.test("expand hidden", function() {
@@ -205,7 +205,7 @@ define([
 			test.afterEach(destroyGrid);
 
 			test.test("child modification", function(){
-				return expand(grid, 0).then(function(){
+				return expand(0).then(function(){
 					testRowExists("0:0");
 					assert.doesNotThrow(function(){
 						grid.store.put({
