@@ -182,6 +182,22 @@ define([
 					testRowExists("4:99");
 				});
 			});
+
+			test.test("expand hidden", function() {
+				var dfd = this.async(1000);
+
+				grid.domNode.style.display = "none";
+				grid.expand(0);
+				grid.domNode.style.display = "block";
+
+				// Since the grid is not displayed the expansion will occur without a transitionend event
+				// However, DOM updates from the expand will not complete within the current stack frame
+				setTimeout(dfd.callback(function() {
+					var connected = grid.row(0).element.connected;
+					assert.isTrue(connected && connected.offsetHeight > 0,
+						"Node should be expanded with non-zero height");
+				}), 0);
+			});
 		});
 
 		test.suite("tree + observable", function(){
@@ -201,6 +217,5 @@ define([
 				});
 			});
 		});
-		
 	});
 });
