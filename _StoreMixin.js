@@ -17,8 +17,6 @@ function(declare, lang, Deferred, listen, aspect, put){
 			// (unfortunately, the Deferred instrumentation will still log them)
 			return;
 		}
-		// TODO: remove this @ 0.4 (prefer grid property directly on event object)
-		err.grid = this;
 		
 		if(listen.emit(this.domNode, "dgrid-error", {
 				grid: this,
