@@ -108,7 +108,7 @@ function(kernel, arrayUtil, on, aspect, has, put){
 			grid._handleSelect = function(event){
 				var cell = this.cell(event);
 				// ignore the default select handler for events that originate from the selector column
-				if(grid.allowSelect(cell.row) && cell.column != column){
+				if(cell.column != column){
 					handleSelect.apply(this, arguments);
 				}
 			};
