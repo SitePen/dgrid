@@ -19,26 +19,32 @@
 		<script>
 			var grid,
 				datachangeStack = [],
-				ready = false;
+				ready = false,
+				setEditorToTextBox;
 
 			require([
 				"dojo/_base/declare",
 				"dgrid/Grid",
-				"dgrid/editor"
-			], function (declare, Grid, editor) {
-				grid = new Grid({
-					columns: {
+				"dgrid/editor",
+				"dijit/form/TextBox"
+			], function (declare, Grid, editor, TextBox) {
+				function createColumnConfig(editorType) {
+					return {
 						id: "ID",
 						name: editor({
 							label: "Name",
-							editor: "text"
+							editor: editorType || "text"
 						}),
 						description: editor({
 							label: "Description",
-							editor: "text",
+							editor: editorType || "text",
 							editOn: "click"
 						})
-					}
+					};
+				}
+
+				grid = new Grid({
+					columns: createColumnConfig("text")
 				}, "grid");
 
 				grid.renderArray([
@@ -53,6 +59,10 @@
 				grid.on("dgrid-datachange", function (event) {
 					datachangeStack.push(event.value);
 				});
+
+				setEditorToTextBox = function () {
+					grid.set("columns", createColumnConfig(TextBox));
+				};
 
 				ready = true;
 			});
