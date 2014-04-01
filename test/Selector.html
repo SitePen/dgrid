@@ -30,9 +30,9 @@
 		<script>
 var getColumns;
 
-require(["dojo/on", "dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Selector", "dgrid/Keyboard", "dgrid/ColumnSet",
+require(["dojo/_base/lang", "dojo/on", "dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Selector", "dgrid/Keyboard", "dgrid/ColumnSet",
 			"dojo/_base/declare", "dojo/_base/array", "dojo/json", "dgrid/test/data/testStore", "put-selector/put", "dojo/domReady!"],
-		function(on, Grid, Selection, Selector, Keyboard, ColumnSet, declare, arrayUtil, json, testStore, put){
+		function(lang, on, Grid, Selection, Selector, Keyboard, ColumnSet, declare, arrayUtil, json, testStore, put){
 			on(document.body, "dgrid-select,dgrid-deselect",
 					function(event){
 						var msg = (event.type == "dgrid-deselect" ? "de" : "") + "selected";
@@ -45,7 +45,7 @@ require(["dojo/on", "dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Selector", "
 
 			getColumns = function(){
 				return {
-					col1: { selector: true },
+					col1: { selector: 'checkbox' },
 					id: "ID",
 					col2: { label: 'Column 2', sortable: false },
 					col3: { label: 'Column 3' }
@@ -75,7 +75,7 @@ require(["dojo/on", "dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Selector", "
 				collection: testStore,
 				selectionMode: "none",
 				columns: {
-					col1: { selector: true, label: "" }, // Test blank label
+					col1: { selector: 'checkbox', label: "" }, // Test blank label
 					id: "ID",
 					col2: {label: 'Column 2', sortable: false},
 					col3: {label: 'Column 3'}
@@ -107,11 +107,11 @@ require(["dojo/on", "dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Selector", "
 				collection: testStore,
 				selectionMode: "none",
 				columns: {
-					col1: { selector: true, label: '' },
+					col1: { selector: 'checkbox', label: '' },
 					id: "ID",
 					col2: {label: 'Column 2'},
 					col3: {label: 'Column 3'},
-					col4: { selector: true }
+					col4: { selector: 'checkbox' }
 				},
 				allowSelectAll: true
 			}, "gridMultipleSelector");
@@ -129,7 +129,7 @@ require(["dojo/on", "dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Selector", "
 				allowSelectAll: true
 			}, "gridMultipleSelectorRadio");
 
-			window.gridMultipleSelectorMixed = new SelectionGrid({
+			window.gridMultipleSelectorMixed1 = new SelectionGrid({
 				collection: testStore,
 				selectionMode: "none",
 				columns: {
@@ -137,20 +137,33 @@ require(["dojo/on", "dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Selector", "
 					id: "ID",
 					col2: {label: 'Column 2'},
 					col3: {label: 'Column 3'},
-					col4: { selector: true }
+					col4: { selector: 'checkbox' }
 				},
 				allowSelectAll: true
-			}, "gridMultipleSelectorMixed");
+			}, "gridMultipleSelectorMixed1");
+
+			window.gridMultipleSelectorMixed2 = new SelectionGrid({
+				collection: testStore,
+				selectionMode: "none",
+				columns: {
+					col1: { selector: "checkbox", label: '' },
+					id: "ID",
+					col2: {label: 'Column 2'},
+					col3: {label: 'Column 3'},
+					col4: { selector: "radio" }
+				},
+				allowSelectAll: true
+			}, "gridMultipleSelectorMixed2");
 
 			window.gridMultipleSelectorNoAll = new SelectionGrid({
 				collection: testStore,
 				selectionMode: "none",
 				columns: {
-					col1: { selector: true, label: '' },
+					col1: { selector: 'checkbox', label: '' },
 					id: "ID",
 					col2: {label: 'Column 2'},
 					col3: {label: 'Column 3'},
-					col4: { selector: true }
+					col4: { selector: 'checkbox' }
 				}
 			}, "gridMultipleSelectorNoAll");
 
@@ -162,7 +175,7 @@ require(["dojo/on", "dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Selector", "
 				columnSets: [
 					[
 						[
-							{ selector: true, field: "col1" }
+							{ selector: 'checkbox', field: "col1" }
 						]
 					],
 					[
@@ -181,7 +194,7 @@ require(["dojo/on", "dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Selector", "
 				columns: {
 					col1: {
 						selector: function(column, value, cell, object){
-							var input = column.grid._defaultRenderSelectorInput(column, value, cell, object);
+							var input = column.grid._defaultRenderSelectorInput(lang.delegate(column, {selector: 'checkbox'}), value, cell, object);
 							put(input, "-span", ">");
 							put(input, "+span", "<");
 							return input;
@@ -231,7 +244,7 @@ require(["dojo/on", "dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Selector", "
 		<div id="grid2"></div>
 		<h2>A grid, initially without a selector column</h2>
 		<div id="gridNoSelector"></div>
-		<div> Tests for resetting columns (should not cause errors, and selectors should work):
+		<div> Tests for resetting columns (should not cause errors,x and selectors should work):
 			<button type="button" onclick="gridNoSelector.set('columns', getColumns());">
 				Reset columns, including selector
 			</button>
@@ -248,7 +261,9 @@ require(["dojo/on", "dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Selector", "
 		<h2>A grid with multiple radio selector columns</h2>
 		<div id="gridMultipleSelectorRadio"></div>
 		<h2>A grid with multiple mixed type selector columns</h2>
-		<div id="gridMultipleSelectorMixed"></div>
+		<div id="gridMultipleSelectorMixed1"></div>
+		<h2>A grid with multiple mixed type selector columns</h2>
+		<div id="gridMultipleSelectorMixed2"></div>
 		<h2>A grid with a custom selector rendering function</h2>
 		<div id="gridCustomRender"></div>
 	</body>

@@ -27,7 +27,7 @@ column are replaced with selector components.
 
 Property | Description
 -------- | -----------
-`selector` | Specifies the type of selector component to use.  Set to `true` or `"checkbox"` for a checkbox that allows muliple rows to be selected, but use `"radio"` if you would like only one row selected at a time.
+`selector` | Specifies the type of selector component to use.  Set to `"checkbox"` for a checkbox that allows muliple rows to be selected, but use `"radio"` if you would like only one row selected at a time.
 
 The value of `selector` may also be a function that renders the selector input component.
 ```js

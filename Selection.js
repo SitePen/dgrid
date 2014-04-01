@@ -233,14 +233,18 @@ return declare(null, {
 		//		Selection handler for "single" mode, where only one target may be
 		//		selected at a time.
 		
-		var ctrlKey = event.keyCode ? event.ctrlKey : event[ctrlEquiv];
+		var ctrlKey = event.keyCode ? event.ctrlKey : event[ctrlEquiv],
+			row;
 		if(this._lastSelected === target){
 			// Allow ctrl to toggle selection, even within single select mode.
 			this.select(target, null, !ctrlKey || !this.isSelected(target));
 		}else{
-			this.clearSelection();
-			this.select(target);
-			this._lastSelected = target;
+			row = this.row(target);
+			if(this.allowSelect(row)){
+				this.clearSelection();
+				this.select(row);
+				this._lastSelected = target;
+			}
 		}
 	},
 	

@@ -1,131 +1,38 @@
 define([
-	"dojo/_base/declare", "dojo/_base/array", "dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put"
-], function(declare, arrayUtil, on, aspect, has, put){
-
-	function changeInput(column, value){
-		// creates a function that modifies the input on an event
-		var grid = column.grid;
-
-		return function(event){
-			var rows = event.rows,
-				len = rows.length,
-				state = "false",
-				selection, mixed, i,
-				selectorHeaderCheckbox = column._selectorHeaderCheckbox;
-
-			for(i = 0; i < len; i++){
-				var element = grid.cell(rows[i], column.id).element;
-				if(!element){
-					continue;
-				} // skip if row has been entirely removed
-				element = (element.contents || element).input;
-				if(element && !element.disabled){
-					// only change the value if it is not disabled
-					element.checked = value;
-					element.setAttribute("aria-checked", value);
-				}
-			}
-			if(column._selectorType === "checkbox" && selectorHeaderCheckbox){
-				selection = grid.selection;
-				mixed = false;
-				// see if the header checkbox needs to be indeterminate
-				for(i in selection){
-					// if there is anything in the selection, than it is indeterminate
-					if(selection[i] != grid.allSelected){
-						mixed = true;
-						break;
-					}
-				}
-				selectorHeaderCheckbox.indeterminate = mixed;
-				selectorHeaderCheckbox.checked = grid.allSelected;
-				if(mixed){
-					state = "mixed";
-				}else if(grid.allSelected){
-					state = "true";
-				}
-				selectorHeaderCheckbox.setAttribute("aria-checked", state);
-			}
-		};
-	}
-
-	function handleSelectorClick(column, event){
-		var grid = column.grid;
-		// we would really only care about click, since other input sources, like spacebar
-		// trigger a click, but the click event doesn't provide access to the shift key in firefox, so
-		// listen for keydown's as well to get an event in firefox that we can properly retrieve
-		// the shiftKey property from
-		if(event.type == "click" || event.keyCode == 32 || (!has("opera") && event.keyCode == 13) || event.keyCode === 0){
-			var row = grid.row(event),
-				lastRow = grid._lastSelected && grid.row(grid._lastSelected);
-
-			grid._selectionTriggerEvent = event;
-
-			if(column._selectorType == "radio"){
-				if(!lastRow || lastRow.id != row.id){
-					grid.clearSelection();
-					grid.select(row, null, true);
-					grid._lastSelected = row.element;
-				}
-			}else{
-				if(row){
-					if(event.shiftKey){
-						// make sure the last input always ends up checked for shift key
-						changeInput(column, true)({rows: [row]});
-					}else{
-						// no shift key, so no range selection
-						lastRow = null;
-					}
-					lastRow = event.shiftKey ? lastRow : null;
-					grid.select(lastRow || row, row, lastRow ? undefined : null);
-					grid._lastSelected = row.element;
-				}else{
-					// No row resolved; must be the select-all checkbox.
-					put(grid.domNode, (grid.allSelected ? "!" : ".") + "dgrid-select-all");
-					grid[grid.allSelected ? "clearSelection" : "selectAll"]();
-				}
-			}
-			grid._selectionTriggerEvent = null;
-		}
-	}
-
-	function setupSelectionEvents(column){
-		var grid = column.grid;
-
-		if(!grid._hasSelectorInputListener){
-			grid._hasSelectorInputListener = true;
-			grid.on(".dgrid-selector:click,.dgrid-selector:keydown", function(event){
-				handleSelectorClick(column, event);
-			});
-		}
-		// register one listener at the top level that receives events delegated
-		// register listeners to the select and deselect events to change the input checked value
-		grid.on("dgrid-select", changeInput(column, true));
-		grid.on("dgrid-deselect", changeInput(column, false));
-	}
+	"dojo/_base/declare", "dojo/_base/array", "dojo/_base/lang", "dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put"
+], function(declare, arrayUtil, lang, on, aspect, has, put){
 
 	return declare(null, {
 		// summary:
 		//		Adds an input field (checkbox or radio) to a column that when checked, selects the row
 		//		that contains the input field.  To enable, add a "selector" property to a column definition.  The
-		//		selector property should contain true, "checkbox", "radio" or be a function that renders the input.
-		//		If set to true or "checkbox" the input field will be a checkbox.  If set to "radio", the input field
-		//		will be a radio button and only one input in the column will be checked.  If the value of selector is
-		//		a function, then the function signature is renderSelectorInput(column, value, cell, object) where
+		//		selector property should contain "checkbox", "radio" or be a function that renders the input.
+		//		If set to "radio", the input field will be a radio button and only one input in the column will be
+		//		checked.  If the value of selector is a function, then the function signature is
+		//		renderSelectorInput(column, value, cell, object) where
 		//		* column - the column definition
 		//		* value - the cell's value
 		//		* cell - the cell's DOM node
 		//		* object - the row's data object
 		//		The custom renderSelectorInput function must return an input field.
 
-		_defaultRenderSelectorInput: function(column, value, cell, object){
-			var grid = column.grid;
-			var parent = cell.parentNode;
+		postCreate: function(){
+			this.inherited(arguments);
 
-			setupSelectionEvents(column);
+			// register one listener at the top level that receives events delegated
+			this.on(".dgrid-selector:click,.dgrid-selector:keydown", lang.hitch(this, this._handleSelectorClick));
+			// register listeners to the select and deselect events to change the input checked value
+			this.on("dgrid-select", lang.hitch(this, this._changeInput, true));
+			this.on("dgrid-deselect", lang.hitch(this, this._changeInput, false));
+		},
+
+		_defaultRenderSelectorInput: function(column, value, cell, object){
+			var parent = cell.parentNode,
+				grid = column.grid;
 
 			// must set the class name on the outer cell in IE for keystrokes to be intercepted
 			put(parent && parent.contents ? parent : cell, ".dgrid-selector");
-			var input = cell.input || (cell.input = put(cell, "input[type=" + column._selectorType + "]", {
+			var input = cell.input || (cell.input = put(cell, "input[type=" + column.selector + "]", {
 				tabIndex: isNaN(column.tabIndex) ? -1 : column.tabIndex,
 				disabled: !grid.allowSelect(grid.row(object)),
 				checked: value
@@ -139,37 +46,144 @@ define([
 			var self = this;
 			var selector = column.selector;
 			if(selector){
-				var grid = this;
+				this._selectorColumns.push(column);
+				this._selectorSingleRow = this._selectorSingleRow || column.selector === "radio";
+
+				var renderSelectorInput = (typeof selector === "function") ? selector : this._defaultRenderSelectorInput;
 
 				column.sortable = false;
-				column._selectorType = (typeof selector === "string") ? selector : "checkbox";
-				column._renderSelectorInput = (typeof selector === "function") ? selector : this._defaultRenderSelectorInput;
-
-				aspect.after(column, "destroy", function(){
-					self._hasSelectorInputListener = false;
-				});
 
 				column.renderCell = function(object, value, cell, options, header){
 					var row = object && self.row(object);
 					value = row && self.selection[row.id];
-					column._renderSelectorInput(column, value, cell, object);
+					renderSelectorInput(column, value, cell, object);
 				};
 
 				column.renderHeaderCell = function(th){
 					var label = "label" in column ? column.label : column.field || "";
 
-					if(column._selectorType === "radio" || !self.allowSelectAll){
+					if(column.selector === "radio" || !self.allowSelectAll){
 						th.appendChild(document.createTextNode(label));
-						setupSelectionEvents(column);
 					}else{
-						column._selectorHeaderCheckbox = column._renderSelectorInput(column, false, th, {});
+						column._selectorHeaderCheckbox = renderSelectorInput(column, false, th, {});
 					}
 				};
 			}
 		},
 
+		_handleSelectorClick: function(event){
+			var cell = this.cell(event),
+				row = cell.row;
+
+			// We would really only care about click, since other input sources like spacebar
+			// trigger a click, but the click event doesn't provide access to the shift key in firefox, so
+			// listen for keydown as well to get an event in firefox that we can properly retrieve
+			// the shiftKey property
+			if(event.type == "click" || event.keyCode == 32 ||
+				(!has("opera") && event.keyCode == 13) || event.keyCode === 0){
+
+				this._selectionTriggerEvent = event;
+
+				if(row){
+					if(this.allowSelect(row)){
+						var lastRow = this._lastSelected && this.row(this._lastSelected);
+
+						if(this._selectorSingleRow){
+							if(!lastRow || lastRow.id != row.id){
+								this.clearSelection();
+								this.select(row, null, true);
+								this._lastSelected = row.element;
+							}
+						}else{
+							if(row){
+								if(event.shiftKey){
+									// Make sure the last input always ends up checked for shift key
+									this._changeInput(true, {rows: [row]});
+								}else{
+									// No shift key, so no range selection
+									lastRow = null;
+								}
+								lastRow = event.shiftKey ? lastRow : null;
+								this.select(lastRow || row, row, lastRow ? undefined : null);
+								this._lastSelected = row.element;
+							}
+						}
+					}
+				}else{
+					// No row resolved; must be the select-all checkbox.
+					put(this.domNode, (this.allSelected ? "!" : ".") + "dgrid-select-all");
+					this[this.allSelected ? "clearSelection" : "selectAll"]();
+				}
+
+				this._selectionTriggerEvent = null;
+			}
+		},
+
+		_changeInput: function(value, event){
+			if(this._selectorColumns.length > 0){
+				this._updateRowSelectors(value, event);
+				this._updateHeaderCheckboxes();
+			}
+		},
+
+		_updateRowSelectors: function(value, event){
+			var rows = event.rows,
+				iRows,
+				iCols,
+				lenRows = rows.length,
+				lenCols = this._selectorColumns.length;
+
+			for(iRows = 0; iRows < lenRows; iRows++){
+				for(iCols = 0; iCols < lenCols; iCols++){
+					var column = this._selectorColumns[iCols];
+					var element = this.cell(rows[iRows], column.id).element;
+					if(!element){
+						continue;
+					} // skip if row has been entirely removed
+					element = (element.contents || element).input;
+					if(element && !element.disabled){
+						// only change the value if it is not disabled
+						element.checked = value;
+						element.setAttribute("aria-checked", value);
+					}
+				}
+			}
+		},
+
+		_updateHeaderCheckboxes: function(){
+			var iCols,
+				lenCols = this._selectorColumns.length;
+			for(iCols = 0; iCols < lenCols; iCols++){
+				var column = this._selectorColumns[iCols];
+				var state = "false";
+				var selection, mixed, i;
+				var selectorHeaderCheckbox = column._selectorHeaderCheckbox;
+				if(column.selector === "checkbox" && selectorHeaderCheckbox){
+					selection = this.selection;
+					mixed = false;
+					// see if the header checkbox needs to be indeterminate
+					for(i in selection){
+						// if there is anything in the selection, than it is indeterminate
+						if(selection[i] != this.allSelected){
+							mixed = true;
+							break;
+						}
+					}
+					selectorHeaderCheckbox.indeterminate = mixed;
+					selectorHeaderCheckbox.checked = this.allSelected;
+					if(mixed){
+						state = "mixed";
+					}else if(this.allSelected){
+						state = "true";
+					}
+					selectorHeaderCheckbox.setAttribute("aria-checked", state);
+				}
+			}
+		},
+
 		_configColumns: function(prefix, columns){
 			var columnArray = this.inherited(arguments);
+			this._selectorColumns = [];
 			for(var i = 0, l = columnArray.length; i < l; i++){
 				this._configureSelectorColumn(columnArray[i]);
 			}
@@ -178,7 +192,8 @@ define([
 
 		_handleSelect: function(event){
 			// ignore the default select handler for events that originate from the selector column
-			if(!this.cell(event).column.selector){
+			var column = this.cell(event).column;
+			if(!column || !column.selector){
 				this.inherited(arguments);
 			}
 		}
