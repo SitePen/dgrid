@@ -350,19 +350,19 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 
 		renderCollection: function(collection, beforeNode){
 			var grid = this,
-				rows = this.inherited(arguments);
+				rows = this.inherited(arguments),
+				data = collection.data;
 
 			if(!beforeNode){
-				// TODO: !== rows is probably not the check we want, but what is?
-				if(this._topLevelRequest && this._topLevelRequest !== rows){
+				if(this._topLevelRequest && this._topLevelRequest !== data){
 					// Cancel previous async request that didn't finish
 					this._topLevelRequest.cancel();
 					delete this._topLevelRequest;
 				}
 
-				if (typeof rows.cancel === "function") {
+				if (typeof data.cancel === "function") {
 					// Store reference to new async request in progress
-					this._topLevelRequest = rows;
+					this._topLevelRequest = data;
 				}
 
 				Deferred.when(rows, function(){
