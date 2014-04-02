@@ -51,6 +51,11 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ## Other changes and fixes
 
+### General/Core
+
+* Fixed an RTL issue that caused the column headers to misalign with the body
+  on Chrome.
+
 ### Mixins
 
 * Fixed issues in the `Selection` and `CellSelection` mixins when the row
