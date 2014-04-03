@@ -367,7 +367,7 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 			//		Dynamically creates a stylesheet rule to alter a column's style.
 			
 			return this.addCssRule("#" + miscUtil.escapeCssIdentifier(this.domNode.id) +
-				" .dgrid-column-" + colId, css);
+				" .dgrid-column-" + colId.replace(":", "-"), css);
 		},
 		
 		/*=====
