@@ -256,7 +256,7 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 				bodyNode.tabIndex = -1;
 			}
 			
-			this.headerScrollNode = put(domNode, "div.dgrid-header.dgrid-header-scroll.dgrid-scrollbar-width" +
+			this.headerScrollNode = put(domNode, "div.dgrid-header-scroll.dgrid-scrollbar-width" +
 				(addUiClasses ? ".ui-widget-header" : ""));
 			
 			// Place footer node (initially hidden if showFooter is false).
