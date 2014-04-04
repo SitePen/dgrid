@@ -514,9 +514,13 @@ return declare(null, {
 					put(element, "!dgrid-selected!ui-state-active");
 				}
 			}
-			if(value !== previousValue && element){
+			if(element){
 				// add to the queue of row events
-				this._selectionEventQueues[(value ? "" : "de") + "select"].push(row);
+				if(!value && previousValue === true) {
+					this._selectionEventQueues.deselect.push(row);
+				} else if (value && value !== previousValue){
+					this._selectionEventQueues.select.push(row);
+				}
 			}
 			
 			if(toRow){

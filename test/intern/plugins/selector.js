@@ -31,6 +31,44 @@ define([
 		test.afterEach(function () {
 			grid.destroy();
 		});
+
+		test.test("programmatic row deselection event", function() {
+			var lastEventType;
+			var expectedEventType = "dgrid-deselect";
+			var eventCount = 0;
+			var upTo = 4;
+			grid.on("dgrid-select, dgrid-deselect", function (event) {
+				lastEventType = event.type;
+				eventCount++;
+			});
+
+			grid.select("1");
+			eventCount = 0;
+			while(upTo--) {
+				grid.deselect("1");
+			}
+			
+			assert.equal(eventCount, 1);
+			assert.equal(expectedEventType, lastEventType);
+		});
+
+		test.test("programmatic row selection event", function() {
+			var lastEventType;
+			var expectedEventType = "dgrid-select";
+			var eventCount = 0;
+			var upTo = 4;
+			grid.on("dgrid-select, dgrid-deselect", function (event) {
+				lastEventType = event.type;
+				eventCount++;
+			});
+
+			while(upTo--) {
+				grid.select("1");
+			}
+			
+			assert.equal(eventCount, 1);
+			assert.equal(expectedEventType, lastEventType);
+		});
 		
 		test.test("programmatic row selection", function () {
 			var rowNode,
