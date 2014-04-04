@@ -81,7 +81,7 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 			// add pagination to footer
 			var grid = this,
 				paginationNode = this.paginationNode =
-					put(this.footerNode, "div.dgrid-pagination"),
+					put(this.footerNode, "div.dgrid-pagination[!tabindex]"),
 				statusNode = this.paginationStatusNode =
 					put(paginationNode, "div.dgrid-status"),
 				i18n = this.i18nPagination,
@@ -260,6 +260,7 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 			
 			function pageLink(page, addSpace){
 				var link;
+				var disabled;
 				if(grid.pagingTextBox && page == currentPage && end > 1){
 					// use a paging text box if enabled instead of just a number
 					link = put(linksNode, 'input.dgrid-page-input[type=text][value=$]', currentPage);
@@ -272,11 +273,17 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 					});
 				}else{
 					// normal link
+					disabled = page == currentPage;
 					link = put(linksNode,
-						'span' + (page == currentPage ? '.dgrid-page-disabled' : '') + '.dgrid-page-link',
+						'span' + (disabled ? '.dgrid-page-disabled' : '') + '.dgrid-page-link',
 						page + (addSpace ? " " : ""));
 					link.setAttribute("aria-label", i18n.gotoPage);
-					link.tabIndex = 0;
+					link.tabIndex = disabled ? -1 : 0;
+					if(disabled) {
+						link.removeAttribute('tabindex')
+					}else{
+						link.setAttribute('tabindex', 0);
+					}
 				}
 				if(page == currentPage && focusLink){
 					// focus on it if we are supposed to retain the focus
@@ -287,10 +294,22 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 			if(pagingTextBoxHandle){ pagingTextBoxHandle.remove(); }
 			linksNode.innerHTML = "";
 			query(".dgrid-first, .dgrid-previous", paginationNavigationNode).forEach(function(link){
-				put(link, (currentPage == 1 ? "." : "!") + "dgrid-page-disabled");
+				var disabled = currentPage == 1;
+				put(link, (disabled ? "." : "!") + "dgrid-page-disabled");
+				if(disabled) {
+					link.removeAttribute('tabindex')
+				}else{
+					link.setAttribute('tabindex', 0);
+				}
 			});
 			query(".dgrid-last, .dgrid-next", paginationNavigationNode).forEach(function(link){
-				put(link, (currentPage >= end ? "." : "!") + "dgrid-page-disabled");
+				var disabled = currentPage >= end;
+				put(link, (disabled ? "." : "!") + "dgrid-page-disabled");
+				if(disabled) {
+					link.removeAttribute('tabindex')
+				}else{
+					link.setAttribute('tabindex', 0);
+				}
 			});
 			
 			if(pagingLinks && end > 0){
