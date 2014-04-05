@@ -187,7 +187,8 @@ function(kernel, declare, lang, Deferred, listen, aspect, query, has, miscUtil, 
 			// summary:
 			//		Dynamically creates a stylesheet rule to alter a columnset's style.
 			
-			var rule = this.addCssRule("#" + miscUtil.escapeCssIdentifier(this.domNode.id) + " .dgrid-column-set-" + colsetId, css);
+			var rule = this.addCssRule("#" + miscUtil.escapeCssIdentifier(this.domNode.id) +
+				" .dgrid-column-set-" + miscUtil.escapeCssIdentifier(colsetId, "-"), css);
 			this._positionScrollers();
 			return rule;
 		},
