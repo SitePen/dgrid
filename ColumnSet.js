@@ -9,10 +9,10 @@ function(kernel, declare, lang, Deferred, listen, aspect, query, has, miscUtil, 
 		try{
 			WheelEvent("wheel");
 			supported = true;
-		}catch(e){ // empty catch block; prevent debuggers from snagging
-		}finally{
-			return supported;
+		}catch(e){
+			// empty catch block; prevent debuggers from snagging
 		}
+		return supported;
 	});
 
 	var colsetidAttr = "data-dgrid-column-set-id";
@@ -40,46 +40,67 @@ function(kernel, declare, lang, Deferred, listen, aspect, query, has, miscUtil, 
 
 		scroller.scrollLeft = scrollLeft < 0 ? 0 : scrollLeft;
 	}
-	
-	var horizMouseWheel;
-	if(!has("touch")){
-		horizMouseWheel = has("event-mousewheel") || has("event-wheel") ? function(grid){
-			return function(target, listener){
-				return listen(target, has("event-wheel") ? "wheel" : "mousewheel", function(event){
-					var node = event.target, deltaX;
-					// WebKit will invoke mousewheel handlers with an event target of a text
-					// node; check target and if it's not an element node, start one node higher
-					// in the tree
-					if(node.nodeType !== 1){
-						node = node.parentNode;
-					}
-					while(!query.matches(node, ".dgrid-column-set[" + colsetidAttr + "]", target)){
-						if(node === target || !(node = node.parentNode)){
-							return;
-						}
-					}
-					
-					// Normalize reported delta value:
-					// wheelDeltaX (webkit, mousewheel) needs to be negated and divided by 3
-					// deltaX (FF17+, wheel) can be used exactly as-is
-					deltaX = event.deltaX || -event.wheelDeltaX / 3;
-					if(deltaX){
-						// only respond to horizontal movement
-						listener.call(null, grid, node, deltaX);
-					}
-				});
-			};
-		} : function(grid){
-			return function(target, listener){
-				return listen(target, ".dgrid-column-set[" + colsetidAttr + "]:MozMousePixelScroll", function(event){
-					if(event.axis === 1){
-						// only respond to horizontal movement
-						listener.call(null, grid, this, event.detail);
-					}
-				});
-			};
-		};
+
+	function getColumnSetSubRows(subRows, columnSetId){
+		// Builds a subRow collection that only contains columns that correspond to
+		// a given column set id.
+		if(!subRows || !subRows.length){
+			return;
+		}
+		var subset = [];
+		var idPrefix = columnSetId + "-";
+		for(var i = 0, numRows = subRows.length; i < numRows; i++){
+			var row = subRows[i];
+			var subsetRow = [];
+			subsetRow.className = row.className;
+			for(var k = 0, numCols = row.length; k < numCols; k++){
+				var column = row[k];
+				// The column id begins with the column set id.
+				if(column.id != null && column.id.indexOf(idPrefix) === 0){
+					subsetRow.push(column);
+				}
+			}
+			subset.push(subsetRow);
+		}
+		return subset;
 	}
+
+	var horizMouseWheel = has("event-mousewheel") || has("event-wheel") ? function(grid){
+		return function(target, listener){
+			return listen(target, has("event-wheel") ? "wheel" : "mousewheel", function(event){
+				var node = event.target, deltaX;
+				// WebKit will invoke mousewheel handlers with an event target of a text
+				// node; check target and if it's not an element node, start one node higher
+				// in the tree
+				if(node.nodeType !== 1){
+					node = node.parentNode;
+				}
+				while(!query.matches(node, ".dgrid-column-set[" + colsetidAttr + "]", target)){
+					if(node === target || !(node = node.parentNode)){
+						return;
+					}
+				}
+				
+				// Normalize reported delta value:
+				// wheelDeltaX (webkit, mousewheel) needs to be negated and divided by 3
+				// deltaX (FF17+, wheel) can be used exactly as-is
+				deltaX = event.deltaX || -event.wheelDeltaX / 3;
+				if(deltaX){
+					// only respond to horizontal movement
+					listener.call(null, grid, node, deltaX);
+				}
+			});
+		};
+	} : function(grid){
+		return function(target, listener){
+			return listen(target, ".dgrid-column-set[" + colsetidAttr + "]:MozMousePixelScroll", function(event){
+				if(event.axis === 1){
+					// only respond to horizontal movement
+					listener.call(null, grid, this, event.detail);
+				}
+			});
+		};
+	};
 	
 	return declare(null, {
 		// summary:
@@ -90,25 +111,24 @@ function(kernel, declare, lang, Deferred, listen, aspect, query, has, miscUtil, 
 		postCreate: function(){
 			this.inherited(arguments);
 			
-			if(!has("touch")){
-				this.on(horizMouseWheel(this), function(grid, colsetNode, amount){
-					var id = colsetNode.getAttribute(colsetidAttr),
-						scroller = grid._columnSetScrollers[id],
-						scrollLeft = scroller.scrollLeft + amount;
-					
-					scroller.scrollLeft = scrollLeft < 0 ? 0 : scrollLeft;
-				});
-			}
+			this.on(horizMouseWheel(this), function(grid, colsetNode, amount){
+				var id = colsetNode.getAttribute(colsetidAttr),
+					scroller = grid._columnSetScrollers[id],
+					scrollLeft = scroller.scrollLeft + amount;
+				
+				scroller.scrollLeft = scrollLeft < 0 ? 0 : scrollLeft;
+			});
 		},
 		columnSets: [],
-		createRowCells: function(tag, each){
+		createRowCells: function(tag, each, subRows, object){
 			var row = put("table.dgrid-row-table");
 			var tr = put(row, "tbody tr");
 			for(var i = 0, l = this.columnSets.length; i < l; i++){
 				// iterate through the columnSets
 				var cell = put(tr, tag + ".dgrid-column-set-cell.dgrid-column-set-" + i +
 					" div.dgrid-column-set[" + colsetidAttr + "=" + i + "]");
-				cell.appendChild(this.inherited(arguments, [tag, each, this.columnSets[i]]));
+				var subset = getColumnSetSubRows(subRows || this.subRows , i) || this.columnSets[i];
+				cell.appendChild(this.inherited(arguments, [tag, each, subset, object]));
 			}
 			return row;
 		},
@@ -187,15 +207,19 @@ function(kernel, declare, lang, Deferred, listen, aspect, query, has, miscUtil, 
 			}
 			this.inherited(arguments);
 		},
+
 		configStructure: function(){
+			// Squash the column sets together so the grid and other dgrid extensions and mixins can
+			// configure the columns and create any needed subrows.
 			this.columns = {};
+			this.subRows = [];
 			for(var i = 0, l = this.columnSets.length; i < l; i++){
-				// iterate through the columnSets
 				var columnSet = this.columnSets[i];
 				for(var j = 0; j < columnSet.length; j++){
 					columnSet[j] = this._configColumns(i + "-" + j + "-", columnSet[j]);
 				}
 			}
+			this.inherited(arguments);
 		},
 
 		_positionScrollers: function (){
@@ -241,14 +265,24 @@ function(kernel, declare, lang, Deferred, listen, aspect, query, has, miscUtil, 
 
 		_onColumnSetScroll: function (evt){
 			var scrollLeft = evt.target.scrollLeft,
-				colSetId = evt.target.getAttribute(colsetidAttr);
+				colSetId = evt.target.getAttribute(colsetidAttr),
+				newScrollLeft;
 
 			if(this._columnSetScrollLefts[colSetId] != scrollLeft){
-				this._columnSetScrollLefts[colSetId] = scrollLeft;
 				query('.dgrid-column-set[' + colsetidAttr + '="' + colSetId + '"],.dgrid-column-set-scroller[' + colsetidAttr + '="' + colSetId + '"]', this.domNode).
-					forEach(function(element){
+					forEach(function(element, i){
 						element.scrollLeft = scrollLeft;
+						if(!i){
+							// Compute newScrollLeft based on actual resulting
+							// value of scrollLeft, which may be different than
+							// what we assigned under certain circumstances
+							// (e.g. Chrome under 33% / 67% / 90% zoom).
+							// Only need to compute this once, as it will be the
+							// same for every row.
+							newScrollLeft = element.scrollLeft;
+						}
 					});
+				this._columnSetScrollLefts[colSetId] = newScrollLeft;
 			}
 		},
 		
@@ -258,7 +292,7 @@ function(kernel, declare, lang, Deferred, listen, aspect, query, has, miscUtil, 
 			this._updateColumns();
 		},
 		setColumnSets: function(columnSets){
-			kernel.deprecated("setColumnSets(...)", 'use set("columnSets", ...) instead', "dgrid 1.0");
+			kernel.deprecated("setColumnSets(...)", 'use set("columnSets", ...) instead', "dgrid 0.4");
 			this.set("columnSets", columnSets);
 		}
 	});

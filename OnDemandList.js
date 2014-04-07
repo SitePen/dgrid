@@ -1,5 +1,5 @@
-define(["./List", "./_StoreMixin", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/on", "./util/misc", "put-selector/put"],
-function(List, _StoreMixin, declare, lang, Deferred, listen, miscUtil, put){
+define(["./List", "./_StoreMixin", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/dom", "dojo/on", "./util/misc", "put-selector/put"],
+function(List, _StoreMixin, declare, lang, Deferred, dom, listen, miscUtil, put){
 
 return declare([List, _StoreMixin], {
 	// summary:
@@ -38,7 +38,7 @@ return declare([List, _StoreMixin], {
 	//		Indicates the number of rows to overlap queries. This helps keep
 	//		continuous data when underlying data changes (and thus pages don't
 	//		exactly align)
-	queryRowsOverlap: 1,
+	queryRowsOverlap: 0,
 	
 	// pagingMethod: String
 	//		Method (from dgrid/util/misc) to use to either throttle or debounce
@@ -108,8 +108,8 @@ return declare([List, _StoreMixin], {
 		if(priorPreload){
 			// the preload nodes (if there are multiple) are represented as a linked list, need to insert it
 			if((preload.next = priorPreload.next) && 
-					// check to make sure that the current scroll position is below this preload
-					this.bodyNode.scrollTop >= priorPreload.node.offsetTop){ 
+					// is this preload node below the prior preload node?
+					preloadNode.offsetTop >= priorPreload.node.offsetTop){
 				// the prior preload is above/before in the linked list
 				preload.previous = priorPreload;
 			}else{
@@ -145,7 +145,8 @@ return declare([List, _StoreMixin], {
 		// Establish query options, mixing in our own.
 		// (The getter returns a delegated object, so simply using mixin is safe.)
 		options = lang.mixin(this.get("queryOptions"), options, 
-			{start: 0, count: this.minRowsPerPage, query: query});
+			{ start: 0, count: this.minRowsPerPage },
+			"level" in query ? { queryLevel: query.level } : null);
 		
 		// Protect the query within a _trackError call, but return the QueryResults
 		this._trackError(function(){ return results = query(options); });
@@ -161,17 +162,23 @@ return declare([List, _StoreMixin], {
 			var total = typeof results.total === "undefined" ?
 				results.length : results.total;
 			return Deferred.when(total, function(total){
-				// remove loading node
+				var trCount = trs.length,
+					parentNode = preloadNode.parentNode,
+					noDataNode = self.noDataNode;
+				
 				put(loadingNode, "!");
+				if(!("queryLevel" in options)){
+					self._total = total;
+				}
 				// now we need to adjust the height and total count based on the first result set
-				var trCount = trs.length;
 				if(total === 0){
-					if(self.noDataNode){
-						put(self.noDataNode, "!");
+					if(noDataNode){
+						put(noDataNode, "!");
 						delete self.noDataNode;
 					}
-					self.noDataNode = put(self.contentNode, "div.dgrid-no-data");
-					self.noDataNode.innerHTML = self.noDataMessage;
+					self.noDataNode = noDataNode = put("div.dgrid-no-data");
+					parentNode.insertBefore(noDataNode, self._getFirstRowSibling(parentNode));
+					noDataNode.innerHTML = self.noDataMessage;
 				}
 				var height = 0;
 				for(var i = 0; i < trCount; i++){
@@ -188,6 +195,9 @@ return declare([List, _StoreMixin], {
 				}else{
 					// if total is 0, IE quirks mode can't handle 0px height for some reason, I don't know why, but we are setting display: none for now
 					preloadNode.style.display = "none";
+					// This is a hack to get Observable to recognize that this is the
+					// last page, like is done in the processScroll function
+					options.count++;
 				}
 				
 				if (self._previousScrollPosition) {
@@ -280,6 +290,15 @@ return declare([List, _StoreMixin], {
 		this.inherited(arguments);
 		this._processScroll();
 	},
+
+	_getFirstRowSibling: function(container){
+		// summary:
+		//		Returns the DOM node that a new row should be inserted before
+		//		when there are no other rows in the current result set.
+		//		In the case of OnDemandList, this will always be the last child
+		//		of the container (which will be a trailing preload node).
+		return container.lastChild;
+	},
 	
 	_calcRowHeight: function(rowElement){
 		// summary:
@@ -287,8 +306,16 @@ return declare([List, _StoreMixin], {
 		//		plugins that add connected elements to a row, like the tree
 		
 		var sibling = rowElement.previousSibling;
-		return sibling && sibling.offsetTop != rowElement.offsetTop ?
-			rowElement.offsetHeight : 0;
+		
+		// If a previous row exists, compare the top of this row with the
+		// previous one (in case "rows" are actually rendering side-by-side).
+		// If no previous row exists, this is either the first or only row,
+		// in which case we count its own height.
+		if(sibling && !/\bdgrid-preload\b/.test(sibling.className)){
+			return rowElement.offsetTop - sibling.offsetTop;
+		}
+		
+		return rowElement.offsetHeight;
 	},
 	
 	lastScrollTop: 0,
@@ -308,7 +335,8 @@ return declare([List, _StoreMixin], {
 			// References related to emitting dgrid-refresh-complete if applicable
 			refreshDfd,
 			lastResults,
-			lastRows;
+			lastRows,
+			preloadSearchNext = true;
 		
 		// XXX: I do not know why this happens.
 		// munging the actual location of the viewport relative to the preload node by a few pixels in either
@@ -342,17 +370,8 @@ return declare([List, _StoreMixin], {
 						break;
 					}
 					var nextRow = row[traversal]; // have to do this before removing it
-					var lastObserverIndex, currentObserverIndex = row.observerIndex;
-					if(currentObserverIndex != lastObserverIndex && lastObserverIndex > -1){
-						// we have gathered a whole page of observed rows, we can delete them now
-						var observers = grid.observers; 
-						var observer = observers[lastObserverIndex]; 
-						observer && observer.cancel();
-						observers[lastObserverIndex] = 0; // remove it so we don't call cancel twice
-					}
 					reclaimedHeight += rowHeight;
 					count += row.count || 1;
-					lastObserverIndex = currentObserverIndex;
 					// we just do cleanup here, as we will do a more efficient node destruction in the setTimeout below
 					grid.removeRow(row, true);
 					toDelete.push(row);
@@ -378,6 +397,12 @@ return declare([List, _StoreMixin], {
 		function adjustHeight(preload, noMax){
 			preload.node.style.height = Math.min(preload.count * grid.rowHeight, noMax ? Infinity : grid.maxEmptySpace) + "px";
 		}
+		function traversePreload(preload, moveNext){
+			do{
+				preload = moveNext ? preload.next : preload.previous;
+			}while(preload && !preload.node.offsetWidth);// skip past preloads that are not currently connected
+			return preload;
+		}
 		while(preload && !preload.node.offsetWidth){
 			// skip past preloads that are not currently connected
 			preload = preload.previous;
@@ -394,14 +419,10 @@ return declare([List, _StoreMixin], {
 			
 			if(visibleBottom + mungeAmount + searchBuffer < preloadTop){
 				// the preload is below the line of sight
-				do{
-					preload = preload.previous;
-				}while(preload && !preload.node.offsetWidth); // skip past preloads that are not currently connected
+				preload = traversePreload(preload, (preloadSearchNext = false));
 			}else if(visibleTop - mungeAmount - searchBuffer > (preloadTop + (preloadHeight = preloadNode.offsetHeight))){
 				// the preload is above the line of sight
-				do{
-					preload = preload.next;
-				}while(preload && !preload.node.offsetWidth);// skip past preloads that are not currently connected
+				preload = traversePreload(preload, (preloadSearchNext = true));
 			}else{
 				// the preload node is visible, or close to visible, better show it
 				var offset = ((preloadNode.rowIndex ? visibleTop - requestBuffer : visibleBottom) - preloadTop) / grid.rowHeight;
@@ -421,9 +442,12 @@ return declare([List, _StoreMixin], {
 				}
 				count = Math.min(Math.max(count, grid.minRowsPerPage),
 									grid.maxRowsPerPage, preload.count);
+				
 				if(count == 0){
-					return;
+					preload = traversePreload(preload, preloadSearchNext);
+					continue;
 				}
+				
 				count = Math.ceil(count);
 				offset = Math.min(Math.floor(offset), preload.count - count);
 				var options = lang.mixin(grid.get("queryOptions"), preload.options);
@@ -449,7 +473,8 @@ return declare([List, _StoreMixin], {
 						preload.count -= offset;
 					}
 					options.start = preloadNode.rowIndex - queryRowsOverlap;
-					preloadNode.rowIndex += count;
+					options.count = Math.min(count + queryRowsOverlap, grid.maxRowsPerPage);
+					preloadNode.rowIndex = options.start + options.count;
 				}else{
 					// add new rows above
 					if(preload.next){
@@ -469,21 +494,30 @@ return declare([List, _StoreMixin], {
 						
 					}
 					options.start = preload.count;
+					options.count = Math.min(count + queryRowsOverlap, grid.maxRowsPerPage);
 				}
-				options.count = Math.min(count + queryRowsOverlap, grid.maxRowsPerPage);
 				if(keepScrollTo && beforeNode && beforeNode.offsetWidth){
 					keepScrollTo = beforeNode.offsetTop;
 				}
 
 				adjustHeight(preload);
+				
+				// use the query associated with the preload node to get the next "page"
+				if("level" in preload.query){
+					options.queryLevel = preload.query.level;
+				}
+				
+				// Avoid spurious queries (ideally this should be unnecessary...)
+				if(!("queryLevel" in options) && (options.start > grid._total || options.count < 0)){
+					continue;
+				}
+				
 				// create a loading node as a placeholder while the data is loaded
 				var loadingNode = put(beforeNode, "-div.dgrid-loading[style=height:" + count * grid.rowHeight + "px]"),
 					innerNode = put(loadingNode, "div.dgrid-" + (below ? "below" : "above"));
 				innerNode.innerHTML = grid.loadingMessage;
 				loadingNode.count = count;
-				loadingNode.blockRowIndex = true;
-				// use the query associated with the preload node to get the next "page"
-				options.query = preload.query;
+				
 				// Query now to fill in these rows.
 				// Keep _trackError-wrapped results separate, since if results is a
 				// promise, it will lose QueryResults functions when chained by `when`
@@ -498,7 +532,7 @@ return declare([List, _StoreMixin], {
 
 				// Isolate the variables in case we make multiple requests
 				// (which can happen if we need to render on both sides of an island of already-rendered rows)
-				(function(loadingNode, scrollNode, below, keepScrollTo, results){
+				(function(loadingNode, below, keepScrollTo, results){
 					lastRows = Deferred.when(grid.renderArray(results, loadingNode, options), function(rows){
 						lastResults = results;
 						
@@ -519,17 +553,30 @@ return declare([List, _StoreMixin], {
 								preserveMomentum: true
 							});
 						}
-						if(below){
-							// if it is below, we will use the total from the results to update
-							// the count of the last preload in case the total changes as later pages are retrieved
-							// (not uncommon when total counts are estimated for db perf reasons)
-							Deferred.when(results.total || results.length, function(total){
+						
+						Deferred.when(results.total || results.length, function(total){
+							if(!("queryLevel" in options)){
+								grid._total = total;
+							}
+							if(below){
+								// if it is below, we will use the total from the results to update
+								// the count of the last preload in case the total changes as later pages are retrieved
+								// (not uncommon when total counts are estimated for db perf reasons)
+								
 								// recalculate the count
 								below.count = total - below.node.rowIndex;
+								// check to see if we are on the last page
+								if(below.count === 0){
+									// This is a hack to get Observable to recognize that this is the
+									// last page; if the count doesn't match results.length, Observable
+									// will think this is the last page and properly handle additions to the bottom
+									options.count++;
+								}
 								// readjust the height
 								adjustHeight(below);
-							});
-						}
+							}
+						});
+						
 						// make sure we have covered the visible area
 						grid._processScroll();
 						return rows;
@@ -537,7 +584,7 @@ return declare([List, _StoreMixin], {
 						put(loadingNode, "!");
 						throw e;
 					});
-				}).call(this, loadingNode, scrollNode, below, keepScrollTo, results);
+				}).call(this, loadingNode, below, keepScrollTo, results);
 				preload = preload.previous;
 			}
 		}
@@ -550,6 +597,57 @@ return declare([List, _StoreMixin], {
 				refreshDfd.resolve(lastResults);
 			});
 		}
+	},
+
+	removeRow: function(rowElement, justCleanup){
+		function chooseIndex(index1, index2){
+			return index1 != null ? index1 : index2;
+		}
+
+		if(rowElement){
+			// Clean up observers that need to be cleaned up.
+			var previousNode = rowElement.previousSibling,
+				nextNode = rowElement.nextSibling,
+				prevIndex = previousNode && chooseIndex(previousNode.observerIndex, previousNode.previousObserverIndex),
+				nextIndex = nextNode && chooseIndex(nextNode.observerIndex, nextNode.nextObserverIndex),
+				thisIndex = rowElement.observerIndex;
+
+			// Clear the observerIndex on the node being removed so it will not be considered any longer.
+			rowElement.observerIndex = undefined;
+			if(justCleanup){
+				// Save the indexes from the siblings for future calls to removeRow.
+				rowElement.nextObserverIndex = nextIndex;
+				rowElement.previousObserverIndex = prevIndex;
+			}
+
+			// Is this row's observer index different than those on either side?
+			if(this.cleanEmptyObservers && thisIndex > -1 && thisIndex !== prevIndex && thisIndex !== nextIndex){
+				// This is the last row that references the observer index.  Cancel the observer.
+				var observers = this.observers;
+				var observer = observers[thisIndex];
+				if(observer){
+					// justCleanup is set to true when the list is being cleaned out.  The rows are left in the DOM
+					// and later they are removed altogether.  Skip the check for overlapping rows because
+					// in the end, all of the rows will be removed and all of the observers need to be canceled.
+					if(!justCleanup){
+					// We need to verify that all the rows really have been removed. If there
+					// are overlapping rows, it is possible another element exists
+						var rows = observer.rows;
+						for(var i = 0; i < rows.length; i++){
+							if(rows[i] != rowElement && dom.isDescendant(rows[i], this.domNode)){
+								// still rows in this list, abandon
+								return this.inherited(arguments);
+							}
+						}
+					}
+					observer.cancel();
+					this._numObservers--;
+					observers[thisIndex] = 0; // remove it so we don't call cancel twice
+				}
+			}
+		}
+		// Finish the row removal.
+		this.inherited(arguments);
 	}
 });
 

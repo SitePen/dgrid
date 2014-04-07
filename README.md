@@ -49,12 +49,12 @@ directory structure like the following:
 * `util` (optional, e.g. if pursuing a custom build)
 
 dgrid works best with the latest revision of Dojo 1.7 or higher.  As of this
-writing, [Dojo 1.8.1](http://download.dojotoolkit.org/release-1.8.1/) is
+writing, [Dojo 1.9.3](http://download.dojotoolkit.org/release-1.9.3/) is
 recommended.
 
-Note that while dgrid supports Dojo 1.8 and may take advantage of features or
-fix issues specific to it where possible, it does not have any hard dependency
-on APIs new to 1.8, so as to maintain compatibility with 1.7.
+Note that while dgrid supports Dojo 1.8 and 1.9 and may take advantage of features
+or fix issues specific to them where possible, it does not have any hard dependency
+on APIs new to 1.8 or 1.9, so as to maintain compatibility with 1.7.
 
 # Documentation
 
@@ -65,6 +65,89 @@ the wiki repository, as indicated under the "Git Access" tab.
 
 In addition to the documentation on the wiki, if upgrading from a previous
 dgrid release, please be sure to read the changelog, found in CHANGES.md.
+
+# Testing
+
+dgrid uses [Intern](http://theintern.io/) as its test runner. Tests can
+either be run using the browser, or using [Sauce Labs](https://saucelabs.com/).
+More information on writing your own tests with Intern can be found in the
+[Intern wiki](https://github.com/theintern/intern/wiki). 
+
+## Setting up
+
+**Note:** Commands listed in this section are all written assuming they are
+run in the parent directory containing `dgrid`, `dojo`, etc.
+
+Install the latest *geezer* version of Intern, which supports IE 6, 7, and 8
+in addition to modern browsers.
+
+```
+npm install intern-geezer
+```
+
+## Running via the browser
+
+1. Open a browser to http://hostname/path_to_dgrid/test/intern/runTests.html
+2. View the console
+
+## Running via Sauce Labs
+
+Make sure the proper Sauce Labs credentials are set in the environment:
+
+```
+export SAUCE_USERNAME=<your_sauce_username>
+export SAUCE_ACCESS_KEY=<your_sauce_access_key>
+```
+
+Then kick off the runner with the following command:
+
+```
+node node_modules/intern-geezer/runner config=dgrid/test/intern/intern
+```
+
+## Running via local Selenium server
+
+### Windows
+
+Obtain the latest version of the Selenium server and the IE driver server from
+[Selenium's Download page](http://docs.seleniumhq.org/download/).  (The IE driver server needs to be
+placed in a folder on your PATH.)
+
+The Selenium server can be started by executing:
+
+```
+java -jar path\to\selenium-server-standalone-<version>.jar
+```
+
+### Mac OS X
+
+The easiest way to obtain the Selenium standalone server for Mac OS X is by
+using [Homebrew](http://brew.sh/).  Once Homebrew is installed, run the following
+commands:
+
+```sh
+brew update # ensure you have the lastest formulae
+brew install selenium-server-standalone
+brew install chromedriver # for automating tests in Chrome
+```
+
+Recent versions of `selenium-server-standalone` install a `selenium-server`
+script which can be used to start up the server.  For additional information
+(e.g. how to start the server at login), see the output of
+`brew info selenium-server-standalone`.
+
+### Running the tests
+
+Once the Selenium server is running, kick off the Intern test runner with the
+following command (run from the directory containing dgrid):
+
+```
+node node_modules/intern-geezer/runner config=dgrid/test/intern/intern.local
+```
+
+The configuration in `intern.local.js` overrides `intern.js` to not use
+Sauce Connect, and to attempt to run Firefox and Chrome by default (this can
+be customized as desired according to the browsers you have installed).
 
 # Community
 

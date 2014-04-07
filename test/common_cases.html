@@ -80,19 +80,21 @@
 						};
 					}
 					window.grid = new StandardGrid({
+						sort: "id",
 						store: testStore,
 						columns: getColumns()
 					}, "grid");
 					
 					window.scrollgrid = new StandardGrid({
+						sort: "id",
 						store: testStore,
 						columns: getColumns()
 					}, "scrollgrid");
 					
 					window.tree = new StandardGrid({
 						tabIndex: 2,
+						sort: "id",
 						store: testCountryStore,
-						query: {type: "continent"},
 						selectionMode: "single",
 						columns: {
 							name: tree({label:'Name', sortable: false}),

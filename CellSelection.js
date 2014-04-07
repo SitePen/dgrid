@@ -1,4 +1,12 @@
-define(["dojo/_base/declare", "./Selection", "dojo/on", "put-selector/put", "dojo/has"], function(declare, Selection, listen, put, has){
+define([
+	"dojo/_base/declare",
+	"dojo/aspect",
+	"dojo/on",
+	"dojo/has",
+	"./Selection",
+	"put-selector/put"
+], function(declare, aspect, listen, has, Selection, put){
+
 return declare(Selection, {
 	// summary:
 	//		Add cell level selection capabilities to a grid. The grid will have a selection property and
@@ -7,18 +15,28 @@ return declare(Selection, {
 	// ensure we don't select when an individual cell is not identifiable
 	selectionDelegate: ".dgrid-cell",
 	
-	select: function(cell, toCell, value){
+	_selectionTargetType: "cells",
+	
+	_select: function(cell, toCell, value){
 		var i, id;
-		if(value === undefined){
+		if(typeof value === "undefined"){
 			// default to true
 			value = true;
 		}
 		if(typeof cell != "object" || !("element" in cell)){
 			cell = this.cell(cell);
 		}else if(!cell.row){
-			// it is row, with the value being a hash
-			for(id in value){
-				this.select(this.cell(cell.id, id), null, value[id]);
+			// Row object was passed instead of cell
+			if(value && typeof value === "object"){
+				// value is a hash of true/false values
+				for(id in value){
+					this._select(this.cell(cell.id, id), null, value[id]);
+				}
+			}else{
+				// Select/deselect all columns in row
+				for(id in this.columns){
+					this._select(this.cell(cell.id, id), null, value);
+				}
 			}
 			return;
 		}
@@ -28,7 +46,7 @@ return declare(Selection, {
 				previousRow = selection[rowId];
 			if(!cell.column){
 				for(i in this.columns){
-					this.select(this.cell(rowId, i), null, value);
+					this._select(this.cell(rowId, i), null, value);
 				}
 				return;
 			}
@@ -56,25 +74,41 @@ return declare(Selection, {
 			if(element){
 				// add or remove classes as appropriate
 				if(value){
-					put(element, ".dgrid-selected.ui-state-active");
+					put(element, ".dgrid-selected" +
+						(this.addUiClasses ? ".ui-state-active" : ""));
 				}else{
 					put(element, "!dgrid-selected!ui-state-active");
 				}
 			}
 			if(value != previous && element){
-				this._selectionEventQueue(value, "cells").push(cell);
+				this._selectionEventQueues[(value ? "" : "de") + "select"].push(cell);
 			}
 			if(toCell){
-				// a range
 				if(!toCell.element){
 					toCell = this.cell(toCell);
 				}
+				
+				if(!toCell || !toCell.row){
+					this._lastSelected = element;
+					console.warn("The selection range has been reset because the " +
+						"beginning of the selection is no longer in the DOM. " +
+						"If you are using OnDemandList, you may wish to increase " +
+						"farOffRemoval to avoid this, but note that keeping more nodes " +
+						"in the DOM may impact performance.");
+					return;
+				}
+				
 				var toElement = toCell.element;
 				var fromElement = cell.element;
-				// find if it is earlier or later in the DOM
-				var traverser = (toElement && (toElement.compareDocumentPosition ? 
-					toElement.compareDocumentPosition(fromElement) == 2 :
-					toElement.sourceIndex > fromElement.sourceIndex)) ? "nextSibling" : "previousSibling";
+				// Find if it is earlier or later in the DOM
+				var direction = this._determineSelectionDirection(fromElement, toElement);
+				if(!direction){
+					// The original element was actually replaced
+					toCell = this.cell(
+						document.getElementById(toCell.row.element.id), toElement.columnId);
+					toElement = toCell && toCell.element;
+					direction = this._determineSelectionDirection(fromElement, toElement);
+				}
 				// now we determine which columns are in the range 
 				var idFrom = cell.column.id, idTo = toCell.column.id, started, columnIds = [];
 				for(id in this.columns){
@@ -99,15 +133,29 @@ return declare(Selection, {
 					// and now loop through each column to be selected
 					for(i = 0; i < columnIds.length; i++){
 						cell = this.cell(nextNode, columnIds[i]);
-						this.select(cell, null, value);
+						this._select(cell, null, value);
 					}
 					if(nextNode == toElement){
 						break;
 					}
-				}while((nextNode = cell.row.element[traverser]));
+				}while((nextNode = cell.row.element[direction]));
 			}
 		}
 	},
+	
+	_determineSelectionDirection: function () {
+		// Extend Selection to return next/previousSibling instead of down/up,
+		// given how CellSelection#_select is written
+		var result = this.inherited(arguments);
+		if(result === "down"){
+			return "nextSibling";
+		}
+		if(result === "up"){
+			return "previousSibling";
+		}
+		return result;
+	},
+	
 	isSelected: function(object, columnId){
 		// summary:
 		//		Returns true if the indicated cell is selected.

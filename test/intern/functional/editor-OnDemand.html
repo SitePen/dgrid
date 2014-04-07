@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Test Cell Editors</title>
+		<style>
+			@import "../../../../dojo/resources/dojo.css";
+			@import "../../../../dijit/themes/claro/claro.css";
+			@import "../../../css/skins/claro.css";
+		</style>
+	</head>
+
+	<body class="claro">
+		<h2>OnDemandGrid with editors</h2>
+		<div id="grid"></div>
+
+		<script src="../../../../dojo/dojo.js" data-dojo-config="async: 1"></script>
+
+		<script>
+			var grid,
+				gridSaveStack = [],
+				ready,
+				// Toggled with each grid.save call to signal test module that a save is complete
+				saveComplete;
+
+			require([
+				"dojo/aspect",
+				"dojo/store/Memory",
+				"dojo/store/Observable",
+				"dgrid/OnDemandGrid",
+				"dgrid/editor"
+			], function (aspect, Memory, Observable, OnDemandGrid, editor) {
+				var store = new Observable(new Memory({ data: [
+					{ id: 0, name: "1", description: "one" },
+					{ id: 1, name: "2", description: "two" },
+					{ id: 2, name: "3", description: "three" }
+				]}));
+
+				grid = new OnDemandGrid({
+					sort: "id",
+					store: store,
+					columns: {
+						id: "ID",
+						name: editor({
+							label: "Name",
+							editor: "text",
+							autoSave: true
+						}),
+						description: editor({
+							label: "Description",
+							editor: "text",
+							editOn: "click",
+							autoSave: true
+						})
+					}
+				}, "grid");
+
+				aspect.before(grid, "save", function () {
+					var dirtyRowId;
+
+					saveComplete = false;
+					for (dirtyRowId in grid.dirty) {
+						// col3 and col4 are the only columns with edit enabled; push the edited value
+						// into 'gridSaveStack'
+						gridSaveStack.push(grid.dirty[dirtyRowId].name || grid.dirty[dirtyRowId].description);
+					}
+				});
+
+				aspect.after(grid, "save", function (savePromise) {
+					savePromise.then(function () {
+						saveComplete = true;
+					});
+				});
+
+				ready = true;
+			});
+		</script>
+	</body>
+</html>

@@ -9,7 +9,7 @@ function(kernel, arrayUtil, on, aspect, has, put){
 		
 		if(column.type){
 			column.selectorType = column.type;
-			kernel.deprecated("columndef.type", "use columndef.selectorType instead", "dgrid 1.0");
+			kernel.deprecated("columndef.type", "use columndef.selectorType instead", "dgrid 0.4");
 		}
 		// accept type as argument to Selector function, or from column def
 		column.selectorType = type = type || column.selectorType || "checkbox";
@@ -68,10 +68,6 @@ function(kernel, arrayUtil, on, aspect, has, put){
 			if(event.type == "click" || event.keyCode == 32 || (!has("opera") && event.keyCode == 13) || event.keyCode === 0){
 				var row = grid.row(event),
 					lastRow = grid._lastSelected && grid.row(grid._lastSelected);
-
-				if (!grid.allowSelect(row)) {
-					return;
-				}
 
 				grid._selectionTriggerEvent = event;
 				
@@ -182,7 +178,8 @@ function(kernel, arrayUtil, on, aspect, has, put){
 			renderInput(value, cell, object);
 		};
 		column.renderHeaderCell = function(th){
-			var label = column.label || column.field || "";
+			var label = "label" in column ? column.label :
+				column.field || "";
 			
 			if(type == "radio" || !grid.allowSelectAll){
 				th.appendChild(document.createTextNode(label));

@@ -65,19 +65,25 @@ function subRowAssoc(subRows){
 	return associations;
 }
 
-function resizeColumnWidth(grid, colId, width, parentType){
+function resizeColumnWidth(grid, colId, width, parentType, doResize){
 	// don't react to widths <= 0, e.g. for hidden columns
 	if(width <= 0){ return; }
 
 	var column = grid.columns[colId],
-		event = {
-			grid: grid,
-			columnId: colId,
-			width: width,
-			bubbles: true,
-			cancelable: true
-		},
+		event,
 		rule;
+	
+	if(!column){
+		return;
+	}
+	
+	event = {
+		grid: grid,
+		columnId: colId,
+		width: width,
+		bubbles: true,
+		cancelable: true
+	};
 	
 	if(parentType){
 		event.parentType = parentType;
@@ -105,6 +111,11 @@ function resizeColumnWidth(grid, colId, width, parentType){
 
 		// keep a reference for future removal
 		grid._columnSizes[colId] = rule;
+		
+		if(doResize !== false){
+			grid.resize();
+		}
+		
 		return true;
 	}
 }
@@ -255,8 +266,8 @@ return declare(null, {
 				put(headerTextNode, childNodes[0]);
 			}
 
-			put(colNode, headerTextNode, "div.dgrid-resize-handle.resizeNode-"+id).columnId = 
-				assoc ? assoc[id] : id;
+			put(colNode, headerTextNode, "div.dgrid-resize-handle.resizeNode-"+id).columnId =
+				assoc && assoc[id] || id;
 		}
 
 		if(!grid.mouseMoveListen){
@@ -345,7 +356,7 @@ return declare(null, {
 			// Set a baseline size for each column based on
 			// its original measure
 			colNodes.forEach(function(colNode, i){
-				this.resizeColumnWidth(colNode.columnId, colWidths[i]);
+				resizeColumnWidth(this, colNode.columnId, colWidths[i], null, false);
 			}, this);
 			
 			this._resizedColumns = true;
@@ -375,7 +386,6 @@ return declare(null, {
 					resizeColumnWidth(this, lastCol, this.minWidth, e.type);
 				}
 			}
-			this.resize();
 		}
 		resizer.hide();
 		

@@ -77,6 +77,10 @@ function tree(column){
 		var grid = column.grid,
 			colSelector = ".dgrid-content .dgrid-column-" + column.id,
 			listeners = []; // to be removed when this column is destroyed
+
+		// Turn off automatic cleanup of empty observers, to prevent confusion
+		// due to observers operating at multiple hierarchy levels.
+		grid.cleanEmptyObservers = false;
 		
 		if(!grid.store){
 			throw new Error("dgrid tree column plugin requires a store to operate.");
@@ -171,7 +175,14 @@ function tree(column){
 			//		if unspecified, toggles the current state.
 			
 			var row = target.element ? target : grid.row(target),
-				hasTransitionend = has("transitionend");
+				hasTransitionend = has("transitionend"),
+				dfd = new Deferred(),
+				promise = dfd.promise;
+			
+			// Resolve initial promise immediately;
+			// promise will be reassigned later if necessary to only resolve
+			// after data is retrieved
+			dfd.resolve();
 			
 			target = row.element;
 			target = target.className.indexOf("dgrid-expando-icon") > -1 ? target :
@@ -191,7 +202,9 @@ function tree(column){
 					container,
 					containerStyle,
 					scrollHeight,
-					options;
+					options = {
+						originalQuery: this.query
+					};
 				
 				if(!preloadNode){
 					// if the children have not been created, create a container, a preload node and do the 
@@ -201,27 +214,29 @@ function tree(column){
 					var query = function(options){
 						return grid.store.getChildren(row.data, options);
 					};
-					query.level = target.level;
 					if(column.allowDuplicates){
 						// If allowDuplicates is specified, include parentId in options
 						// in order to facilitate unique IDs for each occurrence of the
 						// same item under multiple different parents.
-						options = { parentId: row.id };
+						options.parentId = row.id;
 					}
-					Deferred.when(
-						grid.renderQuery ?
-							grid._trackError(function(){
-								return grid.renderQuery(query, preloadNode, options);
-							}) :
-							grid.renderArray(query(options), preloadNode, {query: query}),
-						function(){
-							// Expand once results are retrieved, if the row is still expanded.
-							if(grid._expanded[row.id] && hasTransitionend){
-								var scrollHeight = container.scrollHeight;
-								container.style.height = scrollHeight ? scrollHeight + "px" : "auto";
-							}
+					// Include level information on query for renderQuery case
+					if("level" in target){
+						query.level = target.level;
+					}
+					// Add the query to the promise chain.
+					promise = promise.then(function(){
+						return grid.renderQuery ?
+							grid.renderQuery(query, preloadNode, options) :
+							grid.renderArray(query(options), preloadNode,
+								"level" in query ? { queryLevel: query.level } : {});
+					}).then(function(){
+						// Expand once results are retrieved, if the row is still expanded.
+						if(grid._expanded[row.id] && hasTransitionend){
+							var scrollHeight = container.scrollHeight;
+							container.style.height = scrollHeight ? scrollHeight + "px" : "auto";
 						}
-					);
+					});
 					
 					if(hasTransitionend){
 						on(container, hasTransitionend, ontransitionend);
@@ -267,6 +282,7 @@ function tree(column){
 					delete this._expanded[row.id];
 				}
 			}
+			return promise;
 		}; // end function grid.expand
 		
 		// Set up a destroy function on column to tear down the listeners/aspects
@@ -284,7 +300,7 @@ function tree(column){
 		//		Renders a cell that can be expanded, creating more rows
 		
 		var grid = column.grid,
-			level = Number(options && options.query && options.query.level) + 1,
+			level = Number(options && options.queryLevel) + 1,
 			mayHaveChildren = !grid.store.mayHaveChildren || grid.store.mayHaveChildren(object),
 			parentId = options.parentId,
 			expando, node;

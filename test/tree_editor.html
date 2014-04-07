@@ -34,8 +34,8 @@
 					var StandardGrid = declare([Grid, Keyboard]);
 					
 					window.grid = new StandardGrid({
+						sort: "id",
 						store: testCountryStore,
-						query: {type: "continent"},
 						columns: [
 							tree(editor({label: "Name", field:"name", sortable: false, editOn: "dblclick"})),
 							editor({label: "Visited", field: "bool", sortable: false}, "checkbox"),

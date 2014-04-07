@@ -105,19 +105,23 @@
 
 					var ResizeGrid = declare([Grid, Selection, ColumnResizer]);
 					window.grid = new ResizeGrid({
+						sort: "id",
 						store: testStore,
 						columns: columns1
 					}, "grid");
 					window.gridPeriod = new ResizeGrid({
 						id: "gridPeriod",
+						sort: "id",
 						store: testStore,
 						columns: columns1
 					}, "grid.period");
 					window.gridWide = new ResizeGrid({
+						sort: "id",
 						store: testStore,
 						columns: lang.clone(columns)
 					}, "gridWide");
 					window.gridPrevent = new ResizeGrid({
+						sort: "id",
 						store: testStore,
 						columns: lang.clone(columns)
 					}, "gridPrevent");
@@ -135,6 +139,7 @@
 						}
 					}
 					window.gridPersist = new ResizeGrid({
+						sort: "id",
 						store: testStore,
 						columns: persistentColumns
 					}, "gridPersist");
