@@ -21,19 +21,26 @@
 		<script src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script>
-			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/editor", "dgrid/Keyboard", "dgrid/tree", "dojo/_base/declare", "dstore/Rest", "dstore/Observable", "dstore/Cache", "dojo/domReady!"], 
-				function(List, Grid, Selection, editor, Keyboard, tree, declare, Rest, Observable, Cache){
-					var testStore = new declare([ Rest, Observable, Cache ])({
-						target:"./data/rest.php", 
-						idProperty: "id",
-						rangeParam: "range",
-						put: function(object){
-							return object;
-						}
-					});
-					testStore.getChildren = function(parent){
-						return testStore.filter({parent: parent.id});
-					};
+			require(["dojo/_base/lang", "dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/editor", "dgrid/Keyboard", "dgrid/tree", "dojo/_base/declare", "dstore/Rest", "dstore/Observable", "dstore/Cache", "dojo/domReady!"],
+				function(lang, List, Grid, Selection, editor, Keyboard, tree, declare, Rest, Observable, Cache){
+
+					var CustomGrid = declare([Grid, Selection, Keyboard]);
+
+					function createStore(config){
+						var testStore = new declare([ Rest, Observable, Cache ])(lang.mixin({
+							target:"./data/rest.php",
+							idProperty: "id",
+							put: function(object){
+								return object;
+							}
+						}, config));
+						testStore.getChildren = function(parent){
+							return testStore.filter({parent: parent.id});
+						};
+
+						return testStore;
+					}
+					var testStore = createStore();
 					var columns = [
 						tree({label:'Name', field:'name', sortable: false}),
 						{label:'Id', field:'id'},
@@ -41,24 +48,19 @@
 						editor({label:'Boolean', field:'boo', sortable: false, autoSave: true}, "checkbox")
 					];
 
-					window.grid = new (declare([Grid, Selection, Keyboard]))({
+					window.grid = new CustomGrid({
 						collection: testStore.filter({ parent: undefined }),
 						sort: "id",
 						getBeforePut: false,
 						columns: columns
 					}, "grid");
-					deleteSelected = function(){
-						for(var i in grid.selection){
-							testStore.remove(i);
-						}
-					}
-					addPage = function(){
-						var selectedId = 0;
-						for(var i in grid.selection){
-							selectedId = +i;
-						}
-						testStore.put({name:"new item", id: selectedId + Math.random()});
-					}
+
+					new CustomGrid({
+						collection: createStore({useRangeHeaders: true}).filter({ parent: undefined }),
+						sort: "id",
+						getBeforePut: false,
+						columns: columns
+					}, "gridRangeHeaders");
 				});
 				
 		</script>
@@ -66,9 +68,8 @@
 	<body class="claro">
 		<h2>A basic grid with Rest store</h2>
 		<div id="grid"></div>
-		<button onclick='deleteSelected()'>Delete Page</div>
-		<button onclick='addPage()'>Add Page</div>
-		<button onclick='grid.save();'>Save</div>
-		<button onclick='grid.revert();'>Revert</div>
+
+		<h2>A basic grid with Rest store using range headers</h2>
+		<div id="gridRangeHeaders"></div>
 	</body>
 </html>

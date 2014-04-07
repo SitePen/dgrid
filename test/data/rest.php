@@ -6,15 +6,38 @@ if(isset($_GET["parent"])){
 	$id_prefix = ($_GET["parent"] + 1) * 1000;
 }
 usleep(rand(0,500000));
-$range = "";
-if(isset($_GET["range"])){
-	$range = $_GET["range"];
+$start = 0;
+$end = 0;
+$limit = "";
+$debug = "";
+foreach($_GET as $param => $value){
+    if(strpos($param, "limit") === 0){
+        $limit = $param;
+        break;
+    }
 }
-if($range){
-	preg_match('/(\d+)-(\d+)/', $range, $matches);
-	
-	$start = $matches[1];
-	$end = $matches[2];
+if($limit){
+	preg_match('/(\d+),*(\d+)*/', $limit, $matches);
+    if($matches[2]){
+        $start = $matches[2];
+        $end = $matches[1] + $start;
+    }else{
+        $end = $matches[1];
+    }
+}else{
+	$range = "";
+	if(isset($_SERVER["HTTP_RANGE"])){
+		$range = $_SERVER["HTTP_RANGE"];
+	}elseif(isset($_SERVER["HTTP_X_RANGE"])){
+		$range = $_SERVER["HTTP_X_RANGE"];
+	}
+	if($range){
+		preg_match('/(\d+)-(\d+)/', $range, $matches);
+		$start = $matches[1];
+		$end = $matches[2] + 1;
+	}
+}
+if($end){
 	if($end > $total){
 		$end = $total;
 	}

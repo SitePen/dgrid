@@ -41,15 +41,18 @@
 						Rest, Cache, Observable){
 					
 					var CustomGrid = declare([Grid, Selection, Pagination]);
-					
-					var testStore = window.testStore = new declare([ Rest, Cache, Observable ])({
-						target:"../data/rest.php",
-						rangeParam: "range"
-					});
-					testStore.getChildren = function(parent){
-						return testStore.filter({parent: parent.id});
-					};
-					
+					var testStore;
+
+					function createStore(config){
+						testStore = new declare([ Rest, Cache, Observable ])(lang.mixin({
+							target:"../data/rest.php"
+						}, config));
+						testStore.getChildren = function(parent){
+							return testStore.filter({parent: parent.id});
+						};
+					}
+					createStore();
+
 					function getColumns(){
 						return [
 							tree({label:'Name', field:'name', sortable: false}),
@@ -85,12 +88,14 @@
 						args.pagingLinks = +args.pagingLinks;
 						if (!args.previousNextArrows) { args.previousNextArrows = false; }
 						if (!args.showLoadingMessage) { args.showLoadingMessage = false; }
-						
+
 						// recreate grid using args from form
 						window.grid.destroy();
 						domConstruct.create("div", { id: "grid" }, form, "after");
+						createStore({ useRangeHeaders: args.useRangeHeaders});
+						args.useRangeHeaders = undefined;
 						createGrid(args);
-						
+
 						return false;
 					};
 				});
@@ -100,6 +105,8 @@
 		<h2>A basic grid with the Pagination extension with tree plugin</h2>
 		<h3>Configuration</h3>
 		<form id="configForm">
+			<div><label><input type="checkbox" name="useRangeHeaders">
+				Use request range headers (rather than limit parameter)</label></div>
 			<div><label><input type="checkbox" name="firstLastArrows">
 				Show first/last page arrows</label></div>
 			<div><label><input type="checkbox" name="previousNextArrows" checked>

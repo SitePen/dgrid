@@ -17,27 +17,16 @@
 		<script src="../../dojo/dojo.js"
 			data-dojo-config="async: true"></script>
 		<script>
-			function deleteSelected(){
-				for(var i in grid.selection){
-					testStore.remove(i);
-				}
-			}
-			function newPage(){
-				testStore.add({
-					name: "new",
-					comment:"New"
-				});
-			}
+			var testStore;
 			
 			require(["dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Keyboard",
 				"dgrid/editor", "dgrid/tree", "dojo/_base/declare",
 				"dstore/Rest", "dstore/Observable", "dstore/Cache", 
 				"dstore/SimpleQuery", "dojo/domReady!"], 
 			function(Grid, Selection, Keyboard, editor, tree, declare, Rest, Observable, Cache, SimpleQuery){
-				var testStore = new declare([ Rest, SimpleQuery, Observable, Cache])({
+				testStore = new declare([ Rest, SimpleQuery, Observable, Cache])({
 					target:"./data/rest.php", 
-					idProperty: "id",
-					rangeParam: "range"
+					idProperty: "id"
 				});
 				testStore.getChildren = function(parent){
 					// Return collection representing same items so we may test rendering duplicates
@@ -61,9 +50,5 @@
 	<body class="claro">
 		<h2>Test JsonRest Tree with objects repeated in different places in hierarchy</h2>
 		<div id="grid"></div>
-		<button onclick='deleteSelected();'>Delete Page</div>
-		<button onclick='grid.save();'>Save</div>
-		<button onclick='grid.revert();'>Revert</div>
-		<button onclick='newPage();'>New Page</div>
 	</body>
 </html>
