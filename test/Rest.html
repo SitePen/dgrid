@@ -21,8 +21,8 @@
 		<script src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script>
-			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/editor", "dgrid/Keyboard", "dgrid/tree", "dojo/_base/declare", "dstore/Rest", "dstore/Observable", "dstore/Cache", "dojo/domReady!"], 
-				function(List, Grid, Selection, editor, Keyboard, tree, declare, Rest, Observable, Cache){
+			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Editor", "dgrid/Keyboard", "dgrid/tree", "dojo/_base/declare", "dstore/Rest", "dstore/Observable", "dstore/Cache", "dojo/domReady!"],
+				function(List, Grid, Selection, Editor, Keyboard, tree, declare, Rest, Observable, Cache){
 					var testStore = new declare([ Rest, Observable, Cache ])({
 						target:"./data/rest.php", 
 						idProperty: "id",
@@ -37,11 +37,11 @@
 					var columns = [
 						tree({label:'Name', field:'name', sortable: false}),
 						{label:'Id', field:'id'},
-						editor({label:'Comment', field:'comment', sortable: false}, "text"),
-						editor({label:'Boolean', field:'boo', sortable: false, autoSave: true}, "checkbox")
+						{label:'Comment', field:'comment', sortable: false, editor: "text"},
+						{label:'Boolean', field:'boo', sortable: false, autoSave: true, editor: "checkbox"}
 					];
 
-					window.grid = new (declare([Grid, Selection, Keyboard]))({
+					window.grid = new (declare([Grid, Selection, Keyboard, Editor]))({
 						collection: testStore.filter({ parent: undefined }),
 						sort: "id",
 						getBeforePut: false,

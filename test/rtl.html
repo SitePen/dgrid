@@ -47,7 +47,7 @@
 		<script>
 		
 			require(["dgrid/Grid", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard",
-					"dgrid/tree", "dgrid/editor", "dojo/_base/lang",
+					"dgrid/tree", "dgrid/Editor", "dojo/_base/lang",
 					"dojo/_base/declare", "dojo/on", "dojo/data/ObjectStore",
 					"dojo/store/Memory", "dojo/store/Observable",
 					"dgrid/test/data/createSyncStore", "dgrid/test/data/createAsyncHierarchicalStore",
@@ -57,7 +57,7 @@
 					"dijit/form/Select", "dijit/form/FilteringSelect",
 					"dgrid/extensions/Pagination", "dojo/domReady!", "xstyle/css!../css/dgrid_rtl.css"], 
 				function(
-					Grid, OnDemandGrid, Selection, Keyboard, tree, editor, lang, declare, on, ObjectStore,
+					Grid, OnDemandGrid, Selection, Keyboard, tree, Editor, lang, declare, on, ObjectStore,
 					LegacyMemory, LegacyObservable, createSyncStore, createAsyncHierarchicalStore,
 					testStore, stateData, typesData, hierarchicalCountryData,
 					CheckBox, TimeTextBox, Select,
@@ -70,7 +70,7 @@
 						{label: 'Column 4', field: 'col4'},
 						{label: 'Column 5', field: 'col5'}
 					];
-					var StandardGrid = declare([OnDemandGrid, Selection, Keyboard]);
+					var StandardGrid = declare([OnDemandGrid, Selection, Keyboard, Editor]);
 
 					window.grid = new StandardGrid({
 						collection: testStore,
@@ -83,7 +83,7 @@
 					}, "scrollgrid");
 					
 					var columnsTree = [
-						editor({label: ' ', field: 'bool', sortable: false}, "checkbox"),
+						{label: ' ', field: 'bool', sortable: false, editor: "checkbox"},
 						tree({label:'Name', field:'name', sortable: false}),
 						{label:'Type', field:'type', sortable: false},
 						{label:'Population', field:'population'},
@@ -96,11 +96,11 @@
 					}, "tree");
 					
 					var columnsHeaderless = { // you can declare columns as an object hash (key translates to field)
-						col1: editor({label: 'Column 1 column 1 column 1'}, "text", "dblclick"),
+						col1: {label: 'Column 1 column 1 column 1', editor: "text", editOn: "dblclick"},
 						col2: {label: 'Column 2', sortable: false},
-						col3: editor({label: 'Column 3'}, "text", "dblclick"),
+						col3: {label: 'Column 3', editor: "text", editOn: "dblclick"},
 						col4: 'Column444444444444444444',
-						col5: editor({label: 'Column 5'}, "text", "dblclick")
+						col5: {label: 'Column 5', editor: "text", editOn: "dblclick"}
 					};
 
 					window.headerless = new StandardGrid({
@@ -117,19 +117,26 @@
 
 					var columnsEditor = [
 						{field: "id", label: "id"},
-						editor({
+						{
 							label: "CheckBox",
 							field: "bool2",
+							editor: CheckBox,
 							editorArgs: {
 								value: "checked"
 							}
-						}, CheckBox),
-						editor({label: "Time", field: "date2", editorArgs: {
-							timePattern: "HH:mm:ss",
-							clickableIncrement: "T00:15:00",
-							visibleIncrement: "T00:15:00",
-							visibleRange: "T01:00:00"}}, TimeTextBox),
-						editor({
+						},
+						{
+							label: "Time",
+							field: "date2",
+							editor: TimeTextBox,
+							editorArgs: {
+								timePattern: "HH:mm:ss",
+								clickableIncrement: "T00:15:00",
+								visibleIncrement: "T00:15:00",
+								visibleRange: "T01:00:00"
+							}
+						},
+						{
 							label: "Select Options",
 							field: "bool",
 							get: function(item){
@@ -140,6 +147,8 @@
 								// convert back to boolean from string
 								return item.bool == "true";
 							},
+							editor: Select,
+							editOn: "dblclick",
 							editorArgs: {
 								style: "width:75px;",
 								options: [
@@ -147,9 +156,28 @@
 									{value: "false", label: "false"}
 								]
 							}
-						}, Select, "dblclick"),
-						editor({label: "Select Store", field: "state", editorArgs: {store: stateStore, maxHeight: 150, style: "width:120px;"}}, Select, "click"),
-						editor({label: "FilteringSelect Store", field: "state2", editorArgs: {store: stateStore, maxHeight: 150, style: "width:120px;"}}, FilteringSelect)
+						},
+						{
+							label: "Select Store",
+							field: "state",
+							editor: Select,
+							editOn: "click",
+							editorArgs: {
+								store: stateStore,
+								maxHeight: 150,
+								style: "width:120px;"
+							}
+						},
+						{
+							label: "FilteringSelect Store",
+							field: "state2",
+							editor: FilteringSelect,
+							editorArgs: {
+								store: stateStore,
+								maxHeight: 150,
+								style: "width:120px;"
+							}
+						}
 					];
 					
 					window.moreeditors = new StandardGrid({

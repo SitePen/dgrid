@@ -27,30 +27,30 @@
 				"dojo/_base/declare",
 				"dojo/aspect",
 				"dgrid/OnDemandGrid",
-				"dgrid/editor",
+				"dgrid/Editor",
 				"dgrid/test/data/createSyncStore"
-			], function (declare, aspect, OnDemandGrid, editor, createSyncStore) {
+			], function (declare, aspect, OnDemandGrid, Editor, createSyncStore) {
 				var store = createSyncStore({ data: [
 					{ id: 0, name: "1", description: "one" },
 					{ id: 1, name: "2", description: "two" },
 					{ id: 2, name: "3", description: "three" }
 				]});
 
-				grid = new OnDemandGrid({
+				grid = new (declare([OnDemandGrid, Editor]))({
 					collection: store,
 					columns: {
 						id: "ID",
-						name: editor({
+						name: {
 							label: "Name",
 							editor: "text",
 							autoSave: true
-						}),
-						description: editor({
+						},
+						description: {
 							label: "Description",
 							editor: "text",
 							editOn: "click",
 							autoSave: true
-						})
+						}
 					}
 				}, "grid");
 

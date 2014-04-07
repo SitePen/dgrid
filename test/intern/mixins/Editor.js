@@ -7,13 +7,15 @@ define([
 	"dijit/registry",
 	"dijit/form/TextBox",
 	"dgrid/Grid",
-	"dgrid/editor",
+	"dgrid/Editor",
 	"dgrid/test/data/orderedData"
-], function (test, assert, declare, on, query, registry, TextBox, Grid, editor, orderedData) {
+], function (test, assert, declare, on, query, registry, TextBox, Grid, Editor, orderedData) {
 	var testOrderedData = orderedData.items,
 		grid;
 
-	test.suite("editor column plugin", function () {
+	var EditorGrid = declare([Grid, Editor]);
+
+	test.suite("editor column mixin", function () {
 
 		test.afterEach(function () {
 			if (grid) {
@@ -28,19 +30,20 @@ define([
 				{id: 2, data1: "Data 1.b", data2: "Data 2.b"},
 				{id: 3, data1: "Data 1.c", data2: "Data 2.c"}
 			];
-			grid = new Grid({
+			grid = new EditorGrid({
 				columns: [
 					{
 						field: "data1",
 						label: "Data 1"
 					},
-					editor({
+					{
+						editor: "text",
 						field: "data2",
 						label: "Data 2",
 						canEdit: function(object, value){
 							results[object.id] = value;
 						}
-					})
+					}
 				]
 			});
 			document.body.appendChild(grid.domNode);
@@ -63,21 +66,23 @@ define([
 				{id: 2, data1: "Data 1.b", data2: "Data 2.b"},
 				{id: 3, data1: "Data 1.c", data2: "Data 2.c"}
 			];
-			grid = new Grid({
+			grid = new EditorGrid({
 				columns: [
 					{
 						field: "data1",
 						label: "Data 1",
 						id: "data1"
 					},
-					editor({
+					{
+						editor: TextBox,
+						editOn: "click",
 						field: "data2",
 						label: "Data 2",
 						id: "data2",
 						canEdit: function(object, value){
 							results[object.id] = value;
 						}
-					}, TextBox, "click")
+					}
 				]
 			});
 			document.body.appendChild(grid.domNode);
@@ -125,21 +130,21 @@ define([
 			function canEdit(data) {
 				return data.order % 2;
 			}
-			
-			grid = new Grid({
+
+			grid = new EditorGrid({
 				columns: {
 					order: "step",
-					name: editor({
+					name: {
+						editor: "text",
 						label: "Name",
-						editor: "text",
 						canEdit: canEdit
-					}),
-					description: editor({
-						label: "Description",
+					},
+					description: {
 						editor: "text",
+						label: "Description",
 						editOn: "click",
 						canEdit: canEdit
-					})
+					}
 				}
 			});
 
@@ -186,18 +191,18 @@ define([
 			assert.strictEqual(0, matchedNodes.length,
 				"Before grid is created there should be 0 input elements on the page");
 
-			grid = new Grid({
+			grid = new EditorGrid({
 				columns: {
 					order: "step",
-					name: editor({
+					name: {
 						label: "Name",
 						editor: "text"
-					}),
-					description: editor({
+					},
+					description: {
 						label: "Description",
 						editor: "text",
 						editOn: "click"
-					})
+					}
 				}
 			});
 			document.body.appendChild(grid.domNode);
@@ -206,7 +211,7 @@ define([
 
 			matchedNodes = query("input");
 			assert.strictEqual(testOrderedData.length, matchedNodes.length,
-				"There should be " + testOrderedData.length + " input elements for the grid's editors");
+					"There should be " + testOrderedData.length + " input elements for the grid's editors");
 
 			grid.destroy();
 
@@ -220,18 +225,18 @@ define([
 			assert.strictEqual(0, registry.length,
 				"Before grid is created there should be 0 widgets on the page");
 
-			grid = new Grid({
+			grid = new EditorGrid({
 				columns: {
 					order: "step",
-					name: editor({
+					name: {
 						label: "Name",
 						editor: TextBox
-					}),
-					description: editor({
+					},
+					description: {
 						label: "Description",
 						editor: TextBox,
 						editOn: "click"
-					})
+					}
 				}
 			});
 			document.body.appendChild(grid.domNode);
@@ -240,7 +245,7 @@ define([
 
 			// Expected is data length + 1 due to widget for editOn editor
 			assert.strictEqual(testOrderedData.length + 1, registry.length,
-				"There should be " + (testOrderedData.length + 1) + " widgets for the grid's editors");
+					"There should be " + (testOrderedData.length + 1) + " widgets for the grid's editors");
 
 			grid.destroy();
 
@@ -268,18 +273,27 @@ define([
 				cell,
 				cellEditor;
 
-			grid = new Grid({
+			function showEventHandler (event) {
+				// document.activeElement is the body for some reason.
+				// So at least check to ensure that the cell we called edit on
+				// is the same as the cell passed to the "dgrid-editor-show" event.
+				assert.strictEqual(cell.element, event.cell.element,
+					"The activated cell should be being edited"
+				);
+			}
+
+			grid = new EditorGrid({
 				columns: {
 					order: "step",
-					name: editor({
+					name: {
 						label: "Name",
 						editor: "text"
-					}),
-					description: editor({
+					},
+					description: {
 						label: "Description",
 						editor: "text",
 						editOn: "click"
-					})
+					}
 				}
 			});
 			document.body.appendChild(grid.domNode);
@@ -305,14 +319,7 @@ define([
 				// Respond to the "dgrid-editor-show" event to ensure the
 				// correct cell has an editor.  This event actually fires
 				// synchronously, so we don't need to use this.async.
-				on.once(grid.domNode, "dgrid-editor-show", function (event) {
-					// document.activeElement is the body for some reason.
-					// So at least check to ensure that the cell we called edit on
-					// is the same as the cell passed to the "dgrid-editor-show" event.
-					assert.strictEqual(cell.element, event.cell.element,
-						"The activated cell should be being edited"
-					);
-				});
+				on.once(grid.domNode, "dgrid-editor-show", showEventHandler);
 
 				grid.edit(cell);
 			}

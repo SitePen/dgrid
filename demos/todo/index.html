@@ -71,8 +71,8 @@
 		</div>
 		<script src="../../../dojo/dojo.js" data-dojo-config="async:1"></script>
 		<script>
-require(["dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/editor", "dgrid/extensions/DnD", "dojo/_base/declare", "dojo/json", "dojo/store/Memory", "dojo/store/Observable", "put-selector/put"],
-function(Grid, Selection, editor, DnD, declare, json, Memory, Observable, put){
+require(["dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Editor", "dgrid/extensions/DnD", "dojo/_base/declare", "dojo/json", "dojo/store/Memory", "dojo/store/Observable", "put-selector/put"],
+function(Grid, Selection, Editor, DnD, declare, json, Memory, Observable, put){
 	function byId(id){
 		return document.getElementById(id);
 	}
@@ -151,14 +151,15 @@ function(Grid, Selection, editor, DnD, declare, json, Memory, Observable, put){
 	}
 		Store = declare(storeMixins),
 		store = Observable(new Store({ idProperty: "summary" })),
-		grid = new (declare([Grid, Selection, DnD]))({
+		grid = new (declare([Grid, Selection, DnD, Editor]))({
 			store: store,
 			columns: {
-				completed: editor({
+				completed: {
+					editor: "checkbox",
 					label: " ",
 					autoSave: true,
 					sortable: false
-				}, "checkbox"),
+				},
 				summary: {
 					field: "_item", // get whole item for use by formatter
 					label: "TODOs",
@@ -172,7 +173,7 @@ function(Grid, Selection, editor, DnD, declare, json, Memory, Observable, put){
 		}, "list"),
 		taskField = byId("txtTask");
 	
-	grid.sort("order");
+	//grid.sort("order");
 	
 	byId("itemForm").onsubmit = function(){
 		// allow overwrite if already exists (by using put, not add)

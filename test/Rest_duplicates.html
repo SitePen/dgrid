@@ -32,10 +32,10 @@
 			}
 			
 			require(["dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Keyboard",
-				"dgrid/editor", "dgrid/tree", "dojo/_base/declare",
+				"dgrid/Editor", "dgrid/tree", "dojo/_base/declare",
 				"dstore/Rest", "dstore/Observable", "dstore/Cache", 
 				"dstore/SimpleQuery", "dojo/domReady!"], 
-			function(Grid, Selection, Keyboard, editor, tree, declare, Rest, Observable, Cache, SimpleQuery){
+			function(Grid, Selection, Keyboard, Editor, tree, declare, Rest, Observable, Cache, SimpleQuery){
 				testStore = new declare([ Rest, SimpleQuery, Observable, Cache])({
 					target:"./data/rest.php", 
 					idProperty: "id",
@@ -48,11 +48,11 @@
 				var columns = [
 					tree({label:'Name', field:'name', sortable: false, allowDuplicates: true}),
 					{label:'Id', field:'id', sortable: true},
-					editor({label:'Comment', field:'comment', sortable: false, autoSave: true}, "text"),
-					editor({label:'Boolean', field:'boo', sortable: false, autoSave: true}, "checkbox")
+					{label:'Comment', field:'comment', sortable: false, autoSave: true, editor: "text"},
+					{label:'Boolean', field:'boo', sortable: false, autoSave: true, editor: "checkbox"}
 				];
 
-				var grid = window.grid = new (declare([Grid, Selection, Keyboard]))({
+				var grid = window.grid = new (declare([Grid, Selection, Keyboard, Editor]))({
 					collection: testStore,
 					getBeforePut: false,
 					columns: columns

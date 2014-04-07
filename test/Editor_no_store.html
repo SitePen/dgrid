@@ -28,21 +28,31 @@
 		<script src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script>
-			require(["dgrid/Grid", "dgrid/Selection", "dgrid/Keyboard", "dgrid/editor", "dijit/form/NumberSpinner", "dojo/_base/declare", "dgrid/test/data/typesData", "dojo/domReady!"],
-				function(Grid, Selection, Keyboard, editor, NumberSpinner, declare, typesData){
+			require(["dgrid/Grid", "dgrid/Selection", "dgrid/Keyboard", "dgrid/Editor", "dijit/form/NumberSpinner", "dojo/_base/declare", "dgrid/test/data/typesData", "dojo/domReady!"],
+				function(Grid, Selection, Keyboard, Editor, NumberSpinner, declare, typesData){
 					var columns = [
-						editor({
+						{
 							label: 'Integer',
 							field: 'integer',
 							autoSave: true,
+							editor: NumberSpinner,
 							editorArgs: {style: 'width: 5em;', constraints: {min:1,max:1550,places:0}}
-						}, NumberSpinner),
-						editor({label: 'Text', field: 'text', autoSave: true},
-							"text", "dblclick"),
-						{label: 'Non editable text', field: 'text', sortable: false}
+						},
+						{
+							label: 'Text',
+							field: 'text',
+							autoSave: true,
+							editor: "text",
+							editOn: "dblclick"
+						},
+						{
+							label: 'Non editable text',
+							field: 'text',
+							sortable: false
+						}
 					];
 
-					window.grid = new (declare([Grid, Selection, Keyboard]))({
+					window.grid = new (declare([Grid, Selection, Keyboard, Editor]))({
 						columns: columns,
 						selectionMode: "single"
 					}, "grid");

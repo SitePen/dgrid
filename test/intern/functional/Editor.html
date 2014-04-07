@@ -25,20 +25,20 @@
 				"dojo/_base/declare",
 				"dgrid/Grid",
 				"dgrid/OnDemandList",
-				"dgrid/editor"
-			], function (declare, Grid, OnDemandList, editor) {
-				grid = new Grid({
+				"dgrid/Editor"
+			], function (declare, Grid, OnDemandList, Editor) {
+				grid = new (declare([Grid, Editor]))({
 					columns: {
 						id: "ID",
-						name: editor({
+						name: {
 							label: "Name",
 							editor: "text"
-						}),
-						description: editor({
+						},
+						description: {
 							label: "Description",
 							editor: "text",
 							editOn: "click"
-						})
+						}
 					}
 				}, "grid");
 
