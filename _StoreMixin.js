@@ -236,7 +236,7 @@ function(kernel, declare, lang, Deferred, listen, aspect, put){
 				store = this.store,
 				dirty = this.dirty,
 				dfd = new Deferred(), promise = dfd.promise,
-        results = {},
+        			results = {},
 				getFunc = function(id){
 					// returns a function to pass as a step in the promise chain,
 					// with the id variable closured
@@ -278,8 +278,8 @@ function(kernel, declare, lang, Deferred, listen, aspect, put){
 						// Clear the item now that it's been confirmed updated
 						delete dirty[id];
 						delete updating[id];
-            // Return the result (a Promise or a resolved value) of the PUT request.
-            results[id] = valueOrPromise;
+            					// Return the result (a Promise or a resolved value) of the PUT request.
+            					results[id] = valueOrPromise;
 						return results;
 					});
 				};
@@ -294,10 +294,10 @@ function(kernel, declare, lang, Deferred, listen, aspect, put){
 				// getting the item from the store first if desired.
 				promise = promise.then(getFunc(id)).then(put);
 			}
-      // Kick off and return the promise representing applicable get/put operation.
+      			// Kick off and return the promise representing applicable get/put operation.
 			// If the success callback is fired, all operations succeeded; otherwise,
 			// save will stop at the first error it encounters.
-      dfd.resolve();
+      			dfd.resolve();
 			return promise;
 		},
 		
