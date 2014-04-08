@@ -236,6 +236,7 @@ function(kernel, declare, lang, Deferred, listen, aspect, put){
 				store = this.store,
 				dirty = this.dirty,
 				dfd = new Deferred(), promise = dfd.promise,
+        results = {},
 				getFunc = function(id){
 					// returns a function to pass as a step in the promise chain,
 					// with the id variable closured
@@ -278,25 +279,28 @@ function(kernel, declare, lang, Deferred, listen, aspect, put){
 						delete dirty[id];
 						delete updating[id];
             // Return the result (a Promise or a resolved value) of the PUT request.
-						return valueOrPromise;
+            results[id] = valueOrPromise;
+						return results;
 					});
 				};
 			}
       
 			// For every dirty item, grab the ID
 			for(var id in dirty) {
-				var dfd = new Deferred(), promise = dfd.promise;
 				// Create put function to handle the saving of the the item
 				var put = putter(id, dirty[id]);
         
 				// Add this item onto the promise chain,
 				// getting the item from the store first if desired.
 				promise = promise.then(getFunc(id)).then(put);
-			// Kick off and return the promise representing applicable get/put operation.
-				dfd.resolve();
 			}
+      promise = promise.then(function(results) {
+        return results;
+      });
+      // Kick off and return the promise representing applicable get/put operation.
 			// If the success callback is fired, all operations succeeded; otherwise,
 			// save will stop at the first error it encounters.
+      dfd.resolve();
 			return promise;
 		},
 		
