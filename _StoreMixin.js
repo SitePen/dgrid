@@ -1,5 +1,5 @@
-define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/lang", "dojo/Deferred", "dojo/promise/all", "dojo/when", "dojo/on", "dojo/aspect", "put-selector/put"],
-function(kernel, declare, lang, Deferred, all, when, listen, aspect, put){
+define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/on", "dojo/aspect", "put-selector/put"],
+function(kernel, declare, lang, Deferred, listen, aspect, put){
 	// This module isolates the base logic required by store-aware list/grid
 	// components, e.g. OnDemandList/Grid and the Pagination extension.
 	
@@ -235,7 +235,7 @@ function(kernel, declare, lang, Deferred, all, when, listen, aspect, put){
 			var self = this,
 				store = this.store,
 				dirty = this.dirty,
-				promises = [],
+				dfd = new Deferred(), promise = dfd.promise,
 				getFunc = function(id){
 					// returns a function to pass as a step in the promise chain,
 					// with the id variable closured
@@ -273,7 +273,7 @@ function(kernel, declare, lang, Deferred, all, when, listen, aspect, put){
 					
 					updating[id] = true;
 					// Put it in the store, returning the result/promise
-					return when(store.put(object), function(valueOrPromise) {
+					return Deferred.when(store.put(object), function(valueOrPromise) {
 						// Clear the item now that it's been confirmed updated
 						delete dirty[id];
 						delete updating[id];
@@ -291,14 +291,13 @@ function(kernel, declare, lang, Deferred, all, when, listen, aspect, put){
         
 				// Add this item onto the promise chain,
 				// getting the item from the store first if desired.
-				promises.push(when(promise, getFunc(id)).then(put));
+				promise = promise.then(getFunc(id)).then(put);
 			// Kick off and return the promise representing applicable get/put operation.
 				dfd.resolve();
 			}
-      
 			// If the success callback is fired, all operations succeeded; otherwise,
 			// save will stop at the first error it encounters.
-			return all(promises);
+			return promise;
 		},
 		
 		revert: function(){
@@ -332,7 +331,7 @@ function(kernel, declare, lang, Deferred, all, when, listen, aspect, put){
 			}
 			
 			// wrap in when call to handle reporting of potential async error
-			return when(result, noop, lang.hitch(this, emitError));
+			return Deferred.when(result, noop, lang.hitch(this, emitError));
 		},
 		
 		newRow: function(){
