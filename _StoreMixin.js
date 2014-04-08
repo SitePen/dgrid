@@ -294,9 +294,6 @@ function(kernel, declare, lang, Deferred, listen, aspect, put){
 				// getting the item from the store first if desired.
 				promise = promise.then(getFunc(id)).then(put);
 			}
-      promise = promise.then(function(results) {
-        return results;
-      });
       // Kick off and return the promise representing applicable get/put operation.
 			// If the success callback is fired, all operations succeeded; otherwise,
 			// save will stop at the first error it encounters.
