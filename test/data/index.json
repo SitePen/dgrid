@@ -77,6 +77,12 @@
         "parent": "extensions"
     },
     {
+        "name": "ColumnHiderRTL.html",
+        "url": "extensions/ColumnHiderRTL.html",
+        "title": "Test Column Hider Extension RTL",
+        "parent": "extensions"
+    },
+    {
         "name": "ColumnHider_MenuHeight.html",
         "url": "extensions/ColumnHider_MenuHeight.html",
         "title": "Test Column Hider Extension: Large Menu",
