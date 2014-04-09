@@ -117,7 +117,8 @@ function(declare, has, listen, miscUtil, put, i18n){
 			var grid = this,
 				hiderMenuNode = this.hiderMenuNode,
 				hiderToggleNode = this.hiderToggleNode,
-				id;
+				id,
+				iconContainer;
 			
 			function stopPropagation(event){
 				event.stopPropagation();
@@ -128,8 +129,13 @@ function(declare, has, listen, miscUtil, put, i18n){
 			if(!hiderMenuNode){ // first run
 				// Assume that if this plugin is used, then columns are hidable.
 				// Create the toggle node.
+				if(has("dom-scrollbar-width")) {
+					iconContainer = this.headerScrollNode;
+				} else {
+					iconContainer = this.headerNode;
+				}
 				hiderToggleNode = this.hiderToggleNode =
-					put(this.headerScrollNode, "button.ui-icon.dgrid-hider-toggle[type=button]");
+					put(iconContainer, "button.ui-icon.dgrid-hider-toggle[type=button]");
 				
 				this._listeners.push(listen(hiderToggleNode, "click", function(e){
 					grid._toggleColumnHiderMenu(e);
