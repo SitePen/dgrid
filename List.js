@@ -40,7 +40,7 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 		// position: absolute makes IE always report child's offsetLeft as 0,
 		// but it conveniently makes other browsers reset to 0 as base, and all
 		// versions of IE are known to move the scrollbar to the left side for rtl
-		isLeft = !!has("ie") || div.offsetLeft >= has("dom-scrollbar-width");
+		isLeft = !!has("ie") || !!has("trident") || div.offsetLeft >= has("dom-scrollbar-width");
 		cleanupTestElement(element);
 		put(div, "!");
 		element.removeAttribute("dir");
