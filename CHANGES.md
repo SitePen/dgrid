@@ -3,7 +3,12 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 # master (0.3.15-dev)
 
-Coming soon!
+## Significant changes
+
+### Extensions
+
+* Fixed a regression in `ColumnHider` where the node to open the menu became
+  invisible on platforms with hidden scrollbars. (#886)
 
 # 0.3.14
 
