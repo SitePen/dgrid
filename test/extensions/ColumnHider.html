@@ -6,6 +6,9 @@
 		<meta name="viewport" content="width=570">
 		<style>
 			@import "../../../dojo/resources/dojo.css";
+			@import "../../../dojo/resources/dnd.css";
+			@import "../../css/dgrid.css";
+			@import "../../css/dgrid_rtl.css";
 			@import "../../css/skins/claro.css";
 			.dgrid {
 				width: 750px;
@@ -55,9 +58,17 @@
 						{ field: "col1", label: "Col1" },
 						{ field: "col5" } // no label, to test fallback to field
 					],
+					body = document.body,
+					rtl = location.search.indexOf("rtl") !== -1,
 					grid,
 					gridResize,
 					gridReorder;
+				
+				if(rtl) {
+					document.documentElement.setAttribute("dir", "rtl");
+				}
+				body.insertBefore(put('a[href="ColumnHider.html' + (rtl ? '' : '?rtl') + '"]',
+					"Switch to " + (rtl ? "LTR" : "RTL")), body.firstChild);
 				
 				getColumns = function(){
 					return lang.clone(columns);

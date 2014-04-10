@@ -129,7 +129,7 @@ function(declare, has, listen, miscUtil, put, i18n){
 				// Assume that if this plugin is used, then columns are hidable.
 				// Create the toggle node.
 				hiderToggleNode = this.hiderToggleNode =
-					put(this.headerScrollNode, "button.ui-icon.dgrid-hider-toggle[type=button]");
+					put(this.domNode, "button.ui-icon.dgrid-hider-toggle[type=button]");
 				
 				this._listeners.push(listen(hiderToggleNode, "click", function(e){
 					grid._toggleColumnHiderMenu(e);
