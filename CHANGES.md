@@ -36,6 +36,8 @@ The following is a rough list of changes, to be outlined more presentably later.
   particularly affecting `tree`. (#817)
 * `List#useTouchScroll` now defaults to `false` on platforms which render tangible
   scrollbars (namely, desktop browsers on touch-enabled devices such as the Surface).
+* Fixed feature detection in `util/has-css3` to be more accurate and avoid causing
+  errors in some situations. (#775)
 
 ### Mixins
 
