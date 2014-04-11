@@ -20,13 +20,31 @@ The following is a rough list of changes, to be outlined more presentably later.
 * Removed deprecated functions marked for removal in 0.4; most of these have had
   `set(...)` equivalents for a long time already
 
-# master (0.3.14-dev)
+# master (0.3.15-dev)
+
+## Significant changes
+
+### Extensions
+
+* Fixed a regression in `ColumnHider` where the node to open the menu became
+  invisible on platforms with hidden scrollbars. (#886)
+
+# 0.3.14
 
 ## Significant changes
 
 ### General/Core
 
-* Fixed issue where `List#destroy` would throw an error if `useTouchScroll` is
+* Added a `List#addUiClasses` property which can be set to `false` on any
+  instance to prevent it from adding `ui-` classes to various elements, which
+  can help when using disparate jQuery UI and dgrid themes/skins on the same page.
+  The option defaults to `true` for consistency with previous versions.
+  Note that some selectors in various dgrid skins have been updated to not use
+  `ui-` classes, to prevent undesired overriding of jQuery UI themes.  (#873)
+* Added styles for a `dgrid-autoheight` class, which can be added to any list/grid
+  via the `className` property to make the grid automatically size based on its
+  contents.
+* Fixed an issue where `List#destroy` would throw an error if `useTouchScroll` is
   set to `false` on a device with touch support. (#867)
 * Fixed a regression in `List` which would cause observed modifications to tree
   children to throw errors. (#862)
@@ -41,6 +59,9 @@ The following is a rough list of changes, to be outlined more presentably later.
 
 ### Mixins
 
+* Fixed a regression in the `Keyboard` mixin which would cause errors when
+  attempting to re-focus an updated row/cell when it (or the entire grid) is
+  currently hidden. (#866)
 * The `Selection` mixin will now listen for both touch and mouse events, rather
   than one or the other exclusively. (#757)
 * The touch event(s) that `Selection` listens for can now be overridden via the
@@ -58,6 +79,11 @@ The following is a rough list of changes, to be outlined more presentably later.
 
 ## Other changes and fixes
 
+### General/Core
+
+* Fixed an RTL issue that caused the column headers to misalign with the body
+  on Chrome.
+
 ### Mixins
 
 * Fixed issues in the `Selection` and `CellSelection` mixins when the row
@@ -66,8 +92,16 @@ The following is a rough list of changes, to be outlined more presentably later.
 * The `ColumnSet` mixin no longer excludes touch devices when registering
   wheel listener logic (for combination mouse+touch devices).
 
+### Column Plugins
+
+* Fixed an issue in `editor` where the wrong column would be referenced from
+  the `change` event handler for native inputs, particularly affecting radio
+  buttons. (#876)
+
 ### Extensions
 
+* Added logic to `ColumnHider` to skip hidden columns when calling `left` and
+  `right` (which affects e.g. `Keyboard` navigation).
 * Improved performance of first resize with `ColumnResizer`. (#832)
 * Fixed errors in the `DnD` extension when using a mouse on a mouse+touch device.
 * The `Pagination` extension will no longer cancel an ongoing async request if

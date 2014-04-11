@@ -82,30 +82,27 @@
 						columns: lang.clone(columns)
 					}, "scrollgrid");
 					
-					var columnsTree = [
-						editor({label: ' ', field: 'bool', sortable: false}, "checkbox"),
-						tree({label:'Name', field:'name', sortable: false}),
-						{label:'Type', field:'type', sortable: false},
-						{label:'Population', field:'population'},
-						{label:'Timezone', field:'timezone'}
-					];
-					
 					window.tree = new StandardGrid({
+						className: "dgrid-autoheight",
 						collection: createAsyncHierarchicalStore({ data: hierarchicalCountryData }),
-						columns: columnsTree
+						columns: [
+							editor({label: ' ', field: 'bool', sortable: false}, "checkbox"),
+							tree({label:'Name', field:'name', sortable: false}),
+							{label:'Type', field:'type', sortable: false},
+							{label:'Population', field:'population'},
+							{label:'Timezone', field:'timezone'}
+						]
 					}, "tree");
 					
-					var columnsHeaderless = { // you can declare columns as an object hash (key translates to field)
-						col1: editor({label: 'Column 1 column 1 column 1'}, "text", "dblclick"),
-						col2: {label: 'Column 2', sortable: false},
-						col3: editor({label: 'Column 3'}, "text", "dblclick"),
-						col4: 'Column444444444444444444',
-						col5: editor({label: 'Column 5'}, "text", "dblclick")
-					};
-
 					window.headerless = new StandardGrid({
 						collection: testStore,
-						columns: columnsHeaderless,
+						columns: {
+							col1: editor({label: 'Column 1 column 1 column 1'}, "text", "dblclick"),
+							col2: {label: 'Column 2', sortable: false},
+							col3: editor({label: 'Column 3'}, "text", "dblclick"),
+							col4: 'Column444444444444444444',
+							col5: editor({label: 'Column 5'}, "text", "dblclick")
+						},
 						showHeader: false
 						
 					}, "headerless");
@@ -115,54 +112,51 @@
 						labelProperty: "name"
 					});
 
-					var columnsEditor = [
-						{field: "id", label: "id"},
-						editor({
-							label: "CheckBox",
-							field: "bool2",
-							editorArgs: {
-								value: "checked"
-							}
-						}, CheckBox),
-						editor({label: "Time", field: "date2", editorArgs: {
-							timePattern: "HH:mm:ss",
-							clickableIncrement: "T00:15:00",
-							visibleIncrement: "T00:15:00",
-							visibleRange: "T01:00:00"}}, TimeTextBox),
-						editor({
-							label: "Select Options",
-							field: "bool",
-							get: function(item){
-								// return as string to match option in list
-								return "" + item.bool;
-							},
-							set: function(item){
-								// convert back to boolean from string
-								return item.bool == "true";
-							},
-							editorArgs: {
-								style: "width:75px;",
-								options: [
-									{value: "true", label: "true"},
-									{value: "false", label: "false"}
-								]
-							}
-						}, Select, "dblclick"),
-						editor({label: "Select Store", field: "state", editorArgs: {store: stateStore, maxHeight: 150, style: "width:120px;"}}, Select, "click"),
-						editor({label: "FilteringSelect Store", field: "state2", editorArgs: {store: stateStore, maxHeight: 150, style: "width:120px;"}}, FilteringSelect)
-					];
-					
 					window.moreeditors = new StandardGrid({
 						collection: createSyncStore({ data: typesData }),
-						columns: columnsEditor,
+						columns: [
+							{field: "id", label: "id"},
+							editor({
+								label: "CheckBox",
+								field: "bool2",
+								editorArgs: {
+									value: "checked"
+								}
+							}, CheckBox),
+							editor({label: "Time", field: "date2", editorArgs: {
+								timePattern: "HH:mm:ss",
+								clickableIncrement: "T00:15:00",
+								visibleIncrement: "T00:15:00",
+								visibleRange: "T01:00:00"}}, TimeTextBox),
+							editor({
+								label: "Select Options",
+								field: "bool",
+								get: function(item){
+									// return as string to match option in list
+									return "" + item.bool;
+								},
+								set: function(item){
+									// convert back to boolean from string
+									return item.bool == "true";
+								},
+								editorArgs: {
+									style: "width:75px;",
+									options: [
+										{value: "true", label: "true"},
+										{value: "false", label: "false"}
+									]
+								}
+							}, Select, "dblclick"),
+							editor({label: "Select Store", field: "state", editorArgs: {store: stateStore, maxHeight: 150, style: "width:120px;"}}, Select, "click"),
+							editor({label: "FilteringSelect Store", field: "state2", editorArgs: {store: stateStore, maxHeight: 150, style: "width:120px;"}}, FilteringSelect)
+						],
 						selectionMode: "none"
 					}, "moreeditors");
 
 					window.paginationGrid = new declare([Grid, Selection, Keyboard, Pagination])({
 						collection: testStore,
 						columns: lang.clone(columns)
-					}, 'pagination');
-					
+					}, "pagination");
 				});
 		</script>
 	</head> 
@@ -174,7 +168,7 @@
 		<p>(for testing horizontal scrolling)</p>
 		<div id="scrollgrid"></div>
 		
-		<h2>Lazy-loading tree grid, with store functionality</h2>
+		<h2>Lazy-loading tree grid with auto-height</h2>
 		<div id="tree"></div>
 		
 		<h2>Headerless grid</h2>
@@ -184,7 +178,7 @@
 		<div id="moreeditors"></div>
 		<button type="button" id="save" onclick="moreeditors.save()">Save</button>
 
-		<h2>A basic grid with Pagination</h2>
+		<h2>A grid with Pagination</h2>
 		<div id="pagination"></div>
 	</body>
 </html>

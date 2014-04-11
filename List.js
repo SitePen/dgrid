@@ -11,17 +11,16 @@ function(declare, listen, has, miscUtil, hasClass, put){
 		return document.getElementById(id);
 	}
 	
-	function getScrollbarSize(node, dimension){
+	function cleanupTestElement(element){
+		element.className = "";
+		document.body.removeChild(element);
+	}
+	
+	function getScrollbarSize(element, dimension){
 		// Used by has tests for scrollbar width/height
-		var body = document.body,
-			size;
-		
-		put(body, node, ".dgrid-scrollbar-measure");
-		size = node["offset" + dimension] - node["client" + dimension];
-		
-		put(node, "!dgrid-scrollbar-measure");
-		body.removeChild(node);
-		
+		put(document.body, element, ".dgrid-scrollbar-measure");
+		var size = element["offset" + dimension] - element["client" + dimension];
+		cleanupTestElement(element);
 		return size;
 	}
 	has.add("dom-scrollbar-width", function(global, doc, element){
@@ -29,6 +28,23 @@ function(declare, listen, has, miscUtil, hasClass, put){
 	});
 	has.add("dom-scrollbar-height", function(global, doc, element){
 		return getScrollbarSize(element, "Height");
+	});
+	
+	has.add("dom-rtl-scrollbar-left", function(global, doc, element){
+		var div = put("div"),
+			isLeft;
+		
+		put(document.body, element, ".dgrid-scrollbar-measure[dir=rtl]");
+		put(element, div);
+		
+		// position: absolute makes IE always report child's offsetLeft as 0,
+		// but it conveniently makes other browsers reset to 0 as base, and all
+		// versions of IE are known to move the scrollbar to the left side for rtl
+		isLeft = !!has("ie") || !!has("trident") || div.offsetLeft >= has("dom-scrollbar-width");
+		cleanupTestElement(element);
+		put(div, "!");
+		element.removeAttribute("dir");
+		return isLeft;
 	});
 	
 	// var and function for autogenerating ID when one isn't provided
@@ -102,6 +118,10 @@ function(declare, listen, has, miscUtil, hasClass, put){
 		//		the call to addCssRule, not at the time of destruction.
 		cleanAddedRules: true,
 		
+		// addUiClasses: Boolean
+		//		Whether to add jQuery UI classes to various elements in dgrid's DOM.
+		addUiClasses: true,
+
 		// highlightDuration: Integer
 		//		The amount of time (in milliseconds) that a row should remain
 		//		highlighted after it has been updated.
@@ -169,6 +189,7 @@ function(declare, listen, has, miscUtil, hasClass, put){
 		},
 		buildRendering: function(){
 			var domNode = this.domNode,
+				addUiClasses = this.addUiClasses,
 				self = this,
 				headerNode, spacerNode, bodyNode, footerNode, isRTL;
 			
@@ -180,11 +201,13 @@ function(declare, listen, has, miscUtil, hasClass, put){
 			// class / className setter), then apply standard classes/attributes
 			domNode.className = "";
 			
-			put(domNode, "[role=grid].ui-widget.dgrid.dgrid-" + this.listType);
+			put(domNode, "[role=grid].dgrid.dgrid-" + this.listType +
+				(addUiClasses ? ".ui-widget" : ""));
 			
 			// Place header node (initially hidden if showHeader is false).
 			headerNode = this.headerNode = put(domNode, 
-				"div.dgrid-header.dgrid-header-row.ui-widget-header" +
+				"div.dgrid-header.dgrid-header-row" +
+				(addUiClasses ? ".ui-widget-header" : "") +
 				(this.showHeader ? "" : ".dgrid-header-hidden"));
 			if(has("quirks") || has("ie") < 8){
 				spacerNode = put(domNode, "div.dgrid-spacer");
@@ -198,7 +221,8 @@ function(declare, listen, has, miscUtil, hasClass, put){
 				bodyNode.tabIndex = -1;
 			}
 			
-			this.headerScrollNode = put(domNode, "div.dgrid-header-scroll.dgrid-scrollbar-width.ui-widget-header");
+			this.headerScrollNode = put(domNode, "div.dgrid-header.dgrid-header-scroll.dgrid-scrollbar-width" +
+				(addUiClasses ? ".ui-widget-header" : ""));
 			
 			// Place footer node (initially hidden if showFooter is false).
 			footerNode = this.footerNode = put("div.dgrid-footer" +
@@ -206,7 +230,8 @@ function(declare, listen, has, miscUtil, hasClass, put){
 			put(domNode, footerNode);
 			
 			if(isRTL){
-				domNode.className += " dgrid-rtl" + (has("webkit") ? "" : " dgrid-rtl-nonwebkit");
+				domNode.className += " dgrid-rtl" +
+					(has("dom-rtl-scrollbar-left") ? " dgrid-rtl-swap" : "");
 			}
 			
 			listen(bodyNode, "scroll", function(event){
@@ -221,7 +246,8 @@ function(declare, listen, has, miscUtil, hasClass, put){
 			this.configStructure();
 			this.renderHeader();
 			
-			this.contentNode = this.touchNode = put(this.bodyNode, "div.dgrid-content.ui-widget-content");
+			this.contentNode = this.touchNode = put(this.bodyNode,
+				"div.dgrid-content" + (addUiClasses ? ".ui-widget-content" : ""));
 			// add window resize handler, with reference for later removal if needed
 			this._listeners.push(this._resizeHandle = listen(window, "resize",
 				miscUtil.throttleDelayed(winResizeHandler, this)));
@@ -291,9 +317,9 @@ function(declare, listen, has, miscUtil, hasClass, put){
 				if(scrollbarWidth != 17 && !quirks){
 					// for modern browsers, we can perform a one-time operation which adds
 					// a rule to account for scrollbar width in all grid headers.
-					miscUtil.addCssRule(".dgrid-header", "right: " + scrollbarWidth + "px");
+					miscUtil.addCssRule(".dgrid-header-row", "right: " + scrollbarWidth + "px");
 					// add another for RTL grids
-					miscUtil.addCssRule(".dgrid-rtl-nonwebkit .dgrid-header", "left: " + scrollbarWidth + "px");
+					miscUtil.addCssRule(".dgrid-rtl-swap .dgrid-header-row", "left: " + scrollbarWidth + "px");
 				}
 			}
 			
@@ -385,9 +411,10 @@ function(declare, listen, has, miscUtil, hasClass, put){
 			//		ui-state-highlight class.
 			
 			rowElement = rowElement.element || rowElement;
-			put(rowElement, ".ui-state-highlight");
+			put(rowElement, ".ui-state-highlight" +
+				(this.addUiClasses ? ".ui-state-highlight" : ""));
 			setTimeout(function(){
-				put(rowElement, "!ui-state-highlight");
+				put(rowElement, "!dgrid-highlight!ui-state-highlight");
 			}, delay || this.highlightDuration);
 		},
 		
@@ -474,7 +501,9 @@ function(declare, listen, has, miscUtil, hasClass, put){
 				this.removeRow(row);
 			}
 			row = this.renderRow(object, options);
-			row.className = (row.className || "") + " ui-state-default dgrid-row " + (i % 2 == 1 ? oddClass : evenClass);
+			row.className = (row.className || "") + " dgrid-row " +
+				(i % 2 == 1 ? oddClass : evenClass) +
+				(this.addUiClasses ? " ui-state-default" : "");
 			// get the row id for easy retrieval
 			this._rowIdToObject[row.id = id] = object;
 			parent.insertBefore(row, beforeNode || null);
