@@ -134,12 +134,12 @@ return declare([List, _StoreMixin], {
 		
 		// Protect the query within a _trackError call, but return the resulting collection
 		return this._trackError(function(){
-			var renderedCollection = query(options);
+			var resultsCollection = query(options);
 
 			// Render the result set
-			return self.renderCollection(renderedCollection, preloadNode, options).then(function(trs){
-				var total = typeof renderedCollection.total === "undefined" ?
-					renderedCollection.length : renderedCollection.total;
+			return self.renderCollection(resultsCollection, preloadNode, options).then(function(trs){
+				var total = typeof resultsCollection.total === "undefined" ?
+					resultsCollection.length : resultsCollection.total;
 				return Deferred.when(total, function(total){
 					var trCount = trs.length,
 						parentNode = preloadNode.parentNode,
@@ -215,12 +215,12 @@ return declare([List, _StoreMixin], {
 		if(keep){ this._previousScrollPosition = this.getScrollPosition(); }
 		
 		this.inherited(arguments);
-		if(this.collection){
+		if(this._renderedCollection){
 			// render the query
 
 			// renderQuery calls _trackError internally
 			return this.renderQuery(function(queryOptions){
-				return self.collection.range(queryOptions.start, queryOptions.start + queryOptions.count);
+				return self._renderedCollection.range(queryOptions.start, queryOptions.start + queryOptions.count);
 			}).then(function(){
 				// Emit on a separate turn to enable event to be used consistently for
 				// initial render, regardless of whether the backing store is async

@@ -207,7 +207,7 @@ function tree(column){
 					container = rowElement.connected = put('div.dgrid-tree-container');//put(rowElement, '+...
 					preloadNode = target.preloadNode = put(rowElement, '+', container, 'div.dgrid-preload');
 					var query = function(options){
-						var childCollection = grid.collection.getChildren(row.data);
+						var childCollection = grid._renderedCollection.getChildren(row.data);
 						if(grid.sort){
 							childCollection = childCollection.sort(grid.sort);
 						}

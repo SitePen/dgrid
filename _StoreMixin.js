@@ -29,9 +29,15 @@ function(declare, lang, Deferred, listen, aspect, put){
 	
 	return declare(null, {
 		// collection: Object
-		//		The object collection (implementing the dstore/api/Store API) from which data is
-		//		to be fetched.
+		//		The base object collection (implementing the dstore/api/Store API) before being sorted
+		//		or otherwise processed by the grid. Use it for general purpose store operations such as
+		//		`getIdentity` and `get`, `add`, `put`, and `remove`.
 		collection: null,
+
+		// _renderedCollection: Object
+		//		The object collection from which data is to be fetched. This is the sorted collection.
+		//		Use it when retrieving data to be rendered by the grid.
+		_renderedCollection: null,
 
 		// _rows: Array
 		//		A sparse array of row nodes, used to maintain the grid in response to events from a tracked collection.
@@ -91,12 +97,12 @@ function(declare, lang, Deferred, listen, aspect, put){
 			// summary:
 			//		Assigns a new collection to the list,
 			//		and tells it to refresh.
-			
-			if(this.collection){
-				if(this.collection.tracking){
-					this.collection.tracking.remove();
+
+			if(this._renderedCollection){
+				if(this._renderedCollection.tracking){
+					this._renderedCollection.tracking.remove();
 				}
-			
+
 				// Remove observer and existing rows so any sub-row observers will be cleaned up
 				if(this._observerHandle){
 					this._observerHandle.remove();
@@ -108,19 +114,19 @@ function(declare, lang, Deferred, listen, aspect, put){
 			}
 			
 			if(collection){
+				var renderedCollection = this.collection = collection;
 				if(this.sort && this.sort.length > 0){
-					collection = collection.sort(this.sort);
+					renderedCollection = collection.sort(this.sort);
 				}
 
-				if(collection.track){
-					collection = this.collection = collection.track();
+				if(renderedCollection.track){
+					renderedCollection = renderedCollection.track();
 					this._rows = [];
 
-					this._observerHandle = this._observeCollection(collection, this.contentNode, this._rows);
-				}else{
-					this.collection = collection;
+					this._observerHandle = this._observeCollection(renderedCollection, this.contentNode, this._rows);
 				}
 
+				this._renderedCollection = renderedCollection;
 				this.refresh();
 			}
 		},
