@@ -268,13 +268,15 @@ function createSharedEditor(column, originalRenderCell){
 		// Remove the editor from the cell, to be reused later.
 		parentNode.removeChild(node);
 		
-		put(cell.element, "!dgrid-cell-editing");
-		
-		// Clear out the rest of the cell's contents, then re-render with new value.
-		while(i--){ put(parentNode.firstChild, "!"); }
-		Grid.appendIfNode(parentNode, column.renderCell(
-			column.grid.row(parentNode).data, grid._activeValue, parentNode,
-			grid._activeOptions ? lang.delegate(options, grid._activeOptions) : options));
+		if(cell.row){
+			// If the row is still present (i.e. we didn't blur due to removal),
+			// clear out the rest of the cell's contents, then re-render with new value.
+			put(cell.element, "!dgrid-cell-editing");
+			while(i--){ put(parentNode.firstChild, "!"); }
+			Grid.appendIfNode(parentNode, column.renderCell(
+				column.grid.row(parentNode).data, grid._activeValue, parentNode,
+				grid._activeOptions ? lang.delegate(options, grid._activeOptions) : options));
+		}
 		
 		// Reset state now that editor is deactivated;
 		// reset focusedCell as well since some browsers will not trigger the
@@ -395,11 +397,12 @@ function edit(cell) {
 				// focus / blur-handler-resume logic is surrounded in a setTimeout
 				// to play nice with Keyboard's dgrid-cellfocusin as an editOn event
 				dfd = new Deferred();
-				setTimeout(function(){
+				column._editTimer = setTimeout(function(){
 					// focus the newly-placed control (supported by form widgets and HTML inputs)
 					if(cmp.focus){ cmp.focus(); }
 					// resume blur handler once editor is focused
 					if(column._editorBlurHandle){ column._editorBlurHandle.resume(); }
+					column._editTimer = null;
 					dfd.resolve(cmp);
 				}, 0);
 
@@ -432,7 +435,9 @@ return function(column, editor, editOn){
 	function commonInit(column) {
 		// Common initialization logic for both editOn and always-on editors
 		var grid = column.grid,
-			focusoutHandle;
+			focusoutHandle,
+			previouslyFocusedCell;
+		
 		if(!grid.edit){
 			// Only perform this logic once on a given grid
 			grid.edit = edit;
@@ -450,6 +455,8 @@ return function(column, editor, editOn){
 				var focusedCell = grid._focusedCell;
 				row = grid.row(row);
 				if (focusedCell && focusedCell.row.id === row.id) {
+					previouslyFocusedCell = focusedCell;
+					
 					// Pause the focusout handler until after this row has had
 					// time to re-render, if this removal is part of an update.
 					// A setTimeout is used here instead of resuming in the
@@ -459,14 +466,14 @@ return function(column, editor, editOn){
 					focusoutHandle.pause();
 					setTimeout(function () {
 						focusoutHandle.resume();
+						previouslyFocusedCell = null;
 					}, 0);
 				}
 			}));
 			listeners.push(aspect.after(grid, 'insertRow', function (rowElement) {
-				var row = grid.row(rowElement),
-					focusedCell = grid._focusedCell;
-				if (focusedCell && focusedCell.row.id === row.id) {
-					grid.edit(grid.cell(row, focusedCell.column.id));
+				var row = grid.row(rowElement);
+				if (previouslyFocusedCell && previouslyFocusedCell.row.id === row.id) {
+					grid.edit(grid.cell(row, previouslyFocusedCell.column.id));
 				}
 				return rowElement;
 			}));
@@ -515,6 +522,7 @@ return function(column, editor, editOn){
 	aspect.after(column, "destroy", function(){
 		arrayUtil.forEach(listeners, function(l){ l.remove(); });
 		if(column._editorBlurHandle){ column._editorBlurHandle.remove(); }
+		if(column._editTimer){ clearTimeout(column._editTimer); }
 		
 		if(editOn && isWidget){ column.editorInstance.destroyRecursive(); }
 		
