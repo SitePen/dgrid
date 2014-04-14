@@ -95,7 +95,7 @@
 				
 				function createGrid(selectionMode) {
 					var id = "grid" + selectionMode.slice(0, 1).toUpperCase() + selectionMode.slice(1);
-					var selectColumn = { label: "Select", selector : true };
+					var selectColumn = { label: "Select", selector: "checkbox" };
 					if (selectionMode === "single") {
 						selectColumn.selector = "radio";
 					}

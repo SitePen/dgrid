@@ -129,32 +129,6 @@ require(["dojo/_base/lang", "dojo/on", "dgrid/OnDemandGrid", "dgrid/Selection", 
 				allowSelectAll: true
 			}, "gridMultipleSelectorRadio");
 
-			window.gridMultipleSelectorMixed1 = new SelectionGrid({
-				collection: testStore,
-				selectionMode: "none",
-				columns: {
-					col1: { selector: "radio", label: '' },
-					id: "ID",
-					col2: {label: 'Column 2'},
-					col3: {label: 'Column 3'},
-					col4: { selector: 'checkbox' }
-				},
-				allowSelectAll: true
-			}, "gridMultipleSelectorMixed1");
-
-			window.gridMultipleSelectorMixed2 = new SelectionGrid({
-				collection: testStore,
-				selectionMode: "none",
-				columns: {
-					col1: { selector: "checkbox", label: '' },
-					id: "ID",
-					col2: {label: 'Column 2'},
-					col3: {label: 'Column 3'},
-					col4: { selector: "radio" }
-				},
-				allowSelectAll: true
-			}, "gridMultipleSelectorMixed2");
-
 			window.gridMultipleSelectorNoAll = new SelectionGrid({
 				collection: testStore,
 				selectionMode: "none",
@@ -260,10 +234,6 @@ require(["dojo/_base/lang", "dojo/on", "dgrid/OnDemandGrid", "dgrid/Selection", 
 		<div id="gridMultipleSelectorNoAll"></div>
 		<h2>A grid with multiple radio selector columns</h2>
 		<div id="gridMultipleSelectorRadio"></div>
-		<h2>A grid with multiple mixed type selector columns</h2>
-		<div id="gridMultipleSelectorMixed1"></div>
-		<h2>A grid with multiple mixed type selector columns</h2>
-		<div id="gridMultipleSelectorMixed2"></div>
 		<h2>A grid with a custom selector rendering function</h2>
 		<div id="gridCustomRender"></div>
 	</body>

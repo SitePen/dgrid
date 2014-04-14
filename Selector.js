@@ -1,15 +1,24 @@
 define([
-	"dojo/_base/declare", "dojo/_base/array", "dojo/_base/lang", "dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put"
-], function(declare, arrayUtil, lang, on, aspect, has, put){
+	"dojo/_base/declare",
+	"dojo/_base/array",
+	"dojo/_base/lang",
+	"dojo/on",
+	"dojo/aspect",
+	"dojo/_base/sniff",
+	"./Selection",
+	"put-selector/put"
+], function(declare, arrayUtil, lang, on, aspect, has, Selection, put){
 
-	return declare(null, {
+	return declare(Selection, {
 		// summary:
 		//		Adds an input field (checkbox or radio) to a column that when checked, selects the row
-		//		that contains the input field.  To enable, add a "selector" property to a column definition.  The
-		//		selector property should contain "checkbox", "radio" or be a function that renders the input.
+		//		that contains the input field.  To enable, add a "selector" property to a column definition.
+		//
+		// description:
+		//		The selector property should contain "checkbox", "radio", or be a function that renders the input.
 		//		If set to "radio", the input field will be a radio button and only one input in the column will be
 		//		checked.  If the value of selector is a function, then the function signature is
-		//		renderSelectorInput(column, value, cell, object) where
+		//		renderSelectorInput(column, value, cell, object) where:
 		//		* column - the column definition
 		//		* value - the cell's value
 		//		* cell - the cell's DOM node
@@ -19,25 +28,25 @@ define([
 		postCreate: function(){
 			this.inherited(arguments);
 
-			// register one listener at the top level that receives events delegated
-			this.on(".dgrid-selector:click,.dgrid-selector:keydown", lang.hitch(this, this._handleSelectorClick));
-			// register listeners to the select and deselect events to change the input checked value
-			this.on("dgrid-select", lang.hitch(this, this._changeInput, true));
-			this.on("dgrid-deselect", lang.hitch(this, this._changeInput, false));
+			// Register one listener at the top level that receives events delegated
+			this.on(".dgrid-selector:click,.dgrid-selector:keydown", lang.hitch(this, "_handleSelectorClick"));
+			// Register listeners to the select and deselect events to change the input checked value
+			this.on("dgrid-select", lang.hitch(this, "_changeSelectorInput", true));
+			this.on("dgrid-deselect", lang.hitch(this, "_changeSelectorInput", false));
 		},
 
-		_defaultRenderSelectorInput: function(column, value, cell, object){
+		_defaultRenderSelectorInput: function(column, selected, cell, object){
 			var parent = cell.parentNode,
 				grid = column.grid;
 
-			// must set the class name on the outer cell in IE for keystrokes to be intercepted
+			// Must set the class name on the outer cell in IE for keystrokes to be intercepted
 			put(parent && parent.contents ? parent : cell, ".dgrid-selector");
 			var input = cell.input || (cell.input = put(cell, "input[type=" + column.selector + "]", {
 				tabIndex: isNaN(column.tabIndex) ? -1 : column.tabIndex,
 				disabled: !grid.allowSelect(grid.row(object)),
-				checked: value
+				checked: selected
 			}));
-			input.setAttribute("aria-checked", !!value);
+			input.setAttribute("aria-checked", selected);
 
 			return input;
 		},
@@ -45,30 +54,31 @@ define([
 		_configureSelectorColumn: function(column){
 			var self = this;
 			var selector = column.selector;
-			if(selector){
-				this._selectorColumns.push(column);
-				this._selectorSingleRow = this._selectorSingleRow || column.selector === "radio";
 
-				var renderSelectorInput = (typeof selector === "function") ? selector : this._defaultRenderSelectorInput;
+			this._selectorColumns.push(column);
+			this._selectorSingleRow = this._selectorSingleRow || column.selector === "radio";
 
-				column.sortable = false;
+			var renderSelectorInput = typeof selector === "function" ?
+				selector : this._defaultRenderSelectorInput;
 
-				column.renderCell = function(object, value, cell, options, header){
-					var row = object && self.row(object);
-					value = row && self.selection[row.id];
-					renderSelectorInput(column, value, cell, object);
-				};
+			column.sortable = false;
 
-				column.renderHeaderCell = function(th){
-					var label = "label" in column ? column.label : column.field || "";
+			column.renderCell = function(object, value, cell){
+				var row = object && self.row(object);
+				value = row && self.selection[row.id];
+				renderSelectorInput(column, !!value, cell, object);
+			};
 
-					if(column.selector === "radio" || !self.allowSelectAll){
-						th.appendChild(document.createTextNode(label));
-					}else{
-						column._selectorHeaderCheckbox = renderSelectorInput(column, false, th, {});
-					}
-				};
-			}
+			column.renderHeaderCell = function(th){
+				var label = "label" in column ? column.label : column.field || "";
+
+				if(column.selector === "radio" || !self.allowSelectAll){
+					th.appendChild(document.createTextNode(label));
+				}else{
+					column._selectorHeaderCheckbox = renderSelectorInput(column, false, th, {});
+					self._hasSelectorHeaderCheckbox = true;
+				}
+			};
 		},
 
 		_handleSelectorClick: function(event){
@@ -98,7 +108,7 @@ define([
 							if(row){
 								if(event.shiftKey){
 									// Make sure the last input always ends up checked for shift key
-									this._changeInput(true, {rows: [row]});
+									this._changeSelectorInput(true, {rows: [row]});
 								}else{
 									// No shift key, so no range selection
 									lastRow = null;
@@ -119,9 +129,11 @@ define([
 			}
 		},
 
-		_changeInput: function(value, event){
-			if(this._selectorColumns.length > 0){
+		_changeSelectorInput: function(value, event){
+			if(this._selectorColumns.length){
 				this._updateRowSelectors(value, event);
+			}
+			if(this._hasSelectorHeaderCheckbox){
 				this._updateHeaderCheckboxes();
 			}
 		},
@@ -138,11 +150,12 @@ define([
 					var column = this._selectorColumns[iCols];
 					var element = this.cell(rows[iRows], column.id).element;
 					if(!element){
+						// Skip if row has been entirely removed
 						continue;
-					} // skip if row has been entirely removed
+					}
 					element = (element.contents || element).input;
 					if(element && !element.disabled){
-						// only change the value if it is not disabled
+						// Only change the value if it is not disabled
 						element.checked = value;
 						element.setAttribute("aria-checked", value);
 					}
@@ -158,12 +171,12 @@ define([
 				var state = "false";
 				var selection, mixed, i;
 				var selectorHeaderCheckbox = column._selectorHeaderCheckbox;
-				if(column.selector === "checkbox" && selectorHeaderCheckbox){
+				if(selectorHeaderCheckbox){
 					selection = this.selection;
 					mixed = false;
-					// see if the header checkbox needs to be indeterminate
+					// See if the header checkbox needs to be indeterminate
 					for(i in selection){
-						// if there is anything in the selection, than it is indeterminate
+						// If there is anything in the selection, than it is indeterminate
 						if(selection[i] != this.allSelected){
 							mixed = true;
 							break;
@@ -181,17 +194,20 @@ define([
 			}
 		},
 
-		_configColumns: function(prefix, columns){
+		_configColumns: function(){
 			var columnArray = this.inherited(arguments);
 			this._selectorColumns = [];
+			this._hasSelectorHeaderCheckbox = this._selectorSingleRow = false;
 			for(var i = 0, l = columnArray.length; i < l; i++){
-				this._configureSelectorColumn(columnArray[i]);
+				if (columnArray[i].selector) {
+					this._configureSelectorColumn(columnArray[i]);
+				}
 			}
 			return columnArray;
 		},
 
 		_handleSelect: function(event){
-			// ignore the default select handler for events that originate from the selector column
+			// Ignore the default select handler for events that originate from the selector column
 			var column = this.cell(event).column;
 			if(!column || !column.selector){
 				this.inherited(arguments);

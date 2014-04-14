@@ -15,7 +15,7 @@ define([
 			grid = new declare([OnDemandGrid, Selection, Selector])({
 				collection: testStore,
 				columns: {
-					select: { selector: true, label: "Select" },
+					select: { selector: "checkbox", label: "Select" },
 					col1: "Column 1",
 					col2: "Column 2",
 					col5: "Column 5"
