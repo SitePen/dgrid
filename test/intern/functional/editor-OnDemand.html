@@ -21,37 +21,42 @@
 				gridSaveStack = [],
 				ready,
 				// Toggled with each grid.save call to signal test module that a save is complete
-				saveComplete;
+				saveComplete,
+				setEditorToTextBox;
 
 			require([
-				"dojo/_base/declare",
 				"dojo/aspect",
 				"dgrid/OnDemandGrid",
 				"dgrid/editor",
+				"dijit/form/TextBox",
 				"dgrid/test/data/createSyncStore"
-			], function (declare, aspect, OnDemandGrid, editor, createSyncStore) {
+			], function (aspect, OnDemandGrid, editor, TextBox, createSyncStore) {
 				var store = createSyncStore({ data: [
 					{ id: 0, name: "1", description: "one" },
 					{ id: 1, name: "2", description: "two" },
 					{ id: 2, name: "3", description: "three" }
 				]});
 
-				grid = new OnDemandGrid({
-					collection: store,
-					columns: {
+				function createColumnConfig(editorType) {
+					return {
 						id: "ID",
 						name: editor({
 							label: "Name",
-							editor: "text",
+							editor: editorType || "text",
 							autoSave: true
 						}),
 						description: editor({
 							label: "Description",
-							editor: "text",
+							editor: editorType || "text",
 							editOn: "click",
 							autoSave: true
 						})
-					}
+					};
+				}
+
+				grid = new OnDemandGrid({
+					collection: store,
+					columns: createColumnConfig("text")
 				}, "grid");
 
 				aspect.before(grid, "save", function () {
@@ -70,6 +75,10 @@
 						saveComplete = true;
 					});
 				});
+
+				setEditorToTextBox = function () {
+					grid.set("columns", createColumnConfig(TextBox));
+				};
 
 				ready = true;
 			});
