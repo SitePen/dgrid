@@ -497,7 +497,7 @@ return declare(null, {
 		// rows shouldn't ever be selected anyway.
 		if(value === false || this.allowSelect(row)){
 			selection = this.selection;
-			previousValue = selection[row.id];
+			previousValue = !!selection[row.id];
 			if(value === null){
 				// indicates a toggle
 				value = !previousValue;

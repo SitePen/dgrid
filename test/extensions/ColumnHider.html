@@ -52,11 +52,12 @@
 						col5: "Column 5"
 					},
 					altColumns = [
-						{ field: "col2", label: "Col2" },
+						// Specify IDs with special chars to test replacement
+						{ id: "col:2", field: "col2", label: "Col2" },
 						// test setting unhidable *and* hidden (i.e. not in menu, not displayed)
-						{ field: "col4", label: "Col4", sortable: false, hidden: true, unhidable: true },
-						{ field: "col1", label: "Col1" },
-						{ field: "col5" } // no label, to test fallback to field
+						{ id: "col:4", field: "col4", label: "Col4", sortable: false, hidden: true, unhidable: true },
+						{ id: "col:1", field: "col1", label: "Col1" },
+						{ id: "col:5", field: "col5" } // no label, to test fallback to field
 					],
 					body = document.body,
 					rtl = location.search.indexOf("rtl") !== -1,

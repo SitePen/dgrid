@@ -105,8 +105,9 @@ function resizeColumnWidth(grid, colId, width, parentType, doResize){
 			rule.set("width", width);
 		}else{
 			// Use miscUtil function directly, since we clean these up ourselves anyway
-			rule = miscUtil.addCssRule(
-				"#" + miscUtil.escapeCssIdentifier(grid.domNode.id) + " .dgrid-column-" + colId, "width: " + width + ";");
+			rule = miscUtil.addCssRule("#" + miscUtil.escapeCssIdentifier(grid.domNode.id) +
+				" .dgrid-column-" + miscUtil.escapeCssIdentifier(colId, "-"),
+				"width: " + width + ";");
 		}
 
 		// keep a reference for future removal
@@ -226,8 +227,9 @@ return declare(null, {
 			if((rule = this._oldColumnSizes[colId])){
 				rule.set("width", column.width + "px");
 			}else{
-				rule = miscUtil.addCssRule(
-					"#" + this.domNode.id + " .dgrid-column-" + colId, "width: " + column.width + "px;");
+				rule = miscUtil.addCssRule("#" + miscUtil.escapeCssIdentifier(this.domNode.id) +
+					" .dgrid-column-" + miscUtil.escapeCssIdentifier(colId, "-"),
+					"width: " + column.width + "px;");
 			}
 			this._columnSizes[colId] = rule;
 		}
@@ -254,7 +256,8 @@ return declare(null, {
 			var colNode = colNodes[i],
 				id = colNode.columnId,
 				col = grid.columns[id],
-				childNodes = colNode.childNodes;
+				childNodes = colNode.childNodes,
+				resizeHandle;
 
 			if(!col || col.resizable === false){ continue; }
 
@@ -266,8 +269,9 @@ return declare(null, {
 				put(headerTextNode, childNodes[0]);
 			}
 
-			put(colNode, headerTextNode, "div.dgrid-resize-handle.resizeNode-"+id).columnId =
-				assoc && assoc[id] || id;
+			resizeHandle = put(colNode, headerTextNode, "div.dgrid-resize-handle.resizeNode-" +
+				miscUtil.escapeCssIdentifier(id, "-"));
+			resizeHandle.columnId = assoc && assoc[id] || id;
 		}
 
 		if(!grid.mouseMoveListen){
@@ -311,7 +315,8 @@ return declare(null, {
 		dom.setSelectable(this.domNode, false);
 		this._startX = this._getResizeMouseLocation(e); //position of the target
 		
-		this._targetCell = query(".dgrid-column-" + target.columnId, this.headerNode)[0];
+		this._targetCell = query(".dgrid-column-" + miscUtil.escapeCssIdentifier(target.columnId, "-"),
+			this.headerNode)[0];
 
 		// Show resizerNode after initializing its x position
 		this._updateResizerPosition(e);
@@ -369,7 +374,8 @@ return declare(null, {
 			obj = this._getResizedColumnWidths(),//get current total column widths before resize
 			totalWidth = obj.totalWidth,
 			lastCol = obj.lastColId,
-			lastColWidth = query(".dgrid-column-"+lastCol, this.headerNode)[0].offsetWidth;
+			lastColWidth = query(".dgrid-column-" + miscUtil.escapeCssIdentifier(lastCol, "-"),
+				this.headerNode)[0].offsetWidth;
 		
 		if(newWidth < this.minWidth){
 			//enforce minimum widths

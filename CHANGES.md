@@ -24,10 +24,24 @@ The following is a rough list of changes, to be outlined more presentably later.
 
 ## Significant changes
 
+### Mixins
+
+* The `Selection` mixin no longer emits superfluous `dgrid-deselect` events
+  for rows which were already deselected. (#889)
+
 ### Extensions
 
 * Fixed a regression in `ColumnHider` where the node to open the menu became
   invisible on platforms with hidden scrollbars. (#886)
+* `ColumnHider` now assigns its menu node an ID in the format
+  `{id}-hider-menu`, not `dgrid-hider-menu-{id}`.
+
+## Other changes and fixes
+
+### General/Core
+
+* Fixed issues related to special characters in column IDs in `Grid`, `ColumnSet`,
+  and the `ColumnHider` and `ColumnResizer` extensions. (#885)
 
 # 0.3.14
 

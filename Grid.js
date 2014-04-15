@@ -1,11 +1,17 @@
 define(["dojo/_base/declare", "dojo/on", "dojo/has", "put-selector/put", "./List", "./util/misc", "dojo/_base/sniff"],
 function(declare, listen, has, put, List, miscUtil){
 	var contentBoxSizing = has("ie") < 8 && !has("quirks");
-	var invalidClassChars = /[^\._a-zA-Z0-9-]/g;
+	
 	function appendIfNode(parent, subNode){
 		if(subNode && subNode.nodeType){
 			parent.appendChild(subNode);
 		}
+	}
+	
+	function replaceInvalidChars(str) {
+		// Replaces invalid characters for a CSS identifier with hyphen,
+		// as dgrid does for field names / column IDs when adding classes.
+		return miscUtil.escapeCssIdentifier(str, "-");
 	}
 	
 	var Grid = declare(List, {
@@ -105,7 +111,9 @@ function(declare, listen, has, put, List, miscUtil){
 					column = subRow[i];
 					id = column.id;
 
-					extraClasses = column.field ? ".field-" + column.field : "";
+					extraClasses = column.field ?
+						".field-" + replaceInvalidChars(column.field) :
+						"";
 					className = typeof column.className === "function" ?
 						column.className(object) : column.className;
 					if(className){
@@ -114,10 +122,9 @@ function(declare, listen, has, put, List, miscUtil){
 
 					cell = put(tag + (
 							".dgrid-cell.dgrid-cell-padding" +
-							(id ? ".dgrid-column-" + id : "") +
+							(id ? ".dgrid-column-" + replaceInvalidChars(id) : "") +
 							extraClasses.replace(/ +/g, ".")
-						).replace(invalidClassChars,"-") +
-						"[role=" + (tag === "th" ? "columnheader" : "gridcell") + "]");
+						) + "[role=" + (tag === "th" ? "columnheader" : "gridcell") + "]");
 					cell.columnId = id;
 					if(contentBoxSizing){
 						// The browser (IE7-) does not support box-sizing: border-box, so we emulate it with a padding div
@@ -367,7 +374,7 @@ function(declare, listen, has, put, List, miscUtil){
 			//		Dynamically creates a stylesheet rule to alter a column's style.
 			
 			return this.addCssRule("#" + miscUtil.escapeCssIdentifier(this.domNode.id) +
-				" .dgrid-column-" + colId, css);
+				" .dgrid-column-" + replaceInvalidChars(colId), css);
 		},
 		
 		/*=====
