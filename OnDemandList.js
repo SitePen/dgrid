@@ -128,8 +128,7 @@ return declare([List, _StoreMixin], {
 		innerNode.innerHTML = this.loadingMessage;
 
 		// Establish query options, mixing in our own.
-		// (The getter returns a delegated object, so simply using mixin is safe.)
-		options = lang.mixin(options,
+		options = lang.mixin({}, options,
 			{ start: 0, count: this.minRowsPerPage },
 			"level" in query ? { queryLevel: query.level } : null);
 		
@@ -405,7 +404,7 @@ return declare([List, _StoreMixin], {
 				
 				count = Math.ceil(count);
 				offset = Math.min(Math.floor(offset), preload.count - count);
-				var options = preload.options || {};
+				var options = lang.mixin({}, preload.options);
 				preload.count -= count;
 				var beforeNode = preloadNode,
 					keepScrollTo, queryRowsOverlap = grid.queryRowsOverlap,

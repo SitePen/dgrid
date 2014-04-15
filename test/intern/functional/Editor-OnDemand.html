@@ -4,9 +4,9 @@
 		<meta charset="utf-8">
 		<title>Test Cell Editors</title>
 		<style>
-			@import "../../../../../dojo/resources/dojo.css";
-			@import "../../../../../dijit/themes/claro/claro.css";
-			@import "../../../../css/skins/claro.css";
+			@import "../../../../dojo/resources/dojo.css";
+			@import "../../../../dijit/themes/claro/claro.css";
+			@import "../../../css/skins/claro.css";
 		</style>
 	</head>
 
@@ -14,20 +14,21 @@
 		<h2>OnDemandGrid with editors</h2>
 		<div id="grid"></div>
 
-		<script src="../../../../../dojo/dojo.js" data-dojo-config="async: 1"></script>
+		<script src="../../../../dojo/dojo.js" data-dojo-config="async: 1"></script>
 
 		<script>
 			var grid,
 				gridSaveStack = [],
 				ready,
 				// Toggled with each grid.save call to signal test module that a save is complete
-				saveComplete;
+				saveComplete,
+				setEditorToTextBox;
 
 			require([
-				"dojo/_base/declare",
 				"dojo/aspect",
 				"dgrid/OnDemandGrid",
 				"dgrid/Editor",
+				"dijit/form/TextBox",
 				"dgrid/test/data/createSyncStore"
 			], function (declare, aspect, OnDemandGrid, Editor, createSyncStore) {
 				var store = createSyncStore({ data: [
@@ -36,22 +37,26 @@
 					{ id: 2, name: "3", description: "three" }
 				]});
 
-				grid = new (declare([OnDemandGrid, Editor]))({
-					collection: store,
-					columns: {
+				function createColumnConfig(editorType) {
+					return {
 						id: "ID",
 						name: {
 							label: "Name",
-							editor: "text",
+							editor: editorType || "text",
 							autoSave: true
 						},
 						description: {
 							label: "Description",
-							editor: "text",
+							editor: editorType || "text",
 							editOn: "click",
 							autoSave: true
 						}
-					}
+					};
+				}
+
+				grid = new OnDemandGrid({
+					collection: store,
+					columns: createColumnConfig("text")
 				}, "grid");
 
 				aspect.before(grid, "save", function () {
@@ -70,6 +75,10 @@
 						saveComplete = true;
 					});
 				});
+
+				setEditorToTextBox = function () {
+					grid.set("columns", createColumnConfig(TextBox));
+				};
 
 				ready = true;
 			});

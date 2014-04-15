@@ -17,8 +17,6 @@
 		<script src="../../dojo/dojo.js"
 			data-dojo-config="async: true"></script>
 		<script>
-			var testStore;
-
 			function deleteSelected(){
 				for(var i in grid.selection){
 					testStore.remove(i);
@@ -36,8 +34,8 @@
 				"dstore/Rest", "dstore/Observable", "dstore/Cache", 
 				"dstore/SimpleQuery", "dojo/domReady!"], 
 			function(Grid, Selection, Keyboard, Editor, tree, declare, Rest, Observable, Cache, SimpleQuery){
-				testStore = new declare([ Rest, SimpleQuery, Observable, Cache])({
-					target:"./data/rest.php", 
+				var testStore = new declare([ Rest, SimpleQuery, Observable, Cache])({
+					target:"./data/rest.php",
 					idProperty: "id",
 					rangeParam: "range"
 				});
@@ -63,9 +61,9 @@
 	<body class="claro">
 		<h2>Test JsonRest Tree with objects repeated in different places in hierarchy</h2>
 		<div id="grid"></div>
-		<button onclick='deleteSelected();'>Delete Page</div>
-		<button onclick='grid.save();'>Save</div>
-		<button onclick='grid.revert();'>Revert</div>
-		<button onclick='newPage();'>New Page</div>
+		<button onclick='deleteSelected();'>Delete Page</button>
+		<button onclick='grid.save();'>Save</button>
+		<button onclick='grid.revert();'>Revert</button>
+		<button onclick='newPage();'>New Page</button>
 	</body>
 </html>

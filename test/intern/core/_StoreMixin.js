@@ -18,7 +18,6 @@ define([
 		var store = createSyncStore({ data: genericData });
 		grid.set("collection", store);
 		document.body.appendChild(grid.domNode);
-		grid.set("store", store);
 		grid.startup();
 
 		var changes = [
@@ -114,55 +113,76 @@ define([
 			assert.equal(lastNotificationEvent.target, item);
 		});
 
-		test.test("_StoreMixin#_trackError", function(){
-			grid = new OnDemandGrid();
+		test.suite("_StoreMixin#_trackError", function(){
+			var emittedErrorCount,
+				lastEmittedError,
+				expectedValue;
 
-			function unexpectedSuccess(){ throw new Error("Unexpected resolution"); }
+			function expectedSuccess(actualValue){
+				assert.strictEqual(actualValue, expectedValue,
+					"Resolved promise should yield expected value");
+				assert.strictEqual(emittedErrorCount, 0,
+					"dgrid-error event should not have fired");
+			}
+			function expectedError(error){
+				assert.strictEqual(error.message, expectedValue,
+					"An error with the expected message should be thrown");
+				assert.strictEqual(emittedErrorCount, 1,
+					"A dgrid-error event should have fired");
+				assert.strictEqual(lastEmittedError, error,
+					"The error should be accessible from the dgrid-error event");
+			}
+			function unexpectedSuccess(){
+				throw new Error("Unexpected resolution");
+			}
 
-			var emittedErrorCount = 0,
-				lastEmittedError;
-			grid.on("dgrid-error", function(event){
-				emittedErrorCount++;
-				lastEmittedError = event.error;
+			test.beforeEach(function(){
+				grid = new OnDemandGrid();
+
+				grid.on("dgrid-error", function(event){
+					emittedErrorCount++;
+					lastEmittedError = event.error;
+				});
+
+				emittedErrorCount = 0;
+				lastEmittedError = null;
 			});
 
-			// sync value
-			var expectedValue = "expected";
-			return grid._trackError(function(){ return expectedValue}).then(function(actualValue){
-				assert.strictEqual(actualValue, expectedValue);
-			}).then(function(){
-				// async value
+			test.test("_StoreMixin#_trackError - sync value", function(){
+				expectedValue = "expected";
+				return grid._trackError(function(){
+					return expectedValue;
+				}).then(expectedSuccess);
+			});
+
+			test.test("_StoreMixin#_trackError - async value", function(){
 				expectedValue = "expected-async";
 				return grid._trackError(function(){
 					var dfd = new Deferred();
-					dfd.resolve(expectedValue);
+					setTimeout(function(){
+						dfd.resolve(expectedValue);
+					}, 100);
 					return dfd.promise;
-				});
-			}).then(function(actualValue){
-				assert.strictEqual(actualValue, expectedValue);
-			}).then(function(){
-				// sync error
-				assert.strictEqual(emittedErrorCount, 0);
+				}).then(expectedSuccess);
+			});
+
+			test.test("_StoreMixin#_trackError - sync error", function(){
 				expectedValue = "expected-error";
 				return grid._trackError(function(){
 					throw new Error(expectedValue);
-				});
-			}).then(unexpectedSuccess, function(err){
-				assert.strictEqual(err.message, expectedValue);
-				assert.strictEqual(emittedErrorCount, 1);
-				assert.strictEqual(lastEmittedError.message, expectedValue);
-			}).then(function(){
+				}).then(unexpectedSuccess, expectedError);
+			});
+
+			test.test("_StoreMixin#_trackError - async error", function(){
 				// async error
 				expectedValue = "expected-async-error";
 				return grid._trackError(function(){
 					var dfd = new Deferred();
-					dfd.reject(new Error(expectedValue));
+					setTimeout(function(){
+						dfd.reject(new Error(expectedValue));
+					}, 100);
 					return dfd.promise;
-				});
-			}).then(unexpectedSuccess, function(err){
-				assert.strictEqual(err.message, expectedValue);
-				assert.strictEqual(emittedErrorCount, 2);
-				assert.strictEqual(lastEmittedError.message, expectedValue);
+				}).then(unexpectedSuccess, expectedError);
 			});
 		});
 

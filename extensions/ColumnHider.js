@@ -129,7 +129,7 @@ function(declare, has, listen, miscUtil, put, i18n){
 				// Assume that if this plugin is used, then columns are hidable.
 				// Create the toggle node.
 				hiderToggleNode = this.hiderToggleNode =
-					put(this.headerScrollNode, "button.ui-icon.dgrid-hider-toggle[type=button]");
+					put(this.domNode, "button.ui-icon.dgrid-hider-toggle[type=button]");
 				
 				this._listeners.push(listen(hiderToggleNode, "click", function(e){
 					grid._toggleColumnHiderMenu(e);
@@ -199,6 +199,29 @@ function(declare, has, listen, miscUtil, put, i18n){
 			for(var id in this._columnHiderRules){
 				this._columnHiderRules[id].remove();
 			}
+		},
+		
+		left: function(cell, steps){
+			return this.right(cell, -steps);
+		},
+		
+		right: function(cell, steps){
+			if(!cell.element){
+				cell = this.cell(cell);
+			}
+			var nextCell = this.inherited(arguments),
+				prevCell = cell;
+			
+			// Skip over hidden cells
+			while(nextCell.column.hidden){
+				nextCell = this.inherited(arguments, [nextCell, steps > 0 ? 1 : -1]);
+				if(prevCell.element === nextCell.element){
+					// No further visible cell found - return original
+					return cell;
+				}
+				prevCell = nextCell;
+			}
+			return nextCell;
 		},
 		
 		isColumnHidden: function(id){

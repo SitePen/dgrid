@@ -51,14 +51,17 @@ define([
 		test.afterEach(function(){
 			grid.destroy();
 		});
+		
+		var store = createSyncStore({ data: genericData }),
+			asyncStore = createAsyncStore({ data: genericData });
 
 		// Tests
 		test.test("OnDemandGrid + sync store", function(){
-			storeTest(OnDemandGrid, createSyncStore({ data: genericData }), true, this.async());
+			storeTest(OnDemandGrid, store, true, this.async());
 		});
 
 		test.test("OnDemandGrid + async store", function(){
-			storeTest(OnDemandGrid, createAsyncStore({ data: genericData }), true, this.async());
+			storeTest(OnDemandGrid, asyncStore, true, this.async());
 		});
 
 		test.test("OnDemandGrid + sync store w/ error", function(){
@@ -74,11 +77,11 @@ define([
 		});
 
 		test.test("PaginationGrid + sync store", function(){
-			storeTest(PaginationGrid, createSyncStore({ data: genericData }), true, this.async());
+			storeTest(PaginationGrid, store, true, this.async());
 		});
 
 		test.test("PaginationGrid + async store", function(){
-			storeTest(PaginationGrid, createAsyncStore({ data: genericData }), true, this.async());
+			storeTest(PaginationGrid, asyncStore, true, this.async());
 		});
 
 		test.test("PaginationGrid + sync store w/ error", function(){

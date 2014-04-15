@@ -19,33 +19,38 @@
 		<script>
 			var grid,
 				datachangeStack = [],
-				ready = false;
+				ready = false,
+				setEditorToTextBox;
 
 			require([
 				"dojo/_base/declare",
 				"dgrid/Grid",
-				"dgrid/OnDemandList",
-				"dgrid/Editor"
-			], function (declare, Grid, OnDemandList, Editor) {
-				grid = new (declare([Grid, Editor]))({
-					columns: {
+				"dgrid/Editor",
+				"dijit/form/TextBox"
+			], function (declare, Grid, Editor, TextBox) {
+				function createColumnConfig(editorType) {
+					return {
 						id: "ID",
 						name: {
 							label: "Name",
-							editor: "text"
+							editor: editorType || "text"
 						},
 						description: {
 							label: "Description",
-							editor: "text",
+							editor: editorType || "text",
 							editOn: "click"
 						}
-					}
+					};
+				}
+
+				grid = new Grid({
+					columns: createColumnConfig("text")
 				}, "grid");
 
 				grid.renderArray([
-					{ name: "1", description: "one" },
-					{ name: "2", description: "two" },
-					{ name: "3", description: "three" }
+					{ id: 0, name: "1", description: "one" },
+					{ id: 1, name: "2", description: "two" },
+					{ id: 2, name: "3", description: "three" }
 				]);
 
 				// Push values received by the "dgrid-datachange" event into a global stack.
@@ -54,6 +59,10 @@
 				grid.on("dgrid-datachange", function (event) {
 					datachangeStack.push(event.value);
 				});
+
+				setEditorToTextBox = function () {
+					grid.set("columns", createColumnConfig(TextBox));
+				};
 
 				ready = true;
 			});
