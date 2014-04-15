@@ -17,14 +17,12 @@ define([
 	test.suite("tree (expand + promise)", function(){
 		var grid,
 			TreeStore = declare(Memory, {
+				constructor: function () {
+					this.root = this;
+				},
+
 				getChildren: function(parent){
-					var fullData = this.storage.fullData,
-						baseCollection = this._createSubCollection({
-							data: fullData,
-							total: fullData.length,
-							queryLog: []
-						}),
-						filteredCollection = baseCollection.filter({ parent: parent.id });
+					var filteredCollection = this.root.filter({ parent: parent.id });
 
 					// filter and sort the child levels the same way as the root level
 					var filterQueries = arrayUtil.filter(this.queryLog, function (entry) {

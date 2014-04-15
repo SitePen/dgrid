@@ -69,12 +69,13 @@
 						data: data,
 						idProperty: "url",
 						getChildren: function(parent){
-							return (this.store || this).filter({ parent: parent.url });
+							return this.root.filter({ parent: parent.url });
 						},
 						mayHaveChildren: function(parent){
 							return !parent.title; // Items with title are html pages, leaves
 						}
 					});
+					store.root = store;
 					
 					var cookieName = "dgrid-test-index",
 						persistedInfo = cookie(cookieName);
