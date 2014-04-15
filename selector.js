@@ -66,36 +66,41 @@ function(kernel, arrayUtil, on, aspect, has, put){
 			// listen for keydown's as well to get an event in firefox that we can properly retrieve
 			// the shiftKey property from
 			if(event.type == "click" || event.keyCode == 32 || (!has("opera") && event.keyCode == 13) || event.keyCode === 0){
-				var row = grid.row(event),
-					lastRow = grid._lastSelected && grid.row(grid._lastSelected);
 
-				grid._selectionTriggerEvent = event;
-				
-				if(type == "radio"){
-					if(!lastRow || lastRow.id != row.id){
-						grid.clearSelection();
-						grid.select(row, null, true);
-						grid._lastSelected = row.element;
+				var row = grid.row(event);
+				if(row){
+					if(grid.allowSelect(row)){
+						var lastRow = grid._lastSelected && grid.row(grid._lastSelected);
+
+						grid._selectionTriggerEvent = event;
+
+						if(type == "radio"){
+							if(!lastRow || lastRow.id != row.id){
+								grid.clearSelection();
+								grid.select(row, null, true);
+								grid._lastSelected = row.element;
+							}
+						}else{
+							if(row){
+								if(event.shiftKey){
+									// make sure the last input always ends up checked for shift key
+									changeInput(true)({rows: [row]});
+								}else{
+									// no shift key, so no range selection
+									lastRow = null;
+								}
+								lastRow = event.shiftKey ? lastRow : null;
+								grid.select(lastRow || row, row, lastRow ? undefined : null);
+								grid._lastSelected = row.element;
+							}
+						}
+						grid._selectionTriggerEvent = null;
 					}
 				}else{
-					if(row){
-						if(event.shiftKey){
-							// make sure the last input always ends up checked for shift key 
-							changeInput(true)({rows: [row]});
-						}else{
-							// no shift key, so no range selection
-							lastRow = null;
-						}
-						lastRow = event.shiftKey ? lastRow : null;
-						grid.select(lastRow || row, row, lastRow ? undefined : null);
-						grid._lastSelected = row.element;
-					}else{
-						// No row resolved; must be the select-all checkbox.
-						put(this, (grid.allSelected ? "!" : ".") + "dgrid-select-all");
-						grid[grid.allSelected ? "clearSelection" : "selectAll"]();
-					}
+					// No row resolved; must be the select-all checkbox.
+					put(this, (grid.allSelected ? "!" : ".") + "dgrid-select-all");
+					grid[grid.allSelected ? "clearSelection" : "selectAll"]();
 				}
-				grid._selectionTriggerEvent = null;
 			}
 		}
 		
@@ -105,8 +110,9 @@ function(kernel, arrayUtil, on, aspect, has, put){
 			listeners.push(grid.on(".dgrid-selector:click,.dgrid-selector:keydown", onSelect));
 			var handleSelect = grid._handleSelect;
 			grid._handleSelect = function(event){
+				var cell = this.cell(event);
 				// ignore the default select handler for events that originate from the selector column
-				if(this.cell(event).column != column){
+				if(cell.column != column){
 					handleSelect.apply(this, arguments);
 				}
 			};
