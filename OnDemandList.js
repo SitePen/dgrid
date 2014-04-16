@@ -138,9 +138,7 @@ return declare([List, _StoreMixin], {
 
 			// Render the result set
 			return self.renderCollection(resultsCollection, preloadNode, options).then(function(trs){
-				var total = typeof resultsCollection.total === "undefined" ?
-					resultsCollection.length : resultsCollection.total;
-				return Deferred.when(total, function(total){
+				return Deferred.when(resultsCollection.total, function(total){
 					var trCount = trs.length,
 						parentNode = preloadNode.parentNode,
 						noDataNode = self.noDataNode;
@@ -499,9 +497,8 @@ return declare([List, _StoreMixin], {
 									preserveMomentum: true
 								});
 							}
-							
-							var total = "total" in rangeCollection ? rangeCollection.total : rangeCollection.length;
-							Deferred.when(total, function(total){
+
+							Deferred.when(rangeCollection.total, function(total){
 								if(!("queryLevel" in options)){
 									grid._total = total;
 								}
