@@ -208,7 +208,7 @@ define([
 							.end();
 				}
 
-				remote.get(require.toUrl("./editor.html"))
+				remote.get(require.toUrl("./Editor.html"))
 					.waitForCondition("ready", 15000);
 
 				if (initFunction) {
@@ -258,7 +258,7 @@ define([
 						});
 				}
 
-				remote.get(require.toUrl("./editor-OnDemand.html"))
+				remote.get(require.toUrl("./Editor-OnDemand.html"))
 					.waitForCondition("ready", 15000);
 
 				if (initFunction) {

@@ -114,32 +114,32 @@
         "parent": ""
     },
     {
-        "name": "editor.html",
-        "url": "editor.html",
+        "name": "Editor.html",
+        "url": "Editor.html",
         "title": "Test Cell Editors",
         "parent": ""
     },
     {
-        "name": "editor_autosave.html",
-        "url": "editor_autosave.html",
+        "name": "Editor_autosave.html",
+        "url": "Editor_autosave.html",
         "title": "Test Dijit Cell Editors with autoSave",
         "parent": ""
     },
     {
-        "name": "editor_more_widgets.html",
-        "url": "editor_more_widgets.html",
+        "name": "Editor_more_widgets.html",
+        "url": "Editor_more_widgets.html",
         "title": "Test Dijit Cell Editors",
         "parent": ""
     },
     {
-        "name": "editor_no_store.html",
-        "url": "editor_no_store.html",
+        "name": "Editor_no_store.html",
+        "url": "Editor_no_store.html",
         "title": "Test Editors in Store-less Grid",
         "parent": ""
     },
     {
-        "name": "editor_widgets.html",
-        "url": "editor_widgets.html",
+        "name": "Editor_widgets.html",
+        "url": "Editor_widgets.html",
         "title": "Test Dijit Cell Editors",
         "parent": ""
     },

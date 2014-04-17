@@ -43,7 +43,7 @@
 					};
 				}
 
-				grid = new Grid({
+				grid = new (declare([Grid, Editor]))({
 					columns: createColumnConfig("text")
 				}, "grid");
 

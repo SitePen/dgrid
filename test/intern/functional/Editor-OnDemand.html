@@ -25,12 +25,13 @@
 				setEditorToTextBox;
 
 			require([
+				"dojo/_base/declare",
 				"dojo/aspect",
 				"dgrid/OnDemandGrid",
 				"dgrid/Editor",
 				"dijit/form/TextBox",
 				"dgrid/test/data/createSyncStore"
-			], function (declare, aspect, OnDemandGrid, Editor, createSyncStore) {
+			], function (declare, aspect, OnDemandGrid, Editor, TextBox, createSyncStore) {
 				var store = createSyncStore({ data: [
 					{ id: 0, name: "1", description: "one" },
 					{ id: 1, name: "2", description: "two" },
@@ -54,7 +55,7 @@
 					};
 				}
 
-				grid = new OnDemandGrid({
+				grid = new (declare([OnDemandGrid, Editor]))({
 					collection: store,
 					columns: createColumnConfig("text")
 				}, "grid");
