@@ -1,3 +1,5 @@
+# Working with Events
+
 ## Listening for events with dojo/on and grid.on
 
 The [`dojo/on`](http://dojotoolkit.org/reference-guide/dojo/on.html) module,

@@ -1,3 +1,5 @@
+# Styling dgrid
+
 dgrid components are designed to be highly CSS-driven for optimal performance and
 organization, so visual styling should be controlled through CSS.
 
@@ -100,8 +102,8 @@ structuring of dgrid components:
 * `dgrid-header-scroll`: Applied to the node in the top right corner of a Grid,
   above the vertical scrollbar
 
-The following generic class names are also available for generic skinning
-(following the jQuery ThemeRoller convention):
+When `addUiClasses` is set to `true` (the default), the following generic class
+names are also available for generic skinning (following the jQuery ThemeRoller convention):
 
 * `ui-widget-content`: Applied to each dgrid list or grid at the top element
 * `ui-widget-header`: Applied to the element that contains the header rendering

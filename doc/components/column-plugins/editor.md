@@ -1,3 +1,5 @@
+# editor
+
 The editor plugin provides the ability to render editor controls within cells
 for a column. When used in conjunction with a store-backed grid such as an
 [OnDemandGrid](../core-components/OnDemandList-and-OnDemandGrid.md#ondemandgrid), edited fields are directly

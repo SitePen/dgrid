@@ -1,3 +1,5 @@
+# CompoundColumns
+
 The CompoundColumns extension adds the ability to define a column structure
 which includes additional spanning header cells above the actual columns in the
 grid.
@@ -22,10 +24,6 @@ require([
 });
 ```
 
-**Note:** Due to the unique `columns` format understood by the CompoundColumns
-extension, it is not currently compatible with various other extensions which
-are not aware of the hierarchical `children` property.
-
 For an example of the CompoundColumns extension in use, see
 `dgrid/test/extensions/CompoundColumns.html`.
 
@@ -42,3 +40,15 @@ label cell spanning above all 3 name fields combined.
 
 Additionally, the headers on the innermost children can be suppressed by
 specifying `showChildHeaders: false` on their immediate parent.
+
+### Mixin Order
+
+`CompoundColumns` contains special considerations for interoperating with a few
+other dgrid mixins and extensions.  As such, the following should be kept in
+mind when using these components together:
+
+* `CompoundColumns` should be mixed in **before** `ColumnSet`,
+  because it needs to normalize its column structure before `ColumnSet` performs its logic.
+* `CompoundColumns` should be mixed in **after** `ColumnResizer` and `ColumnHider`,
+  because it extends methods defined by these other extensions,
+  to add considerations specific to its own behavior.

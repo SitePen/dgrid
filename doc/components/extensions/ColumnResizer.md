@@ -1,3 +1,5 @@
+# ColumnResizer
+
 The ColumnResizer extension can be used to add column resizing functionality (accessible via mouse or touch drag).
 
 ```js

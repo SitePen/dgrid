@@ -1,3 +1,5 @@
+# Limitations
+
 ## Use with the Legacy Loader API
 
 The dgrid package was designed primarily with AMD in mind; as such, it has been

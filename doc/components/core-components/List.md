@@ -1,6 +1,7 @@
+# List
+
 This provides the basic facilities for taking an array of objects and rendering
-them as rows of HTML in a scrollable area. This will automatically include touch
-scrolling capabilities (via the `TouchScroll` module) on mobile devices.
+them as rows of HTML in a scrollable area.
 
 The List module can be used to render an array of data as follows:
 
@@ -46,13 +47,13 @@ Property | Description
 `bodyNode` | The DOM node representing the body region (the area which will show rows for each item).
 `contentNode` | The DOM node immediately under the `bodyNode`, which may potentially be scrolled to accommodate more content than the component's height will allow to fit.
 `footerNode` | A DOM node appearing below the `bodyNode`; initially empty and not displayed by default.
+`addUiClasses` | Boolean indicating whether to add `ui-` classes (corresponding to jQuery UI) to nodes within the grid.  The default is `true`.
 `className` | A class (or classes, space- or period-delimited) to be set on the instance's `domNode` in addition to the defaults; if an existing DOM node is being passed to the constructor, extra classes may alternatively be specified via its `class` attribute or `className` property
 `cleanAddedRules` | Whether to clean up CSS rules added via the `addCssRule` method when the instance is destroyed; defaults to `true`.
 `cleanEmptyObservers` | Whether to clean up observers for result sets that are or become empty; defaults to `true` but is set to `false` by the `tree` plugin due to special considerations.
 `showHeader` | Whether to display the header area; normally `false` for lists and `true` for grids.  Can be reset later via `set("showHeader", ...)`.
 `showFooter` | Whether to display the footer area; `false` by default, but enabled and used by some extensions (e.g. Pagination).  Can be reset later via `set("showFooter", ...)`.
 `sort` | How to initially sort the grid; may be either a string referencing a field name, or an array of objects with `attribute` and `descending` properties.  See also `set("sort", ...)` below.
-`useTouchScroll` | Whether to use the `TouchScroll` module if touch support is available on the device, or defer to native capabilities if they exist; `true` by default for backwards compatibility.  Setting this to `false` is particularly useful for devices which support both touch and mouse input.
 
 ### Method Summary
 
@@ -71,4 +72,4 @@ Method | Description
 `set("sort", property, descending)` | This can be called to sort the List by a given property; if `true` is passed for `descending`, the sort will be in descending order. Multiple sort criteria can be specified in the format expected by stores' `queryOptions` (an array of objects with `attribute` and `descending` properties); this is also the format `get("sort")` will return in. The [Grid](Grid.md) and [OnDemandList)(OnDemandList-and-OnDemandGrid.md) modules further extend sort functionality.
 `scrollTo(options)` | scrolls to a given point in the grid.  Accepts `x` and `y` properties; if one is not given, position along that axis is not modified.
 `getScrollPosition()` | returns the current position that the grid is scrolled to, in the form of an object containing `x` and `y` properties.
-`addCssRule(selector, css)` | Programmatically adds styles for a given CSS selector by injecting a rule into a stylesheet in the document.  Returns a handle with a`remove` function, which can be called to later remove the added style rule.  Styles added via this method will be removed when the instance is destroyed if `cleanAddedRules` is set to `true`.
+`addCssRule(selector, css)` | Programmatically adds styles for a given CSS selector by injecting the given rule string into a stylesheet in the document.  Returns a handle with a`remove` function, which can be called to later remove the added style rule.  Styles added via this method will be removed when the instance is destroyed if `cleanAddedRules` is set to `true`.

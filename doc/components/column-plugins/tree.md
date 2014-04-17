@@ -1,3 +1,5 @@
+# tree
+
 The tree plugin enables expansion of rows to display children. 
 
 ```js

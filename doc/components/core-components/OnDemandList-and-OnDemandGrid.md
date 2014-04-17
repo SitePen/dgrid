@@ -1,3 +1,5 @@
+# OnDemandList and OnDemandGrid
+
 ## OnDemandList
 
 OnDemandList extends List to provide on-demand lazy loading of data as the user
@@ -18,7 +20,7 @@ require(["dgrid/OnDemandList", "put-selector/put"], function(OnDemandList, put){
 
 ## OnDemandGrid
 
-This module is simply the composition of [[Grid]] and OnDemandList. For example:
+This module is simply the composition of [Grid](Grid.md) and OnDemandList. For example:
 
 ```js
 define(["dgrid/OnDemandGrid"], function(OnDemandGrid){
@@ -110,7 +112,6 @@ results finish rendering as the result of a `refresh` call (also including the
 initial render). The event includes the following properties:
 
 * `grid`: The Grid (or List) instance responsible for firing the event
-* `results`: The QueryResults returned by the store query
 
 ### dgrid-error
 

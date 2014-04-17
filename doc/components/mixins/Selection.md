@@ -1,3 +1,5 @@
+# Selection
+
 The Selection module adds selection capability to a list or grid. The resulting
 instance(s) will include a `selection` property representing the selected items.
 This mixin will also fire batched `dgrid-select` and `dgrid-deselect` events,

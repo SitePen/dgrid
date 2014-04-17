@@ -31,9 +31,9 @@ ground up.  Further development on this module is likely to occur.
 
 The following extensions have been added since v0.2:
 
-* [ColumnReorder](components/extensions/ColumnReorder.md): allows reordering columns in simple grids via DnD
-* [ColumnHider](components/extensions/ColumnHider.md): allows dynamically hiding/showing grid columns from a simple menu
-* [Pagination](components/extensions/Pagination.md): adds controls for discrete pagination
+* [ColumnReorder](../components/extensions/ColumnReorder.md): allows reordering columns in simple grids via DnD
+* [ColumnHider](../components/extensions/ColumnHider.md): allows dynamically hiding/showing grid columns from a simple menu
+* [Pagination](../components/extensions/Pagination.md): adds controls for discrete pagination
 
 ## CSS
 

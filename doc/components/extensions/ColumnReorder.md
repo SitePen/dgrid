@@ -1,3 +1,5 @@
+# ColumnReorder
+
 The ColumnReorder extension adds the ability to reorder the columns of a grid
 via drag'n'drop operations on column headers. In the case of more complex grid
 structures, note that reordering is only supported between columns within the

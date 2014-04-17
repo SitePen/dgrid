@@ -1,3 +1,5 @@
+# ColumnSet
+
 The ColumnSet module provides functionality which divides a grid's columns into
 multiple distinct sets, each of which manage their columns' horizontal scrolling
 independently. This makes it possible to keep certain columns in view even while

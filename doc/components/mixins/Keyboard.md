@@ -1,3 +1,5 @@
+# Keyboard
+
 This mixin adds keyboard handling functionality. The arrow keys can be used to
 navigate the focus across cells and rows, providing accessibility and ease of
 use. The page up and page down keys may also be used for faster navigation,

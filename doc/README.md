@@ -1,6 +1,6 @@
 # dgrid Documentation
 
-This wiki serves as the official source of dgrid documentation. It includes
+This folder contains the official dgrid documentation. It includes
 information on dgrid's core components, as well as information on various
 mixins, plugins, and extensions that are available to further expand dgrid's
 default functionality. 
@@ -13,11 +13,11 @@ default functionality.
     * [GridFromHtml](components/core-components/GridFromHtml.md)
     * [OnDemandList and OnDemandGrid](components/core-components/OnDemandList-and-OnDemandGrid.md)
 * Mixins
+    * [Keyboard](components/mixins/Keyboard.md)
     * [ColumnSet](components/mixins/ColumnSet.md)
     * [Selection](components/mixins/Selection.md)
-    * [CellSelection](components/mixins/CellSelection.md)
-    * [Keyboard](components/mixins/Keyboard.md)
     * [Selector](components/mixins/Selector.md)
+    * [CellSelection](components/mixins/CellSelection.md)
 * Column Plugins
     * [editor](components/column-plugins/editor.md)
     * [tree](components/column-plugins/tree.md)
@@ -49,7 +49,6 @@ default functionality.
 ## Changelogs
 
 **Note:** this section contains older changelogs; for the most recent changes,
-see [CHANGES.md](../CHANGES.md) in
-the dgrid package.
+see [CHANGES.md](../CHANGES.md) in the dgrid package.
 
 * [Beta Changelog](changelogs/Beta-Changelog.md)

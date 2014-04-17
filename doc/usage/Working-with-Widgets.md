@@ -1,3 +1,5 @@
+# Working with Widgets
+
 ## Layout widgets and the DijitRegistry extension
 
 When creating dgrid instances within Dijit layout widgets, it is recommended to

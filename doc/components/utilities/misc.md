@@ -1,3 +1,5 @@
+# util/misc
+
 The `util/misc` module provides miscellaneous utility functions. Currently this
 consists primarily of functions related to throttling or debouncing function
 calls, which can be particularly useful for events which tend to fire rapidly,

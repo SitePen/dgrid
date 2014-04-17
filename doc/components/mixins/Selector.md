@@ -1,3 +1,5 @@
+# Selector
+
 Building on the [Selection](Selection.md) mixin, the Selector mixin can be used to
 dedicate one or more columns to the purpose of rendering a selector component,
 providing alternate means for selecting and deselecting rows in a grid.

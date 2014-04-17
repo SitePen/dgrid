@@ -1,3 +1,5 @@
+# CellSelection
+
 The CellSelection mixin extends upon the functionality of the [Selection](Selection.md) mixin
 to provide selection at the cell level instead.
 

@@ -1,3 +1,5 @@
+# util/touch
+
 The `util/touch` module defines two simple extension events, `tap` and `dbltap`,
 for detecting the respective actions on touch devices.  It also defines utility
 functions for handling touch events.

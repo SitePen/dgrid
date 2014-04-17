@@ -1,5 +1,7 @@
-In contrast to the [OnDemandList and OnDemandGrid](../core-components/OnDemandList-and-OnDemandGrid.md) modules, the Pagination
-extension implements classic discrete paging controls. It displays a certain
+# Pagination
+
+In contrast to the [OnDemandList and OnDemandGrid](../core-components/OnDemandList-and-OnDemandGrid.md) modules,
+the Pagination extension implements classic discrete paging controls. It displays a certain
 number of results at a given time, and provides a footer area with controls to
 switch between pages.
 

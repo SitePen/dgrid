@@ -1,3 +1,5 @@
+# util/mouse
+
 The `util/mouse` module defines a number of extension events which are useful in
 situations which require the mouse moving into and/or out of rows or cells.
 These scenarios warrant extension events due to the often-problematic bubbling
@@ -31,4 +33,4 @@ The following extension events are provided:
 
 These extension events can be used as indicated in the example above, further
 described in the respective section of the
-[`dojo/on` Reference Guide](http://dojotoolkit.org/reference-guide/1.8/dojo/on.html#extension-events).
+[`dojo/on` Reference Guide](http://dojotoolkit.org/reference-guide/dojo/on.html#extension-events).

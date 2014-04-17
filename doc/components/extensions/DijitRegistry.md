@@ -1,3 +1,5 @@
+# DijitRegistry
+
 The DijitRegistry extension adds a couple of considerations for working with
 Dijit, particularly useful when a dgrid instance is to live inside of a Dijit
 layout widget. Its primary purpose is to add dgrid instances to the Dijit

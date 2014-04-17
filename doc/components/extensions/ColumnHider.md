@@ -1,3 +1,5 @@
+# ColumnHider
+
 The ColumnHider extension adds the ability to dynamically hide or show columns
 in a grid without the need to fully reset its layout. User interaction is
 enabled via a menu accessible from the top right corner of the grid
