@@ -24,6 +24,12 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 * Fixed issues related to special characters in column IDs in `Grid`, `ColumnSet`,
   and the `ColumnHider` and `ColumnResizer` extensions. (#885)
 
+### Mixins
+
+* The `Selection` mixin (and `selector` column plugin) will no longer clear the
+  selection during an attempt to select a row that cannot be selected
+  (i.e. `allowSelect` returns `false`). (#822)
+
 # 0.3.14
 
 ## Significant changes
