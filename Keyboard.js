@@ -221,6 +221,7 @@ var Keyboard = declare(null, {
 		//		previously removed row, or to the nearest sibling otherwise.
 		
 		var focusInfo = this._removedFocus,
+			oldTarget = this.row(focusInfo.rowId),
 			newTarget,
 			cell;
 		
@@ -242,10 +243,11 @@ var Keyboard = declare(null, {
 				if(cell && cell.element){
 					newTarget = cell;
 				}
+				oldTarget = this.cell(focusInfo.rowId, focusInfo.columnId);
 			}
 			if(focusInfo.active && newTarget.element.offsetHeight !== 0){
 				// Row/cell was previously focused and is visible, so focus the new one immediately
-				this.focus(newTarget);
+				this._focusOnNode(newTarget, false, { oldTarget: oldTarget.element });
 			}else{
 				// Row/cell was not focused or is not visible, but we still need to update tabIndex
 				// and the element's class to be consistent with the old one
