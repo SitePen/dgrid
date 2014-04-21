@@ -93,6 +93,8 @@ define([
 			assert.isUndefined(results[3],
 				"canEdit should not have been called yet for editOn editor (item 3)");
 
+			// Note: The "Data 2" column's canEdit method always returns false so none of the following
+			// grid.edit calls will return a promise and not editor with receive focus.
 			grid.edit(grid.cell(1, "data2"));
 			assert.isUndefined(results[1],
 				"canEdit should not have been called yet for editOn editor (item 1)");
@@ -118,16 +120,15 @@ define([
 				"canEdit should have been called for editOn editor (item 3)");
 		});
 
-
-		test.test("canEdit: suppress on false", function () {
-			var rowIndex,
+		function testCanEdit(dfd, columnId){
+			var rowCount,
 				cell,
 				matchedNodes;
 
 			function canEdit(data) {
 				return data.order % 2;
 			}
-			
+
 			grid = new OnDemandGrid({
 				columns: {
 					order: "step",
@@ -148,38 +149,45 @@ define([
 			document.body.appendChild(grid.domNode);
 			grid.startup();
 			grid.renderArray(testOrderedData);
+			rowCount = testOrderedData.length;
 
-			for (rowIndex = 0; rowIndex < testOrderedData.length; rowIndex++) {
-				// Test always-on editors
-				cell = grid.cell(rowIndex, "name");
-				grid.edit(cell);
-				matchedNodes = query("input", cell.element);
+			function testRow(rowIndex){
+				var editPromise;
 
-				if (canEdit(cell.row.data)) {
-					assert.strictEqual(1, matchedNodes.length,
-						"Cell with canEdit=>true should have an editor element");
+				function checkAndMoveOn(expectedMatchCount, message){
+					matchedNodes = query("input", cell.element);
+					assert.strictEqual(expectedMatchCount, matchedNodes.length, message);
+
+					rowIndex++;
+					if(rowIndex < rowCount){
+						testRow(rowIndex);
+					}else{
+						dfd.resolve();
+					}
 				}
-				else {
-					assert.strictEqual(0, matchedNodes.length,
-						"Cell with canEdit=>false should not have an editor element");
-				}
 
-				// Test non-always-on editors
-				cell = grid.cell(rowIndex, "description");
-				grid.edit(cell);
-				matchedNodes = query("input", cell.element);
-
-				if (canEdit(cell.row.data)) {
-					assert.strictEqual(1, matchedNodes.length,
-						"Cell with canEdit=>true should have an editor element");
-				}
-				else {
-					assert.strictEqual(0, matchedNodes.length,
-						"Cell with canEdit=>false should not have an editor element");
+				cell = grid.cell(rowIndex, columnId);
+				editPromise = grid.edit(cell);
+				if(editPromise){
+					editPromise.then(dfd.rejectOnError(function(){
+						checkAndMoveOn(1, "Cell with canEdit=>true should have an editor element");
+					}));
+				}else{
+					checkAndMoveOn(0, "Cell with canEdit=>false should not have an editor element");
 				}
 			}
+			testRow(0);
+
+			return dfd;
+		}
+
+		test.test("canEdit always on editor: suppress on false", function(){
+			return testCanEdit(this.async(), "name");
 		});
 
+		test.test("canEdit edit-on click editor: suppress on false", function(){
+			return testCanEdit(this.async(), "description");
+		});
 
 		test.test("destroy editor widgets: native", function () {
 			var matchedNodes;
@@ -208,7 +216,8 @@ define([
 
 			matchedNodes = query("input");
 			assert.strictEqual(testOrderedData.length, matchedNodes.length,
-				"There should be " + testOrderedData.length + " input elements for the grid's editors");
+				"There should be " + testOrderedData.length + " input elements for the grid's editors and there were " +
+				matchedNodes.length);
 
 			grid.destroy();
 
@@ -250,25 +259,11 @@ define([
 				"After grid is destroyed there should be 0 widgets on the page");
 		});
 
-
-		// Goal: test that when "grid.edit(cell)" is called the cell gets an editor with focus
-		//
-		// Observed behavior:
-		// In a cell without an always-on editor, if you call "grid.edit(cell)"
-		// repeatedly, the previously edited cell loses its content (not just its editor).
-		// document.activeElement.blur() between calls of "grid.edit" does not
-		// seem to work in this automated test, though it is of no consequence
-		// since this test is simply testing the editor's presence, not its after-effects.
-		//
-		// grid.edit:
-		//		In a cell with an always-on editor, the editor's "focus" event is fired and
-		//		"document.activeElement" is set to the editor.
-		//		In a cell with a click-to-activate editor, no "focus" event is fired and
-		//		"document.activeElement" is the body.
-		test.test("editor focus", function () {
-			var rowIndex,
+		test.test("editor focus with always on editor", function () {
+			var rowCount,
 				cell,
-				cellEditor;
+				cellEditor,
+				dfd = this.async();
 
 			grid = new OnDemandGrid({
 				columns: {
@@ -287,37 +282,82 @@ define([
 			document.body.appendChild(grid.domNode);
 			grid.startup();
 			grid.renderArray(testOrderedData);
+			rowCount = testOrderedData.length;
 
-			for (rowIndex = 0; rowIndex < testOrderedData.length; rowIndex++) {
-				// Calling 'grid.edit()' on different cells consecutively results in the last-edited
-				// cell losing its content. It seems the blur process is important, so try to trigger that:
-				document.activeElement.blur();
-
+			function testRow(rowIndex){
 				// Test calling 'grid.edit()' in an always-on cell
 				cell = grid.cell(rowIndex, "name");
-				grid.edit(cell);
-
+				grid.edit(cell).then(dfd.rejectOnError(function(node){
 				cellEditor = query("input", cell.element)[0];
+					assert.strictEqual(cellEditor, node,
+						"edit method's promise should return the active editor");
 				assert.strictEqual(cellEditor, document.activeElement,
 					"Editing a cell should make the cell's editor active");
+					rowIndex++;
+					if(rowIndex < rowCount){
+						testRow(rowIndex);
+					}else{
+						dfd.resolve();
+					}
+				}));
+			}
+			testRow(0);
 
-				document.activeElement.blur();
+			return dfd;
+		});
 
+		test.test("editor focus and show event with edit-on click editor", function () {
+			var rowCount,
+				cell,
+				cellEditor,
+				dfd = this.async();
+
+			grid = new OnDemandGrid({
+				columns: {
+					order: "step",
+					name: editor({
+						label: "Name",
+						editor: "text"
+					}),
+					description: editor({
+						label: "Description",
+						editor: "text",
+						editOn: "click"
+					})
+				}
+			});
+			document.body.appendChild(grid.domNode);
+			grid.startup();
+			grid.renderArray(testOrderedData);
+			rowCount = testOrderedData.length;
+
+			function testRow(rowIndex){
+				// Test calling 'grid.edit()' in an always-on cell
 				cell = grid.cell(rowIndex, "description");
 				// Respond to the "dgrid-editor-show" event to ensure the
 				// correct cell has an editor.  This event actually fires
 				// synchronously, so we don't need to use this.async.
-				on.once(grid.domNode, "dgrid-editor-show", function (event) {
-					// document.activeElement is the body for some reason.
-					// So at least check to ensure that the cell we called edit on
-					// is the same as the cell passed to the "dgrid-editor-show" event.
+				on.once(grid.domNode, "dgrid-editor-show", dfd.rejectOnError(function(event){
 					assert.strictEqual(cell.element, event.cell.element,
 						"The activated cell should be being edited"
 					);
-				});
-
-				grid.edit(cell);
+				}));
+				// Don't move on to the next row until, the editor has received focus and the show event has fired.
+				grid.edit(cell).then(dfd.rejectOnError(function(){
+					cellEditor = query("input", cell.element)[0];
+					assert.strictEqual(cellEditor, document.activeElement,
+						"Editing a cell should make the cell's editor active");
+					rowIndex++;
+					if(rowIndex < rowCount){
+						testRow(rowIndex);
+					}else{
+						dfd.resolve();
+					}
+				}));
 			}
+			testRow(0);
+
+			return dfd;
 		});
 	});
 });
