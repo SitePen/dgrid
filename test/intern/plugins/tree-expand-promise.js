@@ -29,9 +29,11 @@ define([
 						return entry.type === 'filter';
 					});
 					arrayUtil.forEach(filterQueries, function (query) {
-						var filter = lang.mixin({}, query.argument);
+						var filterArgs = query.arguments.slice(),
+							// copy the filter object so we don't change an existing logged filter
+							filter = filterArgs[0] = lang.mixin({}, filterArgs[0]);
 						('parent' in filter) && delete filter.parent;
-						filteredCollection = filteredCollection.filter(filter);
+						filteredCollection = filteredCollection.filter.apply(filteredCollection, filterArgs);
 					});
 
 					return filteredCollection;
