@@ -2,6 +2,7 @@ define([
 	"intern!tdd",
 	"intern/chai!assert",
 	"dojo/_base/declare",
+	"dojo/aspect",
 	"dojo/Deferred",
 	"dojo/on",
 	"dojo/promise/all",
@@ -10,23 +11,71 @@ define([
 	"dijit/registry",
 	"dijit/form/TextBox",
 	"dgrid/Grid",
+	"dgrid/OnDemandGrid",
 	"dgrid/Editor",
+	"dgrid/test/data/createSyncStore",
 	"dgrid/test/data/orderedData"
-], function (test, assert, declare, Deferred, on, all, query, when, registry, TextBox, Grid, Editor, orderedData) {
+], function(test, assert, declare, aspect, Deferred, on, all, query, when, registry, TextBox, Grid, OnDemandGrid, Editor, createSyncStore, orderedData){
 	var testOrderedData = orderedData.items,
 		grid;
 
 	var EditorGrid = declare([Grid, Editor]);
 
-	test.suite("editor column mixin", function () {
+	test.suite("editor column mixin", function(){
 
-		test.afterEach(function () {
-			if (grid) {
+		function areCellsEqual(cell1, cell2){
+			return cell1.row.id === cell2.row.id &&
+				cell1.column.id === cell2.column.id;
+		}
+
+		function createFocusPreservationTest(editorType, colId){
+			return function(){
+				var name = "mix together",
+					cell,
+					dfd = this.async(1000);
+
+				grid = new (declare([OnDemandGrid, Editor]))({
+					collection: createSyncStore({ data: orderedData }),
+					columns: {
+						name: {
+							label: "Name",
+							editor: editorType || "text"
+						},
+						description: {
+							label: "Description",
+							editor: editorType || "text",
+							editOn: "click"
+						}
+					}
+				});
+
+				document.body.appendChild(grid.domNode);
+				grid.startup();
+				cell = grid.cell(name, colId);
+
+				grid.edit(cell).then(dfd.rejectOnError(function(){
+					var activeCell = grid.cell(document.activeElement),
+						editAspect = aspect.after(grid, "edit", dfd.callback(function(cell){
+							assert.isTrue(areCellsEqual(cell, activeCell),
+								"The same editor should be refocused after update");
+							editAspect.remove();
+						}), true);
+
+					assert.strictEqual(cell.element, activeCell.element,
+						"The editor in the expected cell should be focused");
+					// Update the item to cause the row to re-render
+					grid.collection.put(grid.collection.get(name));
+				}));
+			};
+		}
+
+		test.afterEach(function(){
+			if(grid){
 				grid.destroy();
 			}
 		});
 
-		test.test("canEdit - always-on (instance-per-row) editor", function () {
+		test.test("canEdit - always-on (instance-per-row) editor", function(){
 			var results = {};
 			var data = [
 				{id: 1, data1: "Data 1.a", data2: "Data 2.a"},
@@ -61,8 +110,7 @@ define([
 				"canEdit should have been called (item 3)");
 		});
 
-
-		test.test("canEdit - editOn (shared) editor", function () {
+		test.test("canEdit - editOn (shared) editor", function(){
 			var results = {};
 			var data = [
 				{id: 1, data1: "Data 1.a", data2: "Data 2.a"},
@@ -126,7 +174,7 @@ define([
 				"canEdit should have been called for editOn editor (item 3)");
 		});
 
-		test.test("canEdit always on editor: suppress on false", function(){
+		test.test("canEdit always on editor - suppress on false", function(){
 			var rowIndex,
 				rowCount,
 				cell,
@@ -184,7 +232,7 @@ define([
 			return dfd;
 		});
 
-		test.test("canEdit edit-on click editor: suppress on false", function(){
+		test.test("canEdit edit-on click editor - suppress on false", function(){
 			var rowIndex,
 				rowCount,
 				cell,
@@ -242,7 +290,7 @@ define([
 			return dfd;
 		});
 
-		test.test("destroy editor widgets: native", function () {
+		test.test("destroy editor widgets - native", function(){
 			var matchedNodes;
 
 			matchedNodes = query("input");
@@ -278,8 +326,7 @@ define([
 				"After grid is destroyed there should be 0 input elements on the page");
 		});
 
-
-		test.test("destroy editor widgets: Dijit", function () {
+		test.test("destroy editor widgets - Dijit", function(){
 			assert.strictEqual(0, registry.length,
 				"Before grid is created there should be 0 widgets on the page");
 
@@ -311,7 +358,7 @@ define([
 				"After grid is destroyed there should be 0 widgets on the page");
 		});
 
-		test.test("editor focus with always on editor", function () {
+		test.test("editor focus with always on editor", function(){
 			var rowIndex,
 				rowCount,
 				cell,
@@ -359,7 +406,7 @@ define([
 			return dfd;
 		});
 
-		test.test("editor focus and show event with edit-on click editor", function () {
+		test.test("editor focus and show event with edit-on click editor", function(){
 			var rowIndex,
 				rowCount,
 				cell,
@@ -415,5 +462,10 @@ define([
 
 			return dfd;
 		});
+
+		test.test("editor focus after update - always-on native input", createFocusPreservationTest("text", "name"));
+		test.test("editor focus after update - editOn native input", createFocusPreservationTest("text", "description"));
+		test.test("editor focus after update - always-on TextBox", createFocusPreservationTest(TextBox, "name"));
+		test.test("editor focus after update - editOn TextBox", createFocusPreservationTest(TextBox, "description"));
 	});
 });

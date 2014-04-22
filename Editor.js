@@ -18,7 +18,8 @@ define([
 	return declare(null, {
 
 		postCreate: function(){
-			var self = this;
+			var self = this,
+				previouslyFocusedCell;
 
 			this.inherited(arguments);
 
@@ -34,6 +35,7 @@ define([
 				var focusedCell = self._focusedCell;
 				row = this.row(row);
 				if(focusedCell && focusedCell.row.id === row.id){
+					previouslyFocusedCell = focusedCell;
 					// Pause the focusout handler until after this row has had
 					// time to re-render, if this removal is part of an update.
 					// A setTimeout is used here instead of resuming in the
@@ -43,14 +45,15 @@ define([
 					self._editorFocusoutHandle.pause();
 					setTimeout(function(){
 						self._editorFocusoutHandle.resume();
+						previouslyFocusedCell = null;
 					}, 0);
 				}
 			});
 			aspect.after(this, 'insertRow', function(rowElement){
 				var focusedCell = self._focusedCell;
 				var row = self.row(rowElement);
-				if(focusedCell && focusedCell.row.id === row.id){
-					self.edit(self.cell(row, focusedCell.column.id));
+				if (previouslyFocusedCell && previouslyFocusedCell.row.id === row.id){
+					self.edit(self.cell(row, previouslyFocusedCell.column.id));
 				}
 				return rowElement;
 			});
@@ -69,6 +72,10 @@ define([
 		_editorStructureCleanup: function(){
 			var editorInstances = this._editorInstances,
 				listeners = this._editorColumnListeners;
+
+			if(this._editTimer){
+				clearTimeout(this._editTimer);
+			}
 			// Do any clean up of previous column structure.
 			if(editorInstances){
 				for(var columnId in editorInstances){
@@ -192,12 +199,18 @@ define([
 					if(!column.canEdit || column.canEdit(cell.row.data, value)){
 						activeCell = cellElement;
 
+						// In some browsers, moving a DOM node causes a blur event to fire.  Pause
+						// the handler until the move is complete.
+						if(column._editorBlurHandle){
+							column._editorBlurHandle.pause();
+						}
+
 						this.showEditor(cmp, column, cellElement, value);
 
 						// focus / blur-handler-resume logic is surrounded in a setTimeout
 						// to play nice with Keyboard's dgrid-cellfocusin as an editOn event
 						dfd = new Deferred();
-						setTimeout(function(){
+						this._editTimer = setTimeout(function(){
 							// focus the newly-placed control (supported by form widgets and HTML inputs)
 							if(cmp.focus){
 								cmp.focus();
@@ -206,6 +219,7 @@ define([
 							if(column._editorBlurHandle){
 								column._editorBlurHandle.resume();
 							}
+							this._editTimer = null;
 							dfd.resolve(cmp);
 						}, 0);
 
@@ -400,15 +414,16 @@ define([
 				// Remove the editor from the cell, to be reused later.
 				parentNode.removeChild(node);
 
-				put(cell.element, "!dgrid-cell-editing");
-
-				// Clear out the rest of the cell's contents, then re-render with new value.
-				while(i--){
-					put(parentNode.firstChild, "!");
+				if(cell.row){
+					// If the row is still present (i.e. we didn't blur due to removal),
+					// clear out the rest of the cell's contents, then re-render with new value.
+					put(cell.element, "!dgrid-cell-editing");
+					while(i--){
+						put(parentNode.firstChild, "!");
+					}
+					Grid.appendIfNode(parentNode, column.renderCell(cell.row.data, activeValue, parentNode,
+						activeOptions ? lang.delegate(options, activeOptions) : options));
 				}
-				Grid.appendIfNode(parentNode, column.renderCell(
-					self.row(parentNode).data, activeValue, parentNode,
-					activeOptions ? lang.delegate(options, activeOptions) : options));
 
 				// Reset state now that editor is deactivated;
 				// reset focusedCell as well since some browsers will not trigger the
