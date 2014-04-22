@@ -1,5 +1,6 @@
 define([
 	"dojo/_base/declare",
+	"dojo/_base/lang",
 	"dojo/_base/array",
 	"dojo/_base/Deferred",
 	"dojo/query",
@@ -9,7 +10,7 @@ define([
 	"./Grid",
 	"dojo/has!touch?./util/touch",
 	"put-selector/put"
-], function(declare, arrayUtil, Deferred, querySelector, on, aspect, has, Grid, touchUtil, put){
+], function(declare, lang, arrayUtil, Deferred, querySelector, on, aspect, has, Grid, touchUtil, put){
 
 function defaultRenderExpando(level, hasChildren, expanded, object){
 	// summary:
@@ -246,7 +247,12 @@ function tree(column){
 						grid.renderQuery(query, preloadNode, options) :
 						grid._trackError(function(){
 							return grid.renderCollection(
-								query(options), preloadNode, "level" in query ? { queryLevel: query.level } : {}
+								query(options),
+								preloadNode,
+								lang.mixin(
+									{ rows: options.rows },
+									"level" in query ? { queryLevel: query.level } : null
+								)
 							);
 						})
 					).then(function(){
