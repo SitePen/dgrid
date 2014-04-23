@@ -11,10 +11,6 @@ define([
 	"dojo/_base/sniff"
 ], function(declare, lang, Deferred, on, aspect, has, query, Grid, put){
 
-// Variables to track info for cell currently being edited
-// (active* variables are for editOn editors only)
-	var activeCell, activeValue, activeOptions;
-
 	return declare(null, {
 
 		postCreate: function(){
@@ -142,7 +138,7 @@ define([
 					if(!options || !options.alreadyHooked){
 						// in IE<8, cell is the child of the td due to the extra padding node
 						self._editorColumnListeners.push(on(cell.tagName == "TD" ? cell : cell.parentNode, editOn, function(){
-							activeOptions = options;
+							self._activeOptions = options;
 							self.edit(this);
 						}));
 					}
@@ -175,7 +171,7 @@ define([
 			//		input/widget when the cell editor is focused.
 			//		If the cell is not editable, returns null.
 
-			var row, column, cellElement, dirty, field, value, cmp, dfd;
+			var row, column, cellElement, dirty, field, value, cmp, dfd, node;
 
 			if(!cell.column){
 				cell = this.cell(cell);
@@ -189,7 +185,7 @@ define([
 			cellElement = cell.element.contents || cell.element;
 
 			if((cmp = this._editorInstances[column.id])){ // shared editor (editOn used)
-				if(activeCell != cellElement){
+				if(this._activeCell != cellElement){
 					// get the cell value
 					row = cell.row;
 					dirty = this.dirty && this.dirty[row.id];
@@ -197,12 +193,14 @@ define([
 						column.get ? column.get(row.data) : row.data[field];
 					// check to see if the cell can be edited
 					if(!column.canEdit || column.canEdit(cell.row.data, value)){
-						activeCell = cellElement;
+						this._activeCell = cellElement;
 
-						// In some browsers, moving a DOM node causes a blur event to fire.  Pause
-						// the handler until the move is complete.
-						if(column._editorBlurHandle){
-							column._editorBlurHandle.pause();
+						// In some browsers, moving a DOM node causes a blur event to fire which in this case,
+						// is a bad time for the blur handler to run.  Blur the input node first.
+						node = cmp.domNode || cmp;
+						if(node.offsetWidth){
+							// The editor is visible.  Blur it.
+							node.blur();
 						}
 
 						this.showEditor(cmp, column, cellElement, value);
@@ -246,7 +244,6 @@ define([
 			// Also called when rendering an editor in an "always-on" editor column.
 
 			var isWidget = cmp.domNode;
-
 			// for regular inputs, we can update the value before even showing it
 			if(!isWidget){
 				this._updateInputValue(cmp, value);
@@ -273,10 +270,10 @@ define([
 			}
 			// track previous value for short-circuiting or in case we need to revert
 			cmp._dgridLastValue = value;
-			// if this is an editor with editOn, also update activeValue
-			// (activeOptions will have been updated previously)
-			if(activeCell){
-				activeValue = value;
+			// if this is an editor with editOn, also update _activeValue
+			// (_activeOptions will have been updated previously)
+			if(this._activeCell){
+				this._activeValue = value;
 				// emit an event immediately prior to placing a shared editor
 				on.emit(cellElement, "dgrid-editor-show", {
 					grid: this,
@@ -381,10 +378,10 @@ define([
 					};
 
 			function blur(){
-				var element = activeCell;
+				var element = self._activeCell;
 				focusNode.blur();
 
-				if(typeof this.focus === "function"){
+				if(typeof self.focus === "function"){
 					// Dijit form widgets don't end up dismissed until the next turn,
 					// so wait before calling focus (otherwise Keyboard will focus the
 					// input again).  IE<9 needs to wait longer, otherwise the cell loses
@@ -421,15 +418,14 @@ define([
 					while(i--){
 						put(parentNode.firstChild, "!");
 					}
-					Grid.appendIfNode(parentNode, column.renderCell(cell.row.data, activeValue, parentNode,
-						activeOptions ? lang.delegate(options, activeOptions) : options));
+					Grid.appendIfNode(parentNode, column.renderCell(cell.row.data, this._activeValue, parentNode,
+						this._activeOptions ? lang.delegate(options, this._activeOptions) : options));
 				}
 
 				// Reset state now that editor is deactivated;
 				// reset focusedCell as well since some browsers will not trigger the
 				// focusout event handler in this case
-				activeCell = activeValue = activeOptions = null;
-				this._focusedCell = null;
+				this._focusedCell = this._activeCell = this._activeValue = this._activeOptions = null;
 			}
 
 			function dismissOnKey(evt){
@@ -439,7 +435,7 @@ define([
 
 				if(key == 27){ // escape: revert + dismiss
 					reset();
-					activeValue = cmp._dgridLastValue;
+					self._activeValue = cmp._dgridLastValue;
 					blur();
 				}else if(key == 13 && column.dismissOnEnter !== false){ // enter: dismiss
 					// FIXME: Opera is "reverting" even in this case
@@ -461,11 +457,11 @@ define([
 			var value, id, editedRow;
 			if(!cmp.isValid || cmp.isValid()){
 				value = this._setProperty((cmp.domNode || cmp).parentNode,
-					activeCell ? activeValue : cmp._dgridLastValue,
+					this._activeCell ? this._activeValue : cmp._dgridLastValue,
 					this._dataFromEditor(column, cmp), triggerEvent);
 
-				if(activeCell){ // for editors with editOn defined
-					activeValue = value;
+				if(this._activeCell){ // for editors with editOn defined
+					this._activeValue = value;
 				}else{ // for always-on editors, update _dgridLastValue immediately
 					cmp._dgridLastValue = value;
 				}
