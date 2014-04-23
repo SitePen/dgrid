@@ -360,7 +360,7 @@ function edit(cell) {
 	//		input/widget when the cell editor is focused.
 	//		If the cell is not editable, returns null.
 	
-	var row, column, cellElement, dirty, field, value, cmp, dfd, activeCell;
+	var row, column, cellElement, dirty, field, value, cmp, dfd, activeCell, node;
 	
 	if(!cell.column){ cell = this.cell(cell); }
 	if(!cell || !cell.element){ return null; }
@@ -384,8 +384,10 @@ function edit(cell) {
 				// In some browsers, moving a DOM node causes a blur event to fire which is not
 				// the best time for the blur handler to fire.  Force the issue by blurring the
 				// editor now.
-				if(column.editorInstance){
-					column.editorInstance.blur();
+				node = cmp.domNode || cmp;
+				if(node.offsetWidth){
+					// The editor is visible.  Blur it.
+					node.blur();
 				}
 
 				showEditor(column.editorInstance, column, cellElement, value);
