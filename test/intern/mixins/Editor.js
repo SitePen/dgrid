@@ -11,63 +11,15 @@ define([
 	"dijit/registry",
 	"dijit/form/TextBox",
 	"dgrid/Grid",
-	"dgrid/OnDemandGrid",
 	"dgrid/Editor",
-	"dgrid/test/data/createSyncStore",
 	"dgrid/test/data/orderedData"
-], function(test, assert, declare, aspect, Deferred, on, all, query, when, registry, TextBox, Grid, OnDemandGrid, Editor, createSyncStore, orderedData){
+], function(test, assert, declare, aspect, Deferred, on, all, query, when, registry, TextBox, Grid, Editor, orderedData){
 	var testOrderedData = orderedData.items,
 		grid;
 
 	var EditorGrid = declare([Grid, Editor]);
 
 	test.suite("editor column mixin", function(){
-
-		function areCellsEqual(cell1, cell2){
-			return cell1.row.id === cell2.row.id &&
-				cell1.column.id === cell2.column.id;
-		}
-
-		function createFocusPreservationTest(editorType, colId){
-			return function(){
-				var name = "mix together",
-					cell,
-					dfd = this.async(1000);
-
-				grid = new (declare([OnDemandGrid, Editor]))({
-					collection: createSyncStore({ data: orderedData }),
-					columns: {
-						name: {
-							label: "Name",
-							editor: editorType || "text"
-						},
-						description: {
-							label: "Description",
-							editor: editorType || "text",
-							editOn: "click"
-						}
-					}
-				});
-
-				document.body.appendChild(grid.domNode);
-				grid.startup();
-				cell = grid.cell(name, colId);
-
-				grid.edit(cell).then(dfd.rejectOnError(function(){
-					var activeCell = grid.cell(document.activeElement),
-						editAspect = aspect.after(grid, "edit", dfd.callback(function(cell){
-							assert.isTrue(areCellsEqual(cell, activeCell),
-								"The same editor should be refocused after update");
-							editAspect.remove();
-						}), true);
-
-					assert.strictEqual(cell.element, activeCell.element,
-						"The editor in the expected cell should be focused");
-					// Update the item to cause the row to re-render
-					grid.collection.put(grid.collection.get(name));
-				}));
-			};
-		}
 
 		test.afterEach(function(){
 			if(grid){
@@ -462,10 +414,5 @@ define([
 
 			return dfd;
 		});
-
-		test.test("editor focus after update - always-on native input", createFocusPreservationTest("text", "name"));
-		test.test("editor focus after update - editOn native input", createFocusPreservationTest("text", "description"));
-		test.test("editor focus after update - always-on TextBox", createFocusPreservationTest(TextBox, "name"));
-		test.test("editor focus after update - editOn TextBox", createFocusPreservationTest(TextBox, "description"));
 	});
 });
