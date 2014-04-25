@@ -14,6 +14,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 * Fixed a regression in `ColumnHider` where the node to open the menu became
   invisible on platforms with hidden scrollbars. (#886)
+* Resolved an issue regarding `dojo/dnd` CSS classes and programmatic dgrid
+  deselection. (#906)
 * `ColumnHider` now assigns its menu node an ID in the format
   `{id}-hider-menu`, not `dgrid-hider-menu-{id}`.
 
