@@ -7,10 +7,22 @@ define([
 	"dojo/_base/declare",
 	"dojo/_base/array",
 	"dgrid/demos/dTuned/data",
+	"put-selector/put",
 	"dojo/domReady!"
 ],
-function(List, Grid, Selection, Keyboard, Hider, declare, arrayUtil, songStore){
-	//	a formatting function for the Duration column.
+function(List, Grid, Selection, Keyboard, Hider, declare, arrayUtil, songStore, put){
+	// Create DOM
+	var headerNode = put("div#header"),
+		listNode = put("div#list-container"),
+		genresNode = put(listNode, "div#genres"),
+		artistsNode = put(listNode, "div#artists"),
+		albumsNode = put(listNode, "div#albums"),
+		gridNode = put("div#grid");
+	put(document.body, headerNode, "div#header-content", "dTuned");
+	put(document.body, listNode);
+	put(document.body, gridNode);
+	
+	// a formatting function for the Duration column.
 	var timeFormatter = function(t){
 		var tmp = parseInt(t, 10), min, sec;
 		if(isNaN(tmp)){ return t; }
@@ -22,7 +34,7 @@ function(List, Grid, Selection, Keyboard, Hider, declare, arrayUtil, songStore){
 	
 	function unique(arr){
 		// Create a unique list of items from the passed array
-		// (removing duplicates).  This is quick and dirty.
+		// (removing duplicates).
 
 		// First, set up a hashtable for unique objects.
 		var obj = {};
@@ -53,18 +65,18 @@ function(List, Grid, Selection, Keyboard, Hider, declare, arrayUtil, songStore){
 			Album: "Album",
 			Genre: "Genre"
 		}
-	}, "grid");
+	}, gridNode);
 
 	// define a List constructor with the features we want mixed in,
 	// for use by the three lists in the top region
 	var TunesList = declare([List, Selection, Keyboard]);
 
-	//	define our three lists for the top.
-	var genres = new TunesList({ selectionMode: "single" }, "genres");
-	var artists = new TunesList({ selectionMode: "single" }, "artists");
-	var albums = new TunesList({ selectionMode: "single" }, "albums");
+	// define our three lists for the top.
+	var genres = new TunesList({ selectionMode: "single" }, genresNode);
+	var artists = new TunesList({ selectionMode: "single" }, artistsNode);
+	var albums = new TunesList({ selectionMode: "single" }, albumsNode);
 
-	//	create the unique lists and render them
+	// create the unique lists and render them
 	var g = unique(arrayUtil.map(songStore.data, function(item){ return item.Genre; })),
 		art = unique(arrayUtil.map(songStore.data, function(item){ return item.Artist; })),
 		alb = unique(arrayUtil.map(songStore.data, function(item){ return item.Album; }));
@@ -77,55 +89,55 @@ function(List, Grid, Selection, Keyboard, Hider, declare, arrayUtil, songStore){
 
 	var currentGenre; // updated on genre select
 
-	//	start listening for selections on the lists.
+	// start listening for selections on the lists.
 	genres.on("dgrid-select", function(e){
-		//	filter the albums, artists and grid
+		// filter the albums, artists and grid
 		var row = e.rows[0],
 			filter = currentGenre = row.data,
 			art;
 		if(row.id == "0"){
-			//	remove filtering
+			// remove filtering
 			art = unique(arrayUtil.map(songStore.data, function(item){ return item.Artist; }));
 			grid.query = {};
 		} else {
-			//	create filtering
+			// create filtering
 			art = unique(arrayUtil.map(arrayUtil.filter(songStore.data, function(item){ return item.Genre === filter; }), function(item){ return item.Artist; }));
 			grid.query = { "Genre": filter };
 		}
 		art.unshift("All (" + art.length + " Artist" + (art.length !== 1 ? "s" : "") + ")");
 		
-		artists.refresh();	//	clear contents
+		artists.refresh();	// clear contents
 		artists.renderArray(art);
-		artists.select(0); //	reselect "all", triggering albums+grid refresh
+		artists.select(0); // reselect "all", triggering albums+grid refresh
 	});
 
 	artists.on("dgrid-select", function(e){
-		//	filter the albums, grid
+		// filter the albums, grid
 		var row = e.rows[0],
 			filter = row.data, alb;
 		if(row.id == "0"){
 			if(genres.selection[0]){
-				//	remove filtering entirely
+				// remove filtering entirely
 				alb = unique(arrayUtil.map(songStore.data, function(item){ return item.Album; }));
 			} else {
-				//	filter only by genre
+				// filter only by genre
 				alb = unique(arrayUtil.map(arrayUtil.filter(songStore.data, function(item){ return item.Genre === currentGenre; }), function(item){ return item.Album; }));
 			}
 			delete grid.query.Artist;
 		} else {
-			//	create filter based on artist
+			// create filter based on artist
 			alb = unique(arrayUtil.map(arrayUtil.filter(songStore.data, function(item){ return item.Artist === filter; }), function(item){ return item.Album; }));
 			grid.query.Artist = filter;
 		}
 		alb.unshift("All (" + alb.length + " Album" + (alb.length !== 1 ? "s" : "") + ")");
 
-		albums.refresh(); //	clear contents
+		albums.refresh(); // clear contents
 		albums.renderArray(alb);
-		albums.select(0); //	reselect "all" item, triggering grid refresh
+		albums.select(0); // reselect "all" item, triggering grid refresh
 	});
 
 	albums.on("dgrid-select", function(e){
-		//	filter the grid
+		// filter the grid
 		var row = e.rows[0],
 			filter = row.data;
 		if(row.id == "0"){
@@ -137,6 +149,6 @@ function(List, Grid, Selection, Keyboard, Hider, declare, arrayUtil, songStore){
 		grid.refresh();
 	});
 
-	//	set the initial selections on the lists.
+	// set the initial selections on the lists.
 	genres.select(0);
 });

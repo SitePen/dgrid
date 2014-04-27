@@ -3,12 +3,25 @@ define([
 	"dgrid/Selection",
 	"dgrid/Keyboard",
 	"dojo/_base/declare",
+	"dojo/dom-construct",
 	"dojo/on",
 	"dojo/query",
 	"dojo/store/Memory",
 	"dojo/store/Observable",
-	"put-selector/put"
-], function(Grid, Selection, Keyboard, declare, on, query, Memory, Observable, put){
+	"put-selector/put",
+	"dojo/text!./resources/description.html"
+], function(Grid, Selection, Keyboard, declare, domConstruct, on, query, Memory, Observable, put, descriptionHtml){
+	// Render DOM
+	domConstruct.place(descriptionHtml, document.body);
+	var switchNode = put("p", "Switch View: "),
+		tableButton = put(switchNode, "button[type=button]", "Table"),
+		detailsButton = put(switchNode, "button[type=button]", "Details"),
+		galleryButton = put(switchNode, "button[type=button]", "Gallery"),
+		gridNode;
+	
+	put(document.body, switchNode);
+	gridNode = put(document.body, "div#grid.table");
+	
 	var grid, store, origRenderRow, expandoListener, expandedNode,
 		renderers = {
 			gallery: function(obj, options){
@@ -108,7 +121,7 @@ define([
 	});
 	
 	// switch views when buttons are clicked
-	byId("btnTable").onclick = viewClickHandler("table");
-	byId("btnDetails").onclick = viewClickHandler("details");
-	byId("btnGallery").onclick = viewClickHandler("gallery");
+	tableButton.onclick = viewClickHandler("table");
+	detailsButton.onclick = viewClickHandler("details");
+	galleryButton.onclick = viewClickHandler("gallery");
 });

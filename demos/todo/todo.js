@@ -7,11 +7,19 @@ define([
 	"dojo/json",
 	"dojo/store/Memory",
 	"dojo/store/Observable",
-	"put-selector/put"
+	"put-selector/put",
+	"dojo/domReady!"
 ], function(Grid, Selection, editor, DnD, declare, json, Memory, Observable, put){
-	function byId(id){
-		return document.getElementById(id);
-	}
+	// Create DOM
+	var container = put("div#container"),
+		itemForm = put(container, "form#itemForm.actionArea.topArea"),
+		taskField = put(itemForm, "input#txtTask[name=task]"),
+		submitButton = put(itemForm, "button[type=submit]", "Add"),
+		listNode = put(container, "div#list"),
+		removeArea = put(container, "div.actionArea.bottomArea"),
+		removeSelectedButton = put(removeArea, "button[type=button]", "Remove Selected"),
+		removeCompletedButton = put(removeArea, "button[type=button]", "Remove Completed");
+	put(document.body, container);
 	
 	// function used to support ordered insertion of store items
 	function calculateOrder(store, object, before, orderField){
@@ -57,7 +65,7 @@ define([
 			query: function(query, options){
 				// sort by order field
 				options = options || {};
-				options.sort = [{attribute:"order"}];
+				options.sort = [{ attribute: "order" }];
 				return this.inherited(arguments);
 			}
 		}),
@@ -105,12 +113,11 @@ define([
 					}
 				}
 			}
-		}, "list"),
-		taskField = byId("txtTask");
+		}, listNode);
 	
 	grid.sort("order");
 	
-	byId("itemForm").onsubmit = function(){
+	itemForm.onsubmit = function(){
 		// allow overwrite if already exists (by using put, not add)
 		store.put({
 			completed: false,
@@ -119,14 +126,14 @@ define([
 		taskField.value = "";
 		return false;
 	};
-	byId("removeSelected").onclick = function(){
+	removeSelectedButton.onclick = function(){
 		for (var i in grid.selection) {
 			// Each key in the selection map is the id of the item,
 			// so we can pass it directly to store.remove.
 			store.remove(i);
 		}
 	};
-	byId("removeCompleted").onclick = function(){
+	removeCompletedButton.onclick = function(){
 		// query for all completed items and remove them
 		store.query({ completed: true }).forEach(function(item){
 			store.remove(item[store.idProperty]);
@@ -135,7 +142,7 @@ define([
 	
 	if(window.localStorage){
 		// add extra button to clear the localStorage key we're using
-		var button = put(byId("removeArea"), "button[type=button]",
+		var button = put(removeArea, "button[type=button]",
 			"Clear localStorage");
 		button.onclick = function(){
 			localStorage.removeItem(key);

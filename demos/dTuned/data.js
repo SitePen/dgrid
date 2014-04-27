@@ -1,4 +1,4 @@
-define(["dojo/store/Memory", "dojo/store/Observable"], function(Memory, Observable){
+define(["dojo/store/Memory"], function(Memory){
 	//	create some song data, and return a Memory Store from it.
 	var data = {
 		identifier: "Key",
@@ -137,5 +137,5 @@ define(["dojo/store/Memory", "dojo/store/Observable"], function(Memory, Observab
 		if(item.Year.length){ item.Year = parseInt(item.Year, 10); }
 	}
 
-	return Observable(Memory({data: data}));
+	return new Memory({data: data});
 });

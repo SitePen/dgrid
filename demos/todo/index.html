@@ -10,17 +10,6 @@
 		<link rel="stylesheet" href="resources/todo.css">
 	</head>
 	<body class="slate">
-		<div id="container">
-			<form id="itemForm" class="actionArea topArea">
-				<input type="text" id="txtTask" name="task">
-				<button type="submit">Add</button>
-			</form>
-			<div id="list"></div>
-			<div id="removeArea" class="actionArea bottomArea">
-				<button type="button" id="removeSelected">Remove Selected</button>
-				<button type="button" id="removeCompleted">Remove Completed</button>
-			</div>
-		</div>
 		<script src="../../../dojo/dojo.js" data-dojo-config="async: true"></script>
 		<script>
 			require(["dgrid/demos/todo/todo"]);
