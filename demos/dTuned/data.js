@@ -137,7 +137,5 @@ define(["dojo/store/Memory", "dojo/store/Observable"], function(Memory, Observab
 		if(item.Year.length){ item.Year = parseInt(item.Year, 10); }
 	}
 
-	// global var "song_store"
-	songStore = Observable(Memory({data: data}));
-	return songStore;
+	return Observable(Memory({data: data}));
 });
