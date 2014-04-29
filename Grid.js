@@ -358,7 +358,7 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 				}
 			}
 			// skip this logic if field being sorted isn't actually displayed
-			if(target){
+			if(target && (target.contents || target.children.length)){
 				target = target.contents || target;
 				// place sort arrow under clicked node, and add up/down sort class
 				this._lastSortedArrow = put(target.firstChild, "-div.dgrid-sort-arrow.ui-icon[role=presentation]");
