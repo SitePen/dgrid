@@ -316,7 +316,7 @@ var Keyboard = declare(null, {
 			// Expose object representing focused cell or row losing focus, via
 			// event.cell or event.row; which is set depends on cellNavigation.
 			event[cellOrRowType] = this[cellOrRowType](focusedNode);
-			on.emit(element, "dgrid-cellfocusout", event);
+			on.emit(focusedNode, "dgrid-cellfocusout", event);
 		}
 		focusedNode = this[focusedNodeProperty] = element;
 		
