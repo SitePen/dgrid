@@ -65,45 +65,42 @@ function(kernel, declare, lang, Deferred, listen, aspect, query, has, miscUtil, 
 		return subset;
 	}
 
-	var horizMouseWheel;
-	if(!has("touch")){
-		horizMouseWheel = has("event-mousewheel") || has("event-wheel") ? function(grid){
-			return function(target, listener){
-				return listen(target, has("event-wheel") ? "wheel" : "mousewheel", function(event){
-					var node = event.target, deltaX;
-					// WebKit will invoke mousewheel handlers with an event target of a text
-					// node; check target and if it's not an element node, start one node higher
-					// in the tree
-					if(node.nodeType !== 1){
-						node = node.parentNode;
+	var horizMouseWheel = has("event-mousewheel") || has("event-wheel") ? function(grid){
+		return function(target, listener){
+			return listen(target, has("event-wheel") ? "wheel" : "mousewheel", function(event){
+				var node = event.target, deltaX;
+				// WebKit will invoke mousewheel handlers with an event target of a text
+				// node; check target and if it's not an element node, start one node higher
+				// in the tree
+				if(node.nodeType !== 1){
+					node = node.parentNode;
+				}
+				while(!query.matches(node, ".dgrid-column-set[" + colsetidAttr + "]", target)){
+					if(node === target || !(node = node.parentNode)){
+						return;
 					}
-					while(!query.matches(node, ".dgrid-column-set[" + colsetidAttr + "]", target)){
-						if(node === target || !(node = node.parentNode)){
-							return;
-						}
-					}
-					
-					// Normalize reported delta value:
-					// wheelDeltaX (webkit, mousewheel) needs to be negated and divided by 3
-					// deltaX (FF17+, wheel) can be used exactly as-is
-					deltaX = event.deltaX || -event.wheelDeltaX / 3;
-					if(deltaX){
-						// only respond to horizontal movement
-						listener.call(null, grid, node, deltaX);
-					}
-				});
-			};
-		} : function(grid){
-			return function(target, listener){
-				return listen(target, ".dgrid-column-set[" + colsetidAttr + "]:MozMousePixelScroll", function(event){
-					if(event.axis === 1){
-						// only respond to horizontal movement
-						listener.call(null, grid, this, event.detail);
-					}
-				});
-			};
+				}
+				
+				// Normalize reported delta value:
+				// wheelDeltaX (webkit, mousewheel) needs to be negated and divided by 3
+				// deltaX (FF17+, wheel) can be used exactly as-is
+				deltaX = event.deltaX || -event.wheelDeltaX / 3;
+				if(deltaX){
+					// only respond to horizontal movement
+					listener.call(null, grid, node, deltaX);
+				}
+			});
 		};
-	}
+	} : function(grid){
+		return function(target, listener){
+			return listen(target, ".dgrid-column-set[" + colsetidAttr + "]:MozMousePixelScroll", function(event){
+				if(event.axis === 1){
+					// only respond to horizontal movement
+					listener.call(null, grid, this, event.detail);
+				}
+			});
+		};
+	};
 	
 	return declare(null, {
 		// summary:
@@ -114,15 +111,13 @@ function(kernel, declare, lang, Deferred, listen, aspect, query, has, miscUtil, 
 		postCreate: function(){
 			this.inherited(arguments);
 			
-			if(!has("touch")){
-				this.on(horizMouseWheel(this), function(grid, colsetNode, amount){
-					var id = colsetNode.getAttribute(colsetidAttr),
-						scroller = grid._columnSetScrollers[id],
-						scrollLeft = scroller.scrollLeft + amount;
-					
-					scroller.scrollLeft = scrollLeft < 0 ? 0 : scrollLeft;
-				});
-			}
+			this.on(horizMouseWheel(this), function(grid, colsetNode, amount){
+				var id = colsetNode.getAttribute(colsetidAttr),
+					scroller = grid._columnSetScrollers[id],
+					scrollLeft = scroller.scrollLeft + amount;
+				
+				scroller.scrollLeft = scrollLeft < 0 ? 0 : scrollLeft;
+			});
 		},
 		columnSets: [],
 		createRowCells: function(tag, each, subRows, object){
@@ -192,7 +187,8 @@ function(kernel, declare, lang, Deferred, listen, aspect, query, has, miscUtil, 
 			// summary:
 			//		Dynamically creates a stylesheet rule to alter a columnset's style.
 			
-			var rule = this.addCssRule("#" + miscUtil.escapeCssIdentifier(this.domNode.id) + " .dgrid-column-set-" + colsetId, css);
+			var rule = this.addCssRule("#" + miscUtil.escapeCssIdentifier(this.domNode.id) +
+				" .dgrid-column-set-" + miscUtil.escapeCssIdentifier(colsetId, "-"), css);
 			this._positionScrollers();
 			return rule;
 		},

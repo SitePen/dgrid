@@ -1,5 +1,5 @@
-define(["./List", "./_StoreMixin", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/on", "./util/misc", "put-selector/put"],
-function(List, _StoreMixin, declare, lang, Deferred, listen, miscUtil, put){
+define(["./List", "./_StoreMixin", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/dom", "dojo/on", "./util/misc", "put-selector/put"],
+function(List, _StoreMixin, declare, lang, Deferred, dom, listen, miscUtil, put){
 
 return declare([List, _StoreMixin], {
 	// summary:
@@ -108,8 +108,8 @@ return declare([List, _StoreMixin], {
 		if(priorPreload){
 			// the preload nodes (if there are multiple) are represented as a linked list, need to insert it
 			if((preload.next = priorPreload.next) && 
-					// check to make sure that the current scroll position is below this preload
-					this.bodyNode.scrollTop >= priorPreload.node.offsetTop){ 
+					// is this preload node below the prior preload node?
+					preloadNode.offsetTop >= priorPreload.node.offsetTop){
 				// the prior preload is above/before in the linked list
 				preload.previous = priorPreload;
 			}else{
@@ -195,6 +195,9 @@ return declare([List, _StoreMixin], {
 				}else{
 					// if total is 0, IE quirks mode can't handle 0px height for some reason, I don't know why, but we are setting display: none for now
 					preloadNode.style.display = "none";
+					// This is a hack to get Observable to recognize that this is the
+					// last page, like is done in the processScroll function
+					options.count++;
 				}
 				
 				if (self._previousScrollPosition) {
@@ -303,14 +306,16 @@ return declare([List, _StoreMixin], {
 		//		plugins that add connected elements to a row, like the tree
 		
 		var sibling = rowElement.previousSibling;
-		sibling = sibling && !/\bdgrid-preload\b/.test(sibling.className) && sibling;
 		
 		// If a previous row exists, compare the top of this row with the
 		// previous one (in case "rows" are actually rendering side-by-side).
 		// If no previous row exists, this is either the first or only row,
 		// in which case we count its own height.
-		return sibling ? rowElement.offsetTop - sibling.offsetTop :
-			rowElement.offsetHeight;
+		if(sibling && !/\bdgrid-preload\b/.test(sibling.className)){
+			return rowElement.offsetTop - sibling.offsetTop;
+		}
+		
+		return rowElement.offsetHeight;
 	},
 	
 	lastScrollTop: 0,
@@ -527,7 +532,7 @@ return declare([List, _StoreMixin], {
 
 				// Isolate the variables in case we make multiple requests
 				// (which can happen if we need to render on both sides of an island of already-rendered rows)
-				(function(loadingNode, scrollNode, below, keepScrollTo, results){
+				(function(loadingNode, below, keepScrollTo, results){
 					lastRows = Deferred.when(grid.renderArray(results, loadingNode, options), function(rows){
 						lastResults = results;
 						
@@ -579,7 +584,7 @@ return declare([List, _StoreMixin], {
 						put(loadingNode, "!");
 						throw e;
 					});
-				}).call(this, loadingNode, scrollNode, below, keepScrollTo, results);
+				}).call(this, loadingNode, below, keepScrollTo, results);
 				preload = preload.previous;
 			}
 		}
@@ -621,13 +626,18 @@ return declare([List, _StoreMixin], {
 				var observers = this.observers;
 				var observer = observers[thisIndex];
 				if(observer){
-					// First we need to verify that all the rows really have been removed. If there
+					// justCleanup is set to true when the list is being cleaned out.  The rows are left in the DOM
+					// and later they are removed altogether.  Skip the check for overlapping rows because
+					// in the end, all of the rows will be removed and all of the observers need to be canceled.
+					if(!justCleanup){
+					// We need to verify that all the rows really have been removed. If there
 					// are overlapping rows, it is possible another element exists
-					var rows = observer.rows;
-					for(var i = 0; i < rows.length; i++){
-						if(rows[i] != rowElement && rows[i].offsetParent){
-							// still rows in this list, abandon
-							return this.inherited(arguments);
+						var rows = observer.rows;
+						for(var i = 0; i < rows.length; i++){
+							if(rows[i] != rowElement && dom.isDescendant(rows[i], this.domNode)){
+								// still rows in this list, abandon
+								return this.inherited(arguments);
+							}
 						}
 					}
 					observer.cancel();
