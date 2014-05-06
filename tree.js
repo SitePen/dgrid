@@ -232,19 +232,13 @@ function tree(column){
 						}
 						return childCollection;
 					};
-					if(column.allowDuplicates){
-						// If allowDuplicates is specified, include parentId in options
-						// in order to facilitate unique IDs for each occurrence of the
-						// same item under multiple different parents.
-						options.parentId = row.id;
-					}
 					// Include level information on query for renderQuery case
 					if("level" in target){
 						query.level = target.level;
 					}
 					// Add the query to the promise chain
 					promise = (grid.renderQuery ?
-						grid.renderQuery(query, preloadNode, options) :
+						grid.renderQuery(query, preloadNode) :
 						grid._trackError(function(){
 							return grid.renderCollection(
 								query(options),
@@ -329,12 +323,11 @@ function tree(column){
 		var grid = column.grid,
 			level = Number(options && options.queryLevel) + 1,
 			mayHaveChildren = !grid.collection.mayHaveChildren || grid.collection.mayHaveChildren(object),
-			parentId = options.parentId,
 			expando, node;
 		
 		level = currentLevel = isNaN(level) ? 0 : level;
 		expando = column.renderExpando(level, mayHaveChildren,
-			grid._expanded[(parentId ? parentId + "-" : "") + grid.collection.getIdentity(object)], object);
+			grid._expanded[grid.collection.getIdentity(object)], object);
 		expando.level = level;
 		expando.mayHaveChildren = mayHaveChildren;
 		

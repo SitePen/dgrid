@@ -60,12 +60,6 @@
         "parent": ""
     },
     {
-        "name": "Rest_duplicates.html",
-        "url": "Rest_duplicates.html",
-        "title": "Test JsonRest Tree with objects repeated in different places in hierarchy",
-        "parent": ""
-    },
-    {
         "name": "Selection.html",
         "url": "Selection.html",
         "title": "Test Selection",

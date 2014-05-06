@@ -487,10 +487,8 @@ function(declare, listen, has, miscUtil, hasClass, put){
 			// Include parentId within row identifier if one was specified in options.
 			// (This is used by tree to allow the same object to appear under
 			// multiple parents.)
-			var parentId = options.parentId,
-				id = this.id + "-row-" + (parentId ? parentId + "-" : "") + 
-					((this.collection && this.collection.getIdentity) ?
-						this.collection.getIdentity(object) : this._autoId++),
+			var id = this.id + "-row-" + ((this.collection && this.collection.getIdentity) ?
+					this.collection.getIdentity(object) : this._autoId++),
 				row = byId(id),
 				previousRow = row && row.previousSibling;
 			
