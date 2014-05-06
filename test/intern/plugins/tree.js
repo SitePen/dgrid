@@ -1,19 +1,20 @@
 define([
 	"intern!tdd",
 	"intern/chai!assert",
-	"../../../OnDemandGrid",
-	"../../../editor",
-	"../../../tree",
-	"../../../util/has-css3",
-	"../../../util/misc",
+	"dgrid/OnDemandGrid",
+	"dgrid/editor",
+	"dgrid/tree",
+	"dgrid/util/has-css3",
+	"dgrid/util/misc",
 	"dojo/_base/lang",
 	"dojo/_base/Deferred",
+	"dojo/dom-style",
 	"dojo/on",
 	"dojo/query",
 	"dojo/store/Memory",
 	"dojo/store/Observable",
 	"put-selector/put"
-], function(test, assert, OnDemandGrid, editor, tree, has, miscUtil, lang, Deferred, on, query, Memory, Observable, put){
+], function(test, assert, OnDemandGrid, editor, tree, has, miscUtil, lang, Deferred, domStyle, on, query, Memory, Observable, put){
 
 	var grid,
 		testDelay = 15,
@@ -62,29 +63,24 @@ define([
 			}
 		}));
 
-		if (options && options.useEditor) {
-			editorPlugin = editor;
-		}
-		else {
-			editorPlugin = function (columnDefinition) {
-				return columnDefinition;
-			}
-		}
-
 		treeColumnOptions = {
 			label: "id",
 			field: "id"
 		};
 
-		if (options && options.treeColumnOptions) {
-			treeColumnOptions = lang.delegate(treeColumnOptions, options.treeColumnOptions);
+		if(options && options.useEditor){
+			treeColumnOptions = editor(treeColumnOptions);
+		}
+
+		if(options && options.treeColumnOptions){
+			lang.mixin(treeColumnOptions, options.treeColumnOptions);
 		}
 
 		grid = new OnDemandGrid({
 			sort: "id",
 			store: store,
 			columns: [
-				tree(editorPlugin(treeColumnOptions)),
+				tree(treeColumnOptions),
 				{ label: "value", field: "value"}
 			]
 		});
@@ -205,7 +201,7 @@ define([
 					});
 			});
 
-			test.test("expand hidden", function() {
+			test.test("expand hidden", function(){
 				var dfd = this.async(1000);
 
 				grid.domNode.style.display = "none";
@@ -214,7 +210,7 @@ define([
 
 				// Since the grid is not displayed the expansion will occur without a transitionend event
 				// However, DOM updates from the expand will not complete within the current stack frame
-				setTimeout(dfd.callback(function() {
+				setTimeout(dfd.callback(function(){
 					var connected = grid.row(0).element.connected;
 					assert.isTrue(connected && connected.offsetHeight > 0,
 						"Node should be expanded with non-zero height");
@@ -227,24 +223,24 @@ define([
 			// * The store created in "createGrid" has a "mayHaveChildren" that returns true for nodes with no parentId
 			// * The expando icon (.dgrid-expando-icon) is always rendered, it is not visible if it lacks the class
 			//   ".ui-icon"
-			test.test("mayHaveChildren", function () {
+			test.test("mayHaveChildren", function(){
 				var rowObject;
 				var expandoNode;
 				var i;
 				var j;
 
-				for (i = 0; i < 5; i++) {
+				for(i = 0; i < 5; i++){
 					rowObject = grid.row(i);
 					expandoNode = query(".dgrid-expando-icon.ui-icon", rowObject.element)[0];
 					assert.isDefined(expandoNode, "Parent node should have an expando icon; node id = " + i);
 
 					grid.expand(i, true, true);
 
-					for (k = 0; k < 2; k++) {
+					for(k = 0; k < 2; k++){
 						rowObject = grid.row(i + ":" + k);
 						expandoNode = query(".dgrid-expando-icon.ui-icon", rowObject.element)[0];
 						assert.isUndefined(expandoNode,
-							"Child node should not have an expando icon; node id = " + i + ":" + k);
+								"Child node should not have an expando icon; node id = " + i + ":" + k);
 					}
 
 					grid.expand(i, false, true);
@@ -253,16 +249,16 @@ define([
 
 			// Test goal: ensure that rows are correctly expanded/collapsed on grid render in accordance with the
 			// column's "shouldExpand" method
-			test.test("shouldExpand", function () {
+			test.test("shouldExpand", function(){
 				var columns;
 				var shouldExpand;
 				var i;
 
 				columns = grid.get("columns");
-				columns[0].shouldExpand = function (rowObject) {
+				columns[0].shouldExpand = function(rowObject){
 					var shouldExpand = false;
 
-					if (rowObject.data.parentId === undefined) {
+					if(rowObject.data.parentId === undefined){
 						shouldExpand = !(rowObject.id % 2);
 					}
 
@@ -270,20 +266,20 @@ define([
 				};
 				grid.set("columns", columns);
 
-				for (i = 0; i < 5; i++) {
+				for(i = 0; i < 5; i++){
 					shouldExpand = !(i % 2);
 
-					if (shouldExpand) {
+					if(shouldExpand){
 						assert.isTrue(grid._expanded[i], "Row " + i + " should be expanded");
 					}
-					else {
+					else{
 						assert.isUndefined(grid._expanded[i], "Row " + i + " should not be expanded");
 					}
 				}
 			});
 
 			// Test goal: ensure that a custom "renderExpando" column method produces the expected DOM structure
-			test.test("renderExpando", function () {
+			test.test("renderExpando", function(){
 				var columns;
 				var rowObject;
 				var expandoNode;
@@ -291,34 +287,28 @@ define([
 				var i;
 
 				columns = grid.get("columns");
-				columns[0].renderExpando = function (level, hasChildren, expanded, object) {
-					// Slightly modified copy of dgrid's defaultRenderExpando method
+				columns[0].renderExpando = function(level, hasChildren, expanded, object){
+
 					// * Adds the "test-expando" class
 					// * Floats the expando at the opposite end of the cell
-					var dir = this.grid.isRTL ? "left" : "right",
-						cls = ".dgrid-expando-icon.test-expando",
-						node;
-					if(hasChildren){
-						cls += ".ui-icon.ui-icon-triangle-1-" + (expanded ? "se" : "e");
-					}
-					node = put("div" + cls + "[style=margin-" + dir + ": " +
-						(level * (this.indentWidth || 9)) + "px; float: " + dir + "]");
-					node.innerHTML = "&nbsp;"; // for opera to space things properly
+					var node = tree.defaultRenderExpando.apply(this, arguments);
+					put(node, ".test-expando");
+					domStyle.set(node, "float", "right");
 					return node;
 				};
 				grid.set("columns", columns);
 
-				for (i = 0; i < 5; i++) {
+				for(i = 0; i < 5; i++){
 					rowObject = grid.row(i);
 					expandoNode = query(".dgrid-expando-icon.ui-icon", rowObject.element)[0];
 					assert.isDefined(expandoNode, "Row " + i + " should have an expando icon");
 					assert.include(expandoNode.className, "test-expando",
-						"Row " + i + "'s expando icon should have the class \"test-expando\"");
+							"Row " + i + "'s expando icon should have the class \"test-expando\"");
 				}
 			});
 
 			// Test goal: ensure the expando node is still rendered when the column has a custom "renderCell" method
-			test.test("renderCell", function () {
+			test.test("renderCell", function(){
 				var rowObject;
 				var expandoNode;
 				var shouldExpand;
@@ -328,13 +318,13 @@ define([
 
 				createGrid({
 					treeColumnOptions: {
-						renderCell: function (rowObject, cellValue, cellNode) {
+						renderCell: function(rowObject, cellValue, cellNode){
 							return put("div.testRenderCell", cellValue);
 						}
 					}
 				});
 
-				for (i = 0; i < 5; i++) {
+				for(i = 0; i < 5; i++){
 					rowObject = grid.row(i);
 					expandoNode = query(".dgrid-expando-icon.ui-icon", rowObject.element)[0];
 					assert.isDefined(expandoNode, "Row " + i + " should have an expando node");
@@ -344,13 +334,13 @@ define([
 
 				createGrid({
 					treeColumnOptions: {
-						renderCell: function (rowObject, cellValue, cellNode) {
+						renderCell: function(rowObject, cellValue, cellNode){
 							put(cellNode, ".testRenderCell", cellValue);
 						}
 					}
 				});
 
-				for (i = 0; i < 5; i++) {
+				for(i = 0; i < 5; i++){
 					rowObject = grid.row(i);
 					expandoNode = query(".dgrid-expando-icon.ui-icon", rowObject.element)[0];
 					assert.isDefined(expandoNode, "Row " + i + " should have an expando node");
@@ -359,7 +349,7 @@ define([
 
 			// Test goal: ensure the expando node is still rendered with the editor plugin
 			// Note: ordering is important: tree(editor()), not editor(tree())
-			test.test("renderCell with editor", function () {
+			test.test("renderCell with editor", function(){
 				var rowObject;
 				var expandoNode;
 				var inputNode;
@@ -371,7 +361,7 @@ define([
 					useEditor: true
 				});
 
-				for (i = 0; i < 5; i++) {
+				for(i = 0; i < 5; i++){
 					rowObject = grid.row(i);
 					expandoNode = query(".dgrid-expando-icon.ui-icon", rowObject.element)[0];
 					assert.isDefined(expandoNode, "Row " + i + " should have an expando node");
@@ -380,7 +370,6 @@ define([
 				}
 			});
 		});
-
 
 		test.suite("tree + observable", function(){
 			test.beforeEach(createGrid);
