@@ -5,6 +5,11 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ## Significant changes
 
+### General/Core
+
+* Fixed a regression in `List` which could cause errors in certain situations
+  due to a feature test being performed before the document is ready. (#907)
+
 ### Mixins
 
 * Fixed a focus issue in the `Keyboard` mixin which manifested when used in
