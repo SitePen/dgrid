@@ -63,7 +63,6 @@ Property | Description
 `renderExpando()` | an optional function which can be overridden to customize the logic for rendering the expando icon beside each tree cell's content.
 `indentWidth` | the number of pixels to indent each nested level of children; the default is `9`.
 `collapseOnRefresh` | a boolean indicating whether to collapse all parents (essentially "forgetting" expanded state) whenever the grid is refreshed; the default is `false`.
-`allowDuplicates` | If this is set to `true`, a single object (and single id) can be used in multiple places in a tree structure. However, enabling this means that `grid.row(id)` will only return top-level objects (since it can't disambiguate other levels). The default is `false`.
 
 ## Additional Grid APIs
 

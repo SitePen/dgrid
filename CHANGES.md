@@ -17,7 +17,8 @@ The following is a rough list of changes, to be outlined more presentably later.
 * Replaced `List#newRow(...)` with `List#highlightRow(row[, delay])`
   (i.e. the equivalent of `newRow` is to call `insertRow` then `highlightRow`)
 * `Selector` is now a mixin (with a capital S)
-* Desupported `Selector`'s `disabled` property (use `Selection#allowSelect`)
+* Desupported `Selector`'s `disabled` property (use `Selection#allowSelect` instead)
+* Desupported `Tree`'s `allowDupilcates` property (ensure unique IDs instead)
 * Removed deprecated functions marked for removal in 0.4; most of these have had
   `set(...)` equivalents for a long time already
 
