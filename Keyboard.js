@@ -335,7 +335,8 @@ var Keyboard = declare(null, {
 		// performs a shallow copy of properties into a new event object.
 		event[cellOrRowType] = cell;
 		
-		if(!inputFocused){
+		var isFocusableClass = this.cellNavigation ? hasGridCellClass : hasGridRowClass;
+		if(!inputFocused && isFocusableClass.test(element.className)){
 			if(has("ie") < 8){
 				// setting the position to relative magically makes the outline
 				// work properly for focusing later on with old IE.
