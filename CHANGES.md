@@ -7,6 +7,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ### Mixins
 
+* Fixed a focus issue in the `Keyboard` mixin which manifested when used in
+  conjunction with the `ColumnResizer` extension. (#928)
 * The `Selection` mixin no longer emits superfluous `dgrid-deselect` events
   for rows which were already deselected. (#889)
 
