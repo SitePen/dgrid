@@ -18,8 +18,9 @@ define([
 		data.push(item);
 	}
 
-	function createGrid(columns, hideHeader){
+	function createGrid(columns, hideHeader, sort){
 		grid = new CompoundColumnGrid({
+			sort: sort,
 			columns: columns,
 			showHeader: !hideHeader
 		});
@@ -29,6 +30,32 @@ define([
 	}
 
 	test.suite("CompoundColumns", function(){
+
+		test.suite("sort method", function(){
+			test.afterEach(function(){
+				grid.destroy();
+			});
+			
+			test.test("sort grid by field with hidden header", function(){
+				createGrid({
+					data0: "Data 0",
+					data1: "Data 1",
+					data2: "Data 2",
+					data3: "Data 3",
+					data4: "Data 4"
+				}, true, 'data0');
+
+				assert.strictEqual(grid.cell(0, 0).element.innerHTML, "Value 0:0");
+				assert.strictEqual(grid.cell(0, 4).element.innerHTML, "Value 0:4");
+				assert.strictEqual(grid.cell(11, 0).element.innerHTML, "Value 11:0");
+				assert.strictEqual(grid.cell(11, 4).element.innerHTML, "Value 11:4");
+				assert.isUndefined(grid.cell(0, 5).element);
+				assert.isUndefined(grid.cell(12, 0).element);
+
+			});
+		
+		});
+
 		test.suite("cell method", function(){
 			test.afterEach(function(){
 				grid.destroy();
