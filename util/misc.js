@@ -1,7 +1,14 @@
-define(["put-selector/put"], function(put){
+define([
+	"dojo/has",
+	"put-selector/put"
+], function(has, put){
 	// summary:
 	//		This module defines miscellaneous utility methods for purposes of
 	//		adding styles, and throttling/debouncing function calls.
+	
+	has.add("dom-contains", function(global, doc, element){
+		return !!element.contains; // not supported by FF < 9
+	});
 	
 	// establish an extra stylesheet which addCssRule calls will use,
 	// plus an array to track actual indices in stylesheet for removal
@@ -106,6 +113,19 @@ define(["put-selector/put"], function(put){
 				for(i in arrayOrObject){
 					callback.call(context, arrayOrObject[i], i, arrayOrObject);
 				}
+			}
+		},
+		
+		// DOM-related functions
+		
+		contains: function(parent, node){
+			// summary:
+			//		Checks to see if an element is contained in another element.
+			
+			if(has("dom-contains")){
+				return parent.contains(node);
+			}else{
+				return parent.compareDocumentPosition(node) & 8 /* DOCUMENT_POSITION_CONTAINS */;
 			}
 		},
 		

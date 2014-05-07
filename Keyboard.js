@@ -5,9 +5,10 @@ define([
 	"dojo/_base/lang",
 	"dojo/has",
 	"put-selector/put",
+	"./util/misc",
 	"dojo/_base/Deferred",
 	"dojo/_base/sniff"
-], function(declare, aspect, on, lang, has, put, Deferred){
+], function(declare, aspect, on, lang, has, put, miscUtil, Deferred){
 
 var delegatingInputTypes = {
 		checkbox: 1,
@@ -16,21 +17,6 @@ var delegatingInputTypes = {
 	},
 	hasGridCellClass = /\bdgrid-cell\b/,
 	hasGridRowClass = /\bdgrid-row\b/;
-
-has.add("dom-contains", function(global, doc, element){
-	return !!element.contains; // not supported by FF < 9
-});
-
-function contains(parent, node){
-	// summary:
-	//		Checks to see if an element is contained by another element.
-	
-	if(has("dom-contains")){
-		return parent.contains(node);
-	}else{
-		return parent.compareDocumentPosition(node) & 8 /* DOCUMENT_POSITION_CONTAINS */;
-	}
-}
 
 var Keyboard = declare(null, {
 	// summary:
@@ -107,7 +93,7 @@ var Keyboard = declare(null, {
 						var focusedNode = grid._focusedNode || initialNode;
 						
 						// do not update the focused element if we already have a valid one
-						if(isFocusableClass.test(focusedNode.className) && contains(areaNode, focusedNode)){
+						if(isFocusableClass.test(focusedNode.className) && miscUtil.contains(areaNode, focusedNode)){
 							return ret;
 						}
 						
