@@ -2,9 +2,10 @@ define([
 	"dojo/_base/lang",
 	"dojo/_base/declare",
 	"dojo/sniff",
+	"dojo/query",
 	"../util/misc",
 	"xstyle/css!../css/extensions/CompoundColumns.css"
-], function(lang, declare, has, miscUtil){
+], function(lang, declare, has, query, miscUtil){
 	return declare(null, {
 		// summary:
 		//		Extension allowing for specification of columns with additional
@@ -133,7 +134,21 @@ define([
 				columns[i].headerNode = headerColumns[i].headerNode;
 			}
 		},
-
+		
+		_findSortArrowParent: function(field){
+			var parent = this.inherited(arguments),
+				columnId,
+				nodes;
+			
+			if(parent && miscUtil.contains(query(".dgrid-spacer-row", this.headerNode)[0], parent)){
+				// Determine column that the sort arrow is in
+				// (fallback is for the padding node in IE < 8)
+				columnId = parent.columnId || parent.parentNode.columnId;
+				nodes = query(".dgrid-column-" + columnId, this.headerNode);
+				return nodes[nodes.length - 1];
+			}
+		},
+		
 		_configColumn: function(column, columnId, rowColumns, prefix){
 			// Updates the id on a column definition that is a child to include
 			// the parent's id.
