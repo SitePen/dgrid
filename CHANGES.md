@@ -16,6 +16,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
   conjunction with the `ColumnResizer` extension. (#928)
 * The `Selection` mixin no longer emits superfluous `dgrid-deselect` events
   for rows which were already deselected. (#889)
+* Fixed an issue in the `Selection` mixin regarding disabling text selection in
+  IE10+. (#786)
 
 ### Extensions
 
