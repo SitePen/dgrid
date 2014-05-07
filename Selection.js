@@ -65,7 +65,15 @@ function setSelectable(grid, selectable){
 	var node = grid.bodyNode,
 		value = selectable ? "text" : has("ff") < 21 ? "-moz-none" : "none";
 	
-	if(hasUserSelect){
+	// IE > 9: user-select: none;
+	// When using a modifier key, IE will select text inside of the element as well
+	// as text outside of the element. This is because IE thinks the selection
+	// starts outside of the element when using a modifier.
+	//
+	// ms-user-select: none; 
+	//   will block selection from starting on that element. It will not block an
+	//   existing selection from entering the element.
+	if(hasUserSelect && hasUserSelect !== "msUserSelect"){
 		node.style[hasUserSelect] = value;
 	}else if(has("dom-selectstart")){
 		// For browsers that don't support user-select but support selectstart (IE<10),
