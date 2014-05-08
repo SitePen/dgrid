@@ -41,6 +41,11 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
   selection during an attempt to select a row that cannot be selected
   (i.e. `allowSelect` returns `false`). (#822)
 
+### Extensions
+
+* Fixed an issue in `CompoundColumns` where sorting programmatically would
+  cause an error when attempting to place the sort arrow node. (#901)
+
 # 0.3.14
 
 ## Significant changes
