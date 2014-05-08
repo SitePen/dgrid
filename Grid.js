@@ -312,6 +312,20 @@ function(declare, listen, has, put, List, miscUtil){
 			this.updateSortArrow(this.sort);
 		},
 		
+		_findSortArrowParent: function(field){
+			// summary:
+			//		Method responsible for finding cell that sort arrow should be
+			//		added under.  Called by updateSortArrow; separated for extensibility.
+			
+			var columns = this.columns;
+			for(var i in columns){
+				var column = columns[i];
+				if(column.field == field){
+					return column.headerNode;
+				}
+			}
+		},
+		
 		updateSortArrow: function(sort, updateSort){
 			// summary:
 			//		Method responsible for updating the placement of the arrow in the
@@ -342,29 +356,21 @@ function(declare, listen, has, put, List, miscUtil){
 			
 			var prop = sort[0].property,
 				desc = sort[0].descending,
-				target = this._sortNode, // stashed if invoked from header click
-				columns, column, i;
+				// if invoked from header click, target is stashed in _sortNode
+				target = this._sortNode || this._findSortArrowParent(prop),
+				arrowNode;
 			
 			delete this._sortNode;
 			
-			if(!target){
-				columns = this.columns;
-				for(i in columns){
-					column = columns[i];
-					if(column.field == prop){
-						target = column.headerNode;
-						break;
-					}
-				}
-			}
-			// skip this logic if field being sorted isn't actually displayed
+			// Skip this logic if field being sorted isn't actually displayed
 			if(target){
 				target = target.contents || target;
-				// place sort arrow under clicked node, and add up/down sort class
-				this._lastSortedArrow = put(target.firstChild, "-div.dgrid-sort-arrow.ui-icon[role=presentation]");
-				this._lastSortedArrow.innerHTML = "&nbsp;";
+				// Place sort arrow under clicked node, and add up/down sort class
+				arrowNode = this._lastSortedArrow = put("div.dgrid-sort-arrow.ui-icon[role=presentation]");
+				arrowNode.innerHTML = "&nbsp;";
+				target.insertBefore(arrowNode, target.firstChild);
 				put(target, desc ? ".dgrid-sort-down" : ".dgrid-sort-up");
-				// call resize in case relocation of sort arrow caused any height changes
+				// Call resize in case relocation of sort arrow caused any height changes
 				this.resize();
 			}
 		},

@@ -1,0 +1,80 @@
+#grid {
+	width: 80%;
+	margin: auto;
+	height: 332px; /* tall enough for 2 rows in gallery view */
+}
+
+/* styles for icon node in various views */
+
+.icon {
+	font-size: 0; /*TODO: is this needed?*/
+	background-repeat: no-repeat;
+}
+
+.table .icon {
+	width: 32px;
+	height: 32px;
+}
+
+.details .icon {
+	width: 72px; /* 64px + buffer to separate icon from text */
+	height: 64px;
+}
+
+.gallery .icon {
+	width: 128px;
+	height: 128px;
+	margin: auto;
+}
+
+/* styles for "table" view (using Grid.renderRow) */
+
+.table .field-icon {
+	width: 33px;
+	padding: 0;
+}
+
+.table .field-icon .dgrid-cell-padding { /* old IE */
+	padding: 0;
+}
+
+.table .dgrid-cell {
+	vertical-align: middle;
+}
+
+/* Table view allows expanding/collapsing rows to show summary */
+
+.table .expando {
+	/* style of area containing summary, expanded on click */
+	padding-left: 40px;
+}
+
+.table .collapsed .expando {
+	display: none;
+}
+
+/* styles for details view */
+
+.details .dgrid-row {
+	clear: both;
+	min-height: 64px;
+	padding: 0.5em;
+}
+
+.details .icon {
+	float: left;
+}
+
+.details .name {
+	font-weight: bold;
+	margin-bottom: 1em;
+}
+
+/* styles for gallery view */
+
+.gallery .dgrid-row {
+	width: 25%;
+	float: left;
+	text-align: center;
+	padding: 1em 0;
+}

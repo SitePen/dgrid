@@ -26,15 +26,26 @@ The following is a rough list of changes, to be outlined more presentably later.
 
 ## Significant changes
 
+### General/Core
+
+* Fixed a regression in `List` which could cause errors in certain situations
+  due to a feature test being performed before the document is ready. (#907)
+
 ### Mixins
 
+* Fixed a focus issue in the `Keyboard` mixin which manifested when used in
+  conjunction with the `ColumnResizer` extension. (#928)
 * The `Selection` mixin no longer emits superfluous `dgrid-deselect` events
   for rows which were already deselected. (#889)
+* Fixed an issue in the `Selection` mixin regarding disabling text selection in
+  IE10+. (#786)
 
 ### Extensions
 
 * Fixed a regression in `ColumnHider` where the node to open the menu became
   invisible on platforms with hidden scrollbars. (#886)
+* Resolved an issue regarding `dojo/dnd` CSS classes and programmatic dgrid
+  deselection. (#906)
 * `ColumnHider` now assigns its menu node an ID in the format
   `{id}-hider-menu`, not `dgrid-hider-menu-{id}`.
 
@@ -50,6 +61,11 @@ The following is a rough list of changes, to be outlined more presentably later.
 * The `Selection` mixin (and `selector` column plugin) will no longer clear the
   selection during an attempt to select a row that cannot be selected
   (i.e. `allowSelect` returns `false`). (#822)
+
+### Extensions
+
+* Fixed an issue in `CompoundColumns` where sorting programmatically would
+  cause an error when attempting to place the sort arrow node. (#901)
 
 # 0.3.14
 

@@ -84,8 +84,8 @@
 		<script src="../../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script>
-			require(["dgrid/OnDemandGrid", "dgrid/extensions/ColumnResizer", "dgrid/Selection", "dojo/_base/declare", "dojo/_base/lang", "dojo/on", "dojo/cookie", "dojo/json", "dgrid/test/data/testStore", "dojo/domReady!"],
-				function(Grid, ColumnResizer, Selection, declare, lang, on, cookie, json, testStore){
+			require(["dgrid/OnDemandGrid", "dgrid/extensions/ColumnResizer", "dgrid/Keyboard", "dgrid/Selection", "dojo/_base/declare", "dojo/_base/lang", "dojo/on", "dojo/cookie", "dojo/json", "dgrid/test/data/testStore", "dojo/domReady!"],
+				function(Grid, ColumnResizer, Keyboard, Selection, declare, lang, on, cookie, json, testStore){
 					var columns = { // you can declare columns as an object hash (key translates to field)
 						col1: 'Column 1Column1Column 1 Column 1',
 						col2: {label: 'Column2222222222222222222222222', sortable: false},
@@ -109,7 +109,7 @@
 						collection: testStore,
 						columns: columns1
 					}, "grid");
-					window.gridPeriod = new ResizeGrid({
+					window.gridPeriod = new (declare([Grid, Keyboard, Selection, ColumnResizer]))({
 						id: "gridPeriod",
 						collection: testStore,
 						columns: columns1
@@ -167,7 +167,7 @@
 			<button onclick="grid.set('adjustLastColumn', true);">Enable</button>
 			<button onclick="grid.set('adjustLastColumn', false);">Disable</button>
 		</div>
-		<h2>A basic grid with a period in its ID, to ensure injected size rules work</h2>
+		<h2>A basic grid with Keyboard navigation and a period in its ID, to ensure injected size rules work</h2>
 		<div id="grid.period"></div>
 		<h2>Another grid w/ columns whose width initially exceed the table's width,
 			placed within a relatively-positioned element</h2>
