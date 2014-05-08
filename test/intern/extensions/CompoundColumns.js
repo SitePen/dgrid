@@ -705,7 +705,7 @@ define([
 					data4: "Data 4"
 				});
 				assert.doesNotThrow(function(){
-					grid.sort("data0");
+					grid.set("sort", "data0");
 				}, null, "Sorting grid programmatically should not throw error");
 			});
 		});
