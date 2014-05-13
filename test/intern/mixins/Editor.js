@@ -100,7 +100,7 @@ define([
 				"canEdit should not have been called yet for editOn editor (item 3)");
 
 			// Note: The "Data 2" column's canEdit method always returns false so none of the following
-			// grid.edit calls will return a promise and not editor with receive focus.
+			// grid.edit calls will return a promise and no editor will receive focus.
 			grid.edit(grid.cell(1, "data2"));
 			assert.isUndefined(results[1],
 				"canEdit should not have been called yet for editOn editor (item 1)");
@@ -126,7 +126,7 @@ define([
 				"canEdit should have been called for editOn editor (item 3)");
 		});
 
-		test.test("canEdit always on editor - suppress on false", function(){
+		test.test("canEdit always-on editor - suppress on false", function(){
 			var rowIndex,
 				rowCount,
 				cell,
@@ -310,7 +310,7 @@ define([
 				"After grid is destroyed there should be 0 widgets on the page");
 		});
 
-		test.test("editor focus with always on editor", function(){
+		test.test("editor focus with always-on editor", function(){
 			var rowIndex,
 				rowCount,
 				cell,
@@ -391,13 +391,13 @@ define([
 				// Respond to the "dgrid-editor-show" event to ensure the
 				// correct cell has an editor.  This event actually fires
 				// synchronously, so we don't need to use this.async.
-				on.once(grid.domNode, "dgrid-editor-show", dfd.rejectOnError(function(event){
+				on.once(grid, "dgrid-editor-show", dfd.rejectOnError(function(event){
 					assert.strictEqual(cell.element, event.cell.element,
 						"The activated cell should be being edited"
 					);
 					dfdEvent.resolve();
 				}));
-				// Don't move on to the next row until, the editor has received focus and the show event has fired.
+				// Don't move on to the next row until the editor has received focus and the show event has fired.
 				all([grid.edit(cell), dfdEvent]).then(dfd.rejectOnError(function(){
 					cellEditor = query("input", cell.element)[0];
 					assert.strictEqual(cellEditor, document.activeElement,

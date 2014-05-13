@@ -46,7 +46,7 @@
 						});
 					}
 
-					window.grid = new (declare([Grid, Keyboard]))({
+					window.grid = new (declare([Grid, Keyboard, Editor]))({
 						collection: testTypesStore,
 						columns: getColumns()
 					}, "grid");

@@ -94,22 +94,14 @@
 						]
 					}, "tree");
 					
-					var columnsHeaderless = { // you can declare columns as an object hash (key translates to field)
-						col1: {label: 'Column 1 column 1 column 1', editor: "text", editOn: "dblclick"},
-						col2: {label: 'Column 2', sortable: false},
-						col3: {label: 'Column 3', editor: "text", editOn: "dblclick"},
-						col4: 'Column444444444444444444',
-						col5: {label: 'Column 5', editor: "text", editOn: "dblclick"}
-					};
-
 					window.headerless = new StandardGrid({
 						collection: testStore,
 						columns: {
-							col1: editor({label: 'Column 1 column 1 column 1'}, "text", "dblclick"),
+							col1: {label: 'Column 1 column 1 column 1', editor: "text", editOn: "dblclick"},
 							col2: {label: 'Column 2', sortable: false},
-							col3: editor({label: 'Column 3'}, "text", "dblclick"),
+							col3: {label: 'Column 3', editor: "text", editOn: "dblclick"},
 							col4: 'Column444444444444444444',
-							col5: editor({label: 'Column 5'}, "text", "dblclick")
+							col5: {label: 'Column 5', editor: "text", editOn: "dblclick"}
 						},
 						showHeader: false
 						
@@ -140,7 +132,8 @@
 									timePattern: "HH:mm:ss",
 									clickableIncrement: "T00:15:00",
 									visibleIncrement: "T00:15:00",
-									visibleRange: "T01:00:00"}
+									visibleRange: "T01:00:00"
+								}
 							},
 							{
 								label: "Select Options",
