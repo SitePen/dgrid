@@ -26,18 +26,17 @@
 			require(["dgrid/GridFromHtml", "dgrid/OnDemandList", "dgrid/Keyboard",
 				"dojo/store/Memory", "dojo/store/Observable",
 				"dojo/_base/declare", "dojo/parser",
-				"dijit/form/Select", "dgrid/editor", "dijit/form/DateTextBox",
-				"dijit/form/HorizontalSlider", "dijit/form/NumberSpinner", "dojo/data/ObjectStore", 
+				"dijit/form/Select", "dgrid/Editor", "dijit/form/DateTextBox",
+				"dijit/form/HorizontalSlider", "dijit/form/NumberSpinner", "dojo/data/ObjectStore",
 				"dgrid/test/data/createSyncStore", "dgrid/test/data/typesData", "dgrid/test/data/stateData",
 				"dojo/domReady!"],
 			function(
 				GridFromHtml, OnDemandList, Keyboard, LegacyMemory, LegacyObservable, declare, parser,
-				Select, editor, DateTextBox, Slider, NumberSpinner, ObjectStore,
+				Select, Editor, DateTextBox, Slider, NumberSpinner, ObjectStore,
 				createSyncStore, typesData, stateData
 			){
 				window.dgrid = {
-					GridFromHtml: declare([GridFromHtml, OnDemandList]),
-					editor: editor
+					GridFromHtml: declare([GridFromHtml, OnDemandList, Editor])
 				};
 				window.stateStore = new ObjectStore({
 						objectStore: LegacyObservable(new LegacyMemory({ data: stateData })),
@@ -64,12 +63,12 @@
 		<table id="gridProgrammatic">
 			<thead>
 				<tr>
-					<th data-dgrid-column="dgrid.editor({field:'date'}, dijit.form.DateTextBox)">Date</th>
-					<th data-dgrid-column="dgrid.editor({field: 'text'}, 'text', 'dblclick')">Text editable on dblclick</th>
-					<th data-dgrid-column="dgrid.editor({
+					<th data-dgrid-column="{field:'date', editor: dijit.form.DateTextBox}">Date</th>
+					<th data-dgrid-column="{field: 'text', editor: 'text', editOn: 'dblclick'}">Text editable on dblclick</th>
+					<th data-dgrid-column="{
 							field: 'state',
-							editorArgs: {store: stateStore, style: 'width:120px;', maxHeight: -1}
-						}, dijit.form.Select)">State</th>
+							editorArgs: {store: stateStore, style: 'width:120px;', maxHeight: -1},
+							editor: dijit.form.Select}">State</th>
 					<th data-dgrid-column="{field:'text2', sortable:false}">Uneditable</th>
 				</tr>
 			</thead>
@@ -79,12 +78,13 @@
 	<table id="gridDeclarative" data-dojo-id="gridDeclarative"
 			data-dojo-type="dgrid.GridFromHtml" data-dojo-props="collection: testTypesStore">
 			<tr>
-				<th data-dgrid-column="dgrid.editor({field:'date'}, dijit.form.DateTextBox)">Date</th>
-				<th data-dgrid-column="dgrid.editor({field: 'text'}, 'text', 'dblclick')">Text editable on dblclick</th>
-				<th data-dgrid-column="dgrid.editor({
+				<th data-dgrid-column="{field:'date', editor: dijit.form.DateTextBox}">Date</th>
+				<th data-dgrid-column="{field: 'text', editor: 'text', editOn: 'dblclick'}">Text editable on dblclick</th>
+				<th data-dgrid-column="{
 						field: 'state',
+						editor: dijit.form.Select,
 						editorArgs: {store: stateStore, style: 'width:120px;', maxHeight: -1}
-					}, dijit.form.Select)">State</th>
+					}">State</th>
 				<th data-dgrid-column="{field:'text2', sortable:false}">Uneditable</th>
 			</tr>
 		</table>

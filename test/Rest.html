@@ -21,10 +21,10 @@
 		<script src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script>
-			require(["dojo/_base/lang", "dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/editor", "dgrid/Keyboard", "dgrid/tree", "dojo/_base/declare", "dstore/Rest", "dstore/Observable", "dstore/Cache", "dojo/domReady!"],
-				function(lang, List, Grid, Selection, editor, Keyboard, tree, declare, Rest, Observable, Cache){
+			require(["dojo/_base/lang", "dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Editor", "dgrid/Keyboard", "dgrid/tree", "dojo/_base/declare", "dstore/Rest", "dstore/Observable", "dstore/Cache", "dojo/domReady!"],
+				function(lang, List, Grid, Selection, Editor, Keyboard, tree, declare, Rest, Observable, Cache){
 
-					var CustomGrid = declare([Grid, Selection, Keyboard]);
+					var CustomGrid = declare([Grid, Selection, Keyboard, Editor]);
 
 					function createStore(config){
 						var testStore = new declare([ Rest, Observable, Cache ])(lang.mixin({
@@ -44,8 +44,8 @@
 					var columns = [
 						tree({label:'Name', field:'name', sortable: false}),
 						{label:'Id', field:'id'},
-						editor({label:'Comment', field:'comment', sortable: false}, "text"),
-						editor({label:'Boolean', field:'boo', sortable: false, autoSave: true}, "checkbox")
+						{label:'Comment', field:'comment', sortable: false, editor: "text"},
+						{label:'Boolean', field:'boo', sortable: false, autoSave: true, editor: "checkbox"}
 					];
 
 					window.grid = new CustomGrid({

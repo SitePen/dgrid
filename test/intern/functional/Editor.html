@@ -25,25 +25,25 @@
 			require([
 				"dojo/_base/declare",
 				"dgrid/Grid",
-				"dgrid/editor",
+				"dgrid/Editor",
 				"dijit/form/TextBox"
-			], function (declare, Grid, editor, TextBox) {
+			], function (declare, Grid, Editor, TextBox) {
 				function createColumnConfig(editorType) {
 					return {
 						id: "ID",
-						name: editor({
+						name: {
 							label: "Name",
 							editor: editorType || "text"
-						}),
-						description: editor({
+						},
+						description: {
 							label: "Description",
 							editor: editorType || "text",
 							editOn: "click"
-						})
+						}
 					};
 				}
 
-				grid = new Grid({
+				grid = new (declare([Grid, Editor]))({
 					columns: createColumnConfig("text")
 				}, "grid");
 

@@ -61,15 +61,15 @@
 				
 				// then add the rest of the dependencies for the test...
 				deps = deps.concat("dgrid/List", "dgrid/OnDemandGrid", "dgrid/tree",
-					"dgrid/Selection", "dgrid/Keyboard", "dgrid/editor",
+					"dgrid/Selection", "dgrid/Keyboard", "dgrid/Editor",
 					"dojo/_base/declare", "dojo/dom-construct", "dgrid/test/data/testStore", "dojo/domReady!");
 				
 				require(deps, 
-				function(css1, css2, css3, List, Grid, tree, Selection, Keyboard, editor, declare, domConstruct, testStore){
+				function(css1, css2, css3, List, Grid, tree, Selection, Keyboard, Editor, declare, domConstruct, testStore){
 					var grid,
 						columns = {
 							col1: "Column 1",
-							col2: editor({label: 'Column 2', sortable: false, editor: "checkbox"}),
+							col2: {label: 'Column 2', sortable: false, editor: "checkbox"},
 							col3: "Column 3",
 							col4: "Column 4",
 							col5: "Column 5"
@@ -90,7 +90,7 @@
 						if(grid){
 							grid.destroy();
 						}
-						grid = window.grid = new (declare([Grid, Selection, Keyboard]))({
+						grid = window.grid = new (declare([Grid, Selection, Keyboard, Editor]))({
 							id: "grid",
 							sort: "id",
 							collection: testStore,

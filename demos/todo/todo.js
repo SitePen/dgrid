@@ -1,7 +1,7 @@
 define([
 	"dgrid/OnDemandGrid",
 	"dgrid/Selection",
-	"dgrid/editor",
+	"dgrid/Editor",
 	"dgrid/extensions/DnD",
 	"dojo/_base/declare",
 	"dojo/json",
@@ -9,7 +9,7 @@ define([
 	"dojo/store/Observable",
 	"put-selector/put",
 	"dojo/domReady!"
-], function(Grid, Selection, editor, DnD, declare, json, Memory, Observable, put){
+], function(Grid, Selection, Editor, DnD, declare, json, Memory, Observable, put){
 	// Create DOM
 	var container = put("div#container"),
 		itemForm = put(container, "form#itemForm.actionArea.topArea"),
@@ -94,15 +94,16 @@ define([
 	}
 	var Store = declare(storeMixins),
 		store = Observable(new Store({ idProperty: "summary" })),
-		grid = new (declare([Grid, Selection, DnD]))({
+		grid = new (declare([Grid, Selection, DnD, Editor]))({
 			sort: "order",
 			store: store,
 			columns: {
-				completed: editor({
+				completed: {
+					editor: "checkbox",
 					label: " ",
 					autoSave: true,
 					sortable: false
-				}, "checkbox"),
+				},
 				summary: {
 					field: "_item", // get whole item for use by formatter
 					label: "TODOs",
@@ -115,7 +116,7 @@ define([
 			}
 		}, listNode);
 	
-	grid.sort("order");
+	grid.set("sort", "order");
 	
 	itemForm.onsubmit = function(){
 		// allow overwrite if already exists (by using put, not add)

@@ -27,23 +27,23 @@
 		<script src="../../dojo/dojo.js" data-dojo-config="async: true"></script>
 		<script>
 			var countWidgets; // function, defined within require callback
-			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dgrid/editor", "dijit/form/TextBox", "dijit/registry", "dojo/aspect", "dojo/_base/declare", "dgrid/test/data/testPerformanceStore", "dojo/domReady!"], 
-				function(List, Grid, Selection, Keyboard, editor, TextBox, registry, aspect, declare, testPerformanceStore){
+			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dgrid/Editor", "dijit/form/TextBox", "dijit/registry", "dojo/aspect", "dojo/_base/declare", "dgrid/test/data/testPerformanceStore", "dojo/domReady!"],
+				function(List, Grid, Selection, Keyboard, Editor, TextBox, registry, aspect, declare, testPerformanceStore){
 					var
 						columns = [
 							{ name: 'Column 0', field: 'id', width: '10%' },
 							// always-on text input editor
-							editor({ name: 'Column 1', field: 'integer', width: '10%' }, 'text'),
+							{ name: 'Column 1', field: 'integer', width: '10%', editor: 'text'},
 							// text input editor activated on double-click
-							editor({ name: 'Column 2', field: 'floatNum', width: '10%', editOn: 'dblclick' }, 'text'),
+							{ name: 'Column 2', field: 'floatNum', width: '10%', editOn: 'dblclick', editor:'text'},
 							{ name: 'Column 3', field: 'date', width: '10%' },
 							{ name: 'Column 4', field: 'date2', width: '10%' },
 							// always-on TextBox widget editor
-							editor({ name: 'Column 5', field: 'text', label: 'text', width: '10%' }, TextBox),
+							{ name: 'Column 5', field: 'text', label: 'text', width: '10%', editor: TextBox},
 							{ name: 'Column 6', field: 'bool', width: '10%' },
 							{ name: 'Column 7', field: 'bool2', width: '10%' },
 							// TextBox widget editor activated on double-click
-							editor({ name: 'Column 8', field: 'price', label: 'price', width: '10%', editOn: 'dblclick' }, TextBox),
+							{ name: 'Column 8', field: 'price', label: 'price', width: '10%', editOn: 'dblclick', editor: TextBox},
 							{ name: 'Column 9', field: 'today', width: '10%' }
 						];
 					
@@ -64,7 +64,7 @@
 					});
 					
 					console.time("grid construction");
-					window.grid = new (declare([Grid, Selection, Keyboard]))({
+					window.grid = new (declare([Grid, Selection, Keyboard, Editor]))({
 						collection: testPerformanceStore,
 						columns: columns
 					}, "grid");

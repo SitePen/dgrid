@@ -62,7 +62,7 @@
 				"dgrid/OnDemandGrid",
 				"dgrid/Keyboard",
 				"dgrid/Selection",
-				"dgrid/editor",
+				"dgrid/Editor",
 				"dijit/form/DateTextBox",
 				"dijit/form/HorizontalSlider",
 				"dijit/form/NumberSpinner",
@@ -81,7 +81,7 @@
 				"dgrid/test/data/smallColorData",
 				"dgrid/test/data/stateData",
 				"dojo/domReady!"
-			], function(on, List, Grid, Keyboard, Selection, editor, DateTextBox, Slider, NumberSpinner,
+			], function(on, List, Grid, Keyboard, Selection, Editor, DateTextBox, Slider, NumberSpinner,
 					lang, declare, arrayUtil, Stateful, Memory, put, errorStores, testStore,
 					createSyncStore, createAsyncStore, typesData, largeColorData, smallColorData, stateData
 			){
@@ -125,13 +125,19 @@
 				};
 
 				var columns2 = [
-					editor({label: 'Real Number', field: 'floatNum'}, Slider),
-					editor({label: 'Integer', field: 'integer', editorArgs: {style: 'width: 5em;'}}, NumberSpinner),
-					editor({label: 'Text editable if checkbox checked', field: 'text', canEdit: function(object){
-						return object.bool;
-					}}, "text", "dblclick"),
-					editor({label: 'Another Date (autoSave)', field: 'date2', autoSave:true}, DateTextBox, "focus"),
-					editor({label: 'Check', field: 'bool'}, "checkbox")
+					{label: 'Real Number', field: 'floatNum', editor: Slider},
+					{label: 'Integer', field: 'integer', editor: NumberSpinner, editorArgs: {style: 'width: 5em;'}},
+					{
+						label: 'Text editable if checkbox checked',
+						field: 'text',
+						editor: "text",
+						editOn: "dblclick",
+						canEdit: function (object) {
+							return object.bool;
+						}
+					},
+					{label: 'Another Date (autoSave)', field: 'date2', autoSave:true, editor: DateTextBox, editOn: "focus"},
+					{label: 'Check', field: 'bool', editor: "checkbox"}
 				];
 
 				var columns3 = {
@@ -157,7 +163,7 @@
 				var emptyStore = createSyncStore();
 				var emptyAsyncStore = createAsyncStore();
 
-				var StandardGrid = declare([Grid, Selection, Keyboard]);
+				var StandardGrid = declare([Grid, Selection, Keyboard, Editor]);
 				var grid = window.grid = new StandardGrid({
 					collection: testStore,
 					columns: columns,
@@ -196,18 +202,18 @@
 				window.statefulGrid = new StandardGrid({
 					collection: createStatefulStore(),
 					columns: [
-						editor({
+						{
 							label: "Abbreviation",
 							field: "abbreviation",
 							editor: "text",
 							editOn: "dblclick"
-						}),
-						editor({
+						},
+						{
 							label: "Name",
 							field: "name",
 							editor: "text",
 							editOn: "dblclick"
-						})
+						}
 					]
 				}, "statefulGrid");
 				

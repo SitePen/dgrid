@@ -20,11 +20,11 @@
 			data-dojo-config="async: true, isDebug: true"></script>
 		<script>
 			require(["dojo/_base/declare", "dojo/_base/array", "dgrid/List", "dgrid/OnDemandGrid", "dgrid/Keyboard",
-					"dgrid/editor", "dijit/form/CheckBox", "dijit/form/DateTextBox",
+					"dgrid/Editor", "dijit/form/CheckBox", "dijit/form/DateTextBox",
 					"dijit/form/HorizontalSlider", "dijit/form/NumberSpinner",
 					"dgrid/test/data/createSyncStore", "dgrid/test/data/typesData", "dojo/domReady!"
 				], function(
-					declare, arrayUtil, List, Grid, Keyboard, editor,
+					declare, arrayUtil, List, Grid, Keyboard, Editor,
 					CheckBox, DateTextBox, Slider, NumberSpinner, createSyncStore, typesData
 				){
 					var testTypesStore = createSyncStore({ data: typesData });
@@ -42,7 +42,7 @@
 							if(editOn){
 								column.editOn = editOn;
 							}
-							return editor(column);
+							return column;
 						});
 					}
 

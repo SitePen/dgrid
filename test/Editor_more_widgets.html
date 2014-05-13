@@ -30,13 +30,13 @@
 		<script>
 			require([
 				"dgrid/List", "dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Keyboard",
-				"dgrid/editor", "dijit/form/CheckBox", "dijit/form/TimeTextBox",  "dijit/form/Select",
+				"dgrid/Editor", "dijit/form/CheckBox", "dijit/form/TimeTextBox",  "dijit/form/Select",
 				"dojo/data/ObjectStore", "dijit/form/FilteringSelect", "dojo/_base/declare", "dojo/_base/lang",
 				"dojo/store/Memory", "dojo/store/Observable",
 				"dgrid/test/data/createSyncStore", "dgrid/test/data/typesData", "dgrid/test/data/stateData",
 				"dojo/domReady!"
 			], function(
-				List, Grid, Selection, Keyboard, editor, CheckBox, TimeTextBox, Select, ObjectStore, FilteringSelect,
+				List, Grid, Selection, Keyboard, Editor, CheckBox, TimeTextBox, Select, ObjectStore, FilteringSelect,
 				declare, lang, LegacyMemory, LegacyObservable, createSyncStore, typesData, stateData
 			){
 
@@ -47,19 +47,26 @@
 
 					var columns = [
 						{field: "id", label: "id"},
-						editor({
+						{
+							editor: CheckBox,
 							label: "CheckBox",
 							field: "bool2",
 							editorArgs: {
 								value: "checked"
 							}
-						}, CheckBox),
-						editor({label: "Time", field: "date2", editorArgs: {
-							timePattern: "HH:mm:ss",
-							clickableIncrement: "T00:15:00",
-							visibleIncrement: "T00:15:00",
-							visibleRange: "T01:00:00"}}, TimeTextBox),
-						editor({
+						},
+						{
+							editor: TimeTextBox,
+							editorArgs: {
+								timePattern: "HH:mm:ss",
+								clickableIncrement: "T00:15:00",
+								visibleIncrement: "T00:15:00",
+								visibleRange: "T01:00:00"
+							},
+							label: "Time",
+							field: "date2"
+						},
+						{
 							label: "Select Options",
 							field: "bool",
 							get: function(item){
@@ -70,6 +77,8 @@
 								// convert back to boolean from string
 								return item.bool == "true";
 							},
+							editor: Select,
+							editOn: "dblclick",
 							editorArgs: {
 								style: "width:75px;",
 								options: [
@@ -77,14 +86,33 @@
 									{value: "false", label: "false"}
 								]
 							}
-						}, Select, "dblclick"),
-						editor({label: "Select Store", field: "state", editorArgs: {store: stateStore, maxHeight: 150, style: "width:120px;"}}, Select, "click"),
-						editor({label: "FilteringSelect Store", field: "state2", editorArgs: {store: stateStore, maxHeight: 150, style: "width:120px;"}}, FilteringSelect)
+						},
+						{
+							label: "Select Store",
+							field: "state",
+							editor: Select,
+							editOn: "click",
+							editorArgs: {
+								store: stateStore,
+								maxHeight: 150,
+								style: "width:120px;"
+							}
+						},
+						{
+							label: "FilteringSelect Store",
+							field: "state2",
+							editor: FilteringSelect,
+							editorArgs: {
+								store: stateStore,
+								maxHeight: 150,
+								style: "width:120px;"
+							}
+						}
 						// Note that mileage may vary with editOn + widgets with multiple focusable children, e.g. dijit/Editor
 					];
 
 
-					window.grid = new (declare([Grid, Selection, Keyboard]))({
+					window.grid = new (declare([Grid, Selection, Keyboard, Editor]))({
 						collection: createSyncStore({ data: typesData }),
 						columns: columns,
 						selectionMode: "none"
