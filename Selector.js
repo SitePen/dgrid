@@ -1,13 +1,10 @@
 define([
 	"dojo/_base/declare",
-	"dojo/_base/array",
 	"dojo/_base/lang",
-	"dojo/on",
-	"dojo/aspect",
 	"dojo/_base/sniff",
 	"./Selection",
 	"put-selector/put"
-], function(declare, arrayUtil, lang, on, aspect, has, Selection, put){
+], function(declare, lang, has, Selection, put){
 
 	return declare(Selection, {
 		// summary:
