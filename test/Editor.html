@@ -283,11 +283,11 @@
 							}, "grid");
 						}else{
 							// instead of destroying/recreating, just reset store + columns
-							grid.set("store", null);
+							grid.set("collection", null);
 							grid.set("columns", {
 								editor: lang.mixin({}, options.column, columnArgs)
 							});
-							grid.set("store", store);
+							grid.set("collection", store);
 						}
 					});
 
