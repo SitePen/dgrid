@@ -195,8 +195,6 @@ define([
 						column.get ? column.get(row.data) : row.data[field];
 					// check to see if the cell can be edited
 					if(!column.canEdit || column.canEdit(cell.row.data, value)){
-						this._activeCell = cellElement;
-
 						// In some browsers, moving a DOM node causes a blur event to fire which in this case,
 						// is a bad time for the blur handler to run.  Blur the input node first.
 						node = cmp.domNode || cmp;
@@ -205,6 +203,7 @@ define([
 							node.blur();
 						}
 
+						this._activeCell = cellElement;
 						this._showEditor(cmp, column, cellElement, value);
 
 						// focus / blur-handler-resume logic is surrounded in a setTimeout
