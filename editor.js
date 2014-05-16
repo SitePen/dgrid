@@ -362,7 +362,24 @@ function edit(cell) {
 	//		input/widget when the cell editor is focused.
 	//		If the cell is not editable, returns null.
 	
-	var row, column, cellElement, dirty, field, value, cmp, dfd, activeCell, node;
+	var row, column, cellElement, dirty, field, value, cmp, dfd, node,
+		self = this;
+	
+	function show(dfd){
+		column.grid._activeCell = cellElement;
+		showEditor(column.editorInstance, column, cellElement, value);
+		
+		// focus / blur-handler-resume logic is surrounded in a setTimeout
+		// to play nice with Keyboard's dgrid-cellfocusin as an editOn event
+		column._editTimer = setTimeout(function(){
+			// focus the newly-placed control (supported by form widgets and HTML inputs)
+			if(cmp.focus){ cmp.focus(); }
+			// resume blur handler once editor is focused
+			if(column._editorBlurHandle){ column._editorBlurHandle.resume(); }
+			column._editTimer = null;
+			dfd.resolve(cmp);
+		}, 0);
+	}
 	
 	if(!cell.column){ cell = this.cell(cell); }
 	if(!cell || !cell.element){ return null; }
@@ -370,10 +387,9 @@ function edit(cell) {
 	column = cell.column;
 	field = column.field;
 	cellElement = cell.element.contents || cell.element;
-	activeCell = column.grid._activeCell;
 	
 	if((cmp = column.editorInstance)){ // shared editor (editOn used)
-		if(activeCell != cellElement){
+		if(column.grid._activeCell != cellElement){
 			// get the cell value
 			row = cell.row;
 			dirty = this.dirty && this.dirty[row.id];
@@ -381,6 +397,8 @@ function edit(cell) {
 				column.get ? column.get(row.data) : row.data[field];
 			// check to see if the cell can be edited
 			if(!column.canEdit || column.canEdit(cell.row.data, value)){
+				dfd = new Deferred();
+				
 				// In some browsers, moving a DOM node causes a blur event to fire which is not
 				// the best time for the blur handler to fire.  Force the issue by blurring the
 				// editor now.
@@ -388,28 +406,18 @@ function edit(cell) {
 				if(node.offsetWidth){
 					// The editor is visible.  Blur it.
 					node.blur();
+					// In IE, the blur does not complete immediately.
+					// Push showing of the editor to the next turn.
+					setTimeout(function () {
+						show(dfd);
+					}, 0);
+				}else{
+					show(dfd);
 				}
-
-				activeCell = cellElement;
-
-				showEditor(column.editorInstance, column, cellElement, value);
-
-				// focus / blur-handler-resume logic is surrounded in a setTimeout
-				// to play nice with Keyboard's dgrid-cellfocusin as an editOn event
-				dfd = new Deferred();
-				column._editTimer = setTimeout(function(){
-					// focus the newly-placed control (supported by form widgets and HTML inputs)
-					if(cmp.focus){ cmp.focus(); }
-					// resume blur handler once editor is focused
-					if(column._editorBlurHandle){ column._editorBlurHandle.resume(); }
-					column._editTimer = null;
-					dfd.resolve(cmp);
-				}, 0);
-
+				
 				return dfd.promise;
 			}
 		}
-
 	}else if(column.editor){ // editor but not shared; always-on
 		cmp = cellElement.widget || cellElement.input;
 		if(cmp){
