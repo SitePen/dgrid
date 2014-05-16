@@ -67,8 +67,8 @@ Event name|Emitted by
 `dgrid-columnresize`|[`ColumnResizer`](../components/extensions/ColumnResizer.md#events) module
 `dgrid-columnreorder`|[`ColumnReorder`](../components/extensions/ColumnReorder.md#events) module
 `dgrid-columnstatechange`|[`ColumnHider`](../components/extensions/ColumnHider.md#events) module
-`dgrid-datachange`|[`editor`](../components/column-plugins/editor.md#events) module when an editor field loses focus after being changed
-`dgrid-editor-show`|[`editor`](../components/column-plugins/editor.md#events) module before placing a shared editor
-`dgrid-editor-hide`|[`editor`](../components/column-plugins/editor.md#events) module before removing an `editOn` editor
+`dgrid-datachange`|[`Editor`](../components/mixins/Editor.md#events) module when an editor field loses focus after being changed
+`dgrid-editor-show`|[`Editor`](../components/mixins/Editor.md#events) module before placing a shared editor
+`dgrid-editor-hide`|[`Editor`](../components/mixins/Editor.md#events) module before removing an `editOn` editor
 `dgrid-select`|[`Selection`](../components/mixins/Selection.md#events) module when one or more rows are selected
 `dgrid-deselect`|[`Selection`](../components/mixins/Selection.md#events) module when one or more rows are deselected

@@ -298,7 +298,7 @@ definitions of declarative grid layouts within the `data-dgrid-column` attribute
 for example:
 
 ```html
-<th data-dgrid-column="dgrid.editor({ field: 'name', editOn: 'dblclick' })">Name</th>
+<th data-dgrid-column="dgrid.tree({ field: 'name' })">Name</th>
 ```
 
 ### Column Layout via HTML with views / columnsets

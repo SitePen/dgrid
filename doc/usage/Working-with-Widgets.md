@@ -25,7 +25,7 @@ appropriate time to destroy rendered widgets would be in `removeRow`, which is
 called whenever a row is undrawn, including scroll operations in on-demand
 components, as well as when `destroy` is called.
 
-For example, the [editor](../components/column-plugins/editor.md) column plugin performs cleanup in this fashion.
+For example, the [Editor](../components/mixins/Editor.md) mixin performs cleanup in this fashion.
 During initial rendering of an editor widget, a reference to the created widget
 is stored, which is then accessed and destroyed when `removeRow` is called:
 

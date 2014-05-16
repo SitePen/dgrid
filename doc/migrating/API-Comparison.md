@@ -88,8 +88,8 @@ Not supported.  Width (and height) should be dictated via CSS.
 ### singleClickEdit
 
 The effect of the `singleClickEdit` property can be achieved by specifying
-`editOn: "click"` in a column definition passed to the editor column plugin
-function.  (Alternatively, `dojox/grid`'s default double-click behavior can be
+`editOn: "click"` in a column definition when the Editor mixin is in use.
+(Alternatively, `dojox/grid`'s default double-click behavior can be
 achieved by specifying `editOn: "dblclick"` instead.)
 
 ### loadingMessage, noDataMessage, errorMessage
@@ -161,7 +161,7 @@ takes the place of `.field-<fieldname>`.)
 
 ### cellType, widgetClass
 
-The editor column plugin provides capabilities equivalent to these properties.
+The Editor mixin provides capabilities equivalent to these properties.
 It accepts an `editor` property, which can be either a widget constructor or a
 string indicating a native HTML input type.
 
@@ -170,15 +170,15 @@ string indicating a native HTML input type.
 Not directly applicable; in `dojox/grid` this applies only to cell definitions
 where `cellType` is set to `dojox.grid.cells.Select`.
 
-The editor column plugin does not currently offer support for standard HTML
+The Editor mixin does not currently offer support for standard HTML
 select components; however, similar behavior can be achieved using the
 `dijit/form/Select` widget as the `editor`, and specifying `options` for the
 widget within the `editorArgs` property of the column definition object.
 
 ### editable
 
-In dgrid, cells are uneditable by default, and are made editable by invoking the
-editor column plugin.
+In dgrid, cells are uneditable by default, and are made editable by including
+the Editor mixin and specifying an `editor` in each editable column's definition.
 
 ### draggable
 
@@ -196,10 +196,10 @@ dgrid supports formatter functions, but doesn't support returning a widget from
 them.
 
 dgrid also has `renderCell`, which is expected to return a DOM node.  This could
-ostensibly be used for displaying widgets (and the editor column plugin does
+ostensibly be used for displaying widgets (and the Editor mixin does
 exactly this).
 
-Note that for cell editing purposes, use of the editor column plugin is highly
+Note that for cell editing purposes, use of the Editor mixin is highly
 encouraged.
 
 ### get

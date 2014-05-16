@@ -18,8 +18,8 @@ default functionality.
     * [Selection](components/mixins/Selection.md)
     * [Selector](components/mixins/Selector.md)
     * [CellSelection](components/mixins/CellSelection.md)
+    * [Editor](components/mixins/Editor.md)
 * Column Plugins
-    * [editor](components/column-plugins/editor.md)
     * [tree](components/column-plugins/tree.md)
 * Extensions
     * [ColumnReorder](components/extensions/ColumnReorder.md)
@@ -45,6 +45,10 @@ default functionality.
 
 * [API Comparison](migrating/API-Comparison.md)
 * [Usage Comparison](migrating/Usage-Comparison.md)
+
+## Tutorials
+
+Various tutorials are available on [dgrid.io](http://dojofoundation.org/packages/dgrid/#tutorials).
 
 ## Changelogs
 

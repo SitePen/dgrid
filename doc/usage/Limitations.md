@@ -30,7 +30,7 @@ the structure, but creates it every time it is called.  For example:
 ```js
 function getColumns(){
     return {
-        col1: editor({ label: "Column 1" }, "text", "dblclick"),
+        col1: { label: "Column 1", editor: "text", editOn: "dblclick" },
         col2: { label: "Column 2", sortable: false },
         // ...
     };
