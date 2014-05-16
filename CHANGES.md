@@ -19,6 +19,10 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 * Fixed an issue in the `Selection` mixin regarding disabling text selection in
   IE10+. (#786)
 
+### Plugins
+
+* Fixed various focus/blur-related issues in `editor` and improved tests. (#903)
+
 ### Extensions
 
 * Fixed a regression in `ColumnHider` where the node to open the menu became
