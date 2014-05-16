@@ -173,7 +173,28 @@ define([
 			//		input/widget when the cell editor is focused.
 			//		If the cell is not editable, returns null.
 
-			var row, column, cellElement, dirty, field, value, cmp, dfd, node;
+			var row, column, cellElement, dirty, field, value, cmp, dfd, node, 
+				self = this;
+
+			function showEditor(dfd) {
+				self._activeCell = cellElement;
+				self._showEditor(cmp, column, cellElement, value);
+
+				// focus / blur-handler-resume logic is surrounded in a setTimeout
+				// to play nice with Keyboard's dgrid-cellfocusin as an editOn event
+				self._editTimer = setTimeout(function(){
+					// focus the newly-placed control (supported by form widgets and HTML inputs)
+					if(cmp.focus){
+						cmp.focus();
+					}
+					// resume blur handler once editor is focused
+					if(column._editorBlurHandle){
+						column._editorBlurHandle.resume();
+					}
+					self._editTimer = null;
+					dfd.resolve(cmp);
+				}, 0);
+			}
 
 			if(!cell.column){
 				cell = this.cell(cell);
@@ -195,32 +216,23 @@ define([
 						column.get ? column.get(row.data) : row.data[field];
 					// check to see if the cell can be edited
 					if(!column.canEdit || column.canEdit(cell.row.data, value)){
+						dfd = new Deferred();
+
 						// In some browsers, moving a DOM node causes a blur event to fire which in this case,
 						// is a bad time for the blur handler to run.  Blur the input node first.
 						node = cmp.domNode || cmp;
 						if(node.offsetWidth){
 							// The editor is visible.  Blur it.
 							node.blur();
+							// In IE, the blur does not complete immediately.
+							// Push showing of the editor to the next turn.
+							// (dfd will be resolved within showEditor)
+							setTimeout(function () {
+								showEditor(dfd);
+							}, 0);
+						} else {
+							showEditor(dfd);
 						}
-
-						this._activeCell = cellElement;
-						this._showEditor(cmp, column, cellElement, value);
-
-						// focus / blur-handler-resume logic is surrounded in a setTimeout
-						// to play nice with Keyboard's dgrid-cellfocusin as an editOn event
-						dfd = new Deferred();
-						this._editTimer = setTimeout(function(){
-							// focus the newly-placed control (supported by form widgets and HTML inputs)
-							if(cmp.focus){
-								cmp.focus();
-							}
-							// resume blur handler once editor is focused
-							if(column._editorBlurHandle){
-								column._editorBlurHandle.resume();
-							}
-							this._editTimer = null;
-							dfd.resolve(cmp);
-						}, 0);
 
 						return dfd.promise;
 					}
