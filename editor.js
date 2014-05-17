@@ -281,7 +281,7 @@ function createSharedEditor(column, originalRenderCell){
 		// Reset state now that editor is deactivated;
 		// reset focusedCell as well since some browsers will not trigger the
 		// focusout event handler in this case
-		grid._focusedCell = grid._activeCell = grid._activeValue = grid._activeOptions = null;
+		grid._focusedEditorCell = grid._activeCell = grid._activeValue = grid._activeOptions = null;
 	}
 	
 	function dismissOnKey(evt){
@@ -451,16 +451,16 @@ return function(column, editor, editOn){
 			grid.edit = edit;
 			
 			listeners.push(on(grid.domNode, '.dgrid-input:focusin', function () {
-				grid._focusedCell = grid.cell(this);
+				grid._focusedEditorCell = grid.cell(this);
 			}));
 			focusoutHandle = grid._editorFocusoutHandle =
 				on.pausable(grid.domNode, '.dgrid-input:focusout', function () {
-					grid._focusedCell = null;
+					grid._focusedEditorCell = null;
 				});
 			listeners.push(focusoutHandle);
 			
 			listeners.push(aspect.before(grid, 'removeRow', function (row) {
-				var focusedCell = grid._focusedCell;
+				var focusedCell = grid._focusedEditorCell;
 				row = grid.row(row);
 				if (focusedCell && focusedCell.row.id === row.id) {
 					previouslyFocusedCell = focusedCell;
