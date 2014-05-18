@@ -47,6 +47,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ### Extensions
 
+* Fixed an IE10 issue in `ColumnHider` where header cells (but not body cells)
+  would remain hidden after columns have been resized with `ColumnResizer`. (#841)
 * Fixed an issue in `CompoundColumns` where sorting programmatically would
   cause an error when attempting to place the sort arrow node. (#901)
 
