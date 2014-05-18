@@ -543,11 +543,6 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 						grid._updateNavigation();
 					});
 
-					if (has("ie") < 7 || (has("ie") && has("quirks"))) {
-						// call resize in old IE in case grid is set to height: auto
-						grid.resize();
-					}
-
 					return results;
 				}, function(error){
 					cleanupLoading(grid);

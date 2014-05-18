@@ -68,7 +68,7 @@
 	height: 100%;
 }
 .dgrid-cell {
-	padding: 0px;
+	padding: 3px;
 	text-align: left;
 	overflow: hidden;
 	vertical-align: top;
@@ -79,9 +79,6 @@
 	-moz-box-sizing: border-box;
 	-ms-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
-}
-.dgrid-cell-padding {
-	padding: 3px;
 }
 
 .dgrid-content {

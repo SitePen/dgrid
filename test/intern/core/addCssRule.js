@@ -311,7 +311,7 @@ define([
 				assert.doesNotThrow(function(){
 					grid.resizeColumnWidth("col:umn", 100);
 				}, null, "resizeColumnWidth should escape special characters and not throw error");
-				assert.strictEqual(query(".dgrid-cell-padding")[0].offsetWidth, 100,
+				assert.strictEqual(query(".dgrid-cell")[0].offsetWidth, 100,
 					"Column should be the expected width");
 			});
 			
@@ -327,7 +327,7 @@ define([
 				}, null, "ColumnResizer should not throw error during construction");
 				document.body.appendChild(grid.domNode);
 				grid.startup();
-				assert.strictEqual(query(".dgrid-cell-padding")[0].offsetWidth, 100,
+				assert.strictEqual(query(".dgrid-cell")[0].offsetWidth, 100,
 					"Column should be the expected width");
 			});
 		});

@@ -19,11 +19,7 @@ function(declare, has, listen, miscUtil, put, i18n){
  */
 	
 	var activeGrid, // references grid for which the menu is currently open
-		bodyListener, // references pausable event handler for body mousedown
-		// Need to handle old IE specially for checkbox listener and for attribute.
-		hasIE = has("ie"),
-		hasIEQuirks = hasIE && has("quirks"),
-		forAttr = hasIE < 8 || hasIEQuirks ? "htmlFor" : "for";
+		bodyListener; // references pausable event handler for body mousedown
 	
 	function getColumnIdFromCheckbox(cb, grid){
 		// Given one of the checkboxes from the hider menu,
@@ -110,7 +106,7 @@ function(declare, has, listen, miscUtil, put, i18n){
 			checkbox.id = checkId;
 			
 			label = put(div, "label.dgrid-hider-menu-label.hider-menu-label-" + replacedId +
-				"[" + forAttr + "=" + checkId + "]",
+				"[for=" + checkId + "]",
 				col.label || col.field || "");
 			
 			put(this.hiderMenuNode, div);
@@ -165,7 +161,7 @@ function(declare, has, listen, miscUtil, put, i18n){
 				
 				// Hook up delegated listener for modifications to checkboxes.
 				this._listeners.push(listen(hiderMenuNode,
-						".dgrid-hider-menu-check:" + (hasIE < 9 || hasIEQuirks ? "click" : "change"),
+						".dgrid-hider-menu-check:" + (has("ie") < 9 ? "click" : "change"),
 					function(e){
 						grid._updateColumnHiddenState(
 							getColumnIdFromCheckbox(e.target, grid), !e.target.checked);
@@ -295,7 +291,9 @@ function(declare, has, listen, miscUtil, put, i18n){
 				miscUtil.addCssRule(selectorPrefix + miscUtil.escapeCssIdentifier(id, "-"),
 					"display: none;");
 
-			if((has("ie") === 8 || has("ie") === 10) && !has("quirks")){
+			if(has("ie") === 8 || has("ie") === 10){
+				// Work around IE8 display issue and IE10 issue where
+				// header/body cells get out of sync when ColumnResizer is also used
 				tableRule = miscUtil.addCssRule(".dgrid-row-table", "display: inline-table;");
 
 				window.setTimeout(function(){

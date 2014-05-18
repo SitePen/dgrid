@@ -178,7 +178,6 @@ return declare([List, _StoreMixin], {
 					if(total){
 						preloadNode.style.height = Math.min(total * self.rowHeight, self.maxEmptySpace) + "px";
 					}else{
-						// if total is 0, IE quirks mode can't handle 0px height for some reason, I don't know why, but we are setting display: none for now
 						preloadNode.style.display = "none";
 					}
 

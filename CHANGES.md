@@ -5,6 +5,7 @@ Release notes are now maintained on the GitHub repository's
 
 The following is a rough list of changes, to be outlined more presentably later.
 
+* dgrid no longer supports IE 6-7 or non-Blink Opera, and explicitly does not support quirks mode.
 * dgrid now interacts with the dstore API rather than the dojo/store API
 * dgrid now requires Dojo 1.8 at minimum (since that is also dstore's minimum requirement)
 * Split out store-specific code from `List#renderArray` to
@@ -30,3 +31,5 @@ The following is a rough list of changes, to be outlined more presentably later.
 * Removed deprecated functions marked for removal in 0.4; most of these have had
   `set(...)` equivalents for a long time already
 * Removed `dgrid/util/mouse` module (made redundant by `dojo/mouse` improvements in Dojo 1.8)
+* Removed the `dgrid-cell-padding` class as its distinction was only useful for IE < 8.
+  Use `dgrid-cell` instead.

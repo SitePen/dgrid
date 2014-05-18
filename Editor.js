@@ -159,8 +159,7 @@ define([
 
 				if (!options || !options.alreadyHooked) {
 					self._editorColumnListeners.push(
-						// in IE<8, cell is the child of the td due to the extra padding node
-						on(cell.tagName === 'TD' ? cell : cell.parentNode, editOn, function () {
+						on(cell, editOn, function () {
 							self._activeOptions = options;
 							self.edit(this);
 						})
@@ -402,8 +401,8 @@ define([
 					tabIndex: isNaN(column.tabIndex) ? -1 : column.tabIndex
 				}, args));
 
-				if (has('ie') < 9 || (has('ie') && has('quirks'))) {
-					// IE<9 / quirks doesn't fire change events for all the right things,
+				if (has('ie') < 9) {
+					// IE<9 doesn't fire change events for all the right things,
 					// and it doesn't bubble.
 					if (editor === 'radio' || editor === 'checkbox') {
 						// listen for clicks since IE doesn't fire change events properly for checks/radios

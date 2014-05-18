@@ -33,7 +33,7 @@ html.has-touch .dgrid-column-resizer {
 	/* set to relative so we can do the resizing against this node */
 	position: relative;
 }
-.dgrid-header .dgrid-cell-padding {
+.dgrid-header .dgrid-cell {
 	overflow: hidden;
 }
 

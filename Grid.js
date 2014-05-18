@@ -1,7 +1,5 @@
 define(["dojo/_base/declare", "dojo/on", "dojo/has", "put-selector/put", "./List", "./util/misc", "dojo/_base/sniff"],
 function(declare, listen, has, put, List, miscUtil){
-	var contentBoxSizing = has("ie") < 8 && !has("quirks");
-	
 	function appendIfNode(parent, subNode){
 		if(subNode && subNode.nodeType){
 			parent.appendChild(subNode);
@@ -87,11 +85,11 @@ function(declare, listen, has, put, List, miscUtil){
 			var row = put("table.dgrid-row-table[role=presentation]"),
 				cellNavigation = this.cellNavigation,
 				// IE < 9 needs an explicit tbody; other browsers do not
-				tbody = (has("ie") < 9 || has("quirks")) ? put(row, "tbody") : row,
+				tbody = (has("ie") < 9) ? put(row, "tbody") : row,
 				tr,
 				si, sl, i, l, // iterators
 				subRow, column, id, extraClasses, className,
-				cell, innerCell, colSpan, rowSpan; // used inside loops
+				cell, colSpan, rowSpan; // used inside loops
 			
 			// Allow specification of custom/specific subRows, falling back to
 			// those defined on the instance.
@@ -120,19 +118,12 @@ function(declare, listen, has, put, List, miscUtil){
 						extraClasses += "." + className;
 					}
 
-					cell = put(tag + (
-							".dgrid-cell.dgrid-cell-padding" +
-							(id ? ".dgrid-column-" + replaceInvalidChars(id) : "") +
-							extraClasses.replace(/ +/g, ".")
-						) + "[role=" + (tag === "th" ? "columnheader" : "gridcell") + "]");
+					cell = put(tag +
+						".dgrid-cell" +
+						(id ? ".dgrid-column-" + replaceInvalidChars(id) : "") +
+						extraClasses.replace(/ +/g, ".") +
+						"[role=" + (tag === "th" ? "columnheader" : "gridcell") + "]");
 					cell.columnId = id;
-					if(contentBoxSizing){
-						// The browser (IE7-) does not support box-sizing: border-box, so we emulate it with a padding div
-						innerCell = put(cell, "!dgrid-cell-padding div.dgrid-cell-padding");// remove the dgrid-cell-padding, and create a child with that class
-						cell.contents = innerCell;
-					}else{
-						innerCell = cell;
-					}
 					colSpan = column.colSpan;
 					if(colSpan){
 						cell.colSpan = colSpan;
@@ -141,7 +132,7 @@ function(declare, listen, has, put, List, miscUtil){
 					if(rowSpan){
 						cell.rowSpan = rowSpan;
 					}
-					each(innerCell, column);
+					each(cell, column);
 					// add the td to the tr at the end for better performance
 					tr.appendChild(cell);
 				}
@@ -217,10 +208,6 @@ function(declare, listen, has, put, List, miscUtil){
 			
 			var row = this.createRowCells("th", function(th, column){
 				var contentNode = column.headerNode = th;
-				if(contentBoxSizing){
-					// we're interested in the th, but we're passed the inner div
-					th = th.parentNode;
-				}
 				var field = column.field;
 				if(field){
 					th.field = field;
@@ -294,18 +281,13 @@ function(declare, listen, has, put, List, miscUtil){
 			
 			this.inherited(arguments);
 			
-			if(!has("ie") || (has("ie") > 7 && !has("quirks"))){
-				// Force contentNode width to match up with header width.
-				// (Old IEs don't have a problem due to how they layout.)
-				
-				contentNode.style.width = ""; // reset first
-				
-				if(contentNode && headerTableNode){
-					if((width = headerTableNode.offsetWidth) != contentNode.offsetWidth){
-						// update size of content node if necessary (to match size of rows)
-						// (if headerTableNode can't be found, there isn't much we can do)
-						contentNode.style.width = width + "px";
-					}
+			// Force contentNode width to match up with header width.
+			contentNode.style.width = ""; // reset first
+			if(contentNode && headerTableNode){
+				if((width = headerTableNode.offsetWidth) != contentNode.offsetWidth){
+					// update size of content node if necessary (to match size of rows)
+					// (if headerTableNode can't be found, there isn't much we can do)
+					contentNode.style.width = width + "px";
 				}
 			}
 		},

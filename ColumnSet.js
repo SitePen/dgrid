@@ -1,5 +1,5 @@
-define(["dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/on", "dojo/aspect", "dojo/query", "dojo/has", "./util/misc", "put-selector/put", "xstyle/has-class", "./Grid", "dojo/_base/sniff", "xstyle/css!./css/columnset.css"],
-function(declare, lang, Deferred, listen, aspect, query, has, miscUtil, put, hasClass, Grid){
+define(["dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/on", "dojo/aspect", "dojo/query", "dojo/has", "./util/misc", "put-selector/put", "./Grid", "dojo/_base/sniff", "xstyle/css!./css/columnset.css"],
+function(declare, lang, Deferred, listen, aspect, query, has, miscUtil, put, Grid){
 	has.add("event-mousewheel", function(global, document, element){
 		return typeof element.onmousewheel !== "undefined";
 	});
@@ -17,20 +17,11 @@ function(declare, lang, Deferred, listen, aspect, query, has, miscUtil, put, has
 
 	var colsetidAttr = "data-dgrid-column-set-id";
 	
-	hasClass("safari", "ie-7");
-	
 	function adjustScrollLeft(grid, row){
 		var scrollLefts = grid._columnSetScrollLefts;
-		function doAdjustScrollLeft(){
-			query(".dgrid-column-set", row).forEach(function(element){
-				element.scrollLeft = scrollLefts[element.getAttribute(colsetidAttr)];
-			});
-		}
-		if(has("ie") < 8 || has("quirks")){
-			setTimeout(doAdjustScrollLeft, 1);
-		}else{
-			doAdjustScrollLeft();
-		}
+		query(".dgrid-column-set", row).forEach(function(element){
+			element.scrollLeft = scrollLefts[element.getAttribute(colsetidAttr)];
+		});
 	}
 	
 	function scrollColumnSetTo(grid, columnSetNode, offsetLeft){

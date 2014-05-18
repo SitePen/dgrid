@@ -20,7 +20,7 @@ define([
 		// enableTreeTransitions: Boolean
 		//		Enables/disables all expand/collapse CSS transitions.
 		enableTreeTransitions: true,
-		
+
 		// treeIndentWidth: Number
 		//		Width (in pixels) of each level of indentation.
 		treeIndentWidth: 9,
@@ -47,7 +47,7 @@ define([
 			// expand: Boolean?
 			//		If specified, designates whether to expand or collapse the row;
 			//		if unspecified, toggles the current state.
-			
+
 			if(!this._treeColumn){
 				return;
 			}
@@ -369,7 +369,7 @@ define([
 			}
 			node = put("div" + cls + "[style=margin-" + dir + ": " +
 				(level * (this.grid.treeIndentWidth)) + "px; float: " + dir + "]");
-			node.innerHTML = "&nbsp;"; // for opera to space things properly
+			node.innerHTML = "&nbsp;";
 			return node;
 		},
 

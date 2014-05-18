@@ -93,10 +93,6 @@ structuring of dgrid components:
   Applying a different color to alternating rows can help visually distinguish individual items.
 * `dgrid-selected`: Applied to selected rows or cells
 * `dgrid-cell`: Applied to each cell element
-* `dgrid-cell-padding`: Applied to each cell element, or to an
-  inner element within the cell in older versions of non-quirks mode IE to
-  properly apply padding to keep the padding within the box measurements
-  (box-sizing is preferred by the grid).
 * `dgrid-focus`: Applied to the element (cell or row) with the focus (for keyboard based navigation)
 * `dgrid-expando-icon`: Applied to the expando icon on tree nodes
 * `dgrid-header-scroll`: Applied to the node in the top right corner of a Grid,

@@ -294,10 +294,7 @@ var Keyboard = declare(null, {
 			for(i = 0, numInputs = inputs.length; i < numInputs; i++){
 				input = inputs[i];
 				if((input.tabIndex != -1 || "_dgridLastValue" in input) && !input.disabled){
-					// Employ workaround for focus rectangle in IE < 8
-					if(has("ie") < 8){ input.style.position = "relative"; }
 					input.focus();
-					if(has("ie") < 8){ input.style.position = ""; }
 					inputFocused = true;
 					break;
 				}
@@ -322,10 +319,6 @@ var Keyboard = declare(null, {
 			// Clean up previously-focused element
 			// Remove the class name and the tabIndex attribute
 			put(focusedNode, "!dgrid-focus[!tabIndex]");
-			if(has("ie") < 8){
-				// Clean up after workaround below (for non-input cases)
-				focusedNode.style.position = "";
-			}
 			
 			// Expose object representing focused cell or row losing focus, via
 			// event.cell or event.row; which is set depends on cellNavigation.
@@ -346,12 +339,6 @@ var Keyboard = declare(null, {
 		
 		var isFocusableClass = this.cellNavigation ? hasGridCellClass : hasGridRowClass;
 		if(!inputFocused && isFocusableClass.test(element.className)){
-			if(has("ie") < 8){
-				// setting the position to relative magically makes the outline
-				// work properly for focusing later on with old IE.
-				// (can't be done a priori with CSS or screws up the entire table)
-				element.style.position = "relative";
-			}
 			element.tabIndex = this.tabIndex;
 			element.focus();
 		}

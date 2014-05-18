@@ -1,7 +1,7 @@
 define(["dojo/_base/declare", "dojo/on", "dojo/has", "./util/misc", "xstyle/has-class", "put-selector/put", "dojo/_base/sniff", "xstyle/css!./css/dgrid.css"],
 function(declare, listen, has, miscUtil, hasClass, put){
 	// Add user agent/feature CSS classes 
-	hasClass("mozilla", "opera", "webkit", "ie", "ie-6", "ie-6-7", "quirks", "no-quirks", "touch");
+	hasClass("mozilla", "touch");
 	
 	// Add a feature test for pointer (only Dojo 1.10 has pointer-events and MSPointer tests)
 	has.add("pointer", function(global){
@@ -82,24 +82,7 @@ function(declare, listen, has, miscUtil, hasClass, put){
 	}
 	
 	// window resize event handler, run in context of List instance
-	var winResizeHandler = has("ie") < 7 && !has("quirks") ? function(){
-		// IE6 triggers window.resize on any element resize;
-		// avoid useless calls (and infinite loop if height: auto).
-		// The measurement logic here is based on dojo/window logic.
-		var root, w, h, dims;
-		
-		if(!this._started){ return; } // no sense calling resize yet
-		
-		root = document.documentElement;
-		w = root.clientWidth;
-		h = root.clientHeight;
-		dims = this._prevWinDims || [];
-		if(dims[0] !== w || dims[1] !== h){
-			this.resize();
-			this._prevWinDims = [w, h];
-		}
-	} :
-	function(){
+	var winResizeHandler = function(){
 		if(this._started){ this.resize(); }
 	};
 	
@@ -199,7 +182,7 @@ function(declare, listen, has, miscUtil, hasClass, put){
 			var domNode = this.domNode,
 				addUiClasses = this.addUiClasses,
 				self = this,
-				headerNode, spacerNode, bodyNode, footerNode, isRTL;
+				headerNode, bodyNode, footerNode, isRTL;
 			
 			// Detect RTL on html/body nodes; taken from dojo/dom-geometry
 			isRTL = this.isRTL = (document.body.dir || document.documentElement.dir ||
@@ -217,9 +200,6 @@ function(declare, listen, has, miscUtil, hasClass, put){
 				"div.dgrid-header.dgrid-header-row" +
 				(addUiClasses ? ".ui-widget-header" : "") +
 				(this.showHeader ? "" : ".dgrid-header-hidden"));
-			if(has("quirks") || has("ie") < 8){
-				spacerNode = put(domNode, "div.dgrid-spacer");
-			}
 			bodyNode = this.bodyNode = put(domNode, "div.dgrid-scroller");
 			
 			// Firefox 4+ adds overflow: auto elements to the tab index by default;
@@ -286,25 +266,10 @@ function(declare, listen, has, miscUtil, hasClass, put){
 				headerNode = this.headerNode,
 				footerNode = this.footerNode,
 				headerHeight = headerNode.offsetHeight,
-				footerHeight = this.showFooter ? footerNode.offsetHeight : 0,
-				quirks = has("quirks") || has("ie") < 7;
+				footerHeight = this.showFooter ? footerNode.offsetHeight : 0;
 			
 			this.headerScrollNode.style.height = bodyNode.style.marginTop = headerHeight + "px";
 			bodyNode.style.marginBottom = footerHeight + "px";
-			
-			if(quirks){
-				// in IE6 and quirks mode, the "bottom" CSS property is ignored.
-				// We guard against negative values in case of issues with external CSS.
-				bodyNode.style.height = ""; // reset first
-				bodyNode.style.height =
-					Math.max((this.domNode.offsetHeight - headerHeight - footerHeight), 0) + "px";
-				if (footerHeight) {
-					// Work around additional glitch where IE 6 / quirks fails to update
-					// the position of the bottom-aligned footer; this jogs its memory.
-					footerNode.style.bottom = '1px';
-					setTimeout(function(){ footerNode.style.bottom = ''; }, 0);
-				}
-			}
 			
 			if(!scrollbarWidth){
 				// Measure the browser's scrollbar width using a DIV we'll delete right away
@@ -322,22 +287,13 @@ function(declare, listen, has, miscUtil, hasClass, put){
 				miscUtil.addCssRule(".dgrid-scrollbar-width", "width: " + scrollbarWidth + "px");
 				miscUtil.addCssRule(".dgrid-scrollbar-height", "height: " + scrollbarHeight + "px");
 				
-				if(scrollbarWidth != 17 && !quirks){
+				if(scrollbarWidth != 17){
 					// for modern browsers, we can perform a one-time operation which adds
 					// a rule to account for scrollbar width in all grid headers.
 					miscUtil.addCssRule(".dgrid-header-row", "right: " + scrollbarWidth + "px");
 					// add another for RTL grids
 					miscUtil.addCssRule(".dgrid-rtl-swap .dgrid-header-row", "left: " + scrollbarWidth + "px");
 				}
-			}
-			
-			if(quirks){
-				// old IE doesn't support left + right + width:auto; set width directly
-				headerNode.style.width = bodyNode.clientWidth + "px";
-				setTimeout(function(){
-					// sync up (after the browser catches up with the new width)
-					headerNode.scrollLeft = bodyNode.scrollLeft;
-				}, 0);
 			}
 		},
 		
