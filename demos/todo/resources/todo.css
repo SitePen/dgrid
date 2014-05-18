@@ -37,11 +37,3 @@
 	/* text field for adding tasks */
 	width: 400px;
 }
-
-/* IE6 doesn't support top+bottom+height:auto, so do something else */
-.has-ie-6 #list {
-	height: 300px;
-}
-.has-ie-6 .bottomArea {
-	top: 330px;
-}
