@@ -12,6 +12,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ### Mixins
 
+* The `Keyboard` mixin no longer fires `dgrid-cellfocusout` and `dgrid-cellfocusin`
+  events when a row/cell is automatically re-focused after an observed update. (#902)
 * Fixed a focus issue in the `Keyboard` mixin which manifested when used in
   conjunction with the `ColumnResizer` extension. (#928)
 * The `Selection` mixin no longer emits superfluous `dgrid-deselect` events
