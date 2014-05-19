@@ -231,7 +231,7 @@ var Keyboard = declare(null, {
 			}
 			if(focusInfo.active && newTarget.element.offsetHeight !== 0){
 				// Row/cell was previously focused and is visible, so focus the new one immediately
-				this.focus(newTarget);
+				this._focusOnNode(newTarget, false, null);
 			}else{
 				// Row/cell was not focused or is not visible, but we still need to update tabIndex
 				// and the element's class to be consistent with the old one
@@ -290,15 +290,20 @@ var Keyboard = declare(null, {
 			}
 		}
 		
-		event = lang.mixin({ grid: this }, event);
-		if(event.type){
-			event.parentType = event.type;
+		// Set up event information for dgrid-cellfocusout/in events.
+		// Note that these events are not fired for _restoreFocus.
+		if(event !== null){
+			event = lang.mixin({ grid: this }, event);
+			if(event.type){
+				event.parentType = event.type;
+			}
+			if(!event.bubbles){
+				// IE doesn't always have a bubbles property already true.
+				// Opera throws if you try to set it to true if it is already true.
+				event.bubbles = true;
+			}
 		}
-		if(!event.bubbles){
-			// IE doesn't always have a bubbles property already true.
-			// Opera throws if you try to set it to true if it is already true.
-			event.bubbles = true;
-		}
+		
 		if(focusedNode){
 			// Clean up previously-focused element
 			// Remove the class name and the tabIndex attribute
@@ -315,11 +320,13 @@ var Keyboard = declare(null, {
 		}
 		focusedNode = this[focusedNodeProperty] = element;
 		
-		// Expose object representing focused cell or row gaining focus, via
-		// event.cell or event.row; which is set depends on cellNavigation.
-		// Note that yes, the same event object is being reused; on.emit
-		// performs a shallow copy of properties into a new event object.
-		event[cellOrRowType] = cell;
+		if(event){
+			// Expose object representing focused cell or row gaining focus, via
+			// event.cell or event.row; which is set depends on cellNavigation.
+			// Note that yes, the same event object is being reused; on.emit
+			// performs a shallow copy of properties into a new event object.
+			event[cellOrRowType] = cell;
+		}
 		
 		var isFocusableClass = this.cellNavigation ? hasGridCellClass : hasGridRowClass;
 		if(!inputFocused && isFocusableClass.test(element.className)){
@@ -333,7 +340,10 @@ var Keyboard = declare(null, {
 			element.focus();
 		}
 		put(element, ".dgrid-focus");
-		on.emit(focusedNode, "dgrid-cellfocusin", event);
+		
+		if(event){
+			on.emit(focusedNode, "dgrid-cellfocusin", event);
+		}
 	},
 	
 	focusHeader: function(element){
