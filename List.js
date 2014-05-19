@@ -411,7 +411,7 @@ function(declare, listen, has, miscUtil, hasClass, put){
 			//		ui-state-highlight class.
 			
 			rowElement = rowElement.element || rowElement;
-			put(rowElement, ".ui-state-highlight" +
+			put(rowElement, ".dgrid-highlight" +
 				(this.addUiClasses ? ".ui-state-highlight" : ""));
 			setTimeout(function(){
 				put(rowElement, "!dgrid-highlight!ui-state-highlight");
