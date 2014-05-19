@@ -283,10 +283,13 @@ return declare(null, {
 		//		except that clicks/keystrokes without modifier keys will clear
 		//		the previous selection.
 		
-		// Clear selection first for right-clicks outside selection and non-ctrl-clicks;
-		// otherwise, extended mode logic is identical to multiple mode
+		// Clear selection first for right-clicks outside selection and non-ctrl-clicks.
+		// For dgrid-cellfocusin events, do not clear the selection if our target is not
+		// changing, thus preserving the selection when the target receives a store update.
+		// Otherwise, extended mode logic is identical to multiple mode.
 		if(event.button === 2 ? !this.isSelected(target) :
-				!(event.keyCode ? event.ctrlKey : event[ctrlEquiv])){
+				!(event.keyCode ? event.ctrlKey : event[ctrlEquiv]) &&
+				!(event.oldTarget && event.oldTarget === target)){
 			this.clearSelection(null, true);
 		}
 		this._multipleSelectionHandler(event, target);
