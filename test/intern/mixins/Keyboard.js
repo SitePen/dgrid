@@ -231,6 +231,7 @@ define([
 
 		test.test("dgrid-cellfocusout event", function(){
 			var blurredCell,
+				blurredElementRowId,
 				targets = query(".dgrid-cell", grid.contentNode);
 			
 			// call one focus event, followed by a subsequent focus event, 
@@ -239,17 +240,20 @@ define([
 			
 			// listen for a dgrid-cellfocusout event
 			handles.push(on(document.body, "dgrid-cellfocusout", function(e){
+				blurredElementRowId = grid.row(e.target).id;
 				blurredCell = e.cell;
 				assert.ok(blurredCell, "dgrid-cellfocusout event got a non-null cell value");
 			}));
 			
-			grid.focus(targets[1]);
-			// make sure our handler was called appropriately
+			// Focus first cell in next row and make sure handler was called
+			grid.focus(targets[3]);
 			assert.ok(blurredCell, "dgrid-cellfocusout event fired");
+			assert.strictEqual(blurredElementRowId, "0",
+				"dgrid-cellfocusout event fired from expected element");
 			assert.strictEqual(blurredCell.row.id, "0",
-				"dgrid-cellfocusout event triggered on expected row");
+				"dgrid-cellfocusout event.cell contains expected row");
 			assert.strictEqual(blurredCell.column.id, "col1",
-				"dgrid-cellfocusout event triggered on expected column");
+				"dgrid-cellfocusout event.cell contains expected column");
 		});
 		
 		test.test("grid.focus + item update", function(){
