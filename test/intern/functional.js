@@ -3,5 +3,5 @@ define([
 	'./functional/KeyboardTab',
 	'./functional/Selector',
 	'./functional/Editor',
-	'./functional/tree'
+	'./functional/Tree'
 ], function(){});

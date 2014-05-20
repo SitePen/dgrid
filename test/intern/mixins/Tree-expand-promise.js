@@ -4,7 +4,7 @@ define([
 	"dgrid/Grid",
 	"dgrid/OnDemandGrid",
 	"dgrid/_StoreMixin",
-	"dgrid/tree",
+	"dgrid/Tree",
 	"dojo/_base/declare",
 	"dojo/_base/lang",
 	"dojo/_base/array",
@@ -12,7 +12,7 @@ define([
 	"dojo/on",
 	"dstore/Memory",
 	"dojo/query"
-], function(test, assert, Grid, OnDemandGrid, _StoreMixin, tree, declare, lang, arrayUtil, Deferred, on, Memory, query){
+], function(test, assert, Grid, OnDemandGrid, _StoreMixin, Tree, declare, lang, arrayUtil, Deferred, on, Memory, query){
 
 	test.suite("tree (expand + promise)", function(){
 		var grid,
@@ -63,7 +63,7 @@ define([
 					this.dfd.reject(error);
 				}
 			}),
-			StoreMixinGrid = declare([Grid, _StoreMixin]),
+			StoreMixinGrid = declare([Grid, _StoreMixin, Tree]),
 			syncStore = new TreeStore({ data: createData() }),
 			asyncStore = new AsyncTreeStore({ data: createData() });
 
@@ -78,10 +78,10 @@ define([
 		}
 
 		function createGrid(store){
-			grid = new OnDemandGrid({
+			grid = new (declare([OnDemandGrid, Tree]))({
 				collection: store.filter({ parent: undefined }),
 				columns: [
-					tree({field: "node", label: "Node"}),
+					{tree: true, field: "node", label: "Node"},
 					{field: "value", label: "Value"}
 				]
 			});
@@ -93,7 +93,7 @@ define([
 			grid = new StoreMixinGrid({
 				collection: store.filter({ parent: undefined }),
 				columns: [
-					tree({field: "node", label: "Node"}),
+					{tree: true, field: "node", label: "Node"},
 					{field: "value", label: "Value"}
 				]
 			});

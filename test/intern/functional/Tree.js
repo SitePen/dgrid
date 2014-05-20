@@ -58,7 +58,7 @@ define([
 		test.before(function(){
 			var remote = this.get("remote");
 
-			return remote.get(require.toUrl("./tree.html")).waitForCondition("ready", 15000);
+			return remote.get(require.toUrl("./Tree.html")).waitForCondition("ready", 15000);
 		});
 
 		test.test("expand/collapse: click on expando node", createExpandTest(".dgrid-expando-icon", "click"));

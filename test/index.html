@@ -50,17 +50,18 @@
 		<script src="../../dojo/dojo.js" data-dojo-config="async: true"></script>
 		<script>
 			require([
+				"dojo/_base/declare",
 				"dojo/_base/xhr",
 				"dojo/on",
 				"dojo/json",
 				"dstore/Memory",
 				"dojo/cookie",
 				"dgrid/OnDemandGrid",
-				"dgrid/tree",
+				"dgrid/Tree",
 				"put-selector/put",
 				"dojo/query",
 				"dojo/domReady!"
-			], function(xhr, on, json, Memory, cookie, OnDemandGrid, tree, put){
+			], function(declare, xhr, on, json, Memory, cookie, OnDemandGrid, Tree, put){
 				xhr.get({
 					url: "data/index.json",
 					handleAs: "json"
@@ -93,16 +94,17 @@
 							value || "");
 					}
 					
-					var grid = new OnDemandGrid({
+					var grid = new (declare([OnDemandGrid, Tree]))({
 						className: "toc",
 						columns: {
-							name: tree({
-								shouldExpand: shouldExpand,
+							name: {
+								tree: true,
 								renderCell: renderLinkCell,
 								expandOn: ".dgrid-row:click"
-							}),
+							},
 							title: { renderCell: renderLinkCell }
 						},
+						shouldExpand: shouldExpand,
 						renderHeader: function(){
 							put(this.headerNode, "div.header-title", "dgrid Tests");
 						},

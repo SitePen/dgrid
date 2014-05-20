@@ -3,7 +3,7 @@ define([
 	"intern/chai!assert",
 	"dgrid/OnDemandGrid",
 	"dgrid/Editor",
-	"dgrid/tree",
+	"dgrid/Tree",
 	"dgrid/util/has-css3",
 	"dgrid/util/misc",
 	"dojo/_base/declare",
@@ -14,7 +14,7 @@ define([
 	"dojo/query",
 	"put-selector/put",
 	"dgrid/test/data/createSyncHierarchicalStore"
-], function(test, assert, OnDemandGrid, Editor, tree, has, miscUtil, declare, lang, Deferred, domStyle, on, query, put,
+], function(test, assert, OnDemandGrid, Editor, Tree, has, miscUtil, declare, lang, Deferred, domStyle, on, query, put,
 	createSyncHierarchicalStore){
 
 	var grid,
@@ -27,7 +27,7 @@ define([
 			treeColumnOptions,
 			i,
 			k,
-			GridConstructor = OnDemandGrid;
+			GridConstructor;
 
 		for(i = 0; i < 5; i++){
 			var parentId = "" + i;
@@ -50,6 +50,7 @@ define([
 		});
 
 		treeColumnOptions = {
+			tree: true,
 			label: "id",
 			field: "id"
 		};
@@ -59,17 +60,19 @@ define([
 		}
 
 		if(options && options.useEditor){
-			GridConstructor = declare([OnDemandGrid, Editor]);
+			GridConstructor = declare([OnDemandGrid, Editor, Tree]);
 			if(!treeColumnOptions.editor){
 				treeColumnOptions.editor = "text";
 			}
+		} else {
+			GridConstructor = declare([OnDemandGrid, Tree]);
 		}
 
 		grid = new GridConstructor({
 			sort: "id",
 			collection: store,
 			columns: [
-				tree(treeColumnOptions),
+				treeColumnOptions,
 				{ label: "value", field: "value"}
 			]
 		});
@@ -243,8 +246,7 @@ define([
 				var shouldExpand;
 				var i;
 
-				columns = grid.get("columns");
-				columns[0].shouldExpand = function(rowObject){
+				grid.shouldExpand = function(rowObject){
 					var shouldExpand = false;
 
 					if(rowObject.data.parent === undefined){
@@ -253,7 +255,7 @@ define([
 
 					return shouldExpand;
 				};
-				grid.set("columns", columns);
+				grid.refresh();
 
 				for(i = 0; i < 5; i++){
 					shouldExpand = !(i % 2);
@@ -272,7 +274,6 @@ define([
 				var columns;
 				var rowObject;
 				var expandoNode;
-				var shouldExpand;
 				var i;
 
 				columns = grid.get("columns");
@@ -280,7 +281,7 @@ define([
 
 					// * Adds the "test-expando" class
 					// * Floats the expando at the opposite end of the cell
-					var node = tree.defaultRenderExpando.apply(this, arguments);
+					var node = grid._defaultRenderExpando.apply(this, arguments);
 					put(node, ".test-expando");
 					domStyle.set(node, "float", "right");
 					return node;
@@ -300,7 +301,6 @@ define([
 			test.test("renderCell", function(){
 				var rowObject;
 				var expandoNode;
-				var shouldExpand;
 				var i;
 
 				grid.destroy();
@@ -352,9 +352,8 @@ define([
 
 				for(i = 0; i < 5; i++){
 					rowObject = grid.row(i);
-// TODO: uncomment when tree plug-in becomes a mixin
-//					expandoNode = query(".dgrid-expando-icon.ui-icon", rowObject.element)[0];
-//					assert.isDefined(expandoNode, "Row " + i + " should have an expando node");
+					expandoNode = query(".dgrid-expando-icon.ui-icon", rowObject.element)[0];
+					assert.isDefined(expandoNode, "Row " + i + " should have an expando node");
 					inputNode = query(".dgrid-input", rowObject.element)[0];
 					assert.isDefined(inputNode, "Row " + i + " should have an input node");
 				}
