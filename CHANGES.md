@@ -45,6 +45,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ### Mixins
 
+* Fixed a state preservation issue in the `Keyboard` mixin when a row/cell that
+  was last focused is removed while the list/grid no longer has focus. (#899)
 * The `Selection` mixin (and `selector` column plugin) will no longer clear the
   selection during an attempt to select a row that cannot be selected
   (i.e. `allowSelect` returns `false`). (#822)
