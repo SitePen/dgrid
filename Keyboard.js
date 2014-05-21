@@ -233,10 +233,11 @@ var Keyboard = declare(null, {
 				// Row/cell was previously focused and is visible, so focus the new one immediately
 				this._focusOnNode(newTarget, false, null);
 			}else{
-				// Row/cell was not focused or is not visible, but we still need to update tabIndex
-				// and the element's class to be consistent with the old one
+				// Row/cell was not focused or is not visible, but we still need to
+				// update _focusedNode and the element's tabIndex/class
 				put(newTarget.element, ".dgrid-focus");
 				newTarget.element.tabIndex = this.tabIndex;
+				this._focusedNode = newTarget.element;
 			}
 		}
 		
