@@ -74,7 +74,7 @@
 
 .gallery .dgrid-row {
 	width: 25%;
-	float: left;
+	display: inline-block;
 	text-align: center;
 	padding: 1em 0;
 }
