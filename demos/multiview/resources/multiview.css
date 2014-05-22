@@ -73,8 +73,8 @@
 /* styles for gallery view */
 
 .gallery .dgrid-row {
-    width: 25%;
-    display: inline-block;
+	width: 25%;
+	display: inline-block;
 	text-align: center;
 	padding: 1em 0;
 }
