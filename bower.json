@@ -1,0 +1,26 @@
+{
+  "name": "dgrid",
+  "version": "0.3.15-dev",
+  "homepage": "https://dgrid.io",
+  "authors": [
+    "Kris Zyp"
+  ],
+  "description": "A lightweight, mobile-ready, data-driven, modular widget designed for lists and grids",
+  "main": "./OnDemandGrid",
+  "moduleType": [
+    "amd"
+  ],
+  "license": ["AFL-2.1", "BSD-3-Clause"],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "dojo": "1.7.2",
+    "put-selector": "0.3.5",
+    "xstyle": "0.1.3"
+  }
+}
