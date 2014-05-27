@@ -1,5 +1,6 @@
-This document outlines changes since 0.3.0.  For older changelogs, see the
-[dgrid wiki](https://github.com/SitePen/dgrid/wiki).
+**Note:** Going forward, release notes will be maintained on the GitHub repository's
+[releases page](https://github.com/SitePen/dgrid/releases).  This file will likely be
+removed in the future.
 
 # master (0.3.15-dev)
 
@@ -7,6 +8,8 @@ This document outlines changes since 0.3.0.  For older changelogs, see the
 
 ### General/Core
 
+* Documentation has been moved out of the wiki and into the repository under the
+  doc folder, to facilitate maintaining relevant documentation for both 0.3 and 0.4.
 * Fixed a regression in `List` which could cause errors in certain situations
   due to a feature test being performed before the document is ready. (#907)
 
