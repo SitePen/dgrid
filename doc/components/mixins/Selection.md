@@ -60,7 +60,7 @@ Method | Description
 `isSelected(row)`| Returns `true` if the given row is selected.
 
 **Note:** The `select`, `deselect`, and `isSelected` methods can be passed any
-type of argument acceptable to List's `row` method; see the [List](Selection.md) APIs for
+type of argument acceptable to List's `row` method; see the [List](../core-components/List.md) APIs for
 more information.
 
 
