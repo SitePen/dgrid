@@ -469,6 +469,14 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 						// It's especially important that _updateNavigation is called only
 						// after renderArray is resolved as well (to prevent jumping).
 						grid._updateNavigation(focusLink);
+						
+						setTimeout(function () {
+                            on.emit(grid.domNode, "dgrid-page-loaded", {
+                                bubbles: true,
+                                cancelable: false,
+                                grid: grid
+                            });
+                        }, 0);
 					});
 					
 					if (has("ie") < 7 || (has("ie") && has("quirks"))) {
