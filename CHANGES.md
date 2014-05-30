@@ -2,7 +2,7 @@
 [releases page](https://github.com/SitePen/dgrid/releases).  This file will likely be
 removed in the future.
 
-# master (0.3.15-dev)
+# 0.3.15
 
 ## Significant changes
 
