@@ -70,9 +70,9 @@ the basic steps one would need to follow:
 
 ### autoHeight
 
-Automatic height can be achieved using `height: auto` in the CSS for a grid's
-main DOM node.  There is no direct programmatic support for this.  (This means
-there is no built-in support for automatically sizing to a certain number of rows.)
+Automatic height can be achieved by adding the `dgrid-autoheight` class to a List
+or Grid's `domNode`.  There is no direct programmatic support for this
+(i.e. there is no built-in support for automatically sizing to a certain number of rows).
 
 Examples of an auto-height grid can be found in the `autoheight.html` and
 `extensions/Pagination.html` test pages.
