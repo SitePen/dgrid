@@ -116,27 +116,42 @@ define([
 			// TODO: bail out if sourceSource.getObject isn't defined?
 			nodes.forEach(function(node, i){
 				Deferred.when(sourceSource.getObject(node), function(object){
-					if(!copy){
-						if(sourceGrid){
-							// Remove original in the case of inter-grid move.
-							// (Also ensure dnd source is cleaned up properly)
-							Deferred.when(sourceGrid.collection.getIdentity(object), function(id){
-								!i && sourceSource.selectNone(); // deselect all, one time
-								sourceSource.delItem(node.id);
-								sourceGrid.collection.remove(id);
-							});
-						}else{
-							sourceSource.deleteSelectedNodes();
-						}
-					}
+
 					// Copy object, if supported by store; otherwise settle for put
 					// (put will relocate an existing item with the same id).
 					// Note that we use store.copy if available even for non-copy dnd:
 					// since this coming from another dnd source, always behave as if
 					// it is a new store item if possible, rather than replacing existing.
-					store[store.copy ? "copy" : "put"](object, {
+					when( store[store.copy ? "copy" : "put"](object, {
 						before: targetItem
-					});
+					}) ).then(
+
+						function( res ){
+
+							// Now that the copy was successful, proceed to deleting the item
+							// from the source grid. This ensures that the worst case scenario
+							// in case of network failure is having the item on both stores,
+							// rather than having an accidental deletion
+							if(!copy){
+								if(sourceGrid){
+									// Remove original in the case of inter-grid move.
+									// (Also ensure dnd source is cleaned up properly)
+									Deferred.when(sourceGrid.collection.getIdentity(object), function(id){
+										!i && sourceSource.selectNone(); // deselect all, one time
+										sourceSource.delItem(node.id);
+										sourceGrid.collection.remove(id);
+									});
+								}else{
+									sourceSource.deleteSelectedNodes();
+								}
+							}
+
+							return res;
+						},
+						function( err ){
+							throw( err );
+						}
+					);
 				});
 			});
 		},
