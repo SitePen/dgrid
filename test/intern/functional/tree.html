@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Test dgrid/selector module</title>
+
+		<style>
+			@import "../../../../dojo/resources/dojo.css";
+			@import "../../../css/dgrid.css";
+			@import "../../../css/skins/claro.css";
+
+			.dgrid {
+				width: 700px;
+				margin: 10px;
+			}
+
+			#treeGrid .field-type {
+				width: 5em;
+			}
+		</style>
+	</head>
+
+	<body class="claro">
+		<div id="treeGrid"></div>
+
+
+		<script>
+			var dojoConfig = {
+				async: true,
+				baseUrl: "../../../../",
+				packages: [
+					"dojo",
+					"dijit",
+					"dojox",
+					"dgrid",
+					"put-selector",
+					"xstyle"
+				]
+			};
+		</script>
+
+		<script src="../../../../dojo/dojo.js"></script>
+
+		<script>
+			var treeGrid;
+			var ready = false;
+
+			require([
+				"dgrid/OnDemandGrid",
+				"dgrid/tree",
+				"dgrid/test/data/base"
+			], function (OnDemandGrid, tree, testStore) {
+				/* global testCountryStore: true */
+
+				treeGrid = new OnDemandGrid({
+					sort: "id",
+					store: testCountryStore,
+					columns: [
+						tree({
+							label: "Name",
+							field: "name",
+							sortable: false
+						}),
+						{
+							label: "Type",
+							field: "type",
+							sortable: false
+						},
+						{
+							label: "Population",
+							field: "population"
+						},
+						{
+							label: "Timezone",
+							field: "timezone"
+						}
+					]
+				}, "treeGrid");
+
+				ready = true;
+			});
+		</script>
+	</body>
+</html>

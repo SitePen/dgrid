@@ -690,5 +690,24 @@ define([
 				assert.strictEqual(grid.column("compound2-nested2-myData8").label, "Data 8");
 			});
 		});
+
+		test.suite("sort method", function(){
+			test.afterEach(function(){
+				grid.destroy();
+			});
+
+			test.test("sort grid programmatically by field present in header", function(){
+				createGrid({
+					data0: "Data 0",
+					data1: "Data 1",
+					data2: "Data 2",
+					data3: "Data 3",
+					data4: "Data 4"
+				});
+				assert.doesNotThrow(function(){
+					grid.set("sort", "data0");
+				}, null, "Sorting grid programmatically should not throw error");
+			});
+		});
 	});
 });

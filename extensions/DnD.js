@@ -330,6 +330,9 @@ define([
 			}
 			function deselectRow(row){
 				delete selectedNodes[row.id];
+				// Re-sync dojo/dnd UI classes based on deselection
+				// (unfortunately there is no good programmatic hook for this)
+				put(row.element, '!dojoDndItemSelected!dojoDndItemAnchor');
 			}
 			
 			this.on("dgrid-select", function(event){

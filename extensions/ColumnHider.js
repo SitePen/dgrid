@@ -294,7 +294,7 @@ function(declare, has, listen, miscUtil, put, i18n){
 				miscUtil.addCssRule(selectorPrefix + miscUtil.escapeCssIdentifier(id, "-"),
 					"display: none;");
 
-			if(has("ie") === 8 && !has("quirks")){
+			if((has("ie") === 8 || has("ie") === 10) && !has("quirks")){
 				tableRule = miscUtil.addCssRule(".dgrid-row-table", "display: inline-table;");
 
 				window.setTimeout(function(){

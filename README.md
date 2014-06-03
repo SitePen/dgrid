@@ -58,13 +58,11 @@ on APIs new to 1.8 or 1.9, so as to maintain compatibility with 1.7.
 
 # Documentation
 
-Documentation for dgrid components is available in the
-[dgrid GitHub project wiki](https://github.com/SitePen/dgrid/wiki).
-The wiki's content may still be obtained for offline reading by cloning
-the wiki repository, as indicated under the "Git Access" tab.
+The [doc folder](./doc) contains documentation for dgrid components.
+In addition, the website hosts a number of [tutorials](http://dgrid.io/#tutorials).
 
-In addition to the documentation on the wiki, if upgrading from a previous
-dgrid release, please be sure to read the changelog, found in CHANGES.md.
+If upgrading from a previous dgrid release, please be sure to read the
+[release notes](https://github.com/SitePen/dgrid/releases).
 
 # Testing
 

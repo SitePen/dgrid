@@ -231,6 +231,7 @@ define([
 
 		test.test("dgrid-cellfocusout event", function(){
 			var blurredCell,
+				blurredElementRowId,
 				targets = query(".dgrid-cell", grid.contentNode);
 			
 			// call one focus event, followed by a subsequent focus event, 
@@ -239,18 +240,36 @@ define([
 			
 			// listen for a dgrid-cellfocusout event
 			handles.push(on(document.body, "dgrid-cellfocusout", function(e){
+				blurredElementRowId = grid.row(e.target).id;
 				blurredCell = e.cell;
 				assert.ok(blurredCell, "dgrid-cellfocusout event got a non-null cell value");
 			}));
 			
-			grid.focus(targets[1]);
-			// make sure our handler was called appropriately
+			// Focus first cell in next row and make sure handler was called
+			grid.focus(targets[3]);
 			assert.ok(blurredCell, "dgrid-cellfocusout event fired");
+			assert.strictEqual(blurredElementRowId, "0",
+				"dgrid-cellfocusout event fired from expected element");
 			assert.strictEqual(blurredCell.row.id, "0",
-				"dgrid-cellfocusout event triggered on expected row");
+				"dgrid-cellfocusout event.cell contains expected row");
 			assert.strictEqual(blurredCell.column.id, "col1",
-				"dgrid-cellfocusout event triggered on expected column");
+				"dgrid-cellfocusout event.cell contains expected column");
 		});
+	});
+
+	test.suite("Keyboard focus preservation", function(){
+		test.before(function(){
+			grid = new (declare([OnDemandGrid, Keyboard]))({
+				columns: columns,
+				sort: "id",
+				store: testStore
+			});
+			document.body.appendChild(grid.domNode);
+			grid.startup();
+		});
+
+		test.afterEach(afterEach);
+		test.after(after);
 		
 		test.test("grid.focus + item update", function(){
 			var element;
@@ -311,6 +330,76 @@ define([
 			setTimeout(dfd.callback(function(){
 				assert.strictEqual(nextElement, document.activeElement,
 					"The next row is focused after removing the item");
+			}), 0);
+			
+			return dfd;
+		});
+	});
+
+	test.suite("Keyboard focused node preservation after blur", function(){
+		var button;
+		
+		test.before(function(){
+			grid = new (declare([OnDemandGrid, Keyboard]))({
+				columns: columns,
+				sort: "id",
+				store: testStore
+			});
+			document.body.appendChild(grid.domNode);
+			grid.startup();
+			
+			// Add a button as a target to move focus out of grid
+			button = put(document.body, "button");
+		});
+
+		test.afterEach(afterEach);
+		test.after(function(){
+			after();
+			put(button, "!");
+		});
+		
+		test.test("grid.focus + item update", function(){
+			var element;
+			grid.focus(grid.cell(1, "col1"));
+			
+			element = document.activeElement;
+			assert.ok(element && element.className && element.className.indexOf("dgrid-cell") > -1,
+				"focus(id) call focused a cell");
+			
+			// Focus the button we added to move focus out of the grid
+			button.focus();
+			
+			grid.store.put(item);
+			grid.focus();
+			assert.notStrictEqual(element, document.activeElement,
+				"A different DOM element is focused after updating the item");
+			assert.strictEqual(grid.cell(1, "col1").element, document.activeElement,
+				"The item's new cell is focused after updating the item");
+		});
+		
+		test.test("grid.focus + item removal", function(){
+			var dfd = this.async(1000),
+				element,
+				nextElement;
+			
+			grid.focus(grid.cell(1, "col1"));
+			
+			element = document.activeElement;
+			assert.ok(element && element.className && element.className.indexOf("dgrid-cell") > -1,
+				"focus(id) call focused a cell");
+			
+			// Focus the button we added to move focus out of the grid
+			button.focus();
+			
+			nextElement = grid.cell(2, "col1").element;
+			grid.store.remove(1);
+			
+			setTimeout(dfd.callback(function(){
+				assert.doesNotThrow(function(){
+					grid.focus();
+				}, null, "focus() after blur and item removal should not throw error");
+				assert.strictEqual(nextElement, document.activeElement,
+					"The next row is focused after calling focus()");
 			}), 0);
 			
 			return dfd;
