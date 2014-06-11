@@ -75,6 +75,32 @@ define([
 			grid.destroy();
 		});
 
+		test.test('_StoreMixin#_setCollection(null)', function () {
+			var store = createSyncStore({ data: genericData });
+			grid = new OnDemandGrid({
+				collection: store
+			});
+			document.body.appendChild(grid.domNode);
+			grid.startup();
+			
+			assert.isDefined(grid._renderedCollection,
+				'grid._renderedCollection should be defined');
+			assert.notStrictEqual(grid.contentNode.children.length, 0,
+				'grid.contentNode should contain children when refreshing with a store');
+			
+			grid.set('collection', null);
+			assert.isNull(grid._renderedCollection,
+				'grid._renderedCollection should be null after setting collection to null');
+			assert.strictEqual(grid.contentNode.children.length, 0,
+				'grid.contentNode should not contain any children when refreshing with a null collection');
+			
+			grid.set('collection', store);
+			assert.isNotNull(grid._renderedCollection,
+				'grid._renderedCollection should not be null after setting collection to store again');
+			assert.notStrictEqual(grid.contentNode.children.length, 0,
+				'grid.contentNode should contain children when refreshing with a store');
+		});
+
 		test.test("_StoreMixin#_onNotification", function(){
 			var store = createSyncStore({ data: genericData }),
 				notificationCount = 0,

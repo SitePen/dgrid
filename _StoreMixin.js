@@ -109,10 +109,13 @@ function(declare, lang, Deferred, listen, aspect, put){
 					this._observerHandle = this._rows = null;
 				}
 				this.cleanup();
-			
-				this.dirty = {}; // discard dirty map, as it applied to a previous collection
+
+				// Discard dirty map, as it applied to a previous collection
+				this.dirty = {};
+
+				this._renderedCollection = null;
 			}
-			
+
 			if(collection){
 				var renderedCollection = this.collection = collection;
 				if(this.sort && this.sort.length > 0){
@@ -127,8 +130,9 @@ function(declare, lang, Deferred, listen, aspect, put){
 				}
 
 				this._renderedCollection = renderedCollection;
-				this.refresh();
 			}
+
+			this.refresh();
 		},
 		
 		_applySort: function(){
