@@ -39,10 +39,8 @@ also be specified as such, e.g. `class`, `rowspan`, and `colspan`. The innerHTML
 of the `th` is interpreted as the column's `label` by default.
 
 Note that *unlike* `data-dojo-props`, `data-dgrid-column` requires that you
-include the surrounding curly braces around the object - this allows
-alternatively specifying a column plugin instead of just a straight-up object.
-(Note, however, that referencing column plugins requires that they be exposed in
-the global scope, perhaps under a namespace.) Examples of creating grids from
+include the surrounding curly braces around the object.
+Examples of creating grids from
 HTML can be found in the `GridFromHtml.html` and `complex_columns.html` test
 pages.
 

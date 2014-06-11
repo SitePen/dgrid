@@ -7,7 +7,7 @@ require([
     "dojo/_base/declare", "dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/extensions/DnD", "dojo/dnd/Source"
 ], function(declare, OnDemandGrid, Selection, DnD, DnDSource){
     var grid = new (declare([OnDemandGrid, Selection, DnD, Keyboard]))({
-        store: myStore,
+        collection: myStore,
         columns: {
             name: "Name"
             // ...

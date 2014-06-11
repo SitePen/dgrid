@@ -53,7 +53,7 @@ clicked to initiate a sort.  This event includes the following properties:
 * `grid`: The Grid instance which fired the event
 * `parentType`: The original type of event responsible for firing this one
   (`click` or `keydown` within a header cell)
-* `sort`: An array of objects with `attribute` and optionally `descending`
+* `sort`: An array of objects with `property` and optionally `descending`
   properties, representing the new sort order to be put into effect
 
 The `dgrid-sort` event bubbles and is cancelable; if canceled, the sort
@@ -168,7 +168,7 @@ require([
                 { field: "description", label: "Description", colSpan: 2 }
             ]
         ],
-        store: memoryStore
+        collection: memoryStore
     }, "grid");
 });
 ```
@@ -188,5 +188,5 @@ Property | Description
 `get(item)` | An optional function that, given a data item, will return the value to render in the cell.
 `set(item)` | An optional function that, given a modified data item, will return the value to set for the respective field on that item upon a call to `save()`. If no value is returned, the value as set in the passed item will be used.  (Modifying the passed item directly is thus also an option.)
 `formatter(value)` | An optional function that, given the value to be displayed, will return a string of HTML for rendering.  If `formatterScope` is used, this can be a string instead of a function, in which case a function will be looked up on the `formatterScope` object using the given string. (Note: if a custom `renderCell` is specified, `formatter` will be ignored unless the custom `renderCell` accounts for it.)
-`renderCell(object, value, node, options)` | An optional function that will be called to render the value into the target cell. `object` refers to the record from the grid’s store for the row, and `value` refers to the specific value for the current cell (which may have been modified by the column definition’s `get` function). `node` refers to the table cell that will be placed in the grid if nothing is returned by `renderCell`; if `renderCell` returns a node, that returned node will be placed in the grid instead. (Note: if a custom `renderCell` is specified, `formatter` will be ignored unless the custom `renderCell` accounts for it.)
+`renderCell(object, value, node, options)` | An optional function that will be called to render the value into the target cell. `object` refers to the record from the grid’s collection for the row, and `value` refers to the specific value for the current cell (which may have been modified by the column definition’s `get` function). `node` refers to the table cell that will be placed in the grid if nothing is returned by `renderCell`; if `renderCell` returns a node, that returned node will be placed in the grid instead. (Note: if a custom `renderCell` is specified, `formatter` will be ignored unless the custom `renderCell` accounts for it.)
 `renderHeaderCell(node)` | An optional function that will be called to render the column's header cell. Like `renderCell`, this may either operate on the node directly, or return a node to be placed within it.

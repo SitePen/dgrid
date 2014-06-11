@@ -2,7 +2,7 @@
 
 This folder contains the official dgrid documentation. It includes
 information on dgrid's core components, as well as information on various
-mixins, plugins, and extensions that are available to further expand dgrid's
+mixins and extensions that are available to further expand dgrid's
 default functionality. 
 
 ## Components

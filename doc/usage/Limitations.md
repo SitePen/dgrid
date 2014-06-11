@@ -3,7 +3,7 @@
 ## Use with the Legacy Loader API
 
 The dgrid package was designed primarily with AMD in mind; as such, it has been
-tested primarily using the `require` and `define` APIs available in Dojo 1.7.
+tested primarily using the `require` and `define` APIs available in Dojo 1.7+.
 
 When using the legacy `dojo.require` method instead, loading `dgrid/List` will
 not work without first loading `dgrid.css`.  This is because otherwise the

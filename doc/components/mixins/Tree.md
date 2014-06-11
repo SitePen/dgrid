@@ -7,7 +7,7 @@ require([
     "dojo/_base/declare", "dgrid/OnDemandGrid", "dgrid/Tree", "dgrid/Keyboard", "dgrid/Selection"
 ], function(declare, OnDemandGrid, Tree, Keyboard, Selection){
     var treeGrid = new (declare([OnDemandGrid, Keyboard, Selection, Tree]))({
-        store: myStore,
+        collection: myStore,
         columns: [
             // Render expando icon and trigger expansion from first column
             { label: "Name", field: "name", renderExpando: true }),

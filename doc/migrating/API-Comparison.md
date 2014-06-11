@@ -6,11 +6,11 @@
 
 The way in which dgrid represents current sort order is significantly different
 than `dojox/grid`.  dgrid stores the current sort options, as they would be passed
-via a store's `queryOptions`; these options are retrievable via the sort getter
+via a store's `sort` method; these options are retrievable via the sort getter
 (e.g. `grid.get("sort")`).
 
 Additionally, store-backed components will reflect any currently-applied sort
-information in the object returned by `get("queryOptions")`, since `sort`
+information in the object returned by `get("sort")`, since `sort`
 becomes part of these options when queries are issued.
 
 ### rowSelector and indirect selection
@@ -231,12 +231,12 @@ an event object which fired on such a node.
 ### setStore
 
 Store-backed dgrid components support this via
-`set("store", store[, query[, queryOptions]])`.
+`set("collection", store)`.
 
 ### setQuery
 
 Store-backed dgrid components support this via
-`set("query", query[, queryOptions])`.
+`set("collection", store.filter(filterOptions))`.
 
 ### setItems
 
@@ -274,6 +274,6 @@ on a store-backed, Selection-enabled list or grid instance as follows:
 
 ```js
 for(var id in grid.selection){
-    grid.store.remove(id);
+    grid.collection.remove(id);
 }
 ```

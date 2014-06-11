@@ -10,7 +10,7 @@ require([
     "dojo/_base/declare", "dgrid/Grid", "dgrid/extensions/Pagination"
 ], function(declare, Grid, Pagination){
     var grid = new (declare([Grid, Pagination]))({
-        store: myStore,
+        collection: myStore,
         columns: myColumns,
         pagingLinks: 1,
         pagingTextBox: true,
@@ -25,7 +25,7 @@ require([
 one of the OnDemand constructors, since those contain their own virtual
 scrolling logic. Internally, Pagination inherits from the same \_StoreMixin
 module inherited by the OnDemand prototypes for common integration with
-`dojo/store`.
+dstore.
 
 ## API
 

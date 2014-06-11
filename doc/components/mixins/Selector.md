@@ -9,7 +9,7 @@ require([
     "dojo/_base/declare", "dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Selector"
 ], function(declare, OnDemandGrid, Selection, Selector){
     var grid = new (declare([OnDemandGrid, Selection, Selector]))({
-        store: myStore,
+        collection: myStore,
         selectionMode: "single",
         columns: {
             col1: { label: "Select", selector: "radio" },

@@ -11,7 +11,7 @@ require([
     "dojo/_base/declare", "dgrid/OnDemandGrid", "dgrid/Keyboard", "dgrid/Selection", "dgrid/Editor"
 ], function(declare, OnDemandGrid, Keyboard, Selection, Editor){
     var editGrid = new (declare([OnDemandGrid, Keyboard, Selection, Editor]))({
-        store: myStore,
+        collection: myStore,
         columns: [
             {
                 label: "Name",

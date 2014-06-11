@@ -44,7 +44,7 @@ following styles...
 
 ```js
 require(["dgrid/OnDemandGrid", "dgrid/Keyboard", "dgrid/Selection",
-    "dojo/_base/declare", "dojo/store/Memory", "dojo/domReady!"],
+    "dojo/_base/declare", "dstore/Memory", "dojo/domReady!"],
 function(OnDemandGrid, Keyboard, Selection, declare, Memory){
     var memoryStore = new Memory({data: [
         // data here...
@@ -56,7 +56,7 @@ function(OnDemandGrid, Keyboard, Selection, declare, Memory){
             name: { label: "Name" },
             description: { label: "Description" }
         },
-        store: memoryStore
+        collection: memoryStore
     }, "grid");
     // dgrid will call startup for you if the node appears to be in flow
 });
@@ -71,10 +71,10 @@ There are a few key differences worth pointing out:
 * `dojox/grid` operates with stores implementing the earlier `dojo/data` APIs;
   in order to use it with a store instance implementing the `dojo/store` APIs,
   the store must first be wrapped using the `dojo/data/ObjectStore` module.
-  On the other hand, dgrid communicates with `dojo/store` APIs out of the box.
+  On the other hand, dgrid communicates with dstore APIs out of the box.
   (Conversely, however, if you *do* need to work with a `dojo/data` store, you
-  would then have to pass it through the `dojo/store/DataStore` wrapper in order
-  for dgrid to work with it.)
+  would then have to pass it through the `dojo/store/DataStore` and `dstore/legacy/StoreAdapter`
+  wrappers in order for dgrid to work with it.)
 * Note that in the dgrid version of the example, the Selection and Keyboard
   modules are required and mixed into the constructor to be instantiated, in
   order to enable those pieces of functionality which are baked-in by default
@@ -119,7 +119,7 @@ var grid = new declare([OnDemandGrid, Keyboard, Selection])({
             { field: "description", label: "Description", colSpan: 2 }
         ]
     ],
-    store: memoryStore
+    collection: memoryStore
 }, "grid");
 ```
 
@@ -184,7 +184,7 @@ grid.startup();
 
 ```js
 require(["dgrid/OnDemandGrid", "dgrid/ColumnSet", "dgrid/Keyboard", "dgrid/Selection",
-    "dojo/_base/declare", "dojo/store/Memory", "dojo/domReady!"],
+    "dojo/_base/declare", "dstore/Memory", "dojo/domReady!"],
 function(OnDemandGrid, ColumnSet, Keyboard, Selection, declare, Memory){
     // ... create memoryStore here ...
     
@@ -202,7 +202,7 @@ function(OnDemandGrid, ColumnSet, Keyboard, Selection, declare, Memory){
                 ]
             ]
         ],
-        store: memoryStore
+        collection: memoryStore
     }, "grid");
 });
 ```
@@ -243,7 +243,7 @@ For instance, the following declarative `dojox/grid` layout...
 
 ```html
 <table id="grid" data-dojo-type="dgrid.CustomGrid"
-    data-dojo-props="store: memoryStore">
+    data-dojo-props="collection: memoryStore">
     <thead>
         <tr>
             <th data-dgrid-column="{ field: 'id' }">ID</th>
@@ -258,7 +258,7 @@ For instance, the following declarative `dojox/grid` layout...
 
 ```js
 require(["dgrid/GridFromHtml", "dgrid/Keyboard", "dgrid/Selection",
-    "dojo/store/Memory", "dojo/_base/declare", "dojo/parser", "dojo/domReady!"],
+    "dstore/Memory", "dojo/_base/declare", "dojo/parser", "dojo/domReady!"],
 function(GridFromHtml, Keyboard, Selection, Memory, declare, parser){
     var memoryStore = window.memoryStore = new Memory({data: [
         // ... data here ...
@@ -334,7 +334,7 @@ example)
 
 ```html
 <table id="grid" data-dojo-type="dgrid.CustomGrid"
-    data-dojo-props="store: memoryStore">
+    data-dojo-props="collection: memoryStore">
     <colgroup span="1"></colgroup>
     <colgroup span="2"></colgroup>
     <thead>
