@@ -13,5 +13,6 @@ define([
 	'intern/node_modules/dojo/has!host-browser?./mixins/Selection',
 	'intern/node_modules/dojo/has!host-browser?./mixins/Selector',
 	'intern/node_modules/dojo/has!host-browser?./mixins/Tree',
-	'intern/node_modules/dojo/has!host-browser?./mixins/Tree-expand-promise'
+	'intern/node_modules/dojo/has!host-browser?./mixins/Tree-expand-promise',
+	'intern/node_modules/dojo/has!host-browser?./mixins/Tree-additional-filter'
 ], function(){});

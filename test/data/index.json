@@ -309,12 +309,18 @@
         "title": "Test tree and editor in same column",
         "parent": ""
     },
-    {
-        "name": "Tree_expand.html",
-        "url": "Tree_expand.html",
-        "title": "Test Tree Grid",
-        "parent": ""
-    },
+	{
+		"name": "Tree_expand.html",
+		"url": "Tree_expand.html",
+		"title": "Test Tree Grid",
+		"parent": ""
+	},
+	{
+		"name": "Tree_extra_filter.html",
+		"url": "Tree_extra_filter.html",
+		"title": "Test Tree Grid with extra children filtering",
+		"parent": ""
+	},
     {
         "name": "tundra_custom.html",
         "url": "tundra_custom.html",
