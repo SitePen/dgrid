@@ -17,6 +17,10 @@ define([
 		//		Whether to collapse all expanded nodes any time refresh is called.
 		collapseOnRefresh: false,
 
+		// enableTreeTransitions: Boolean
+		//		Enables/disables all expand/collapse CSS transitions.
+		enableTreeTransitions: true,
+
 		constructor: function(){
 			this._treeColumnListeners = [];
 		},
@@ -39,8 +43,8 @@ define([
 			// expand: Boolean?
 			//		If specified, designates whether to expand or collapse the row;
 			//		if unspecified, toggles the current state.
+			
 			if(!this._treeColumn){
-				// Do nothing, there is no tree column defined.
 				return;
 			}
 
@@ -52,6 +56,8 @@ define([
 			target = row.element;
 			target = target.className.indexOf("dgrid-expando-icon") > -1 ? target :
 				querySelector(".dgrid-expando-icon", target)[0];
+
+			noTransition = noTransition || !this.enableTreeTransitions;
 
 			if(target && target.mayHaveChildren &&
 				(noTransition || expand !== !!this._expanded[row.id])){
@@ -243,15 +249,11 @@ define([
 		},
 
 		_calcRowHeight: function(rowElement){
-			if(this._treeColumn){
-				// Override this method to provide row height measurements that
-				// include the children of a row
-				var connected = rowElement.connected;
-				// if connected, need to consider this in the total row height
-				return rowElement.offsetHeight + (connected ? connected.offsetHeight : 0);
-			}else{
-				return this.inherited(arguments);
-			}
+			// Override this method to provide row height measurements that
+			// include the children of a row
+			var connected = rowElement.connected;
+			// if connected, need to consider this in the total row height
+			return this.inherited(arguments) + (connected ? connected.offsetHeight : 0);
 		},
 
 		_configureTreeColumn: function(column){
@@ -267,7 +269,7 @@ define([
 				colSelector = ".dgrid-content .dgrid-column-" + column.id;
 
 			if(!grid.collection){
-				throw new Error("dgrid tree column plugin requires a collection to operate.");
+				throw new Error("dgrid Tree mixin requires a collection to operate.");
 			}
 
 			if(typeof column.renderExpando !== "function"){
