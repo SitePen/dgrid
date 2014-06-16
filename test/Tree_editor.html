@@ -40,7 +40,7 @@
 				window.grid = new StandardGrid({
 					collection: createAsyncHierarchicalStore({ data: hierarchicalCountryData }),
 					columns: [
-						{tree: true, label: "Name", field:"name", sortable: false, editor: "text", editOn: "dblclick"},
+						{renderExpando: true, label: "Name", field:"name", sortable: false, editor: "text", editOn: "dblclick"},
 						{label: "Visited", field: "bool", sortable: false, editor: "checkbox"},
 						{label:"Type", field:"type", sortable: false},
 						{label:"Population", field:"population"},

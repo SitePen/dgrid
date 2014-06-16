@@ -83,7 +83,7 @@ define([
 			grid1 = new TreeGrid({
 				collection: store.filter({ type: "basket" }),
 				columns: [
-					{tree: true, label: "Name", field: "name", sortable: false}
+					{renderExpando: true, label: "Name", field: "name", sortable: false}
 				]
 			});
 			document.body.appendChild(grid1.domNode);
@@ -92,7 +92,7 @@ define([
 			grid2 = new TreeGrid({
 				collection: noBlueStore.filter({ type: "basket" }),
 				columns: [
-					{tree: true, label: "Name", field: "name", sortable: false}
+					{renderExpando: true, label: "Name", field: "name", sortable: false}
 				]
 			});
 			document.body.appendChild(grid2.domNode);

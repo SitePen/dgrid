@@ -13,6 +13,9 @@ define([
 ], function(declare, lang, arrayUtil, Deferred, querySelector, on, aspect, has, Grid, touchUtil, put){
 
 	return declare(null, {
+		// collapseOnRefresh: Boolean
+		//		Whether to collapse all expanded nodes any time refresh is called.
+		collapseOnRefresh: false,
 
 		constructor: function(){
 			this._treeColumnListeners = [];
@@ -174,7 +177,7 @@ define([
 			var columnArray = this.inherited(arguments);
 
 			for(var i = 0, l = columnArray.length; i < l; i++){
-				if(columnArray[i].tree){
+				if(columnArray[i].renderExpando){
 					this._configureTreeColumn(columnArray[i]);
 					break; // Allow only one tree column.
 				}
@@ -222,9 +225,9 @@ define([
 		cleanup: function(){
 			this.inherited(arguments);
 
-			if(this._treeColumn && this._treeColumn.collapseOnRefresh){
+			if(this.collapseOnRefresh){
 				// Clear out the _expanded hash on each call to cleanup
-				// (which generally coincides with refreshes, as well as destroy).
+				// (which generally coincides with refreshes, as well as destroy)
 				this._expanded = {};
 			}
 		},
@@ -256,12 +259,8 @@ define([
 			//		Adds tree navigation capability to a column.
 
 			var originalRenderCell = column.renderCell || Grid.defaultRenderCell;
-
 			var clicked; // tracks row that was clicked (for expand dblclick event handling)
 
-			if(!column){
-				column = {};
-			}
 			this._treeColumn = column;
 
 			var grid = this,
@@ -271,34 +270,34 @@ define([
 				throw new Error("dgrid tree column plugin requires a collection to operate.");
 			}
 
-			if(!column.renderExpando){
+			if(typeof column.renderExpando !== "function"){
 				column.renderExpando = grid._defaultRenderExpando;
 			}
 
 			// Set up the event listener once and use event delegation for better memory use.
-			this._treeColumnListeners.push(grid.on(
-						column.expandOn || ".dgrid-expando-icon:click," + colSelector + ":dblclick," + colSelector + ":keydown",
-					function(event){
-						var row = grid.row(event);
-						if((!grid.collection.mayHaveChildren || grid.collection.mayHaveChildren(row.data)) &&
-							(event.type != "keydown" || event.keyCode == 32) && !(event.type == "dblclick" && clicked && clicked.count > 1 &&
-							row.id == clicked.id && event.target.className.indexOf("dgrid-expando-icon") > -1)){
-							grid.expand(row);
-						}
+			this._treeColumnListeners.push(grid.on(column.expandOn ||
+					".dgrid-expando-icon:click," + colSelector + ":dblclick," + colSelector + ":keydown",
+				function(event){
+					var row = grid.row(event);
+					if((!grid.collection.mayHaveChildren || grid.collection.mayHaveChildren(row.data)) &&
+						(event.type != "keydown" || event.keyCode == 32) && !(event.type == "dblclick" && clicked && clicked.count > 1 &&
+						row.id == clicked.id && event.target.className.indexOf("dgrid-expando-icon") > -1)){
+						grid.expand(row);
+					}
 
-						// If the expando icon was clicked, update clicked object to prevent
-						// potential over-triggering on dblclick (all tested browsers but IE < 9).
-						if(event.target.className.indexOf("dgrid-expando-icon") > -1){
-							if(clicked && clicked.id == grid.row(event).id){
-								clicked.count++;
-							}else{
-								clicked = {
-									id: grid.row(event).id,
-									count: 1
-								};
-							}
+					// If the expando icon was clicked, update clicked object to prevent
+					// potential over-triggering on dblclick (all tested browsers but IE < 9).
+					if(event.target.className.indexOf("dgrid-expando-icon") > -1){
+						if(clicked && clicked.id == grid.row(event).id){
+							clicked.count++;
+						}else{
+							clicked = {
+								id: grid.row(event).id,
+								count: 1
+							};
 						}
-					})
+					}
+				})
 			);
 
 			if(has("touch")){
@@ -341,7 +340,7 @@ define([
 
 		_defaultRenderExpando: function(level, hasChildren, expanded, object){
 			// summary:
-			//		Provides default implementation for column.renderExpando.
+			//		Default implementation for column.renderExpando.
 
 			var dir = this.grid.isRTL ? "right" : "left",
 				cls = ".dgrid-expando-icon",

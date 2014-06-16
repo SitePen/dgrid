@@ -50,7 +50,7 @@ define([
 		});
 
 		treeColumnOptions = {
-			tree: true,
+			renderExpando: true,
 			label: "id",
 			field: "id"
 		};

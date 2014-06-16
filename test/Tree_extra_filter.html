@@ -69,7 +69,7 @@ require([
 	var treeGrid = new Grid({
 		collection: store.filter({ type: "basket" }),
 		columns: [
-			{tree: true, label: "Name", field: "name", sortable: false}
+			{renderExpando: true, label: "Name", field: "name", sortable: false}
 		]
 	}, "treeGrid");
 
@@ -86,7 +86,7 @@ require([
 	var treeGridNoBlue = new Grid({
 		collection: noBlueStore.filter({ type: "basket" }),
 		columns: [
-			{tree: true, label: "Name", field: "name", sortable: false}
+			{renderExpando: true, label: "Name", field: "name", sortable: false}
 		]
 	}, "treeGridNoBlue");
 });

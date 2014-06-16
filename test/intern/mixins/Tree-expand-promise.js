@@ -67,7 +67,7 @@ define([
 			grid = new (declare([OnDemandGrid, Tree]))({
 				collection: store.filter({ parent: undefined }),
 				columns: [
-					{tree: true, field: "node", label: "Node"},
+					{renderExpando: true, field: "node", label: "Node"},
 					{field: "value", label: "Value"}
 				]
 			});
@@ -79,7 +79,7 @@ define([
 			grid = new StoreMixinGrid({
 				collection: store.filter({ parent: undefined }),
 				columns: [
-					{tree: true, field: "node", label: "Node"},
+					{renderExpando: true, field: "node", label: "Node"},
 					{field: "value", label: "Value"}
 				]
 			});

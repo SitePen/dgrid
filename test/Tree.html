@@ -52,7 +52,7 @@
 					var treeGrid = window.treeGrid = new StandardGrid({
 						collection: testCountryStore,
 						columns: [
-							{tree: true, label: "Name", field:"name", sortable: false},
+							{renderExpando: true, label: "Name", field:"name", sortable: false},
 							{label: "Visited", field: "bool", sortable: false, editor: "checkbox"},
 							{label:"Type", field:"type", sortable: false},
 							{label:"Population", field:"population"},
@@ -104,7 +104,7 @@
 						return [
 							{selector: 'checkbox', className: "selector"},
 							{
-								tree: true,
+								renderExpando: true,
 								label: "Name",
 								field: "name",
 								formatter: function(value){
@@ -135,7 +135,7 @@
 					window.treeTopHeavy = new StandardGrid({
 						collection: testTopHeavyHierarchicalStore.filter({ parent: undefined }),
 						columns: {
-							abbreviation: { tree: true, label: "Abbreviation", field: "abbreviation" },
+							abbreviation: { renderExpando: true, label: "Abbreviation", field: "abbreviation" },
 							name: "Name"
 						}
 					}, "treeTopHeavy");
@@ -143,7 +143,7 @@
 					window.treeSubRows = new StandardGrid({
 						collection: testCountryStore,
 						subRows: [[
-							{tree: true, label:"Name", field:"name", sortable: false},
+							{renderExpando: true, label:"Name", field:"name", sortable: false},
 							{label:"Type", field:"type", sortable: false}
 						], [
 							{label:"Population", field:"population"},
@@ -154,7 +154,7 @@
 					window.treeColumnSets = new (declare([Grid, Keyboard, Selection, ColumnSet, Tree]))({
 						collection: testCountryStore,
 						columnSets: [[
-							[ {tree: true, label:"Name", field:"name", sortable: false} ],
+							[ {renderExpando: true, label:"Name", field:"name", sortable: false} ],
 							[ {label:"Type", field:"type", sortable: false} ]
 						], [
 							[
