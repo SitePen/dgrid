@@ -69,7 +69,7 @@
 			require(["dojo/on",
 				"dgrid/List",
 				"dgrid/OnDemandGrid",
-				"dgrid/tree",
+				"dgrid/Tree",
 				"dgrid/Editor",
 				"dgrid/Selection",
 				"dgrid/Keyboard",
@@ -87,7 +87,7 @@
 				on,
 				List,
 				Grid,
-				tree,
+				Tree,
 				Editor,
 				Selection,
 				Keyboard,
@@ -101,7 +101,7 @@
 				typesData,
 				hierarchicalCountryData){
 
-					var StandardGrid = declare([Grid, Selection, Keyboard, Editor]),
+					var StandardGrid = declare([Grid, Selection, Keyboard, Editor, Tree]),
 						testStore = createSyncStore({ data: genericData }),
 						typesStore = createSyncStore({ data: typesData }),
 						testCountryStore = createAsyncHierarchicalStore({ data: hierarchicalCountryData });
@@ -135,7 +135,7 @@
 						collection: testCountryStore,
 						selectionMode: "single",
 						columns: {
-							name: tree({label:'Name', sortable: false}),
+							name: {label:'Name', sortable: false, renderExpando: true},
 							bool: {label: 'A CheckBox', sortable: false, editor: "checkbox"},
 							type: {label: 'Type', sortable: false},
 							population: 'Population',

@@ -182,6 +182,9 @@ define([
 		_configColumns: function(prefix, columns){
 			var columnArray = this.inherited(arguments);
 
+			// Set up hash to store IDs of expanded rows
+			this._expanded = {};
+
 			for(var i = 0, l = columnArray.length; i < l; i++){
 				if(columnArray[i].renderExpando){
 					this._configureTreeColumn(columnArray[i]);
@@ -308,11 +311,6 @@ define([
 					function(){
 						grid.expand(this);
 					}));
-			}
-
-			// Set up hash to store IDs of expanded rows
-			if(!grid._expanded){
-				grid._expanded = {};
 			}
 
 			column.renderCell = function(object, value, td, options){

@@ -47,7 +47,7 @@
 		<script>
 		
 			require(["dgrid/Grid", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard",
-					"dgrid/tree", "dgrid/Editor", "dojo/_base/lang",
+					"dgrid/Tree", "dgrid/Editor", "dojo/_base/lang",
 					"dojo/_base/declare", "dojo/on", "dojo/data/ObjectStore",
 					"dojo/store/Memory", "dojo/store/Observable",
 					"dgrid/test/data/createSyncStore", "dgrid/test/data/createAsyncHierarchicalStore",
@@ -57,7 +57,7 @@
 					"dijit/form/Select", "dijit/form/FilteringSelect",
 					"dgrid/extensions/Pagination", "dojo/domReady!", "xstyle/css!../css/dgrid_rtl.css"], 
 				function(
-					Grid, OnDemandGrid, Selection, Keyboard, tree, Editor, lang, declare, on, ObjectStore,
+					Grid, OnDemandGrid, Selection, Keyboard, Tree, Editor, lang, declare, on, ObjectStore,
 					LegacyMemory, LegacyObservable, createSyncStore, createAsyncHierarchicalStore,
 					testStore, stateData, typesData, hierarchicalCountryData,
 					CheckBox, TimeTextBox, Select,
@@ -70,7 +70,7 @@
 						{label: 'Column 4', field: 'col4'},
 						{label: 'Column 5', field: 'col5'}
 					];
-					var StandardGrid = declare([OnDemandGrid, Selection, Keyboard, Editor]);
+					var StandardGrid = declare([OnDemandGrid, Selection, Keyboard, Editor, Tree]);
 
 					window.grid = new StandardGrid({
 						collection: testStore,
@@ -87,7 +87,7 @@
 						collection: createAsyncHierarchicalStore({ data: hierarchicalCountryData }),
 						columns: [
 							{label: ' ', field: 'bool', sortable: false, editor: "checkbox"},
-							tree({label:'Name', field:'name', sortable: false}),
+							{label:'Name', field:'name', sortable: false, renderExpando: true},
 							{label:'Type', field:'type', sortable: false},
 							{label:'Population', field:'population'},
 							{label:'Timezone', field:'timezone'}

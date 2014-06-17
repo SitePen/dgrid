@@ -33,14 +33,14 @@
 			if(match){ skin = match[1]; }
 			skinDep = "xstyle/css!dgrid/css/skins/" + skin + ".css";
 			
-			require([skinDep, "dgrid/Grid", "dgrid/extensions/Pagination", "dgrid/Selection", "dgrid/tree",
+			require([skinDep, "dgrid/Grid", "dgrid/extensions/Pagination", "dgrid/Selection", "dgrid/Tree",
 					"dojo/_base/lang", "dojo/_base/declare", "dojo/dom-construct", "dojo/dom-form", 
 					"dstore/Rest", "dstore/Cache", "dstore/Observable", "dojo/domReady!"],
-				function(skinResource, Grid, Pagination, Selection, tree,
+				function(skinResource, Grid, Pagination, Selection, Tree,
 						lang, declare, domConstruct, domForm, 
 						Rest, Cache, Observable){
 					
-					var CustomGrid = declare([Grid, Selection, Pagination]);
+					var CustomGrid = declare([Grid, Selection, Pagination, Tree]);
 					var testStore;
 
 					function createStore(config){
@@ -55,7 +55,7 @@
 
 					function getColumns(){
 						return [
-							tree({label:'Name', field:'name', sortable: false}),
+							{label:'Name', field:'name', sortable: false, renderExpando: true},
 							{label:'Id', field:'id', sortable: true},
 							{label:'Comment', field:'comment', sortable: false}
 						];
