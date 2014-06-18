@@ -16,6 +16,8 @@ define([
 	test.suite("tree + additional filters", function(){
 		var grid1;
 		var grid2;
+		var store;
+		var noBlueStore;
 		var TreeGrid = declare([OnDemandGrid, Tree]);
 		var TreeStore = declare(Memory, {
 			constructor: function(){
@@ -39,7 +41,7 @@ define([
 			}
 		}
 
-		test.beforeEach(function(){
+		test.before(function(){
 			var id = 0;
 			var iItemType, lItem;
 			var iColor, lColor;
@@ -65,13 +67,13 @@ define([
 				}
 			}
 
-			var store = new TreeStore({
+			store = new TreeStore({
 				data: items
 			});
 
 			// Create a delegate of the original store with a new getChildren method.
 			// Make getChildren remove the blue items.
-			var noBlueStore = lang.delegate(store, {
+			noBlueStore = lang.delegate(store, {
 				getChildren: function(parent){
 					var children = this.root.getChildren(parent);
 					return children.filter(function(obj){
@@ -79,7 +81,9 @@ define([
 					});
 				}
 			});
+		});
 
+		test.beforeEach(function(){
 			grid1 = new TreeGrid({
 				collection: store.filter({ type: "basket" }),
 				columns: [

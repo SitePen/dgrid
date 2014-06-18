@@ -40,30 +40,30 @@
 
 						return testStore;
 					}
+					
+					function getColumns(){
+						return [
+							{label:'Name', field:'name', sortable: false, renderExpando: true},
+							{label:'Id', field:'id'},
+							{label:'Comment', field:'comment', sortable: false, editor: "text"},
+							{label:'Boolean', field:'boo', sortable: false, autoSave: true, editor: "checkbox"}
+						];
+					}
+					
 					var testStore = createStore();
 
 					window.grid = new CustomGrid({
 						collection: testStore.filter({ parent: undefined }),
 						sort: "id",
 						getBeforePut: false,
-						columns: [
-							{label:'Name', field:'name', sortable: false, renderExpando: true},
-							{label:'Id', field:'id'},
-							{label:'Comment', field:'comment', sortable: false, editor: "text"},
-							{label:'Boolean', field:'boo', sortable: false, autoSave: true, editor: "checkbox"}
-						]
+						columns: getColumns()
 					}, "grid");
 
 					new CustomGrid({
 						collection: createStore({useRangeHeaders: true}).filter({ parent: undefined }),
 						sort: "id",
 						getBeforePut: false,
-						columns: [
-							{label:'Name', field:'name', sortable: false, renderExpando: true},
-							{label:'Id', field:'id'},
-							{label:'Comment', field:'comment', sortable: false, editor: "text"},
-							{label:'Boolean', field:'boo', sortable: false, autoSave: true, editor: "checkbox"}
-						]
+						columns: getColumns()
 					}, "gridRangeHeaders");
 				});
 				
