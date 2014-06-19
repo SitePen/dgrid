@@ -116,24 +116,23 @@ define([
 							return grid.renderCollection(
 								query(options),
 								preloadNode,
-								lang.mixin(
-									{ rows: options.rows },
-										"level" in query ? { queryLevel: query.level } : null
+								lang.mixin({ rows: options.rows },
+									"level" in query ? { queryLevel: query.level } : null
 								)
 							);
 						})
-						).then(function(){
-							// Expand once results are retrieved, if the row is still expanded.
-							if(grid._expanded[row.id] && hasTransitionend){
-								var scrollHeight = container.scrollHeight;
-								container.style.height = scrollHeight ? scrollHeight + "px" : "auto";
-							}
-						});
+					).then(function(){
+						// Expand once results are retrieved, if the row is still expanded.
+						if(grid._expanded[row.id] && hasTransitionend){
+							var scrollHeight = container.scrollHeight;
+							container.style.height = scrollHeight ? scrollHeight + "px" : "auto";
+						}
+					});
 
-					if(hasTransitionend){
-						on.once(container, hasTransitionend, this._handleTransitionEnd);
+					if(hasTransitionend && !noTransition){
+						on.once(container, hasTransitionend, this._onTreeTransitionEnd);
 					}else{
-						this._handleTransitionEnd.call(container);
+						this._onTreeTransitionEnd.call(container);
 					}
 				}
 
@@ -182,7 +181,8 @@ define([
 		_configColumns: function(prefix, columns){
 			var columnArray = this.inherited(arguments);
 
-			// Set up hash to store IDs of expanded rows
+			// Set up hash to store IDs of expanded rows (here rather than in
+			// _configureTreeColumn so nothing breaks if no column has renderExpando)
 			this._expanded = {};
 
 			for(var i = 0, l = columnArray.length; i < l; i++){
@@ -276,11 +276,11 @@ define([
 			}
 
 			if(typeof column.renderExpando !== "function"){
-				column.renderExpando = grid._defaultRenderExpando;
+				column.renderExpando = this._defaultRenderExpando;
 			}
 
 			// Set up the event listener once and use event delegation for better memory use.
-			this._treeColumnListeners.push(grid.on(column.expandOn ||
+			this._treeColumnListeners.push(this.on(column.expandOn ||
 					".dgrid-expando-icon:click," + colSelector + ":dblclick," + colSelector + ":keydown",
 				function(event){
 					var row = grid.row(event);
@@ -307,7 +307,7 @@ define([
 
 			if(has("touch")){
 				// Also listen on double-taps of the cell.
-				this._treeColumnListeners.push(grid.on(touchUtil.selector(colSelector, touchUtil.dbltap),
+				this._treeColumnListeners.push(this.on(touchUtil.selector(colSelector, touchUtil.dbltap),
 					function(){
 						grid.expand(this);
 					}));
@@ -354,7 +354,7 @@ define([
 			return node;
 		},
 
-		_handleTransitionEnd: function(event){
+		_onTreeTransitionEnd: function(event){
 			var container = this,
 				height = this.style.height;
 			if(height){
