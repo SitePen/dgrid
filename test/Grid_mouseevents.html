@@ -32,10 +32,18 @@
 				name: {},
 				description: {label: "what to do", sortable: false}
 			};
-			require(["dojo/_base/declare", "dgrid/Grid", "dgrid/OnDemandGrid", "dgrid/Tree", "dgrid/util/mouse", "dojo/on",
-				"dgrid/test/data/createAsyncHierarchicalStore", "dgrid/test/data/hierarchicalCountryData",
-				"dojo/query", "dojo/domReady!"],
-			function(declare, Grid, OnDemandGrid, Tree, mouseUtil, on, createAsyncHierarchicalStore, hierarchicalCountryData){
+			require([
+				"dojo/_base/declare",
+				"dgrid/Grid",
+				"dgrid/OnDemandGrid",
+				"dgrid/Tree",
+				"dojo/mouse",
+				"dojo/on",
+				"dgrid/test/data/createAsyncHierarchicalStore",
+				"dgrid/test/data/hierarchicalCountryData",
+				"dojo/query",
+				"dojo/domReady!"
+			], function (declare, Grid, OnDemandGrid, Tree, mouse, on, createAsyncHierarchicalStore, hierarchicalCountryData) {
 				var data = [
 					{order: 1, name:"preheat", description:"Preheat your oven to 350F"},
 					{order: 2, name:"mix dry", description:"In a medium bowl, combine flour, salt, and baking soda"},
@@ -53,26 +61,26 @@
 				}, "grid");
 				grid.renderArray(data);
 				
-				function makeHandler(grid, type, dir){
-					return function(evt){
-						var obj = grid[type](evt),
+				function makeHandler (grid, type, dir) {
+					return function (event) {
+						var obj = grid[type](event),
 							str = obj.column ? obj.row.id + " " + obj.column.id : obj.id;
 						console.log(grid.id + " " + type + " " + dir + ": " + str);
 					};
 				}
-				function makeHeaderCellHandler(grid, dir){
-					return function(evt){
+				function makeHeaderCellHandler (grid, dir) {
+					return function (event) {
 						console.log(grid.id + " header cell " + dir + ": " +
-							grid.cell(evt).column.id);
+							grid.cell(event).column.id);
 					};
 				}
 				
-				grid.on(mouseUtil.enterRow, makeHandler(grid, "row", "entered"));
-				grid.on(mouseUtil.leaveRow, makeHandler(grid, "row", "left"));
-				grid.on(mouseUtil.enterCell, makeHandler(grid, "cell", "entered"));
-				grid.on(mouseUtil.leaveCell, makeHandler(grid, "cell", "left"));
-				grid.on(mouseUtil.enterHeaderCell, makeHeaderCellHandler(grid, "entered"));
-				grid.on(mouseUtil.leaveHeaderCell, makeHeaderCellHandler(grid, "left"));
+				grid.on(on.selector(".dgrid-content .dgrid-row", mouse.enter), makeHandler(grid, "row", "entered"));
+				grid.on(on.selector(".dgrid-content .dgrid-row", mouse.leave), makeHandler(grid, "row", "left"));
+				grid.on(on.selector(".dgrid-content .dgrid-cell", mouse.enter), makeHandler(grid, "cell", "entered"));
+				grid.on(on.selector(".dgrid-content .dgrid-cell", mouse.leave), makeHandler(grid, "cell", "left"));
+				grid.on(on.selector(".dgrid-header .dgrid-cell", mouse.enter), makeHeaderCellHandler(grid, "entered"));
+				grid.on(on.selector(".dgrid-header .dgrid-cell", mouse.leave), makeHeaderCellHandler(grid, "left"));
 				
 				var treegrid = window.treegrid = new (declare([OnDemandGrid, Tree]))({
 					collection: createAsyncHierarchicalStore({ data: hierarchicalCountryData }),
@@ -84,19 +92,19 @@
 					]
 				}, "treegrid");
 				
-				treegrid.on(mouseUtil.enterRow, makeHandler(treegrid, "row", "entered"));
-				treegrid.on(mouseUtil.leaveRow, makeHandler(treegrid, "row", "left"));
-				treegrid.on(mouseUtil.enterCell, makeHandler(treegrid, "cell", "entered"));
-				treegrid.on(mouseUtil.leaveCell, makeHandler(treegrid, "cell", "left"));
+				treegrid.on(on.selector(".dgrid-content .dgrid-row", mouse.enter), makeHandler(treegrid, "row", "entered"));
+				treegrid.on(on.selector(".dgrid-content .dgrid-row", mouse.leave), makeHandler(treegrid, "row", "left"));
+				treegrid.on(on.selector(".dgrid-content .dgrid-cell", mouse.enter), makeHandler(treegrid, "cell", "entered"));
+				treegrid.on(on.selector(".dgrid-content .dgrid-cell", mouse.leave), makeHandler(treegrid, "cell", "left"));
 				// specifically only hooking up leaveHeaderCell, to ensure that leave events
 				// work independently (in earlier dev, this wasn't the case)
-				treegrid.on(mouseUtil.leaveHeaderCell, makeHeaderCellHandler(treegrid, "left"));
+				treegrid.on(on.selector(".dgrid-header .dgrid-cell", mouse.leave), makeHeaderCellHandler(treegrid, "left"));
 			});
 				
 		</script>
 	</head>
 	<body class="claro">
-		<h2>A basic grid rendered from an array, with simulated mouseover events</h2>
+		<h2>A basic grid rendered from an array, with simulated mouse enter/leave events</h2>
 		<div id="grid"></div>
 		<h2>A grid with a tree column</h2>
 		<div id="treegrid"></div>

@@ -1,5 +1,6 @@
 # util/mouse
 
+The `util/mouse` module has been removed from dgrid 0.4.
 The `util/mouse` module defines a number of extension events which are useful in
 situations which require the mouse moving into and/or out of rows or cells.
 These scenarios warrant extension events due to the often-problematic bubbling
