@@ -215,7 +215,10 @@ return declare([List, _StoreMixin], {
 
 			// renderQuery calls _trackError internally
 			return this.renderQuery(function(queryOptions){
-				return self._renderedCollection.range(queryOptions.start, queryOptions.start + queryOptions.count);
+				return self._renderedCollection.fetchRange({
+					start: queryOptions.start,
+					end: queryOptions.start + queryOptions.count
+				});
 			}).then(function(){
 				// Emit on a separate turn to enable event to be used consistently for
 				// initial render, regardless of whether the backing store is async
