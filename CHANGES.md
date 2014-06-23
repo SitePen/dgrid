@@ -18,6 +18,11 @@ The following is a rough list of changes, to be outlined more presentably later.
   (i.e. the equivalent of `newRow` is to call `insertRow` then `highlightRow`)
 * `Editor` is now a mixin (with a capital E), activated by presence of the `editor` column definition property
 * `Selector` is now a mixin (with a capital S), activated by presence of the `selector` column definition property
+* `Tree` is now a mixin (with a capital T), activated by presence of the `renderExpando` column definition property
+* Some `Tree` properties have been moved from the column definition to instance-level,
+  including `collapseOnRefresh` and `shouldExpand`
+* New `Tree` property `enableTreeTransitions` can be set to `false` at instance-level to
+  disable all CSS transitions
 * Desupported `Selector`'s `disabled` property (use `Selection#allowSelect` instead)
 * Desupported `Tree`'s `allowDupilcates` property (ensure unique IDs instead)
 * Removed deprecated functions marked for removal in 0.4; most of these have had
