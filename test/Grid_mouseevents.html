@@ -27,80 +27,79 @@
 		<script src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script>
-			var columns = {
-				order: "step", // give column a custom name
-				name: {},
-				description: {label: "what to do", sortable: false}
-			};
 			require([
-				"dojo/_base/declare",
-				"dgrid/Grid",
-				"dgrid/OnDemandGrid",
-				"dgrid/Tree",
-				"dojo/mouse",
-				"dojo/on",
-				"dgrid/test/data/createAsyncHierarchicalStore",
-				"dgrid/test/data/hierarchicalCountryData",
-				"dojo/query",
-				"dojo/domReady!"
+				'dojo/_base/declare',
+				'dgrid/Grid',
+				'dgrid/OnDemandGrid',
+				'dgrid/Tree',
+				'dojo/mouse',
+				'dojo/on',
+				'dgrid/test/data/createAsyncHierarchicalStore',
+				'dgrid/test/data/hierarchicalCountryData',
+				'dojo/query',
+				'dojo/domReady!'
 			], function (declare, Grid, OnDemandGrid, Tree, mouse, on, createAsyncHierarchicalStore, hierarchicalCountryData) {
 				var data = [
-					{order: 1, name:"preheat", description:"Preheat your oven to 350F"},
-					{order: 2, name:"mix dry", description:"In a medium bowl, combine flour, salt, and baking soda"},
-					{order: 3, name:"mix butter", description:"In a large bowl, beat butter, then add the brown sugar and white sugar then mix"},
-					{order: 4, name:"mix together", description:"Slowly add the dry ingredients from the medium bowl to the wet ingredients in the large bowl, mixing until the dry ingredients are totally combined"},
-					{order: 5, name:"chocolate chips", description:"Add chocolate chips"},
-					{order: 6, name:"make balls", description:"Scoop up a golf ball size amount of dough with a spoon and drop in onto a cookie sheet"},
-					{order: 7, name:"bake", description:"Put the cookies in the oven and bake for about 10-14 minutes"},
-					{order: 8, name:"remove", description:"Using a spatula, lift cookies off onto wax paper or a cooling rack"},
-					{order: 9, name:"eat", description:"Eat and enjoy!"}
+					{ order: 1, name: 'preheat', description: 'Preheat your oven to 350F' },
+					{ order: 2, name: 'mix dry', description: 'In a medium bowl, combine flour, salt, and baking soda' },
+					{ order: 3, name: 'mix butter', description: 'In a large bowl, beat butter, then add the brown sugar and white sugar then mix' },
+					{ order: 4, name: 'mix together', description: 'Slowly add the dry ingredients from the medium bowl to the wet ingredients in the large bowl, mixing until the dry ingredients are totally combined' },
+					{ order: 5, name: 'chocolate chips', description: 'Add chocolate chips' },
+					{ order: 6, name: 'make balls', description: 'Scoop up a golf ball size amount of dough with a spoon and drop in onto a cookie sheet' },
+					{ order: 7, name: 'bake', description: 'Put the cookies in the oven and bake for about 10-14 minutes' },
+					{ order: 8, name: 'remove', description: 'Using a spatula, lift cookies off onto wax paper or a cooling rack' },
+					{ order: 9, name: 'eat', description: 'Eat and enjoy!'}
 				];
+				var columns = {
+					order: 'step', // give column a custom name
+					name: {},
+					description: { label: 'what to do', sortable: false }
+				};
 				
 				var grid = window.grid = new Grid({
 					columns: columns
-				}, "grid");
+				}, 'grid');
 				grid.renderArray(data);
 				
 				function makeHandler (grid, type, dir) {
 					return function (event) {
 						var obj = grid[type](event),
-							str = obj.column ? obj.row.id + " " + obj.column.id : obj.id;
-						console.log(grid.id + " " + type + " " + dir + ": " + str);
+							str = obj.column ? obj.row.id + ' ' + obj.column.id : obj.id;
+						console.log(grid.id + ' ' + type + ' ' + dir + ': ' + str);
 					};
 				}
 				function makeHeaderCellHandler (grid, dir) {
 					return function (event) {
-						console.log(grid.id + " header cell " + dir + ": " +
+						console.log(grid.id + ' header cell ' + dir + ': ' +
 							grid.cell(event).column.id);
 					};
 				}
 				
-				grid.on(on.selector(".dgrid-content .dgrid-row", mouse.enter), makeHandler(grid, "row", "entered"));
-				grid.on(on.selector(".dgrid-content .dgrid-row", mouse.leave), makeHandler(grid, "row", "left"));
-				grid.on(on.selector(".dgrid-content .dgrid-cell", mouse.enter), makeHandler(grid, "cell", "entered"));
-				grid.on(on.selector(".dgrid-content .dgrid-cell", mouse.leave), makeHandler(grid, "cell", "left"));
-				grid.on(on.selector(".dgrid-header .dgrid-cell", mouse.enter), makeHeaderCellHandler(grid, "entered"));
-				grid.on(on.selector(".dgrid-header .dgrid-cell", mouse.leave), makeHeaderCellHandler(grid, "left"));
+				grid.on(on.selector('.dgrid-content .dgrid-row', mouse.enter), makeHandler(grid, 'row', 'entered'));
+				grid.on(on.selector('.dgrid-content .dgrid-row', mouse.leave), makeHandler(grid, 'row', 'left'));
+				grid.on(on.selector('.dgrid-content .dgrid-cell', mouse.enter), makeHandler(grid, 'cell', 'entered'));
+				grid.on(on.selector('.dgrid-content .dgrid-cell', mouse.leave), makeHandler(grid, 'cell', 'left'));
+				grid.on(on.selector('.dgrid-header .dgrid-cell', mouse.enter), makeHeaderCellHandler(grid, 'entered'));
+				grid.on(on.selector('.dgrid-header .dgrid-cell', mouse.leave), makeHeaderCellHandler(grid, 'left'));
 				
 				var treegrid = window.treegrid = new (declare([OnDemandGrid, Tree]))({
 					collection: createAsyncHierarchicalStore({ data: hierarchicalCountryData }),
 					columns: [
-						{label: "Name", field:"name", sortable: false, renderExpando: true},
-						{label:"Type", field:"type", sortable: false},
-						{label:"Population", field:"population"},
-						{label:"Timezone", field:"timezone"}
+						{ label: 'Name', field: 'name', sortable: false, renderExpando: true },
+						{ label: 'Type', field: 'type', sortable: false },
+						{ label: 'Population', field: 'population' },
+						{ label: 'Timezone', field: 'timezone' }
 					]
-				}, "treegrid");
+				}, 'treegrid');
 				
-				treegrid.on(on.selector(".dgrid-content .dgrid-row", mouse.enter), makeHandler(treegrid, "row", "entered"));
-				treegrid.on(on.selector(".dgrid-content .dgrid-row", mouse.leave), makeHandler(treegrid, "row", "left"));
-				treegrid.on(on.selector(".dgrid-content .dgrid-cell", mouse.enter), makeHandler(treegrid, "cell", "entered"));
-				treegrid.on(on.selector(".dgrid-content .dgrid-cell", mouse.leave), makeHandler(treegrid, "cell", "left"));
+				treegrid.on(on.selector('.dgrid-content .dgrid-row', mouse.enter), makeHandler(treegrid, 'row', 'entered'));
+				treegrid.on(on.selector('.dgrid-content .dgrid-row', mouse.leave), makeHandler(treegrid, 'row', 'left'));
+				treegrid.on(on.selector('.dgrid-content .dgrid-cell', mouse.enter), makeHandler(treegrid, 'cell', 'entered'));
+				treegrid.on(on.selector('.dgrid-content .dgrid-cell', mouse.leave), makeHandler(treegrid, 'cell', 'left'));
 				// specifically only hooking up leaveHeaderCell, to ensure that leave events
 				// work independently (in earlier dev, this wasn't the case)
-				treegrid.on(on.selector(".dgrid-header .dgrid-cell", mouse.leave), makeHeaderCellHandler(treegrid, "left"));
+				treegrid.on(on.selector('.dgrid-header .dgrid-cell', mouse.leave), makeHeaderCellHandler(treegrid, 'left'));
 			});
-				
 		</script>
 	</head>
 	<body class="claro">
