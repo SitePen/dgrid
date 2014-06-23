@@ -39,6 +39,10 @@ The following is a rough list of changes, to be outlined more presentably later.
 
 ### Mixins
 
+* The `Keyboard` mixin no longer fires `dgrid-cellfocusout` and `dgrid-cellfocusin`
+  events when a row/cell is automatically re-focused after an observed update. (#902)
+* The `Keyboard` mixin now correctly emits `dgrid-cellfocusout` events from the
+  element losing focus, not the one gaining focus. (#917, thanks cmaus)
 * Fixed a focus issue in the `Keyboard` mixin which manifested when used in
   conjunction with the `ColumnResizer` extension. (#928)
 * The `Selection` mixin no longer emits superfluous `dgrid-deselect` events
@@ -64,12 +68,16 @@ The following is a rough list of changes, to be outlined more presentably later.
 
 ### Mixins
 
+* Fixed a state preservation issue in the `Keyboard` mixin when a row/cell that
+  was last focused is removed while the list/grid no longer has focus. (#899)
 * The `Selection` mixin (and `selector` column plugin) will no longer clear the
   selection during an attempt to select a row that cannot be selected
   (i.e. `allowSelect` returns `false`). (#822)
 
 ### Extensions
 
+* Fixed an IE10 issue in `ColumnHider` where header cells (but not body cells)
+  would remain hidden after columns have been resized with `ColumnResizer`. (#841)
 * Fixed an issue in `CompoundColumns` where sorting programmatically would
   cause an error when attempting to place the sort arrow node. (#901)
 
