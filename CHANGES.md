@@ -28,7 +28,7 @@ The following is a rough list of changes, to be outlined more presentably later.
 * Removed deprecated functions marked for removal in 0.4; most of these have had
   `set(...)` equivalents for a long time already
 
-# master (0.3.15-dev)
+# 0.3.15
 
 ## Significant changes
 
