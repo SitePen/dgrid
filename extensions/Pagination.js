@@ -426,7 +426,10 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 				grid._isLoading = true;
 
 				// Run new query and pass it into renderCollection
-				results = grid._renderedCollection.range(start, start + count);
+				results = grid._renderedCollection.fetchRange({
+					start: start,
+					end: start + count
+				});
 
 				return grid.renderCollection(results, null, options).then(function(rows){
 					cleanupLoading(grid);

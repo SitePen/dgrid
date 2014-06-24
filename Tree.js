@@ -86,11 +86,11 @@ define([
 							childCollection = childCollection.sort(grid.sort);
 						}
 						if('start' in options){
-							var rangeArgs = [ options.start ];
+							var rangeArgs = { start: options.start };
 							if('count' in options){
-								rangeArgs.push(options.start + options.count);
+								rangeArgs.end = options.start + options.count;
 							}
-							childCollection = childCollection.range.apply(childCollection, rangeArgs);
+							childCollection = childCollection.fetchRange.call(childCollection, rangeArgs);
 						}
 						if(childCollection.track){
 							options.rows = [];
