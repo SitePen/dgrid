@@ -131,11 +131,11 @@ return declare([List, _StoreMixin], {
 		
 		// Protect the query within a _trackError call, but return the resulting collection
 		return this._trackError(function(){
-			var resultsCollection = query(options);
+			var results = query(options);
 
 			// Render the result set
-			return self.renderCollection(resultsCollection, preloadNode, options).then(function(trs){
-				return Deferred.when(resultsCollection.total, function(total){
+			return self.renderQueryResults(results, preloadNode, options).then(function(trs){
+				return Deferred.when(results.total, function(total){
 					var trCount = trs.length,
 						parentNode = preloadNode.parentNode,
 						noDataNode = self.noDataNode;
@@ -286,7 +286,6 @@ return declare([List, _StoreMixin], {
 			searchBuffer = requestBuffer - grid.rowHeight, // Avoid rounding causing multiple queries
 			// References related to emitting dgrid-refresh-complete if applicable
 			refreshDfd,
-			lastCollection,
 			lastRows,
 			preloadSearchNext = true;
 		
@@ -473,14 +472,12 @@ return declare([List, _StoreMixin], {
 				
 				// Query now to fill in these rows.
 				grid._trackError(function(){
-					var rangeCollection = preload.query(options);
+					var rangeResults = preload.query(options);
 
 					// Use function to isolate the variables in case we make multiple requests
 					// (which can happen if we need to render on both sides of an island of already-rendered rows)
-					(function(loadingNode, below, keepScrollTo, rangeCollection){
-						lastRows = grid.renderCollection(rangeCollection, loadingNode, options).then(function(rows){
-							lastCollection = rangeCollection;
-							
+					(function(loadingNode, below, keepScrollTo, rangeResults){
+						lastRows = grid.renderQueryResults(rangeResults, loadingNode, options).then(function(rows){
 							// can remove the loading node now
 							beforeNode = loadingNode.nextSibling;
 							put(loadingNode, "!");
@@ -522,7 +519,7 @@ return declare([List, _StoreMixin], {
 							put(loadingNode, "!");
 							throw e;
 						});
-					})(loadingNode, below, keepScrollTo, rangeCollection);
+					})(loadingNode, below, keepScrollTo, rangeResults);
 				});
 				
 				preload = preload.previous;

@@ -113,8 +113,8 @@ define([
 					promise = (this.renderQuery ?
 						this.renderQuery(query, preloadNode) :
 						this._trackError(function(){
-							return grid.renderCollection(
-								query(options),
+							return grid.renderQueryResults(
+								query(options).fetch(),
 								preloadNode,
 								lang.mixin({ rows: options.rows },
 									"level" in query ? { queryLevel: query.level } : null

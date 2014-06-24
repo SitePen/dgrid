@@ -85,7 +85,7 @@ define([
 			});
 			document.body.appendChild(grid.domNode);
 			grid.startup();
-			grid.renderCollection(grid.collection);
+			grid.renderQueryResults(grid.collection.fetch());
 		}
 
 		function destroyGrid(){

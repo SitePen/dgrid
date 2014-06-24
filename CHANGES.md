@@ -8,7 +8,7 @@ The following is a rough list of changes, to be outlined more presentably later.
 * dgrid now interacts with the dstore API rather than the dojo/store API
 * dgrid now requires Dojo 1.8 at minimum (since that is also dstore's minimum requirement)
 * Split out store-specific code from `List#renderArray` to
-  `_StoreMixin#renderCollection`, which always returns a promise
+  `_StoreMixin#renderQueryResults`, which always returns a promise
 * Removed observer tracking logic and workarounds now irrelevant with dstore
   (this includes removal of the `cleanEmptyObservers` flag)
 * Removed `results` property from `dgrid-refresh-complete` event
