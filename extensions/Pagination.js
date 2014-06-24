@@ -350,19 +350,18 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 
 		renderQueryResults: function(results, beforeNode){
 			var grid = this,
-				rows = this.inherited(arguments),
-				data = collection.data;
+				rows = this.inherited(arguments);
 
 			if(!beforeNode){
-				if(this._topLevelRequest && this._topLevelRequest !== data){
+				if(this._topLevelRequest){
 					// Cancel previous async request that didn't finish
 					this._topLevelRequest.cancel();
 					delete this._topLevelRequest;
 				}
 
-				if (typeof data.cancel === "function") {
+				if (typeof rows.cancel === "function") {
 					// Store reference to new async request in progress
-					this._topLevelRequest = data;
+					this._topLevelRequest = rows;
 				}
 
 				Deferred.when(rows, function(){
@@ -435,7 +434,7 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 					// Reset scroll Y-position now that new page is loaded.
 					grid.scrollTo({ y: 0 });
 
-					Deferred.when(results.total, function(total){
+					Deferred.when(results.totalLength, function(total){
 						if(!total){
 							if(grid.noDataNode){
 								put(grid.noDataNode, "!");
