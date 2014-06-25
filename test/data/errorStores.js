@@ -2,8 +2,9 @@ define([
 	"dojo/_base/lang",
 	"dojo/_base/Deferred",
 	"dstore/Memory",
+	"dstore/QueryResults",
 	"./typesData"
-], function(lang, Deferred, Memory, typesData){
+], function(lang, Deferred, Memory, QueryResults, typesData){
 	// summary:
 	//		Returns a hash containing stores which generate errors on specific
 	//		methods, synchronously or asynchronously.
@@ -25,14 +26,18 @@ define([
 	asyncFetchStore.fetch = function() {
 		var dfd = new Deferred();
 		setTimeout(function() { dfd.reject("Error on async query"); }, 200);
-		this.total = 0;
-		return dfd;
+		return new QueryResults(dfd, { totalLength: 0 });
 	};
 
-	asyncFetchTotalStore.fetch = function () {
-		this.total = new Deferred();
-		this.total.reject("Error getting the total");
-		return [];
+	// Need to overwrite fetchRange for testing total rejection;
+	// in the other cases, fetchRange will end up calling fetch anyway and
+	// chaining the result, but Memory#fetchRange determines totalLength itself.
+	asyncFetchTotalStore.fetchRange = function () {
+		var total = new Deferred();
+		total.reject("Error getting the total");
+		return new QueryResults([], {
+			totalLength: total
+		});
 	};
 
 	asyncPutStore.put = function() {
