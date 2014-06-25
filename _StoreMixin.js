@@ -132,6 +132,7 @@ function(declare, lang, Deferred, listen, aspect, put){
 				this._renderedCollection = renderedCollection;
 			}
 
+			this.collection = collection;
 			this.refresh();
 		},
 		
