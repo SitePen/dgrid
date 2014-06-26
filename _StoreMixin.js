@@ -376,6 +376,11 @@ function(declare, lang, Deferred, listen, aspect, put){
 							self._processScroll();
 						}
 					}
+					if(event.type === "remove"){
+						// Reset row in case this is later followed by an add;
+						// only update events should retain the row variable below
+						row = null;
+					}
 				}),
 
 				collection.on("add, update", function(event){
@@ -423,6 +428,8 @@ function(declare, lang, Deferred, listen, aspect, put){
 							rows.splice(to, 0, row);
 						}
 					}
+					// Reset row so it doesn't get reused on the next event
+					row = null;
 				}),
 
 				collection.on("add, remove, update", function(event){
