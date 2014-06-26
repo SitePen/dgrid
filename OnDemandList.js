@@ -135,7 +135,7 @@ return declare([List, _StoreMixin], {
 
 			// Render the result set
 			return self.renderQueryResults(results, preloadNode, options).then(function(trs){
-				return Deferred.when(results.total, function(total){
+				return Deferred.when(results.totalLength, function(total){
 					var trCount = trs.length,
 						parentNode = preloadNode.parentNode,
 						noDataNode = self.noDataNode;
@@ -472,11 +472,10 @@ return declare([List, _StoreMixin], {
 				
 				// Query now to fill in these rows.
 				grid._trackError(function(){
-					var rangeResults = preload.query(options);
-
 					// Use function to isolate the variables in case we make multiple requests
 					// (which can happen if we need to render on both sides of an island of already-rendered rows)
-					(function(loadingNode, below, keepScrollTo, rangeResults){
+					(function(loadingNode, below, keepScrollTo){
+						var rangeResults = preload.query(options);
 						lastRows = grid.renderQueryResults(rangeResults, loadingNode, options).then(function(rows){
 							// can remove the loading node now
 							beforeNode = loadingNode.nextSibling;
@@ -496,7 +495,7 @@ return declare([List, _StoreMixin], {
 								});
 							}
 
-							Deferred.when(rangeCollection.total, function(total){
+							Deferred.when(rangeResults.totalLength, function(total){
 								if(!("queryLevel" in options)){
 									grid._total = total;
 								}
@@ -519,7 +518,7 @@ return declare([List, _StoreMixin], {
 							put(loadingNode, "!");
 							throw e;
 						});
-					})(loadingNode, below, keepScrollTo, rangeResults);
+					})(loadingNode, below, keepScrollTo);
 				});
 				
 				preload = preload.previous;
