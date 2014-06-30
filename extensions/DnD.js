@@ -93,7 +93,7 @@ define([
 				anchor = targetSource._targetAnchor,
 				targetRow,
 				self = this;
-			
+		
 			if(anchor){ // (falsy if drop occurred in empty space after rows)
 				targetRow = this.before ? anchor.previousSibling : anchor.nextSibling;
 			}
@@ -116,7 +116,7 @@ define([
 					// otherwise settle for put anyway.
 					// (put will relocate an existing item with the same id, i.e. move).
 					store[copy && store.copy ? "copy" : "put"](object, {
-						before: targetItem
+						beforeId: targetItem ? store.getIdentity( targetItem ) : null
 					}).then(
 						function(e){ 
 							self._emitEventForGrid(grid, "dgrid-drop-completed");
@@ -159,7 +159,7 @@ define([
 					// since this coming from another dnd source, always behave as if
 					// it is a new store item if possible, rather than replacing existing.
 					when( store[store.copy ? "copy" : "put"](object, {
-						before: targetItem
+						beforeId: targetItem ? store.getIdentity( targetItem ) : null
 					}) ).then(
 
 						
