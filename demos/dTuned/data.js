@@ -1,7 +1,7 @@
-define(["dojo/store/Memory"], function(Memory){
+define(["dstore/Memory"], function(Memory){
 	//	create some song data, and return a Memory Store from it.
 	var data = {
-		identifier: "Key",
+		idProperty: "Key",
 		label: "Name",
 		items: [
 			{"Key":"1","Name":"Grind","Artist":"Alice In Chains","Album":"Alice In Chains","Genre":"Alternative","Time":"284","TrackNumber":"1","Year":"1995"},
