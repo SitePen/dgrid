@@ -8,7 +8,7 @@ The following is a rough list of changes, to be outlined more presentably later.
 * dgrid now interacts with the dstore API rather than the dojo/store API
 * dgrid now requires Dojo 1.8 at minimum (since that is also dstore's minimum requirement)
 * Split out store-specific code from `List#renderArray` to
-  `_StoreMixin#renderCollection`, which always returns a promise
+  `_StoreMixin#renderQueryResults`, which always returns a promise
 * Removed observer tracking logic and workarounds now irrelevant with dstore
   (this includes removal of the `cleanEmptyObservers` flag)
 * Removed `results` property from `dgrid-refresh-complete` event
@@ -18,12 +18,17 @@ The following is a rough list of changes, to be outlined more presentably later.
   (i.e. the equivalent of `newRow` is to call `insertRow` then `highlightRow`)
 * `Editor` is now a mixin (with a capital E), activated by presence of the `editor` column definition property
 * `Selector` is now a mixin (with a capital S), activated by presence of the `selector` column definition property
+* `Tree` is now a mixin (with a capital T), activated by presence of the `renderExpando` column definition property
+* Some `Tree` properties have been moved from the column definition to instance-level,
+  including `collapseOnRefresh` and `shouldExpand`
+* New `Tree` property `enableTreeTransitions` can be set to `false` at instance-level to
+  disable all CSS transitions
 * Desupported `Selector`'s `disabled` property (use `Selection#allowSelect` instead)
 * Desupported `Tree`'s `allowDupilcates` property (ensure unique IDs instead)
 * Removed deprecated functions marked for removal in 0.4; most of these have had
   `set(...)` equivalents for a long time already
 
-# master (0.3.15-dev)
+# 0.3.15
 
 ## Significant changes
 
@@ -34,6 +39,10 @@ The following is a rough list of changes, to be outlined more presentably later.
 
 ### Mixins
 
+* The `Keyboard` mixin no longer fires `dgrid-cellfocusout` and `dgrid-cellfocusin`
+  events when a row/cell is automatically re-focused after an observed update. (#902)
+* The `Keyboard` mixin now correctly emits `dgrid-cellfocusout` events from the
+  element losing focus, not the one gaining focus. (#917, thanks cmaus)
 * Fixed a focus issue in the `Keyboard` mixin which manifested when used in
   conjunction with the `ColumnResizer` extension. (#928)
 * The `Selection` mixin no longer emits superfluous `dgrid-deselect` events
@@ -59,12 +68,16 @@ The following is a rough list of changes, to be outlined more presentably later.
 
 ### Mixins
 
+* Fixed a state preservation issue in the `Keyboard` mixin when a row/cell that
+  was last focused is removed while the list/grid no longer has focus. (#899)
 * The `Selection` mixin (and `selector` column plugin) will no longer clear the
   selection during an attempt to select a row that cannot be selected
   (i.e. `allowSelect` returns `false`). (#822)
 
 ### Extensions
 
+* Fixed an IE10 issue in `ColumnHider` where header cells (but not body cells)
+  would remain hidden after columns have been resized with `ColumnResizer`. (#841)
 * Fixed an issue in `CompoundColumns` where sorting programmatically would
   cause an error when attempting to place the sort arrow node. (#901)
 

@@ -21,10 +21,10 @@
 		<script src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script>
-			require(["dojo/_base/lang", "dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Editor", "dgrid/Keyboard", "dgrid/tree", "dojo/_base/declare", "dstore/Rest", "dstore/Observable", "dstore/Cache", "dojo/domReady!"],
-				function(lang, List, Grid, Selection, Editor, Keyboard, tree, declare, Rest, Observable, Cache){
+			require(["dojo/_base/lang", "dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Editor", "dgrid/Keyboard", "dgrid/Tree", "dojo/_base/declare", "dstore/Rest", "dstore/Observable", "dstore/Cache", "dojo/domReady!"],
+				function(lang, List, Grid, Selection, Editor, Keyboard, Tree, declare, Rest, Observable, Cache){
 
-					var CustomGrid = declare([Grid, Selection, Keyboard, Editor]);
+					var CustomGrid = declare([Grid, Selection, Keyboard, Editor, Tree]);
 
 					function createStore(config){
 						var testStore = new declare([ Rest, Observable, Cache ])(lang.mixin({
@@ -40,26 +40,30 @@
 
 						return testStore;
 					}
+					
+					function getColumns(){
+						return [
+							{label:'Name', field:'name', sortable: false, renderExpando: true},
+							{label:'Id', field:'id'},
+							{label:'Comment', field:'comment', sortable: false, editor: "text"},
+							{label:'Boolean', field:'boo', sortable: false, autoSave: true, editor: "checkbox"}
+						];
+					}
+					
 					var testStore = createStore();
-					var columns = [
-						tree({label:'Name', field:'name', sortable: false}),
-						{label:'Id', field:'id'},
-						{label:'Comment', field:'comment', sortable: false, editor: "text"},
-						{label:'Boolean', field:'boo', sortable: false, autoSave: true, editor: "checkbox"}
-					];
 
 					window.grid = new CustomGrid({
 						collection: testStore.filter({ parent: undefined }),
 						sort: "id",
 						getBeforePut: false,
-						columns: columns
+						columns: getColumns()
 					}, "grid");
 
 					new CustomGrid({
 						collection: createStore({useRangeHeaders: true}).filter({ parent: undefined }),
 						sort: "id",
 						getBeforePut: false,
-						columns: columns
+						columns: getColumns()
 					}, "gridRangeHeaders");
 				});
 				

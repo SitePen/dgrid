@@ -19,8 +19,7 @@ default functionality.
     * [Selector](components/mixins/Selector.md)
     * [CellSelection](components/mixins/CellSelection.md)
     * [Editor](components/mixins/Editor.md)
-* Column Plugins
-    * [tree](components/column-plugins/tree.md)
+    * [Tree](components/mixins/Tree.md)
 * Extensions
     * [ColumnReorder](components/extensions/ColumnReorder.md)
     * [ColumnResizer](components/extensions/ColumnResizer.md)

@@ -203,8 +203,8 @@
         "parent": "extensions"
     },
     {
-        "name": "DnD_tree.html",
-        "url": "extensions/DnD_tree.html",
+        "name": "DnD_Tree.html",
+        "url": "extensions/DnD_Tree.html",
         "title": "DnD test dragging tree children",
         "parent": "extensions"
     },
@@ -221,8 +221,8 @@
         "parent": "extensions"
     },
     {
-        "name": "Pagination_tree.html",
-        "url": "extensions/Pagination_tree.html",
+        "name": "Pagination_Tree.html",
+        "url": "extensions/Pagination_Tree.html",
         "title": "Test Pagination Extension with tree plugin",
         "parent": "extensions"
     },
@@ -298,23 +298,29 @@
         "parent": ""
     },
     {
-        "name": "tree.html",
-        "url": "tree.html",
-        "title": "Test Tree Grid",
+        "name": "Tree.html",
+        "url": "Tree.html",
+        "title": "Test tree Grid",
         "parent": ""
     },
     {
-        "name": "tree_editor.html",
-        "url": "tree_editor.html",
+        "name": "Tree_editor.html",
+        "url": "Tree_editor.html",
         "title": "Test tree and editor in same column",
         "parent": ""
     },
-    {
-        "name": "tree_expand.html",
-        "url": "tree_expand.html",
-        "title": "Test Tree Grid",
-        "parent": ""
-    },
+	{
+		"name": "Tree_expand.html",
+		"url": "Tree_expand.html",
+		"title": "Test Tree Grid",
+		"parent": ""
+	},
+	{
+		"name": "Tree_extra_filter.html",
+		"url": "Tree_extra_filter.html",
+		"title": "Test Tree Grid with extra children filtering",
+		"parent": ""
+	},
     {
         "name": "tundra_custom.html",
         "url": "tundra_custom.html",

@@ -68,7 +68,7 @@
 				"dojo/on",
 				"dgrid/List",
 				"dgrid/OnDemandGrid",
-				"dgrid/tree",
+				"dgrid/Tree",
 				"dgrid/Editor",
 				"dgrid/Selection",
 				"dgrid/Keyboard",
@@ -79,10 +79,10 @@
 				"dojo/_base/declare",
 				"dojo/_base/array",
 				"dojo/domReady!"
-			], function(on, List, Grid, tree, Editor, Selection, Keyboard, createSyncStore, genericData, createSyncHierarchicalStore, hierarchicalCountryData, declare, arrayUtil){
+			], function(on, List, Grid, Tree, Editor, Selection, Keyboard, createSyncStore, genericData, createSyncHierarchicalStore, hierarchicalCountryData, declare, arrayUtil){
 					console.log("loaded in " + (new Date().getTime() - start));
 
-					var StandardGrid = declare([Grid, Selection, Keyboard, Editor]),
+					var StandardGrid = declare([Grid, Selection, Keyboard, Editor, Tree]),
 						store = createSyncStore({ data: genericData }),
 						countryStore = createSyncHierarchicalStore({ data: hierarchicalCountryData });
 					
@@ -110,7 +110,7 @@
 						collection: countryStore,
 						selectionMode: "single",
 						columns: {
-							name: tree({label:'Name', sortable: false}),
+							name: {label:'Name', sortable: false, renderExpando: true},
 							bool: {label: 'A CheckBox', sortable: false, editor: "checkbox"},
 							type: {label: 'Type', sortable: false},
 							population: 'Population',

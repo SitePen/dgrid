@@ -131,11 +131,11 @@ return declare([List, _StoreMixin], {
 		
 		// Protect the query within a _trackError call, but return the resulting collection
 		return this._trackError(function(){
-			var resultsCollection = query(options);
+			var results = query(options);
 
 			// Render the result set
-			return self.renderCollection(resultsCollection, preloadNode, options).then(function(trs){
-				return Deferred.when(resultsCollection.total, function(total){
+			return self.renderQueryResults(results, preloadNode, options).then(function(trs){
+				return Deferred.when(results.totalLength, function(total){
 					var trCount = trs.length,
 						parentNode = preloadNode.parentNode,
 						noDataNode = self.noDataNode;
@@ -215,7 +215,10 @@ return declare([List, _StoreMixin], {
 
 			// renderQuery calls _trackError internally
 			return this.renderQuery(function(queryOptions){
-				return self._renderedCollection.range(queryOptions.start, queryOptions.start + queryOptions.count);
+				return self._renderedCollection.fetchRange({
+					start: queryOptions.start,
+					end: queryOptions.start + queryOptions.count
+				});
 			}).then(function(){
 				// Emit on a separate turn to enable event to be used consistently for
 				// initial render, regardless of whether the backing store is async
@@ -283,7 +286,6 @@ return declare([List, _StoreMixin], {
 			searchBuffer = requestBuffer - grid.rowHeight, // Avoid rounding causing multiple queries
 			// References related to emitting dgrid-refresh-complete if applicable
 			refreshDfd,
-			lastCollection,
 			lastRows,
 			preloadSearchNext = true;
 		
@@ -470,14 +472,11 @@ return declare([List, _StoreMixin], {
 				
 				// Query now to fill in these rows.
 				grid._trackError(function(){
-					var rangeCollection = preload.query(options);
-
 					// Use function to isolate the variables in case we make multiple requests
 					// (which can happen if we need to render on both sides of an island of already-rendered rows)
-					(function(loadingNode, below, keepScrollTo, rangeCollection){
-						lastRows = grid.renderCollection(rangeCollection, loadingNode, options).then(function(rows){
-							lastCollection = rangeCollection;
-							
+					(function(loadingNode, below, keepScrollTo){
+						var rangeResults = preload.query(options);
+						lastRows = grid.renderQueryResults(rangeResults, loadingNode, options).then(function(rows){
 							// can remove the loading node now
 							beforeNode = loadingNode.nextSibling;
 							put(loadingNode, "!");
@@ -496,7 +495,7 @@ return declare([List, _StoreMixin], {
 								});
 							}
 
-							Deferred.when(rangeCollection.total, function(total){
+							Deferred.when(rangeResults.totalLength, function(total){
 								if(!("queryLevel" in options)){
 									grid._total = total;
 								}
@@ -519,7 +518,7 @@ return declare([List, _StoreMixin], {
 							put(loadingNode, "!");
 							throw e;
 						});
-					})(loadingNode, below, keepScrollTo, rangeCollection);
+					})(loadingNode, below, keepScrollTo);
 				});
 				
 				preload = preload.previous;

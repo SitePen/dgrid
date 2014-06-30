@@ -348,21 +348,20 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 			}
 		},
 
-		renderCollection: function(collection, beforeNode){
+		renderQueryResults: function(results, beforeNode){
 			var grid = this,
-				rows = this.inherited(arguments),
-				data = collection.data;
+				rows = this.inherited(arguments);
 
 			if(!beforeNode){
-				if(this._topLevelRequest && this._topLevelRequest !== data){
+				if(this._topLevelRequest){
 					// Cancel previous async request that didn't finish
 					this._topLevelRequest.cancel();
 					delete this._topLevelRequest;
 				}
 
-				if (typeof data.cancel === "function") {
+				if (typeof rows.cancel === "function") {
 					// Store reference to new async request in progress
-					this._topLevelRequest = data;
+					this._topLevelRequest = rows;
 				}
 
 				Deferred.when(rows, function(){
@@ -425,15 +424,17 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 				// set flag to deactivate pagination event handlers until loaded
 				grid._isLoading = true;
 
-				// Run new query and pass it into renderCollection
-				results = grid._renderedCollection.range(start, start + count);
+				results = grid._renderedCollection.fetchRange({
+					start: start,
+					end: start + count
+				});
 
-				return grid.renderCollection(results, null, options).then(function(rows){
+				return grid.renderQueryResults(results, null, options).then(function(rows){
 					cleanupLoading(grid);
 					// Reset scroll Y-position now that new page is loaded.
 					grid.scrollTo({ y: 0 });
 
-					Deferred.when(results.total, function(total){
+					Deferred.when(results.totalLength, function(total){
 						if(!total){
 							if(grid.noDataNode){
 								put(grid.noDataNode, "!");
@@ -455,7 +456,7 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 						grid._rowsOnPage = rows.length;
 
 						// It's especially important that _updateNavigation is called only
-						// after renderCollection is resolved as well (to prevent jumping).
+						// after renderQueryResults is resolved as well (to prevent jumping).
 						grid._updateNavigation(focusLink);
 					});
 

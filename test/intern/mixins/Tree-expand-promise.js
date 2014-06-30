@@ -4,7 +4,7 @@ define([
 	"dgrid/Grid",
 	"dgrid/OnDemandGrid",
 	"dgrid/_StoreMixin",
-	"dgrid/tree",
+	"dgrid/Tree",
 	"dojo/_base/declare",
 	"dojo/_base/lang",
 	"dojo/_base/array",
@@ -12,31 +12,17 @@ define([
 	"dojo/on",
 	"dstore/Memory",
 	"dojo/query"
-], function(test, assert, Grid, OnDemandGrid, _StoreMixin, tree, declare, lang, arrayUtil, Deferred, on, Memory, query){
+], function(test, assert, Grid, OnDemandGrid, _StoreMixin, Tree, declare, lang, arrayUtil, Deferred, on, Memory, query){
 
 	test.suite("tree (expand + promise)", function(){
 		var grid,
 			TreeStore = declare(Memory, {
-				constructor: function () {
+				constructor: function(){
 					this.root = this;
 				},
 
 				getChildren: function(parent){
-					var filteredCollection = this.root.filter({ parent: parent.id });
-
-					// filter and sort the child levels the same way as the root level
-					var filterQueries = arrayUtil.filter(this.queryLog, function (entry) {
-						return entry.type === 'filter';
-					});
-					arrayUtil.forEach(filterQueries, function (query) {
-						var filterArgs = query.arguments.slice(),
-							// copy the filter object so we don't change an existing logged filter
-							filter = filterArgs[0] = lang.mixin({}, filterArgs[0]);
-						('parent' in filter) && delete filter.parent;
-						filteredCollection = filteredCollection.filter.apply(filteredCollection, filterArgs);
-					});
-
-					return filteredCollection;
+					return this.root.filter({ parent: parent.id });
 				},
 				mayHaveChildren: function(parent){
 					return true;
@@ -63,7 +49,7 @@ define([
 					this.dfd.reject(error);
 				}
 			}),
-			StoreMixinGrid = declare([Grid, _StoreMixin]),
+			StoreMixinGrid = declare([Grid, _StoreMixin, Tree]),
 			syncStore = new TreeStore({ data: createData() }),
 			asyncStore = new AsyncTreeStore({ data: createData() });
 
@@ -78,10 +64,10 @@ define([
 		}
 
 		function createGrid(store){
-			grid = new OnDemandGrid({
+			grid = new (declare([OnDemandGrid, Tree]))({
 				collection: store.filter({ parent: undefined }),
 				columns: [
-					tree({field: "node", label: "Node"}),
+					{renderExpando: true, field: "node", label: "Node"},
 					{field: "value", label: "Value"}
 				]
 			});
@@ -93,13 +79,13 @@ define([
 			grid = new StoreMixinGrid({
 				collection: store.filter({ parent: undefined }),
 				columns: [
-					tree({field: "node", label: "Node"}),
+					{renderExpando: true, field: "node", label: "Node"},
 					{field: "value", label: "Value"}
 				]
 			});
 			document.body.appendChild(grid.domNode);
 			grid.startup();
-			grid.renderCollection(grid.collection);
+			grid.renderQueryResults(grid.collection.fetch());
 		}
 
 		function destroyGrid(){
@@ -109,21 +95,23 @@ define([
 			}
 		}
 
-		function createOnPromise(target, event) {
+		function createOnPromise(target, event){
 			// Creates a promise based on an on.once call.
 			// Resolves to the event passed to the handler function.
-			var dfd = new Deferred(function () {
+			var dfd = new Deferred(function(){
 					handle.remove();
 				}),
-				handle = on.once(target, event, function (event) {
+				handle = on.once(target, event, function(event){
 					dfd.resolve(event);
 				});
 
 			return dfd.promise;
 		}
 
-		function delayedResolve() {
-			setTimeout(function(){ grid.collection.resolve(); }, 10);
+		function delayedResolve(){
+			setTimeout(function(){
+				grid.collection.resolve();
+			}, 10);
 		}
 
 		test.suite("tree + sync store", function(){
@@ -281,9 +269,11 @@ define([
 					// Verify that the result is the same before the query resolves.
 					assert.strictEqual(2, query(".dgrid-row", grid.domNode).length,
 						"Grid should still have 2 rows before expand resolves");
-					setTimeout(function(){ grid.collection.reject("Rejected"); }, 10);
+					setTimeout(function(){
+						grid.collection.reject("Rejected");
+					}, 10);
 					return promise;
-				}).then(function () {
+				}).then(function(){
 					throw new Error('Promise should have been rejected');
 				}, function(){
 					assert.strictEqual(2, query(".dgrid-row", grid.domNode).length,
@@ -448,7 +438,9 @@ define([
 					// Verify that the result is the same before the query resolves.
 					assert.strictEqual(2, query(".dgrid-row", grid.domNode).length,
 						"Grid should still have 2 rows before expand resolves");
-					setTimeout(function(){ grid.collection.reject("Rejected"); }, 10);
+					setTimeout(function(){
+						grid.collection.reject("Rejected");
+					}, 10);
 					return promise;
 				}).then(function(){
 					throw new Error('Promise should have been rejected');

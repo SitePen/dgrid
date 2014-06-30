@@ -23,7 +23,7 @@
 			<button onclick="filter(false)">Reset query</button>
 		</div>
 
-		<h2>Grid with a dstore/Store</h2>
+		<h2>Grid with a dstore/Memory store</h2>
 		<div id="grid1"></div>
 
 		<h2>Grid with a dojo/store</h2>
@@ -32,6 +32,8 @@
 		<h2>Grid with a dojo/data store</h2>
 		<div id="grid3"></div>
 
+		<h2>Grid with a dstore/RequestMemory store</h2>
+		<div id="grid4"></div>
 
 <script src="../../dojo/dojo.js" data-dojo-config="async: true"></script>
 
@@ -48,10 +50,11 @@ require([
 	'dojo/store/util/QueryResults',
 	'dgrid/OnDemandGrid',
 	'dgrid/test/data/createAsyncStore',
+	'dstore/RequestMemory',
 	'dstore/legacy/StoreAdapter',
 	'dstore/Observable'
 ], function (declare, lang, Deferred, ItemFileReadStore, DataStore, LegacyMemory, QueryResults, OnDemandGrid,
-	createAsyncStore, StoreAdapter, Observable) {
+	createAsyncStore, RequestMemory, StoreAdapter, Observable) {
 
 	var dataStore;
 	var names = [ 'sasquatch', 'foo', 'bar', 'zaphod', 'beeblebrox' ];
@@ -130,6 +133,13 @@ require([
 		columns: { id: 'id', name: 'name' },
 		collection: stores[2]
 	}, 'grid3'));
+	
+	// Create a dstore RequestMemory instance
+	stores.push(new RequestMemory({ target: 'data/requestData.json' }));
+	grids.push(new OnDemandGrid({
+		columns: { id: 'id', name: 'name' },
+		collection: stores[3]
+	}, 'grid4'));
 });
 </script>
 

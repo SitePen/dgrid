@@ -1,5 +1,5 @@
-define([
-	"dojo/_base/declare",
+
+jo/_base/declare",
 	"dojo/_base/lang",
 	"dojo/_base/array",
 	"dojo/_base/Deferred",
@@ -116,7 +116,7 @@ define([
 					// otherwise settle for put anyway.
 					// (put will relocate an existing item with the same id, i.e. move).
 					store[copy && store.copy ? "copy" : "put"](object, {
-						beforeId: targetItem ? store.getIdentity( targetItem ) : null
+						beforeId: targetItem ? store.getIdentity(targetItem) : null
 					}).then(
 						function(e){ 
 							self._emitEventForGrid(grid, "dgrid-drop-completed");
@@ -158,8 +158,8 @@ define([
 					// Note that we use store.copy if available even for non-copy dnd:
 					// since this coming from another dnd source, always behave as if
 					// it is a new store item if possible, rather than replacing existing.
-					when( store[store.copy ? "copy" : "put"](object, {
-						beforeId: targetItem ? store.getIdentity( targetItem ) : null
+					Deferred.when( store[store.copy ? "copy" : "put"](object, {
+						beforeId: targetItem ? store.getIdentity(targetItem) : null
 					}) ).then(
 
 						

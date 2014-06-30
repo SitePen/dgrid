@@ -24,4 +24,4 @@ defines the following functions.
 Function | Description
 -------- | -----------
 `countCurrentTouches(event, node)` | Counts the number of currently active touches which fall within the given node; useful in cases where other handlers may call `stopPropagation`, thus affecting other means of counting touches.
-`selector(selector, eventType, children)` | A version of the `selector` function from `dojo/on`, with an additional fix to work around issues experienced on iOS Safari.  This is used by `dgrid/Selection` and `dgrid/tree` for touch event handling.
+`selector(selector, eventType, children)` | A version of the `selector` function from `dojo/on`, with an additional fix to work around issues experienced on iOS Safari.  This is used by `dgrid/Selection` and `dgrid/Tree` for touch event handling.

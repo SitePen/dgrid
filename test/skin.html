@@ -60,12 +60,12 @@
 				rtl && (document.body.dir = "rtl");
 				
 				// then add the rest of the dependencies for the test...
-				deps = deps.concat("dgrid/List", "dgrid/OnDemandGrid", "dgrid/tree",
+				deps = deps.concat("dgrid/List", "dgrid/OnDemandGrid",
 					"dgrid/Selection", "dgrid/Keyboard", "dgrid/Editor",
 					"dojo/_base/declare", "dojo/dom-construct", "dgrid/test/data/testStore", "dojo/domReady!");
 				
-				require(deps, 
-				function(css1, css2, css3, List, Grid, tree, Selection, Keyboard, Editor, declare, domConstruct, testStore){
+				require(deps,
+				function(css1, css2, css3, List, Grid, Selection, Keyboard, Editor, declare, domConstruct, testStore){
 					var grid,
 						columns = {
 							col1: "Column 1",

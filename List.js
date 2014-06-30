@@ -13,7 +13,9 @@ function(declare, listen, has, miscUtil, hasClass, put){
 	
 	function cleanupTestElement(element){
 		element.className = "";
-		document.body.removeChild(element);
+		if(element.parentNode){
+			document.body.removeChild(element);
+		}
 	}
 	
 	function getScrollbarSize(element, dimension){

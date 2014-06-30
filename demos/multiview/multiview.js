@@ -12,15 +12,19 @@ define([
 	"dojo/text!./resources/description.html"
 ], function(Grid, Selection, Keyboard, declare, domConstruct, on, query, Memory, Observable, put, descriptionHtml){
 	// Render DOM
-	domConstruct.place(descriptionHtml, document.body);
-	var switchNode = put("p", "Switch View: "),
+	var containerNode = put(document.body, "div"),
+		switchNode = put("div.controls", "Select View: "),
 		tableButton = put(switchNode, "button[type=button]", "Table"),
 		detailsButton = put(switchNode, "button[type=button]", "Details"),
 		galleryButton = put(switchNode, "button[type=button]", "Gallery"),
+		contentNode = put("div.content"),
 		gridNode;
 	
-	put(document.body, switchNode);
-	gridNode = put(document.body, "div#grid.table");
+	put(containerNode, switchNode);
+	
+	gridNode = put(contentNode, "div#grid.table");
+	domConstruct.place(descriptionHtml, contentNode);
+	put(containerNode, contentNode);
 	
 	var grid, store, origRenderRow, expandoListener, expandedNode,
 		renderers = {
