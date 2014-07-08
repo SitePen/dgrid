@@ -1,0 +1,199 @@
+html,
+body {
+	height: 100%;
+	width: 100%;
+	margin: 0;
+	overflow: hidden;
+}
+
+.dijitBorderContainer {
+	height: 100%;
+	width: 100%;
+}
+
+body {
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+textarea {
+	-moz-tab-size: 4;
+	tab-size: 4;
+}
+
+h1 {
+	background-color: rgb(53, 101, 143);
+	color: white;
+	font-size: 1.5em;
+	font-weight: normal;
+	margin: 0 0 6px 0;
+	padding: 5px;
+}
+
+.fa {
+	color: rgb(34, 85, 141);
+}
+
+.claro .dijitBorderContainer-dijitContentPane.topPane {
+	padding: 0;
+}
+
+.gridTypeForm {
+	margin: 8px;
+}
+
+/* FIX: incompatibility between DnD CSS and dgrid's Claro CSS */
+.dgrid-row.dojoDndItem {
+	padding: 0;
+}
+.dgrid-row.dojoDndItemAnchor,
+.dgrid-row.dojoDndItemOver {
+	border: none;
+}
+/* END DnD FIX */
+
+/* FIX: dgrid.css applies 99% width to ALL input elements */
+.dgrid-input {
+	width: auto;
+}
+/* END input width fix */
+
+.actionLink {
+	color: rgb(53, 101, 143);
+	cursor: pointer;
+	text-decoration: underline;
+}
+
+.featureEditor {
+	width: 385px;
+}
+
+.featureEditor .dgrid {
+	border: none;
+}
+
+.columnEditor {
+	width: 460px;
+}
+
+.claro .columnEditor .dijitContentPane {
+	margin: 0;
+	padding: 0 0 0 4px;
+}
+
+.featureGrid,
+.columnGrid {
+	width: 100%;
+}
+
+.buttonBar {
+	text-align: right;
+}
+
+.columnInfoTextBox {
+	margin: 0 6px 0 0;
+	width: 162px;
+}
+
+.columnGrid {
+	height: 423px;
+}
+
+.featureGrid .field-label .fa-cog {
+	cursor: pointer;
+	float: right;
+}
+
+.featureGrid .field-selected {
+	text-align: center;
+	width: 40px;
+}
+
+.columnGrid .field-dragSource {
+	text-align: center;
+	vertical-align: middle;
+	width: 26px;
+}
+
+.columnGrid .field-config {
+	vertical-align: middle;
+	width: 45px;
+}
+
+.columnGrid .field-config .fa {
+	cursor: pointer;
+}
+
+.columnGrid .dojoDndHandle {
+	cursor: move;
+	cursor: -moz-grab;
+	cursor: -webkit-grab;
+	cursor: grab;
+}
+
+.columnGrid .field-config .fa-times {
+	float: left;
+	margin-left: 3px;
+}
+
+.columnGrid .field-config .fa-cog {
+	float: right;
+	margin-right: 2px;
+}
+
+.configForm {
+	padding: 4px;
+}
+
+.configForm fieldset {
+	border: 1px solid #aaa;
+	margin-bottom: 8px;
+	padding: 4px;
+}
+
+.configForm legend {
+	font-weight: bold;
+}
+
+.configForm .label,
+.configForm .field {
+	margin-bottom: 5px;
+}
+
+.configForm .label {
+	clear: both;
+	float: left;
+	vertical-align: top;
+	width: 180px;
+}
+
+.featureEditor .configForm .dijitTextBox,
+.featureEditor .configForm .dijitMultiSelect {
+	width: 180px;
+}
+
+.featureEditor .configForm .dijitTextBox.halfWidth {
+	width: 90px;
+}
+
+.configForm.column .dijitTextBox,
+.configForm.column .dijitMultiSelect {
+	width: 240px;
+}
+
+.configForm .dijitMultiSelect {
+	font-size: 16px;
+}
+
+.demoGrid {
+	height: 500px;
+}
+
+.gridCode {
+	display: block;
+	width: 500px;
+	height: 500px;
+}

@@ -1,0 +1,171 @@
+<div class="${baseClass}">
+	<div class="buttonBar">
+		<button data-dojo-type="dijit/form/Button" class="doneButton"
+				data-dojo-attach-point="doneButton" type="button"
+				data-dojo-props="iconClass: 'fa fa-reply'">Done</button>
+	</div>
+
+	<div class="scrollContainer">
+		<fieldset>
+			<legend>General column properties</legend>
+
+			<div class="label">
+				<code>field</code>
+			</div>
+			<div class="field">
+				<input data-dojo-type="dijit/form/TextBox" name="field" type="text">
+			</div>
+
+			<div class="label">
+				<code>label</code>
+			</div>
+			<div class="field">
+				<input data-dojo-type="dijit/form/TextBox" name="label" type="text">
+			</div>
+
+			<div class="label">
+				<code>className</code>
+			</div>
+			<div class="field">
+				<input data-dojo-type="dijit/form/TextBox" name="className" type="text">
+			</div>
+
+			<div class="label">
+				<code>sortable</code>
+			</div>
+			<div class="field">
+				<input data-dojo-type="dijit/form/RadioButton" name="sortable" value="true" id="${id}_sortableTrue" type="radio" checked>
+				<label for="${id}_sortableTrue">true</label>
+				<input data-dojo-type="dijit/form/RadioButton" name="sortable" value="false" id="${id}_sortableFalse" type="radio">
+				<label for="${id}_sortableFalse">false</label>
+			</div>
+		</fieldset>
+
+		<a href="https://github.com/SitePen/dgrid/blob/dev-0.4/doc/components/core-components/Grid.md" target="_blank">Grid documentation</a> <i class="fa fa-external-link"></i>
+
+
+		<h3>Plugin column properties</h3>
+
+		<fieldset data-dojo-attach-point="EditorFields" class="dijitHidden">
+			<legend>Editor properties</legend>
+
+			<div class="label">
+				<code>editor</code>
+			</div>
+			<div class="field">
+				<select data-dojo-type="dijit/form/ComboBox" name="editor">
+					<option>text</option>
+					<option>checkbox</option>
+					<option>radio</option>
+				</select>
+			</div>
+
+			<div class="label">
+				<code>editOn</code>
+			</div>
+			<div class="field">
+				<select data-dojo-type="dijit/form/ComboBox" name="editOn">
+					<option>click</option>
+					<option>dblclick</option>
+				</select>
+			</div>
+
+			<div class="label">
+				<code>autoSave</code>
+			</div>
+			<div class="field">
+				<input data-dojo-type="dijit/form/RadioButton" name="autoSave" value="true" id="${id}_autoSaveTrue" type="radio">
+				<label for="${id}_autoSaveTrue">true</label>
+				<input data-dojo-type="dijit/form/RadioButton" name="autoSave" value="false" id="${id}_autoSaveFalse" type="radio" checked>
+				<label for="${id}_autoSaveFalse">false</label>
+			</div>
+
+			<div class="label">
+				<code>autoSelect</code>
+			</div>
+			<div class="field">
+				<input data-dojo-type="dijit/form/RadioButton" name="autoSelect" value="true" id="${id}_autoSelectTrue" type="radio">
+				<label for="${id}_autoSelectTrue">true</label>
+				<input data-dojo-type="dijit/form/RadioButton" name="autoSelect" value="false" id="${id}_autoSelectFalse" type="radio" checked>
+				<label for="${id}_autoSelectFalse">false</label>
+			</div>
+
+			<div class="label">
+				<code>dismissOnEnter</code>
+			</div>
+			<div class="field">
+				<input data-dojo-type="dijit/form/RadioButton" name="dismissOnEnter" value="true" id="${id}_dismissOnEnterTrue" type="radio" checked>
+				<label for="${id}_dismissOnEnterTrue">true</label>
+				<input data-dojo-type="dijit/form/RadioButton" name="dismissOnEnter" value="false" id="${id}_dismissOnEnterFalse" type="radio">
+				<label for="${id}_dismissOnEnterFalse">false</label>
+			</div>
+		</fieldset>
+
+		<fieldset data-dojo-attach-point="ColumnHiderFields" class="dijitHidden">
+			<legend>ColumnHider properties</legend>
+
+			<div class="label">
+				<code>hidden</code>
+			</div>
+			<div class="field">
+				<input data-dojo-type="dijit/form/RadioButton" name="hidden" value="true" id="${id}_hiddenTrue" type="radio">
+				<label for="${id}_hiddenTrue">true</label>
+				<input data-dojo-type="dijit/form/RadioButton" name="hidden" value="false" id="${id}_hiddenFalse" type="radio" checked>
+				<label for="${id}_hiddenFalse">false</label>
+			</div>
+
+			<div class="label">
+				<code>unhidable</code>
+			</div>
+			<div class="field">
+				<input data-dojo-type="dijit/form/RadioButton" name="unhidable" value="true" id="${id}_unhidableTrue" type="radio">
+				<label for="${id}_unhidableTrue">true</label>
+				<input data-dojo-type="dijit/form/RadioButton" name="unhidable" value="false" id="${id}_unhidableFalse" type="radio" checked>
+				<label for="${id}_unhidableFalse">false</label>
+			</div>
+		</fieldset>
+
+		<fieldset data-dojo-attach-point="ColumnReorderFields" class="dijitHidden">
+			<legend>ColumnReorder properties</legend>
+
+			<div class="label">
+				<code>reorderable</code>
+			</div>
+			<div class="field">
+				<input data-dojo-type="dijit/form/RadioButton" name="reorderable" value="true" id="${id}_reorderableTrue" type="radio" checked>
+				<label for="${id}_reorderableTrue">true</label>
+				<input data-dojo-type="dijit/form/RadioButton" name="reorderable" value="false" id="${id}_reorderableFalse" type="radio">
+				<label for="${id}_reorderableFalse">false</label>
+			</div>
+		</fieldset>
+
+		<fieldset data-dojo-attach-point="ColumnResizerFields" class="dijitHidden">
+			<legend>ColumnResizer properties</legend>
+
+			<div class="label">
+				<code>resizable</code>
+			</div>
+			<div class="field">
+				<input data-dojo-type="dijit/form/RadioButton" name="resizable" value="true" id="${id}_resizableTrue" type="radio" checked>
+				<label for="${id}_resizableTrue">true</label>
+				<input data-dojo-type="dijit/form/RadioButton" name="resizable" value="false" id="${id}_resizableFalse" type="radio">
+				<label for="${id}_resizableFalse">false</label>
+			</div>
+		</fieldset>
+
+		<fieldset data-dojo-attach-point="SelectorFields" class="dijitHidden">
+			<legend>Selector properties</legend>
+
+			<div class="label">
+				<code>selector</code>
+			</div>
+			<div class="field">
+				<input data-dojo-type="dijit/form/RadioButton" name="selector" value="checkbox" id="${id}_selectorTrue" type="radio" checked>
+				<label for="${id}_selectorTrue">checkbox</label>
+				<input data-dojo-type="dijit/form/RadioButton" name="selector" value="radio" id="${id}_selectorFalse" type="radio">
+				<label for="${id}_selectorFalse">radio</label>
+				<span class="actionLink" data-dojo-attach-event="click: _clearField" data-field-name="selector">clear</span>
+			</div>
+		</fieldset>
+	</div>
+</div>

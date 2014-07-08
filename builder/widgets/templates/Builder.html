@@ -1,0 +1,40 @@
+<div>
+	<!-- Top pane -->
+	<div data-dojo-type="dijit/layout/ContentPane"
+		 data-dojo-props="region: 'top'" class="topPane">
+		<h1>dgrid builder</h1>
+		<div data-dojo-type="dijit/form/Form" class="gridTypeForm"
+			 data-dojo-attach-point="gridTypeForm">
+			<label>What data source do you want?</label>
+			<input data-dojo-type="dijit/form/RadioButton" name="gridType" type="radio" value="OnDemandGrid"
+				   id="${id}_gridTypeOnDemand" checked>
+			<label for="${id}_gridTypeOnDemand">dstore object store</label>
+			<input data-dojo-type="dijit/form/RadioButton" name="gridType" type="radio" value="Grid" id="${id}_gridTypeArray">
+			<label for="${id}_gridTypeArray">array</label>
+		</div>
+	</div>
+
+	<!-- Left pane with feature grid -->
+	<div data-dojo-attach-point="featureEditorNode"></div>
+
+	<!-- Center pane with column configuration -->
+	<div data-dojo-attach-point="columnEditorNode"></div>
+
+	<!-- Right pane with demo grid and source code output -->
+	<div data-dojo-type="dijit/layout/TabContainer"
+		 data-dojo-attach-point="previewTabs"
+		 data-dojo-props="region: 'center'">
+
+		<div data-dojo-type="dijit/layout/ContentPane"
+			 data-dojo-attach-point="demoGridPane"
+			 data-dojo-props="title: 'Demo grid'">
+		</div>
+
+		<div data-dojo-type="dijit/layout/ContentPane"
+			 data-dojo-attach-point="demoCodePane"
+			 data-dojo-props="title: 'Source code'">
+
+			<textarea data-dojo-attach-point="gridCodeTextArea" class="gridCode"></textarea>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,75 @@
+<form class="${baseClass}">
+	<fieldset>
+		<legend>${moduleName} configuration</legend>
+
+		<div class="label">
+			<code>minRowsPerPage</code>
+		</div>
+		<div class="field">
+			<input data-dojo-type="dijit/form/NumberTextBox" type="text" name="minRowsPerPage">
+		</div>
+
+		<div class="label">
+			<code>maxRowsPerPage</code>
+		</div>
+		<div class="field">
+			<input data-dojo-type="dijit/form/NumberTextBox" type="text" name="maxRowsPerPage">
+		</div>
+
+		<div class="label">
+			<code>maxEmptySpace</code>
+		</div>
+		<div class="field">
+			<input data-dojo-type="dijit/form/TextBox" type="text" name="maxEmptySpace">
+		</div>
+
+		<div class="label">
+			<code>bufferRows</code>
+		</div>
+		<div class="field">
+			<input data-dojo-type="dijit/form/NumberTextBox" type="text" name="bufferRows">
+		</div>
+
+		<div class="label">
+			<code>farOffRemoval</code>
+		</div>
+		<div class="field">
+			<input data-dojo-type="dijit/form/NumberTextBox" type="text" name="farOffRemoval">
+		</div>
+
+		<div class="label">
+			<code>queryRowsOverlap</code>
+		</div>
+		<div class="field">
+			<input data-dojo-type="dijit/form/NumberTextBox" type="text" name="queryRowsOverlap">
+		</div>
+
+		<div class="label">
+			<code>pagingMethod</code>
+		</div>
+		<div class="field">
+			<select data-dojo-attach-point="pagingMethodSelectNode">
+				<option value="debounce">debounce</option>
+				<option value="throttle">throttle</option>
+				<option value="throttleDelayed">throttleDelayed</option>
+			</select>
+		</div>
+
+		<div class="label">
+			<code>pagingDelay</code>
+		</div>
+		<div class="field">
+			<input data-dojo-type="dijit/form/NumberTextBox" type="text" name="pagingDelay">
+		</div>
+
+		<div class="label">
+			<code>keepScrollPosition</code>
+		</div>
+		<div class="field">
+			<input data-dojo-type="dijit/form/RadioButton" name="keepScrollPosition" value="true" id="${id}_keepScrollTrue" type="radio">
+			<label for="${id}_keepScrollTrue">true</label>
+			<input data-dojo-type="dijit/form/RadioButton" name="keepScrollPosition" value="false" id="${id}_keepScrollFalse" type="radio">
+			<label for="${id}_keepScrollFalse">false</label>
+		</div>
+	</fieldset>
+</form>
