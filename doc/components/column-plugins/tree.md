@@ -59,10 +59,11 @@ The tree plugin supports the following additional column definition properties.
 
 Property | Description
 -------- | -----------
-`shouldExpand(row, level, previouslyExpanded)` | an optional function which returns a boolean indicating whether the given row should be expanded when rendered.  The default implementation simply returns the value of `previouslyExpanded`, which denotes whether the row in question was previously expanded before being re-rendered.
-`renderExpando()` | an optional function which can be overridden to customize the logic for rendering the expando icon beside each tree cell's content.
-`indentWidth` | the number of pixels to indent each nested level of children; the default is `9`.
-`collapseOnRefresh` | a boolean indicating whether to collapse all parents (essentially "forgetting" expanded state) whenever the grid is refreshed; the default is `false`.
+`shouldExpand(row, level, previouslyExpanded)` | Optional function which returns a boolean indicating whether the given row should be expanded when rendered.  The default implementation simply returns the value of `previouslyExpanded`, which denotes whether the row in question was previously expanded before being re-rendered.
+`renderExpando()` | Optional function which can be overridden to customize the logic for rendering the expando icon beside each tree cell's content.
+`collapseOnRefresh` | Boolean indicating whether to collapse all parents (essentially "forgetting" expanded state) whenever the grid is refreshed; the default is `false`.
+`enableTransitions` | Boolean indicating whether to perform CSS transitions when expanding/collapsing; the default is `true`.  Note that this does not apply to browsers which do not support CSS transitions (e.g. IE < 10).
+`indentWidth` | Number of pixels to indent each nested level of children; the default is `9`.
 `allowDuplicates` | If this is set to `true`, a single object (and single id) can be used in multiple places in a tree structure. However, enabling this means that `grid.row(id)` will only return top-level objects (since it can't disambiguate other levels). The default is `false`.
 
 ## Additional Grid APIs
