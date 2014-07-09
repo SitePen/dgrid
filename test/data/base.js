@@ -236,7 +236,7 @@ function(lang, arrayUtil, Deferred, Memory, Observable, QueryResults, DeferredWr
 	}));
 	
 	// global var testCountryStore
-	testCountryStore = new Observable(new DeferredWrapper(testSyncCountryStore));
+	testCountryStore = new Observable(new DeferredWrapper(testSyncCountryStore, 100));
 	var nextId = 0;
 	var testTopHeavyData = arrayUtil.map(testStateStore.data, function (state) {
 		return {
