@@ -1,4 +1,5 @@
 define([
+	'require',
 	'dgrid/List',
 	'dgrid/OnDemandGrid',
 	'dgrid/Selection',
@@ -10,7 +11,7 @@ define([
 	'dstore/RequestMemory',
 	'put-selector/put',
 	'dojo/domReady!'
-], function (List, Grid, Selection, Keyboard, Hider, declare, arrayUtil, Stateful, RequestMemory, put) {
+], function (require, List, Grid, Selection, Keyboard, Hider, declare, arrayUtil, Stateful, RequestMemory, put) {
 	// Create DOM
 	var headerNode = put('div#header');
 	var listNode = put('div#list-container');
@@ -18,7 +19,8 @@ define([
 	var artistsNode = put(listNode, 'div#artists');
 	var albumsNode = put(listNode, 'div#albums');
 	var gridNode = put('div#grid');
-	var songStore = new RequestMemory({ target: 'data.json' });
+	// Use require.toUrl for portability (looking up via module path)
+	var songStore = new RequestMemory({ target: require.toUrl('./data.json') });
 
 	put(document.body, headerNode, 'div#header-content', 'dTuned');
 	put(document.body, listNode);

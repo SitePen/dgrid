@@ -1,4 +1,5 @@
 define([
+	'require',
 	'dgrid/OnDemandGrid',
 	'dgrid/Selection',
 	'dgrid/Keyboard',
@@ -9,7 +10,7 @@ define([
 	'put-selector/put',
 	'dojo/text!./resources/description.html',
 	'dojo/query'
-], function (Grid, Selection, Keyboard, declare, domConstruct, on, RequestMemory, put, descriptionHtml) {
+], function (require, Grid, Selection, Keyboard, declare, domConstruct, on, RequestMemory, put, descriptionHtml) {
 	// Render DOM
 	var containerNode = put(document.body, 'div');
 	var switchNode = put('div.controls', 'Select View: ');
@@ -69,7 +70,8 @@ define([
 	domConstruct.place(descriptionHtml, contentNode);
 	put(containerNode, contentNode);
 
-	store = new RequestMemory({ target: 'data.json' });
+	// Use require.toUrl for portability (looking up via module path)
+	store = new RequestMemory({ target: require.toUrl('./data.json') });
 
 	grid = new Grid({
 		columns: [
