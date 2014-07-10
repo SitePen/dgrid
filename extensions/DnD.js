@@ -90,7 +90,7 @@ define([
 			// directly on self doesn't fire onDrop, but we do have to worry about
 			// dropping last node into empty space beyond rendered rows.)
 			if(!copy && (targetRow === nodes[0] ||
-					(!targetItem && grid.down(grid.row(nodes[0])).element == nodes[0]))){
+					(!targetItem && nodes[0].parentNode && anchor && grid.down(grid.row(nodes[0])).element == nodes[0]))){
 				return;
 			}
 			
