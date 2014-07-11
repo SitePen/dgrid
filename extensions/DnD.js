@@ -111,7 +111,6 @@ define([
 					// so update the cached node manually
 					if(targetSource._selectedNodes[id]){
 						targetSource._selectedNodes[id] = grid.row(id).element;
-						console.log('after internal drop:', targetSource._selectedNodes);
 					}
 				});
 			});
@@ -253,14 +252,12 @@ define([
 			
 			function selectRow(row){
 				selectedNodes[row.id] = row.element;
-				console.log('after select', Object.keys(selectedNodes));
 			}
 			function deselectRow(row){
 				delete selectedNodes[row.id];
 				// Re-sync dojo/dnd UI classes based on deselection
 				// (unfortunately there is no good programmatic hook for this)
 				put(row.element, '!dojoDndItemSelected!dojoDndItemAnchor');
-				console.log('after deselect', Object.keys(selectedNodes));
 			}
 			
 			this.on("dgrid-select", function(event){
