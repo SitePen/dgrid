@@ -79,7 +79,8 @@ define([
 				store = grid.store,
 				targetSource = this,
 				anchor = targetSource._targetAnchor,
-				targetRow;
+				targetRow,
+				nodeRow;
 			
 			if(anchor){ // (falsy if drop occurred in empty space after rows)
 				targetRow = this.before ? anchor.previousSibling : anchor.nextSibling;
@@ -89,8 +90,9 @@ define([
 			// (Don't need to worry about edge first/last cases since dropping
 			// directly on self doesn't fire onDrop, but we do have to worry about
 			// dropping last node into empty space beyond rendered rows.)
+			nodeRow = grid.row(nodes[0]);
 			if(!copy && (targetRow === nodes[0] ||
-					(!targetItem && grid.down(grid.row(nodes[0])).element == nodes[0]))){
+					(!targetItem && nodeRow && grid.down(nodeRow).element == nodes[0]))){
 				return;
 			}
 			
