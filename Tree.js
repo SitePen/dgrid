@@ -81,29 +81,32 @@ define([
 					container = rowElement.connected = put('div.dgrid-tree-container');//put(rowElement, '+...
 					preloadNode = target.preloadNode = put(rowElement, '+', container, 'div.dgrid-preload');
 					var query = function(options){
-						var childCollection = grid._renderedCollection.getChildren(row.data);
+						var childCollection = grid._renderedCollection.getChildren(row.data),
+							results;
 						if(grid.sort){
 							childCollection = childCollection.sort(grid.sort);
 						}
-						if('start' in options){
-							var rangeArgs = { start: options.start };
-							if('count' in options){
-								rangeArgs.end = options.start + options.count;
-							}
-							childCollection = childCollection.fetchRange.call(childCollection, rangeArgs);
-						}
 						if(childCollection.track){
-							options.rows = [];
+							container._rows = options.rows = [];
 
 							childCollection = childCollection.track();
 
 							// remember observation handles so they can be removed when the parent row is destroyed
 							container._handles = [
 								childCollection.tracking,
-								grid._observeCollection(childCollection, container, options.rows, options)
+								grid._observeCollection(childCollection, container, options)
 							];
 						}
-						return childCollection;
+						if('start' in options){
+							var rangeArgs = { start: options.start };
+							if('count' in options){
+								rangeArgs.end = options.start + options.count;
+							}
+							results = childCollection.fetchRange.call(childCollection, rangeArgs);
+						} else {
+							results = childCollection.fetch();
+						}
+						return results;
 					};
 					// Include level information on query for renderQuery case
 					if("level" in target){
@@ -114,7 +117,7 @@ define([
 						this.renderQuery(query, preloadNode) :
 						this._trackError(function(){
 							return grid.renderQueryResults(
-								query(options).fetch(),
+								query(options),
 								preloadNode,
 								lang.mixin({ rows: options.rows },
 									"level" in query ? { queryLevel: query.level } : null
@@ -202,8 +205,9 @@ define([
 			return rowElement; // pass return value through
 		},
 
-		removeRow: function(rowElement, justCleanup){
-			var connected = rowElement.connected;
+		removeRow: function(rowElement, justCleanup, options){
+			var connected = rowElement.connected,
+				childOptions = {};
 			if(connected){
 				if(connected._handles){
 					arrayUtil.forEach(connected._handles, function(handle){
@@ -212,10 +216,21 @@ define([
 					delete connected._handles;
 				}
 
+				if(connected._rows){
+					childOptions.rows = connected._rows;
+				}
+
+				// TODO: Why "if" in the below comment? Either it has children or doesn't
 				// if it has a connected expando node, we process the children
 				querySelector(">.dgrid-row", connected).forEach(function(element){
-					this.removeRow(element, true);
+					this.removeRow(element, true, childOptions);
 				}, this);
+
+				if(connected._rows){
+					connected._rows.length = 0;
+					delete connected._rows;
+				}
+
 				// now remove the connected container node
 				if(!justCleanup){
 					put(connected, "!");

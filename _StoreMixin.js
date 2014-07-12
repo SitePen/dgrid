@@ -114,7 +114,11 @@ function(declare, lang, Deferred, listen, aspect, put){
 					renderedCollection = renderedCollection.track();
 					this._rows = [];
 
-					this._observerHandle = this._observeCollection(renderedCollection, this.contentNode, this._rows);
+					this._observerHandle = this._observeCollection(
+						renderedCollection,
+						this.contentNode,
+						{ rows: this._rows }
+					);
 				}
 
 				this._renderedCollection = renderedCollection;
@@ -171,7 +175,11 @@ function(declare, lang, Deferred, listen, aspect, put){
 			}
 			
 			row = this.inherited(arguments);
-			
+
+			if (options && options.rows) {
+				options.rows[i] = row;
+			}
+
 			// Remove no data message when a new row appears.
 			// Run after inherited logic to prevent confusion due to noDataNode
 			// no longer being present as a sibling.
@@ -301,8 +309,11 @@ function(declare, lang, Deferred, listen, aspect, put){
 			});
 			return promise;
 		},
-		
-		removeRow: function(rowElement, justCleanup){
+
+		// TODO: Should justCleanup be renamed to preserveDom?
+		// TODO: Should justCleanup be moved into options?
+		// TODO: Should options be documented for List#removeRow?
+		removeRow: function(rowElement, justCleanup, options){
 			var row = {element: rowElement};
 			// Check to see if we are now empty...
 			if(!justCleanup && this.noDataMessage &&
@@ -312,35 +323,32 @@ function(declare, lang, Deferred, listen, aspect, put){
 				this.noDataNode = put(this.contentNode, "div.dgrid-no-data");
 				this.noDataNode.innerHTML = this.noDataMessage;
 			}
+
+			var rows = (options && options.rows) || this._rows;
+			if (rows) {
+				delete rows[rowElement.rowIndex];
+			}
+
 			return this.inherited(arguments);
 		},
 		
 		renderQueryResults: function(results, beforeNode, options){
 			// summary:
 			//		Renders objects from QueryResults as rows, before the given node.
-			
-			options = options || {};
+
+			options = lang.mixin({ rows: this._rows }, options);
 			var self = this,
 				start = options.start || 0,
-				rows = options.rows || this._rows,
 				container;
 
 			return Deferred.when(results).then(function(resolvedResults){
-				var resolvedRows,
-					i;
-					
+				var resolvedRows;
+
 				container = beforeNode ? beforeNode.parentNode : self.contentNode;
 				if(container && container.parentNode &&
 						(container !== self.contentNode || resolvedResults.length)){
 					resolvedRows = self.renderArray(resolvedResults, beforeNode, options);
-					i = resolvedRows.length;
 
-					if(rows){
-						for (var itemIndex = 0; itemIndex < resolvedRows.length; ++itemIndex){
-							rows[start + itemIndex] = resolvedRows[itemIndex];
-						}
-					}
-					
 					delete self._lastCollection; // used only for non-store List/Grid
 				}else{
 					// Don't bother inserting; the container has been removed from the DOM
@@ -351,25 +359,27 @@ function(declare, lang, Deferred, listen, aspect, put){
 			});
 		},
 
-		_observeCollection: function(collection, container, rows, options){
-			var self = this, row;
-
-			options = options || {};
+		_observeCollection: function(collection, container, options){
+			var self = this,
+				rows = options.rows,
+				row;
 
 			var handles = [
 				collection.on("remove, update", function(event){
 					var from = event.previousIndex;
 					if(from !== undefined && rows[from]){
-						// remove from old slot
-						row = rows.splice(from, 1)[0];
-
-						// adjust the rowIndex so adjustRowIndices has the right starting point
-						rows[from] && rows[from].rowIndex--;
+						row = rows[from];
 
 						// check to make the sure the node is still there before we try to remove it, (in case it was moved to a different place in the DOM)
 						if(row.parentNode == container){
-							self.removeRow(row); // now remove
+							self.removeRow(row, false, options);
 						}
+
+						// remove the old slot
+						rows.splice(from, 1);
+
+						// adjust the rowIndex so adjustRowIndices has the right starting point
+						rows[from] && rows[from].rowIndex--;
 
 						// the removal of rows could cause us to need to page in more items
 						if(self._processScroll){
@@ -420,13 +430,9 @@ function(declare, lang, Deferred, listen, aspect, put){
 						// TODO: This was taken from the previous observe listener where each range request was observed individually. Is this still necessary?
 						//parentNode = (beforeNode && beforeNode.parentNode) ||
 						//	(nextNode && nextNode.parentNode) || self.contentNode;
+						rows.splice(to, 0, undefined);
 						row = self.insertRow(event.target, container, nextNode, to, options);
 						self.highlightRow(row);
-						
-						// TODO: When would row be falsy?
-						if(row){
-							rows.splice(to, 0, row);
-						}
 					}
 					// Reset row so it doesn't get reused on the next event
 					row = null;
