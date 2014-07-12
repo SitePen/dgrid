@@ -64,8 +64,9 @@ Property | Description
 When the Tree mixin is applied to a column in a grid, the grid is augmented with
 the following method.
 
-Method | Description
------- | -----------
+Property | Description
+-------- | -----------
 `collapseOnRefresh` | Boolean indicating whether to collapse all parents (essentially "forgetting" expanded state) whenever the grid is refreshed; the default is `false`.
+`enableTreeTransitions` | Boolean indicating whether to perform CSS transitions when expanding/collapsing; the default is `true`.  Note that this does not apply to browsers which do not support CSS transitions (e.g. IE < 10).
 `expand(row, expand)` | Expands or collapses the row indicated by the given Row object (from `grid.row(target)`) or a `dgrid-row` element. The optional `expand` argument specifies whether the row should be expanded (`true`) or collapsed (`false`); if unspecified, the method toggles the current expanded state of the row.  Returns a promise which resolves after data for the children has been retrieved.
 `shouldExpand(row, level, previouslyExpanded)` | Optional function which returns a boolean indicating whether the given row should be expanded when rendered.  The default implementation simply returns the value of `previouslyExpanded`, which denotes whether the row in question was previously expanded before being re-rendered.

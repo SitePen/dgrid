@@ -121,13 +121,7 @@ define([
 								)
 							);
 						})
-					).then(function(){
-						// Expand once results are retrieved, if the row is still expanded.
-						if(grid._expanded[row.id] && hasTransitionend){
-							var scrollHeight = container.scrollHeight;
-							container.style.height = scrollHeight ? scrollHeight + "px" : "auto";
-						}
-					});
+					);
 
 					if(hasTransitionend && !noTransition){
 						on.once(container, hasTransitionend, this._onTreeTransitionEnd);

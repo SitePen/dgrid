@@ -1,154 +1,237 @@
 define([
-	"dgrid/List",
-	"dgrid/OnDemandGrid",
-	"dgrid/Selection",
-	"dgrid/Keyboard",
-	"dgrid/extensions/ColumnHider",
-	"dojo/_base/declare",
-	"dojo/_base/array",
-	"dgrid/demos/dTuned/data",
-	"put-selector/put",
-	"dojo/domReady!"
-],
-function(List, Grid, Selection, Keyboard, Hider, declare, arrayUtil, songStore, put){
+	'require',
+	'dgrid/List',
+	'dgrid/OnDemandGrid',
+	'dgrid/Selection',
+	'dgrid/Keyboard',
+	'dgrid/extensions/ColumnHider',
+	'dojo/_base/declare',
+	'dojo/_base/array',
+	'dojo/Stateful',
+	'dstore/RequestMemory',
+	'put-selector/put',
+	'dojo/domReady!'
+], function (require, List, Grid, Selection, Keyboard, Hider, declare, arrayUtil, Stateful, RequestMemory, put) {
 	// Create DOM
-	var headerNode = put("div#header"),
-		listNode = put("div#list-container"),
-		genresNode = put(listNode, "div#genres"),
-		artistsNode = put(listNode, "div#artists"),
-		albumsNode = put(listNode, "div#albums"),
-		gridNode = put("div#grid");
-	put(document.body, headerNode, "div#header-content", "dTuned");
+	var headerNode = put('div#header');
+	var listNode = put('div#list-container');
+	var genresNode = put(listNode, 'div#genres');
+	var artistsNode = put(listNode, 'div#artists');
+	var albumsNode = put(listNode, 'div#albums');
+	var gridNode = put('div#grid');
+	// Use require.toUrl for portability (looking up via module path)
+	var songStore = new RequestMemory({ target: require.toUrl('./data.json') });
+
+	put(document.body, headerNode, 'div#header-content', 'dTuned');
 	put(document.body, listNode);
 	put(document.body, gridNode);
 	
 	// a formatting function for the Duration column.
-	var timeFormatter = function(t){
-		var tmp = parseInt(t, 10), min, sec;
-		if(isNaN(tmp)){ return t; }
-		min = Math.floor(tmp/60);
+	function timeFormatter(t) {
+		var tmp = parseInt(t, 10);
+		var min;
+		var sec;
+
+		if (isNaN(tmp)) {
+			return t;
+		}
+
+		min = Math.floor(tmp / 60);
 		sec = tmp % 60;
 		// don't forget to pad seconds.
-		return "" + min + ":" + (sec < 10 ? "0" : "") + sec;
-	};
+		return '' + min + ':' + (sec < 10 ? '0' : '') + sec;
+	}
 	
-	function unique(arr){
+	function unique(arr) {
 		// Create a unique list of items from the passed array
 		// (removing duplicates).
+		var ret = [];
 
 		// First, set up a hashtable for unique objects.
 		var obj = {};
-		for(var i = 0,l = arr.length; i < l; i++){
-			if(!(arr[i] in obj)){
+		for (var i = 0, l = arr.length; i < l; i++) {
+			if (!(arr[i] in obj)) {
 				obj[arr[i]] = true;
 			}
 		}
 
 		// Now push the unique objects back into an array, and return it.
-		var ret = [];
-		for(var p in obj){
+		for (var p in obj) {
 			ret.push(p);
 		}
 		ret.sort();
 		return ret;
 	}
 
+	function pickField(fieldName) {
+		return function (object) {
+			return object[fieldName];
+		};
+	}
 
 	// Create the main grid to appear below the genre/artist/album lists.
 	var grid = new (declare([Grid, Selection, Keyboard, Hider]))({
-		store: songStore,
+		collection: songStore,
 		columns: {
-			Name: "Name",
-			Time: { label: "Duration", formatter: timeFormatter },
-			Year: "Year",
-			Artist: "Artist",
-			Album: "Album",
-			Genre: "Genre"
+			name: 'Name',
+			time: { label: 'Duration', formatter: timeFormatter },
+			year: 'Year',
+			artist: 'Artist',
+			album: 'Album',
+			genre: 'Genre'
 		}
 	}, gridNode);
 
 	// define a List constructor with the features we want mixed in,
 	// for use by the three lists in the top region
-	var TunesList = declare([List, Selection, Keyboard]);
+	var TunesList = declare([List, Selection, Keyboard], {
+		selectionMode: 'single'
+	});
 
 	// define our three lists for the top.
-	var genres = new TunesList({ selectionMode: "single" }, genresNode);
-	var artists = new TunesList({ selectionMode: "single" }, artistsNode);
-	var albums = new TunesList({ selectionMode: "single" }, albumsNode);
+	var genresList = new TunesList({}, genresNode);
+	var artistsList = new TunesList({}, artistsNode);
+	var albumsList = new TunesList({}, albumsNode);
 
 	// create the unique lists and render them
-	var g = unique(arrayUtil.map(songStore.data, function(item){ return item.Genre; })),
-		art = unique(arrayUtil.map(songStore.data, function(item){ return item.Artist; })),
-		alb = unique(arrayUtil.map(songStore.data, function(item){ return item.Album; }));
-	g.unshift("All (" + g.length + " Genre" + (g.length !== 1 ? "s" : "") + ")");
-	art.unshift("All (" + art.length + " Artist" + (art.length !== 1 ? "s" : "") + ")");
-	alb.unshift("All (" + alb.length + " Album" + (alb.length !== 1 ? "s" : "") + ")");
-	genres.renderArray(g);
-	artists.renderArray(art);
-	albums.renderArray(alb);
+	var genres, artists, albums;
+	
+	songStore.fetch().then(function (songs) {
+		genres = unique(arrayUtil.map(songs, pickField('genre')));
+		artists = unique(arrayUtil.map(songs, pickField('artist')));
+		albums = unique(arrayUtil.map(songs, pickField('album')));
+		
+		genres.unshift('All (' + genres.length + ' Genre' + (genres.length !== 1 ? 's' : '') + ')');
+		artists.unshift('All (' + artists.length + ' Artist' + (artists.length !== 1 ? 's' : '') + ')');
+		albums.unshift('All (' + albums.length + ' Album' + (albums.length !== 1 ? 's' : '') + ')');
 
-	var currentGenre; // updated on genre select
+		genresList.renderArray(genres);
+		artistsList.renderArray(artists);
+		albumsList.renderArray(albums);
+	});
+	
+	// As items are selected in each of the genre, artist, and album dgrid lists the
+	// associated value will be set on this stateful object so the main grid can
+	// watch for updates and filter accordingly
+	var gridFilter = new Stateful();
+
+	// This function is used further down by the select handler for the artists list.
+	// It builds a filtered list of album names depending on the selected genre and artist.
+	function getFilteredAlbumList(gridFilter, songStore, selectedArtist) {
+		var filterOptions = {};
+		var filteredObjects;
+		var filteredAlbumList;
+
+		if (gridFilter.get('genre')) {
+			filterOptions.genre = gridFilter.get('genre');
+		}
+
+		if (selectedArtist) {
+			filterOptions.artist = selectedArtist;
+		}
+		filteredObjects = songStore.filter(filterOptions).fetch();
+		filteredAlbumList = unique(arrayUtil.map(filteredObjects, pickField('album')));
+		filteredAlbumList.unshift('All (' + filteredAlbumList.length +
+			' Album' + (filteredAlbumList.length !== 1 ? 's' : '') + ')');
+
+		return filteredAlbumList;
+	}
+
+	gridFilter.watch(function () {
+		var filter;
+
+		if (this.genre || this.artist || this.album) {
+			filter = {};
+
+			if (this.genre) {
+				filter.genre = this.genre;
+			}
+			if (this.artist) {
+				filter.artist = this.artist;
+			}
+			if (this.album) {
+				filter.album = this.album;
+			}
+
+			grid.set('collection', songStore.filter(filter));
+		}
+		else {
+			if (grid.collection !== songStore) {
+				grid.set('collection', songStore);
+			}
+		}
+	});
 
 	// start listening for selections on the lists.
-	genres.on("dgrid-select", function(e){
+	genresList.on('dgrid-select', function (event) {
 		// filter the albums, artists and grid
-		var row = e.rows[0],
-			filter = currentGenre = row.data,
-			art;
-		if(row.id == "0"){
+		var row = event.rows[0];
+		var selectedGenre = row.data;
+		var filteredObjects;
+		var filteredArtistList;
+
+		if (row.id === '0') {
 			// remove filtering
-			art = unique(arrayUtil.map(songStore.data, function(item){ return item.Artist; }));
-			grid.query = {};
-		} else {
-			// create filtering
-			art = unique(arrayUtil.map(arrayUtil.filter(songStore.data, function(item){ return item.Genre === filter; }), function(item){ return item.Artist; }));
-			grid.query = { "Genre": filter };
+			gridFilter.set('genre', undefined);
+			filteredArtistList = artists;
 		}
-		art.unshift("All (" + art.length + " Artist" + (art.length !== 1 ? "s" : "") + ")");
+		else {
+			gridFilter.set('genre', selectedGenre);
+			// filter the store on the current genre
+			filteredObjects = songStore.filter({ genre: selectedGenre }).fetch();
+			// map the full album objects to a unique array of artist names (strings)
+			filteredArtistList = unique(arrayUtil.map(filteredObjects, pickField('artist')));
+			// add the "All" option at the top
+			filteredArtistList.unshift('All (' + filteredArtistList.length +
+				' Artist' + (filteredArtistList.length !== 1 ? 's' : '') + ')');
+		}
 		
-		artists.refresh();	// clear contents
-		artists.renderArray(art);
-		artists.select(0); // reselect "all", triggering albums+grid refresh
+		artistsList.refresh();	// clear contents
+		artistsList.renderArray(filteredArtistList);
+		artistsList.select('0'); // reselect "all", triggering albums+grid refresh
 	});
 
-	artists.on("dgrid-select", function(e){
+	artistsList.on('dgrid-select', function (event) {
 		// filter the albums, grid
-		var row = e.rows[0],
-			filter = row.data, alb;
-		if(row.id == "0"){
-			if(genres.selection[0]){
-				// remove filtering entirely
-				alb = unique(arrayUtil.map(songStore.data, function(item){ return item.Album; }));
-			} else {
-				// filter only by genre
-				alb = unique(arrayUtil.map(arrayUtil.filter(songStore.data, function(item){ return item.Genre === currentGenre; }), function(item){ return item.Album; }));
-			}
-			delete grid.query.Artist;
-		} else {
-			// create filter based on artist
-			alb = unique(arrayUtil.map(arrayUtil.filter(songStore.data, function(item){ return item.Artist === filter; }), function(item){ return item.Album; }));
-			grid.query.Artist = filter;
-		}
-		alb.unshift("All (" + alb.length + " Album" + (alb.length !== 1 ? "s" : "") + ")");
+		var row = event.rows[0];
+		var selectedArtist = row.data;
+		var filteredAlbumList;
 
-		albums.refresh(); // clear contents
-		albums.renderArray(alb);
-		albums.select(0); // reselect "all" item, triggering grid refresh
+		if (row.id === '0') {
+			gridFilter.set('artist', undefined);
+
+			if (gridFilter.get('genre')) {
+				// filter only by genre
+				filteredAlbumList = getFilteredAlbumList(gridFilter, songStore);
+			} else {
+				// remove filtering entirely
+				filteredAlbumList = albums;
+			}
+		}
+		else {
+			// create filter based on artist
+			gridFilter.set('artist', selectedArtist);
+			filteredAlbumList = getFilteredAlbumList(gridFilter, songStore, selectedArtist);
+		}
+
+		albumsList.refresh(); // clear contents
+		albumsList.renderArray(filteredAlbumList);
+		albumsList.select('0'); // reselect "all" item, triggering grid refresh
 	});
 
-	albums.on("dgrid-select", function(e){
+	albumsList.on('dgrid-select', function (event) {
 		// filter the grid
-		var row = e.rows[0],
-			filter = row.data;
-		if(row.id == "0"){
+		var row = event.rows[0];
+		var selectedAlbum = row.data;
+
+		if (row.id === '0') {
 			// show all albums
-			delete grid.query.Album;
+			gridFilter.set('album', undefined);
 		} else {
-			grid.query.Album = filter;
+			gridFilter.set('album', selectedAlbum);
 		}
-		grid.refresh();
 	});
 
 	// set the initial selections on the lists.
-	genres.select(0);
+	genresList.select('0');
 });
