@@ -9,10 +9,6 @@ than `dojox/grid`.  dgrid stores the current sort options, as they would be pass
 via a store's `sort` method; these options are retrievable via the sort getter
 (e.g. `grid.get("sort")`).
 
-Additionally, store-backed components will reflect any currently-applied sort
-information in the object returned by `get("sort")`, since `sort`
-becomes part of these options when queries are issued.
-
 ### rowSelector and indirect selection
 
 Indirect selection is available in dgrid via the Selector mixin.  This
@@ -230,13 +226,12 @@ an event object which fired on such a node.
 
 ### setStore
 
-Store-backed dgrid components support this via
-`set("collection", store)`.
+Store-backed dgrid components support this via `set("collection", store)`.
 
 ### setQuery
 
-Store-backed dgrid components support this via
-`set("collection", store.filter(filterOptions))`.
+Store-backed dgrid components support passing not only a root store, but also a
+filtered collection, e.g. `set("collection", store.filter(filterOptions))`.
 
 ### setItems
 

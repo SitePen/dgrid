@@ -26,11 +26,14 @@ require([
 ## Requirements
 
 The DnD extension assumes usage of a store-backed component, most commonly an
-[OnDemandGrid](../core-components/OnDemandList-and-OnDemandGrid.md#ondemandgrid) instance. The store should be
-order-aware, supporting the `options.before` parameter on `add()` and `put()`
-calls to properly respond to DnD operations. Additionally, if the store supports
-a `copy` method, it will be called for DnD copy operations within the same
-list/grid (since a `put` would normally relocate the item).
+[OnDemandGrid](../core-components/OnDemandList-and-OnDemandGrid.md#ondemandgrid)
+instance. The store should be order-aware, supporting the `options.beforeId`
+parameter on `add()` and `put()` calls to properly respond to DnD operations.
+(`dstore/Memory` and `dstore/Rest` both support this feature.)
+
+Additionally, if the store supports a `copy` method, it will be called for DnD
+copy operations within the same list/grid (since a `put` would normally relocate
+the item).
 
 Note that the DnD extension inherits the [Selection](../mixins/Selection.md) mixin, which allows it to
 behave more resiliently when dragging items.

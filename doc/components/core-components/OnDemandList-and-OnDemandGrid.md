@@ -39,18 +39,16 @@ define(["dgrid/OnDemandGrid"], function(OnDemandGrid){
 ## Usage
 
 OnDemandList inherits the \_StoreMixin module, which implements a basis for
-interacting with a [dstore
-store](https://github.com/SitePen/dstore) for querying of
+interacting with a [dstore store](https://github.com/SitePen/dstore) for querying of
 data. At minimum, this implementation expects a store which supports the `get`,
-`getIdentity`, `fetch`, `sort`, and `range` methods, and whose items include unique identifiers.
+`getIdentity`, `fetch`, `fetchRange`, and `sort` methods, and whose items include
+unique identifiers.
 
 OnDemandList requires that a store be specified via the `collection` property, and
-will call the `fetch` method on the store to retrieve the data to be rendered.
-OnDemandList will call the `range` method so as to only
-retrieve the necessary objects needed to render the visible rows. As the list or
-grid is scrolled, more `range` calls will be made to retrieve additional rows,
-and previous rows will be pruned from the DOM as they are scrolled well out of
-view.
+will call the `fetchRange` method so as to only retrieve the necessary objects
+needed to render the visible rows. As the list or grid is scrolled.  Additional
+`fetchRange` calls will be made to retrieve additional rows, and previous rows
+will be pruned from the DOM as they are scrolled far out of view.
 
 When working with a writable store, for best results, the store should return
 a collection with a `track` method, which enables the list to keep its
@@ -82,7 +80,7 @@ Property | Description
 `noDataMessage` | An optional message to be displayed when no results are returned by a query.
 `loadingMessage` | An optional message to be displayed in the loading node which appears when a new page of results is requested.
 `getBeforePut` | If `true` (the default), any `save` operations will re-fetch the item from the store via a `get` call, before applying changes represented by dirty data.
-`collection` | An instance of a dstore implementation, from which to fetch data.
+`collection` | An instance of a dstore implementation, from which to fetch data.  This may be a store instance, or a filtered collection returned from `store.filter()`.
 
 ### Method Summary 
 
