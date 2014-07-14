@@ -62,7 +62,7 @@ Property | Description
 ## Additional Grid APIs
 
 When the Tree mixin is applied to a column in a grid, the grid is augmented with
-the following method.
+the following methods and properties.
 
 Property | Description
 -------- | -----------

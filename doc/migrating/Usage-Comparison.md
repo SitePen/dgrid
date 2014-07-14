@@ -227,7 +227,7 @@ usage.
 For instance, the following declarative `dojox/grid` layout...
 
 ```html
-<table id="grid" data-dojo-type="dojox.grid.DataGrid"
+<table id="grid" data-dojo-type="dojox/grid/DataGrid"
     data-dojo-props="store: objectStore">
     <thead>
         <tr>
@@ -242,7 +242,8 @@ For instance, the following declarative `dojox/grid` layout...
 ...could be achieved declaratively using dgrid as follows...
 
 ```html
-<table id="grid" data-dojo-type="dgrid.CustomGrid"
+<table id="grid" data-dojo-type="dgrid/GridFromHtml"
+    data-dojo-mixins="dgrid/OnDemandList, dgrid/Keyboard, dgrid/Selection"
     data-dojo-props="collection: memoryStore">
     <thead>
         <tr>
@@ -252,26 +253,6 @@ For instance, the following declarative `dojox/grid` layout...
         </tr>
     </thead>
 </table>
-```
-
-...provided the following script is used...
-
-```js
-require(["dgrid/GridFromHtml", "dgrid/Keyboard", "dgrid/Selection",
-    "dstore/Memory", "dojo/_base/declare", "dojo/parser", "dojo/domReady!"],
-function(GridFromHtml, Keyboard, Selection, Memory, declare, parser){
-    var memoryStore = window.memoryStore = new Memory({data: [
-        // ... data here ...
-    ]});
-    
-    // Globally expose a Grid constructor including the mixins we want.
-    window.dgrid = {
-        CustomGrid: declare([GridFromHtml, Keyboard, Selection])
-    };
-    
-    // Parse the markup after exposing the global.
-    parser.parse();
-});
 ```
 
 Notice that rather than specifying individual non-standard attributes inside the
@@ -285,21 +266,10 @@ Note that some properties which have standard equivalents, such as `colspan` and
 `rowspan`, can be specified directly as HTML attributes in the element instead.
 Additionally, the innerHTML of the `th` becomes the column's label.
 
-The script block above demonstrates the main catch to using dgrid declaratively
-with `dojo/parser`: since the modules in the dgrid package are written to be
-pure AMD, they do not expose globals, which means whatever constructors are to
-be used need to be exposed manually.  Furthermore, rather than simply exposing
-the GridFromHtml constructor, the above example exposes a custom-declared
-constructor which mixes in desired functionality.
-
-Note that if column plugins are to be employed, these will also need to be
-similarly globally exposed.  Column plugins may be specified in the column
-definitions of declarative grid layouts within the `data-dgrid-column` attribute;
-for example:
-
-```html
-<th data-dgrid-column="dgrid.tree({ field: 'name' })">Name</th>
-```
+Note that since the modules in the dgrid package are written to be
+pure AMD, they do not expose globals, so module ID syntax *must* be used when
+parsing declarative dgrid instances.  `data-dojo-mixins` can be used to incorporate
+the desired functionality, analogous to using `declare` programmatically.
 
 ### Column Layout via HTML with views / columnsets
     
@@ -314,7 +284,7 @@ As a quick example, here is what a simple declarative grid with two views could
 look like with `dojox/grid`...
 
 ```html
-<table id="grid" data-dojo-type="dojox.grid.DataGrid"
+<table id="grid" data-dojo-type="dojox/grid/DataGrid"
     data-dojo-props="store: objectStore">
     <colgroup span="1" width="10%"></colgroup>
     <colgroup span="2"></colgroup>
@@ -333,7 +303,8 @@ look like with `dojox/grid`...
 example)
 
 ```html
-<table id="grid" data-dojo-type="dgrid.CustomGrid"
+<table id="grid" data-dojo-type="dgrid/GridWithColumnSetsFromHtml"
+    data-dojo-mixins="dgrid/OnDemandList, dgrid/Keyboard, dgrid/Selection"
     data-dojo-props="collection: memoryStore">
     <colgroup span="1"></colgroup>
     <colgroup span="2"></colgroup>

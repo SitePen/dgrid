@@ -20,8 +20,7 @@ or extensions (such as `dgrid/extensions/ColumnResizer`).
 Reusing a single column definition object between multiple grids (e.g.
 `var cols = {...}, gridA = new Grid({ columns: cols }), gridB = new Grid({ columns: cols })`)
 is *not* supported, and will not function properly. Always create a fresh `columns`
-object for every grid you instantiate.  This includes performing unique invocations
-of column plugin functions for each grid.
+object for every grid you instantiate.
 
 If multiple grids in a single page are likely to use the same column structure,
 in order to avoid code repetition, you can create a function which returns
