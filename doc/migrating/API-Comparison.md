@@ -103,7 +103,7 @@ will reject if an error occurs.
 ### selectable
 
 This is not exposed as a distinct option in dgrid, but is automatically managed
-by the `Selection` plugin.  Standard browser selection is disabled when a
+by the `Selection` mixin.  Standard browser selection is disabled when a
 `selectionMode` other than `none` is in use.
 Otherwise, text selection operates as normal.
 

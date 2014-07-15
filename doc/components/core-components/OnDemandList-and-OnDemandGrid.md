@@ -70,7 +70,7 @@ Property | Description
 `maxEmptySpace` | The maximum size (in pixels) of unrendered space below or above the rendered portion of the component; default is `Infinity`, which indicates that the size of unrendered space should approximate the total space which would be occupied by all items in the result set.
 `bufferRows` | The number of rows to keep rendered beyond each end of the currently visible area of the component; default is `10`.
 `farOffRemoval` | The minimum distance (in pixels) which must exist between the currently visible area and previously-rendered rows before they are removed from the DOM; default is `2000`, but this can be adjusted based on a known maximum height in cases where keeping fewer nodes in the DOM is preferable.
-`queryRowsOverlap` | Specifies the number of items to "overlap" between queries, which helps ensure consistency of observed updates to items at page boundaries. The default is `1`.
+`queryRowsOverlap` | Specifies the number of items to "overlap" between queries, which helps ensure consistency of observed updates to items at page boundaries. The default is `0`.
 `pagingMethod` | Specifies the method from the `dgrid/util/misc` module to use for throttling the scroll handler; defaults to `"debounce"` to wait until scrolling stops, but can also be set to `"throttleDelayed"` to load even as scrolling continues.
 `pagingDelay` | Specifies the number of milliseconds to debounce or throttle scroll handler calls (and thus also potential store requests); default is `15`.
 `keepScrollPosition` | Whether to attempt preserving scroll position by default on all `refresh` operations (including sort); defaults to `false`.  This can also be set per-refresh by passing an object with a `keepScrollPosition` property to the `refresh` function.
@@ -81,7 +81,7 @@ Property | Description
 -------- | -----------
 `noDataMessage` | An optional message to be displayed when no results are returned by a query.
 `loadingMessage` | An optional message to be displayed in the loading node which appears when a new page of results is requested.
-`getBeforePut` | if `true` (the default), any `save` operations will re-fetch the item from the store via a `get` call, before applying changes represented by dirty data.
+`getBeforePut` | If `true` (the default), any `save` operations will re-fetch the item from the store via a `get` call, before applying changes represented by dirty data.
 `query` | An object to be passed when issuing store queries, which may contain filter criteria.
 `queryOptions` | An object to be passed along with `query` when issuing store queries.  Note that the standard `start`, `count`, and `sort` properties are already managed by OnDemandList itself.
 `store` | An instance of a `dojo/store` implementation, from which to fetch data.
