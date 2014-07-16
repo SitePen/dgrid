@@ -67,7 +67,7 @@ Method | Description
 `down(row[, steps])` | Same as `up()`, but operating downward.
 `renderArray(array, beforeNode, options)` | This can be called to render an array directly into the list.  The `beforeNode` parameter can be used to render at a specific point in the list.  Note that when using store-backed components, this is called automatically.
 `renderRow(item, options)` | This method can be overridden to provide custom rendering logic for rows.  (The [Grid](Grid.md) module actually overrides this method.) `item` refers to the record from the array or store for the row.
-`removeRow(rowElement, justCleanup)` | This method can be extended/aspected to perform cleanup logic when an individual row is removed.
+`removeRow(rowElement, preserveDom, options)` | This method can be extended/aspected to perform cleanup logic when an individual row is removed.
 `set("sort", property, descending)` | This can be called to sort the List by a given property; if `true` is passed for `descending`, the sort will be in descending order. Multiple sort criteria can be specified in the format expected by store's `sort` method (an array of objects with `property` and `descending` properties); this is also the format `get("sort")` will return in. The [Grid](Grid.md) and [OnDemandList](OnDemandList-and-OnDemandGrid.md) modules further extend sort functionality.
 `scrollTo(options)` | scrolls to a given point in the grid.  Accepts `x` and `y` properties; if one is not given, position along that axis is not modified.
 `getScrollPosition()` | returns the current position that the grid is scrolled to, in the form of an object containing `x` and `y` properties.

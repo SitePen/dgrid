@@ -413,9 +413,9 @@ return declare(null, {
 			];
 		}else{
 			signals = [
-				aspect.before(this, "removeRow", function(rowElement, justCleanup){
+				aspect.before(this, "removeRow", function(rowElement, preserveDom){
 					var row;
-					if(!justCleanup){
+					if(!preserveDom){
 						row = this.row(rowElement);
 						// if it is a real row removal for a selected item, deselect it
 						if(row && (row.id in this.selection)){

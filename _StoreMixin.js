@@ -310,13 +310,10 @@ function(declare, lang, Deferred, listen, aspect, put){
 			return promise;
 		},
 
-		// TODO: Should justCleanup be renamed to preserveDom?
-		// TODO: Should justCleanup be moved into options?
-		// TODO: Should options be documented for List#removeRow?
-		removeRow: function(rowElement, justCleanup, options){
+		removeRow: function(rowElement, preserveDom, options){
 			var row = {element: rowElement};
 			// Check to see if we are now empty...
-			if(!justCleanup && this.noDataMessage &&
+			if(!preserveDom && this.noDataMessage &&
 					(this.up(row).element === rowElement) &&
 					(this.down(row).element === rowElement)){
 				// ...we are empty, so show the no data message.

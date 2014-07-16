@@ -520,20 +520,23 @@ function(declare, listen, has, miscUtil, hasClass, put){
 			
 			return put("div", "" + value);
 		},
-		removeRow: function(rowElement, justCleanup){
+		removeRow: function(rowElement, preserveDom, options){
 			// summary:
 			//		Simply deletes the node in a plain List.
 			//		Column plugins may aspect this to implement their own cleanup routines.
 			// rowElement: Object|DOMNode
 			//		Object or element representing the row to be removed.
-			// justCleanup: Boolean
+			// preserveDom: Boolean?
 			//		If true, the row element will not be removed from the DOM; this can
 			//		be used by extensions/plugins in cases where the DOM will be
 			//		massively cleaned up at a later point in time.
+			// options: Object?
+			//		May be specified with a `rows` property for the purpose of
+			//		cleaning up collection tracking (used by `_StoreMixin`).
 			
 			rowElement = rowElement.element || rowElement;
 			delete this._rowIdToObject[rowElement.id];
-			if(!justCleanup){
+			if(!preserveDom){
 				put(rowElement, "!");
 			}
 		},

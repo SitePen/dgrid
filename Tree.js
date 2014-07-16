@@ -98,11 +98,11 @@ define([
 							];
 						}
 						if('start' in options){
-							var rangeArgs = { start: options.start };
-							if('count' in options){
-								rangeArgs.end = options.start + options.count;
-							}
-							results = childCollection.fetchRange.call(childCollection, rangeArgs);
+							var rangeArgs = {
+								start: options.start,
+								end: options.start + options.count
+							};
+							results = childCollection.fetchRange(rangeArgs);
 						} else {
 							results = childCollection.fetch();
 						}
@@ -205,7 +205,7 @@ define([
 			return rowElement; // pass return value through
 		},
 
-		removeRow: function(rowElement, justCleanup, options){
+		removeRow: function(rowElement, preserveDom, options){
 			var connected = rowElement.connected,
 				childOptions = {};
 			if(connected){
@@ -232,7 +232,7 @@ define([
 				}
 
 				// now remove the connected container node
-				if(!justCleanup){
+				if(!preserveDom){
 					put(connected, "!");
 				}
 			}
