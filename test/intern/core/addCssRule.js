@@ -15,6 +15,7 @@ define([
 
 	test.suite("addCssRule", function(){
 		var testDiv;
+		var grid;
 		
 		// Setup / teardown
 		test.before(function(){
@@ -23,6 +24,12 @@ define([
 
 		test.after(function(){
 			domConstruct.destroy(testDiv);
+		});
+		
+		test.afterEach(function(){
+			if(grid){
+				grid.destroy();
+			}
 		});
 
 		// Tests
@@ -109,8 +116,7 @@ define([
 
 		test.test("addCssRule via dgrid APIs", function(){
 			var values = ["7px", "8px"],
-				origValues,
-				grid;
+				origValues;
 			
 			function createGrid(cleanAddedRules){
 				grid = new Grid({
@@ -184,9 +190,26 @@ define([
 				this.rules[i].remove();
 			}
 		});
+
+		test.test("Grid columns as array (numeric IDs)", function(){
+			grid = new Grid({
+				columns: [
+					{ field: "name" },
+					{ field: "value" }
+				]
+			});
+			document.body.appendChild(grid.domNode);
+			grid.startup();
+			
+			assert.doesNotThrow(function(){
+				grid.styleColumn(0, "font-size: 8px;");
+			}, null, "styleColumn with numeric column ID should not throw error");
+			assert.strictEqual("8px", domStyle.getComputedStyle(query(".dgrid-cell")[0]).fontSize,
+				"Column cell should have expected style");
+		});
 	});
 
-	test.suite("CSS escaping of IDs via dgrid APIs", function(){
+	test.suite("CSS escaping of column IDs via dgrid APIs", function(){
 	
 		var grid;
 		

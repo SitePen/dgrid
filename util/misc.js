@@ -178,7 +178,7 @@ define([
 			//		If specified, indicates that invalid characters should be
 			//		replaced by the given string rather than being escaped
 			
-			return id.replace(invalidCssChars, replace || "\\$1");
+			return typeof id === 'string' ? id.replace(invalidCssChars, replace || "\\$1") : id;
 		}
 	};
 	return util;
