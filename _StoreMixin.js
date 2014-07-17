@@ -375,8 +375,10 @@ function(declare, lang, Deferred, listen, aspect, put){
 						// remove the old slot
 						rows.splice(from, 1);
 
-						// adjust the rowIndex so adjustRowIndices has the right starting point
-						rows[from] && rows[from].rowIndex--;
+						if(event.type === 'remove' || (event.type === 'update' && event.from < event.to)){
+							// adjust the rowIndex so adjustRowIndices has the right starting point
+							rows[from] && rows[from].rowIndex--;
+						}
 
 						// the removal of rows could cause us to need to page in more items
 						if(self._processScroll){

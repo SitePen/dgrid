@@ -507,11 +507,12 @@ function(declare, listen, has, miscUtil, hasClass, put){
 			// get the row id for easy retrieval
 			this._rowIdToObject[row.id = id] = object;
 			parent.insertBefore(row, beforeNode || null);
-			if(previousRow){
+
+			row.rowIndex = i;
+			if(previousRow && previousRow.rowIndex !== (row.rowIndex - 1)){
 				// in this case, we are pulling the row from another location in the grid, and we need to readjust the rowIndices from the point it was removed
 				this.adjustRowIndices(previousRow);
 			}
-			row.rowIndex = i;
 			return row;
 		},
 		renderRow: function(value, options){
