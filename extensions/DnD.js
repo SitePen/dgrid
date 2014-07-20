@@ -92,7 +92,7 @@ define([
 				targetSource = this,
 				anchor = targetSource._targetAnchor,
 				targetRow,
-				self = this;
+				self = this,
 				nodeRow;
 			
 			if(anchor){ // (falsy if drop occurred in empty space after rows)
