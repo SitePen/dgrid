@@ -186,7 +186,7 @@ define([
 					// focus the newly-placed control (supported by form widgets and HTML inputs)
 					if(cmp.focus){
 						cmp.focus();
-						if (cmp.autoSelect) {
+						if (column.editorArgs && column.editorArgs.autoSelect) {
 							cmp.select();
 						}
 					}
@@ -246,7 +246,7 @@ define([
 					dfd = new Deferred();
 					if(cmp.focus){
 						cmp.focus();
-						if (cmp.autoSelect) {
+						if (column.editorArgs && column.editorArgs.autoSelect) {
 							cmp.select();
 						}
 					}
