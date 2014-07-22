@@ -186,6 +186,9 @@ define([
 					// focus the newly-placed control (supported by form widgets and HTML inputs)
 					if(cmp.focus){
 						cmp.focus();
+						if (cmp.autoSelect) {
+							cmp.select();
+						}
 					}
 					// resume blur handler once editor is focused
 					if(column._editorBlurHandle){
@@ -243,6 +246,9 @@ define([
 					dfd = new Deferred();
 					if(cmp.focus){
 						cmp.focus();
+						if (cmp.autoSelect) {
+							cmp.select();
+						}
 					}
 					dfd.resolve(cmp);
 					return dfd.promise;
