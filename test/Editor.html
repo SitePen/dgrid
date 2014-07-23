@@ -240,6 +240,7 @@
 							deps = editorType.indexOf("/") > -1 ? [editorType] : [],
 							data = [],
 							async = form.elements.async.checked,
+							autoSelect = form.elements.autoselect.checked,
 							store,
 							i;
 
@@ -254,6 +255,7 @@
 
 					require(deps, function(ctor){
 						var columnArgs = {
+							autoSelect: autoSelect,
 							autoSave: form.elements.autoSave.checked,
 							editor: ctor || editorType
 						};
@@ -350,6 +352,8 @@
 				(note: customRenderCell supersedes this setting)</label></p>
 
 			<p><label><input type="checkbox" name="async" value="true"> use async store</label></p>
+
+			<p><label><input type="checkbox" name="autoselect" value="true"> use autoselect</label></p>
 
 			<div>
 				<button type="submit" id="editorFormSubmit">Recreate Grid</button>
