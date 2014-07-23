@@ -367,6 +367,17 @@ define([
 				}
 			}
 
+			if (column.autoSelect) {
+				var selectNode = cmp.focusNode || cmp;
+				if (selectNode.select) {
+					on(selectNode, 'focus', function() {
+						setTimeout(function() {
+							selectNode.select();
+						}, 0);
+					});
+				}
+			}
+
 			return cmp;
 		},
 
