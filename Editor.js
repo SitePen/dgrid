@@ -367,6 +367,19 @@ define([
 				}
 			}
 
+			if (column.autoSelect) {
+				var selectNode = cmp.focusNode || cmp;
+				if (selectNode.select) {
+					on(selectNode, 'focus', function() {
+						// setTimeout is needed for always-on editors on WebKit,
+						// otherwise selection is reset immediately afterwards
+						setTimeout(function () {
+							selectNode.select();
+						}, 0);
+					});
+				}
+			}
+
 			return cmp;
 		},
 

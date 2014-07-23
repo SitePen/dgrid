@@ -254,6 +254,7 @@
 
 					require(deps, function(ctor){
 						var columnArgs = {
+							autoSelect: form.elements.autoSelect.checked,
 							autoSave: form.elements.autoSave.checked,
 							editor: ctor || editorType
 						};
@@ -348,6 +349,8 @@
 
 			<p><label><input type="checkbox" name="customFormatter" value="true"> use custom formatter
 				(note: customRenderCell supersedes this setting)</label></p>
+
+			<p><label><input type="checkbox" name="autoSelect" value="true"> automatically select text (textbox-based editors only)</label></p>
 
 			<p><label><input type="checkbox" name="async" value="true"> use async store</label></p>
 
