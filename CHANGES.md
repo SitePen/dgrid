@@ -17,6 +17,7 @@ The following is a rough list of changes, to be outlined more presentably later.
 * Replaced `List#newRow(...)` with `List#highlightRow(row[, delay])`
   (i.e. the equivalent of `newRow` is to call `insertRow` then `highlightRow`)
 * `Editor` is now a mixin (with a capital E), activated by presence of the `editor` column definition property
+* `Editor` now supports `autoSelect` property for columns using textbox-based inputs
 * `Selector` is now a mixin (with a capital S), activated by presence of the `selector` column definition property
 * `Tree` is now a mixin (with a capital T), activated by presence of the `renderExpando` column definition property
 * Some `Tree` properties have been moved from the column definition to instance-level,
