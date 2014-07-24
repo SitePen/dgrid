@@ -4,12 +4,13 @@ define([
 	"dgrid/OnDemandList",
 	"dgrid/OnDemandGrid",
 	"dgrid/Keyboard",
+	"dgrid/ColumnSet",
 	"dojo/_base/declare",
 	"dojo/on",
 	"dojo/query",
 	"put-selector/put",
 	"dgrid/test/data/base"
-], function(test, assert, OnDemandList, OnDemandGrid, Keyboard, declare, on, query, put){
+], function(test, assert, OnDemandList, OnDemandGrid, Keyboard, ColumnSet, declare, on, query, put){
 	var handles = [],
 		columns = {
 			col1: "Column 1",
@@ -17,7 +18,18 @@ define([
 			col5: "Column 5"
 		},
 		item = testStore.get(1),
-		grid;
+		grid,
+		columnSet = [
+			[
+				[{label: 'Column 1', field: 'col1'},
+						{label: 'Column 2', field: 'col2', sortable: false}],
+					[{label: 'Column 3', field: 'col3', colSpan: 2}]],
+			[
+				[{label: 'Column 1', field: 'col1', rowSpan: 2},
+					{label: 'Column 4', field: 'col4'}],
+					[{label: 'Column 5', field: 'col5'}]
+			]
+		];
 	
 	// Common functions run after each test and suite
 	
@@ -254,6 +266,38 @@ define([
 				"dgrid-cellfocusout event.cell contains expected row");
 			assert.strictEqual(blurredCell.column.id, "col1",
 				"dgrid-cellfocusout event.cell contains expected column");
+		});
+	});
+
+	test.suite("Keyboard (Grid + cellNavigation:true + ColumnSet)", function(){
+		test.before(function(){
+			grid = new (declare([OnDemandGrid, ColumnSet, Keyboard]))({
+				columnSets: columnSet,
+				sort: "id",
+				store: testStore
+			});
+			document.body.appendChild(grid.domNode);
+			grid.startup();
+		});
+
+		test.afterEach(afterEach);
+		test.after(after);
+
+		test.test("grid.focusHeader + ColumnSet", function(){
+			var colSetId;
+
+			handles.push(on(document.body, "dgrid-cellfocusin", function(e){
+				assert.isTrue("cell" in e, "dgrid-cellfocusin event has a cell property");
+				assert.isFalse("row" in e, "dgrid-cellfocusin event does not have a row property");
+				colSetId = e.cell.column.id;
+			}));
+
+			grid.focus(); // first focus the content body
+			grid.focusHeader();
+			assert.strictEqual(document.activeElement, query(".dgrid-cell", grid.headerNode)[0],
+				"focusHeader() targeted the first header cell");
+			assert.strictEqual(colSetId, "0-0-0",
+				"dgrid-cellfocusin event triggered on first cell on focusHeader() call");
 		});
 	});
 
