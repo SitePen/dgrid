@@ -369,7 +369,12 @@ var Keyboard = declare(null, {
 	},
 	
 	focus: function(element){
-		this._focusOnNode(element || this._focusedNode, false);
+		var node = element || this._focusedNode;
+		if(node){
+			this._focusOnNode(node, false);
+		}else{
+			this.contentNode.focus();
+		}
 	}
 });
 

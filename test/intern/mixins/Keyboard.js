@@ -8,9 +8,10 @@ define([
 	"dojo/_base/declare",
 	"dojo/on",
 	"dojo/query",
+	"dojo/store/Memory",
 	"put-selector/put",
 	"dgrid/test/data/base"
-], function(test, assert, OnDemandList, OnDemandGrid, Keyboard, ColumnSet, declare, on, query, put){
+], function(test, assert, OnDemandList, OnDemandGrid, Keyboard, ColumnSet, declare, on, query, Memory, put){
 	var handles = [],
 		columns = {
 			col1: "Column 1",
@@ -266,6 +267,15 @@ define([
 				"dgrid-cellfocusout event.cell contains expected row");
 			assert.strictEqual(blurredCell.column.id, "col1",
 				"dgrid-cellfocusout event.cell contains expected column");
+		});
+
+		test.test("grid.focus - no args, empty store", function(){
+			grid.set("store", new Memory({ data: [] }));
+			assert.doesNotThrow(function(){
+				grid.focus();
+			}, null, "grid.focus() on empty grid should not throw error");
+			assert.strictEqual(document.activeElement, grid.contentNode,
+				"grid.contentNode should be focused after grid.focus() on empty grid");
 		});
 	});
 
