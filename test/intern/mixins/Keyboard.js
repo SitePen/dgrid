@@ -275,7 +275,7 @@ define([
 			grid = new (declare([OnDemandGrid, ColumnSet, Keyboard]))({
 				columnSets: columnSet,
 				sort: "id",
-				store: testStore
+				collection: testStore
 			});
 			document.body.appendChild(grid.domNode);
 			grid.startup();
