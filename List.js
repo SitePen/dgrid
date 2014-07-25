@@ -456,10 +456,6 @@ function(declare, listen, has, miscUtil, hasClass, put){
 				this._lastCollection = results;
 			}
 			
-			if(!len){
-				return rows;
-			}
-			
 			// Insert a row for each item into the document fragment
 			while(i < len){
 				rows[i] = this.insertRow(results[i], rowsFragment, null, start++, options);
@@ -471,7 +467,9 @@ function(declare, listen, has, miscUtil, hasClass, put){
 			if(container && container.parentNode &&
 					(container !== self.contentNode || len)){
 				container.insertBefore(rowsFragment, beforeNode || null);
-				self.adjustRowIndices(rows[len - 1]);
+				if(len){
+					self.adjustRowIndices(rows[len - 1]);
+				}
 			}
 			
 			return rows;

@@ -335,23 +335,11 @@ function(declare, lang, Deferred, listen, aspect, put){
 
 			options = lang.mixin({ rows: this._rows }, options);
 			var self = this,
-				start = options.start || 0,
-				container;
+				start = options.start || 0;
 
 			return Deferred.when(results).then(function(resolvedResults){
-				var resolvedRows;
-
-				container = beforeNode ? beforeNode.parentNode : self.contentNode;
-				if(container && container.parentNode &&
-						(container !== self.contentNode || resolvedResults.length)){
-					resolvedRows = self.renderArray(resolvedResults, beforeNode, options);
-
-					delete self._lastCollection; // used only for non-store List/Grid
-				}else{
-					// Don't bother inserting; the container has been removed from the DOM
-					// or there were no rows to render
-					resolvedRows = [];
-				}
+				var resolvedRows = self.renderArray(resolvedResults, beforeNode, options);
+				delete self._lastCollection; // used only for non-store List/Grid
 				return resolvedRows;
 			});
 		},
