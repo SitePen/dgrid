@@ -14,6 +14,9 @@ function(declare, lang, Deferred, listen, aspect, query, has, miscUtil, put, has
 		}
 		return supported;
 	});
+	has.add('event-touchmove', function(global, document, element) {
+		return ('ontouchstart' in global) || global.DocumentTouch && document instanceof DocumentTouch
+	});
 
 	var colsetidAttr = "data-dgrid-column-set-id";
 	
@@ -65,6 +68,36 @@ function(declare, lang, Deferred, listen, aspect, query, has, miscUtil, put, has
 		return subset;
 	}
 
+	var horizTouchMove = has('event-touchmove') ? function(grid){
+		return function(target, listener){
+			var lastX, timeoutId;
+			return listen(target, 'touchmove', function(event){
+				if(timeoutId){
+					clearTimeout(timeoutId);
+				}
+				var node = event.target,
+					touch = event.touches[0] || event.changedTouches[0];
+
+				if(lastX){
+					while(!query.matches(node, '.dgrid-column-set[' + colsetidAttr + ']', target)){
+						if(node === target || !(node = node.parentNode)){
+							return;
+						}
+					}
+					listener.call(null, grid, node, lastX - touch.clientX);
+				}
+				lastX = touch.clientX;
+
+				// Reset lastX if a touchmove hasn't fired in a while
+				timeoutId = setTimeout(function(){
+					lastX = 0;
+				}, 500);
+			});
+		}
+	} : function(){
+		return function(){}
+	}
+
 	var horizMouseWheel = has("event-mousewheel") || has("event-wheel") ? function(grid){
 		return function(target, listener){
 			return listen(target, has("event-wheel") ? "wheel" : "mousewheel", function(event){
@@ -110,14 +143,16 @@ function(declare, lang, Deferred, listen, aspect, query, has, miscUtil, put, has
 		
 		postCreate: function(){
 			this.inherited(arguments);
-			
-			this.on(horizMouseWheel(this), function(grid, colsetNode, amount){
+
+			function horizMoveHandler(grid, colsetNode, amount){
 				var id = colsetNode.getAttribute(colsetidAttr),
 					scroller = grid._columnSetScrollers[id],
 					scrollLeft = scroller.scrollLeft + amount;
 				
 				scroller.scrollLeft = scrollLeft < 0 ? 0 : scrollLeft;
-			});
+			}
+			this.on(horizTouchMove(this), horizMoveHandler);
+			this.on(horizMouseWheel(this), horizMoveHandler);
 		},
 		columnSets: [],
 		createRowCells: function(tag, each, subRows, object){
