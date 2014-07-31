@@ -3,6 +3,12 @@ function(declare, listen, has, miscUtil, hasClass, put){
 	// Add user agent/feature CSS classes 
 	hasClass("mozilla", "opera", "webkit", "ie", "ie-6", "ie-6-7", "quirks", "no-quirks", "touch");
 	
+	// Add a feature test for pointer (only Dojo 1.10 has pointer-events and MSPointer tests)
+	has.add("pointer", function(global, doc, element){
+		return "onpointerdown" in element ? "pointer" :
+			"onmspointerdown" in element ? "MSPointer" : false;
+	});
+	
 	var oddClass = "dgrid-row-odd",
 		evenClass = "dgrid-row-even",
 		scrollbarWidth, scrollbarHeight;

@@ -5,11 +5,6 @@ has.add("dom-comparedocumentposition", function(global, doc, element){
 	return !!element.compareDocumentPosition;
 });
 
-has.add("pointer", function(global, doc, element){
-	return "onpointerdown" in element ? "pointer" :
-		"onmspointerdown" in element ? "MSPointer" : false;
-});
-
 // Add feature test for user-select CSS property for optionally disabling
 // text selection.
 // (Can't use dom.setSelectable prior to 1.8.2 because of bad sniffs, see #15990)

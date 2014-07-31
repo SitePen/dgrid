@@ -3,6 +3,9 @@
 	width: 100%;
 	position: relative; /* This is needed because we setting position: relative on cells in the grid for focus in IE7*/
 	height: 100%;
+	/* On touch devices, disable default X-axis drag behavior but allow vertical scrolling */
+	-ms-touch-action: pan-y;
+	touch-action: pan-y;
 }
 
 .dgrid-column-set-cell {

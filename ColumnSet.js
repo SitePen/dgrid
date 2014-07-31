@@ -65,20 +65,90 @@ function(declare, lang, Deferred, listen, aspect, query, has, miscUtil, put, has
 		return subset;
 	}
 
+	function findParentColumnSet(node, root) {
+		// WebKit will invoke mousewheel handlers with an event target of a text
+		// node; check target and if it's not an element node, start one node higher
+		// in the tree
+		if (node.nodeType !== 1) {
+			node = node.parentNode;
+		}
+		while(node && !query.matches(node, '.dgrid-column-set[' + colsetidAttr + ']', root)){
+			node = node.parentNode;
+		}
+		return node;
+	}
+	
+	var pointerMap = {
+		start: 'down',
+		end: 'up'
+	};
+	
+	function getTouchEventName(type) {
+		// Given 'start', 'move', or 'end', returns appropriate touch or pointer event name
+		// based on browser support.  (Assumes browser supports touch or pointer.)
+		var hasPointer = has('pointer');
+		if (hasPointer) {
+			type = pointerMap[type] || type;
+			if (hasPointer.slice(0, 2) === 'MS') {
+				return 'MSPointer' + type.slice(0, 1).toUpperCase() + type.slice(1);
+			}
+			else {
+				return 'pointer' + type;
+			}
+		}
+		return 'touch' + type;
+	}
+	
+	var horizTouchMove = has('touch') && function(grid){
+		return function(target, listener){
+			var listeners = [
+				listen(target, getTouchEventName('start'), function (event) {
+					if (!grid._currentlyTouchedColumnSet) {
+						var node = findParentColumnSet(event.target, target);
+						// If handling pointer events, only react to touch;
+						// MSPointerDown (IE10) reports 2, 3, 4 for touch, pen, mouse
+						if (node && (!event.pointerType || event.pointerType === 'touch' || event.pointerType === 2)) {
+							grid._currentlyTouchedColumnSet = node;
+							grid._lastColumnSetTouchX = event.clientX;
+							grid._lastColumnSetTouchY = event.clientY;
+						}
+					}
+				}),
+				listen(target, getTouchEventName('move'), function (event) {
+					if (grid._currentlyTouchedColumnSet === null) {
+						return;
+					}
+					var node = findParentColumnSet(event.target);
+					if (!node) {
+						return;
+					}
+					listener.call(null, grid, node, grid._lastColumnSetTouchX - event.clientX);
+					grid._lastColumnSetTouchX = event.clientX;
+					grid._lastColumnSetTouchY = event.clientY;
+				}),
+				listen(target, getTouchEventName('end'), function () {
+					grid._currentlyTouchedColumnSet = null;
+				})
+			];
+			
+			return {
+				remove: function () {
+					for (var i = listeners.length; i--;) {
+						listeners[i].remove();
+					}
+				}
+			};
+		}
+	}
+
 	var horizMouseWheel = has("event-mousewheel") || has("event-wheel") ? function(grid){
 		return function(target, listener){
 			return listen(target, has("event-wheel") ? "wheel" : "mousewheel", function(event){
-				var node = event.target, deltaX;
-				// WebKit will invoke mousewheel handlers with an event target of a text
-				// node; check target and if it's not an element node, start one node higher
-				// in the tree
-				if(node.nodeType !== 1){
-					node = node.parentNode;
-				}
-				while(!query.matches(node, ".dgrid-column-set[" + colsetidAttr + "]", target)){
-					if(node === target || !(node = node.parentNode)){
-						return;
-					}
+				var node = findParentColumnSet(event.target, target),
+					deltaX;
+				
+				if (!node) {
+					return;
 				}
 				
 				// Normalize reported delta value:
@@ -102,6 +172,14 @@ function(declare, lang, Deferred, listen, aspect, query, has, miscUtil, put, has
 		};
 	};
 	
+	function horizMoveHandler(grid, colsetNode, amount){
+		var id = colsetNode.getAttribute(colsetidAttr),
+			scroller = grid._columnSetScrollers[id],
+			scrollLeft = scroller.scrollLeft + amount;
+		
+		scroller.scrollLeft = scrollLeft < 0 ? 0 : scrollLeft;
+	}
+	
 	return declare(null, {
 		// summary:
 		//		Provides column sets to isolate horizontal scroll of sets of 
@@ -110,16 +188,15 @@ function(declare, lang, Deferred, listen, aspect, query, has, miscUtil, put, has
 		
 		postCreate: function(){
 			this.inherited(arguments);
-			
-			this.on(horizMouseWheel(this), function(grid, colsetNode, amount){
-				var id = colsetNode.getAttribute(colsetidAttr),
-					scroller = grid._columnSetScrollers[id],
-					scrollLeft = scroller.scrollLeft + amount;
-				
-				scroller.scrollLeft = scrollLeft < 0 ? 0 : scrollLeft;
-			});
+
+			this.on(horizMouseWheel(this), horizMoveHandler);
+			if (has('touch')) {
+				this.on(horizTouchMove(this), horizMoveHandler);
+			}
 		},
+		
 		columnSets: [],
+		
 		createRowCells: function(tag, each, subRows, object){
 			var row = put("table.dgrid-row-table");
 			var tr = put(row, "tbody tr");
