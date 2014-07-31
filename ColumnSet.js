@@ -33,12 +33,11 @@ function(kernel, declare, lang, Deferred, listen, aspect, query, has, miscUtil, 
 		}
 	}
 	
-	function scrollColumnSet(grid, columnSetNode, amount){
-		var id = columnSetNode.getAttribute(colsetidAttr),
-			scroller = grid._columnSetScrollers[id],
-			scrollLeft = scroller.scrollLeft + amount;
+	function scrollColumnSetTo(grid, columnSetNode, offsetLeft){
+		var id = columnSetNode.getAttribute(colsetidAttr);
+		var scroller = grid._columnSetScrollers[id];
 
-		scroller.scrollLeft = scrollLeft < 0 ? 0 : scrollLeft;
+		scroller.scrollLeft = offsetLeft < 0 ? 0 : offsetLeft;
 	}
 
 	function getColumnSetSubRows(subRows, columnSetId){
@@ -109,6 +108,7 @@ function(kernel, declare, lang, Deferred, listen, aspect, query, has, miscUtil, 
 		//		column locking.
 		
 		postCreate: function(){
+			var self = this;
 			this.inherited(arguments);
 			
 			this.on(horizMouseWheel(this), function(grid, colsetNode, amount){
@@ -117,6 +117,9 @@ function(kernel, declare, lang, Deferred, listen, aspect, query, has, miscUtil, 
 					scrollLeft = scroller.scrollLeft + amount;
 				
 				scroller.scrollLeft = scrollLeft < 0 ? 0 : scrollLeft;
+			});
+			this.on('.dgrid-column-set:dgrid-cellfocusin', function (event) {
+				self._onColumnSetCellFocus(event, this);
 			});
 		},
 		columnSets: [],
@@ -170,7 +173,6 @@ function(kernel, declare, lang, Deferred, listen, aspect, query, has, miscUtil, 
 				// first-time-only operations: hook up event/aspected handlers
 				aspect.after(this, "resize", reposition, true);
 				aspect.after(this, "styleColumn", reposition, true);
-				listen(domNode, ".dgrid-column-set:dgrid-cellfocusin", lang.hitch(this, '_onColumnSetScroll'));
 			}
 			
 			// reset to new object to be populated in loop below
@@ -295,6 +297,20 @@ function(kernel, declare, lang, Deferred, listen, aspect, query, has, miscUtil, 
 		setColumnSets: function(columnSets){
 			kernel.deprecated("setColumnSets(...)", 'use set("columnSets", ...) instead', "dgrid 0.4");
 			this.set("columnSets", columnSets);
+		},
+
+		_onColumnSetCellFocus: function(event, columnSetNode){
+			var focusedNode = event.target;
+			var columnSetId = columnSetNode.getAttribute(colsetidAttr);
+			// columnSetNode's offsetLeft is not always correct,
+			// so get the columnScroller to check offsetLeft against
+			var columnScroller = this._columnSetScrollers[columnSetId];
+			var elementEdge = focusedNode.offsetLeft - columnScroller.scrollLeft + focusedNode.offsetWidth;
+
+			if (elementEdge > columnSetNode.offsetWidth ||
+				columnScroller.scrollLeft > focusedNode.offsetLeft) {
+				scrollColumnSetTo(this, columnSetNode, focusedNode.offsetLeft);
+			}
 		}
 	});
 });
