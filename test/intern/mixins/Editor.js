@@ -11,13 +11,16 @@ define([
 	"dijit/registry",
 	"dijit/form/TextBox",
 	"dgrid/Grid",
+	"dgrid/OnDemandGrid",
 	"dgrid/Editor",
+	"dgrid/test/data/createSyncStore",
 	"dgrid/test/data/orderedData"
-], function(test, assert, declare, aspect, Deferred, on, all, query, when, registry, TextBox, Grid, Editor, orderedData){
+], function(test, assert, declare, aspect, Deferred, on, all, query, when, registry, TextBox,
+		Grid, OnDemandGrid, Editor, createSyncStore, orderedData){
+	
 	var testOrderedData = orderedData.items,
+		EditorGrid = declare([Grid, Editor]),
 		grid;
-
-	var EditorGrid = declare([Grid, Editor]);
 
 	test.suite("editor column mixin", function(){
 
@@ -308,6 +311,50 @@ define([
 
 			assert.strictEqual(0, registry.length,
 				"After grid is destroyed there should be 0 widgets on the page");
+		});
+
+		test.test("editor widget startup called at appropriate time", function () {
+			var assertionMessage;
+			var AssertionTextBox = declare(TextBox, {
+				startup: function () {
+					if (this._started) {
+						return;
+					}
+					assert.isTrue(this.domNode.offsetHeight > 0,
+						assertionMessage + ": startup should not be called before widgets are in flow");
+					this.inherited(arguments);
+				}
+			});
+
+			grid = new (declare([OnDemandGrid, Editor]))({
+				columns: {
+					order: "step",
+					name: {
+						label: "Name",
+						editor: AssertionTextBox
+					},
+					description: {
+						label: "Description",
+						editor: AssertionTextBox,
+						editOn: "click"
+					}
+				},
+				collection: createSyncStore({
+					data: testOrderedData,
+					idProperty: "order"
+				})
+			});
+			document.body.appendChild(grid.domNode);
+
+			assertionMessage = "always-on";
+			grid.startup();
+
+			// Assertions will automatically run for always-on editor;
+			// test activating an editOn editor and also test updating a row
+			assertionMessage = "editOn + edit()";
+			grid.edit(grid.cell(1, "description"));
+			assertionMessage = "editOn + Observable";
+			grid.collection.put(grid.collection.get(2));
 		});
 
 		test.test("editor focus with always-on editor", function(){

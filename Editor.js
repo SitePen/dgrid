@@ -14,6 +14,7 @@ define([
 		constructor: function(){
 			this._editorInstances = {};
 			this._editorColumnListeners = [];
+			this._editorsPendingStartup = [];
 		},
 
 		postCreate: function(){
@@ -76,6 +77,23 @@ define([
 			return this.inherited(arguments);
 		},
 
+		renderArray: function () {
+			var rows = this.inherited(arguments);
+			if (rows.length) {
+				// Finish processing any pending editors that are now displayed
+				this._startupPendingEditors();
+			}
+			else {
+				this._editorsPendingStartup = [];
+			}
+			return rows;
+		},
+
+		_onNotification: function () {
+			this.inherited(arguments);
+			this._startupPendingEditors();
+		},
+
 		_destroyColumns: function(){
 			this._editorStructureCleanup();
 			this.inherited(arguments);
@@ -102,6 +120,7 @@ define([
 				listeners[i].remove();
 			}
 			this._editorColumnListeners = [];
+			this._editorsPendingStartup = [];
 		},
 
 		_configColumns: function(prefix, columns){
@@ -173,7 +192,7 @@ define([
 			//		input/widget when the cell editor is focused.
 			//		If the cell is not editable, returns null.
 
-			var row, column, cellElement, dirty, field, value, cmp, dfd, node, 
+			var row, column, cellElement, dirty, field, value, cmp, dfd, node,
 				self = this;
 
 			function showEditor(dfd) {
@@ -265,10 +284,23 @@ define([
 			put(cellElement, ".dgrid-cell-editing");
 			put(cellElement, cmp.domNode || cmp);
 
-			if(isWidget){
-				// For widgets, ensure startup is called before setting value,
-				// to maximize compatibility with flaky widgets like dijit/form/Select.
-				if(!cmp._started){
+			if (isWidget && !column.editOn) {
+				// Queue arguments to be run once editor is in DOM
+				this._editorsPendingStartup.push([cmp, column, cellElement, value]);
+			}
+			else {
+				this._startupEditor(cmp, column, cellElement, value);
+			}
+		},
+
+		_startupEditor: function (cmp, column, cellElement, value) {
+			// summary:
+			//		Handles editor widget startup logic and updates the editor's value.
+
+			if (cmp.domNode) {
+				// For widgets, ensure startup is called before setting value, to maximize compatibility
+				// with flaky widgets like dijit/form/Select.
+				if (!cmp._started) {
 					cmp.startup();
 				}
 
@@ -276,15 +308,16 @@ define([
 				// (Clear flag on a timeout to wait for delayed onChange to fire first)
 				cmp._dgridIgnoreChange = true;
 				cmp.set("value", value);
-				setTimeout(function(){
+				setTimeout( function () {
 					cmp._dgridIgnoreChange = false;
 				}, 0);
 			}
+
 			// track previous value for short-circuiting or in case we need to revert
 			cmp._dgridLastValue = value;
 			// if this is an editor with editOn, also update _activeValue
 			// (_activeOptions will have been updated previously)
-			if(this._activeCell){
+			if (this._activeCell) {
 				this._activeValue = value;
 				// emit an event immediately prior to placing a shared editor
 				on.emit(cellElement, "dgrid-editor-show", {
@@ -296,6 +329,14 @@ define([
 					cancelable: false
 				});
 			}
+		},
+
+		_startupPendingEditors: function () {
+			var args = this._editorsPendingStartup;
+			for (var i = args.length; i--;) {
+				this._startupEditor.apply(this, args[i]);
+			}
+			this._editorsPendingStartup = [];
 		},
 
 		_createEditor: function(column){
@@ -537,7 +578,7 @@ define([
 				column = cell.column;
 				// Re-resolve cellElement in case the passed element was nested
 				cellElement = cell.element;
-				
+
 				if(column.field && row){
 					// TODO: remove rowId in lieu of cell (or grid.row/grid.cell)
 					// (keeping for the moment for back-compat, but will note in changes)
