@@ -4,13 +4,15 @@ define([
 	"dojo/_base/declare",
 	"dojo/on",
 	"dojo/query",
+	"dojo/store/Memory",
+	"dojo/store/Observable",
 	"dijit/registry",
 	"dijit/form/TextBox",
 	"dgrid/Grid",
 	"dgrid/OnDemandGrid",
 	"dgrid/editor",
 	"dgrid/test/data/base"
-], function (test, assert, declare, on, query, registry, TextBox, Grid, OnDemandGrid, editor) {
+], function (test, assert, declare, on, query, Memory, Observable, registry, TextBox, Grid, OnDemandGrid, editor) {
 	var grid;
 
 	// testOrderedData: global from dgrid/test/data/base.js
@@ -129,7 +131,7 @@ define([
 				return data.order % 2;
 			}
 
-			grid = new OnDemandGrid({
+			grid = new Grid({
 				columns: {
 					order: "step",
 					name: editor({
@@ -196,7 +198,7 @@ define([
 			assert.strictEqual(0, matchedNodes.length,
 				"Before grid is created there should be 0 input elements on the page");
 
-			grid = new OnDemandGrid({
+			grid = new Grid({
 				columns: {
 					order: "step",
 					name: editor({
@@ -231,7 +233,7 @@ define([
 			assert.strictEqual(0, registry.length,
 				"Before grid is created there should be 0 widgets on the page");
 
-			grid = new OnDemandGrid({
+			grid = new Grid({
 				columns: {
 					order: "step",
 					name: editor({
@@ -259,13 +261,57 @@ define([
 				"After grid is destroyed there should be 0 widgets on the page");
 		});
 
+		test.test("editor widget startup called at appropriate time", function () {
+			var assertionMessage;
+			var AssertionTextBox = declare(TextBox, {
+				startup: function () {
+					if (this._started) {
+						return;
+					}
+					assert.isTrue(this.domNode.offsetHeight > 0,
+						assertionMessage + ": startup should not be called before widgets are in flow");
+					this.inherited(arguments);
+				}
+			});
+
+			grid = new OnDemandGrid({
+				columns: {
+					order: "step",
+					name: editor({
+						label: "Name",
+						editor: AssertionTextBox
+					}),
+					description: editor({
+						label: "Description",
+						editor: AssertionTextBox,
+						editOn: "click"
+					})
+				},
+				store: new Observable(new Memory({
+					data: testOrderedData,
+					idProperty: "order"
+				}))
+			});
+			document.body.appendChild(grid.domNode);
+
+			assertionMessage = "always-on";
+			grid.startup();
+
+			// Assertions will automatically run for always-on editor;
+			// test activating an editOn editor and also test updating a row
+			assertionMessage = "editOn + edit()";
+			grid.edit(grid.cell(1, "description"));
+			assertionMessage = "editOn + Observable";
+			grid.store.put(grid.store.get(2));
+		});
+
 		test.test("editor focus with always on editor", function () {
 			var rowCount,
 				cell,
 				cellEditor,
 				dfd = this.async();
 
-			grid = new OnDemandGrid({
+			grid = new Grid({
 				columns: {
 					order: "step",
 					name: editor({
@@ -312,7 +358,7 @@ define([
 				cellEditor,
 				dfd = this.async();
 
-			grid = new OnDemandGrid({
+			grid = new Grid({
 				columns: {
 					order: "step",
 					name: editor({
