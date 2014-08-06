@@ -27,7 +27,7 @@ define([
 				xOffset = 30;
 			}
 
-			remote.elementByCssSelector("#treeGrid-row-AF " + clickTarget)
+			return remote.elementByCssSelector("#treeGrid-row-AF " + clickTarget)
 				.moveTo(xOffset, 8)
 				[clickMethod]()
 				.sleep(TRANSITION_DELAY)
@@ -47,9 +47,8 @@ define([
 				.isDisplayed()
 				.then(function(isDisplayed){
 					assert.ok(!isDisplayed, "Collapsed rows should not be visible");
-				});
-
-			return remote.end();
+				})
+				.end();
 		};
 	}
 

@@ -2,75 +2,76 @@ define([
 	"intern!tdd",
 	"intern/chai!assert",
 	"./util",
-	"dojo/node!wd/lib/special-keys",
+	"intern/dojo/node!leadfoot/keys",
 	"require"
-], function (test, assert, util, specialKeys, require) {
+], function (test, assert, util, keys, require) {
 	// Number of visible rows in the grid.
 	// Check the data loaded in test file (editor.html) and rows visible
 	// when the page is loaded to ensure this is correct.
 	var GRID_ROW_COUNT = 3;
 	var rowSelectorPrefix = "#grid-row-";
 
+	var EditorCommand = util.createCommandConstructor({
+		dismissViaEnter: function () {
+			// Presses the enter key and ends the current element context.
+			return new this.constructor(this, function () {
+				return this.parent.type(keys.ENTER);
+			});
+		},
+		dismissViaBlur: function () {
+			// Exits to the parent context and focuses an unrelated element.
+			return new this.constructor(this, function () {
+				return this.parent.end()
+					.elementByTagName("h2")
+					.click();
+			});
+		}
+	});
+
 	test.suite("dgrid/editor functional tests", function () {
 		var gotoEnd; // Function defined when `before` logic runs
-		
-		// Functions to dismiss field and register edited value, passed to createDatachangeTest
-
-		function dismissViaEnter(remote) {
-			return remote.type(specialKeys.Enter)
-				.end();
-		}
-
-		function dismissViaBlur(remote) {
-			return remote.end()
-				.elementByTagName("h2")
-				.click()
-				.end();
-		}
 
 		// Functions performing operations to test the editor columns in the grid,
 		// passed to createDatachangeTest
 
-		function testAlwaysOnEditor(remote, rowIndex, dismissFunc) {
+		function testAlwaysOnEditor(command, rowIndex, dismissFunc) {
 			var startValue,
 				appendValue = "abc";
 
 			// Click the cell's editor element to focus it
-			remote.elementByCssSelector(rowSelectorPrefix + rowIndex + " .field-name input")
+			command = command.elementByCssSelector(rowSelectorPrefix + rowIndex + " .field-name input")
 					.clickElement()
-
 					// Store the current cell value
 					.getValue()
 					.then(function (cellValue) {
 						startValue = cellValue;
 					});
-
-				// Type extra chars to change value
-				gotoEnd(remote)
-					.type(appendValue);
-				dismissFunc(remote); // calls end
-
-			// Click another cell to blur the edited cell (and trigger saving and dgrid-datachange event)
-			remote.elementByCssSelector(rowSelectorPrefix + rowIndex + " .field-description")
-				.clickElement()
-				// The test page has a dgrid-datachange event listener that will push the new value
-				// into a global array: datachangeStack
-				.execute("return datachangeStack.shift();")
-				.then(function (datachangeValue) {
-					assert.strictEqual(startValue + appendValue, datachangeValue,
-						"Value in dgrid-datachange event (" + datachangeValue +
-							") should equal edited value (" + startValue + appendValue + ")");
-				})
-				.end();
+			// Type extra characters to change value
+			return gotoEnd(command)
+					.type(appendValue)
+					[dismissFunc]()
+					.end()
+				// Click another cell to blur the edited cell (and trigger saving and dgrid-datachange event)
+				.elementByCssSelector(rowSelectorPrefix + rowIndex + " .field-description")
+					.clickElement()
+					// The test page has a dgrid-datachange event listener that will push the new value
+					// into a global array: datachangeStack
+					.execute("return datachangeStack.shift();")
+					.then(function (datachangeValue) {
+						assert.strictEqual(startValue + appendValue, datachangeValue,
+							"Value in dgrid-datachange event (" + datachangeValue +
+								") should equal edited value (" + startValue + appendValue + ")");
+					})
+					.end();
 		}
 
-		function testEditOnEditor(remote, rowIndex, dismissFunc) {
+		function testEditOnEditor(command, rowIndex, dismissFunc) {
 			var cellSelector = rowSelectorPrefix + rowIndex + " .field-description",
 				startValue,
 				appendValue = "abc";
 
 			// Click the cell to activate the editor
-			remote.elementByCssSelector(cellSelector)
+			command = command.elementByCssSelector(cellSelector)
 					.clickElement()
 					.end()
 				// Set context to the cell's editor
@@ -80,15 +81,14 @@ define([
 					.then(function (cellValue) {
 						startValue = cellValue;
 					});
-
-				// Type extra chars to change value
-				gotoEnd(remote)
-					.type(appendValue);
-				dismissFunc(remote); // calls end
-
-			// The test page has a dgrid-datachange event listener that will push the new value
-			// into a global array: datachangeStack
-			remote.execute("return datachangeStack.shift();")
+			// Type extra characters to change value
+			return gotoEnd(command)
+					.type(appendValue)
+					[dismissFunc]()
+					.end()
+				// The test page has a dgrid-datachange event listener that will push the new value
+				// into a global array: datachangeStack
+				.execute("return datachangeStack.shift();")
 				.then(function (datachangeValue) {
 					assert.strictEqual(startValue + appendValue, datachangeValue,
 						"Value in dgrid-datachange event (" + datachangeValue +
@@ -100,32 +100,32 @@ define([
 			// Generates test functions for enter/blur value registration tests
 			return function () {
 				this.async(60000);
-				var remote = this.get("remote");
+				var command = new EditorCommand(this.get("remote"));
 
-				remote.get(require.toUrl("./Editor.html"));
-				remote.waitForCondition("ready", 15000);
+				command = command.get(require.toUrl("./Editor.html"))
+					.waitForCondition("ready", 15000);
 
 				if (initFunction) {
-					remote.execute(initFunction);
+					command = command.execute(initFunction);
 				}
 
 				for (var rowIndex = 0; rowIndex < GRID_ROW_COUNT; rowIndex++) {
-					testFunc(remote, rowIndex, dismissFunc);
+					command = testFunc(command, rowIndex, dismissFunc);
 				}
-				
-				return remote.end();
+
+				return command;
 			};
 		}
 
 		function createFocusTest(selector, initFunction) {
 			// Generates test functions for focus preservation tests
 			return function () {
-				var remote = this.get("remote"),
+				var command = new EditorCommand(this.get("remote")),
 					rowIndex;
 
 				function each(rowIndex) {
 					// Click the cell to activate and focus the editor
-					remote.elementByCssSelector(rowSelectorPrefix + rowIndex + " " + selector)
+					return command.elementByCssSelector(rowSelectorPrefix + rowIndex + " " + selector)
 							.clickElement()
 							.end()
 						.executeAsync(function (id, rowIdPrefix, done) {
@@ -154,24 +154,24 @@ define([
 							.end();
 				}
 
-				remote.get(require.toUrl("./Editor-OnDemand.html"))
+				command = command.get(require.toUrl("./Editor-OnDemand.html"))
 					.waitForCondition("ready", 15000);
 
 				if (initFunction) {
-					remote.execute(initFunction);
+					command = command.execute(initFunction);
 				}
 
 				for (rowIndex = 0; rowIndex < GRID_ROW_COUNT; rowIndex++) {
-					each(rowIndex);
+					command = each(rowIndex);
 				}
 
-				return remote.end();
+				return command;
 			};
 		}
 
 		function createEscapeRevertTest(initFunction) {
 			return function () {
-				var remote = this.get("remote"),
+				var command = new EditorCommand(this.get("remote")),
 					rowIndex;
 
 				function each(rowIndex) {
@@ -180,7 +180,7 @@ define([
 						appendValue = "abc";
 
 					// Click the cell to focus the editor
-					remote.elementByCssSelector(cellSelector)
+					var newCommand = command.elementByCssSelector(cellSelector)
 							.clickElement()
 							.end()
 						// Get the initial value from the editor field
@@ -190,8 +190,8 @@ define([
 								startValue = cellValue;
 							});
 
-						// Append extra chars and verify the editor's value has updated
-						gotoEnd(remote)
+					// Append extra chars and verify the editor's value has updated
+					return gotoEnd(newCommand)
 							.type(appendValue)
 							.getValue()
 							.then(function (cellValue) {
@@ -199,7 +199,7 @@ define([
 									"Row " + rowIndex + " editor value should differ from the original");
 							})
 							// Send Escape and verify the value has reverted in the grid's data
-							.type(specialKeys.Escape)
+							.type(keys.ESCAPE)
 							.execute("return grid.row(" + rowIndex + ").data.description;")
 							.then(function (cellValue) {
 								assert.strictEqual(startValue, cellValue,
@@ -208,24 +208,24 @@ define([
 							.end();
 				}
 
-				remote.get(require.toUrl("./Editor.html"))
+				command = command.get(require.toUrl("./Editor.html"))
 					.waitForCondition("ready", 15000);
 
 				if (initFunction) {
-					remote.execute(initFunction);
+					command = command.execute(initFunction);
 				}
 
 				for (rowIndex = 0; rowIndex < GRID_ROW_COUNT; rowIndex++) {
-					each(rowIndex);
+					command = each(rowIndex);
 				}
 
-				return remote.end();
+				return command;
 			};
 		}
 
 		function createAutosaveTest(initFunction) {
 			return function () {
-				var remote = this.get("remote"),
+				var command = new EditorCommand(this.get("remote")),
 					appendValue = "abc",
 					rowIndex;
 
@@ -233,20 +233,20 @@ define([
 					var editedValue;
 
 					// Click the cell editor and update the value
-					remote.elementByCssSelector(rowSelectorPrefix + rowIndex + " .field-name input")
+					var newCommand = command.elementByCssSelector(rowSelectorPrefix + rowIndex + " .field-name input")
 							.clickElement();
-						gotoEnd(remote)
+					return gotoEnd(newCommand)
 							.type(appendValue)
 							.getValue()
 							.then(function (cellValue) {
 								editedValue = cellValue;
-							});
-						dismissViaBlur(remote); // calls end
-
-					// Click elsewhere to trigger saving of edited cell
-					remote.elementByTagName("h2")
+							})
+							.dismissViaBlur()
+							.end()
+						// Click elsewhere to trigger saving of edited cell
+						.elementByTagName("h2")
 							.clickElement()
-						.end()
+							.end()
 						// Wait for the save to complete before moving on to next iteration
 						.waitForCondition("saveComplete", 5000)
 						// Get the saved value from the test page and verify it
@@ -258,39 +258,39 @@ define([
 						});
 				}
 
-				remote.get(require.toUrl("./Editor-OnDemand.html"))
+				command = command.get(require.toUrl("./Editor-OnDemand.html"))
 					.waitForCondition("ready", 15000);
 
 				if (initFunction) {
-					remote.execute(initFunction);
+					command = command.execute(initFunction);
 				}
 
 				for (rowIndex = 0; rowIndex < GRID_ROW_COUNT; rowIndex++) {
-					each(rowIndex);
+					command = each(rowIndex);
 				}
 
-				return remote.end();
+				return command;
 			};
 		}
 
 		// Function passed to above functions to change grid column structure
 		// to test other types of editors
-		
+
 		function setTextBox() {
 			/* global setEditorToTextBox */
 			setEditorToTextBox();
 		}
-		
+
 		test.before(function () {
 			// In order to function properly on all platforms, we need to know
 			// what the proper character sequence is to go to the end of a text field.
 			// End key works generally everywhere except Mac OS X.
 			return util.isInputHomeEndSupported(this.get("remote")).then(function (isSupported) {
-				gotoEnd = isSupported ? function (remote) {
-					return remote.type(specialKeys.End);
-				} : function (remote) {
-					return remote.keys(specialKeys.Meta + specialKeys["Right arrow"] +
-						specialKeys.NULL);
+				gotoEnd = isSupported ? function (command) {
+					return command.type(keys.END);
+				} : function (command) {
+					return command.keys(keys.META + keys.ARROW_RIGHT +
+						keys.NULL);
 				};
 			});
 		});
@@ -300,22 +300,22 @@ define([
 
 		// This combination works, though it's debatable whether it even should
 		test.test("enter registers edited value for always-on editor",
-			createDatachangeTest(testAlwaysOnEditor, dismissViaEnter));
+			createDatachangeTest(testAlwaysOnEditor, 'dismissViaEnter'));
 
 		test.test("enter registers edited value for editOn editor",
-			createDatachangeTest(testEditOnEditor, dismissViaEnter));
+			createDatachangeTest(testEditOnEditor, 'dismissViaEnter'));
 
 		test.test("blur registers edited value for always-on editor",
-			createDatachangeTest(testAlwaysOnEditor, dismissViaBlur));
+			createDatachangeTest(testAlwaysOnEditor, 'dismissViaBlur'));
 
 		test.test("blur registers edited value for always-on editor - TextBox",
-			createDatachangeTest(testAlwaysOnEditor, dismissViaBlur, setTextBox));
+			createDatachangeTest(testAlwaysOnEditor, 'dismissViaBlur', setTextBox));
 
 		test.test("blur registers edited value for editOn editor",
-			createDatachangeTest(testEditOnEditor, dismissViaBlur));
+			createDatachangeTest(testEditOnEditor, 'dismissViaBlur'));
 
 		test.test("blur registers edited value for editOn editor - TextBox",
-			createDatachangeTest(testEditOnEditor, dismissViaBlur, setTextBox));
+			createDatachangeTest(testEditOnEditor, 'dismissViaBlur', setTextBox));
 
 		test.test("maintain focus on update for always-on editor",
 			createFocusTest(".field-name input"));

@@ -1,10 +1,10 @@
 define([
 	"intern!tdd",
 	"intern/chai!assert",
-	"dojo/node!wd/lib/special-keys",
+	"intern/dojo/node!leadfoot/keys",
 	"require"
-], function(test, assert, specialKeys, require){
-	var tabKey = specialKeys.Tab;
+], function(test, assert, keys, require){
+	var tabKey = keys.TAB;
 	test.suite("Keyboard tab key functional tests", function(){
 		test.before(function(){
 			// Get our html page. This page should load all necessary scripts
@@ -23,12 +23,14 @@ define([
 					.then(function(id){
 						assert.strictEqual(id, "showHeaderButton", "Focus is on the button: " + id);
 					})
-				.type(tabKey)
+					.type(tabKey)
+					.end()
 				.active()
 					.getAttribute("role").then(function(role){
 						assert.strictEqual(role, "columnheader", "Focus is on a column header: " + role);
 					})
-				.type(tabKey)
+					.type(tabKey)
+					.end()
 				.active()
 					.getAttribute("role").then(function(role){
 						assert.strictEqual(role, "gridcell", "Focus is on a grid cell: " + role);
@@ -36,7 +38,8 @@ define([
 					.text().then(function(text){
 						assert.strictEqual(text, "0", "The cell with focus contains 0: " + text);
 					})
-				.type(tabKey)
+					.type(tabKey)
+					.end()
 				.active()
 					.getAttribute("role").then(function(role){
 						assert.strictEqual(role, "gridcell", "Focus is on a grid cell: " + role);
@@ -45,19 +48,23 @@ define([
 						assert.strictEqual(text, "10", "The cell with focus contains 10: " + text);
 					})
 					.reset()
+					.end()
 				.elementById("showHeaderButton")
 					.click()
+					.end()
 				.active()
 					.getAttribute("id")
 					.then(function(id){
 						assert.strictEqual(id, "showHeaderButton", "Focus is on the button: " + id);
 					})
-				.type(tabKey)
+					.type(tabKey)
+					.end()
 				.active()
 					.getAttribute("role").then(function(role){
 						assert.strictEqual(role, "columnheader", "Focus is on a column header: " + role);
 					})
-				.type(tabKey)
+					.type(tabKey)
+					.end()
 				.active()
 					.getAttribute("role").then(function(role){
 						assert.strictEqual(role, "gridcell", "Focus is on a grid cell: " + role);
@@ -65,12 +72,14 @@ define([
 					.text().then(function(text){
 						assert.strictEqual(text, "0", "The cell with focus contains 0: " + text);
 					})
-				.type(tabKey)
+					.type(tabKey)
+					.end()
 				.active()
 					.getAttribute("role").then(function(role){
 						assert.strictEqual(role, "columnheader", "Focus is on a column header: " + role);
 					})
-				.type(tabKey)
+					.type(tabKey)
+					.end()
 				.active()
 					.getAttribute("role").then(function(role){
 						assert.strictEqual(role, "gridcell", "Focus is on a grid cell: " + role);

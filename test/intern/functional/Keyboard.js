@@ -1,16 +1,16 @@
 define([
 	"intern!tdd",
 	"intern/chai!assert",
-	"dojo/node!wd/lib/special-keys",
+	"intern/dojo/node!leadfoot/keys",
 	"require"
-], function(test, assert, specialKeys, require){
+], function(test, assert, keys, require){
 	function testUpDownKeys(gridId, cellNavigation){
 		var rootQuery = "#" + gridId + " #" + gridId + "-row-";
 		return function(){
 			return this.get("remote")
 				.elementByCssSelector(rootQuery + "0" + (cellNavigation ? " .dgrid-column-col1" : ""))
 					.clickElement()
-					.type([specialKeys["Down arrow"]])
+					.type([keys.ARROW_DOWN])
 					.end()
 				.elementByCssSelector(rootQuery + "1" + (cellNavigation ? " .dgrid-column-col1" : ""))
 					.getAttribute("class")
@@ -19,7 +19,7 @@ define([
 							containsClass = (arr.indexOf("dgrid-focus") !== -1);
 						assert.ok(containsClass, "the down arrow key should move focus one element down");
 					})
-					.type([specialKeys["Up arrow"]])
+					.type([keys.ARROW_UP])
 					.end()
 				.elementByCssSelector(rootQuery + "0" + (cellNavigation ? " .dgrid-column-col1" : ""))
 					.getAttribute("class")
@@ -38,7 +38,7 @@ define([
 			return this.get("remote")
 				.elementByCssSelector(rootQuery + " .dgrid-column-col1")
 					.clickElement()
-					.type([specialKeys["Right arrow"]])
+					.type([keys.ARROW_RIGHT])
 					.end()
 				.elementByCssSelector(rootQuery + " .dgrid-column-col2")
 					.getAttribute("class")
@@ -47,7 +47,7 @@ define([
 							containsClass = (arr.indexOf("dgrid-focus") !== -1);
 						assert.ok(containsClass, "the right arrow key should move focus one element right");
 					})
-					.type([specialKeys["Left arrow"]])
+					.type([keys.ARROW_LEFT])
 					.end()
 				.elementByCssSelector(rootQuery + " .dgrid-column-col1")
 					.getAttribute("class")
@@ -66,7 +66,7 @@ define([
 			return this.get("remote")
 				.elementByCssSelector(rootQuery + "0" + (cellNavigation ? " .dgrid-column-col1" : ""))
 					.clickElement()
-					.type([specialKeys.End])
+					.type([keys.END])
 					.end()
 				.setImplicitWaitTimeout(1000)
 				// Note that this assumes the list is always 100 items, 0-99
@@ -77,7 +77,7 @@ define([
 						containsClass = arr.indexOf("dgrid-focus") !== -1;
 						assert.ok(containsClass, "the end key should move focus to the last element in the list");
 					})
-					.type([specialKeys.Home])
+					.type([keys.HOME])
 					.end()
 				.elementByCssSelector(rootQuery + "0" + (cellNavigation ? " .dgrid-column-col1" : ""))
 					.getAttribute("class")
@@ -100,7 +100,7 @@ define([
 				.get(require.toUrl("./Keyboard.html"))
 				.waitForCondition("ready", 5000);
 		});
-		
+
 		test.test("grid (cellNavigation: true) -> up + down arrow keys",
 			testUpDownKeys("grid", true));
 

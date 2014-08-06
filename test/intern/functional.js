@@ -4,4 +4,4 @@ define([
 	'./functional/Selector',
 	'./functional/Editor',
 	'./functional/Tree'
-], function(){});
+], function () {});

@@ -2,9 +2,9 @@ define([
 	"intern!tdd",
 	"intern/chai!assert",
 	"./util",
-	"dojo/node!wd/lib/special-keys",
+	"intern/dojo/node!leadfoot/keys",
 	"require"
-], function (test, assert, util, specialKeys, require) {
+], function (test, assert, util, keys, require) {
 	// The number of visible rows in each grid (clickable without scrolling)
 	// Look at the test page to determine this value
 	var NUM_VISIBLE_ROWS = 6;
@@ -24,7 +24,7 @@ define([
 	test.suite("dgrid/selector functional tests", function () {
 
 		var isShiftClickSupported;
-		
+
 		// Click the checkbox/radio in the first NUM_VISIBLE_ROWS of a grid.
 		// After each click the row will be tested for the "dgrid-selected" class.
 		function clickAndTestEachRow(remote, gridId) {
@@ -33,7 +33,7 @@ define([
 
 			function each(rowIndex) {
 				// Click the dgrid/selector checkbox/radio
-				remote.elementByCssSelector(rowSelector + rowIndex + " .field-select input")
+				return remote.elementByCssSelector(rowSelector + rowIndex + " .field-select input")
 						.clickElement()
 						.end()
 					// Check the row for the "dgrid-selected" class
@@ -60,21 +60,23 @@ define([
 			for (rowIndex = 0; rowIndex < NUM_VISIBLE_ROWS; rowIndex++) {
 				// The code in this loop is async and might run after the loop has updated
 				// rowIndex, so run the code in a function with its own value
-				each(rowIndex);
+				remote = each(rowIndex);
 			}
+
+			return remote;
 		}
 
 		// Click the checkbox/radio in the first row, then shift+click in the 5th.
 		function shiftClickAndTestRows(remote, gridId) {
 			var rowSelector = "#" + gridId + "-row-";
 
-			remote.elementByCssSelector(rowSelector + "0" + " .field-select input")
+			return remote.elementByCssSelector(rowSelector + "0" + " .field-select input")
 					.clickElement()
 					.end()
-				.keys(specialKeys.Shift)
+				.keys(keys.SHIFT)
 				.elementByCssSelector(rowSelector + "4" + " .field-select input")
 					.clickElement()
-					.keys(specialKeys.NULL)
+					.keys(keys.NULL)
 					.end();
 		}
 
@@ -82,7 +84,7 @@ define([
 		function selectAll(remote, gridId) {
 			var selector = "#" + gridId + " .dgrid-header .field-select input";
 
-			remote.elementByCssSelector(selector)
+			return remote.elementByCssSelector(selector)
 				.clickElement()
 				.end();
 		}
@@ -98,7 +100,7 @@ define([
 					rowIndex;
 
 				function each(rowIndex) {
-					remote.elementByCssSelector(selector + rowIndex)
+					return remote.elementByCssSelector(selector + rowIndex)
 						.getAttribute("class").then(function (classString) {
 							var classNames,
 								isSelected;
@@ -117,33 +119,33 @@ define([
 						.end();
 				}
 
-				selectTestFunction(remote, gridId);
+				remote = selectTestFunction(remote, gridId);
 
 				// Loop through all rows to verify selection state
 				for (rowIndex = 0; rowIndex < NUM_VISIBLE_ROWS; rowIndex++) {
 					// The code in this loop is async and might run after the loop has updated
 					// rowIndex, so run the code in a function with its own value
-					each(rowIndex);
+					remote = each(rowIndex);
 				}
 
-				return remote.end();
+				return remote;
 			};
 		}
-		
+
 		test.before(function () {
 			var remote = this.get("remote");
-			remote.get(require.toUrl("./Selector.html"));
-			return remote.waitForCondition("ready", 15000).then(function () {
-				return util.isShiftClickSupported(remote).then(function (isSupported) {
-					isShiftClickSupported = isSupported;
-					if (!isSupported) {
-						console.warn("shift+click tests will be no-ops because " +
-							"this browser/WebDriver combination does not support shift+click.");
-					}
+			return remote.get(require.toUrl("./Selector.html"))
+				.waitForCondition("ready", 15000).then(function () {
+					return util.isShiftClickSupported(remote).then(function (isSupported) {
+						isShiftClickSupported = isSupported;
+						if (!isSupported) {
+							console.warn("shift+click tests will be no-ops because " +
+								"this browser/WebDriver combination does not support shift+click.");
+						}
+					});
 				});
-			});
 		});
-		
+
 		test.beforeEach(function () {
 			// Clear selections from previous tests
 			return this.get("remote").execute(function () {
@@ -155,7 +157,7 @@ define([
 				gridNone.clearSelection();
 			});
 		});
-		
+
 		test.test("selectionMode: extended",
 			createRowSelectionTest("gridExtended", true, clickAndTestEachRow));
 		test.test("selectionMode: multiple",
