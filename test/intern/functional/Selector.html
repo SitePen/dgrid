@@ -77,7 +77,7 @@
 			var gridSingle;
 			var gridToggle;
 			var gridNone;
-			var ready = false;
+			var ready;
 
 			require([
 				"dojo/_base/declare",
@@ -92,14 +92,14 @@
 				function allowSelect(row) {
 					return !row.id || row.id % 2 === 0;
 				}
-				
+
 				function createGrid(selectionMode) {
 					var id = "grid" + selectionMode.slice(0, 1).toUpperCase() + selectionMode.slice(1);
 					var selectColumn = { label: "Select", selector: "checkbox" };
 					if (selectionMode === "single") {
 						selectColumn.selector = "radio";
 					}
-					
+
 					return new SelectionGrid({
 						collection: testStore,
 						columns: {
@@ -113,7 +113,7 @@
 						allowSelectAll: selectionMode !== "single"
 					}, id);
 				}
-				
+
 				gridExtended = createGrid("extended");
 				gridMultiple = createGrid("multiple");
 				gridSingle = createGrid("single");

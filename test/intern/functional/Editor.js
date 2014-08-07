@@ -2,9 +2,10 @@ define([
 	"intern!tdd",
 	"intern/chai!assert",
 	"./util",
+	"intern/dojo/node!leadfoot/helpers/pollUntil",
 	"intern/dojo/node!leadfoot/keys",
 	"require"
-], function (test, assert, util, keys, require) {
+], function (test, assert, util, pollUntil, keys, require) {
 	// Number of visible rows in the grid.
 	// Check the data loaded in test file (editor.html) and rows visible
 	// when the page is loaded to ensure this is correct.
@@ -22,7 +23,7 @@ define([
 			// Exits to the parent context and focuses an unrelated element.
 			return new this.constructor(this, function () {
 				return this.parent.end()
-					.elementByTagName("h2")
+					.findByTagName("h2")
 					.click();
 			});
 		}
@@ -39,10 +40,10 @@ define([
 				appendValue = "abc";
 
 			// Click the cell's editor element to focus it
-			command = command.elementByCssSelector(rowSelectorPrefix + rowIndex + " .field-name input")
-					.clickElement()
+			command = command.findByCssSelector(rowSelectorPrefix + rowIndex + " .field-name input")
+					.click()
 					// Store the current cell value
-					.getValue()
+					.getProperty('value')
 					.then(function (cellValue) {
 						startValue = cellValue;
 					});
@@ -52,8 +53,8 @@ define([
 					[dismissFunc]()
 					.end()
 				// Click another cell to blur the edited cell (and trigger saving and dgrid-datachange event)
-				.elementByCssSelector(rowSelectorPrefix + rowIndex + " .field-description")
-					.clickElement()
+				.findByCssSelector(rowSelectorPrefix + rowIndex + " .field-description")
+					.click()
 					// The test page has a dgrid-datachange event listener that will push the new value
 					// into a global array: datachangeStack
 					.execute("return datachangeStack.shift();")
@@ -71,13 +72,13 @@ define([
 				appendValue = "abc";
 
 			// Click the cell to activate the editor
-			command = command.elementByCssSelector(cellSelector)
-					.clickElement()
+			command = command.findByCssSelector(cellSelector)
+					.click()
 					.end()
 				// Set context to the cell's editor
-				.elementByCssSelector(cellSelector + " input")
+				.findByCssSelector(cellSelector + " input")
 					// Store the current cell value
-					.getValue()
+					.getProperty('value')
 					.then(function (cellValue) {
 						startValue = cellValue;
 					});
@@ -103,7 +104,7 @@ define([
 				var command = new EditorCommand(this.get("remote"));
 
 				command = command.get(require.toUrl("./Editor.html"))
-					.waitForCondition("ready", 15000);
+					.then(pollUntil(function () { return window.ready; }, null, 5000));
 
 				if (initFunction) {
 					command = command.execute(initFunction);
@@ -125,8 +126,8 @@ define([
 
 				function each(rowIndex) {
 					// Click the cell to activate and focus the editor
-					return command.elementByCssSelector(rowSelectorPrefix + rowIndex + " " + selector)
-							.clickElement()
+					return command.findByCssSelector(rowSelectorPrefix + rowIndex + " " + selector)
+							.click()
 							.end()
 						.executeAsync(function (id, rowIdPrefix, done) {
 							/* global grid */
@@ -149,13 +150,13 @@ define([
 							assert.isTrue(testPassed,
 								"Focused element before refresh should remain focused after refresh");
 						})
-						.elementByTagName("h2")
+						.findByTagName("h2")
 							.click()
 							.end();
 				}
 
 				command = command.get(require.toUrl("./Editor-OnDemand.html"))
-					.waitForCondition("ready", 15000);
+					.then(pollUntil(function () { return window.ready; }, null, 5000));
 
 				if (initFunction) {
 					command = command.execute(initFunction);
@@ -180,12 +181,12 @@ define([
 						appendValue = "abc";
 
 					// Click the cell to focus the editor
-					var newCommand = command.elementByCssSelector(cellSelector)
-							.clickElement()
+					var newCommand = command.findByCssSelector(cellSelector)
+							.click()
 							.end()
 						// Get the initial value from the editor field
-						.elementByCssSelector(cellSelector + " input")
-							.getValue()
+						.findByCssSelector(cellSelector + " input")
+							.getProperty('value')
 							.then(function (cellValue) {
 								startValue = cellValue;
 							});
@@ -193,7 +194,7 @@ define([
 					// Append extra chars and verify the editor's value has updated
 					return gotoEnd(newCommand)
 							.type(appendValue)
-							.getValue()
+							.getProperty('value')
 							.then(function (cellValue) {
 								assert.notStrictEqual(startValue, cellValue,
 									"Row " + rowIndex + " editor value should differ from the original");
@@ -209,7 +210,7 @@ define([
 				}
 
 				command = command.get(require.toUrl("./Editor.html"))
-					.waitForCondition("ready", 15000);
+					.then(pollUntil(function () { return window.ready; }, null, 5000));
 
 				if (initFunction) {
 					command = command.execute(initFunction);
@@ -233,22 +234,22 @@ define([
 					var editedValue;
 
 					// Click the cell editor and update the value
-					var newCommand = command.elementByCssSelector(rowSelectorPrefix + rowIndex + " .field-name input")
-							.clickElement();
+					var newCommand = command.findByCssSelector(rowSelectorPrefix + rowIndex + " .field-name input")
+							.click();
 					return gotoEnd(newCommand)
 							.type(appendValue)
-							.getValue()
+							.getProperty('value')
 							.then(function (cellValue) {
 								editedValue = cellValue;
 							})
 							.dismissViaBlur()
 							.end()
 						// Click elsewhere to trigger saving of edited cell
-						.elementByTagName("h2")
-							.clickElement()
+						.findByTagName("h2")
+							.click()
 							.end()
 						// Wait for the save to complete before moving on to next iteration
-						.waitForCondition("saveComplete", 5000)
+						.then(pollUntil(function () { return window.saveComplete; }, null, 5000))
 						// Get the saved value from the test page and verify it
 						.execute("return gridSaveStack.shift();")
 						.then(function (savedValue) {
@@ -259,7 +260,7 @@ define([
 				}
 
 				command = command.get(require.toUrl("./Editor-OnDemand.html"))
-					.waitForCondition("ready", 15000);
+					.then(pollUntil(function () { return window.ready; }, null, 5000));
 
 				if (initFunction) {
 					command = command.execute(initFunction);
@@ -289,8 +290,7 @@ define([
 				gotoEnd = isSupported ? function (command) {
 					return command.type(keys.END);
 				} : function (command) {
-					return command.keys(keys.META + keys.ARROW_RIGHT +
-						keys.NULL);
+					return command.type(keys.META + keys.ARROW_RIGHT);
 				};
 			});
 		});

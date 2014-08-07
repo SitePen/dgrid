@@ -1,8 +1,8 @@
 define([
+	"intern/dojo/node!leadfoot/helpers/pollUntil",
 	"intern/dojo/node!leadfoot/keys",
-	"intern/dojo/node!leadfoot/Command",
-	"intern/dojo/node!leadfoot/compat"
-], function (keys, Command, compat) {
+	"intern/dojo/node!leadfoot/Command"
+], function (pollUntil, keys, Command) {
 	return {
 		isShiftClickSupported: function (remote) {
 			// summary:
@@ -15,7 +15,6 @@ define([
 			//		A promise that resolves to a boolean
 
 			return remote.execute(function () {
-					window.shiftClickTestButtonClicked = false;
 					window.isShiftClickSupported = false;
 					var button = document.createElement("button");
 					button.id = "shiftClickTestButton";
@@ -25,12 +24,12 @@ define([
 					};
 					document.body.appendChild(button);
 				})
-				.keys(keys.SHIFT)
-					.elementById("shiftClickTestButton")
-					.clickElement()
-					.keys(keys.NULL)
+				.pressKeys(keys.SHIFT)
+					.findById("shiftClickTestButton")
+					.click()
+					.pressKeys(keys.NULL)
 					.end()
-				.waitForCondition("shiftClickTestButtonClicked", 5000)
+				.then(pollUntil(function () { return window.shiftClickTestButtonClicked; }, null, 5000))
 				.execute(function () {
 					document.body.removeChild(document.getElementById('shiftClickTestButton'));
 					return window.isShiftClickSupported;
@@ -52,8 +51,8 @@ define([
 					input.value = "2";
 					document.body.appendChild(input);
 				})
-				.elementById("homeEndTestInput")
-					.clickElement()
+				.findById("homeEndTestInput")
+					.click()
 					.type(keys.END + "3" + keys.HOME + "1")
 					.end()
 				.execute(function () {
@@ -79,9 +78,6 @@ define([
 			Object.keys(members).forEach(function (name) {
 				CustomCommand.prototype[name] = members[name];
 			});
-
-			// Add Intern 1.x shim (TODO: stop doing this once all tests are fully converted)
-			compat.applyTo(CustomCommand.prototype);
 
 			return CustomCommand;
 		}

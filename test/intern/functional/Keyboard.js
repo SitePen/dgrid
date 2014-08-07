@@ -1,18 +1,19 @@
 define([
 	"intern!tdd",
 	"intern/chai!assert",
+	"intern/dojo/node!leadfoot/helpers/pollUntil",
 	"intern/dojo/node!leadfoot/keys",
 	"require"
-], function(test, assert, keys, require){
+], function(test, assert, pollUntil, keys, require){
 	function testUpDownKeys(gridId, cellNavigation){
 		var rootQuery = "#" + gridId + " #" + gridId + "-row-";
 		return function(){
 			return this.get("remote")
-				.elementByCssSelector(rootQuery + "0" + (cellNavigation ? " .dgrid-column-col1" : ""))
-					.clickElement()
+				.findByCssSelector(rootQuery + "0" + (cellNavigation ? " .dgrid-column-col1" : ""))
+					.click()
 					.type([keys.ARROW_DOWN])
 					.end()
-				.elementByCssSelector(rootQuery + "1" + (cellNavigation ? " .dgrid-column-col1" : ""))
+				.findByCssSelector(rootQuery + "1" + (cellNavigation ? " .dgrid-column-col1" : ""))
 					.getAttribute("class")
 					.then(function(classNames){
 						var arr = classNames.split(" "),
@@ -21,7 +22,7 @@ define([
 					})
 					.type([keys.ARROW_UP])
 					.end()
-				.elementByCssSelector(rootQuery + "0" + (cellNavigation ? " .dgrid-column-col1" : ""))
+				.findByCssSelector(rootQuery + "0" + (cellNavigation ? " .dgrid-column-col1" : ""))
 					.getAttribute("class")
 					.then(function(classNames){
 						var arr = classNames.split(" "),
@@ -36,11 +37,11 @@ define([
 		var rootQuery = header ? ("#" + gridId + " .dgrid-header") : ("#" + gridId + " #" + gridId + "-row-0");
 		return function(){
 			return this.get("remote")
-				.elementByCssSelector(rootQuery + " .dgrid-column-col1")
-					.clickElement()
+				.findByCssSelector(rootQuery + " .dgrid-column-col1")
+					.click()
 					.type([keys.ARROW_RIGHT])
 					.end()
-				.elementByCssSelector(rootQuery + " .dgrid-column-col2")
+				.findByCssSelector(rootQuery + " .dgrid-column-col2")
 					.getAttribute("class")
 					.then(function(classNames){
 						var arr = classNames.split(" "),
@@ -49,7 +50,7 @@ define([
 					})
 					.type([keys.ARROW_LEFT])
 					.end()
-				.elementByCssSelector(rootQuery + " .dgrid-column-col1")
+				.findByCssSelector(rootQuery + " .dgrid-column-col1")
 					.getAttribute("class")
 					.then(function(classNames){
 						var arr = classNames.split(" "),
@@ -64,13 +65,13 @@ define([
 		var rootQuery = "#" + gridId + " #" + gridId + "-row-";
 		return function(){
 			return this.get("remote")
-				.elementByCssSelector(rootQuery + "0" + (cellNavigation ? " .dgrid-column-col1" : ""))
-					.clickElement()
+				.findByCssSelector(rootQuery + "0" + (cellNavigation ? " .dgrid-column-col1" : ""))
+					.click()
 					.type([keys.END])
 					.end()
-				.setImplicitWaitTimeout(1000)
+				.setFindTimeout(1000)
 				// Note that this assumes the list is always 100 items, 0-99
-				.elementByCssSelector("#" + gridId + "-row-99" + (cellNavigation ? " .dgrid-column-col1" : ""))
+				.findByCssSelector("#" + gridId + "-row-99" + (cellNavigation ? " .dgrid-column-col1" : ""))
 					.getAttribute("class")
 					.then(function(classNames){
 						var arr = classNames.split(" "),
@@ -79,7 +80,7 @@ define([
 					})
 					.type([keys.HOME])
 					.end()
-				.elementByCssSelector(rootQuery + "0" + (cellNavigation ? " .dgrid-column-col1" : ""))
+				.findByCssSelector(rootQuery + "0" + (cellNavigation ? " .dgrid-column-col1" : ""))
 					.getAttribute("class")
 					.then(function(classNames){
 						var arr = classNames.split(" "),
@@ -98,7 +99,7 @@ define([
 			// to true to tell the runner to continue.
 			return this.get("remote")
 				.get(require.toUrl("./Keyboard.html"))
-				.waitForCondition("ready", 5000);
+				.then(pollUntil(function () { return window.ready; }, null, 5000));
 		});
 
 		test.test("grid (cellNavigation: true) -> up + down arrow keys",

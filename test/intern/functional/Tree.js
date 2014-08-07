@@ -1,8 +1,9 @@
 define([
 	"intern!tdd",
 	"intern/chai!assert",
+	"intern/dojo/node!leadfoot/helpers/pollUntil",
 	"require"
-], function(test, assert, require){
+], function(test, assert, pollUntil, require){
 	// dgrid.css defines a 300ms transition duration for .dgrid-tree-container
 	// Add 20% for good measure
 	var TRANSITION_DELAY = 360;
@@ -23,27 +24,27 @@ define([
 			// With the cell selector used in the double-click test the cursor will be positioned at the start of the
 			// cell, right over the expando
 			// Move the cursor a bit to the right so it's not on the expando
-			if(clickMethod === "doubleclick"){
+			if(clickMethod === "doubleClick"){
 				xOffset = 30;
 			}
 
-			return remote.elementByCssSelector("#treeGrid-row-AF " + clickTarget)
-				.moveTo(xOffset, 8)
+			return remote.findByCssSelector("#treeGrid-row-AF " + clickTarget)
+				.moveMouseTo(xOffset, 8)
 				[clickMethod]()
 				.sleep(TRANSITION_DELAY)
 				.end()
-				.elementByCssSelector("#treeGrid-row-SD")
+				.findByCssSelector("#treeGrid-row-SD")
 				.isDisplayed()
 				.then(function(isDisplayed){
 					assert.ok(isDisplayed, "Expanded rows should be visible");
 				})
 				.end()
-				.elementByCssSelector("#treeGrid-row-AF " + clickTarget)
-				.moveTo(xOffset, 8)
+				.findByCssSelector("#treeGrid-row-AF " + clickTarget)
+				.moveMouseTo(xOffset, 8)
 				[clickMethod]()
 				.sleep(TRANSITION_DELAY)
 				.end()
-				.elementByCssSelector("#treeGrid-row-SD")
+				.findByCssSelector("#treeGrid-row-SD")
 				.isDisplayed()
 				.then(function(isDisplayed){
 					assert.ok(!isDisplayed, "Collapsed rows should not be visible");
@@ -57,10 +58,11 @@ define([
 		test.before(function(){
 			var remote = this.get("remote");
 
-			return remote.get(require.toUrl("./Tree.html")).waitForCondition("ready", 15000);
+			return remote.get(require.toUrl("./Tree.html"))
+				.then(pollUntil(function () { return window.ready; }, null, 5000));
 		});
 
 		test.test("expand/collapse: click on expando node", createExpandTest(".dgrid-expando-icon", "click"));
-		test.test("expand/collapse: double-click on cell node", createExpandTest(".dgrid-column-0", "doubleclick"));
+		test.test("expand/collapse: double-click on cell node", createExpandTest(".dgrid-column-0", "doubleClick"));
 	});
 });

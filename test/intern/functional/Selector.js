@@ -2,9 +2,10 @@ define([
 	"intern!tdd",
 	"intern/chai!assert",
 	"./util",
+	"intern/dojo/node!leadfoot/helpers/pollUntil",
 	"intern/dojo/node!leadfoot/keys",
 	"require"
-], function (test, assert, util, keys, require) {
+], function (test, assert, util, pollUntil, keys, require) {
 	// The number of visible rows in each grid (clickable without scrolling)
 	// Look at the test page to determine this value
 	var NUM_VISIBLE_ROWS = 6;
@@ -33,11 +34,11 @@ define([
 
 			function each(rowIndex) {
 				// Click the dgrid/selector checkbox/radio
-				return remote.elementByCssSelector(rowSelector + rowIndex + " .field-select input")
-						.clickElement()
+				return remote.findByCssSelector(rowSelector + rowIndex + " .field-select input")
+						.click()
 						.end()
 					// Check the row for the "dgrid-selected" class
-					.elementByCssSelector(rowSelector + rowIndex)
+					.findByCssSelector(rowSelector + rowIndex)
 						.getAttribute("class")
 						.then(function (classString) {
 							var classNames,
@@ -70,13 +71,13 @@ define([
 		function shiftClickAndTestRows(remote, gridId) {
 			var rowSelector = "#" + gridId + "-row-";
 
-			return remote.elementByCssSelector(rowSelector + "0" + " .field-select input")
-					.clickElement()
+			return remote.findByCssSelector(rowSelector + "0" + " .field-select input")
+					.click()
 					.end()
-				.keys(keys.SHIFT)
-				.elementByCssSelector(rowSelector + "4" + " .field-select input")
-					.clickElement()
-					.keys(keys.NULL)
+				.pressKeys(keys.SHIFT)
+				.findByCssSelector(rowSelector + "4" + " .field-select input")
+					.click()
+					.pressKeys(keys.NULL)
 					.end();
 		}
 
@@ -84,8 +85,8 @@ define([
 		function selectAll(remote, gridId) {
 			var selector = "#" + gridId + " .dgrid-header .field-select input";
 
-			return remote.elementByCssSelector(selector)
-				.clickElement()
+			return remote.findByCssSelector(selector)
+				.click()
 				.end();
 		}
 
@@ -100,7 +101,7 @@ define([
 					rowIndex;
 
 				function each(rowIndex) {
-					return remote.elementByCssSelector(selector + rowIndex)
+					return remote.findByCssSelector(selector + rowIndex)
 						.getAttribute("class").then(function (classString) {
 							var classNames,
 								isSelected;
@@ -135,7 +136,8 @@ define([
 		test.before(function () {
 			var remote = this.get("remote");
 			return remote.get(require.toUrl("./Selector.html"))
-				.waitForCondition("ready", 15000).then(function () {
+				.then(pollUntil(function () { return window.ready; }, null, 5000))
+				.then(function () {
 					return util.isShiftClickSupported(remote).then(function (isSupported) {
 						isShiftClickSupported = isSupported;
 						if (!isSupported) {
