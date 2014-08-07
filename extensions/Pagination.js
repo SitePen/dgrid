@@ -319,11 +319,6 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 
 			this.inherited(arguments);
 
-			if(!this.collection){
-				console.warn("Pagination requires a collection to operate.");
-				return;
-			}
-
 			// Reset to first page and return promise from gotoPage
 			return this.gotoPage(1).then(function(results){
 				// Emit on a separate turn to enable event to be used consistently for
@@ -390,8 +385,18 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 		gotoPage: function(page, focusLink){
 			// summary:
 			//		Loads the given page.  Note that page numbers start at 1.
-			var grid = this;
+			var grid = this,
+				start = (this._currentPage - 1) * this.rowsPerPage;
 
+			if (!this._renderedCollection) {
+				console.warn("Pagination requires a collection to operate.");
+				return Deferred.when([]);
+			}
+
+			if (this._renderedCollection.releaseRange) {
+				this._renderedCollection.releaseRange(start, start + this.rowsPerPage);
+			}
+			
 			return this._trackError(function(){
 				var count = grid.rowsPerPage,
 					start = (page - 1) * count,

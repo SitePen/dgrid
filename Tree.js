@@ -220,8 +220,6 @@ define([
 					childOptions.rows = connected._rows;
 				}
 
-				// TODO: Why "if" in the below comment? Either it has children or doesn't
-				// if it has a connected expando node, we process the children
 				querySelector(">.dgrid-row", connected).forEach(function(element){
 					this.removeRow(element, true, childOptions);
 				}, this);
@@ -231,7 +229,6 @@ define([
 					delete connected._rows;
 				}
 
-				// now remove the connected container node
 				if(!preserveDom){
 					put(connected, "!");
 				}

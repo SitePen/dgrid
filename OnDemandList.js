@@ -310,22 +310,30 @@ return declare([List, _StoreMixin], {
 			// by checking to see if it is the farOffRemoval distance away
 			if(distanceOff > 2 * farOffRemoval){
 				// ok, there is preloadNode that is far off, let's remove rows until we get to in the current viewpoint
-				var row, nextRow = preloadNode[traversal];
+				var row;
+				var nextRow = preloadNode[traversal];
 				var reclaimedHeight = 0;
 				var count = 0;
 				var toDelete = [];
+				var firstRowIndex = nextRow && nextRow.rowIndex;
+				
 				while((row = nextRow)){
 					var rowHeight = grid._calcRowHeight(row);
 					if(reclaimedHeight + rowHeight + farOffRemoval > distanceOff || (nextRow.className.indexOf("dgrid-row") < 0 && nextRow.className.indexOf("dgrid-loading") < 0)){
-						// we have reclaimed enough rows or we have gone beyond grid rows, let's call it good
+						// we have reclaimed enough rows or we have gone beyond grid rows
 						break;
 					}
+					
 					var nextRow = row[traversal]; // have to do this before removing it
 					reclaimedHeight += rowHeight;
 					count += row.count || 1;
 					// we just do cleanup here, as we will do a more efficient node destruction in the setTimeout below
 					grid.removeRow(row, true);
 					toDelete.push(row);
+				}
+				
+				if (typeof firstRowIndex === 'number' && grid._renderedCollection.releaseRange) {
+					grid._renderedCollection.releaseRange(firstRowIndex, row.rowIndex);
 				}
 				// now adjust the preloadNode based on the reclaimed space
 				preload.count += count;
