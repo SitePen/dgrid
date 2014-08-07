@@ -17,12 +17,12 @@ define([
 	"dgrid/test/data/orderedData"
 ], function(test, assert, declare, aspect, Deferred, on, all, query, when, registry, TextBox,
 		Grid, OnDemandGrid, Editor, createSyncStore, orderedData){
-	
+
 	var testOrderedData = orderedData.items,
 		EditorGrid = declare([Grid, Editor]),
 		grid;
 
-	test.suite("editor column mixin", function(){
+	test.suite("Editor mixin", function(){
 
 		test.afterEach(function(){
 			if(grid){

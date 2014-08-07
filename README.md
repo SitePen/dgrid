@@ -1,5 +1,5 @@
 This project provides widgets for lists of data, including simple sets of scrolling rows,
-grids of data, on-demand lazy-loaded data, and various plugins for additional functionality. 
+grids of data, on-demand lazy-loaded data, and various plugins for additional functionality.
 This project also provides touch scrolling for mobile devices with native style
 momentum, bouncing, and scrollbars.
 
@@ -75,20 +75,20 @@ dgrid release, please be sure to read the changelog, found in CHANGES.md.
 # Testing
 
 dgrid uses [Intern](http://theintern.io/) as its test runner. Tests can
-either be run using the browser, or using [Sauce Labs](https://saucelabs.com/).
-More information on writing your own tests with Intern can be found in the
-[Intern wiki](https://github.com/theintern/intern/wiki). 
+either be run using the browser, or using a cloud provider such as
+[Sauce Labs](https://saucelabs.com/). More information on writing your own tests
+with Intern can be found in the [Intern wiki](https://github.com/theintern/intern/wiki).
 
 ## Setting up
 
 **Note:** Commands listed in this section are all written assuming they are
-run in the parent directory containing `dgrid`, `dojo`, etc.
+run inside the `dgrid` directory.
 
-Install the latest *geezer* version of Intern, which supports IE 6, 7, and 8
+Install the latest *geezer* version of Intern, which supports IE 8
 in addition to modern browsers.
 
 ```
-npm install intern-geezer
+npm install --production intern-geezer
 ```
 
 ## Running via the browser
@@ -108,7 +108,7 @@ export SAUCE_ACCESS_KEY=<your_sauce_access_key>
 Then kick off the runner with the following command:
 
 ```
-node node_modules/intern-geezer/runner config=dgrid/test/intern/intern
+node node_modules/intern-geezer/runner config=test/intern/intern
 ```
 
 ## Running via local Selenium server
@@ -132,7 +132,7 @@ using [Homebrew](http://brew.sh/).  Once Homebrew is installed, run the followin
 commands:
 
 ```sh
-brew update # ensure you have the lastest formulae
+brew update # ensure you have the latest formulae
 brew install selenium-server-standalone
 brew install chromedriver # for automating tests in Chrome
 ```
@@ -148,7 +148,7 @@ Once the Selenium server is running, kick off the Intern test runner with the
 following command (run from the directory containing dgrid):
 
 ```
-node node_modules/intern-geezer/runner config=dgrid/test/intern/intern.local
+node node_modules/intern-geezer/runner config=test/intern/intern.local
 ```
 
 The configuration in `intern.local.js` overrides `intern.js` to not use
