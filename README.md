@@ -1,34 +1,45 @@
-This project provides widgets for lists of data, including simple sets of scrolling rows,
-grids of data, on-demand lazy-loaded data, and various plugins for additional functionality.
-This project also provides touch scrolling for mobile devices with native style
-momentum, bouncing, and scrollbars.
+The dgrid project provides widgets for lists of data, including simple sets of scrolling rows,
+grids of data, on-demand lazy-loaded data, and various mixins for additional functionality.
 
-The dgrid project is available under the same dual BSD/AFLv2 license as the Dojo Toolkit.
+dgrid is available under the same dual BSD/AFLv2 license as the Dojo Toolkit.
 
 # Installation
 
-## Automatic Download with CPM
+## Installing with bower
 
-dgrid can be installed via [CPM](https://github.com/kriszyp/cpm)
-using the following command:
+dgrid and its dependencies can be installed via [bower](http://bower.io/) using the following command:
 
-    cpm install dgrid
+```
+bower install dgrid
+```
 
-The above command will automatically find the highest tagged version of dgrid and
-install it.  Alternatively, the latest development version of dgrid can be
-installed by instructing CPM to install from the master branch:
+Note that by default, bower installs to a `bower_components` subdirectory.  If you'd
+like to install to the current directory instead (which tends to be more appropriate
+for AMD projects), add a `.bowerrc` with the following:
 
-    cpm install dgrid master
+```json
+{
+    "directory": "."
+}
+```
 
-Note that while dgrid lists the dojo package as a dependency, it does not install
-dijit, as it is not a hard requirement.  Dijit can be additionally installed by
+By default, bower will automatically find the highest tagged version of dgrid and
+install it along with its dependencies.  Alternatively, the latest development version of dgrid can be
+installed by instructing bower to install from the master branch:
+
+```
+bower install dgrid#master
+```
+
+Note that while dgrid lists the `dojo` package as a dependency, it will not automatically
+install `dijit`, as it is not a hard requirement.  Dijit can be additionally installed by
 running:
 
-    cpm install dijit
+```
+bower install dijit#<target>
+```
 
-dgrid 0.4 also uses [dstore](https://github.com/SitePen/dstore) for store-backed grids.
-dstore is not listed in cpm's repository, so it will need to be obtained manually.
-We are still investigating options in regard to package managers for new releases.
+...where `<target>` corresponds to the version of Dojo you have installed.
 
 ## Manual Download
 
@@ -37,7 +48,7 @@ Alternatively, dgrid and its dependencies can be downloaded individually:
 * [xstyle](https://github.com/kriszyp/xstyle)
 * [put-selector](https://github.com/kriszyp/put-selector)
 * [dstore](https://github.com/SitePen/dstore) for store-backed grids
-* [The Dojo Toolkit](http://dojotoolkit.org) SDK version 1.7 or higher
+* [The Dojo Toolkit](http://dojotoolkit.org) SDK version 1.8 or higher
     * Out of the DTK components, Dojo core is the only hard dependency for dgrid;
       however, some of the test pages also use components from Dijit, and
       Dojox (namely grid for a comparison test, and mobile for a mobile page).
@@ -46,7 +57,7 @@ It is recommended to arrange all dependencies as siblings, resulting in a
 directory structure like the following:
 
 * `dgrid`
-* `dijit` (optional, dependency of some dgrid tests)
+* `dijit` (optional, dependency of some dgrid tests/components)
 * `dojo`
 * `dojox` (optional, dependency of some dgrid tests)
 * `dstore`
@@ -54,23 +65,15 @@ directory structure like the following:
 * `xstyle`
 * `util` (optional, e.g. if pursuing a custom build)
 
-dgrid works best with the latest revision of Dojo 1.7 or higher.  As of this
-writing, [Dojo 1.9.3](http://download.dojotoolkit.org/release-1.9.3/) is
+dgrid works best with the latest revision of Dojo 1.8 or higher.  As of this
+writing, [Dojo 1.10.0](http://download.dojotoolkit.org/release-1.10.0/) is
 recommended.
-
-Note that while dgrid supports Dojo 1.8 and 1.9 and may take advantage of features
-or fix issues specific to them where possible, it does not have any hard dependency
-on APIs new to 1.8 or 1.9, so as to maintain compatibility with 1.7.
 
 # Documentation
 
 Documentation for dgrid components is available in the
-[dgrid GitHub project wiki](https://github.com/SitePen/dgrid/wiki).
-The wiki's content may still be obtained for offline reading by cloning
-the wiki repository, as indicated under the "Git Access" tab.
-
-In addition to the documentation on the wiki, if upgrading from a previous
-dgrid release, please be sure to read the changelog, found in CHANGES.md.
+[doc folder](doc).  In addition to the documentation on the wiki, if upgrading from a previous
+dgrid release, please be sure to read the [release notes on GitHub](https://github.com/SitePen/dgrid/releases).
 
 # Testing
 
@@ -79,16 +82,19 @@ either be run using the browser, or using a cloud provider such as
 [Sauce Labs](https://saucelabs.com/). More information on writing your own tests
 with Intern can be found in the [Intern wiki](https://github.com/theintern/intern/wiki).
 
+*Note that installing dgrid via bower will not include the test folder; if you
+wish to run dgrid's unit tests, download the package directly.*
+
 ## Setting up
 
 **Note:** Commands listed in this section are all written assuming they are
 run inside the `dgrid` directory.
 
-Install the latest *geezer* version of Intern, which supports IE 8
-in addition to modern browsers.
+Run `npm install` to install the latest *geezer* version of Intern 2,
+which supports IE 8 in addition to modern browsers:
 
 ```
-npm install --production intern-geezer
+npm install
 ```
 
 ## Running via the browser
