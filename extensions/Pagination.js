@@ -275,7 +275,7 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 							grid.gotoPage(+this.value, true);
 						}
 					});
-					if(focused.tagName === "INPUT"){
+					if(focused && focused.tagName === "INPUT"){
 						link.focus();
 					}
 				}else{

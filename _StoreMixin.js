@@ -200,12 +200,11 @@ function(kernel, declare, lang, Deferred, listen, aspect, put){
 		},
 		
 		refresh: function(){
-			var self = this;
 			var result = this.inherited(arguments);
 			
-			if(!self.store){
-				self.noDataNode = put(self.contentNode, "div.dgrid-no-data");
-				self.noDataNode.innerHTML = self.noDataMessage;
+			if(!this.store){
+				this.noDataNode = put(this.contentNode, "div.dgrid-no-data");
+				this.noDataNode.innerHTML = this.noDataMessage;
 			}
 			
 			return result;
@@ -215,7 +214,7 @@ function(kernel, declare, lang, Deferred, listen, aspect, put){
 			var self = this;
 			var rows = this.inherited(arguments);
 			
-			if(!self.store){
+			if(!this.store){
 				Deferred.when(rows, function(resolvedRows){
 					if(rows.length && self.noDataNode){
 						put(self.noDataNode, "!");
