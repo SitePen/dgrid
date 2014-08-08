@@ -216,7 +216,7 @@ function(kernel, declare, lang, Deferred, listen, aspect, put){
 			
 			if(!this.store){
 				Deferred.when(rows, function(resolvedRows){
-					if(rows.length && self.noDataNode){
+					if(resolvedRows.length && self.noDataNode){
 						put(self.noDataNode, "!");
 					}
 				});
