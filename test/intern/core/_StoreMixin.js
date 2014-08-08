@@ -91,8 +91,10 @@ define([
 			grid.set('collection', null);
 			assert.isNull(grid._renderedCollection,
 				'grid._renderedCollection should be null after setting collection to null');
-			assert.strictEqual(grid.contentNode.children.length, 0,
-				'grid.contentNode should not contain any children when refreshing with a null collection');
+			assert.strictEqual(grid.contentNode.children.length, 1,
+				'grid.contentNode should contain one child when refreshing with a null collection');
+			assert.strictEqual(grid.contentNode.children[0], grid.noDataNode,
+				'grid.contentNode should contain the noDataNode');
 			
 			grid.set('collection', store);
 			assert.isNotNull(grid._renderedCollection,

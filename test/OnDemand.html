@@ -263,6 +263,9 @@
 				on(document.getElementById("error2"), "click", function(){
 					grid.set("collection", errorStores.asyncFetch, {});
 				});
+				on(document.getElementById("null"), "click", function(){
+					grid.set("collection", null, {});
+				});
 				
 				// buttons / listeners for 2nd grid
 				
@@ -340,6 +343,7 @@
 		<button id="emptyAsync">Set to empty store (async)</button>
 		<button id="error">Set to error store</button>
 		<button id="error2">Set to error store (async)</button>
+		<button id="null">Set store to null</button>
 
 		<br><br>
 		<h2>Simple test to show editor effect on store data</h2>

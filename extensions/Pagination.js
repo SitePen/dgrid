@@ -1,7 +1,7 @@
 define(["../_StoreMixin", "dojo/_base/declare", "dojo/_base/array", "dojo/_base/lang", "dojo/_base/Deferred",
-	"dojo/on", "dojo/query", "dojo/string", "dojo/has", "put-selector/put", "dojo/i18n!./nls/pagination",
+	"dojo/on", "dojo/query", "dojo/string", "dojo/has", "put-selector/put", "../util/misc", "dojo/i18n!./nls/pagination",
 	"dojo/_base/sniff", "xstyle/css!../css/extensions/Pagination.css"],
-function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has, put, i18n){
+function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has, put, miscUtil, i18n){
 	function cleanupContent(grid){
 		// Remove any currently-rendered rows, or noDataMessage
 		if(grid.noDataNode){
@@ -250,10 +250,15 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 				pagingLinks = this.pagingLinks,
 				paginationNavigationNode = this.paginationNavigationNode,
 				end = Math.ceil(this._total / this.rowsPerPage),
-				pagingTextBoxHandle = this._pagingTextBoxHandle;
+				pagingTextBoxHandle = this._pagingTextBoxHandle,
+				focused = document.activeElement,
+				focusedPage,
+				lastFocusablePageLink,
+				focusableNodes;
 
 			function pageLink(page, addSpace){
 				var link;
+				var disabled;
 				if(grid.pagingTextBox && page == currentPage && end > 1){
 					// use a paging text box if enabled instead of just a number
 					link = put(linksNode, 'input.dgrid-page-input[type=text][value=$]', currentPage);
@@ -264,27 +269,55 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 							grid.gotoPage(+this.value, true);
 						}
 					});
+					if(focused && focused.tagName === "INPUT"){
+						link.focus();
+					}
 				}else{
 					// normal link
+					disabled = page === currentPage;
 					link = put(linksNode,
-						'span' + (page == currentPage ? '.dgrid-page-disabled' : '') + '.dgrid-page-link',
+						'span' + (disabled ? '.dgrid-page-disabled' : '') + '.dgrid-page-link',
 						page + (addSpace ? " " : ""));
 					link.setAttribute("aria-label", i18n.gotoPage);
-					link.tabIndex = 0;
+					link.tabIndex = disabled ? -1 : 0;
+
+					// Try to restore focus if applicable;
+					// if we need to but can't, try on the previous or next page,
+					// depending on whether we're at the end
+					if(focusedPage === page){
+						if(!disabled){
+							link.focus();
+						}else if(page < end){
+							focusedPage++;
+						}else{
+							lastFocusablePageLink.focus();
+						}
+					}
+
+					if(!disabled){
+						lastFocusablePageLink = link;
+					}
 				}
-				if(page == currentPage && focusLink){
-					// focus on it if we are supposed to retain the focus
-					link.focus();
-				}
+			}
+
+			function setDisabled(link, disabled){
+				put(link, (disabled ? "." : "!") + "dgrid-page-disabled");
+				link.tabIndex = disabled ? -1 : 0;
+			}
+
+			if(!focused || !miscUtil.contains(this.paginationNavigationNode, focused)){
+				focused = null;
+			}else if(focused.className === "dgrid-page-link"){
+				focusedPage = +focused.innerHTML;
 			}
 
 			if(pagingTextBoxHandle){ pagingTextBoxHandle.remove(); }
 			linksNode.innerHTML = "";
 			query(".dgrid-first, .dgrid-previous", paginationNavigationNode).forEach(function(link){
-				put(link, (currentPage == 1 ? "." : "!") + "dgrid-page-disabled");
+				setDisabled(link, currentPage === 1);
 			});
 			query(".dgrid-last, .dgrid-next", paginationNavigationNode).forEach(function(link){
-				put(link, (currentPage >= end ? "." : "!") + "dgrid-page-disabled");
+				setDisabled(link, currentPage >= end);
 			});
 
 			if(pagingLinks && end > 0){
@@ -311,6 +344,20 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 			}else if(grid.pagingTextBox){
 				// The pageLink function is also used to create the paging textbox.
 				pageLink(currentPage);
+			}
+
+			if (focused && focused.tabIndex === -1) {
+				// One of the first/last or prev/next links was focused but
+				// is now disabled, so find something focusable
+				focusableNodes = query("[tabindex='0']", this.paginationNavigationNode);
+				if(focused === this.paginationPreviousNode || focused === this.paginationFirstNode){
+					focused = focusableNodes[0];
+				}else if(focusableNodes.length){
+					focused = focusableNodes[focusableNodes.length - 1];
+				}
+				if(focused){
+					focused.focus();
+				}
 			}
 		},
 

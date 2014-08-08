@@ -160,6 +160,28 @@ function(declare, lang, Deferred, listen, aspect, put){
 			return row;
 		},
 		
+		refresh: function(){
+			var result = this.inherited(arguments);
+			
+			if(!this.collection){
+				this.noDataNode = put(this.contentNode, "div.dgrid-no-data");
+				this.noDataNode.innerHTML = this.noDataMessage;
+			}
+			
+			return result;
+		},
+		
+		renderArray: function(){
+			var rows = this.inherited(arguments);
+			
+			if(!this.collection){
+				if(rows.length && this.noDataNode){
+					put(this.noDataNode, "!");
+				}
+			}
+			return rows;
+		},
+		
 		insertRow: function(object, parent, beforeNode, i, options){
 			var store = this.collection,
 				dirty = this.dirty,
