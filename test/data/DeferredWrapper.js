@@ -1,4 +1,8 @@
-define(["dojo/_base/lang", "dojo/_base/Deferred"],function(lang, Deferred){
+define([
+	'dojo/_base/lang',
+	'dojo/Deferred',
+	'dstore/QueryResults'
+], function (lang, Deferred, QueryResults) {
 	// summary:
 	//		Creates a store that wraps the delegate store's query results and total in Deferred
 	//		instances. If delay is set, the Deferreds will be resolved asynchronously after delay +/-50%
@@ -6,33 +10,43 @@ define(["dojo/_base/lang", "dojo/_base/Deferred"],function(lang, Deferred){
 	return function (store, delay) {
 		return lang.delegate(store, {
 			fetch: function () {
-				if (!this.data || !this.data.then) {
-					store.fetch.call(this);
+				var actualData = store.fetch.call(this);
+				var actualTotal = actualData.totalLength;
+				var resultsDeferred = new Deferred();
+				var totalDeferred = new Deferred();
 
-					var actualData = this.data;
-					var actualTotal = this.total;
-
-					var resultsDeferred = this.data = new Deferred();
-					var totalDeferred = this.total = new Deferred();
-
-					var resolveTotal = function () {
-						totalDeferred.resolve(actualTotal);
-					};
-
-					var resolveResults = function () {
-						resultsDeferred.resolve(actualData);
-					};
-
-					if (delay) {
-						setTimeout(resolveTotal, delay * (Math.random() + 0.5));
-						setTimeout(resolveResults, delay * (Math.random() + 0.5));
-					} else {
-						resolveTotal();
-						resolveResults();
-					}
+				function resolveResults() {
+					resultsDeferred.resolve(actualData);
 				}
-				
-				return this.data;
+				function resolveTotal() {
+					totalDeferred.resolve(actualTotal);
+				}
+
+				if (delay) {
+					setTimeout(resolveTotal, delay * (Math.random() + 0.5));
+					setTimeout(resolveResults, delay * (Math.random() + 0.5));
+				} else {
+					resolveTotal();
+					resolveResults();
+				}
+
+				return new QueryResults(resultsDeferred, {
+					totalLength: totalDeferred
+				});
+			},
+
+			fetchRange: function (kwArgs) {
+				// dstore/Memory currently handles the data as potentially async
+				// but not the length.
+				// TODO: Revisit/remove when dstore is always-promise.
+				var results = this.fetch();
+				return new QueryResults(results.then(function (data) {
+					return data.slice(kwArgs.start, kwArgs.end);
+				}), {
+					totalLength: results.then(function (data) {
+						return data.length;
+					})
+				})
 			}
 		});
 	};
