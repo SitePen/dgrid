@@ -199,20 +199,19 @@ function tree(column){
 				put(target, ".ui-icon-triangle-1-" + (expanded ? "se" : "e") +
 					"!ui-icon-triangle-1-" + (expanded ? "e" : "se"));
 				
-				var preloadNode = target.preloadNode,
-					rowElement = row.element,
-					container,
+				var rowElement = row.element,
+					container = rowElement.connected,
 					containerStyle,
 					scrollHeight,
 					options = {
 						originalQuery: this.query
 					};
 				
-				if(!preloadNode){
+				if(!container){
 					// if the children have not been created, create a container, a preload node and do the 
 					// query for the children
-					container = rowElement.connected = put('div.dgrid-tree-container');//put(rowElement, '+...
-					preloadNode = target.preloadNode = put(rowElement, '+', container, 'div.dgrid-preload');
+					container = options.container = rowElement.connected =
+						put(rowElement, '+div.dgrid-tree-container');
 					var query = function(options){
 						return grid.store.getChildren(row.data, options);
 					};
@@ -228,10 +227,20 @@ function tree(column){
 					}
 					// Add the query to the promise chain.
 					promise = promise.then(function(){
-						return grid.renderQuery ?
-							grid.renderQuery(query, preloadNode, options) :
-							grid.renderArray(query(options), preloadNode,
-								"level" in query ? { queryLevel: query.level } : {});
+						if(grid.renderQuery){
+							return grid.renderQuery(query, options);
+						}
+						
+						// If not using OnDemandList, we don't need preload nodes,
+						// but we still need a beforeNode to pass to renderArray,
+						// so create a temporary one
+						var firstChild = put(container, "div");
+						var rows = grid.renderArray(query(options), firstChild,
+							"level" in query ? { queryLevel: query.level } : {});
+						Deferred.when(rows, function(){
+							put(firstChild, "!");
+						});
+						return rows;
 					});
 					
 					if(hasTransitionend){
@@ -243,7 +252,6 @@ function tree(column){
 				
 				// Show or hide all the children.
 				
-				container = rowElement.connected;
 				container.hidden = !expanded;
 				containerStyle = container.style;
 				
