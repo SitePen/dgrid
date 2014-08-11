@@ -305,14 +305,14 @@ return declare([List, _StoreMixin], {
 		//		Calculate the height of a row. This is a method so it can be overriden for
 		//		plugins that add connected elements to a row, like the tree
 		
-		var sibling = rowElement.previousSibling;
+		var sibling = rowElement.nextSibling;
 		
-		// If a previous row exists, compare the top of this row with the
-		// previous one (in case "rows" are actually rendering side-by-side).
-		// If no previous row exists, this is either the first or only row,
+		// If a next row exists, compare the top of this row with the
+		// next one (in case "rows" are actually rendering side-by-side).
+		// If no next row exists, this is either the last or only row,
 		// in which case we count its own height.
 		if(sibling && !/\bdgrid-preload\b/.test(sibling.className)){
-			return rowElement.offsetTop - sibling.offsetTop;
+			return sibling.offsetTop - rowElement.offsetTop;
 		}
 		
 		return rowElement.offsetHeight;
