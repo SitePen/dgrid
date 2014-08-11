@@ -327,6 +327,7 @@ return declare([List, _StoreMixin], {
 				var count = 0;
 				var toDelete = [];
 				var firstRowIndex = nextRow && nextRow.rowIndex;
+				var lastRowIndex;
 				
 				while((row = nextRow)){
 					var rowHeight = grid._calcRowHeight(row);
@@ -341,13 +342,18 @@ return declare([List, _StoreMixin], {
 					// we just do cleanup here, as we will do a more efficient node destruction in the setTimeout below
 					grid.removeRow(row, true);
 					toDelete.push(row);
+					
+					if ('rowIndex' in row) {
+						lastRowIndex = row.rowIndex;
+					}
 				}
 				
-				if (typeof firstRowIndex === 'number' && grid._renderedCollection.releaseRange) {
+				if (grid._renderedCollection.releaseRange &&
+						typeof firstRowIndex === 'number' && typeof lastRowIndex === 'number') {
 					// Note that currently child rows in Tree structures are never unrendered;
 					// this logic will need to be revisited when that is addressed.
-					grid._renderedCollection.releaseRange(firstRowIndex, row.rowIndex);
-					grid._rows[below ? 'max' : 'min'] = row.rowIndex;
+					grid._renderedCollection.releaseRange(firstRowIndex, lastRowIndex);
+					grid._rows[below ? 'max' : 'min'] = lastRowIndex;
 					if (grid._rows.max >= grid._total - 1) {
 						grid._rows.max = Infinity;
 					}
@@ -503,7 +509,7 @@ return declare([List, _StoreMixin], {
 						var rangeResults = preload.query(options);
 						lastRows = grid.renderQueryResults(rangeResults, loadingNode, options).then(function(rows){
 							var gridRows = grid._rows;
-							if (gridRows && !('queryLevel' in options)) {
+							if (gridRows && !('queryLevel' in options) && rows.length) {
 								// Update relevant observed range for top-level items
 								if (below) {
 									if (gridRows.max <= gridRows.min) {
