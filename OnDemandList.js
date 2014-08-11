@@ -420,7 +420,7 @@ return declare([List, _StoreMixin], {
 				preload.count -= count;
 				var beforeNode = preloadNode,
 					keepScrollTo, queryRowsOverlap = grid.queryRowsOverlap,
-					below = preloadNode.rowIndex > 0 && preload;
+					below = (preloadNode.rowIndex > 0 || preloadNode.offsetTop > visibleTop) && preload;
 				if(below){
 					// add new rows below
 					var previous = preload.previous;
