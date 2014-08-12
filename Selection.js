@@ -5,9 +5,9 @@ has.add("dom-comparedocumentposition", function(global, doc, element){
 	return !!element.compareDocumentPosition;
 });
 
-has.add("pointer", function(global, doc, element){
-	return "onpointerdown" in element ? "pointer" :
-		"onmspointerdown" in element ? "MSPointer" : false;
+has.add("pointer", function(global){
+	return "PointerEvent" in global ? "pointer" :
+		"MSPointerEvent" in global ? "MSPointer" : false;
 });
 
 // Add feature test for user-select CSS property for optionally disabling
