@@ -4,9 +4,9 @@ function(declare, listen, has, miscUtil, hasClass, put){
 	hasClass("mozilla", "opera", "webkit", "ie", "ie-6", "ie-6-7", "quirks", "no-quirks", "touch");
 	
 	// Add a feature test for pointer (only Dojo 1.10 has pointer-events and MSPointer tests)
-	has.add("pointer", function(global, doc, element){
-		return "onpointerdown" in element ? "pointer" :
-			"onmspointerdown" in element ? "MSPointer" : false;
+	has.add("pointer", function(global){
+		return "PointerEvent" in global ? "pointer" :
+			"MSPointerEvent" in global ? "MSPointer" : false;
 	});
 	
 	var oddClass = "dgrid-row-odd",
