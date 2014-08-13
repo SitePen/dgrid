@@ -295,7 +295,7 @@ var Keyboard = declare(null, {
 			inputs = element.getElementsByTagName("input");
 			for(i = 0, numInputs = inputs.length; i < numInputs; i++){
 				input = inputs[i];
-				if((input.tabIndex != -1 || "lastValue" in input) && !input.disabled){
+				if((input.tabIndex != -1 || "_dgridLastValue" in input) && !input.disabled){
 					// Employ workaround for focus rectangle in IE < 8
 					if(has("ie") < 8){ input.style.position = "relative"; }
 					input.focus();
