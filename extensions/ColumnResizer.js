@@ -436,19 +436,9 @@ return declare(null, {
 		//Summary:
 		//      returns object containing new column width and column id
 		var totalWidth = 0,
-			colNodes = query(".dgrid-cell", this.headerNode);
-
-		// For ColumnSets and subRows, only the top row of columns matters
-		if(this.columnSets && this.columnSets.length){
-			colNodes = colNodes.filter(function(node){
-				var idx = node.columnId.split("-");
-				return idx[1] == "0";
-			});
-		}else if(this.subRows && this.subRows.length > 1){
-			colNodes = colNodes.filter(function(node){
-				return node.columnId.charAt(0) == "0";
-			});
-		}
+			colNodes = query(
+				(this.columnSets ? ".dgrid-column-set-cell " : "") + "tr:first-child .dgrid-cell",
+				this.headerNode);
 
 		var i = colNodes.length;
 		if(!i){ return {}; }
