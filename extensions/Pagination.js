@@ -186,7 +186,8 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 				if(!paginationSizeSelect){
 					// First time setting page options; create the select
 					paginationSizeSelect = this.paginationSizeSelect =
-						put(this.paginationNode, "select.dgrid-page-size");
+						put(this.paginationNode, "select.dgrid-page-size[aria-label=" +
+							this.i18nPagination.rowsPerPage + "]");
 					
 					handle = this._paginationSizeChangeHandle =
 						on(paginationSizeSelect, "change", lang.hitch(this, function(){
