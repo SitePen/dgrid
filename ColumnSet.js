@@ -248,6 +248,7 @@ function(declare, lang, Deferred, listen, aspect, query, has, miscUtil, put, has
 				// first-time-only operations: hook up event/aspected handlers
 				aspect.after(this, "resize", reposition, true);
 				aspect.after(this, "styleColumn", reposition, true);
+				this._columnSetScrollerNode = put(this.footerNode, "+div.dgrid-column-set-scroller-container");
 			}
 			
 			// reset to new object to be populated in loop below
@@ -305,26 +306,28 @@ function(declare, lang, Deferred, listen, aspect, query, has, miscUtil, put, has
 				scrollers = this._columnSetScrollers,
 				scrollerContents = this._columnSetScrollerContents,
 				columnSets = this.columnSets,
-				left = 0,
 				scrollerWidth = 0,
 				numScrollers = 0, // tracks number of visible scrollers (sets w/ overflow)
 				i, l, columnSetElement, contentWidth;
 			
 			for(i = 0, l = columnSets.length; i < l; i++){
 				// iterate through the columnSets
-				left += scrollerWidth;
 				columnSetElement = query('.dgrid-column-set[' + colsetidAttr + '="' + i +'"]', domNode)[0];
 				scrollerWidth = columnSetElement.offsetWidth;
 				contentWidth = columnSetElement.firstChild.offsetWidth;
 				scrollerContents[i].style.width = contentWidth + "px";
 				scrollers[i].style.width = scrollerWidth + "px";
-				scrollers[i].style.bottom = this.showFooter ? this.footerNode.offsetHeight + "px" : "0px";
-				// IE seems to need scroll to be set explicitly
-				scrollers[i].style.overflowX = contentWidth > scrollerWidth ? "scroll" : "auto";
-				scrollers[i].style.left = left + "px";
+				
+				if(has("ie") < 9){
+					// IE seems to need scroll to be set explicitly
+					scrollers[i].style.overflowX = contentWidth > scrollerWidth ? "scroll" : "auto";
+				}
+				
 				// Keep track of how many scrollbars we're showing
 				if(contentWidth > scrollerWidth){ numScrollers++; }
 			}
+			
+			this._columnSetScrollerNode.style.bottom = this.showFooter ? this.footerNode.offsetHeight + "px" : "0";
 			
 			// Align bottom of body node depending on whether there are scrollbars
 			this.bodyNode.style.bottom = numScrollers ?
@@ -335,7 +338,7 @@ function(declare, lang, Deferred, listen, aspect, query, has, miscUtil, put, has
 		_putScroller: function (columnSet, i){
 			// function called for each columnSet
 			var scroller = this._columnSetScrollers[i] =
-				put(this.domNode, "div.dgrid-column-set-scroller.dgrid-column-set-scroller-" + i +
+				put(this._columnSetScrollerNode, "span.dgrid-column-set-scroller.dgrid-column-set-scroller-" + i +
 					"[" + colsetidAttr + "=" + i +"]");
 			this._columnSetScrollerContents[i] = put(scroller, "div.dgrid-column-set-scroller-content");
 			listen(scroller, "scroll", lang.hitch(this, '_onColumnSetScroll'));

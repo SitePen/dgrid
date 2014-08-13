@@ -6,7 +6,8 @@ define({
 		gotoPrev: "Go to previous page",
 		gotoLast: "Go to last page",
 		gotoPage: "Go to page",
-		jumpPage: "Jump to page"
+		jumpPage: "Jump to page",
+		rowsPerPage: "Number of rows per page"
 	},
 	ar: true,
 	de: true,
