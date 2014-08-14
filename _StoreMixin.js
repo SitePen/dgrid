@@ -374,7 +374,13 @@ function(declare, lang, Deferred, listen, aspect, put){
 			var handles = [
 				collection.on("remove, update", function(event){
 					var from = event.previousIndex;
+					var to = event.index;
+
 					if(from !== undefined && rows[from]){
+						if ('max' in rows && (to === undefined || to < rows.min || to > rows.max)) {
+							rows.max--;
+						}
+						
 						row = rows[from];
 
 						// check to make the sure the node is still there before we try to remove it, (in case it was moved to a different place in the DOM)
@@ -403,13 +409,19 @@ function(declare, lang, Deferred, listen, aspect, put){
 				}),
 
 				collection.on("add, update", function(event){
-					var to = event.index, nextNode;
+					var from = event.previousIndex;
+					var to = event.index;
+					var nextNode;
 
 					function advanceNext() {
 						nextNode = (nextNode.connected || nextNode).nextSibling;
 					}
 
-					if(to !== undefined){
+					// When possible, restrict observations to the actually rendered range
+					if(to !== undefined && (!('max' in rows) || (to >= rows.min && to <= rows.max))){
+						if ('max' in rows && (from === undefined || from < rows.min || from > rows.max)) {
+							rows.max++;
+						}
 						// Add to new slot (either before an existing row, or at the end)
 						// First determine the DOM node that this should be placed before.
 						if(rows.length){
@@ -453,7 +465,9 @@ function(declare, lang, Deferred, listen, aspect, put){
 						adjustAtIndex = Math.min(from, to);
 					from !== to && rows[adjustAtIndex] && self.adjustRowIndices(rows[adjustAtIndex]);
 
-					self._onNotification(rows, event);
+					// Fire _onNotification, even for out-of-viewport notifications,
+					// since some things may still need to update (e.g. Pagination's status/navigation)
+					self._onNotification(rows, event, collection);
 				})
 			];
 
@@ -466,7 +480,7 @@ function(declare, lang, Deferred, listen, aspect, put){
 			};
 		},
 
-		_onNotification: function(rows, event){
+		_onNotification: function(rows, event, collection){
 			// summary:
 			//		Protected method called whenever a store notification is observed.
 			//		Intended to be extended as necessary by mixins/extensions.
@@ -474,6 +488,9 @@ function(declare, lang, Deferred, listen, aspect, put){
 			//		A sparse array of row nodes corresponding to data objects in the collection.
 			// event: Object
 			//		The notification event
+			// collection: Object
+			//		The collection that the notification is relevant to.
+			//		Useful for distinguishing child-level from top-level notifications.
 		}
 	});
 });

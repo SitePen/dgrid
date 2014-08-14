@@ -91,8 +91,7 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 
 			// initialize some content into paginationStatusNode, to ensure
 			// accurate results on initial resize call
-			statusNode.innerHTML = string.substitute(i18n.status,
-				{ start: 1, end: 1, total: 0 });
+			this._updatePaginationStatus();
 
 			navigationNode = this.paginationNavigationNode =
 				put(paginationNode, "div.dgrid-navigation");
@@ -362,13 +361,30 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 			}
 		},
 
-		refresh: function(){
+		_updatePaginationStatus: function (status) {
+			var count = this.rowsPerPage;
+			var total = this._total || 0;
+			var start = Math.min(total, (this._currentPage - 1) * count + 1);
+			this.paginationStatusNode.innerHTML = string.substitute(this.i18nPagination.status, {
+				start: start,
+				end: Math.min(total, start + count - 1),
+				total: total
+			});
+		},
+
+		refresh: function(options){
+			// summary:
+			//		Re-renders the first page of data, or the current page if
+			//		options.keepCurrentPage is true.
+
 			var self = this;
+			var page = options && options.keepCurrentPage ?
+				Math.min(this._currentPage, Math.ceil(grid._total / grid.rowsPerPage)) : 1;
 
 			this.inherited(arguments);
 
 			// Reset to first page and return promise from gotoPage
-			return this.gotoPage(1).then(function(results){
+			return this.gotoPage(page).then(function(results){
 				// Emit on a separate turn to enable event to be used consistently for
 				// initial render, regardless of whether the backing store is async
 				setTimeout(function() {
@@ -384,10 +400,23 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 			});
 		},
 
-		_onNotification: function(){
-			if(this._rows.length !== this._rowsOnPage){
+		_onNotification: function(rows, event, collection){
+			var rowsPerPage = this.rowsPerPage;
+			var pageEnd = this._currentPage * rowsPerPage;
+			var needsRefresh = (event.type === 'add' && event.index < pageEnd) ||
+				(event.type === 'remove' && event.previousIndex < pageEnd) ||
+				(event.type === 'update' &&
+					Math.floor(event.index / rowsPerPage) !== Math.floor(event.previousIndex / rowsPerPage));
+
+			if (needsRefresh) {
 				// Refresh the current page to maintain correct number of rows on page
-				this.gotoPage(this._currentPage);
+				this.gotoPage(Math.min(this._currentPage, Math.ceil(event.totalLength / this.rowsPerPage)));
+			}
+			// If we're not updating the whole page, check if we at least need to update status/navigation
+			else if (collection === this._renderedCollection && event.totalLength !== this._total) {
+				this._total = event.totalLength;
+				this._updatePaginationStatus();
+				this._updateNavigation();
 			}
 		},
 
@@ -486,6 +515,11 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 					cleanupLoading(grid);
 					// Reset scroll Y-position now that new page is loaded.
 					grid.scrollTo({ y: 0 });
+					
+					if (grid._rows) {
+						grid._rows.min = start;
+						grid._rows.max = start + count - 1;
+					}
 
 					Deferred.when(results.totalLength, function(total){
 						if(!total){
@@ -499,14 +533,10 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 						}
 
 						// Update status text based on now-current page and total.
-						grid.paginationStatusNode.innerHTML = string.substitute(grid.i18nPagination.status, {
-							start: Math.min(start + 1, total),
-							end: Math.min(total, start + count),
-							total: total
-						});
 						grid._total = total;
 						grid._currentPage = page;
 						grid._rowsOnPage = rows.length;
+						grid._updatePaginationStatus();
 
 						// It's especially important that _updateNavigation is called only
 						// after renderQueryResults is resolved as well (to prevent jumping).

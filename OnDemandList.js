@@ -146,6 +146,11 @@ return declare([List, _StoreMixin], {
 						parentNode = preloadNode.parentNode,
 						noDataNode = self.noDataNode;
 
+					if (self._rows) {
+						self._rows.min = 0;
+						self._rows.max = trCount === results.totalLength ? Infinity : trCount - 1;
+					}
+
 					put(loadingNode, "!");
 					if(!("queryLevel" in options)){
 						self._total = total;
@@ -339,7 +344,13 @@ return declare([List, _StoreMixin], {
 				}
 				
 				if (typeof firstRowIndex === 'number' && grid._renderedCollection.releaseRange) {
+					// Note that currently child rows in Tree structures are never unrendered;
+					// this logic will need to be revisited when that is addressed.
 					grid._renderedCollection.releaseRange(firstRowIndex, row.rowIndex);
+					grid._rows[below ? 'max' : 'min'] = row.rowIndex;
+					if (grid._rows.max >= grid._total - 1) {
+						grid._rows.max = Infinity;
+					}
 				}
 				// now adjust the preloadNode based on the reclaimed space
 				preload.count += count;
@@ -491,6 +502,25 @@ return declare([List, _StoreMixin], {
 					(function(loadingNode, below, keepScrollTo){
 						var rangeResults = preload.query(options);
 						lastRows = grid.renderQueryResults(rangeResults, loadingNode, options).then(function(rows){
+							var gridRows = grid._rows;
+							if (gridRows && !('queryLevel' in options)) {
+								// Update relevant observed range for top-level items
+								if (below) {
+									if (gridRows.max <= gridRows.min) {
+										// All rows were removed; update start of rendered range as well
+										gridRows.min = rows[0].rowIndex;
+									}
+									gridRows.max = rows[rows.length - 1].rowIndex;
+								}
+								else {
+									if (gridRows.max <= gridRows.min) {
+										// All rows were removed; update end of rendered range as well
+										gridRows.max = rows[rows.length - 1].rowIndex;
+									}
+									gridRows.min = rows[0].rowIndex;
+								}
+							}
+							
 							// can remove the loading node now
 							beforeNode = loadingNode.nextSibling;
 							put(loadingNode, "!");
@@ -512,6 +542,9 @@ return declare([List, _StoreMixin], {
 							Deferred.when(rangeResults.totalLength, function(total){
 								if(!("queryLevel" in options)){
 									grid._total = total;
+									if (grid._rows && grid._rows.max >= grid._total - 1) {
+										grid._rows.max = Infinity;
+									}
 								}
 								if(below){
 									// if it is below, we will use the total from the collection to update
