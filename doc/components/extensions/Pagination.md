@@ -53,7 +53,7 @@ Property | Description
 Method | Description
 ------ | -----------
 `gotoPage(page)` | Loads the indicated page; returns a promise yielding an object containing the `rows` rendered as well as the `results` they represent.  **Note:** Page numbers start at 1.
-`refresh()` | Clears the grid and re-queries the store for the first page of data.  The Pagination extension returns a promise from `refresh`, which resolves when items in the first page finish rendering.  The promise resolves with the QueryResults that were rendered.
+`refresh(options)` | Clears the grid and re-queries the store for the first page of data.  The Pagination extension returns a promise from `refresh`, which resolves when items in the first page finish rendering.  The promise resolves with the QueryResults that were rendered.  `options` is an optional object which may include a `keepCurrentPage` option; if true, the current page will be reloaded, rather than the first page.  (If the current page no longer exists due to item removal, the last page will be loaded.)
 
 ## Events
 

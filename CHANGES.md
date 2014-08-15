@@ -24,6 +24,7 @@ The following is a rough list of changes, to be outlined more presentably later.
   including `collapseOnRefresh`, `shouldExpand`, and `enableTreeTransitions` (formerly `enableTransitions`)
 * Desupported `Selector`'s `disabled` property (use `Selection#allowSelect` instead)
 * Desupported `Tree`'s `allowDupilcates` property (ensure unique IDs instead)
+* Added `options.keepCurrentPage` to `Pagination#refresh`
 * Removed deprecated functions marked for removal in 0.4; most of these have had
   `set(...)` equivalents for a long time already
 * Removed `dgrid/util/mouse` module (made redundant by `dojo/mouse` improvements in Dojo 1.8)
