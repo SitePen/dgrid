@@ -254,6 +254,27 @@ return declare([List, _StoreMixin], {
 		this.preload = null;
 	},
 
+	renderQueryResults: function (results) {
+		var rows = this.inherited(arguments);
+		var collection = this._renderedCollection;
+
+		if (collection && collection.releaseRange) {
+			Deferred.when(rows, function (resolvedRows) {
+				if (resolvedRows[0] && !resolvedRows[0].parentNode.tagName) {
+					// Release this range, since it was never actually rendered;
+					// need to wait until totalLength promise resolves, since
+					// Observable only adds the range then to begin with
+					Deferred.when(results.totalLength, function () {
+						collection.releaseRange(resolvedRows[0].rowIndex,
+							resolvedRows[resolvedRows.length - 1].rowIndex + 1);
+					});
+				}
+			});
+		} 
+		
+		return rows;
+	},
+	
 	_getFirstRowSibling: function(container){
 		// summary:
 		//		Returns the DOM node that a new row should be inserted before
