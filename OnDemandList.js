@@ -352,7 +352,15 @@ return declare([List, _StoreMixin], {
 						typeof firstRowIndex === 'number' && typeof lastRowIndex === 'number') {
 					// Note that currently child rows in Tree structures are never unrendered;
 					// this logic will need to be revisited when that is addressed.
-					grid._renderedCollection.releaseRange(firstRowIndex, lastRowIndex);
+					
+					// releaseRange is end-exclusive, and won't remove anything if start >= end.
+					if (below) {
+						grid._renderedCollection.releaseRange(lastRowIndex, firstRowIndex + 1);
+					}
+					else {
+						grid._renderedCollection.releaseRange(firstRowIndex, lastRowIndex + 1);
+					}
+					
 					grid._rows[below ? 'max' : 'min'] = lastRowIndex;
 					if (grid._rows.max >= grid._total - 1) {
 						grid._rows.max = Infinity;
