@@ -41,10 +41,10 @@
 			require([
 				"dgrid/OnDemandGrid", "dgrid/GridWithColumnSetsFromHtml", "dgrid/ColumnSet", "dgrid/Selection",
 				"dgrid/Keyboard", "dojo/_base/declare", "dojo/on", "dojo/parser",
-				"dgrid/test/data/testStore", "dgrid/test/data/DeferredWrapper",
+				"dgrid/test/data/testStore", "dgrid/test/data/genericData", "dgrid/test/data/createAsyncStore",
 				"dojo/domReady!"
 			], function(OnDemandGrid, GridFromHtml, ColumnSet, Selection, Keyboard,
-					declare, on, parser, testStore, DeferredWrapper){
+					declare, on, parser, testStore, genericData, createAsyncStore){
 				window.testStore = testStore;
 				var columnSets1 = [
 						[
@@ -113,19 +113,20 @@
 				function byId(id){ return document.getElementById(id); }
 
 				var ComplexGrid = declare([OnDemandGrid, ColumnSet, Selection, Keyboard]);
+				var asyncStore = createAsyncStore({ data: genericData, delay: 0 });
 
 				window.gridNoColumnSets = new (declare([OnDemandGrid, Selection, Keyboard]))({
-					collection: DeferredWrapper(testStore),
+					collection: asyncStore,
 					subRows: subRows1
 				}, "gridNoColumnSets");
 				
 				window.gridSingleRow = new ComplexGrid({
-					collection: DeferredWrapper(testStore),
+					collection: asyncStore,
 					columnSets: columnSetsSingleRow
 				}, "gridSingleRow");
 				
 				window.grid = new ComplexGrid({
-					collection: DeferredWrapper(testStore),
+					collection: asyncStore,
 					columnSets: columnSets1
 				}, "grid");
 				
@@ -150,7 +151,7 @@
 				var HtmlGrid = declare([OnDemandGrid, GridFromHtml, Selection, Keyboard]);
 
 				window.gridFromHtml = new HtmlGrid({
-					collection: DeferredWrapper(testStore)
+					collection: asyncStore
 				}, "gridFromHtml");
 				window.gridFromHtml2 = new HtmlGrid({
 					collection: testStore

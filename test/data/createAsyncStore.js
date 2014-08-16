@@ -52,7 +52,14 @@ define([
 
 	var ObservableAsyncStore = declare([ AsyncStore, Observable ]);
 	
-	return function (kwArgs) {
-		return new ObservableAsyncStore(kwArgs);
-	}
+	return function (kwArgs, Mixin) {
+		kwArgs = kwArgs || {};
+
+		if (kwArgs.data) {
+			kwArgs = lang.mixin({}, kwArgs, { data: lang.clone(kwArgs.data) });
+		}
+
+		var Ctor = Mixin ? declare([ObservableAsyncStore, Mixin]) : ObservableAsyncStore;
+		return new Ctor(kwArgs);
+	};
 });

@@ -49,12 +49,12 @@ require([
 	"dojo/_base/declare",
 	"dgrid/OnDemandGrid",
 	"dgrid/Tree",
-	"dgrid/test/data/createSyncHierarchicalStore",
+	"dgrid/test/data/createHierarchicalStore",
 	"dgrid/test/data/hierarchicalCountryData"
-], function(declare, OnDemandGrid, Tree, createSyncHierarchicalStore, hierarchicalCountryData){
+], function(declare, OnDemandGrid, Tree, createHierarchicalStore, hierarchicalCountryData){
 	/* global testCountryStore: true */
 
-	var testCountryStore = createSyncHierarchicalStore({ data: hierarchicalCountryData });
+	var testCountryStore = createHierarchicalStore({ data: hierarchicalCountryData });
 
 	treeGrid = new (declare([OnDemandGrid, Tree]))({
 		sort: "id",

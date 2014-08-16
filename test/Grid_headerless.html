@@ -78,7 +78,7 @@
 				"dijit/form/HorizontalSlider",
 				"dijit/form/NumberSpinner",
 				"dgrid/test/data/createSyncStore",
-				"dgrid/test/data/createAsyncHierarchicalStore",
+				"dgrid/test/data/createHierarchicalStore",
 				"dgrid/test/data/genericData",
 				"dgrid/test/data/typesData",
 				"dgrid/test/data/hierarchicalCountryData",
@@ -96,7 +96,7 @@
 				Slider,
 				NumberSpinner,
 				createSyncStore,
-				createAsyncHierarchicalStore,
+				createHierarchicalStore,
 				genericData,
 				typesData,
 				hierarchicalCountryData){
@@ -104,7 +104,7 @@
 					var StandardGrid = declare([Grid, Selection, Keyboard, Editor, Tree]),
 						testStore = createSyncStore({ data: genericData }),
 						typesStore = createSyncStore({ data: typesData }),
-						testCountryStore = createAsyncHierarchicalStore({ data: hierarchicalCountryData });
+						testCountryStore = createHierarchicalStore({ data: hierarchicalCountryData }, true);
 
 
 					window.grid = new StandardGrid({

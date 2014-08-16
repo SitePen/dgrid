@@ -74,17 +74,17 @@
 				"dgrid/Keyboard",
 				"dgrid/test/data/createSyncStore",
 				"dgrid/test/data/genericData",
-				"dgrid/test/data/createSyncHierarchicalStore",
+				"dgrid/test/data/createHierarchicalStore",
 				"dgrid/test/data/hierarchicalCountryData",
 				"dojo/_base/declare",
 				"dojo/_base/array",
 				"dojo/domReady!"
-			], function(on, List, Grid, Tree, Editor, Selection, Keyboard, createSyncStore, genericData, createSyncHierarchicalStore, hierarchicalCountryData, declare, arrayUtil){
+			], function(on, List, Grid, Tree, Editor, Selection, Keyboard, createSyncStore, genericData, createHierarchicalStore, hierarchicalCountryData, declare, arrayUtil){
 					console.log("loaded in " + (new Date().getTime() - start));
 
 					var StandardGrid = declare([Grid, Selection, Keyboard, Editor, Tree]),
 						store = createSyncStore({ data: genericData }),
-						countryStore = createSyncHierarchicalStore({ data: hierarchicalCountryData });
+						countryStore = createHierarchicalStore({ data: hierarchicalCountryData });
 					
 					function getColumns(){
 						return { // you can declare columns as an object hash (key translates to field)

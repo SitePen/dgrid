@@ -50,7 +50,7 @@
 					"dgrid/Tree", "dgrid/Editor", "dojo/_base/lang",
 					"dojo/_base/declare", "dojo/on", "dojo/data/ObjectStore",
 					"dojo/store/Memory", "dojo/store/Observable",
-					"dgrid/test/data/createSyncStore", "dgrid/test/data/createAsyncHierarchicalStore",
+					"dgrid/test/data/createSyncStore", "dgrid/test/data/createHierarchicalStore",
 					"dgrid/test/data/testStore", "dgrid/test/data/stateData", "dgrid/test/data/typesData",
 					"dgrid/test/data/hierarchicalCountryData",
 					"dijit/form/CheckBox", "dijit/form/TimeTextBox",
@@ -58,7 +58,7 @@
 					"dgrid/extensions/Pagination", "dojo/domReady!", "xstyle/css!../css/dgrid_rtl.css"], 
 				function(
 					Grid, OnDemandGrid, Selection, Keyboard, Tree, Editor, lang, declare, on, ObjectStore,
-					LegacyMemory, LegacyObservable, createSyncStore, createAsyncHierarchicalStore,
+					LegacyMemory, LegacyObservable, createSyncStore, createHierarchicalStore,
 					testStore, stateData, typesData, hierarchicalCountryData,
 					CheckBox, TimeTextBox, Select,
 					FilteringSelect, Pagination
@@ -84,7 +84,7 @@
 					
 					window.tree = new StandardGrid({
 						className: "dgrid-autoheight",
-						collection: createAsyncHierarchicalStore({ data: hierarchicalCountryData }),
+						collection: createHierarchicalStore({ data: hierarchicalCountryData }, true),
 						columns: [
 							{label: ' ', field: 'bool', sortable: false, editor: "checkbox"},
 							{label:'Name', field:'name', sortable: false, renderExpando: true},

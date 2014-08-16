@@ -30,8 +30,8 @@
 		<script src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script>
-			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dgrid/test/data/testPerformanceStore", "dgrid/test/data/DeferredWrapper", "dojo/domReady!"],
-				function(List, Grid, Selection, Keyboard, declare, testPerformanceStore, DeferredWrapper){
+			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dgrid/test/data/testPerformanceStore", "dgrid/test/data/createAsyncStore", "dojo/domReady!"],
+				function(List, Grid, Selection, Keyboard, declare, testPerformanceStore, createAsyncStore){
 					var columns = [
 						{ name: 'Column 0', field: 'id', width: '10%' },
 						{ name: 'Column 1', field: 'integer', width: '10%' },
@@ -51,7 +51,7 @@
 
 					var start = new Date().getTime();
 					window.grid = new (declare([Grid, Selection, Keyboard]))({
-						collection: DeferredWrapper(testPerformanceStore, 500),
+						collection: createAsyncStore({ data: testPerformanceStore.data, delay: 500 }),
 						columns: columns,
 						selection: selection,
 						deselectOnRefresh: false

@@ -13,9 +13,9 @@ define([
 	"dojo/on",
 	"dojo/query",
 	"put-selector/put",
-	"dgrid/test/data/createSyncHierarchicalStore"
+	"dgrid/test/data/createHierarchicalStore"
 ], function(test, assert, OnDemandGrid, Editor, Tree, has, miscUtil, declare, lang, Deferred, domStyle, on, query, put,
-	createSyncHierarchicalStore){
+	createHierarchicalStore){
 
 	var grid,
 		testDelay = 15,
@@ -45,7 +45,7 @@ define([
 			}
 		}
 
-		store = createSyncHierarchicalStore({
+		store = createHierarchicalStore({
 			data: data
 		});
 

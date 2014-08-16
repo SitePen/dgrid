@@ -34,11 +34,11 @@
 				'dgrid/Tree',
 				'dojo/mouse',
 				'dojo/on',
-				'dgrid/test/data/createAsyncHierarchicalStore',
+				'dgrid/test/data/createHierarchicalStore',
 				'dgrid/test/data/hierarchicalCountryData',
 				'dojo/query',
 				'dojo/domReady!'
-			], function (declare, Grid, OnDemandGrid, Tree, mouse, on, createAsyncHierarchicalStore, hierarchicalCountryData) {
+			], function (declare, Grid, OnDemandGrid, Tree, mouse, on, createHierarchicalStore, hierarchicalCountryData) {
 				var data = [
 					{ order: 1, name: 'preheat', description: 'Preheat your oven to 350F' },
 					{ order: 2, name: 'mix dry', description: 'In a medium bowl, combine flour, salt, and baking soda' },
@@ -83,7 +83,7 @@
 				grid.on(on.selector('.dgrid-header .dgrid-cell', mouse.leave), makeHeaderCellHandler(grid, 'left'));
 				
 				var treegrid = window.treegrid = new (declare([OnDemandGrid, Tree]))({
-					collection: createAsyncHierarchicalStore({ data: hierarchicalCountryData }),
+					collection: createHierarchicalStore({ data: hierarchicalCountryData }, true),
 					columns: [
 						{ label: 'Name', field: 'name', sortable: false, renderExpando: true },
 						{ label: 'Type', field: 'type', sortable: false },

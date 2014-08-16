@@ -33,13 +33,12 @@
 		<script>
 			require(["dojo/on", "dgrid/OnDemandGrid","dgrid/Tree","dgrid/Editor", "dgrid/Keyboard",
 					"dgrid/Selection", "dojo/_base/declare", "dojo/_base/array",
-					"dgrid/test/data/createAsyncHierarchicalStore",
-					"dgrid/test/data/createSyncHierarchicalStore",
+					"dgrid/test/data/createHierarchicalStore",
 					"dgrid/test/data/hierarchicalCountryData",
 					"dojo/domReady!"], 
 				function(
 					on, Grid, Tree, Editor, Keyboard, Selection, declare, arrayUtil,
-					createAsyncHierarchicalStore, createSyncHierarchicalStore, hierarchicalCountryData
+					createHierarchicalStore, hierarchicalCountryData
 				){
 					var count = 0; // for incrementing edits from button under 1st grid
 					
@@ -52,10 +51,10 @@
 					
 					arrayUtil.forEach([{
 						id: "asyncGrid",
-						collection: createAsyncHierarchicalStore({ data: hierarchicalCountryData })
+						collection: createHierarchicalStore({ data: hierarchicalCountryData }, true)
 					}, {
 						id: "syncGrid",
-						collection: createSyncHierarchicalStore({ data: hierarchicalCountryData })
+						collection: createHierarchicalStore({ data: hierarchicalCountryData })
 					}], function(info){
 						var grid = window[info.id] = new StandardGrid({
 							collection: info.collection,

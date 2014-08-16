@@ -35,11 +35,11 @@
 			require(["dojo/_base/declare",
 				"dgrid/OnDemandList", "dgrid/OnDemandGrid", "dgrid/Keyboard", "dgrid/Selection",
 				"dgrid/extensions/DnD", "dgrid/Tree", "put-selector/put",
-				"dgrid/test/data/createAsyncHierarchicalStore", "dgrid/test/data/hierarchicalCountryData",
+				"dgrid/test/data/createHierarchicalStore", "dgrid/test/data/hierarchicalCountryData",
 				"dgrid/test/data/createOrderedStore", "dojo/domReady!"],
 			function(
 				declare, OnDemandList, OnDemandGrid, Keyboard, Selection, DnD, Tree, put,
-				createAsyncHierarchicalStore, hierarchicalCountryData, createOrderedStore
+				createHierarchicalStore, hierarchicalCountryData, createOrderedStore
 			){
 				var DnDList = declare([OnDemandList, Keyboard, Selection, DnD]),
 					DnDGrid = declare([OnDemandGrid, Keyboard, Selection, Tree, DnD]);
@@ -52,7 +52,7 @@
 						{label:"Population", field:"population"},
 						{label:"Timezone", field:"timezone"}
 					],
-					collection: createAsyncHierarchicalStore({ data: hierarchicalCountryData }),
+					collection: createHierarchicalStore({ data: hierarchicalCountryData }, true),
 					dndParams: {
 						allowNested: true, // also pick up indirect children w/ dojoDndItem class
 						checkAcceptance: function(source, nodes) {
