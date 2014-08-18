@@ -65,15 +65,57 @@ directory structure like the following:
 * `xstyle`
 * `util` (optional, e.g. if pursuing a custom build)
 
-dgrid works best with the latest revision of Dojo 1.8 or higher.  As of this
-writing, [Dojo 1.10.0](http://download.dojotoolkit.org/release-1.10.0/) is
-recommended.
+# Browser and Dojo Version Support
+
+dgrid 0.4 works with Dojo 1.8 or higher, and supports the following browsers:
+
+* IE 8+
+* Firefox latest + ESR
+* Chrome latest (desktop and mobile)
+* Safari latest (desktop and mobile)
+* Opera latest
+
+dgrid 0.4 *does not* support quirks mode.  You are *heavily* encouraged to
+include the HTML5 DOCTYPE (`<!DOCTYPE html>`) at the beginning of your pages.
 
 # Documentation
 
 Documentation for dgrid components is available in the
-[doc folder](doc).  In addition to the documentation on the wiki, if upgrading from a previous
-dgrid release, please be sure to read the [release notes on GitHub](https://github.com/SitePen/dgrid/releases).
+[doc folder](doc).  In addition, the website hosts a number of
+[tutorials](http://dgrid.io/#tutorials).
+
+If upgrading from a previous dgrid release, please be sure to read the
+[release notes on GitHub](https://github.com/SitePen/dgrid/releases).
+
+# Community
+
+## Reporting Issues
+
+Bugs or enhancements can be filed by opening an issue in the
+[issue tracker on GitHub](https://github.com/SitePen/dgrid/issues?state=open).
+
+When reporting a bug, please provide the following information:
+
+* Affected browsers and Dojo versions
+* A clear list of steps to reproduce the problem
+* If the problem cannot be easily reproduced in an existing dgrid test page,
+  include a [Gist](https://gist.github.com/) with code for a page containing a
+  reduced test case
+
+If you would like to suggest a fix for a particular issue, you are welcome to
+fork dgrid, create a branch, and submit a pull request.  Please note that a
+[Dojo CLA](http://www.dojofoundation.org/about/cla) is required for any
+non-trivial modifications.
+
+## Getting Support
+
+Questions about dgrid usage can be discussed on the
+[dojo-interest mailing list](http://mail.dojotoolkit.org/mailman/listinfo/dojo-interest)
+or in the #dojo IRC channel on irc.freenode.net. Web interfaces are available
+from the [Dojo Toolkit Community page](https://dojotoolkit.org/community/).
+
+SitePen also offers [commercial support](https://www.sitepen.com/support/)
+for dgrid, as well as Dojo and a number of other JavaScript libraries.
 
 # Testing
 
@@ -160,33 +202,3 @@ node node_modules/intern-geezer/runner config=test/intern/intern.local
 The configuration in `intern.local.js` overrides `intern.js` to not use
 Sauce Connect, and to attempt to run Firefox and Chrome by default (this can
 be customized as desired according to the browsers you have installed).
-
-# Community
-
-## Reporting Issues
-
-Bugs or enhancements can be filed by opening an issue in the
-[issue tracker on GitHub](https://github.com/SitePen/dgrid/issues?state=open).
-
-When reporting a bug, please provide the following information:
-
-* Affected browsers and Dojo versions
-* A clear list of steps to reproduce the problem
-* If the problem cannot be easily reproduced in an existing dgrid test page,
-  include a [Gist](https://gist.github.com/) with code for a page containing a
-  reduced test case
-
-If you would like to suggest a fix for a particular issue, you are welcome to
-fork dgrid, create a branch, and submit a pull request.  Please note that a
-[Dojo CLA](http://www.dojofoundation.org/about/cla) is required for any
-non-trivial modifications.
-
-## Getting Support
-
-Questions about dgrid usage can be discussed on the
-[dojo-interest mailing list](http://mail.dojotoolkit.org/mailman/listinfo/dojo-interest)
-or in the #dojo IRC channel on irc.freenode.net. Web interfaces are available
-from the [Dojo Toolkit Community page](https://dojotoolkit.org/community/).
-
-SitePen also offers [commercial support](https://www.sitepen.com/support/)
-for dgrid, as well as Dojo and a number of other JavaScript libraries.
