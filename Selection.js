@@ -1,5 +1,14 @@
-define(["dojo/_base/declare", "dojo/_base/Deferred", "dojo/on", "dojo/has", "dojo/aspect", "./List", "dojo/has!touch?./util/touch", "put-selector/put", "dojo/query", "dojo/_base/sniff"],
-function(declare, Deferred, on, has, aspect, List, touchUtil, put){
+define([
+	"dojo/_base/declare",
+	"dojo/on",
+	"dojo/has",
+	"dojo/aspect",
+	"./List",
+	"dojo/has!touch?./util/touch",
+	"put-selector/put",
+	"dojo/query",
+	"dojo/_base/sniff"
+], function (declare, on, has, aspect, List, touchUtil, put) {
 
 has.add("dom-comparedocumentposition", function(global, doc, element){
 	return !!element.compareDocumentPosition;

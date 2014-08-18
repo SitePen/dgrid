@@ -2,11 +2,11 @@ define([
 	"dojo/_base/declare",
 	"dojo/_base/lang",
 	"dojo/_base/array",
-	"dojo/_base/Deferred",
 	"dojo/aspect",
 	"dojo/on",
 	"dojo/topic",
 	"dojo/has",
+	"dojo/when",
 	"dojo/dnd/Source",
 	"dojo/dnd/Manager",
 	"dojo/_base/NodeList",
@@ -15,7 +15,7 @@ define([
 	"dojo/has!touch?../util/touch",
 	"dojo/has!touch?./_DnD-touch-autoscroll",
 	"xstyle/css!dojo/resources/dnd.css"
-], function(declare, lang, arrayUtil, Deferred, aspect, on, topic, has, DnDSource, DnDManager, NodeList, put, Selection, touchUtil){
+], function(declare, lang, arrayUtil, aspect, on, topic, has, when, DnDSource, DnDManager, NodeList, put, Selection, touchUtil){
 	// Requirements
 	// * requires a store (sounds obvious, but not all Lists/Grids have stores...)
 	// * must support options.before in put calls
@@ -60,7 +60,7 @@ define([
 			}
 			targetRow = targetRow && grid.row(targetRow);
 			
-			Deferred.when(targetRow && store.get(targetRow.id), function(target){
+			when(targetRow && store.get(targetRow.id), function(target){
 				// Note: if dropping after the last row, or into an empty grid,
 				// target will be undefined.  Thus, it is important for store to place
 				// item last in order if options.before is undefined.
@@ -97,7 +97,7 @@ define([
 			}
 			
 			nodes.forEach(function(node){
-				Deferred.when(targetSource.getObject(node), function(object){
+				when(targetSource.getObject(node), function(object){
 					var id = store.getIdentity(object);
 					
 					// For copy DnD operations, copy object, if supported by store;
@@ -125,12 +125,12 @@ define([
 			
 			// TODO: bail out if sourceSource.getObject isn't defined?
 			nodes.forEach(function(node, i){
-				Deferred.when(sourceSource.getObject(node), function(object){
+				when(sourceSource.getObject(node), function(object){
 					if(!copy){
 						if(sourceGrid){
 							// Remove original in the case of inter-grid move.
 							// (Also ensure dnd source is cleaned up properly)
-							Deferred.when(sourceGrid.collection.getIdentity(object), function(id){
+							when(sourceGrid.collection.getIdentity(object), function(id){
 								!i && sourceSource.selectNone(); // deselect all, one time
 								sourceSource.delItem(node.id);
 								sourceGrid.collection.remove(id);

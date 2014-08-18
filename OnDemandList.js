@@ -1,5 +1,13 @@
-define(["./List", "./_StoreMixin", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/on", "./util/misc", "put-selector/put"],
-function(List, _StoreMixin, declare, lang, Deferred, listen, miscUtil, put){
+define([
+	"./List",
+	"./_StoreMixin",
+	"dojo/_base/declare",
+	"dojo/_base/lang",
+	"dojo/on",
+	"dojo/when",
+	"./util/misc",
+	"put-selector/put"
+], function (List, _StoreMixin, declare, lang, on, when, miscUtil, put) {
 
 return declare([List, _StoreMixin], {
 	// summary:
@@ -66,7 +74,7 @@ return declare([List, _StoreMixin], {
 		this.inherited(arguments);
 		var self = this;
 		// check visibility on scroll events
-		listen(this.bodyNode, "scroll",
+		on(this.bodyNode, "scroll",
 			miscUtil[this.pagingMethod](function(event){ self._processScroll(event); },
 				null, this.pagingDelay));
 	},
@@ -141,7 +149,7 @@ return declare([List, _StoreMixin], {
 
 			// Render the result set
 			return self.renderQueryResults(results, preloadNode, options).then(function(trs){
-				return Deferred.when(results.totalLength, function(total){
+				return when(results.totalLength, function(total){
 					var trCount = trs.length,
 						parentNode = preloadNode.parentNode,
 						noDataNode = self.noDataNode;
@@ -189,7 +197,7 @@ return declare([List, _StoreMixin], {
 
 					// Redo scroll processing in case the query didn't fill the screen,
 					// or in case scroll position was restored
-					return Deferred.when(self._processScroll()).then(function(){
+					return when(self._processScroll()).then(function(){
 						return trs;
 					});
 				});
@@ -233,7 +241,7 @@ return declare([List, _StoreMixin], {
 				// Emit on a separate turn to enable event to be used consistently for
 				// initial render, regardless of whether the backing store is async
 				setTimeout(function() {
-					listen.emit(self.domNode, "dgrid-refresh-complete", {
+					on.emit(self.domNode, "dgrid-refresh-complete", {
 						bubbles: true,
 						cancelable: false,
 						grid: self
@@ -258,12 +266,12 @@ return declare([List, _StoreMixin], {
 		var collection = this._renderedCollection;
 
 		if (collection && collection.releaseRange) {
-			Deferred.when(rows, function (resolvedRows) {
+			when(rows, function (resolvedRows) {
 				if (resolvedRows[0] && !resolvedRows[0].parentNode.tagName) {
 					// Release this range, since it was never actually rendered;
 					// need to wait until totalLength promise resolves, since
 					// Observable only adds the range then to begin with
-					Deferred.when(results.totalLength, function () {
+					when(results.totalLength, function () {
 						collection.releaseRange(resolvedRows[0].rowIndex,
 							resolvedRows[resolvedRows.length - 1].rowIndex + 1);
 					});
@@ -573,7 +581,7 @@ return declare([List, _StoreMixin], {
 								});
 							}
 
-							Deferred.when(rangeResults.totalLength, function(total){
+							when(rangeResults.totalLength, function(total){
 								if(!("queryLevel" in options)){
 									grid._total = total;
 									if (grid._rows && grid._rows.max >= grid._total - 1) {

@@ -52,11 +52,11 @@
 		<script>
 			require([
 				"dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/extensions/DnD", "dgrid/Keyboard", "dojo/dnd/Source",
-				"dojo/_base/declare", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/Deferred",
+				"dojo/_base/declare", "dojo/_base/lang", "dojo/_base/array", "dojo/when",
 				"dgrid/test/data/createOrderedStore", "dgrid/test/data/orderedData",
 				"dojo/domReady!"],
 				function(
-					Grid, Selection, DnD, Keyboard, DnDSource, declare, lang, arrayUtil, Deferred, 
+					Grid, Selection, DnD, Keyboard, DnDSource, declare, lang, arrayUtil, when, 
 					createOrderedStore, orderedData
 				){
 					var DnDGrid = declare([Grid, Selection, DnD, Keyboard]);
@@ -171,7 +171,7 @@
 							// Re-implement to simply swap flag on store item
 							var grid = this.grid;
 							arrayUtil.forEach(nodes, function(node){
-								Deferred.when(source.getObject(node), function(object){
+								when(source.getObject(node), function(object){
 									object.added = grid.addedSide;
 									// If we wanted to support copy, we would probably want
 									// to check the copy flag and call copy instead of put here.

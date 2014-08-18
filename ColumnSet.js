@@ -1,5 +1,16 @@
-define(["dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/on", "dojo/aspect", "dojo/query", "dojo/has", "./util/misc", "put-selector/put", "./Grid", "dojo/_base/sniff", "xstyle/css!./css/columnset.css"],
-function(declare, lang, Deferred, listen, aspect, query, has, miscUtil, put, Grid){
+define([
+	"dojo/_base/declare",
+	"dojo/_base/lang",
+	"dojo/on",
+	"dojo/aspect",
+	"dojo/query",
+	"dojo/has",
+	"./util/misc",
+	"put-selector/put",
+	"./Grid",
+	"dojo/_base/sniff",
+	"xstyle/css!./css/columnset.css"
+], function (declare, lang, on, aspect, query, has, miscUtil, put, Grid) {
 	has.add("event-mousewheel", function(global, document, element){
 		return typeof element.onmousewheel !== "undefined";
 	});
@@ -92,7 +103,7 @@ function(declare, lang, Deferred, listen, aspect, query, has, miscUtil, put, Gri
 	var horizTouchMove = has('touch') && function(grid){
 		return function(target, listener){
 			var listeners = [
-				listen(target, getTouchEventName('start'), function (event) {
+				on(target, getTouchEventName('start'), function (event) {
 					if (!grid._currentlyTouchedColumnSet) {
 						var node = findParentColumnSet(event.target, target);
 						// If handling pointer events, only react to touch;
@@ -104,7 +115,7 @@ function(declare, lang, Deferred, listen, aspect, query, has, miscUtil, put, Gri
 						}
 					}
 				}),
-				listen(target, getTouchEventName('move'), function (event) {
+				on(target, getTouchEventName('move'), function (event) {
 					if (grid._currentlyTouchedColumnSet === null) {
 						return;
 					}
@@ -116,7 +127,7 @@ function(declare, lang, Deferred, listen, aspect, query, has, miscUtil, put, Gri
 					grid._lastColumnSetTouchX = event.clientX;
 					grid._lastColumnSetTouchY = event.clientY;
 				}),
-				listen(target, getTouchEventName('end'), function () {
+				on(target, getTouchEventName('end'), function () {
 					grid._currentlyTouchedColumnSet = null;
 				})
 			];
@@ -133,7 +144,7 @@ function(declare, lang, Deferred, listen, aspect, query, has, miscUtil, put, Gri
 
 	var horizMouseWheel = has("event-mousewheel") || has("event-wheel") ? function(grid){
 		return function(target, listener){
-			return listen(target, has("event-wheel") ? "wheel" : "mousewheel", function(event){
+			return on(target, has("event-wheel") ? "wheel" : "mousewheel", function(event){
 				var node = findParentColumnSet(event.target, target),
 					deltaX;
 				
@@ -153,7 +164,7 @@ function(declare, lang, Deferred, listen, aspect, query, has, miscUtil, put, Gri
 		};
 	} : function(grid){
 		return function(target, listener){
-			return listen(target, ".dgrid-column-set[" + colsetidAttr + "]:MozMousePixelScroll", function(event){
+			return on(target, ".dgrid-column-set[" + colsetidAttr + "]:MozMousePixelScroll", function(event){
 				if(event.axis === 1){
 					// only respond to horizontal movement
 					listener.call(null, grid, this, event.detail);
@@ -332,7 +343,7 @@ function(declare, lang, Deferred, listen, aspect, query, has, miscUtil, put, Gri
 				put(this._columnSetScrollerNode, "span.dgrid-column-set-scroller.dgrid-column-set-scroller-" + i +
 					"[" + colsetidAttr + "=" + i +"]");
 			this._columnSetScrollerContents[i] = put(scroller, "div.dgrid-column-set-scroller-content");
-			listen(scroller, "scroll", lang.hitch(this, '_onColumnSetScroll'));
+			on(scroller, "scroll", lang.hitch(this, '_onColumnSetScroll'));
 		},
 
 		_onColumnSetScroll: function (evt){

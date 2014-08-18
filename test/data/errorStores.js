@@ -1,6 +1,6 @@
 define([
 	"dojo/_base/lang",
-	"dojo/_base/Deferred",
+	"dojo/Deferred",
 	"dstore/Memory",
 	"dstore/QueryResults",
 	"./typesData"

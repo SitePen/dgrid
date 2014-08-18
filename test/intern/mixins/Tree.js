@@ -8,7 +8,7 @@ define([
 	"dgrid/util/misc",
 	"dojo/_base/declare",
 	"dojo/_base/lang",
-	"dojo/_base/Deferred",
+	"dojo/Deferred",
 	"dojo/dom-style",
 	"dojo/on",
 	"dojo/query",

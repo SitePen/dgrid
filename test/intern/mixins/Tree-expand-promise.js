@@ -8,7 +8,7 @@ define([
 	"dojo/_base/declare",
 	"dojo/_base/lang",
 	"dojo/_base/array",
-	"dojo/_base/Deferred",
+	"dojo/Deferred",
 	"dojo/on",
 	"dstore/Memory",
 	"dstore/QueryResults",

@@ -1,7 +1,18 @@
-define(["../_StoreMixin", "dojo/_base/declare", "dojo/_base/array", "dojo/_base/lang", "dojo/_base/Deferred",
-	"dojo/on", "dojo/query", "dojo/string", "dojo/has", "put-selector/put", "../util/misc", "dojo/i18n!./nls/pagination",
-	"dojo/_base/sniff", "xstyle/css!../css/extensions/Pagination.css"],
-function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has, put, miscUtil, i18n){
+define(["../_StoreMixin",
+	"dojo/_base/declare",
+	"dojo/_base/array",
+	"dojo/_base/lang",
+	"dojo/on",
+	"dojo/query",
+	"dojo/string",
+	"dojo/has",
+	"dojo/when",
+	"put-selector/put",
+	"../util/misc",
+	"dojo/i18n!./nls/pagination",
+	"dojo/_base/sniff",
+	"xstyle/css!../css/extensions/Pagination.css"
+], function (_StoreMixin, declare, arrayUtil, lang, on, query, string, has, when, put, miscUtil, i18n) {
 	function cleanupContent(grid){
 		// Remove any currently-rendered rows, or noDataMessage
 		if(grid.noDataNode){
@@ -436,7 +447,7 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 					this._topLevelRequest = rows;
 				}
 
-				Deferred.when(rows, function(){
+				when(rows, function(){
 					if(grid._topLevelRequest){
 						// Remove reference to request now that it's finished
 						delete grid._topLevelRequest;
@@ -467,7 +478,7 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 
 			if (!this._renderedCollection) {
 				console.warn("Pagination requires a collection to operate.");
-				return Deferred.when([]);
+				return when([]);
 			}
 
 			if (this._renderedCollection.releaseRange) {
@@ -521,7 +532,7 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 						grid._rows.max = start + count - 1;
 					}
 
-					Deferred.when(results.totalLength, function(total){
+					when(results.totalLength, function(total){
 						if(!total){
 							if(grid.noDataNode){
 								put(grid.noDataNode, "!");

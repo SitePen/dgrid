@@ -6,9 +6,8 @@ define([
 	"dojo/has",
 	"put-selector/put",
 	"./util/misc",
-	"dojo/_base/Deferred",
 	"dojo/_base/sniff"
-], function(declare, aspect, on, lang, has, put, miscUtil, Deferred){
+], function(declare, aspect, on, lang, has, put, miscUtil){
 
 var delegatingInputTypes = {
 		checkbox: 1,

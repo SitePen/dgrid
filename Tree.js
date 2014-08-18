@@ -2,15 +2,15 @@ define([
 	"dojo/_base/declare",
 	"dojo/_base/lang",
 	"dojo/_base/array",
-	"dojo/_base/Deferred",
-	"dojo/query",
-	"dojo/on",
 	"dojo/aspect",
+	"dojo/on",
+	"dojo/query",
+	"dojo/when",
 	"./util/has-css3",
 	"./Grid",
 	"dojo/has!touch?./util/touch",
 	"put-selector/put"
-], function(declare, lang, arrayUtil, Deferred, querySelector, on, aspect, has, Grid, touchUtil, put){
+], function(declare, lang, arrayUtil, aspect, on, querySelector, when, has, Grid, touchUtil, put){
 
 	return declare(null, {
 		// collapseOnRefresh: Boolean
@@ -184,7 +184,7 @@ define([
 			}
 
 			// Always return a promise
-			return Deferred.when(promise);
+			return when(promise);
 		},
 
 		_configColumns: function(prefix, columns){

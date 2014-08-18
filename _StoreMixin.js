@@ -1,5 +1,12 @@
-define(["dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/on", "dojo/aspect", "put-selector/put"],
-function(declare, lang, Deferred, listen, aspect, put){
+define([
+	"dojo/_base/declare",
+	"dojo/_base/lang",
+	"dojo/Deferred",
+	"dojo/aspect",
+	"dojo/on",
+	"dojo/when",
+	"put-selector/put"
+], function(declare, lang, Deferred, aspect, on, when, put){
 	// This module isolates the base logic required by store-aware list/grid
 	// components, e.g. OnDemandList/Grid and the Pagination extension.
 	
@@ -18,7 +25,7 @@ function(declare, lang, Deferred, listen, aspect, put){
 			return;
 		}
 		
-		if(listen.emit(this.domNode, "dgrid-error", {
+		if(on.emit(this.domNode, "dgrid-error", {
 				grid: this,
 				error: err,
 				cancelable: true,
@@ -268,7 +275,7 @@ function(declare, lang, Deferred, listen, aspect, put){
 					
 					updating[id] = true;
 					// Put it in the store, returning the result/promise
-					return Deferred.when(store.put(object), function() {
+					return when(store.put(object), function() {
 						// Clear the item now that it's been confirmed updated
 						delete dirty[id];
 						delete updating[id];
@@ -318,7 +325,7 @@ function(declare, lang, Deferred, listen, aspect, put){
 				promise;
 			
 			try{
-				promise = Deferred.when(func());
+				promise = when(func());
 			}catch(err){
 				// report sync error
 				var dfd = new Deferred();
@@ -359,7 +366,7 @@ function(declare, lang, Deferred, listen, aspect, put){
 			var self = this,
 				start = options.start || 0;
 
-			return Deferred.when(results).then(function(resolvedResults){
+			return when(results).then(function(resolvedResults){
 				var resolvedRows = self.renderArray(resolvedResults, beforeNode, options);
 				delete self._lastCollection; // used only for non-store List/Grid
 				return resolvedRows;
