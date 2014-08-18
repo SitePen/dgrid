@@ -233,14 +233,15 @@ define([
 			field = column.field;
 			cellElement = cell.element.contents || cell.element;
 
-			if ((cmp = this._editorInstances[column.id])) { // shared editor (editOn used)
+			if ((cmp = this._editorInstances[column.id])) {
+				// Shared editor (editOn used)
 				if (this._activeCell !== cellElement) {
-					// get the cell value
+					// Get the cell value
 					var row = cell.row;
 					dirty = this.dirty && this.dirty[row.id];
 					value = (dirty && field in dirty) ? dirty[field] :
 						column.get ? column.get(row.data) : row.data[field];
-					// check to see if the cell can be edited
+					// Check to see if the cell can be edited
 					if (!column.canEdit || column.canEdit(cell.row.data, value)) {
 						dfd = new Deferred();
 
@@ -264,7 +265,8 @@ define([
 					}
 				}
 			}
-			else if (column.editor) { // editor but not shared; always-on
+			else if (column.editor) {
+				// editor but not shared; always-on
 				cmp = cellElement.widget || cellElement.input;
 				if (cmp) {
 					dfd = new Deferred();
@@ -421,7 +423,7 @@ define([
 			if (column.autoSelect) {
 				var selectNode = cmp.focusNode || cmp;
 				if (selectNode.select) {
-					on(selectNode, 'focus', function() {
+					on(selectNode, 'focus', function () {
 						// setTimeout is needed for always-on editors on WebKit,
 						// otherwise selection is reset immediately afterwards
 						setTimeout(function () {
@@ -509,12 +511,14 @@ define([
 				// Calls `focusNode.blur()` in cases where field should be dismissed.
 				var key = evt.keyCode || evt.which;
 
-				if (key === 27) { // escape: revert + dismiss
+				if (key === 27) {
+					// Escape: revert + dismiss
 					reset();
 					self._activeValue = cmp._dgridLastValue;
 					blur();
 				}
-				else if (key === 13 && column.dismissOnEnter !== false) { // enter: dismiss
+				else if (key === 13 && column.dismissOnEnter !== false) {
+					// Enter: dismiss
 					blur();
 				}
 			}

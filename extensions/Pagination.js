@@ -1,36 +1,39 @@
-define(["../_StoreMixin",
-	"dojo/_base/declare",
-	"dojo/_base/array",
-	"dojo/_base/lang",
-	"dojo/on",
-	"dojo/query",
-	"dojo/string",
-	"dojo/has",
-	"dojo/when",
-	"put-selector/put",
-	"../util/misc",
-	"dojo/i18n!./nls/pagination",
-	"dojo/_base/sniff",
-	"xstyle/css!../css/extensions/Pagination.css"
+define([
+	'../_StoreMixin',
+	'dojo/_base/declare',
+	'dojo/_base/array',
+	'dojo/_base/lang',
+	'dojo/on',
+	'dojo/query',
+	'dojo/string',
+	'dojo/has',
+	'dojo/when',
+	'put-selector/put',
+	'../util/misc',
+	'dojo/i18n!./nls/pagination',
+	'dojo/_base/sniff',
+	'xstyle/css!../css/extensions/Pagination.css'
 ], function (_StoreMixin, declare, arrayUtil, lang, on, query, string, has, when, put, miscUtil, i18n) {
-	function cleanupContent(grid){
+	function cleanupContent(grid) {
 		// Remove any currently-rendered rows, or noDataMessage
-		if(grid.noDataNode){
-			put(grid.noDataNode, "!");
+		if (grid.noDataNode) {
+			put(grid.noDataNode, '!');
 			delete grid.noDataNode;
-		}else{
+		}
+		else {
 			grid.cleanup();
 		}
-		grid.contentNode.innerHTML = "";
+		grid.contentNode.innerHTML = '';
 	}
-	function cleanupLoading(grid){
-		if(grid.loadingNode){
-			put(grid.loadingNode, "!");
+	function cleanupLoading(grid) {
+		if (grid.loadingNode) {
+			put(grid.loadingNode, '!');
 			delete grid.loadingNode;
-		}else if(grid._oldPageNodes){
+		}
+		else if (grid._oldPageNodes) {
 			// If cleaning up after a load w/ showLoadingMessage: false,
 			// be careful to only clean up rows from the old page, not the new one
-			for(var id in grid._oldPageNodes){
+			for (var id in grid._oldPageNodes) {
 				grid.removeRow(grid._oldPageNodes[id]);
 			}
 			delete grid._oldPageNodes;
@@ -80,19 +83,18 @@ define(["../_StoreMixin",
 		_currentPage: 1,
 		_total: 0,
 
-		buildRendering: function(){
+		buildRendering: function () {
 			this.inherited(arguments);
 
 			// add pagination to footer
 			var grid = this,
 				paginationNode = this.paginationNode =
-					put(this.footerNode, "div.dgrid-pagination"),
+					put(this.footerNode, 'div.dgrid-pagination'),
 				statusNode = this.paginationStatusNode =
-					put(paginationNode, "div.dgrid-status"),
+					put(paginationNode, 'div.dgrid-status'),
 				i18n = this.i18nPagination,
 				navigationNode,
-				node,
-				i;
+				node;
 
 			statusNode.tabIndex = 0;
 
@@ -105,49 +107,50 @@ define(["../_StoreMixin",
 			this._updatePaginationStatus();
 
 			navigationNode = this.paginationNavigationNode =
-				put(paginationNode, "div.dgrid-navigation");
+				put(paginationNode, 'div.dgrid-navigation');
 
-			if(this.firstLastArrows){
+			if (this.firstLastArrows) {
 				// create a first-page link
 				node = this.paginationFirstNode =
-					put(navigationNode,  "span.dgrid-first.dgrid-page-link", "«");
-				node.setAttribute("aria-label", i18n.gotoFirst);
+					put(navigationNode,  'span.dgrid-first.dgrid-page-link', '«');
+				node.setAttribute('aria-label', i18n.gotoFirst);
 				node.tabIndex = 0;
 			}
-			if(this.previousNextArrows){
+			if (this.previousNextArrows) {
 				// create a previous link
 				node = this.paginationPreviousNode =
-					put(navigationNode,  "span.dgrid-previous.dgrid-page-link", "‹");
-				node.setAttribute("aria-label", i18n.gotoPrev);
+					put(navigationNode,  'span.dgrid-previous.dgrid-page-link', '‹');
+				node.setAttribute('aria-label', i18n.gotoPrev);
 				node.tabIndex = 0;
 			}
 
-			this.paginationLinksNode = put(navigationNode, "span.dgrid-pagination-links");
-			if(this.previousNextArrows){
+			this.paginationLinksNode = put(navigationNode, 'span.dgrid-pagination-links');
+			if (this.previousNextArrows) {
 				// create a next link
 				node = this.paginationNextNode =
-					put(navigationNode, "span.dgrid-next.dgrid-page-link", "›");
-				node.setAttribute("aria-label", i18n.gotoNext);
+					put(navigationNode, 'span.dgrid-next.dgrid-page-link', '›');
+				node.setAttribute('aria-label', i18n.gotoNext);
 				node.tabIndex = 0;
 			}
-			if(this.firstLastArrows){
+			if (this.firstLastArrows) {
 				// create a last-page link
 				node = this.paginationLastNode =
-					put(navigationNode,  "span.dgrid-last.dgrid-page-link", "»");
-				node.setAttribute("aria-label", i18n.gotoLast);
+					put(navigationNode,  'span.dgrid-last.dgrid-page-link', '»');
+				node.setAttribute('aria-label', i18n.gotoLast);
 				node.tabIndex = 0;
 			}
 
-			this._listeners.push(on(navigationNode, ".dgrid-page-link:click,.dgrid-page-link:keydown", function(event){
+			/* jshint maxlen: 121 */
+			this._listeners.push(on(navigationNode, '.dgrid-page-link:click,.dgrid-page-link:keydown', function (event) {
 				// For keyboard events, only respond to enter
-				if(event.type === "keydown" && event.keyCode !== 13){
+				if (event.type === 'keydown' && event.keyCode !== 13) {
 					return;
 				}
 
 				var cls = this.className,
 					curr, max;
 
-				if(grid._isLoading || cls.indexOf("dgrid-page-disabled") > -1){
+				if (grid._isLoading || cls.indexOf('dgrid-page-disabled') > -1) {
 					return;
 				}
 
@@ -155,28 +158,32 @@ define(["../_StoreMixin",
 				max = Math.ceil(grid._total / grid.rowsPerPage);
 
 				// determine navigation target based on clicked link's class
-				if(this === grid.paginationPreviousNode){
+				if (this === grid.paginationPreviousNode) {
 					grid.gotoPage(curr - 1);
-				}else if(this === grid.paginationNextNode){
+				}
+				else if (this === grid.paginationNextNode) {
 					grid.gotoPage(curr + 1);
-				}else if(this === grid.paginationFirstNode){
+				}
+				else if (this === grid.paginationFirstNode) {
 					grid.gotoPage(1);
-				}else if(this === grid.paginationLastNode){
+				}
+				else if (this === grid.paginationLastNode) {
 					grid.gotoPage(max);
-				}else if(cls === "dgrid-page-link"){
+				}
+				else if (cls === 'dgrid-page-link') {
 					grid.gotoPage(+this.innerHTML); // the innerHTML has the page number
 				}
 			}));
 		},
 
-		destroy: function(){
+		destroy: function () {
 			this.inherited(arguments);
-			if(this._pagingTextBoxHandle){
+			if (this._pagingTextBoxHandle) {
 				this._pagingTextBoxHandle.remove();
 			}
 		},
 
-		_updatePaginationSizeSelect: function(){
+		_updatePaginationSizeSelect: function () {
 			// summary:
 			//		Creates or repopulates the pagination size selector based on
 			//		the values in pageSizeOptions. Called from buildRendering
@@ -186,46 +193,47 @@ define(["../_StoreMixin",
 				paginationSizeSelect = this.paginationSizeSelect,
 				handle;
 
-			if(pageSizeOptions && pageSizeOptions.length){
-				if(!paginationSizeSelect){
+			if (pageSizeOptions && pageSizeOptions.length) {
+				if (!paginationSizeSelect) {
 					// First time setting page options; create the select
 					paginationSizeSelect = this.paginationSizeSelect =
-						put(this.paginationNode, "select.dgrid-page-size[aria-label=" +
-							this.i18nPagination.rowsPerPage + "]");
+						put(this.paginationNode, 'select.dgrid-page-size[aria-label=' +
+							this.i18nPagination.rowsPerPage + ']');
 
 					handle = this._paginationSizeChangeHandle =
-						on(paginationSizeSelect, "change", lang.hitch(this, function(){
-							this.set("rowsPerPage", +this.paginationSizeSelect.value);
+						on(paginationSizeSelect, 'change', lang.hitch(this, function () {
+							this.set('rowsPerPage', +this.paginationSizeSelect.value);
 						}));
 					this._listeners.push(handle);
 				}
 
 				// Repopulate options
 				paginationSizeSelect.options.length = 0;
-				for(var i = 0; i < pageSizeOptions.length; i++){
-					put(paginationSizeSelect, "option", pageSizeOptions[i], {
+				for (var i = 0; i < pageSizeOptions.length; i++) {
+					put(paginationSizeSelect, 'option', pageSizeOptions[i], {
 						value: pageSizeOptions[i],
 						selected: this.rowsPerPage === pageSizeOptions[i]
 					});
 				}
 				// Ensure current rowsPerPage value is in options
 				this._updateRowsPerPageOption();
-			}else if(!(pageSizeOptions && pageSizeOptions.length) && paginationSizeSelect){
+			}
+			else if (!(pageSizeOptions && pageSizeOptions.length) && paginationSizeSelect) {
 				// pageSizeOptions was removed; remove/unhook the drop-down
-				put(paginationSizeSelect, "!");
+				put(paginationSizeSelect, '!');
 				this.paginationSizeSelect = null;
 				this._paginationSizeChangeHandle.remove();
 			}
 		},
 
-		_setPageSizeOptions: function(pageSizeOptions){
-			this.pageSizeOptions = pageSizeOptions && pageSizeOptions.sort(function(a, b){
+		_setPageSizeOptions: function (pageSizeOptions) {
+			this.pageSizeOptions = pageSizeOptions && pageSizeOptions.sort(function (a, b) {
 				return a - b;
 			});
 			this._updatePaginationSizeSelect();
 		},
 
-		_updateRowsPerPageOption: function(){
+		_updateRowsPerPageOption: function () {
 			// summary:
 			//		Ensures that an option for rowsPerPage's value exists in the
 			//		paginationSizeSelect drop-down (if one is rendered).
@@ -235,22 +243,23 @@ define(["../_StoreMixin",
 				pageSizeOptions = this.pageSizeOptions,
 				paginationSizeSelect = this.paginationSizeSelect;
 
-			if(paginationSizeSelect){
-				if(arrayUtil.indexOf(pageSizeOptions, rowsPerPage) < 0){
+			if (paginationSizeSelect) {
+				if (arrayUtil.indexOf(pageSizeOptions, rowsPerPage) < 0) {
 					this._setPageSizeOptions(pageSizeOptions.concat([rowsPerPage]));
-				}else{
-					paginationSizeSelect.value = "" + rowsPerPage;
+				}
+				else {
+					paginationSizeSelect.value = '' + rowsPerPage;
 				}
 			}
 		},
 
-		_setRowsPerPage: function(rowsPerPage){
+		_setRowsPerPage: function (rowsPerPage) {
 			this.rowsPerPage = rowsPerPage;
 			this._updateRowsPerPageOption();
 			this.gotoPage(1);
 		},
 
-		_updateNavigation: function(){
+		_updateNavigation: function () {
 			// summary:
 			//		Update status and navigation controls based on total count from query
 
@@ -267,92 +276,100 @@ define(["../_StoreMixin",
 				lastFocusablePageLink,
 				focusableNodes;
 
-			function pageLink(page, addSpace){
+			function pageLink(page, addSpace) {
 				var link;
 				var disabled;
-				if(grid.pagingTextBox && page == currentPage && end > 1){
+				if (grid.pagingTextBox && page === currentPage && end > 1) {
 					// use a paging text box if enabled instead of just a number
 					link = put(linksNode, 'input.dgrid-page-input[type=text][value=$]', currentPage);
-					link.setAttribute("aria-label", i18n.jumpPage);
-					grid._pagingTextBoxHandle = on(link, "change", function(){
+					link.setAttribute('aria-label', i18n.jumpPage);
+					grid._pagingTextBoxHandle = on(link, 'change', function () {
 						var value = +this.value;
-						if(!isNaN(value) && value > 0 && value <= end){
+						if (!isNaN(value) && value > 0 && value <= end) {
 							grid.gotoPage(+this.value);
 						}
 					});
-					if(focused && focused.tagName === "INPUT"){
+					if (focused && focused.tagName === 'INPUT') {
 						link.focus();
 					}
-				}else{
+				}
+				else {
 					// normal link
 					disabled = page === currentPage;
 					link = put(linksNode,
 						'span' + (disabled ? '.dgrid-page-disabled' : '') + '.dgrid-page-link',
-						page + (addSpace ? " " : ""));
-					link.setAttribute("aria-label", i18n.gotoPage);
+						page + (addSpace ? ' ' : ''));
+					link.setAttribute('aria-label', i18n.gotoPage);
 					link.tabIndex = disabled ? -1 : 0;
 
 					// Try to restore focus if applicable;
 					// if we need to but can't, try on the previous or next page,
 					// depending on whether we're at the end
-					if(focusedPage === page){
-						if(!disabled){
+					if (focusedPage === page) {
+						if (!disabled) {
 							link.focus();
-						}else if(page < end){
+						}
+						else if (page < end) {
 							focusedPage++;
-						}else{
+						}
+						else {
 							lastFocusablePageLink.focus();
 						}
 					}
 
-					if(!disabled){
+					if (!disabled) {
 						lastFocusablePageLink = link;
 					}
 				}
 			}
 
-			function setDisabled(link, disabled){
-				put(link, (disabled ? "." : "!") + "dgrid-page-disabled");
+			function setDisabled(link, disabled) {
+				put(link, (disabled ? '.' : '!') + 'dgrid-page-disabled');
 				link.tabIndex = disabled ? -1 : 0;
 			}
 
-			if(!focused || !miscUtil.contains(this.paginationNavigationNode, focused)){
+			if (!focused || !miscUtil.contains(this.paginationNavigationNode, focused)) {
 				focused = null;
-			}else if(focused.className === "dgrid-page-link"){
+			}
+			else if (focused.className === 'dgrid-page-link') {
 				focusedPage = +focused.innerHTML;
 			}
 
-			if(pagingTextBoxHandle){ pagingTextBoxHandle.remove(); }
-			linksNode.innerHTML = "";
-			query(".dgrid-first, .dgrid-previous", paginationNavigationNode).forEach(function(link){
+			if (pagingTextBoxHandle) {
+				pagingTextBoxHandle.remove();
+			}
+			linksNode.innerHTML = '';
+			query('.dgrid-first, .dgrid-previous', paginationNavigationNode).forEach(function (link) {
 				setDisabled(link, currentPage === 1);
 			});
-			query(".dgrid-last, .dgrid-next", paginationNavigationNode).forEach(function(link){
+			query('.dgrid-last, .dgrid-next', paginationNavigationNode).forEach(function (link) {
 				setDisabled(link, currentPage >= end);
 			});
 
-			if(pagingLinks && end > 0){
+			if (pagingLinks && end > 0) {
 				// always include the first page (back to the beginning)
 				pageLink(1, true);
 				var start = currentPage - pagingLinks;
-				if(start > 2) {
+				if (start > 2) {
 					// visual indication of skipped page links
-					put(linksNode, "span.dgrid-page-skip", "...");
-				}else{
+					put(linksNode, 'span.dgrid-page-skip', '...');
+				}
+				else {
 					start = 2;
 				}
 				// now iterate through all the page links we should show
-				for(var i = start; i < Math.min(currentPage + pagingLinks + 1, end); i++){
+				for (var i = start; i < Math.min(currentPage + pagingLinks + 1, end); i++) {
 					pageLink(i, true);
 				}
-				if(currentPage + pagingLinks + 1 < end){
-					put(linksNode, "span.dgrid-page-skip", "...");
+				if (currentPage + pagingLinks + 1 < end) {
+					put(linksNode, 'span.dgrid-page-skip', '...');
 				}
 				// last link
-				if(end > 1){
+				if (end > 1) {
 					pageLink(end);
 				}
-			}else if(grid.pagingTextBox){
+			}
+			else if (grid.pagingTextBox) {
 				// The pageLink function is also used to create the paging textbox.
 				pageLink(currentPage);
 			}
@@ -360,19 +377,20 @@ define(["../_StoreMixin",
 			if (focused && focused.tabIndex === -1) {
 				// One of the first/last or prev/next links was focused but
 				// is now disabled, so find something focusable
-				focusableNodes = query("[tabindex='0']", this.paginationNavigationNode);
-				if(focused === this.paginationPreviousNode || focused === this.paginationFirstNode){
+				focusableNodes = query('[tabindex="0"]', this.paginationNavigationNode);
+				if (focused === this.paginationPreviousNode || focused === this.paginationFirstNode) {
 					focused = focusableNodes[0];
-				}else if(focusableNodes.length){
+				}
+				else if (focusableNodes.length) {
 					focused = focusableNodes[focusableNodes.length - 1];
 				}
-				if(focused){
+				if (focused) {
 					focused.focus();
 				}
 			}
 		},
 
-		_updatePaginationStatus: function (status) {
+		_updatePaginationStatus: function () {
 			var count = this.rowsPerPage;
 			var total = this._total || 0;
 			var start = Math.min(total, (this._currentPage - 1) * count + 1);
@@ -383,23 +401,23 @@ define(["../_StoreMixin",
 			});
 		},
 
-		refresh: function(options){
+		refresh: function (options) {
 			// summary:
 			//		Re-renders the first page of data, or the current page if
 			//		options.keepCurrentPage is true.
 
 			var self = this;
 			var page = options && options.keepCurrentPage ?
-				Math.min(this._currentPage, Math.ceil(grid._total / grid.rowsPerPage)) : 1;
+				Math.min(this._currentPage, Math.ceil(this._total / this.rowsPerPage)) : 1;
 
 			this.inherited(arguments);
 
 			// Reset to first page and return promise from gotoPage
-			return this.gotoPage(page).then(function(results){
+			return this.gotoPage(page).then(function (results) {
 				// Emit on a separate turn to enable event to be used consistently for
 				// initial render, regardless of whether the backing store is async
-				setTimeout(function() {
-					on.emit(self.domNode, "dgrid-refresh-complete", {
+				setTimeout(function () {
+					on.emit(self.domNode, 'dgrid-refresh-complete', {
 						bubbles: true,
 						cancelable: false,
 						grid: self,
@@ -411,7 +429,7 @@ define(["../_StoreMixin",
 			});
 		},
 
-		_onNotification: function(rows, event, collection){
+		_onNotification: function (rows, event, collection) {
 			var rowsPerPage = this.rowsPerPage;
 			var pageEnd = this._currentPage * rowsPerPage;
 			var needsRefresh = (event.type === 'add' && event.index < pageEnd) ||
@@ -431,24 +449,24 @@ define(["../_StoreMixin",
 			}
 		},
 
-		renderQueryResults: function(results, beforeNode){
+		renderQueryResults: function (results, beforeNode) {
 			var grid = this,
 				rows = this.inherited(arguments);
 
-			if(!beforeNode){
-				if(this._topLevelRequest){
+			if (!beforeNode) {
+				if (this._topLevelRequest) {
 					// Cancel previous async request that didn't finish
 					this._topLevelRequest.cancel();
 					delete this._topLevelRequest;
 				}
 
-				if (typeof rows.cancel === "function") {
+				if (typeof rows.cancel === 'function') {
 					// Store reference to new async request in progress
 					this._topLevelRequest = rows;
 				}
 
-				when(rows, function(){
-					if(grid._topLevelRequest){
+				when(rows, function () {
+					if (grid._topLevelRequest) {
 						// Remove reference to request now that it's finished
 						delete grid._topLevelRequest;
 					}
@@ -458,11 +476,11 @@ define(["../_StoreMixin",
 			return rows;
 		},
 
-		insertRow: function(){
+		insertRow: function () {
 			var oldNodes = this._oldPageNodes,
 				row = this.inherited(arguments);
 
-			if(oldNodes && row === oldNodes[row.id]){
+			if (oldNodes && row === oldNodes[row.id]) {
 				// If the previous row was reused, avoid removing it in cleanup
 				delete oldNodes[row.id];
 			}
@@ -470,22 +488,22 @@ define(["../_StoreMixin",
 			return row;
 		},
 
-		gotoPage: function(page){
+		gotoPage: function (page) {
 			// summary:
 			//		Loads the given page.  Note that page numbers start at 1.
 			var grid = this,
 				start = (this._currentPage - 1) * this.rowsPerPage;
 
 			if (!this._renderedCollection) {
-				console.warn("Pagination requires a collection to operate.");
+				console.warn('Pagination requires a collection to operate.');
 				return when([]);
 			}
 
 			if (this._renderedCollection.releaseRange) {
 				this._renderedCollection.releaseRange(start, start + this.rowsPerPage);
 			}
-			
-			return this._trackError(function(){
+
+			return this._trackError(function () {
 				var count = grid.rowsPerPage,
 					start = (page - 1) * count,
 					options = {
@@ -500,16 +518,17 @@ define(["../_StoreMixin",
 					i,
 					len;
 
-				if(grid.showLoadingMessage){
+				if (grid.showLoadingMessage) {
 					cleanupContent(grid);
-					loadingNode = grid.loadingNode = put(contentNode, "div.dgrid-loading");
+					loadingNode = grid.loadingNode = put(contentNode, 'div.dgrid-loading');
 					loadingNode.innerHTML = grid.loadingMessage;
-				}else{
+				}
+				else {
 					// Reference nodes to be cleared later, rather than now;
 					// iterate manually since IE < 9 doesn't like slicing HTMLCollections
 					grid._oldPageNodes = oldNodes = {};
 					children = contentNode.children;
-					for(i = 0, len = children.length; i < len; i++){
+					for (i = 0, len = children.length; i < len; i++) {
 						oldNodes[children[i].id] = children[i];
 					}
 				}
@@ -522,24 +541,24 @@ define(["../_StoreMixin",
 					end: start + count
 				});
 
-				return grid.renderQueryResults(results, null, options).then(function(rows){
+				return grid.renderQueryResults(results, null, options).then(function (rows) {
 					cleanupLoading(grid);
 					// Reset scroll Y-position now that new page is loaded.
 					grid.scrollTo({ y: 0 });
-					
+
 					if (grid._rows) {
 						grid._rows.min = start;
 						grid._rows.max = start + count - 1;
 					}
 
-					when(results.totalLength, function(total){
-						if(!total){
-							if(grid.noDataNode){
-								put(grid.noDataNode, "!");
+					when(results.totalLength, function (total) {
+						if (!total) {
+							if (grid.noDataNode) {
+								put(grid.noDataNode, '!');
 								delete grid.noDataNode;
 							}
 							// If there are no results, display the no data message.
-							grid.noDataNode = put(grid.contentNode, "div.dgrid-no-data");
+							grid.noDataNode = put(grid.contentNode, 'div.dgrid-no-data');
 							grid.noDataNode.innerHTML = grid.noDataMessage;
 						}
 
@@ -555,7 +574,7 @@ define(["../_StoreMixin",
 					});
 
 					return results;
-				}, function(error){
+				}, function (error) {
 					cleanupLoading(grid);
 					throw error;
 				});

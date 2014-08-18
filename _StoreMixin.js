@@ -1,39 +1,38 @@
 define([
-	"dojo/_base/declare",
-	"dojo/_base/lang",
-	"dojo/Deferred",
-	"dojo/aspect",
-	"dojo/on",
-	"dojo/when",
-	"put-selector/put"
-], function(declare, lang, Deferred, aspect, on, when, put){
+	'dojo/_base/declare',
+	'dojo/_base/lang',
+	'dojo/Deferred',
+	'dojo/aspect',
+	'dojo/on',
+	'dojo/when',
+	'put-selector/put'
+], function (declare, lang, Deferred, aspect, on, when, put) {
 	// This module isolates the base logic required by store-aware list/grid
 	// components, e.g. OnDemandList/Grid and the Pagination extension.
-	
-	// Noop function, needed for _trackError when callback due to a bug in 1.8
-	// (see http://bugs.dojotoolkit.org/ticket/16667)
-	function noop(value){ return value; }
-	
-	function emitError(err){
+
+	function emitError(err) {
 		// called by _trackError in context of list/grid, if an error is encountered
-		if(typeof err !== "object"){
+		if (typeof err !== 'object') {
 			// Ensure we actually have an error object, so we can attach a reference.
 			err = new Error(err);
-		}else if(err.dojoType === "cancel"){
+		}
+		else if (err.dojoType === 'cancel') {
 			// Don't fire dgrid-error events for errors due to canceled requests
 			// (unfortunately, the Deferred instrumentation will still log them)
 			return;
 		}
-		
-		if(on.emit(this.domNode, "dgrid-error", {
-				grid: this,
-				error: err,
-				cancelable: true,
-				bubbles: true })){
+
+		var event = on.emit(this.domNode, 'dgrid-error', {
+			grid: this,
+			error: err,
+			cancelable: true,
+			bubbles: true
+		});
+		if (event) {
 			console.error(err);
 		}
 	}
-	
+
 	return declare(null, {
 		// collection: Object
 		//		The base object collection (implementing the dstore/api/Store API) before being sorted
@@ -47,77 +46,77 @@ define([
 		_renderedCollection: null,
 
 		// _rows: Array
-		//		A sparse array of row nodes, used to maintain the grid in response to events from a tracked collection.
+		//		Sparse array of row nodes, used to maintain the grid in response to events from a tracked collection.
 		//		Each node's index corresponds to the index of its data object in the collection.
 		_rows: null,
 
 		// _observerHandle: Object
 		//		The observer handle for the current collection, if trackable.
 		_observerHandle: null,
-		
+
 		// getBeforePut: boolean
 		//		If true, a get request will be performed to the store before each put
 		//		as a baseline when saving; otherwise, existing row data will be used.
 		getBeforePut: true,
-		
+
 		// noDataMessage: String
 		//		Message to be displayed when no results exist for a collection, whether at
 		//		the time of the initial query or upon subsequent observed changes.
 		//		Defined by _StoreMixin, but to be implemented by subclasses.
-		noDataMessage: "",
-		
+		noDataMessage: '',
+
 		// loadingMessage: String
 		//		Message displayed when data is loading.
 		//		Defined by _StoreMixin, but to be implemented by subclasses.
-		loadingMessage: "",
-		
-		constructor: function(){
+		loadingMessage: '',
+
+		constructor: function () {
 			// Create empty objects on each instance, not the prototype
 			this.dirty = {};
 			this._updating = {}; // Tracks rows that are mid-update
 			this._columnsWithSet = {};
 
 			// Reset _columnsWithSet whenever column configuration is reset
-			aspect.before(this, "configStructure", lang.hitch(this, function(){
+			aspect.before(this, 'configStructure', lang.hitch(this, function () {
 				this._columnsWithSet = {};
 			}));
 		},
-		
-		destroy: function(){
+
+		destroy: function () {
 			this.inherited(arguments);
 
-			if(this._renderedCollection){
+			if (this._renderedCollection) {
 				this._cleanupCollection();
 			}
 		},
-		
-		_configColumn: function(column){
+
+		_configColumn: function (column) {
 			// summary:
 			//		Implements extension point provided by Grid to store references to
 			//		any columns with `set` methods, for use during `save`.
-			if (column.set){
+			if (column.set) {
 				this._columnsWithSet[column.field] = column;
 			}
 			this.inherited(arguments);
 		},
-		
-		_setCollection: function(collection){
+
+		_setCollection: function (collection) {
 			// summary:
 			//		Assigns a new collection to the list/grid, sets up tracking
 			//		if applicable, and tells the list/grid to refresh.
 
-			if(this._renderedCollection){
+			if (this._renderedCollection) {
 				this.cleanup();
 				this._cleanupCollection();
 			}
 
-			if(collection){
+			if (collection) {
 				var renderedCollection = collection;
-				if(this.sort && this.sort.length > 0){
+				if (this.sort && this.sort.length > 0) {
 					renderedCollection = collection.sort(this.sort);
 				}
 
-				if(renderedCollection.track){
+				if (renderedCollection.track) {
 					renderedCollection = renderedCollection.track();
 					this._rows = [];
 
@@ -152,57 +151,59 @@ define([
 			this._renderedCollection = this.collection = null;
 		},
 
-		_applySort: function(){
-			if(this.collection){
+		_applySort: function () {
+			if (this.collection) {
 				this.set('collection', this.collection);
 			}
 		},
-		
-		row: function(target){
+
+		row: function () {
 			// Extend List#row with more appropriate lookup-by-id logic
 			var row = this.inherited(arguments);
-			if(row && row.data && typeof row.id !== "undefined"){
+			if (row && row.data && typeof row.id !== 'undefined') {
 				row.id = this.collection.getIdentity(row.data);
 			}
 			return row;
 		},
-		
-		refresh: function(){
+
+		refresh: function () {
 			var result = this.inherited(arguments);
-			
-			if(!this.collection){
-				this.noDataNode = put(this.contentNode, "div.dgrid-no-data");
+
+			if (!this.collection) {
+				this.noDataNode = put(this.contentNode, 'div.dgrid-no-data');
 				this.noDataNode.innerHTML = this.noDataMessage;
 			}
-			
+
 			return result;
 		},
-		
-		renderArray: function(){
+
+		renderArray: function () {
 			var rows = this.inherited(arguments);
-			
-			if(!this.collection){
-				if(rows.length && this.noDataNode){
-					put(this.noDataNode, "!");
+
+			if (!this.collection) {
+				if (rows.length && this.noDataNode) {
+					put(this.noDataNode, '!');
 				}
 			}
 			return rows;
 		},
-		
-		insertRow: function(object, parent, beforeNode, i, options){
+
+		insertRow: function (object, parent, beforeNode, i, options) {
 			var store = this.collection,
 				dirty = this.dirty,
 				id = store && store.getIdentity(object),
 				dirtyObj,
 				row;
-			
-			if(id in dirty && !(id in this._updating)){ dirtyObj = dirty[id]; }
-			if(dirtyObj){
+
+			if (id in dirty && !(id in this._updating)) {
+				dirtyObj = dirty[id];
+			}
+			if (dirtyObj) {
 				// restore dirty object as delegate on top of original object,
 				// to provide protection for subsequent changes as well
 				object = lang.delegate(object, dirtyObj);
 			}
-			
+
 			row = this.inherited(arguments);
 
 			if (options && options.rows) {
@@ -212,54 +213,58 @@ define([
 			// Remove no data message when a new row appears.
 			// Run after inherited logic to prevent confusion due to noDataNode
 			// no longer being present as a sibling.
-			if(this.noDataNode){
-				put(this.noDataNode, "!");
+			if (this.noDataNode) {
+				put(this.noDataNode, '!');
 				this.noDataNode = null;
 			}
-			
+
 			return row;
 		},
-		
-		updateDirty: function(id, field, value){
+
+		updateDirty: function (id, field, value) {
 			// summary:
 			//		Updates dirty data of a field for the item with the specified ID.
 			var dirty = this.dirty,
 				dirtyObj = dirty[id];
-			
-			if(!dirtyObj){
+
+			if (!dirtyObj) {
 				dirtyObj = dirty[id] = {};
 			}
 			dirtyObj[field] = value;
 		},
-		
-		save: function() {
+
+		save: function () {
 			// Keep track of the store and puts
 			var self = this,
 				store = this.collection,
 				dirty = this.dirty,
 				dfd = new Deferred(), promise = dfd.promise,
-				getFunc = function(id){
+				getFunc = function (id) {
 					// returns a function to pass as a step in the promise chain,
 					// with the id variable closured
 					var data;
 					return (self.getBeforePut || !(data = self.row(id).data)) ?
-						function(){ return store.get(id); } :
-						function(){ return data; };
+						function () {
+							return store.get(id);
+						} :
+						function () {
+							return data;
+						};
 				};
-			
+
 			// function called within loop to generate a function for putting an item
 			function putter(id, dirtyObj) {
 				// Return a function handler
-				return function(object) {
+				return function (object) {
 					var colsWithSet = self._columnsWithSet,
 						updating = self._updating,
 						key, data;
 
-					if (typeof object.set === "function") {
+					if (typeof object.set === 'function') {
 						object.set(dirtyObj);
 					} else {
 						// Copy dirty props to the original, applying setters if applicable
-						for(key in dirtyObj){
+						for (key in dirtyObj) {
 							object[key] = dirtyObj[key];
 						}
 					}
@@ -268,46 +273,48 @@ define([
 					// Note that while in the most common cases column.set is intended
 					// to return transformed data for the key in question, it is also
 					// possible to directly modify the object to be saved.
-					for(key in colsWithSet){
+					for (key in colsWithSet) {
 						data = colsWithSet[key].set(object);
-						if(data !== undefined){ object[key] = data; }
+						if (data !== undefined) {
+							object[key] = data;
+						}
 					}
-					
+
 					updating[id] = true;
 					// Put it in the store, returning the result/promise
-					return when(store.put(object), function() {
+					return when(store.put(object), function () {
 						// Clear the item now that it's been confirmed updated
 						delete dirty[id];
 						delete updating[id];
 					});
 				};
 			}
-			
+
 			// For every dirty item, grab the ID
-			for(var id in dirty) {
+			for (var id in dirty) {
 				// Create put function to handle the saving of the the item
 				var put = putter(id, dirty[id]);
-				
+
 				// Add this item onto the promise chain,
 				// getting the item from the store first if desired.
 				promise = promise.then(getFunc(id)).then(put);
 			}
-			
+
 			// Kick off and return the promise representing all applicable get/put ops.
 			// If the success callback is fired, all operations succeeded; otherwise,
 			// save will stop at the first error it encounters.
 			dfd.resolve();
 			return promise;
 		},
-		
-		revert: function(){
+
+		revert: function () {
 			// summary:
 			//		Reverts any changes since the previous save.
 			this.dirty = {};
 			this.refresh();
 		},
-		
-		_trackError: function(func){
+
+		_trackError: function (func) {
 			// summary:
 			//		Utility function to handle emitting of error events.
 			// func: Function|String
@@ -318,35 +325,37 @@ define([
 			//		callback on failure.
 			// tags:
 			//		protected
-			
-			if(typeof func == "string"){ func = lang.hitch(this, func); }
-			
+
+			if (typeof func === 'string') {
+				func = lang.hitch(this, func);
+			}
+
 			var self = this,
 				promise;
-			
-			try{
+
+			try {
 				promise = when(func());
-			}catch(err){
+			} catch (err) {
 				// report sync error
 				var dfd = new Deferred();
 				dfd.reject(err);
 				promise = dfd.promise;
 			}
-			
-			promise.otherwise(function(err){
+
+			promise.otherwise(function (err) {
 				emitError.call(self, err);
 			});
 			return promise;
 		},
 
-		removeRow: function(rowElement, preserveDom, options){
+		removeRow: function (rowElement, preserveDom, options) {
 			var row = {element: rowElement};
 			// Check to see if we are now empty...
-			if(!preserveDom && this.noDataMessage &&
+			if (!preserveDom && this.noDataMessage &&
 					(this.up(row).element === rowElement) &&
-					(this.down(row).element === rowElement)){
+					(this.down(row).element === rowElement)) {
 				// ...we are empty, so show the no data message.
-				this.noDataNode = put(this.contentNode, "div.dgrid-no-data");
+				this.noDataNode = put(this.contentNode, 'div.dgrid-no-data');
 				this.noDataNode.innerHTML = this.noDataMessage;
 			}
 
@@ -357,65 +366,65 @@ define([
 
 			return this.inherited(arguments);
 		},
-		
-		renderQueryResults: function(results, beforeNode, options){
+
+		renderQueryResults: function (results, beforeNode, options) {
 			// summary:
 			//		Renders objects from QueryResults as rows, before the given node.
 
 			options = lang.mixin({ rows: this._rows }, options);
-			var self = this,
-				start = options.start || 0;
+			var self = this;
 
-			return when(results).then(function(resolvedResults){
+			return when(results).then(function (resolvedResults) {
 				var resolvedRows = self.renderArray(resolvedResults, beforeNode, options);
 				delete self._lastCollection; // used only for non-store List/Grid
 				return resolvedRows;
 			});
 		},
 
-		_observeCollection: function(collection, container, options){
+		_observeCollection: function (collection, container, options) {
 			var self = this,
 				rows = options.rows,
 				row;
 
 			var handles = [
-				collection.on("remove, update", function(event){
+				collection.on('remove, update', function (event) {
 					var from = event.previousIndex;
 					var to = event.index;
 
-					if(from !== undefined && rows[from]){
+					if (from !== undefined && rows[from]) {
 						if ('max' in rows && (to === undefined || to < rows.min || to > rows.max)) {
 							rows.max--;
 						}
-						
+
 						row = rows[from];
 
-						// check to make the sure the node is still there before we try to remove it, (in case it was moved to a different place in the DOM)
-						if(row.parentNode == container){
+						// check to make the sure the node is still there before we try to remove it
+						// (in case it was moved to a different place in the DOM)
+						if (row.parentNode === container) {
 							self.removeRow(row, false, options);
 						}
 
 						// remove the old slot
 						rows.splice(from, 1);
 
-						if(event.type === 'remove' || (event.type === 'update' && event.from < event.to)){
+						if (event.type === 'remove' || (event.type === 'update' && event.from < event.to)) {
 							// adjust the rowIndex so adjustRowIndices has the right starting point
 							rows[from] && rows[from].rowIndex--;
 						}
 
 						// the removal of rows could cause us to need to page in more items
-						if(self._processScroll){
+						if (self._processScroll) {
 							self._processScroll();
 						}
 					}
-					if(event.type === "remove"){
+					if (event.type === 'remove') {
 						// Reset row in case this is later followed by an add;
 						// only update events should retain the row variable below
 						row = null;
 					}
 				}),
 
-				collection.on("add, update", function(event){
+				collection.on('add, update', function (event) {
 					var from = event.previousIndex;
 					var to = event.index;
 					var nextNode;
@@ -425,23 +434,24 @@ define([
 					}
 
 					// When possible, restrict observations to the actually rendered range
-					if(to !== undefined && (!('max' in rows) || (to >= rows.min && to <= rows.max))){
+					if (to !== undefined && (!('max' in rows) || (to >= rows.min && to <= rows.max))) {
 						if ('max' in rows && (from === undefined || from < rows.min || from > rows.max)) {
 							rows.max++;
 						}
 						// Add to new slot (either before an existing row, or at the end)
 						// First determine the DOM node that this should be placed before.
-						if(rows.length){
+						if (rows.length) {
 							nextNode = rows[to];
-							if(!nextNode){
+							if (!nextNode) {
 								nextNode = rows[to - 1];
-								if(nextNode){
+								if (nextNode) {
 									// Make sure to skip connected nodes, so we don't accidentally
 									// insert a row in between a parent and its children.
 									advanceNext();
 								}
 							}
-						}else{
+						}
+						else {
 							// There are no rows.  Allow for subclasses to insert new rows somewhere other than
 							// at the end of the parent node.
 							nextNode = self._getFirstRowSibling && self._getFirstRowSibling(container);
@@ -449,13 +459,14 @@ define([
 						// Make sure we don't trip over a stale reference to a
 						// node that was removed, or try to place a node before
 						// itself (due to overlapped queries)
-						if(row && nextNode && row.id === nextNode.id){
+						if (row && nextNode && row.id === nextNode.id) {
 							advanceNext();
 						}
-						if(nextNode && !nextNode.parentNode){
+						if (nextNode && !nextNode.parentNode) {
 							nextNode = document.getElementById(nextNode.id);
 						}
-						// TODO: This was taken from the previous observe listener where each range request was observed individually. Is this still necessary?
+						// TODO: This was taken from the previous observe listener,
+						// where each range request was observed individually. Is this still necessary?
 						//parentNode = (beforeNode && beforeNode.parentNode) ||
 						//	(nextNode && nextNode.parentNode) || self.contentNode;
 						rows.splice(to, 0, undefined);
@@ -466,9 +477,9 @@ define([
 					row = null;
 				}),
 
-				collection.on("add, remove, update", function(event){
-					var from = (typeof event.previousIndex !== "undefined") ? event.previousIndex : Infinity,
-						to = (typeof event.index !== "undefined") ? event.index : Infinity,
+				collection.on('add, remove, update', function (event) {
+					var from = (typeof event.previousIndex !== 'undefined') ? event.previousIndex : Infinity,
+						to = (typeof event.index !== 'undefined') ? event.index : Infinity,
 						adjustAtIndex = Math.min(from, to);
 					from !== to && rows[adjustAtIndex] && self.adjustRowIndices(rows[adjustAtIndex]);
 
@@ -479,15 +490,15 @@ define([
 			];
 
 			return {
-				remove: function(){
-					while(handles.length > 0){
+				remove: function () {
+					while (handles.length > 0) {
 						handles.pop().remove();
 					}
 				}
 			};
 		},
 
-		_onNotification: function(rows, event, collection){
+		_onNotification: function () {
 			// summary:
 			//		Protected method called whenever a store notification is observed.
 			//		Intended to be extended as necessary by mixins/extensions.
