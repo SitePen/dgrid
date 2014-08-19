@@ -57,7 +57,6 @@
 					window.errorStores = errorStores; // for easy access by button handlers
 					window.testStore = testStore;
 					window.testAsyncStore = createAsyncStore({ data: genericData });
-					window.emptyStore = createSyncStore();
 					window.emptyAsyncStore = createAsyncStore();
 					
 					var CustomGrid = declare([Grid, Keyboard, Selection, Pagination]);
@@ -189,10 +188,8 @@
 		<div>Buttons to test different stores:
 			<button onclick="grid.set('collection', testAsyncStore);">Set to async store</button>
 			<button onclick="grid.set('collection', testStore);">Set to sync store</button>
-			<button onclick="grid.set('collection', emptyAsyncStore);">Set to async empty store</button>
-			<button onclick="grid.set('collection', emptyStore);">Set to sync empty store</button>
-			<button onclick="grid.set('collection', errorStores.asyncFetch);">Set to async error store</button>
-			<button onclick="grid.set('collection', errorStores.fetch);">Set to sync error store</button>
+			<button onclick="grid.set('collection', emptyAsyncStore);">Set to empty store</button>
+			<button onclick="grid.set('collection', errorStores.asyncFetch);">Set to error store</button>
 		</div>
 		<div>Buttons to test store operations:
 			<button onclick="grid.collection.remove(5);">Delete item with id 5 from store</button>

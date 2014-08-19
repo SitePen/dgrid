@@ -78,10 +78,6 @@ define([
 			storeTest(OnDemandGrid, asyncStore, true, this.async());
 		});
 
-		test.test("OnDemandGrid + sync store w/ error", function(){
-			storeTest(OnDemandGrid, errorStores.fetch, false, this.async());
-		});
-
 		test.test("OnDemandGrid + async store w/ error", function(){
 			storeTest(OnDemandGrid, errorStores.asyncFetch, false, this.async());
 		});
@@ -112,10 +108,6 @@ define([
 
 		test.test("PaginationGrid + async store", function(){
 			storeTest(PaginationGrid, asyncStore, true, this.async());
-		});
-
-		test.test("PaginationGrid + sync store w/ error", function(){
-			storeTest(PaginationGrid, errorStores.fetch, false, this.async());
 		});
 
 		test.test("PaginationGrid + async store w/ error", function(){
