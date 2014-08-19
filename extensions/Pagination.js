@@ -160,7 +160,7 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 				}else if(this === grid.paginationLastNode){
 					grid.gotoPage(max);
 				}else if(cls === "dgrid-page-link"){
-					grid.gotoPage(+this.innerHTML, true); // the innerHTML has the page number
+					grid.gotoPage(+this.innerHTML); // the innerHTML has the page number
 				}
 			}));
 		},
@@ -198,7 +198,7 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 				
 				// Repopulate options
 				paginationSizeSelect.options.length = 0;
-				for(i = 0; i < pageSizeOptions.length; i++){
+				for(var i = 0; i < pageSizeOptions.length; i++){
 					put(paginationSizeSelect, "option", pageSizeOptions[i], {
 						value: pageSizeOptions[i],
 						selected: this.rowsPerPage === pageSizeOptions[i]
@@ -246,7 +246,7 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 			this.gotoPage(1);
 		},
 
-		_updateNavigation: function(focusLink){
+		_updateNavigation: function(){
 			// summary:
 			//		Update status and navigation controls based on total count from query
 			
@@ -273,7 +273,7 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 					grid._pagingTextBoxHandle = on(link, "change", function(){
 						var value = +this.value;
 						if(!isNaN(value) && value > 0 && value <= end){
-							grid.gotoPage(+this.value, true);
+							grid.gotoPage(+this.value);
 						}
 					});
 					if(focused && focused.tagName === "INPUT"){
@@ -444,7 +444,7 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 			return row;
 		},
 		
-		gotoPage: function(page, focusLink){
+		gotoPage: function(page){
 			// summary:
 			//		Loads the given page.  Note that page numbers start at 1.
 			var grid = this,
@@ -516,7 +516,7 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 						
 						// It's especially important that _updateNavigation is called only
 						// after renderArray is resolved as well (to prevent jumping).
-						grid._updateNavigation(focusLink);
+						grid._updateNavigation();
 					});
 					
 					if (has("ie") < 7 || (has("ie") && has("quirks"))) {
