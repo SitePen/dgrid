@@ -11,8 +11,9 @@ define([
 	"dojo/_base/Deferred",
 	"dojo/on",
 	"dstore/Memory",
+	"dstore/QueryResults",
 	"dojo/query"
-], function(test, assert, Grid, OnDemandGrid, _StoreMixin, Tree, declare, lang, arrayUtil, Deferred, on, Memory, query){
+], function(test, assert, Grid, OnDemandGrid, _StoreMixin, Tree, declare, lang, arrayUtil, Deferred, on, Memory, QueryResults, query){
 
 	test.suite("tree (expand + promise)", function(){
 		var grid,
@@ -30,15 +31,11 @@ define([
 			}),
 			AsyncTreeStore = declare(TreeStore, {
 				// TreeStore with an asynchronous fetch method.
-				fetch: function(){
-					// Setting dfd on the prototype because collection chaining means we can't set it on an instance.
-					// It isn't great, but in practice, it is not much different than before.
-					var dfd = AsyncTreeStore.prototype.dfd = new Deferred();
-					var results = AsyncTreeStore.prototype.results = this.inherited(arguments);
-					results.total = dfd.then(function(){
-						return results.length;
-					});
-					return dfd.promise;
+				fetch: function () {
+					return asyncFetch.call(this);
+				},
+				fetchRange: function (kwArgs) {
+					return asyncFetch.call(this, kwArgs);
 				},
 				resolve: function(){
 					// Allows the test to control when the store query is resolved.
@@ -52,6 +49,19 @@ define([
 			StoreMixinGrid = declare([Grid, _StoreMixin, Tree]),
 			syncStore = new TreeStore({ data: createData() }),
 			asyncStore = new AsyncTreeStore({ data: createData() });
+
+		function asyncFetch(kwArgs) {
+			// Setting dfd on the prototype because collection chaining means we can't set it on an instance.
+			// It isn't great, but in practice, it is not much different than before.
+			var dfd = AsyncTreeStore.prototype.dfd = new Deferred();
+			var results = this.fetchSync();
+			var results = AsyncTreeStore.prototype.results = kwArgs ?
+				this.fetchSync().slice(kwArgs.start, kwArgs.end) : this.fetchSync();
+			results.totalLength = dfd.then(function(){
+				return results.length;
+			});
+			return new QueryResults(dfd.promise);
+		}
 
 		function createData(){
 			return [

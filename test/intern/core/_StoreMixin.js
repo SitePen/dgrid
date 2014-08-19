@@ -53,7 +53,7 @@ define([
 			dfd.callback(function(){
 				for(var i = 0, change; i < changes.length; i++){
 					change = changes[i];
-					assert.strictEqual(store.get(change.objectId)[change.field],
+					assert.strictEqual(store.getSync(change.objectId)[change.field],
 						change.expectedSavedValue);
 				}
 			}),
@@ -118,15 +118,15 @@ define([
 			document.body.appendChild(grid.domNode);
 			grid.startup();
 
-			var item = store.get(1);
-			store.remove(item.id);
+			var item = store.getSync(1);
+			store.removeSync(item.id);
 			assert.equal(notificationCount, 1);
 			assert.isNotNull(lastNotificationEvent);
 			assert.equal(lastNotificationEvent.type, "remove");
 			assert.equal(lastNotificationEvent.id, item.id);
 
 			lastNotificationEvent = null;
-			store.add(item);
+			store.addSync(item);
 			assert.equal(notificationCount, 2);
 			assert.isNotNull(lastNotificationEvent);
 			assert.equal(lastNotificationEvent.type, "add");
@@ -134,7 +134,7 @@ define([
 
 			item.col1 = "changed";
 			lastNotificationEvent = null;
-			store.put(item);
+			store.putSync(item);
 			assert.equal(notificationCount, 3);
 			assert.isNotNull(lastNotificationEvent);
 			assert.equal(lastNotificationEvent.type, "update");

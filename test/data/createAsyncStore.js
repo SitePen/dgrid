@@ -15,7 +15,7 @@ define([
 		randomizeDelay: false,
 
 		fetch: function () {
-			var actualData = this.inherited(arguments);
+			var actualData = this.fetchSync();
 			var actualTotal = actualData.totalLength;
 			var resultsDeferred = new Deferred();
 			var totalDeferred = new Deferred();
