@@ -157,7 +157,24 @@ function(declare, listen, has, put, List, miscUtil){
 			if(!cell.element){ cell = this.cell(cell); }
 			return this.cell(this._move(cell, steps || 1, "dgrid-cell"));
 		},
-		
+
+		_defaultRenderCell: function (object, data, td, options) {
+			// summary:
+			//		Default renderCell implementation.
+			//		NOTE: Called in context of column definition object.
+
+			if (this.formatter) {
+				// Support formatter, with or without formatterScope
+				var formatter = this.formatter,
+					formatterScope = this.grid.formatterScope;
+				td.innerHTML = typeof formatter === 'string' && formatterScope ?
+					formatterScope[formatter](data, object) : this.formatter(data, object);
+			}
+			else if (data != null) {
+				td.appendChild(document.createTextNode(data));
+			}
+		},
+
 		renderRow: function(object, options){
 			var self = this;
 			var row = this.createRowCells("td", function(td, column){
@@ -174,7 +191,7 @@ function(declare, listen, has, put, List, miscUtil){
 					// event handling, etc.
 					appendIfNode(td, column.renderCell(object, data, td, options));
 				}else{
-					defaultRenderCell.call(column, object, data, td, options);
+					self._defaultRenderCell.call(column, object, data, td, options);
 				}
 			}, options && options.subRows, object);
 			// row gets a wrapper div for a couple reasons:
@@ -511,22 +528,7 @@ function(declare, listen, has, put, List, miscUtil){
 		}
 	});
 	
-	function defaultRenderCell(object, data, td, options){
-		if(this.formatter){
-			// Support formatter, with or without formatterScope
-			var formatter = this.formatter,
-				formatterScope = this.grid.formatterScope;
-			td.innerHTML = typeof formatter === "string" && formatterScope ?
-				formatterScope[formatter](data, object) : this.formatter(data, object);
-		}else if(data != null){
-			td.appendChild(document.createTextNode(data)); 
-		}
-	}
-	
-	// expose appendIfNode and default implementation of renderCell,
-	// e.g. for use by column plugins
 	Grid.appendIfNode = appendIfNode;
-	Grid.defaultRenderCell = defaultRenderCell;
 	
 	return Grid;
 });

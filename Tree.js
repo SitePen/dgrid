@@ -281,7 +281,7 @@ define([
 			// summary:
 			//		Adds tree navigation capability to a column.
 
-			var originalRenderCell = column.renderCell || Grid.defaultRenderCell;
+			var originalRenderCell = column.renderCell || this._defaultRenderCell;
 			var clicked; // tracks row that was clicked (for expand dblclick event handling)
 
 			this._treeColumn = column;

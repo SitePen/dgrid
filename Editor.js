@@ -141,7 +141,7 @@ define([
 			var editor = column.editor;
 			var self = this;
 
-			var originalRenderCell = column.renderCell || Grid.defaultRenderCell;
+			var originalRenderCell = column.renderCell || this._defaultRenderCell;
 			var editOn = column.editOn;
 			var isWidget = typeof editor != "string";
 

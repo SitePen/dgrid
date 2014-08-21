@@ -16,6 +16,7 @@ The following is a rough list of changes, to be outlined more presentably later.
   (use `grid` property directly on event instead)
 * Replaced `List#newRow(...)` with `List#highlightRow(row[, delay])`
   (i.e. the equivalent of `newRow` is to call `insertRow` then `highlightRow`)
+* Moved `Grid.defaultRenderCell` to prototype as `_defaultRenderCell` (#375)
 * `Editor` is now a mixin (with a capital E), activated by presence of the `editor` column definition property
 * `Editor` now supports `autoSelect` property for columns using textbox-based inputs
 * `Selector` is now a mixin (with a capital S), activated by presence of the `selector` column definition property
