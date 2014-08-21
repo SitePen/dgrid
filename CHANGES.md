@@ -21,7 +21,8 @@ The following is a rough list of changes, to be outlined more presentably later.
 * `Selector` is now a mixin (with a capital S), activated by presence of the `selector` column definition property
 * `Tree` is now a mixin (with a capital T), activated by presence of the `renderExpando` column definition property
 * Some `Tree` properties have been moved from the column definition to instance-level,
-  including `collapseOnRefresh`, `shouldExpand`, and `enableTreeTransitions` (formerly `enableTransitions`)
+  including `collapseOnRefresh`, `treeIndentWidth` (formerly `indentWidth`), `shouldExpand`,
+  and `enableTreeTransitions` (formerly `enableTransitions`)
 * Desupported `Selector`'s `disabled` property (use `Selection#allowSelect` instead)
 * Desupported `Tree`'s `allowDupilcates` property (ensure unique IDs instead)
 * Added `options.keepCurrentPage` to `Pagination#refresh`

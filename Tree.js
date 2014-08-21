@@ -20,6 +20,10 @@ define([
 		// enableTreeTransitions: Boolean
 		//		Enables/disables all expand/collapse CSS transitions.
 		enableTreeTransitions: true,
+		
+		// treeIndentWidth: Number
+		//		Width (in pixels) of each level of indentation.
+		treeIndentWidth: 9,
 
 		constructor: function(){
 			this._treeColumnListeners = [];
@@ -355,6 +359,7 @@ define([
 		_defaultRenderExpando: function(level, hasChildren, expanded, object){
 			// summary:
 			//		Default implementation for column.renderExpando.
+			//		NOTE: Called in context of the column definition object.
 
 			var dir = this.grid.isRTL ? "right" : "left",
 				cls = ".dgrid-expando-icon",
@@ -363,7 +368,7 @@ define([
 				cls += ".ui-icon.ui-icon-triangle-1-" + (expanded ? "se" : "e");
 			}
 			node = put("div" + cls + "[style=margin-" + dir + ": " +
-				(level * (this.indentWidth || 9)) + "px; float: " + dir + "]");
+				(level * (this.grid.treeIndentWidth)) + "px; float: " + dir + "]");
 			node.innerHTML = "&nbsp;"; // for opera to space things properly
 			return node;
 		},
