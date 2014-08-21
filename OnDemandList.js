@@ -148,7 +148,7 @@ return declare([List, _StoreMixin], {
 
 					if (self._rows) {
 						self._rows.min = 0;
-						self._rows.max = trCount === results.totalLength ? Infinity : trCount - 1;
+						self._rows.max = trCount === total ? Infinity : trCount - 1;
 					}
 
 					put(loadingNode, "!");

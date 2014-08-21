@@ -20,7 +20,7 @@ define([
 			col5: "Column 5"
 		},
 		testStore = createSyncStore({ data: genericData }),
-		item = testStore.get(1),
+		item = testStore.getSync(1),
 		grid,
 		columnSet = [
 			[
