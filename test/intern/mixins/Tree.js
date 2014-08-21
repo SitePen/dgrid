@@ -49,15 +49,11 @@ define([
 			data: data
 		});
 
-		treeColumnOptions = {
+		treeColumnOptions = lang.mixin({
 			renderExpando: true,
 			label: "id",
 			field: "id"
-		};
-
-		if(options && options.treeColumnOptions){
-			lang.mixin(treeColumnOptions, options.treeColumnOptions);
-		}
+		}, options && options.treeColumnOptions);
 
 		if(options && options.useEditor){
 			GridConstructor = declare([OnDemandGrid, Editor, Tree]);
@@ -68,14 +64,14 @@ define([
 			GridConstructor = declare([OnDemandGrid, Tree]);
 		}
 
-		grid = new GridConstructor({
+		grid = new GridConstructor(lang.mixin({
 			sort: "id",
 			collection: store,
 			columns: [
 				treeColumnOptions,
 				{ label: "value", field: "value"}
 			]
-		});
+		}, options && options.gridOptions));
 		put(document.body, grid.domNode);
 		grid.startup();
 	}
@@ -374,6 +370,28 @@ define([
 							parent: "0"
 						});
 					}, null, 'Modification of child should not throw error');
+				});
+			});
+		});
+		
+		test.suite('treeIndentWidth', function () {
+			var treeIndentWidth = 20;
+			test.beforeEach(function () {
+				createGrid({
+					gridOptions: { treeIndentWidth: treeIndentWidth }
+				});
+				return wait();
+			});
+			
+			test.afterEach(destroyGrid);
+			
+			test.test('treeIndentWidth override', function () {
+				return expand(0).then(function () {
+					var row = grid.row('0:0');
+					assert.ok(row, 'Expected child row exists');
+					query('.dgrid-expando-icon', row.element).forEach(function (element) {
+						assert.strictEqual(element.style.marginLeft, treeIndentWidth + 'px');
+					});
 				});
 			});
 		});
