@@ -21,7 +21,7 @@ function(GridFromHtml, ColumnSet, declare){
 			// used in loops:
 			currcol, // keeps track of what column we're at
 			currcg, // and which colgroup
-			groupColumns, tr, ths, i, j, tmp;
+			groupColumns, tr, ths, thslen, i, j, tmp;
 		
 		function incCurrcol(amount){
 			// Check whether we've passed into the next colgroup within current row.
