@@ -1,74 +1,74 @@
 define([
-	"intern!tdd",
-	"intern/chai!assert",
-	"dojo/_base/declare",
-	"dojo/dom-class",
-	"dojo/query",
-	"../../data/createSyncStore",
-	"dgrid/OnDemandList",
-	"put-selector/put"
-], function(test, assert, declare, domClass, query, createSyncStore, OnDemandList, put){
+	'intern!tdd',
+	'intern/chai!assert',
+	'dojo/_base/declare',
+	'dojo/dom-class',
+	'dojo/query',
+	'../../data/createSyncStore',
+	'dgrid/OnDemandList',
+	'put-selector/put'
+], function (test, assert, declare, domClass, query, createSyncStore, OnDemandList, put) {
 
 	var widget,
 		storeCounter = 0;
 
-	function destroyWidget(){
-		if(widget){
+	function destroyWidget() {
+		if (widget) {
 			widget.destroy();
 			widget = null;
 		}
 	}
 
-	function indexToId(index){
+	function indexToId(index) {
 		return (index + 1) * 10;
 	}
 
-	function createItem(index){
+	function createItem(index) {
 		var id = indexToId(index);
-		return {id: id, value: "Value " + id + " / Store " + storeCounter};
+		return { id: id, value: 'Value ' + id + ' / Store ' + storeCounter };
 	}
 
-	function createData(numStoreItems){
+	function createData(numStoreItems) {
 		var data = [];
-		for(var i = 0; i < numStoreItems; i++){
+		for (var i = 0; i < numStoreItems; i++) {
 			data.push(createItem(i));
 		}
 		return data;
 	}
 
-	function createStore(numStoreItems){
+	function createStore(numStoreItems) {
 		storeCounter++;
 		return createSyncStore({
 			data: createData(numStoreItems)
 		});
 	}
 
-	function createList(numStoreItems, itemsPerQuery, overlap){
+	function createList(numStoreItems, itemsPerQuery, overlap) {
 		widget = new OnDemandList({
 			collection: createStore(numStoreItems),
 			minRowsPerPage: itemsPerQuery,
 			maxRowsPerPage: itemsPerQuery,
 			queryRowsOverlap: overlap,
-			renderRow: function(object){
-				return put("div", object.value);
+			renderRow: function (object) {
+				return put('div', object.value);
 			},
-			sort: "id"
+			sort: 'id'
 		});
 		document.body.appendChild(widget.domNode);
 		widget.startup();
 	}
 
-	function itemTest(itemAction, index, numToModify, backwards){
+	function itemTest(itemAction, index, numToModify, backwards) {
 		// Creates a single test case for performing an action on numToModify rows/items.
-		var description = itemAction.actionName + " " + numToModify + " item" + (numToModify > 1 ? "s" : "") +
-			" starting at index " + index + ", in " + (backwards ? "decreasing" : "increasing") + " order";
+		var description = itemAction.actionName + ' ' + numToModify + ' item' + (numToModify > 1 ? 's' : '') +
+			' starting at index ' + index + ', in ' + (backwards ? 'decreasing' : 'increasing') + ' order';
 
 		numToModify = numToModify || 1;
 
-		test.test(description, function(){
+		test.test(description, function () {
 			var i,
 				cnt,
-				step = function(){
+				step = function () {
 					cnt++;
 					backwards ? i-- : i++;
 				},
@@ -76,72 +76,76 @@ define([
 				expectedValues = [],
 				msgPrefix;
 
-			function testRow(element, i){
+			function testRow(element, i) {
 				var expectedValue = expectedValues[i];
-				if(expectedValue == null || expectedValue.deleted){
-					assert.isTrue(element == null, msgPrefix + "row at index " + i + " should not be found");
-				}else{
+				if (expectedValue == null || expectedValue.deleted) {
+					assert.isTrue(element == null, msgPrefix + 'row at index ' + i + ' should not be found');
+				}
+				else {
 					expectedValue = expectedValue.value;
-					assert.isTrue(element != null, msgPrefix + "row at index " + i + " with an expected value of \"" + expectedValue + "\" is missing");
-					assert.strictEqual(expectedValue, element.innerHTML, msgPrefix + element.innerHTML + " should be " + expectedValue);
+					assert.isTrue(element != null,
+						msgPrefix + 'row at index ' + i + ' with an expected value of "' +
+						expectedValue + '" is missing');
+					assert.strictEqual(expectedValue, element.innerHTML,
+						msgPrefix + element.innerHTML + ' should be ' + expectedValue);
 				}
 			}
 
 			// Perform the actions and update the array of expected values.
 			expectedValues = createData(widget.collection.data.length);
-			for(i = index, cnt = 0; cnt < numToModify; step()){
+			for (i = index, cnt = 0; cnt < numToModify; step()) {
 				itemAction(indexToId(i), expectedValues);
 			}
 
 			// Use the dgrid widget API to test if the action was performed properly.
-			msgPrefix = "dgrid API: ";
+			msgPrefix = 'dgrid API: ';
 			tmp = [];
-			for(i = 0; i < expectedValues.length; i++){
+			for (i = 0; i < expectedValues.length; i++) {
 				var expectedValue = expectedValues[i],
 					expectedId = expectedValue.id;
 				testRow(widget.row(expectedId).element, i);
-				if(!expectedValue.deleted){
+				if (!expectedValue.deleted) {
 					tmp.push(expectedValue);
 				}
 			}
 			expectedValues = tmp;
 
 			// Query the DOM to verify the structure matches the expected results.
-			msgPrefix = "DOM query: ";
-			query(".dgrid-row", widget.domNode).forEach(testRow);
+			msgPrefix = 'DOM query: ';
+			query('.dgrid-row', widget.domNode).forEach(testRow);
 		});
 	}
 
-	function itemTestSuite(widgetClassName, storeSize, itemsPerQuery, overlap, config){
+	function itemTestSuite(widgetClassName, storeSize, itemsPerQuery, overlap, config) {
 		// Create a test suite that performs one action type (itemAction) on 1 to config.itemsModifiedMax with
 		// a given amount of overlap.
 		var index, numToModify;
 
-		test.suite(widgetClassName + " with " + overlap + " overlap", function(){
+		test.suite(widgetClassName + ' with ' + overlap + ' overlap', function () {
 
-			test.beforeEach(function(){
+			test.beforeEach(function () {
 				createList(storeSize, itemsPerQuery, overlap);
 			});
 
 			test.afterEach(destroyWidget);
 
 			// Modify items counting up.
-			for(numToModify = 1; numToModify <= config.itemsModifiedMax; numToModify++){
-				for(index = 0; index <= (storeSize - numToModify); index++){
+			for (numToModify = 1; numToModify <= config.itemsModifiedMax; numToModify++) {
+				for (index = 0; index <= (storeSize - numToModify); index++) {
 					itemTest(config.itemAction, index, numToModify);
 				}
 			}
 			// Modify items counting down.  Starting at a count of 2 because
 			// single item modification were tested above.
-			for(numToModify = 2; numToModify <= config.itemsModifiedMax; numToModify++){
-				for(index = numToModify - 1; index < storeSize; index++){
+			for (numToModify = 2; numToModify <= config.itemsModifiedMax; numToModify++) {
+				for (index = numToModify - 1; index < storeSize; index++) {
 					itemTest(config.itemAction, index, numToModify, true);
 				}
 			}
 		});
 	}
 
-	function itemActionTestSuite(description, itemAction, config){
+	function itemActionTestSuite(description, itemAction, config) {
 		// Creates multiple item test suites for a given action (itemAction):
 		// - a list that executes a single query
 		// - lists with overlap from 0 to config.itemOverlapMax
@@ -153,69 +157,69 @@ define([
 		// with the correct widget on the page.
 		config.itemAction = itemAction;
 
-		test.suite(description, function(){
+		test.suite(description, function () {
 			// Test widgets with only one query: total item count equals item count per query.
-			itemTestSuite("OnDemandList one query", config.itemsPerQuery, config.itemsPerQuery, 0, config);
+			itemTestSuite('OnDemandList one query', config.itemsPerQuery, config.itemsPerQuery, 0, config);
 
 			// Test widgets that make multiple query requests: twice as many items as items per query so multiple
 			// queries will create multiple observers.
 			var storeSize = config.itemsPerQuery * 2;
 			// Test with OnDemandList with varying overlap values
-			for(var overlap = 0; overlap <= config.itemOverlapMax; overlap++){
-				itemTestSuite("OnDemandList multiple queries", storeSize, config.itemsPerQuery, overlap, config);
+			for (var overlap = 0; overlap <= config.itemOverlapMax; overlap++) {
+				itemTestSuite('OnDemandList multiple queries', storeSize, config.itemsPerQuery, overlap, config);
 			}
 		});
 	}
 
-	function itemAddEmptyStoreTest(itemsToAddCount, itemsPerQuery, overlap){
+	function itemAddEmptyStoreTest(itemsToAddCount, itemsPerQuery, overlap) {
 		var i;
 
-		function rowHasClass(rowNode, cssClass){
-			assert.isTrue(domClass.contains(rowNode, cssClass), rowNode.outerHTML + " should have " + cssClass);
+		function rowHasClass(rowNode, cssClass) {
+			assert.isTrue(domClass.contains(rowNode, cssClass), rowNode.outerHTML + ' should have ' + cssClass);
 		}
 
-		test.test("Add " + itemsToAddCount + " items with " + overlap + " overlap", function(){
+		test.test('Add ' + itemsToAddCount + ' items with ' + overlap + ' overlap', function () {
 			createList(0, itemsPerQuery, overlap);
 			var store = widget.collection;
-			for(i = 0; i < itemsToAddCount; i++){
+			for (i = 0; i < itemsToAddCount; i++) {
 				store.put(createItem(i));
 			}
 
-			var rows = query(".dgrid-content > div", widget.domNode);
-			rowHasClass(rows[0], "dgrid-preload");
-			for(i = 1; i <= itemsToAddCount; i++){
-				rowHasClass(rows[i], (i % 2) ? "dgrid-row-even" : "dgrid-row-odd");
+			var rows = query('.dgrid-content > div', widget.domNode);
+			rowHasClass(rows[0], 'dgrid-preload');
+			for (i = 1; i <= itemsToAddCount; i++) {
+				rowHasClass(rows[i], (i % 2) ? 'dgrid-row-even' : 'dgrid-row-odd');
 			}
-			rowHasClass(rows[i], "dgrid-preload");
+			rowHasClass(rows[i], 'dgrid-preload');
 
-			for(i = 0; i < itemsToAddCount; i++){
+			for (i = 0; i < itemsToAddCount; i++) {
 				store.put(createItem(i));
 			}
 
-			rows = query(".dgrid-content > div", widget.domNode);
-			rowHasClass(rows[0], "dgrid-preload");
-			for(i = 1; i <= itemsToAddCount; i++){
-				rowHasClass(rows[i], (i % 2) ? "dgrid-row-even" : "dgrid-row-odd");
+			rows = query('.dgrid-content > div', widget.domNode);
+			rowHasClass(rows[0], 'dgrid-preload');
+			for (i = 1; i <= itemsToAddCount; i++) {
+				rowHasClass(rows[i], (i % 2) ? 'dgrid-row-even' : 'dgrid-row-odd');
 			}
-			rowHasClass(rows[i], "dgrid-preload");
+			rowHasClass(rows[i], 'dgrid-preload');
 		});
 	}
 
-	function itemAddEmptyStoreTestSuite(config){
-		test.suite("Add items to empty store", function(){
+	function itemAddEmptyStoreTestSuite(config) {
+		test.suite('Add items to empty store', function () {
 
 			test.afterEach(destroyWidget);
 
 			itemAddEmptyStoreTest(1, config.itemsPerQuery, 0);
 
 			// Test with OnDemandList with varying overlap values
-			for(var overlap = 0; overlap <= config.itemOverlapMax; overlap++){
+			for (var overlap = 0; overlap <= config.itemOverlapMax; overlap++) {
 				itemAddEmptyStoreTest(config.itemsPerQuery + overlap + 1, config.itemsPerQuery, overlap);
 			}
 		});
 	}
 
-	test.suite("observable lists", function(){
+	test.suite('observable lists', function () {
 		// Creates test suites that execute the following actions on OnDemandLists with varying amount of
 		// overlap and modifying varying number of items:
 		// - modify existing items
@@ -223,47 +227,47 @@ define([
 		// - add new items before existing items
 		// - add new items after existing items
 
-		function findIndex(id, objs){
-			for(var i = 0; i < objs.length; i++){
+		function findIndex(id, objs) {
+			for (var i = 0; i < objs.length; i++) {
 				var obj = objs[i];
-				if(obj && obj.id === id){
+				if (obj && obj.id === id) {
 					return i;
 				}
 			}
 			return -1;
 		}
 
-		var modifyAction = function(id, expectedValues){
+		var modifyAction = function (id, expectedValues) {
 			var index = findIndex(id, expectedValues);
-			var value = expectedValues[index].value + " / Changed!";
+			var value = expectedValues[index].value + ' / Changed!';
 			var dataObj = {id: id, value: value};
 			widget.collection.put(dataObj);
 			expectedValues[index] = dataObj;
 		};
-		modifyAction.actionName = "Modify";
+		modifyAction.actionName = 'Modify';
 
-		var removeAction = function(id, expectedValues){
+		var removeAction = function (id, expectedValues) {
 			widget.collection.remove(id);
 			var index = findIndex(id, expectedValues);
 			expectedValues[index].deleted = true;
 		};
-		removeAction.actionName = "Remove";
+		removeAction.actionName = 'Remove';
 
-		var addBeforeAction = function(id, expectedValues){
+		var addBeforeAction = function (id, expectedValues) {
 			var index = findIndex(id, expectedValues);
-			var obj = {id: id - 5, value: expectedValues[index].value + " / Added before!"};
+			var obj = { id: id - 5, value: expectedValues[index].value + ' / Added before!' };
 			widget.collection.add(obj);
 			expectedValues.splice(index, 0, obj);
 		};
-		addBeforeAction.actionName = "Add before";
+		addBeforeAction.actionName = 'Add before';
 
-		var addAfterAction = function(id, expectedValues){
+		var addAfterAction = function (id, expectedValues) {
 			var index = findIndex(id, expectedValues);
-			var obj = {id: id + 5, value: expectedValues[index].value + " / Added after!"};
+			var obj = {id: id + 5, value: expectedValues[index].value + ' / Added after!'};
 			widget.collection.add(obj);
 			expectedValues.splice(index + 1, 0, obj);
 		};
-		addAfterAction.actionName = "Add after";
+		addAfterAction.actionName = 'Add after';
 
 		// Run a test case with each action (modify, remove, add before, add after) and vary the amount of
 		// queryRowsOverlap and vary the number of items modified during each test case.  A configuration
@@ -280,10 +284,10 @@ define([
 			itemOverlapMax: 2,
 			itemsModifiedMax: 2
 		};
-		itemActionTestSuite("Modify store items", modifyAction, config);
-		itemActionTestSuite("Remove store items", removeAction, config);
-		itemActionTestSuite("Insert store items before", addBeforeAction, config);
-		itemActionTestSuite("Insert store items after", addAfterAction, config);
+		itemActionTestSuite('Modify store items', modifyAction, config);
+		itemActionTestSuite('Remove store items', removeAction, config);
+		itemActionTestSuite('Insert store items before', addBeforeAction, config);
+		itemActionTestSuite('Insert store items after', addAfterAction, config);
 
 		itemAddEmptyStoreTestSuite(config);
 	});

@@ -41,8 +41,8 @@ define([
 		// environment variables.
 		tunnel: 'SauceLabsTunnel',
 
-		// Configuration options for the module loader; any AMD configuration options supported by the Dojo loader can be
-		// used here
+		// Configuration options for the module loader;
+		// any AMD configuration options supported by the Dojo loader can be used here
 		loader: {
 			baseUrl: has('host-browser') ? '../../..' : '..',
 			// Packages that should be registered with the loader in each testing environment
@@ -63,5 +63,5 @@ define([
 
 		// Functional test suite(s) to run in each browser once non-functional tests are completed
 		functionalSuites: [ 'dgrid/test/intern/functional' ]
-	}
+	};
 });

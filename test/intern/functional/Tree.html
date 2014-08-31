@@ -30,41 +30,40 @@ var treeGrid;
 var ready;
 
 require([
-	"dojo/_base/declare",
-	"dgrid/OnDemandGrid",
-	"dgrid/Tree",
-	"dgrid/test/data/createHierarchicalStore",
-	"dgrid/test/data/hierarchicalCountryData"
+	'dojo/_base/declare',
+	'dgrid/OnDemandGrid',
+	'dgrid/Tree',
+	'dgrid/test/data/createHierarchicalStore',
+	'dgrid/test/data/hierarchicalCountryData'
 ], function(declare, OnDemandGrid, Tree, createHierarchicalStore, hierarchicalCountryData){
-	/* global testCountryStore: true */
 
 	var testCountryStore = createHierarchicalStore({ data: hierarchicalCountryData });
 
 	treeGrid = new (declare([OnDemandGrid, Tree]))({
-		sort: "id",
+		sort: 'id',
 		collection: testCountryStore,
 		columns: [
 			{
 				renderExpando: true,
-				label: "Name",
-				field: "name",
+				label: 'Name',
+				field: 'name',
 				sortable: false
 			},
 			{
-				label: "Type",
-				field: "type",
+				label: 'Type',
+				field: 'type',
 				sortable: false
 			},
 			{
-				label: "Population",
-				field: "population"
+				label: 'Population',
+				field: 'population'
 			},
 			{
-				label: "Timezone",
-				field: "timezone"
+				label: 'Timezone',
+				field: 'timezone'
 			}
 		]
-	}, "treeGrid");
+	}, 'treeGrid');
 
 	ready = true;
 });

@@ -25,31 +25,31 @@
 				setEditorToTextBox;
 
 			require([
-				"dojo/_base/declare",
-				"dojo/aspect",
-				"dgrid/OnDemandGrid",
-				"dgrid/Editor",
-				"dijit/form/TextBox",
-				"dgrid/test/data/createSyncStore"
+				'dojo/_base/declare',
+				'dojo/aspect',
+				'dgrid/OnDemandGrid',
+				'dgrid/Editor',
+				'dijit/form/TextBox',
+				'dgrid/test/data/createSyncStore'
 			], function (declare, aspect, OnDemandGrid, Editor, TextBox, createSyncStore) {
 				var store = createSyncStore({ data: [
-					{ id: 0, name: "1", description: "one" },
-					{ id: 1, name: "2", description: "two" },
-					{ id: 2, name: "3", description: "three" }
+					{ id: 0, name: '1', description: 'one' },
+					{ id: 1, name: '2', description: 'two' },
+					{ id: 2, name: '3', description: 'three' }
 				]});
 
 				function createColumnConfig(editorType) {
 					return {
-						id: "ID",
+						id: 'ID',
 						name: {
-							label: "Name",
-							editor: editorType || "text",
+							label: 'Name',
+							editor: editorType || 'text',
 							autoSave: true
 						},
 						description: {
-							label: "Description",
-							editor: editorType || "text",
-							editOn: "click",
+							label: 'Description',
+							editor: editorType || 'text',
+							editOn: 'click',
 							autoSave: true
 						}
 					};
@@ -57,10 +57,10 @@
 
 				grid = new (declare([OnDemandGrid, Editor]))({
 					collection: store,
-					columns: createColumnConfig("text")
-				}, "grid");
+					columns: createColumnConfig('text')
+				}, 'grid');
 
-				aspect.before(grid, "save", function () {
+				aspect.before(grid, 'save', function () {
 					var dirtyRowId;
 
 					saveComplete = undefined;
@@ -71,14 +71,14 @@
 					}
 				});
 
-				aspect.after(grid, "save", function (savePromise) {
+				aspect.after(grid, 'save', function (savePromise) {
 					savePromise.then(function () {
 						saveComplete = true;
 					});
 				});
 
 				setEditorToTextBox = function () {
-					grid.set("columns", createColumnConfig(TextBox));
+					grid.set('columns', createColumnConfig(TextBox));
 				};
 
 				ready = true;

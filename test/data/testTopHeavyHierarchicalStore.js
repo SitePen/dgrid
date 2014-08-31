@@ -1,8 +1,8 @@
 define([
-	"./createSyncStore",
-	"./stateData",
-	"dojo/_base/array"
-], function(createSyncStore, stateData, arrayUtil){
+	'./createSyncStore',
+	'./stateData',
+	'dojo/_base/array'
+], function (createSyncStore, stateData, arrayUtil) {
 
 	var nextId = 0;
 	var topHeavyData = arrayUtil.map(stateData.items, function (state) {
@@ -22,13 +22,13 @@ define([
 	// issues due to bugs related to total disregarding level
 	return createSyncStore({
 		data: topHeavyData,
-		getChildren: function(parent, options){
+		getChildren: function (parent) {
 			return this._createSubCollection({
 				data: parent.children,
 				total: parent.children.length
 			});
 		},
-		mayHaveChildren: function(parent){
+		mayHaveChildren: function (parent) {
 			return !!parent.children;
 		}
 	});

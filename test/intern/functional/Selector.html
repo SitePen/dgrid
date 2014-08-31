@@ -53,24 +53,7 @@
 			</tr>
 		</table>
 
-
-		<script>
-			var dojoConfig = {
-				async: true,
-				baseUrl: "../../../../",
-				packages: [
-					"dojo",
-					"dijit",
-					"dojox",
-					"dgrid",
-					"put-selector",
-					"xstyle"
-				]
-			};
-		</script>
-
 		<script src="../../../../dojo/dojo.js"></script>
-
 		<script>
 			var gridExtended;
 			var gridMultiple;
@@ -80,12 +63,12 @@
 			var ready;
 
 			require([
-				"dojo/_base/declare",
-				"dojo/_base/lang",
-				"dgrid/OnDemandGrid",
-				"dgrid/Selection",
-				"dgrid/Selector",
-				"dgrid/test/data/testStore"
+				'dojo/_base/declare',
+				'dojo/_base/lang',
+				'dgrid/OnDemandGrid',
+				'dgrid/Selection',
+				'dgrid/Selector',
+				'dgrid/test/data/testStore'
 			], function (declare, lang, OnDemandGrid, Selection, Selector, testStore) {
 				var SelectionGrid = declare([OnDemandGrid, Selection, Selector]);
 
@@ -94,31 +77,31 @@
 				}
 
 				function createGrid(selectionMode) {
-					var id = "grid" + selectionMode.slice(0, 1).toUpperCase() + selectionMode.slice(1);
-					var selectColumn = { label: "Select", selector: "checkbox" };
-					if (selectionMode === "single") {
-						selectColumn.selector = "radio";
+					var id = 'grid' + selectionMode.slice(0, 1).toUpperCase() + selectionMode.slice(1);
+					var selectColumn = { label: 'Select', selector: 'checkbox' };
+					if (selectionMode === 'single') {
+						selectColumn.selector = 'radio';
 					}
 
 					return new SelectionGrid({
 						collection: testStore,
 						columns: {
 							select: selectColumn,
-							col1: "Column 1",
-							col2: "Column 2",
-							col5: "Column 5"
+							col1: 'Column 1',
+							col2: 'Column 2',
+							col5: 'Column 5'
 						},
 						selectionMode: selectionMode,
 						allowSelect: allowSelect,
-						allowSelectAll: selectionMode !== "single"
+						allowSelectAll: selectionMode !== 'single'
 					}, id);
 				}
 
-				gridExtended = createGrid("extended");
-				gridMultiple = createGrid("multiple");
-				gridSingle = createGrid("single");
-				gridToggle = createGrid("toggle");
-				gridNone = createGrid("none");
+				gridExtended = createGrid('extended');
+				gridMultiple = createGrid('multiple');
+				gridSingle = createGrid('single');
+				gridToggle = createGrid('toggle');
+				gridNone = createGrid('none');
 
 				ready = true;
 			});

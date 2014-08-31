@@ -1,7 +1,7 @@
 define([
-	"intern/dojo/node!leadfoot/helpers/pollUntil",
-	"intern/dojo/node!leadfoot/keys",
-	"intern/dojo/node!leadfoot/Command"
+	'intern/dojo/node!leadfoot/helpers/pollUntil',
+	'intern/dojo/node!leadfoot/keys',
+	'intern/dojo/node!leadfoot/Command'
 ], function (pollUntil, keys, Command) {
 	return {
 		isShiftClickSupported: function (remote) {
@@ -16,8 +16,8 @@ define([
 
 			return remote.execute(function () {
 					window.isShiftClickSupported = false;
-					var button = document.createElement("button");
-					button.id = "shiftClickTestButton";
+					var button = document.createElement('button');
+					button.id = 'shiftClickTestButton';
 					button.onclick = function (event) {
 						window.shiftClickTestButtonClicked = true;
 						window.isShiftClickSupported = event.shiftKey;
@@ -25,11 +25,13 @@ define([
 					document.body.appendChild(button);
 				})
 				.pressKeys(keys.SHIFT)
-					.findById("shiftClickTestButton")
+					.findById('shiftClickTestButton')
 					.click()
 					.pressKeys(keys.NULL)
 					.end()
-				.then(pollUntil(function () { return window.shiftClickTestButtonClicked; }, null, 5000))
+				.then(pollUntil(function () {
+					return window.shiftClickTestButtonClicked;
+				}, null, 5000))
 				.execute(function () {
 					document.body.removeChild(document.getElementById('shiftClickTestButton'));
 					return window.isShiftClickSupported;
@@ -46,20 +48,20 @@ define([
 			//		A promise that resolves to a boolean
 
 			return remote.execute(function () {
-					var input = document.createElement("input");
-					input.id = "homeEndTestInput";
-					input.value = "2";
+					var input = document.createElement('input');
+					input.id = 'homeEndTestInput';
+					input.value = '2';
 					document.body.appendChild(input);
 				})
-				.findById("homeEndTestInput")
+				.findById('homeEndTestInput')
 					.click()
-					.type(keys.END + "3" + keys.HOME + "1")
+					.type(keys.END + '3' + keys.HOME + '1')
 					.end()
 				.execute(function () {
-					var input = document.getElementById("homeEndTestInput"),
+					var input = document.getElementById('homeEndTestInput'),
 						value = input.value;
 					document.body.removeChild(input);
-					return value === "123";
+					return value === '123';
 				});
 		},
 

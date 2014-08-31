@@ -1,10 +1,10 @@
 define([
-	"intern!tdd",
-	"intern/chai!assert",
-	"./util",
-	"intern/dojo/node!leadfoot/helpers/pollUntil",
-	"intern/dojo/node!leadfoot/keys",
-	"require"
+	'intern!tdd',
+	'intern/chai!assert',
+	'./util',
+	'intern/dojo/node!leadfoot/helpers/pollUntil',
+	'intern/dojo/node!leadfoot/keys',
+	'require'
 ], function (test, assert, util, pollUntil, keys, require) {
 	// The number of visible rows in each grid (clickable without scrolling)
 	// Look at the test page to determine this value
@@ -22,37 +22,37 @@ define([
 	expectedSelectState.gridToggle = expectedSelectState.gridExtended;
 	expectedSelectState.gridNone = expectedSelectState.gridExtended;
 
-	test.suite("dgrid/selector functional tests", function () {
+	test.suite('dgrid/selector functional tests', function () {
 
 		var isShiftClickSupported;
 
 		// Click the checkbox/radio in the first NUM_VISIBLE_ROWS of a grid.
 		// After each click the row will be tested for the "dgrid-selected" class.
 		function clickAndTestEachRow(remote, gridId) {
-			var rowSelector = "#" + gridId + "-row-",
+			var rowSelector = '#' + gridId + '-row-',
 				rowIndex;
 
 			function each(rowIndex) {
 				// Click the dgrid/selector checkbox/radio
-				return remote.findByCssSelector(rowSelector + rowIndex + " .field-select input")
+				return remote.findByCssSelector(rowSelector + rowIndex + ' .field-select input')
 						.click()
 						.end()
 					// Check the row for the "dgrid-selected" class
 					.findByCssSelector(rowSelector + rowIndex)
-						.getAttribute("class")
+						.getAttribute('class')
 						.then(function (classString) {
 							var classNames,
 								isSelected;
 
 							if (rowIndex % 2) {
-								classNames = classString.split(" ");
-								isSelected = classNames.indexOf("dgrid-selected") !== -1;
+								classNames = classString.split(' ');
+								isSelected = classNames.indexOf('dgrid-selected') !== -1;
 								assert.isFalse(isSelected,
-									gridId + ": Row " + rowIndex + " should NOT be selected");
+									gridId + ': Row ' + rowIndex + ' should NOT be selected');
 							}
 							else {
-								assert.include(classString, "dgrid-selected",
-									gridId + ": Row " + rowIndex + " should be selected after click");
+								assert.include(classString, 'dgrid-selected',
+									gridId + ': Row ' + rowIndex + ' should be selected after click');
 							}
 						})
 						.end();
@@ -69,13 +69,13 @@ define([
 
 		// Click the checkbox/radio in the first row, then shift+click in the 5th.
 		function shiftClickAndTestRows(remote, gridId) {
-			var rowSelector = "#" + gridId + "-row-";
+			var rowSelector = '#' + gridId + '-row-';
 
-			return remote.findByCssSelector(rowSelector + "0" + " .field-select input")
+			return remote.findByCssSelector(rowSelector + '0' + ' .field-select input')
 					.click()
 					.end()
 				.pressKeys(keys.SHIFT)
-				.findByCssSelector(rowSelector + "4" + " .field-select input")
+				.findByCssSelector(rowSelector + '4' + ' .field-select input')
 					.click()
 					.pressKeys(keys.NULL)
 					.end();
@@ -83,7 +83,7 @@ define([
 
 		// Click the "Select All" checkbox in the grid header
 		function selectAll(remote, gridId) {
-			var selector = "#" + gridId + " .dgrid-header .field-select input";
+			var selector = '#' + gridId + ' .dgrid-header .field-select input';
 
 			return remote.findByCssSelector(selector)
 				.click()
@@ -96,25 +96,25 @@ define([
 					return;
 				}
 
-				var selector = "#" + gridId + "-row-",
-					remote = this.get("remote"),
+				var selector = '#' + gridId + '-row-',
+					remote = this.get('remote'),
 					rowIndex;
 
 				function each(rowIndex) {
 					return remote.findByCssSelector(selector + rowIndex)
-						.getAttribute("class").then(function (classString) {
+						.getAttribute('class').then(function (classString) {
 							var classNames,
 								isSelected;
 
 							if (expectedSelectState[gridId][rowIndex]) {
-								assert.include(classString, "dgrid-selected",
-									gridId + ": Row " + rowIndex + " should still be selected");
+								assert.include(classString, 'dgrid-selected',
+									gridId + ': Row ' + rowIndex + ' should still be selected');
 							}
 							else {
-								classNames = classString.split(" ");
-								isSelected = classNames.indexOf("dgrid-selected") !== -1;
+								classNames = classString.split(' ');
+								isSelected = classNames.indexOf('dgrid-selected') !== -1;
 								assert.isFalse(isSelected,
-									gridId + ": Row " + rowIndex + " should NOT be selected");
+									gridId + ': Row ' + rowIndex + ' should NOT be selected');
 							}
 						})
 						.end();
@@ -134,15 +134,17 @@ define([
 		}
 
 		test.before(function () {
-			var remote = this.get("remote");
-			return remote.get(require.toUrl("./Selector.html"))
-				.then(pollUntil(function () { return window.ready; }, null, 5000))
+			var remote = this.get('remote');
+			return remote.get(require.toUrl('./Selector.html'))
+				.then(pollUntil(function () {
+					return window.ready;
+				}, null, 5000))
 				.then(function () {
 					return util.isShiftClickSupported(remote).then(function (isSupported) {
 						isShiftClickSupported = isSupported;
 						if (!isSupported) {
-							console.warn("shift+click tests will be no-ops because " +
-								"this browser/WebDriver combination does not support shift+click.");
+							console.warn('shift+click tests will be no-ops because ' +
+								'this browser/WebDriver combination does not support shift+click.');
 						}
 					});
 				});
@@ -150,7 +152,7 @@ define([
 
 		test.beforeEach(function () {
 			// Clear selections from previous tests
-			return this.get("remote").execute(function () {
+			return this.get('remote').execute(function () {
 				/* global gridExtended, gridMultiple, gridSingle, gridToggle, gridNone */
 				gridExtended.clearSelection();
 				gridMultiple.clearSelection();
@@ -160,35 +162,35 @@ define([
 			});
 		});
 
-		test.test("selectionMode: extended",
-			createRowSelectionTest("gridExtended", true, clickAndTestEachRow));
-		test.test("selectionMode: multiple",
-			createRowSelectionTest("gridMultiple", true, clickAndTestEachRow));
-		test.test("selectionMode: single",
-			createRowSelectionTest("gridSingle", false, clickAndTestEachRow));
-		test.test("selectionMode: toggle",
-			createRowSelectionTest("gridToggle", true, clickAndTestEachRow));
-		test.test("selectionMode: none",
-			createRowSelectionTest("gridNone", true, clickAndTestEachRow));
+		test.test('selectionMode: extended',
+			createRowSelectionTest('gridExtended', true, clickAndTestEachRow));
+		test.test('selectionMode: multiple',
+			createRowSelectionTest('gridMultiple', true, clickAndTestEachRow));
+		test.test('selectionMode: single',
+			createRowSelectionTest('gridSingle', false, clickAndTestEachRow));
+		test.test('selectionMode: toggle',
+			createRowSelectionTest('gridToggle', true, clickAndTestEachRow));
+		test.test('selectionMode: none',
+			createRowSelectionTest('gridNone', true, clickAndTestEachRow));
 
-		test.test("multiple selection with shift+click; selectionMode: extended",
-			createRowSelectionTest("gridExtended", true, shiftClickAndTestRows));
-		test.test("multiple selection with shift+click; selectionMode: multiple",
-			createRowSelectionTest("gridMultiple", true, shiftClickAndTestRows));
-		test.test("multiple selection with shift+click; selectionMode: single",
-			createRowSelectionTest("gridSingle", false, shiftClickAndTestRows));
-		test.test("multiple selection with shift+click; selectionMode: toggle",
-				createRowSelectionTest("gridToggle", true, shiftClickAndTestRows));
-		test.test("multiple selection with shift+click; selectionMode: none",
-				createRowSelectionTest("gridNone", true, shiftClickAndTestRows));
+		test.test('multiple selection with shift+click; selectionMode: extended',
+			createRowSelectionTest('gridExtended', true, shiftClickAndTestRows));
+		test.test('multiple selection with shift+click; selectionMode: multiple',
+			createRowSelectionTest('gridMultiple', true, shiftClickAndTestRows));
+		test.test('multiple selection with shift+click; selectionMode: single',
+			createRowSelectionTest('gridSingle', false, shiftClickAndTestRows));
+		test.test('multiple selection with shift+click; selectionMode: toggle',
+				createRowSelectionTest('gridToggle', true, shiftClickAndTestRows));
+		test.test('multiple selection with shift+click; selectionMode: none',
+				createRowSelectionTest('gridNone', true, shiftClickAndTestRows));
 
-		test.test("select all; selectionMode: extended",
-			createRowSelectionTest("gridExtended", true, selectAll));
-		test.test("select all; selectionMode: multiple",
-			createRowSelectionTest("gridMultiple", true, selectAll));
-		test.test("select all; selectionMode: toggle",
-			createRowSelectionTest("gridToggle", true, selectAll));
-		test.test("select all; selectionMode: none",
-			createRowSelectionTest("gridNone", true, selectAll));
+		test.test('select all; selectionMode: extended',
+			createRowSelectionTest('gridExtended', true, selectAll));
+		test.test('select all; selectionMode: multiple',
+			createRowSelectionTest('gridMultiple', true, selectAll));
+		test.test('select all; selectionMode: toggle',
+			createRowSelectionTest('gridToggle', true, selectAll));
+		test.test('select all; selectionMode: none',
+			createRowSelectionTest('gridNone', true, selectAll));
 	});
 });

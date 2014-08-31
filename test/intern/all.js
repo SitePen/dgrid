@@ -15,4 +15,4 @@ define([
 	'intern/node_modules/dojo/has!host-browser?./mixins/Tree',
 	'intern/node_modules/dojo/has!host-browser?./mixins/Tree-expand-promise',
 	'intern/node_modules/dojo/has!host-browser?./mixins/Tree-additional-filter'
-], function(){});
+], function () {});

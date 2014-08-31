@@ -23,45 +23,45 @@
 				setEditorToTextBox;
 
 			require([
-				"dojo/_base/declare",
-				"dgrid/Grid",
-				"dgrid/Editor",
-				"dijit/form/TextBox"
+				'dojo/_base/declare',
+				'dgrid/Grid',
+				'dgrid/Editor',
+				'dijit/form/TextBox'
 			], function (declare, Grid, Editor, TextBox) {
 				function createColumnConfig(editorType) {
 					return {
-						id: "ID",
+						id: 'ID',
 						name: {
-							label: "Name",
-							editor: editorType || "text"
+							label: 'Name',
+							editor: editorType || 'text'
 						},
 						description: {
-							label: "Description",
-							editor: editorType || "text",
-							editOn: "click"
+							label: 'Description',
+							editor: editorType || 'text',
+							editOn: 'click'
 						}
 					};
 				}
 
 				grid = new (declare([Grid, Editor]))({
-					columns: createColumnConfig("text")
-				}, "grid");
+					columns: createColumnConfig('text')
+				}, 'grid');
 
 				grid.renderArray([
-					{ id: 0, name: "1", description: "one" },
-					{ id: 1, name: "2", description: "two" },
-					{ id: 2, name: "3", description: "three" }
+					{ id: 0, name: '1', description: 'one' },
+					{ id: 1, name: '2', description: 'two' },
+					{ id: 2, name: '3', description: 'three' }
 				]);
 
 				// Push values received by the "dgrid-datachange" event into a global stack.
 				// The functional test can read from this stack to verify the values it is
 				// inputting are being emitted by the "dgrid-datachange" event.
-				grid.on("dgrid-datachange", function (event) {
+				grid.on('dgrid-datachange', function (event) {
 					datachangeStack.push(event.value);
 				});
 
 				setEditorToTextBox = function () {
-					grid.set("columns", createColumnConfig(TextBox));
+					grid.set('columns', createColumnConfig(TextBox));
 				};
 
 				ready = true;
