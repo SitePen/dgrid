@@ -7,8 +7,10 @@ switch between pages.
 
 ```js
 require([
-    "dojo/_base/declare", "dgrid/Grid", "dgrid/extensions/Pagination"
-], function(declare, Grid, Pagination){
+    'dojo/_base/declare',
+    'dgrid/Grid',
+    'dgrid/extensions/Pagination'
+], function (declare, Grid, Pagination) {
     var grid = new (declare([Grid, Pagination]))({
         collection: myStore,
         columns: myColumns,
@@ -16,7 +18,7 @@ require([
         pagingTextBox: true,
         firstLastArrows: true,
         pageSizeOptions: [10, 15, 25]
-    }, "grid");
+    }, 'grid');
     // ...
 });
 ```

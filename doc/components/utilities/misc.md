@@ -7,7 +7,7 @@ such as scroll.  As of dgrid 0.3.5, `util/misc` is also home to the `addCssRule`
 function, used by various APIs across dgrid components.
 
 ```js
-require(["dgrid/util/misc"], function(misc){
+require([ 'dgrid/util/misc' ], function (misc) {
     // Produce a new function which will call `myFunction` a maximum of
     // once per second
     var myThrottledFunction = misc.throttle(myFunction, null, 1000);

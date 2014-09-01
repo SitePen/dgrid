@@ -5,9 +5,9 @@ for detecting the respective actions on touch devices.  It also defines utility
 functions for handling touch events.
 
 ```js
-require(["dgrid/util/touch"], function(touchUtil){
+require([ 'dgrid/util/touch' ], function (touchUtil) {
     // Assume we have a Grid instance in the variable `grid`...
-    grid.on(touchUtil.selector(".dgrid-content .dgrid-row", touchUtil.dbltap), function(event){
+    grid.on(touchUtil.selector('.dgrid-content .dgrid-row', touchUtil.dbltap), function (event) {
         var row = grid.row(event);
         // Do something with `row` here in reaction to when it is double-tapped
     });

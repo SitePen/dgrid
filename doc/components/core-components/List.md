@@ -6,9 +6,9 @@ them as rows of HTML in a scrollable area.
 The List module can be used to render an array of data as follows:
 
 ```js
-require(["dgrid/List"], function(List){
+require([ 'dgrid/List' ], function (List) {
     // attach to a DOM element indicated by its ID
-    var list = new List({}, "list");
+    var list = new List({}, 'list');
     // render some data
     list.renderArray(arrayOfData);
 });

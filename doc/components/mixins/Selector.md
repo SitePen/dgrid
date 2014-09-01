@@ -6,16 +6,19 @@ providing alternate means for selecting and deselecting rows in a grid.
 
 ```js
 require([
-    "dojo/_base/declare", "dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Selector"
-], function(declare, OnDemandGrid, Selection, Selector){
+    'dojo/_base/declare',
+    'dgrid/OnDemandGrid',
+    'dgrid/Selection',
+    'dgrid/Selector'
+], function (declare, OnDemandGrid, Selection, Selector) {
     var grid = new (declare([OnDemandGrid, Selection, Selector]))({
         collection: myStore,
-        selectionMode: "single",
+        selectionMode: 'single',
         columns: {
-            col1: { label: "Select", selector: "radio" },
-            col2: "Column 2"
+            col1: { label: 'Select', selector: 'radio' },
+            col2: 'Column 2'
         }
-    }, "grid");
+    }, 'grid');
     // ...
 });
 ```
@@ -41,21 +44,24 @@ Parameter | Description
 
 ```js
 require([
-    "dojo/_base/declare", "dgrid/Grid", "dgrid/Selection", "dgrid/Selector"
-], function(declare, Grid, Selection, Selector){
+    'dojo/_base/declare',
+    'dgrid/Grid',
+    'dgrid/Selection',
+    'dgrid/Selector'
+], function (declare, Grid, Selection, Selector) {
     var grid = new (declare([Grid, Selection, Selector]))({
         columns: {
             col1: {
-                label: "Select",
+                label: 'Select',
                 selector: function (column, selected, cell, object) {
                     var inputNode;
                     // ... render an input component ...
                     return inputNode;
                 }
             },
-            col2: "Column 2"
+            col2: 'Column 2'
         }
-    }, "grid");
+    }, 'grid');
     // ...
 });
 ```
@@ -66,7 +72,7 @@ construct the component first and then make your modifications to the returned D
 ```js
 selector: function (column, selected, cell, object) {
     var inputNode = column.grid._defaultRenderSelectorInput(column, selected, cell, object);
-    domClass.add(inputNode, "mySelectorClass");
+    domClass.add(inputNode, 'mySelectorClass');
     return inputNode;
 }
 ```

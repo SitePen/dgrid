@@ -14,13 +14,17 @@ all manner of events.  For example, to listen for right-clicks on rows in the
 grid's body:
 
 ```js
-grid.on(".dgrid-row:contextmenu", function(evt){ /* ... */ });
+grid.on('.dgrid-row:contextmenu', function (event) {
+    /* ... */
+});
 ```
 
 Or, to listen to clicks on individual header cells:
 
 ```js
-grid.on(".dgrid-header .dgrid-cell:click", function(evt){ /* ... */ });
+grid.on('.dgrid-header .dgrid-cell:click', function (event) {
+    /* ... */
+});
 ```
 
 In summary, pretty much any combination desired can be achieved by using
@@ -41,14 +45,14 @@ of `cell`, a second argument indicating column ID would also be passed.
 Expanding upon the examples above...
 
 ```js
-grid.on(".dgrid-row:contextmenu", function(evt){
+grid.on('.dgrid-row:contextmenu', function (event) {
     var row = grid.row(evt);
     // row.element == the element with the dgrid-row class
     // row.id == the identity of the item represented by the row
     // row.data == the item represented by the row
 });
 
-grid.on(".dgrid-header .dgrid-cell:click", function(evt){
+grid.on('.dgrid-header .dgrid-cell:click', function (event) {
     var cell = grid.cell(evt);
     // cell.element == the element with the dgrid-cell class
     // cell.column == the column definition object for the column the cell is within

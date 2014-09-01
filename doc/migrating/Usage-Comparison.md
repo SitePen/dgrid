@@ -5,22 +5,25 @@
 Given the following programmatic example using `dojox/grid`...
 
 ```js
-require(["dojox/grid/DataGrid", "dojo/store/Memory", "dojo/data/ObjectStore",
-    "dojo/domReady!"],
-function(DataGrid, Memory, ObjectStore){
-    var memoryStore = new Memory({data: [
+require([
+    'dojox/grid/DataGrid',
+    'dojo/store/Memory',
+    'dojo/data/ObjectStore',
+    'dojo/domReady!'
+], function (DataGrid, Memory, ObjectStore) {
+    var memoryStore = new Memory({ data: [
         // data here...
     ]});
     var objectStore = new ObjectStore({ objectStore: memoryStore });
-    
+
     var grid = new DataGrid({
         structure: [
-            { field: "id", name: "ID", width: "10%" },
-            { field: "name", name: "Name", width: "20%" },
-            { field: "description", name: "Description", width: "70%" }
+            { field: 'id', name: 'ID', width: '10%' },
+            { field: 'name', name: 'Name', width: '20%' },
+            { field: 'description', name: 'Description', width: '70%' }
         ],
         store: objectStore
-    }, "grid");
+    }, 'grid');
     grid.startup();
 });
 ```
@@ -43,21 +46,26 @@ following styles...
 ...and the following JavaScript...
 
 ```js
-require(["dgrid/OnDemandGrid", "dgrid/Keyboard", "dgrid/Selection",
-    "dojo/_base/declare", "dstore/Memory", "dojo/domReady!"],
-function(OnDemandGrid, Keyboard, Selection, declare, Memory){
+require([
+    'dgrid/OnDemandGrid',
+    'dgrid/Keyboard',
+    'dgrid/Selection',
+    'dojo/_base/declare',
+    'dstore/Memory',
+    'dojo/domReady!'
+], function (OnDemandGrid, Keyboard, Selection, declare, Memory) {
     var memoryStore = new Memory({data: [
         // data here...
     ]});
-    
+
     var grid = new declare([OnDemandGrid, Keyboard, Selection])({
         columns: {
-            id: { label: "ID" },
-            name: { label: "Name" },
-            description: { label: "Description" }
+            id: 'ID',
+            name: 'Name',
+            description: 'Description'
         },
         collection: memoryStore
-    }, "grid");
+    }, 'grid');
     // dgrid will call startup for you if the node appears to be in flow
 });
 ```
@@ -93,15 +101,15 @@ contrived example demonstrating use of sub-rows in `dojox/grid`...
 var grid = new DataGrid({
     structure: [
         [
-            { field: "id", name: "ID", width: "10%" },
-            { field: "name", name: "Name", width: "20%" }
+            { field: 'id', name: 'ID', width: '10%' },
+            { field: 'name', name: 'Name', width: '20%' }
         ],
         [
-            { field: "description", name: "Description", width: "70%", colSpan: 2 }
+            { field: 'description', name: 'Description', width: '70%', colSpan: 2 }
         ]
     ],
     store: objectStore
-}, "grid");
+}, 'grid');
 grid.startup();
 ```
 
@@ -112,15 +120,15 @@ grid.startup();
 var grid = new declare([OnDemandGrid, Keyboard, Selection])({
     subRows: [
         [
-            { field: "id", label: "ID" },
-            { field: "name", label: "Name" }
+            { field: 'id', label: 'ID' },
+            { field: 'name', label: 'Name' }
         ],
         [
-            { field: "description", label: "Description", colSpan: 2 }
+            { field: 'description', label: 'Description', colSpan: 2 }
         ]
     ],
     collection: memoryStore
-}, "grid");
+}, 'grid');
 ```
 
 Notice that `subRows` is now defined instead of `columns`.  The `columns`
@@ -148,20 +156,20 @@ sections, the following `dojox/grid` structure with multiple views...
 var grid = new DataGrid({
     structure: [
         { // first view
-            width: "10%",
+            width: '10%',
             cells: [
-                { field: "id", name: "ID", width: "auto" }
+                { field: 'id', name: 'ID', width: 'auto' }
             ]
         },
         [ // second view
             [
-                { field: "name", name: "Name", width: "20%" },
-                { field: "description", name: "Description", width: "80%" }
+                { field: 'name', name: 'Name', width: '20%' },
+                { field: 'description', name: 'Description', width: '80%' }
             ]
         ]
     ],
     store: objectStore
-}, "grid");
+}, 'grid');
 grid.startup();
 ```
 
@@ -183,27 +191,33 @@ grid.startup();
 (require call included, to demonstrate additional dependency)
 
 ```js
-require(["dgrid/OnDemandGrid", "dgrid/ColumnSet", "dgrid/Keyboard", "dgrid/Selection",
-    "dojo/_base/declare", "dstore/Memory", "dojo/domReady!"],
-function(OnDemandGrid, ColumnSet, Keyboard, Selection, declare, Memory){
+require([
+    'dgrid/OnDemandGrid',
+    'dgrid/ColumnSet',
+    'dgrid/Keyboard',
+    'dgrid/Selection',
+    'dojo/_base/declare',
+    'dstore/Memory',
+    'dojo/domReady!'
+], function (OnDemandGrid, ColumnSet, Keyboard, Selection, declare, Memory) {
     // ... create memoryStore here ...
-    
+
     var grid = new declare([OnDemandGrid, ColumnSet, Keyboard, Selection])({
         columnSets: [
             [ // first columnSet
                 [
-                    { field: "id", label: "ID" }
+                    { field: 'id', label: 'ID' }
                 ]
             ],
             [ // second columnSet
                 [
-                    { field: "name", label: "Name" },
-                    { field: "description", label: "Description" }
+                    { field: 'name', label: 'Name' },
+                    { field: 'description', label: 'Description' }
                 ]
             ]
         ],
         collection: memoryStore
-    }, "grid");
+    }, 'grid');
 });
 ```
 
@@ -272,7 +286,7 @@ parsing declarative dgrid instances.  `data-dojo-mixins` can be used to incorpor
 the desired functionality, analogous to using `declare` programmatically.
 
 ### Column Layout via HTML with views / columnsets
-    
+
 While both `dojox/grid` and dgrid also enable declarative creation
 of grids with multiple views/columnsets, in dgrid's case this is again separated
 to its own module, GridWithColumnSetsFromHtml.  This separation exists due to
@@ -353,8 +367,8 @@ grid.connect(grid, "onRowClick", function(evt){
 ...and using dgrid...
 
 ```js
-grid.on(".dgrid-row:click", function(evt){
-    var item = grid.row(evt).data;
-    console.log("Clicked item with name: " + item.name);
+grid.on('.dgrid-row:click', function (event) {
+    var item = grid.row(event).data;
+    console.log('Clicked item with name: ' + item.name);
 });
 ```

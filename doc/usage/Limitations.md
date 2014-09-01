@@ -27,10 +27,10 @@ in order to avoid code repetition, you can create a function which returns
 the structure, but creates it every time it is called.  For example:
 
 ```js
-function getColumns(){
+function getColumns () {
     return {
-        col1: { label: "Column 1", editor: "text", editOn: "dblclick" },
-        col2: { label: "Column 2", sortable: false },
+        col1: { label: 'Column 1', editor: 'text', editOn: 'dblclick' },
+        col2: { label: 'Column 2', sortable: false },
         // ...
     };
 }
@@ -38,11 +38,11 @@ function getColumns(){
 var grid = new Grid({
     columns: getColumns(),
     // ...
-}, "grid");
+}, 'grid');
 var secondGrid = new Grid({
     columns: getColumns(),
     // ...
-}, "secondGrid");
+}, 'secondGrid');
 ```
 
 ## Column Definitions: Coexistence of formatter and renderCell

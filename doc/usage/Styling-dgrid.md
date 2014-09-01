@@ -22,14 +22,14 @@ For example, you could define a grid and style it like so:
     }
 </style>
 <script>
-    require(["dgrid/Grid"], function(Grid){
+    require([ 'dgrid/Grid' ], function (Grid) {
         var grid = new Grid({
             columns: {
-                age: "Age",
-                first: "First Name",
+                age: 'Age',
+                first: 'First Name',
                 // ...
             }
-        }, "grid");
+        }, 'grid');
         grid.renderArray(someData);
     });
 </script>
@@ -47,7 +47,7 @@ arguments object as a second parameter to the advising function, allowing access
 to the original object:
 
 ```js
-aspect.after(grid, "renderRow", function(row, args) {
+aspect.after(grid, 'renderRow', function(row, args) {
   // Add classes to `row` based on `args[0]` here
   return row;
 });
@@ -57,8 +57,8 @@ In Dojo 1.7, you need to use `aspect.around`, in order to have access to both th
 incoming object and the resulting row node:
 
 ```js
-aspect.around(grid, "renderRow", function(original) {
-  return function(object) {
+aspect.around(grid, 'renderRow', function (original) {
+  return function (object) {
     var row = original.apply(this, arguments);
     // Add classes to `row` based on `object` here
     return row;

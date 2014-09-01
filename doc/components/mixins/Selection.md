@@ -8,25 +8,27 @@ which will possess a `rows` property containing an array of Row objects (with
 
 ```js
 require([
-    "dojo/_base/declare", "dgrid/OnDemandGrid", "dgrid/Selection"
-], function(declare, OnDemandGrid, Selection){
+    'dojo/_base/declare',
+    'dgrid/OnDemandGrid',
+    'dgrid/Selection'
+], function (declare, OnDemandGrid, Selection) {
     var grid = new (declare([OnDemandGrid, Selection]))({
-        selectionMode: "single",
+        selectionMode: 'single',
         // ...
-    }, "grid");
-    grid.on("dgrid-select", function(event){
+    }, 'grid');
+    grid.on('dgrid-select', function (event) {
         // Get the rows that were just selected
         var rows = event.rows;
         // ...
-        
+
         // Iterate through all currently-selected items
-        for(var id in grid.selection){
-            if(grid.selection[id]){
+        for (var id in grid.selection) {
+            if (grid.selection[id]) {
                 // ...
             }
         }
     });
-    grid.on("dgrid-deselect", function(event){
+    grid.on('dgrid-deselect', function (event) {
         // Get the rows that were just deselected
         var rows = event.rows;
         // ...

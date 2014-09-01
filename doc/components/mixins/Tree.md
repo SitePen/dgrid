@@ -1,21 +1,25 @@
 # Tree
 
-The Tree mixin enables expansion of rows to display children. 
+The Tree mixin enables expansion of rows to display children.
 
 ```js
 require([
-    "dojo/_base/declare", "dgrid/OnDemandGrid", "dgrid/Tree", "dgrid/Keyboard", "dgrid/Selection"
-], function(declare, OnDemandGrid, Tree, Keyboard, Selection){
+    'dojo/_base/declare',
+    'dgrid/OnDemandGrid',
+    'dgrid/Tree',
+    'dgrid/Keyboard',
+    'dgrid/Selection'
+], function (declare, OnDemandGrid, Tree, Keyboard, Selection) {
     var treeGrid = new (declare([OnDemandGrid, Keyboard, Selection, Tree]))({
         collection: myStore,
         columns: [
             // Render expando icon and trigger expansion from first column
-            { label: "Name", field: "name", renderExpando: true }),
-            { label: "Type", field: "type", sortable: false},
-            { label: "Population", field: "population" },
-            { label: "Timezone", field: "timezone" }
+            { label: 'Name', field: 'name', renderExpando: true }),
+            { label: 'Type', field: 'type', sortable: false},
+            { label: 'Population', field: 'population' },
+            { label: 'Timezone', field: 'timezone' }
         ]
-    }, "treeGrid");
+    }, 'treeGrid');
 });
 ```
 
@@ -35,15 +39,15 @@ look like in an extension to `dstore/Memory`, where hierarchy is indicated
 by a `parent` property on child items:
 
 ```js
-constructor: function(){
+constructor: function () {
     // Save a reference to the original store for use in getChildren()
     this.root = this;
 },
-getChildren: function(parent, options){
+getChildren: function (parent, options) {
     // Call filter on the original store to avoid the filter looking only for the root objects.
     return this.root.filter({ parent: parent.id });
 }
-``` 
+```
 
 The store may also (optionally) provide a `mayHaveChildren(object)` method which
 returns a boolean indicating whether or not the row can be expanded. If this

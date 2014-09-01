@@ -4,19 +4,23 @@ The DnD extension can be used to add row drag'n'drop functionality.
 
 ```js
 require([
-    "dojo/_base/declare", "dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/extensions/DnD", "dojo/dnd/Source"
-], function(declare, OnDemandGrid, Selection, DnD, DnDSource){
+    'dojo/_base/declare',
+    'dgrid/OnDemandGrid',
+    'dgrid/Selection',
+    'dgrid/extensions/DnD',
+    'dojo/dnd/Source'
+], function (declare, OnDemandGrid, Selection, DnD, DnDSource) {
     var grid = new (declare([OnDemandGrid, Selection, DnD, Keyboard]))({
         collection: myStore,
         columns: {
-            name: "Name"
+            name: 'Name'
             // ...
         }
-    }, "grid");
-    
+    }, 'grid');
+
     // Set up another target
-    var target = new DnDSource("target", {
-        accept: ["dgrid-row"],
+    var target = new DnDSource('target', {
+        accept: [ 'dgrid-row' ],
         isSource: false
         // Optionally, override onDrop(source, nodes) with custom behavior
     });

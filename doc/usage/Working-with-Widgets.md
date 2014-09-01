@@ -31,10 +31,12 @@ is stored, which is then accessed and destroyed when `removeRow` is called:
 
 ```js
 // add advice for cleaning up widgets in this column
-aspect.before(grid, "removeRow", function(rowElement){
+aspect.before(grid, 'removeRow', function (rowElement) {
     // destroy our widget during the row removal operation
     var cellElement = grid.cell(rowElement, column.id).element,
         widget = (cellElement.contents || cellElement).widget;
-    if(widget){ widget.destroyRecursive(); }
+    if (widget) {
+        widget.destroyRecursive();
+    }
 });
 ```

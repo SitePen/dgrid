@@ -8,20 +8,24 @@ can then be saved back to the store based on edits performed in the grid.
 
 ```js
 require([
-    "dojo/_base/declare", "dgrid/OnDemandGrid", "dgrid/Keyboard", "dgrid/Selection", "dgrid/Editor"
-], function(declare, OnDemandGrid, Keyboard, Selection, Editor){
+    'dojo/_base/declare',
+    'dgrid/OnDemandGrid',
+    'dgrid/Keyboard',
+    'dgrid/Selection',
+    'dgrid/Editor'
+], function (declare, OnDemandGrid, Keyboard, Selection, Editor) {
     var editGrid = new (declare([OnDemandGrid, Keyboard, Selection, Editor]))({
         collection: myStore,
         columns: [
             {
-                label: "Name",
-                field: "name",
-                editor: "text",
-                editOn: "dblclick"
+                label: 'Name',
+                field: 'name',
+                editor: 'text',
+                editOn: 'dblclick'
             },
             // ...
         ]
-    }, "editGrid");
+    }, 'editGrid');
 });
 ```
 
@@ -80,15 +84,18 @@ taps as well. If a different event is desired for desktop browsers, it is
 possible to do something like the following:
 
 ```js
-require(
-    ["dgrid/OnDemandGrid", "dgrid/Editor", "dojo/has" /*, ... */],
-    function(OnDemandGrid, Editor, has /*, ... */){
+require([
+    'dgrid/OnDemandGrid',
+    'dgrid/Editor',
+    'dojo/has'
+    // ...
+], function (OnDemandGrid, Editor, has /*, ... */) {
         var columns = [
             {
-                name: "name",
-                label: "Editable Name",
-                editor: "text",
-                editOn: has("touch") ? "click" : "dblclick"
+                name: 'name',
+                label: 'Editable Name',
+                editor: 'text',
+                editOn: has('touch') ? 'click' : 'dblclick'
             },
             // ...
         ];

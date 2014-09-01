@@ -4,7 +4,7 @@ Grid extends List to provide tabular display of data items, with different
 fields arranged into columns.
 
 ```js
-require(["dgrid/Grid"], function(Grid){
+require([ 'dgrid/Grid' ], function (Grid) {
     var columns = {
         first: {
             label: "First Name"
@@ -13,7 +13,7 @@ require(["dgrid/Grid"], function(Grid){
             label: "Last Name"
         }
     };
-    var grid = new Grid({ columns: columns }, "grid"); // attach to a DOM id
+    var grid = new Grid({ columns: columns }, 'grid'); // attach to a DOM id
     grid.renderArray(arrayOfData); // render some data
 });
 ```
@@ -82,22 +82,22 @@ in the case of keys coercible to numbers.
 This is an example of a `Grid` using object column definitions:
 
 ```js
-require(["dgrid/Grid"], function(Grid){
+require([ 'dgrid/Grid' ], function (Grid) {
     var columns = {
         first: {
-            label: "First Name"
+            label: 'First Name'
         },
         last: {
-            label: "Last Name"
+            label: 'Last Name'
         },
         age: {
-            label: "Age",
+            label: 'Age',
             get: function(object){
                 return (new Date() - object.birthDate) / 31536000000;
             }
         }
     };
-    var grid = new Grid({ columns: columns }, "grid"); // attach to a DOM id
+    var grid = new Grid({ columns: columns }, 'grid'); // attach to a DOM id
     grid.renderArray(arrayOfData); // render some data
     // ...
 });
@@ -109,23 +109,23 @@ Alternatively, the same columns as above could be defined in an array, as
 follows:
 
 ```js
-    var columns = [
-        {
-            label: "First Name",
-            field: "first"
-        },
-        {
-            label: "Last Name",
-            field: "last"
-        },
-        {
-            label: "Age",
-            field: "age",
-            get: function(object){
-                return (new Date() - object.birthDate) / 31536000000;
-            }
+var columns = [
+    {
+        label: 'First Name',
+        field: 'first'
+    },
+    {
+        label: 'Last Name',
+        field: 'last'
+    },
+    {
+        label: 'Age',
+        field: 'age',
+        get: function(object){
+            return (new Date() - object.birthDate) / 31536000000;
         }
-    ];
+    }
+];
 ```
 
 ### Column shorthand
@@ -135,14 +135,11 @@ value of the string is interpreted as the label of the column. Thus, the
 simplest column structures can be more succinctly written:
 
 ```js
-var grid = new Grid({
-    columns: {
-        first: "First Name",
-        last: "Last Name",
-        // ...
-    },
+var columns = {
+    first: 'First Name',
+    last: 'Last Name',
     // ...
-}, "grid");
+};
 ```
 
 ### Subrows
@@ -156,20 +153,20 @@ by using the central `set` method.
 
 ```js
 require([
-    "dgrid/Grid"
-],function(Grid){
+    'dgrid/Grid'
+],function (Grid) {
     var grid = new Grid({
         subRows: [
             [
-                { field: "id", label: "ID" },
-                { field: "name", label: "Name" }
+                { field: 'id', label: 'ID' },
+                { field: 'name', label: 'Name' }
             ],
             [
-                { field: "description", label: "Description", colSpan: 2 }
+                { field: 'description', label: 'Description', colSpan: 2 }
             ]
         ],
         // ...
-    }, "grid");
+    }, 'grid');
 });
 ```
 

@@ -7,12 +7,15 @@ scrolls through the list. This provides a seamless, intuitive interface for
 viewing large sets of data in a scalable manner.
 
 ```js
-require(["dgrid/OnDemandList", "put-selector/put"], function(OnDemandList, put){
+require([
+    'dgrid/OnDemandList',
+    'put-selector/put'
+], function (OnDemandList, put) {
     var list = new OnDemandList({
-        collection: myStore, // a dstore store
-        renderRow: function(object, options){
+        collection: myStore, // a dstore collection
+        renderRow: function (object, options) {
             // Override renderRow to accommodate store items
-            return put("div", object.myField);
+            return put('div', object.myField);
         }
     });
 });
@@ -23,15 +26,15 @@ require(["dgrid/OnDemandList", "put-selector/put"], function(OnDemandList, put){
 This module is simply the composition of [Grid](Grid.md) and OnDemandList. For example:
 
 ```js
-define(["dgrid/OnDemandGrid"], function(OnDemandGrid){
+define([ 'dgrid/OnDemandGrid' ], function (OnDemandGrid) {
     grid = new OnDemandGrid({
         collection: myStore, // a dstore store
         columns: [
-            {label: "Column 1", field: "col1", sortable: false},
-            {label: "Column 2", field: "col2"},
+            { label: 'Column 1', field: 'col1', sortable: false },
+            { label: 'Column 2', field: 'col2' },
             // ...
         ]
-    }, "grid");
+    }, 'grid');
     // ...
 });
 ```
@@ -82,7 +85,7 @@ Property | Description
 `getBeforePut` | If `true` (the default), any `save` operations will re-fetch the item from the store via a `get` call, before applying changes represented by dirty data.
 `collection` | An instance of a dstore implementation, from which to fetch data.  This may be a store instance, or a filtered collection returned from `store.filter()`.
 
-### Method Summary 
+### Method Summary
 
 Method | Description
 ------ | -----------

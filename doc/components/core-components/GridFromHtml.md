@@ -2,7 +2,7 @@
 
 Some developers prefer specifying column layouts in an actual table structure
 because it is more convenient or semantically clearer. dgrid supports this via
-the GridFromHtml module. 
+the GridFromHtml module.
 
 ```html
 <table id="htmlgrid">
@@ -16,10 +16,10 @@ the GridFromHtml module.
 
 <script>
     require([
-        "dgrid/GridFromHtml"
+        'dgrid/GridFromHtml'
         /* ... */
-    ], function(GridFromHtml /* , ... */){
-        var grid = new GridFromHtml({}, "htmlgrid");
+    ], function (GridFromHtml /* , ... */) {
+        var grid = new GridFromHtml({}, 'htmlgrid');
         grid.renderArray(someData);
     });
 </script>
@@ -28,7 +28,7 @@ the GridFromHtml module.
 GridFromHtml can also be used for store-based grids by additionally
 mixing in [OnDemandList](OnDemandList-and-OnDemandGrid.md) or [Pagination](../extensions/Pagination.md).
 
-## Usage 
+## Usage
 
 When using this module, a `table` element should be specified as the source node
 for the grid instance; it then scans for `th` nodes within rows (typically placed

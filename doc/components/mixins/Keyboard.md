@@ -11,12 +11,14 @@ the row level (`false`).
 
 ```js
 require([
-    "dojo/_base/declare", "dgrid/OnDemandGrid", "dgrid/Keyboard"
-], function(declare, OnDemandGrid, Keyboard){
+    'dojo/_base/declare',
+    'dgrid/OnDemandGrid',
+    'dgrid/Keyboard'
+], function (declare, OnDemandGrid, Keyboard) {
     var grid = new (declare([OnDemandGrid, Keyboard]))({
         pageSkip: 20,
         cellNavigation: false
-    }, "grid");
+    }, 'grid');
 });
 ```
 

@@ -32,9 +32,9 @@ described in the respective section of the
 
 ```js
 require([
-	'dojo/on',
-	'dojo/mouse',
-	'dojo/query'
+    'dojo/on',
+    'dojo/mouse',
+    'dojo/query'
 ], function (on, mouse) {
     // Assume we have a Grid instance in the variable `grid`...
     grid.on(on.selector('.dgrid-content .dgrid-row', mouse.enter), function (event) {
