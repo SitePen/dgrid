@@ -420,8 +420,7 @@ define([
 					on.emit(self.domNode, 'dgrid-refresh-complete', {
 						bubbles: true,
 						cancelable: false,
-						grid: self,
-						results: results // QueryResults object (may be a wrapped promise)
+						grid: self
 					});
 				}, 0);
 
