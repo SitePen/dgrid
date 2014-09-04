@@ -81,7 +81,6 @@ define([
 
 		showFooter: true,
 		_currentPage: 1,
-		_total: 0,
 
 		buildRendering: function () {
 			this.inherited(arguments);
@@ -104,7 +103,7 @@ define([
 
 			// initialize some content into paginationStatusNode, to ensure
 			// accurate results on initial resize call
-			this._updatePaginationStatus();
+			this._updatePaginationStatus(this._total);
 
 			navigationNode = this.paginationNavigationNode =
 				put(paginationNode, 'div.dgrid-navigation');
@@ -390,9 +389,8 @@ define([
 			}
 		},
 
-		_updatePaginationStatus: function () {
+		_updatePaginationStatus: function (total) {
 			var count = this.rowsPerPage;
-			var total = this._total || 0;
 			var start = Math.min(total, (this._currentPage - 1) * count + 1);
 			this.paginationStatusNode.innerHTML = string.substitute(this.i18nPagination.status, {
 				start: start,
@@ -442,8 +440,7 @@ define([
 			}
 			// If we're not updating the whole page, check if we at least need to update status/navigation
 			else if (collection === this._renderedCollection && event.totalLength !== this._total) {
-				this._total = event.totalLength;
-				this._updatePaginationStatus();
+				this._updatePaginationStatus(event.totalLength);
 				this._updateNavigation();
 			}
 		},
@@ -565,7 +562,7 @@ define([
 						grid._total = total;
 						grid._currentPage = page;
 						grid._rowsOnPage = rows.length;
-						grid._updatePaginationStatus();
+						grid._updatePaginationStatus(total);
 
 						// It's especially important that _updateNavigation is called only
 						// after renderQueryResults is resolved as well (to prevent jumping).

@@ -70,6 +70,8 @@ define([
 		//		Defined by _StoreMixin, but to be implemented by subclasses.
 		loadingMessage: '',
 
+		_total: 0,
+
 		constructor: function () {
 			// Create empty objects on each instance, not the prototype
 			this.dirty = {};
@@ -132,6 +134,15 @@ define([
 
 			this.collection = collection;
 			this.refresh();
+		},
+
+		_getTotal: function () {
+			// summary:
+			//		Retrieves the currently-tracked total (as updated by
+			//		subclasses after store queries, or by _StoreMixin in response to
+			//		updated totalLength in events)
+
+			return this._total;
 		},
 
 		_cleanupCollection: function () {
@@ -483,6 +494,12 @@ define([
 					// Fire _onNotification, even for out-of-viewport notifications,
 					// since some things may still need to update (e.g. Pagination's status/navigation)
 					self._onNotification(rows, event, collection);
+
+					// Update _total after _onNotification so that it can potentially
+					// decide whether to perform actions based on whether the total changed
+					if (collection === self._renderedCollection && 'totalLength' in event) {
+						self._total = event.totalLength;
+					}
 				})
 			];
 
