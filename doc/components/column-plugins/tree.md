@@ -9,7 +9,7 @@ require([
     var treeGrid = new (declare([OnDemandGrid, Keyboard, Selection]))({
         store: myStore,
         columns: [
-            tree({ label: "Name", field: "name" }),
+            tree({ label: "Name", field: "name" },
             { label:"Type", field: "type", sortable: false},
             { label:"Population", field: "population" },
             { label:"Timezone", field: "timezone" }
