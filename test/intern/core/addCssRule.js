@@ -1,15 +1,22 @@
 define([
 	"intern!tdd",
 	"intern/chai!assert",
+	"dojo/_base/declare",
 	"dojo/dom-style",
 	"dojo/dom-construct",
 	"dojo/query",
 	"dgrid/Grid",
+	"dgrid/ColumnSet",
+	"dgrid/extensions/ColumnHider",
+	"dgrid/extensions/ColumnResizer",
 	"dgrid/util/misc"
-], function (test, assert, domStyle, domConstruct, query, Grid, miscUtil) {
-	var testDiv;
+], function (test, assert, declare, domStyle, domConstruct, query,
+		Grid, ColumnSet, ColumnHider, ColumnResizer, miscUtil) {
 
 	test.suite("addCssRule", function(){
+		var testDiv;
+		var grid;
+		
 		// Setup / teardown
 		test.before(function(){
 			testDiv = domConstruct.create("div", null, document.body);
@@ -17,6 +24,12 @@ define([
 
 		test.after(function(){
 			domConstruct.destroy(testDiv);
+		});
+		
+		test.afterEach(function(){
+			if(grid){
+				grid.destroy();
+			}
 		});
 
 		// Tests
@@ -103,8 +116,7 @@ define([
 
 		test.test("addCssRule via dgrid APIs", function(){
 			var values = ["7px", "8px"],
-				origValues,
-				grid;
+				origValues;
 			
 			function createGrid(cleanAddedRules){
 				grid = new Grid({
@@ -177,6 +189,147 @@ define([
 			for(i in this.rules){
 				this.rules[i].remove();
 			}
+		});
+
+		test.test("Grid columns as array (numeric IDs)", function(){
+			grid = new Grid({
+				columns: [
+					{ field: "name" },
+					{ field: "value" }
+				]
+			});
+			document.body.appendChild(grid.domNode);
+			grid.startup();
+			
+			assert.doesNotThrow(function(){
+				grid.styleColumn(0, "font-size: 8px;");
+			}, null, "styleColumn with numeric column ID should not throw error");
+			assert.strictEqual("8px", domStyle.getComputedStyle(query(".dgrid-cell")[0]).fontSize,
+				"Column cell should have expected style");
+		});
+	});
+
+	test.suite("CSS escaping of column IDs via dgrid APIs", function(){
+	
+		var grid;
+		
+		test.suite("Grid columns and columnsets", function(){
+			function makeTest(func, id) {
+				return function () {
+					assert.doesNotThrow(function(){
+						grid[func](id, "font-size: 8px;");
+					}, null, func + " should escape special characters and not throw error");
+					assert.strictEqual("8px", domStyle.getComputedStyle(query(".dgrid-cell")[0]).fontSize,
+						"Column cell should have expected style");
+				};
+			}
+			
+			test.beforeEach(function(){
+				grid = new (declare([Grid, ColumnSet]))({
+					id: "i:d",
+					columnSets: [[[
+						{ field: "foo", id: "col:umn" }
+					]]]
+				});
+				document.body.appendChild(grid.domNode);
+				grid.startup();
+			});
+			
+			test.afterEach(function(){
+				grid.destroy();
+			});
+			
+			test.test("styleColumn", makeTest("styleColumn", "col:umn"));
+				
+			// Currently ColumnSet IDs can't be customized so that isn't really an issue,
+			// but this still tests escaping the grid ID
+			test.test("styleColumnSet", makeTest("styleColumnSet", "0"));
+		});
+		
+		test.suite("ColumnHider", function(){
+			var ColumnHiderGrid = declare([Grid, ColumnHider]);
+			
+			test.afterEach(function(){
+				grid.destroy();
+			});
+			
+			test.test("Hiding column after construction", function(){
+				assert.doesNotThrow(function(){
+					grid = new ColumnHiderGrid({
+						id: "i:d",
+						columns: [
+							{ field: "foo", id: "col:umn" }
+						]
+					});
+				}, null, "ColumnHider should not throw error during construction");
+				document.body.appendChild(grid.domNode);
+				grid.startup();
+				
+				assert.doesNotThrow(function(){
+					grid._hideColumn("col:umn");
+				}, null, "_hideColumn should escape special characters and not throw error");
+				assert.strictEqual(query(".dgrid-cell")[0].offsetHeight, 0,
+					"Column should be hidden");
+			});
+			
+			test.test("Hiding column during construction", function(){
+				assert.doesNotThrow(function(){
+					grid = new ColumnHiderGrid({
+						id: "i:d",
+						columns: [
+							{ field: "foo", id: "col:umn", hidden: true }
+						]
+					});
+				}, null, "ColumnHider should not throw error during construction");
+				document.body.appendChild(grid.domNode);
+				grid.startup();
+				assert.strictEqual(query(".dgrid-cell")[0].offsetHeight, 0,
+					"Column should be hidden");
+			});
+		});
+		
+		test.suite("ColumnResizer", function(){
+			var ColumnResizerGrid = declare([Grid, ColumnResizer]);
+			
+			test.afterEach(function(){
+				grid.destroy();
+			});
+			
+			test.test("Resizing column after construction", function(){
+				assert.doesNotThrow(function(){
+					grid = new ColumnResizerGrid({
+						id: "i:d",
+						columns: [
+							{ field: "foo", id: "col:umn" },
+							{ field: "bar" }
+						]
+					});
+				}, null, "ColumnResizer should not throw error during construction");
+				document.body.appendChild(grid.domNode);
+				grid.startup();
+				
+				assert.doesNotThrow(function(){
+					grid.resizeColumnWidth("col:umn", 100);
+				}, null, "resizeColumnWidth should escape special characters and not throw error");
+				assert.strictEqual(query(".dgrid-cell-padding")[0].offsetWidth, 100,
+					"Column should be the expected width");
+			});
+			
+			test.test("Resizing column during construction", function(){
+				assert.doesNotThrow(function(){
+					grid = new ColumnResizerGrid({
+						id: "i:d",
+						columns: [
+							{ field: "foo", id: "col:umn", width: 100 },
+							{ field: "bar" }
+						]
+					});
+				}, null, "ColumnResizer should not throw error during construction");
+				document.body.appendChild(grid.domNode);
+				grid.startup();
+				assert.strictEqual(query(".dgrid-cell-padding")[0].offsetWidth, 100,
+					"Column should be the expected width");
+			});
 		});
 	});
 });

@@ -1,7 +1,14 @@
-define(["put-selector/put"], function(put){
+define([
+	"dojo/has",
+	"put-selector/put"
+], function(has, put){
 	// summary:
 	//		This module defines miscellaneous utility methods for purposes of
 	//		adding styles, and throttling/debouncing function calls.
+	
+	has.add("dom-contains", function(global, doc, element){
+		return !!element.contains; // not supported by FF < 9
+	});
 	
 	// establish an extra stylesheet which addCssRule calls will use,
 	// plus an array to track actual indices in stylesheet for removal
@@ -109,6 +116,19 @@ define(["put-selector/put"], function(put){
 			}
 		},
 		
+		// DOM-related functions
+		
+		contains: function(parent, node){
+			// summary:
+			//		Checks to see if an element is contained in another element.
+			
+			if(has("dom-contains")){
+				return parent.contains(node);
+			}else{
+				return parent.compareDocumentPosition(node) & 8 /* DOCUMENT_POSITION_CONTAINS */;
+			}
+		},
+		
 		// CSS-related functions
 		
 		addCssRule: function(selector, css){
@@ -148,14 +168,17 @@ define(["put-selector/put"], function(put){
 			};
 		},
 		
-		escapeCssIdentifier: function(id){
+		escapeCssIdentifier: function(id, replace){
 			// summary:
-			//		Escapes normally-invalid characters in a CSS identifier (such as .);
+			//		Escapes normally-invalid characters in a CSS identifier (such as . or :);
 			//		see http://www.w3.org/TR/CSS2/syndata.html#value-def-identifier
 			// id: String
 			//		CSS identifier (e.g. tag name, class, or id) to be escaped
+			// replace: String?
+			//		If specified, indicates that invalid characters should be
+			//		replaced by the given string rather than being escaped
 			
-			return id.replace(invalidCssChars, "\\$1");
+			return typeof id === 'string' ? id.replace(invalidCssChars, replace || "\\$1") : id;
 		}
 	};
 	return util;

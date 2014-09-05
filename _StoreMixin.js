@@ -199,6 +199,31 @@ function(kernel, declare, lang, Deferred, listen, aspect, put){
 			}
 		},
 		
+		refresh: function(){
+			var result = this.inherited(arguments);
+			
+			if(!this.store){
+				this.noDataNode = put(this.contentNode, "div.dgrid-no-data");
+				this.noDataNode.innerHTML = this.noDataMessage;
+			}
+			
+			return result;
+		},
+		
+		renderArray: function(){
+			var self = this;
+			var rows = this.inherited(arguments);
+			
+			if(!this.store){
+				Deferred.when(rows, function(resolvedRows){
+					if(resolvedRows.length && self.noDataNode){
+						put(self.noDataNode, "!");
+					}
+				});
+			}
+			return rows;
+		},
+		
 		insertRow: function(object, parent, beforeNode, i, options){
 			var store = this.store,
 				dirty = this.dirty,

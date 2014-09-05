@@ -236,13 +236,15 @@ function(lang, arrayUtil, Deferred, Memory, Observable, QueryResults, DeferredWr
 	}));
 	
 	// global var testCountryStore
-	testCountryStore = new Observable(new DeferredWrapper(testSyncCountryStore));
-	
+	testCountryStore = new Observable(new DeferredWrapper(testSyncCountryStore, 100));
+	var nextId = 0;
 	var testTopHeavyData = arrayUtil.map(testStateStore.data, function (state) {
 		return {
+			id: nextId++,
 			abbreviation: state.abbreviation,
 			name: state.name,
 			children: [{
+				id: nextId++,
 				abbreviation: 'US',
 				name: 'United States of America'
 			}]
@@ -254,7 +256,6 @@ function(lang, arrayUtil, Deferred, Memory, Observable, QueryResults, DeferredWr
 	// issues due to bugs related to total disregarding level
 	testTopHeavyStore = Observable(new Memory({
 		data: testTopHeavyData,
-		idProperty: "abbreviation",
 		getChildren: function(parent, options){
 			return parent.children;
 		},

@@ -1,11 +1,17 @@
 define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/on", "dojo/has", "put-selector/put", "./List", "./util/misc", "dojo/_base/sniff"],
 function(kernel, declare, listen, has, put, List, miscUtil){
 	var contentBoxSizing = has("ie") < 8 && !has("quirks");
-	var invalidClassChars = /[^\._a-zA-Z0-9-]/g;
+	
 	function appendIfNode(parent, subNode){
 		if(subNode && subNode.nodeType){
 			parent.appendChild(subNode);
 		}
+	}
+	
+	function replaceInvalidChars(str) {
+		// Replaces invalid characters for a CSS identifier with hyphen,
+		// as dgrid does for field names / column IDs when adding classes.
+		return miscUtil.escapeCssIdentifier(str, "-");
 	}
 	
 	var Grid = declare(List, {
@@ -105,7 +111,9 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 					column = subRow[i];
 					id = column.id;
 
-					extraClasses = column.field ? ".field-" + column.field : "";
+					extraClasses = column.field ?
+						".field-" + replaceInvalidChars(column.field) :
+						"";
 					className = typeof column.className === "function" ?
 						column.className(object) : column.className;
 					if(className){
@@ -114,10 +122,9 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 
 					cell = put(tag + (
 							".dgrid-cell.dgrid-cell-padding" +
-							(id ? ".dgrid-column-" + id : "") +
+							(id ? ".dgrid-column-" + replaceInvalidChars(id) : "") +
 							extraClasses.replace(/ +/g, ".")
-						).replace(invalidClassChars,"-") +
-						"[role=" + (tag === "th" ? "columnheader" : "gridcell") + "]");
+						) + "[role=" + (tag === "th" ? "columnheader" : "gridcell") + "]");
 					cell.columnId = id;
 					if(contentBoxSizing){
 						// The browser (IE7-) does not support box-sizing: border-box, so we emulate it with a padding div
@@ -305,6 +312,20 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 			this.updateSortArrow(this._sort);
 		},
 		
+		_findSortArrowParent: function(field){
+			// summary:
+			//		Method responsible for finding cell that sort arrow should be
+			//		added under.  Called by updateSortArrow; separated for extensibility.
+			
+			var columns = this.columns;
+			for(var i in columns){
+				var column = columns[i];
+				if(column.field == field){
+					return column.headerNode;
+				}
+			}
+		},
+		
 		updateSortArrow: function(sort, updateSort){
 			// summary:
 			//		Method responsible for updating the placement of the arrow in the
@@ -335,29 +356,21 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 			
 			var prop = sort[0].attribute,
 				desc = sort[0].descending,
-				target = this._sortNode, // stashed if invoked from header click
-				columns, column, i;
+				// if invoked from header click, target is stashed in _sortNode
+				target = this._sortNode || this._findSortArrowParent(prop),
+				arrowNode;
 			
 			delete this._sortNode;
 			
-			if(!target){
-				columns = this.columns;
-				for(i in columns){
-					column = columns[i];
-					if(column.field == prop){
-						target = column.headerNode;
-						break;
-					}
-				}
-			}
-			// skip this logic if field being sorted isn't actually displayed
+			// Skip this logic if field being sorted isn't actually displayed
 			if(target){
 				target = target.contents || target;
-				// place sort arrow under clicked node, and add up/down sort class
-				this._lastSortedArrow = put(target.firstChild, "-div.dgrid-sort-arrow.ui-icon[role=presentation]");
-				this._lastSortedArrow.innerHTML = "&nbsp;";
+				// Place sort arrow under clicked node, and add up/down sort class
+				arrowNode = this._lastSortedArrow = put("div.dgrid-sort-arrow.ui-icon[role=presentation]");
+				arrowNode.innerHTML = "&nbsp;";
+				target.insertBefore(arrowNode, target.firstChild);
 				put(target, desc ? ".dgrid-sort-down" : ".dgrid-sort-up");
-				// call resize in case relocation of sort arrow caused any height changes
+				// Call resize in case relocation of sort arrow caused any height changes
 				this.resize();
 			}
 		},
@@ -367,7 +380,7 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 			//		Dynamically creates a stylesheet rule to alter a column's style.
 			
 			return this.addCssRule("#" + miscUtil.escapeCssIdentifier(this.domNode.id) +
-				" .dgrid-column-" + colId, css);
+				" .dgrid-column-" + replaceInvalidChars(colId), css);
 		},
 		
 		/*=====

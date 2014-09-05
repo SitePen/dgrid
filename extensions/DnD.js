@@ -75,11 +75,12 @@ define([
 			});
 		},
 		onDropInternal: function(nodes, copy, targetItem){
-			var store = this.grid.store,
+			var grid = this.grid,
+				store = grid.store,
 				targetSource = this,
-				grid = this.grid,
 				anchor = targetSource._targetAnchor,
-				targetRow;
+				targetRow,
+				nodeRow;
 			
 			if(anchor){ // (falsy if drop occurred in empty space after rows)
 				targetRow = this.before ? anchor.previousSibling : anchor.nextSibling;
@@ -89,19 +90,28 @@ define([
 			// (Don't need to worry about edge first/last cases since dropping
 			// directly on self doesn't fire onDrop, but we do have to worry about
 			// dropping last node into empty space beyond rendered rows.)
+			nodeRow = grid.row(nodes[0]);
 			if(!copy && (targetRow === nodes[0] ||
-					(!targetItem && grid.down(grid.row(nodes[0])).element == nodes[0]))){
+					(!targetItem && nodeRow && grid.down(nodeRow).element == nodes[0]))){
 				return;
 			}
 			
 			nodes.forEach(function(node){
 				Deferred.when(targetSource.getObject(node), function(object){
+					var id = store.getIdentity(object);
+					
 					// For copy DnD operations, copy object, if supported by store;
 					// otherwise settle for put anyway.
 					// (put will relocate an existing item with the same id, i.e. move).
 					store[copy && store.copy ? "copy" : "put"](object, {
 						before: targetItem
 					});
+					
+					// Self-drops won't cause the dgrid-select handler to re-fire,
+					// so update the cached node manually
+					if(targetSource._selectedNodes[id]){
+						targetSource._selectedNodes[id] = grid.row(id).element;
+					}
 				});
 			});
 		},
@@ -245,6 +255,9 @@ define([
 			}
 			function deselectRow(row){
 				delete selectedNodes[row.id];
+				// Re-sync dojo/dnd UI classes based on deselection
+				// (unfortunately there is no good programmatic hook for this)
+				put(row.element, '!dojoDndItemSelected!dojoDndItemAnchor');
 			}
 			
 			this.on("dgrid-select", function(event){

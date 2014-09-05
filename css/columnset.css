@@ -9,14 +9,22 @@
 	vertical-align: top;
 	height: 100%;
 }
-.dgrid-column-set-scroller {
+
+.dgrid-column-set-scroller-container {
+	font-size: 0;
 	position: absolute;
-	bottom: 0px;
+	bottom: 0;
+}
+.dgrid-autoheight .dgrid-column-set-scroller-container {
+	position: relative;
+}
+
+.dgrid-column-set-scroller {
+	display: inline-block;
 	overflow-x: auto;
 	overflow-y: hidden;
 }
 .dgrid-column-set-scroller-content {
-	position: relative;
 	height: 1px;
 }
 

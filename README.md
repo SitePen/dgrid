@@ -1,9 +1,9 @@
-This project provides widgets for lists of data, including simple sets of scrolling rows,
+The dgrid project provides widgets for lists of data, including simple sets of scrolling rows,
 grids of data, on-demand lazy-loaded data, and various plugins for additional functionality. 
 This project also provides touch scrolling for mobile devices with native style
 momentum, bouncing, and scrollbars.
 
-The dgrid project is available under the same dual BSD/AFLv2 license as the Dojo Toolkit.
+dgrid is available under the same dual BSD/AFLv2 license as the Dojo Toolkit.
 
 # Installation
 
@@ -49,22 +49,20 @@ directory structure like the following:
 * `util` (optional, e.g. if pursuing a custom build)
 
 dgrid works best with the latest revision of Dojo 1.7 or higher.  As of this
-writing, [Dojo 1.9.3](http://download.dojotoolkit.org/release-1.9.3/) is
+writing, [Dojo 1.10.0](http://download.dojotoolkit.org/release-1.10.0/) is
 recommended.
 
-Note that while dgrid supports Dojo 1.8 and 1.9 and may take advantage of features
+Note that while dgrid 0.3 supports Dojo 1.8 and 1.9 and may take advantage of features
 or fix issues specific to them where possible, it does not have any hard dependency
 on APIs new to 1.8 or 1.9, so as to maintain compatibility with 1.7.
 
 # Documentation
 
-Documentation for dgrid components is available in the
-[dgrid GitHub project wiki](https://github.com/SitePen/dgrid/wiki).
-The wiki's content may still be obtained for offline reading by cloning
-the wiki repository, as indicated under the "Git Access" tab.
+The [doc folder](./doc) contains documentation for dgrid components.
+In addition, the website hosts a number of [tutorials](http://dgrid.io/#tutorials).
 
-In addition to the documentation on the wiki, if upgrading from a previous
-dgrid release, please be sure to read the changelog, found in CHANGES.md.
+If upgrading from a previous dgrid release, please be sure to read the
+[release notes](https://github.com/SitePen/dgrid/releases).
 
 # Testing
 
@@ -126,7 +124,7 @@ using [Homebrew](http://brew.sh/).  Once Homebrew is installed, run the followin
 commands:
 
 ```sh
-brew update # ensure you have the lastest formulae
+brew update # ensure you have the latest formulae
 brew install selenium-server-standalone
 brew install chromedriver # for automating tests in Chrome
 ```

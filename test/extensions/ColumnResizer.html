@@ -84,8 +84,8 @@
 		<script src="../../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script>
-			require(["dgrid/OnDemandGrid", "dgrid/extensions/ColumnResizer", "dgrid/Selection", "dojo/_base/declare", "dojo/_base/lang", "dojo/on", "dojo/cookie", "dojo/json", "dgrid/test/data/base", "dojo/domReady!"],
-				function(Grid, ColumnResizer, Selection, declare, lang, on, cookie, json, testStore){
+			require(["dgrid/OnDemandGrid", "dgrid/extensions/ColumnResizer", "dgrid/Keyboard", "dgrid/Selection", "dojo/_base/declare", "dojo/_base/lang", "dojo/on", "dojo/cookie", "dojo/json", "dgrid/test/data/base", "dojo/domReady!"],
+				function(Grid, ColumnResizer, Keyboard, Selection, declare, lang, on, cookie, json, testStore){
 					var columns = { // you can declare columns as an object hash (key translates to field)
 						col1: 'Column 1Column1Column 1 Column 1',
 						col2: {label: 'Column2222222222222222222222222', sortable: false},
@@ -95,12 +95,13 @@
 					};
 					columns1 = lang.clone(columns);
 
-					// columns2 tests using an array of columns with explicit IDs
+					// columns2 tests using an array of columns with explicit IDs,
+					// including special characters to test replacement
 					columns2 = [
-						{ id: "col2", field: "col2", label: "Column 2" },
-						{ id: "col4", field: "col4", label: "Column 4", sortable: false },
-						{ id: "col1", field: "col1", label: "Column 1" },
-						{ id: "col5", field: "col5", label: "Column 5" }
+						{ id: "col:2", field: "col2", label: "Column 2" },
+						{ id: "col:4", field: "col4", label: "Column 4", sortable: false },
+						{ id: "col:1", field: "col1", label: "Column 1" },
+						{ id: "col:5", field: "col5", label: "Column 5" }
 					];
 
 					var ResizeGrid = declare([Grid, Selection, ColumnResizer]);
@@ -109,7 +110,7 @@
 						store: testStore,
 						columns: columns1
 					}, "grid");
-					window.gridPeriod = new ResizeGrid({
+					window.gridPeriod = new (declare([Grid, Keyboard, Selection, ColumnResizer]))({
 						id: "gridPeriod",
 						sort: "id",
 						store: testStore,
@@ -171,7 +172,7 @@
 			<button onclick="grid.set('adjustLastColumn', true);">Enable</button>
 			<button onclick="grid.set('adjustLastColumn', false);">Disable</button>
 		</div>
-		<h2>A basic grid with a period in its ID, to ensure injected size rules work</h2>
+		<h2>A basic grid with Keyboard navigation and a period in its ID, to ensure injected size rules work</h2>
 		<div id="grid.period"></div>
 		<h2>Another grid w/ columns whose width initially exceed the table's width,
 			placed within a relatively-positioned element</h2>

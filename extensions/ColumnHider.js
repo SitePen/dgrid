@@ -83,7 +83,11 @@ function(declare, has, listen, miscUtil, put, i18n){
 		
 		_renderHiderMenuEntry: function(col){
 			var id = col.id,
-				div, checkId, checkbox;
+				replacedId = miscUtil.escapeCssIdentifier(id, "-"),
+				div,
+				checkId,
+				checkbox,
+				label;
 			
 			if(col.hidden){
 				// Hide the column (reset first to avoid short-circuiting logic)
@@ -97,12 +101,17 @@ function(declare, has, listen, miscUtil, put, i18n){
 			
 			// Create the checkbox and label for each column selector.
 			div = put("div.dgrid-hider-menu-row");
-			checkId = this.domNode.id + "-hider-menu-check-" + id;
+			checkId = this.domNode.id + "-hider-menu-check-" + replacedId;
 			
-			this._columnHiderCheckboxes[id] = checkbox = put(div, "input#" + checkId +
-					".dgrid-hider-menu-check.hider-menu-check-" + id + "[type=checkbox]");
-			put(div, "label.dgrid-hider-menu-label.hider-menu-label" + id +
-				"[" + forAttr + "=" + checkId + "]", col.label || col.field || "");
+			// put-selector can't handle invalid selector characters, and the
+			// ID could have some, so add it directly
+			checkbox = this._columnHiderCheckboxes[id] =
+				put(div, "input.dgrid-hider-menu-check.hider-menu-check-" + replacedId + "[type=checkbox]");
+			checkbox.id = checkId;
+			
+			label = put(div, "label.dgrid-hider-menu-label.hider-menu-label-" + replacedId +
+				"[" + forAttr + "=" + checkId + "]",
+				col.label || col.field || "");
 			
 			put(this.hiderMenuNode, div);
 			
@@ -129,7 +138,8 @@ function(declare, has, listen, miscUtil, put, i18n){
 				// Assume that if this plugin is used, then columns are hidable.
 				// Create the toggle node.
 				hiderToggleNode = this.hiderToggleNode =
-					put(this.headerScrollNode, "button.ui-icon.dgrid-hider-toggle[type=button]");
+					put(this.domNode, "button.ui-icon.dgrid-hider-toggle[type=button][aria-label=" +
+						this.i18nColumnHider.popupTriggerLabel + "]");
 				
 				this._listeners.push(listen(hiderToggleNode, "click", function(e){
 					grid._toggleColumnHiderMenu(e);
@@ -137,8 +147,9 @@ function(declare, has, listen, miscUtil, put, i18n){
 	
 				// Create the column list, with checkboxes.
 				hiderMenuNode = this.hiderMenuNode =
-					put("div#dgrid-hider-menu-" + this.id +
-						".dgrid-hider-menu[role=dialog][aria-label=" + this.i18nColumnHider.popupLabel + "]");
+					put("div.dgrid-hider-menu[role=dialog][aria-label=" +
+						this.i18nColumnHider.popupLabel + "]");
+				hiderMenuNode.id = this.id + "-hider-menu";
 
 				this._listeners.push(listen(hiderMenuNode, "keyup", function (e) {
 					var charOrCode = e.charCode || e.keyCode;
@@ -281,9 +292,10 @@ function(declare, has, listen, miscUtil, put, i18n){
 			}
 
 			this._columnHiderRules[id] =
-				miscUtil.addCssRule(selectorPrefix + id, "display: none;");
+				miscUtil.addCssRule(selectorPrefix + miscUtil.escapeCssIdentifier(id, "-"),
+					"display: none;");
 
-			if(has("ie") === 8 && !has("quirks")){
+			if((has("ie") === 8 || has("ie") === 10) && !has("quirks")){
 				tableRule = miscUtil.addCssRule(".dgrid-row-table", "display: inline-table;");
 
 				window.setTimeout(function(){

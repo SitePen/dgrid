@@ -71,36 +71,36 @@ return declare([List, _StoreMixin], {
 				null, this.pagingDelay));
 	},
 	
-	renderQuery: function(query, preloadNode, options){
+	renderQuery: function(query, options){
 		// summary:
 		//		Creates a preload node for rendering a query into, and executes the query
 		//		for the first page of data. Subsequent data will be downloaded as it comes
 		//		into view.
 		var self = this,
+			container = (options && options.container) || this.contentNode,
 			preload = {
 				query: query,
 				count: 0,
-				node: preloadNode,
 				options: options
 			},
+			preloadNode,
 			priorPreload = this.preload,
 			results;
 		
-		if(!preloadNode){
-			// Initial query; set up top and bottom preload nodes
-			var topPreload = {
-				node: put(this.contentNode, "div.dgrid-preload", {
-					rowIndex: 0
-				}),
-				count: 0,
-				query: query,
-				next: preload,
-				options: options
-			};
-			topPreload.node.style.height = "0";
-			preload.node = preloadNode = put(this.contentNode, "div.dgrid-preload");
-			preload.previous = topPreload;
-		}
+		// Initial query; set up top and bottom preload nodes
+		var topPreload = {
+			node: put(container, "div.dgrid-preload", {
+				rowIndex: 0
+			}),
+			count: 0,
+			query: query,
+			next: preload,
+			options: options
+		};
+		topPreload.node.style.height = "0";
+		preload.node = preloadNode = put(container, "div.dgrid-preload");
+		preload.previous = topPreload;
+		
 		// this preload node is used to represent the area of the grid that hasn't been
 		// downloaded yet
 		preloadNode.rowIndex = this.minRowsPerPage;
@@ -305,14 +305,14 @@ return declare([List, _StoreMixin], {
 		//		Calculate the height of a row. This is a method so it can be overriden for
 		//		plugins that add connected elements to a row, like the tree
 		
-		var sibling = rowElement.previousSibling;
+		var sibling = rowElement.nextSibling;
 		
-		// If a previous row exists, compare the top of this row with the
-		// previous one (in case "rows" are actually rendering side-by-side).
-		// If no previous row exists, this is either the first or only row,
+		// If a next row exists, compare the top of this row with the
+		// next one (in case "rows" are actually rendering side-by-side).
+		// If no next row exists, this is either the last or only row,
 		// in which case we count its own height.
 		if(sibling && !/\bdgrid-preload\b/.test(sibling.className)){
-			return rowElement.offsetTop - sibling.offsetTop;
+			return sibling.offsetTop - rowElement.offsetTop;
 		}
 		
 		return rowElement.offsetHeight;
@@ -454,7 +454,7 @@ return declare([List, _StoreMixin], {
 				preload.count -= count;
 				var beforeNode = preloadNode,
 					keepScrollTo, queryRowsOverlap = grid.queryRowsOverlap,
-					below = preloadNode.rowIndex > 0 && preload; 
+					below = (preloadNode.rowIndex > 0 || preloadNode.offsetTop > visibleTop) && preload;
 				if(below){
 					// add new rows below
 					var previous = preload.previous;
