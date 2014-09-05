@@ -4,5 +4,6 @@ define({
 		popupLabel: 'Show or hide columns'
 	},
 	es: true,
-	ro: true
+	ro: true,
+	sl: true
 });

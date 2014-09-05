@@ -17,6 +17,7 @@ define({
 	pt: true,
 	ro: true,
 	sk: true,
+	sl: true,
 	th: true,
 	"zh-cn": true,
 	"zh-hk": true
