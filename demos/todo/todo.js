@@ -7,10 +7,10 @@ define([
 	'dojo/json',
 	'dojo/on',
 	'dstore/Memory',
-	'dstore/Observable',
+	'dstore/Trackable',
 	'put-selector/put',
 	'dojo/domReady!'
-], function (OnDemandGrid, Selection, Editor, DnD, declare, JSON, on, Memory, Observable, put) {
+], function (OnDemandGrid, Selection, Editor, DnD, declare, JSON, on, Memory, Trackable, put) {
 	// Create DOM
 	var container = put('div#container');
 	var itemForm = put(container, 'form#itemForm.actionArea.topArea');
@@ -24,7 +24,7 @@ define([
 
 	put(document.body, container);
 	
-	var storeMixins = [Memory, Observable];
+	var storeMixins = [ Memory, Trackable ];
 
 	if (window.localStorage) {
 		// add functionality for saving/recalling from localStorage

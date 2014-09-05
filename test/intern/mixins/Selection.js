@@ -7,13 +7,13 @@ define([
 	'dojo/json',
 	'dojo/dom-class',
 	'dstore/Memory',
-	'dstore/Observable',
+	'dstore/Trackable',
 	'dgrid/Grid',
 	'dgrid/OnDemandGrid',
 	'dgrid/Selection',
 	'dgrid/CellSelection',
 	'dgrid/extensions/Pagination'
-], function (test, assert, declare, arrayUtil, lang, JSON, domClass, Memory, Observable,
+], function (test, assert, declare, arrayUtil, lang, JSON, domClass, Memory, Trackable,
 		Grid, OnDemandGrid, Selection, CellSelection, Pagination) {
 
 	var mixins = {
@@ -22,7 +22,7 @@ define([
 		},
 		notificationTests = {},
 		grid,
-		ObservableMemory = declare([ Memory, Observable ]);
+		TrackableMemory = declare([ Memory, Trackable ]);
 
 	function _createTestData(size) {
 		var data = [],
@@ -61,7 +61,7 @@ define([
 	arrayUtil.forEach([ 'Selection', 'CellSelection' ], function (name) {
 		var SelectionMixin = mixins[name];
 		notificationTests[name + ' + update'] = function () {
-			var store = new ObservableMemory({
+			var store = new TrackableMemory({
 					data: _createTestData()
 				});
 
@@ -170,7 +170,7 @@ define([
 
 		notificationTests[name + ' + update + store + paging'] = function () {
 			// Create a selection, trigger paging, notify
-			var store = new ObservableMemory({
+			var store = new TrackableMemory({
 					data: _createTestData(100)
 				});
 
@@ -259,7 +259,7 @@ define([
 
 		notificationTests[name + ' events + store'] = function () {
 			// Create and remove selections, watch for events
-			var store = new ObservableMemory({
+			var store = new TrackableMemory({
 					data: _createTestData()
 				});
 
@@ -313,7 +313,7 @@ define([
 			// Run the event tests
 			testEvents();
 			// Change the store
-			store = new ObservableMemory({
+			store = new TrackableMemory({
 				data: _createTestData()
 			});
 			grid.set('collection', store);
@@ -404,7 +404,7 @@ define([
 
 		notificationTests[name + ' events + store + remove'] = function () {
 			// Create selections, remove data, watch for events
-			var store = new ObservableMemory({
+			var store = new TrackableMemory({
 					data: _createTestData()
 				}),
 				selectEventFired,
@@ -452,7 +452,7 @@ define([
 			// Test the events
 			testEvents();
 			// Change the store
-			store = new ObservableMemory({
+			store = new TrackableMemory({
 				data: _createTestData()
 			});
 			grid.set('collection', store);
@@ -474,7 +474,7 @@ define([
 	});
 
 	test.suite('Selection events', function () {
-		var store = new ObservableMemory({
+		var store = new TrackableMemory({
 			data: _createTestData()
 		});
 

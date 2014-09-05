@@ -52,9 +52,9 @@ require([
 	'dgrid/test/data/createAsyncStore',
 	'dstore/RequestMemory',
 	'dstore/legacy/StoreAdapter',
-	'dstore/Observable'
+	'dstore/Trackable'
 ], function (declare, lang, Deferred, ItemFileReadStore, DataStore, LegacyMemory, QueryResults, OnDemandGrid,
-	createAsyncStore, RequestMemory, StoreAdapter, Observable) {
+	createAsyncStore, RequestMemory, StoreAdapter, Trackable) {
 
 	var dataStore;
 	var names = [ 'sasquatch', 'foo', 'bar', 'zaphod', 'beeblebrox' ];
@@ -106,7 +106,7 @@ require([
 	});
 
 	// Create a dojo/store instance and use the dstore adapter
-	stores.push(new declare([StoreAdapter, Observable])({
+	stores.push(new declare([ StoreAdapter, Trackable ])({
 		objectStore: new LegacyAsyncMemory({
 			data: createItems()
 		})

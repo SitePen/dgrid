@@ -7,8 +7,6 @@ define([
 		return states[Math.floor(Math.random() * states.length)].abbreviation;
 	}
 
-	//store with non-existent url
-	//errorStore = Observable(Memory({data: junk}));
 	var typesData = [];
 	for (var i = 0; i < 12; i++) {
 		typesData.push({

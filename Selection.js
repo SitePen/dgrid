@@ -386,7 +386,7 @@ define([
 		_updateDeselectionAspect: function (collection) {
 			// summary:
 			//		Hooks up logic to handle deselection of removed items.
-			//		Aspects to an observable collection's notify method if applicable,
+			//		Aspects to a trackable collection's notify method if applicable,
 			//		or to the list/grid's removeRow method otherwise.
 
 			var self = this,

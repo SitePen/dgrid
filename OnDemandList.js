@@ -281,7 +281,7 @@ define([
 					if (resolvedRows[0] && !resolvedRows[0].parentNode.tagName) {
 						// Release this range, since it was never actually rendered;
 						// need to wait until totalLength promise resolves, since
-						// Observable only adds the range then to begin with
+						// Trackable only adds the range then to begin with
 						when(results.totalLength, function () {
 							collection.releaseRange(resolvedRows[0].rowIndex,
 								resolvedRows[resolvedRows.length - 1].rowIndex + 1);

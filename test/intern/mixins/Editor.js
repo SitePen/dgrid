@@ -353,8 +353,8 @@ define([
 			// test activating an editOn editor and also test updating a row
 			assertionMessage = 'editOn + edit()';
 			grid.edit(grid.cell(1, 'description'));
-			assertionMessage = 'editOn + Observable';
-			grid.collection.put(grid.collection.get(2));
+			assertionMessage = 'editOn + Trackable';
+			grid.collection.put(grid.collection.getSync(2));
 		});
 
 		test.test('editor focus with always-on editor', function () {

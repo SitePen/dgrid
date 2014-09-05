@@ -131,7 +131,7 @@ define([
 		return dfd.promise;
 	}
 
-	test.suite('tree', function () {
+	test.suite('Tree', function () {
 		test.suite('large family expansion', function () {
 
 			test.beforeEach(function () {
@@ -356,7 +356,7 @@ define([
 			});
 		});
 
-		test.suite('tree + observable', function () {
+		test.suite('Tree + Trackable', function () {
 			test.beforeEach(createGrid);
 			test.afterEach(destroyGrid);
 

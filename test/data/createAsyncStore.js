@@ -3,9 +3,9 @@ define([
 	'dojo/_base/lang',
 	'dojo/Deferred',
 	'dstore/Memory',
-	'dstore/Observable',
+	'dstore/Trackable',
 	'dstore/QueryResults'
-], function (declare, lang, Deferred, Memory, Observable, QueryResults) {
+], function (declare, lang, Deferred, Memory, Trackable, QueryResults) {
 	// summary:
 	//		Creates a store that wraps the delegate store's query results and total in Deferred
 	//		instances. If delay is set, the Deferreds will be resolved asynchronously after delay +/-50%
@@ -50,7 +50,7 @@ define([
 		}
 	});
 
-	var ObservableAsyncStore = declare([ AsyncStore, Observable ]);
+	var TrackableAsyncStore = declare([ AsyncStore, Trackable ]);
 	
 	return function (kwArgs, Mixin) {
 		kwArgs = kwArgs || {};
@@ -59,7 +59,7 @@ define([
 			kwArgs = lang.mixin({}, kwArgs, { data: lang.clone(kwArgs.data) });
 		}
 
-		var Ctor = Mixin ? declare([ObservableAsyncStore, Mixin]) : ObservableAsyncStore;
+		var Ctor = Mixin ? declare([TrackableAsyncStore, Mixin]) : TrackableAsyncStore;
 		return new Ctor(kwArgs);
 	};
 });

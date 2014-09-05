@@ -219,7 +219,7 @@ define([
 		});
 	}
 
-	test.suite('observable lists', function () {
+	test.suite('Trackable lists', function () {
 		// Creates test suites that execute the following actions on OnDemandLists with varying amount of
 		// overlap and modifying varying number of items:
 		// - modify existing items

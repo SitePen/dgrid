@@ -21,13 +21,13 @@
 		<script src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script>
-			require(["dojo/_base/lang", "dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Editor", "dgrid/Keyboard", "dgrid/Tree", "dojo/_base/declare", "dstore/Rest", "dstore/Observable", "dstore/Cache", "dojo/domReady!"],
-				function(lang, List, Grid, Selection, Editor, Keyboard, Tree, declare, Rest, Observable, Cache){
+			require(["dojo/_base/lang", "dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Editor", "dgrid/Keyboard", "dgrid/Tree", "dojo/_base/declare", "dstore/Rest", "dstore/Trackable", "dstore/Cache", "dojo/domReady!"],
+				function(lang, List, Grid, Selection, Editor, Keyboard, Tree, declare, Rest, Trackable, Cache){
 
 					var CustomGrid = declare([Grid, Selection, Keyboard, Editor, Tree]);
 
 					function createStore(config){
-						var testStore = new declare([ Rest, Observable, Cache ])(lang.mixin({
+						var testStore = new declare([ Rest, Trackable, Cache ])(lang.mixin({
 							target:"./data/rest.php",
 							idProperty: "id",
 							put: function(object){

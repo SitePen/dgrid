@@ -41,9 +41,9 @@
 
 			require(["dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Keyboard", "dgrid/Editor", "put-selector/put",
 				"dojo/_base/lang", "dojo/_base/declare", "dojo/on", "dojo/dom-construct",
-				"dojo/store/Memory", "dstore/Memory", "dstore/Observable", "dojo/data/ObjectStore",
+				"dojo/store/Memory", "dstore/Memory", "dstore/Trackable", "dojo/data/ObjectStore",
 				"dgrid/test/data/createAsyncStore", "dojo/domReady!"
-			], function(Grid, Selection, Keyboard, Editor, put, lang, declare, on, domConstruct, LegacyMemory, Memory, Observable, ObjectStore, createAsyncStore){
+			], function(Grid, Selection, Keyboard, Editor, put, lang, declare, on, domConstruct, LegacyMemory, Memory, Trackable, ObjectStore, createAsyncStore){
 				var today = new Date(),
 						form = document.getElementById("editorForm"),
 						typesArea = document.getElementById("editorComponentTypes"),
@@ -67,7 +67,7 @@
 								this.inherited(arguments);
 							}
 						}),
-						TestStore = declare([ Memory, Observable, TestStoreMixin ]),
+						TestStore = declare([ Memory, Trackable, TestStoreMixin ]),
 				// define choices of component type which will be available in form
 						componentTypes = [
 							// native input types

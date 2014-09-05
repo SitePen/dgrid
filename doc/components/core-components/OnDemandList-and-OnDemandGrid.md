@@ -57,7 +57,7 @@ When working with a writable store, for best results, the store should return
 a collection with a `track` method, which enables the list to keep its
 display up to date with any changes that occur in the store after the items are
 rendered. The
-[`dstore/Observable`](https://github.com/SitePen/dstore/blob/master/Observable.js)
+[`dstore/Trackable`](https://github.com/SitePen/dstore/blob/master/docs/Collection.md#track)
 module can prove useful for adding this functionality.
 
 ## APIs
