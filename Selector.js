@@ -122,7 +122,6 @@ define([
 				}
 				else {
 					// No row resolved; must be the select-all checkbox.
-					put(this.domNode, (this.allSelected ? '!' : '.') + 'dgrid-select-all');
 					this[this.allSelected ? 'clearSelection' : 'selectAll']();
 				}
 
