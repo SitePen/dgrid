@@ -65,6 +65,30 @@ directory structure like the following:
 * `xstyle`
 * `util` (optional, e.g. if pursuing a custom build)
 
+## CDN
+
+[RawGit](http://rawgit.com/) now offers CDN hosting of raw tagged git URLs.
+It can serve any version of dgrid, xstyle, and put-selector via MaxCDN.
+
+For example, here's a `packages` configuration for dgrid 0.4.0, xstyle 0.2.1, and put-selector 0.3.5:
+
+```js
+packages: [
+    {
+        name: 'dgrid',
+        location: '//cdn.rawgit.com/SitePen/dgrid/v0.4.0'
+    },
+    {
+        name: 'xstyle',
+        location: '//cdn.rawgit.com/kriszyp/xstyle/v0.2.1'
+    },
+    {
+        name: 'put-selector',
+        location: '//cdn.rawgit.com/kriszyp/put-selector/v0.3.5'
+    }
+]
+```
+
 # Browser and Dojo Version Support
 
 dgrid 0.4 works with Dojo 1.8 or higher, and supports the following browsers:
