@@ -23,9 +23,8 @@ define([
 	return createSyncStore({
 		data: topHeavyData,
 		getChildren: function (parent) {
-			return this._createSubCollection({
-				data: parent.children,
-				total: parent.children.length
+			return createSyncStore({
+				data: parent.children
 			});
 		},
 		mayHaveChildren: function (parent) {
