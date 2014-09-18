@@ -465,10 +465,6 @@ define([
 						if (nextNode && !nextNode.parentNode) {
 							nextNode = document.getElementById(nextNode.id);
 						}
-						// TODO: This was taken from the previous observe listener,
-						// where each range request was observed individually. Is this still necessary?
-						//parentNode = (beforeNode && beforeNode.parentNode) ||
-						//	(nextNode && nextNode.parentNode) || self.contentNode;
 						rows.splice(to, 0, undefined);
 						row = self.insertRow(event.target, container, nextNode, to, options);
 						self.highlightRow(row);
