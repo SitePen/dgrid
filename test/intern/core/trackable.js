@@ -291,4 +291,36 @@ define([
 
 		itemAddEmptyStoreTestSuite(config);
 	});
+
+	test.suite('Multiple updates to trackable list', function () {
+		test.afterEach(destroyWidget);
+
+		test.test('Multiple puts', function () {
+			var i;
+			var data = [];
+			for (i = 0; i < 10; i++) {
+				data.push({ id: i, value: "Value " + i, enabled: true });
+			}
+			var store = createSyncStore({ data: data });
+			widget = new OnDemandList({
+				collection: store.filter({ enabled: true }),
+				renderRow: function (object) {
+					return put('div', object.value);
+				}
+			});
+			document.body.appendChild(widget.domNode);
+			widget.startup();
+
+			// Test putting several items with a filter applied;
+			// the put objects should all be seen as removed
+			for (i = 0; i < 5; i++){
+				var item = data[i];
+				item.enabled = false;
+				store.put(item);
+			}
+
+			assert.strictEqual(widget._rows.length, 5,
+				'5 items should remain in the _rows array (5 should be removed)');
+		});
+	});
 });
