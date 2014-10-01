@@ -593,12 +593,9 @@ define([
 				cellElement = cell.element;
 
 				if (column.field && row) {
-					// TODO: remove rowId in lieu of cell (or grid.row/grid.cell)
-					// (keeping for the moment for back-compat, but will note in changes)
 					var eventObject = {
 						grid: this,
 						cell: cell,
-						rowId: row.id,
 						oldValue: oldValue,
 						value: value,
 						bubbles: true,
