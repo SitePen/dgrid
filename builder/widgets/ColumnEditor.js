@@ -4,11 +4,9 @@ define([
 	'dojo/aspect',
 	'dojo/topic',
 	'dijit/layout/StackContainer',
-	'dstore/Memory',
-	'dstore/Trackable',
 	'./ColumnConfigForm',
 	'./ColumnGrid'
-], function (declare, lang, aspect, topic, StackContainer, MemoryStore, TrackableMixin, ColumnConfigForm, ColumnGrid) {
+], function (declare, lang, aspect, topic, StackContainer, ColumnConfigForm, ColumnGrid) {
 	return declare(StackContainer, {
 		baseClass: 'columnEditor',
 
@@ -26,10 +24,8 @@ define([
 		postCreate: function () {
 			this.inherited(arguments);
 
-			this.own(
-				aspect.after(this.form, 'onClose', lang.hitch(this, '_showGrid')),
-				this.columnGrid.on('editcolumn', lang.hitch(this, '_onEditColumn'))
-			);
+			this.form.on('close', lang.hitch(this, '_showGrid'));
+			this.columnGrid.on('editcolumn', lang.hitch(this, '_onEditColumn'));
 		},
 
 		_getColumnsAttr: function () {

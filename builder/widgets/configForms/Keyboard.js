@@ -10,6 +10,6 @@ define([
 ], function (declare, ConfigForm, template, Grid, Keyboard) {
 	return declare(ConfigForm, {
 		templateString: template,
-		defaultsObject: declare([Grid, Keyboard]).prototype
+		defaultsObject: declare([ Grid, Keyboard ]).prototype
 	});
 });

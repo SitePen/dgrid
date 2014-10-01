@@ -11,39 +11,43 @@ define([
 	'dijit/_WidgetsInTemplateMixin',
 	'dijit/form/_FormMixin',
 	'dijit/form/Button'
-], function (arrayUtil, declare, lang, domConstruct, on, string, topic, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin,
-	_FormMixin, Button) {
+], function (arrayUtil, declare, lang, domConstruct, on, string, topic,
+		_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, _FormMixin, Button) {
 
 	return declare([ _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, _FormMixin ], {
 		baseClass: 'configForm',
-		documentationUrlTemplate: '<a href="${documentationUrl}" target="_blank">${moduleName} documentation</a> <i class="fa fa-external-link"></i>',
+		documentationUrlTemplate: '<a href="${documentationUrl}" target="_blank">${moduleName} documentation</a>',
 
 		// This should be over-ridden by sub-classes and define an object with properties that specify default
 		// configuration values for the module
 		defaultsObject: {},
+
+		documentationUrl: '',
+
+		moduleName: '',
 
 		_isValueBroadcastEnabled: true,
 
 		buildRendering: function () {
 			this.inherited(arguments);
 
-			var buttonBar;
-
 			if (!this.containerNode) {
 				this.containerNode = this.domNode;
 			}
 
-			buttonBar = domConstruct.create('div', {
+			// Add button bar to the top of each config form (including subclasses)
+			var buttonBar = domConstruct.create('div', {
 				className: 'buttonBar'
 			});
 
 			this.doneButton = new Button({
 				label: 'Done',
 				className: 'doneButton',
-				iconClass: 'fa fa-reply'
-			});
+				iconClass: 'icon-mail-reply'
+			}).placeAt(buttonBar);
 
-			this.doneButton.placeAt(buttonBar);
+			this._startupWidgets.push(this.doneButton);
+
 			domConstruct.place(buttonBar, this.domNode, 'first');
 
 			if (this.documentationUrl && this.moduleName) {
@@ -53,7 +57,9 @@ define([
 
 		postCreate: function () {
 			this.own(
-				on(this.doneButton, 'click', lang.hitch(this, 'onClose')),
+				on(this.doneButton, 'click', lang.hitch(this, function () {
+					this.emit('close');
+				})),
 				this.watch('value', lang.hitch(this, function () {
 					if (this._isValueBroadcastEnabled) {
 						// Let the Builder know that is should update the demo display (grid or generated code)
@@ -68,10 +74,6 @@ define([
 
 			// This must be done in startup: _FormMixin doesn't set this._descendants until startup
 			this._setDefaultValues();
-		},
-
-		// hook for external modules
-		onClose: function () {
 		},
 
 		_getValueAttr: function () {
@@ -101,7 +103,7 @@ define([
 
 			arrayUtil.forEach(this._descendants, function (widget) {
 				if (widget.name && widget.name in this.defaultsObject) {
-					defaultValues[widget.name] = String(this.defaultsObject[widget.name]);
+					defaultValues[widget.name] = '' + this.defaultsObject[widget.name];
 				}
 			}, this);
 

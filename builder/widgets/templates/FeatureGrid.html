@@ -1,0 +1,13 @@
+<div>
+	<div data-dojo-type="dijit/form/Form" class="gridTypeForm"
+		 data-dojo-attach-point="gridTypeForm">
+		<label>Data source:</label>
+		<input data-dojo-type="dijit/form/RadioButton" id="${id}_gridTypeOnDemand"
+			name="gridType" type="radio" value="OnDemandGrid" checked>
+		<label for="${id}_gridTypeOnDemand">dstore object store</label>
+		<input data-dojo-type="dijit/form/RadioButton" id="${id}_gridTypeArray"
+			name="gridType" type="radio" value="Grid">
+		<label for="${id}_gridTypeArray">array</label>
+	</div>
+	<div data-dojo-attach-point="gridNode"></div>
+</div>

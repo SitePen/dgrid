@@ -11,8 +11,8 @@ define([
 	'dijit/layout/StackContainer',
 	'./FeatureGrid',
 	'../data/features'
-], function (require, arrayUtil, declare, lang, aspect, topic, MemoryStore, TrackableMixin, TreeMixin, StackContainer,
-	FeatureGrid, featureData) {
+], function (require, arrayUtil, declare, lang, aspect, topic, Memory, Trackable, Tree, StackContainer,
+		FeatureGrid, featureData) {
 
 	return declare(StackContainer, {
 		baseClass: 'featureEditor',
@@ -25,22 +25,21 @@ define([
 
 			this.configPanes = {};
 
-			this.store = new (declare([MemoryStore, TrackableMixin, TreeMixin], {
+			this.store = new (declare([ Memory, Trackable, Tree ], {
 				mayHaveChildren: function (item) {
 					return !('parentId' in item);
 				},
 				getChildren: function (item) {
-					return this.root.filter({ parentId: item.id });
+					return this.root.filter({ parentId: this.getIdentity(item) });
 				}
 			}))({
 				data: featureData
 			});
 
-			this.grid = new FeatureGrid({
-				collection: this.store.filter('mayHaveChildren'),
-				className: 'featureGrid'
+			this.featureGrid = new FeatureGrid({
+				collection: this.store.filter('mayHaveChildren')
 			});
-			this.addChild(this.grid);
+			this.addChild(this.featureGrid);
 
 			arrayUtil.forEach(featureData, function (feature) {
 				if (feature.configModule) {
@@ -56,20 +55,18 @@ define([
 					if (feature.configModule !== undefined) {
 						ConfigConstructor = require('./' + feature.configModule);
 						configPane = new ConfigConstructor({
-							moduleName: feature.mid.substr(feature.mid.lastIndexOf('/') + 1),
+							moduleName: feature.mid.slice(feature.mid.lastIndexOf('/') + 1),
 							documentationUrl: feature.documentationUrl
 						});
 
-						self.addChild(configPane);
-						self.configPanes[feature.mid] = configPane;
+						configPane.on('close', function () {
+							self.selectChild(self.featureGrid);
+						});
 
-						self.own(
-							aspect.after(configPane, 'onClose', function () {
-								self.selectChild(self.grid);
-							})
-						);
+						this.addChild(configPane);
+						this.configPanes[feature.mid] = configPane;
 					}
-				});
+				}, self);
 			});
 		},
 
@@ -77,17 +74,17 @@ define([
 			this.inherited(arguments);
 
 			this.own(
-				this.grid.on('.fa-cog:click', lang.hitch(this, '_showModuleConfig')),
-				this.store.on(['add', 'remove', 'update'], lang.hitch(this, '_onUpdateStore'))
+				this.featureGrid.on('configure-module', lang.hitch(this, '_showModuleConfig')),
+				this.store.on(['add', 'delete', 'update'], lang.hitch(this, '_onUpdateStore'))
 			);
 		},
 
 		isSelected: function (moduleId) {
-			return this.store && this.store.filter({ mid: moduleId, selected: true }).fetchSync().length;
+			return this.store.filter({ mid: moduleId, selected: true }).fetchSync().length;
 		},
 
 		filter: function (query) {
-			return this.store && this.store.filter(query).fetchSync();
+			return this.store.filter(query).fetchSync();
 		},
 
 		getModuleConfig: function (mid) {
@@ -95,8 +92,7 @@ define([
 		},
 
 		_showModuleConfig: function (event) {
-			var row = this.grid.row(event);
-			var configPane = this.configPanes[row.data.mid];
+			var configPane = this.configPanes[event.mid];
 
 			if (configPane) {
 				this.selectChild(configPane);
@@ -106,21 +102,6 @@ define([
 		_onUpdateStore: function () {
 			// Let the Builder know that is should update the demo display (grid or generated code)
 			topic.publish('/configuration/changed');
-		},
-
-		_setGridModuleAttr: function (value) {
-			var paginationRow;
-
-			this.grid.set('gridModule', value);
-
-			if (value === 'OnDemandGrid') {
-				paginationRow = this.store.filter({ mid: 'dgrid/extensions/Pagination', selected: true }).fetchSync()[0];
-
-				if (paginationRow) {
-					paginationRow.selected = false;
-					this.store.put(paginationRow);
-				}
-			}
 		},
 
 		_getExpandoColumnAttr: function () {

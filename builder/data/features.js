@@ -17,7 +17,7 @@ define([], function () {
 	return [
 		{
 			id: 0,
-			label: 'Grid features',
+			label: 'Grid features'
 		},
 		{
 			id: 1.1,
@@ -95,7 +95,7 @@ define([], function () {
 			mid: 'dgrid/extensions/DijitRegistry',
 			label: 'Dijit registry',
 			documentationUrl: baseUrl + 'doc/components/extensions/DijitRegistry.md',
-			info: "Add dgrid to Dijit's registry"
+			info: 'Add dgrid to Dijit\'s registry'
 		},
 		{
 			id: 8,
@@ -108,7 +108,7 @@ define([], function () {
 		},
 		{
 			id: 1,
-			label: 'Column features',
+			label: 'Column features'
 		},
 		{
 			id: 9,
@@ -144,7 +144,7 @@ define([], function () {
 			documentationUrl: baseUrl + 'doc/components/extensions/ColumnResizer.md',
 			info: 'Resize columns'
 		},
-		// There's no UI for configuring CompoundColumns, so just omit it
+		// There's no UI for configuring CompoundColumns or ColumnSet, so just omit them
 /*
 		{
 			id: 13,
@@ -154,7 +154,6 @@ define([], function () {
 			documentationUrl: baseUrl + 'doc/components/extensions/CompoundColumns.md',
 			info: 'Define column headers that span multiple grid columns'
 		},
-*/
 		{
 			id: 14,
 			parentId: 1,
@@ -163,6 +162,7 @@ define([], function () {
 			documentationUrl: baseUrl + 'doc/components/mixins/ColumnSet.md',
 			info: 'Define column sets that scroll independently'
 		},
+*/
 		{
 			id: 15,
 			parentId: 1,

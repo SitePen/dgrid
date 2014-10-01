@@ -11,7 +11,7 @@
 	"dojo": false,
 	"eqeqeq": true,
 	"eqnull": true,
-	"es3": false,
+	"es3": true,
 	"esnext": false,
 	"evil": false,
 	"expr": true,

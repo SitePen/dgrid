@@ -20,33 +20,29 @@ define([
 	'dojo/text!./templates/Builder.html',
 	'dojo/text!./templates/gridCode.js',
 	'dojo/query',
-	// for template
-	'dijit/form/Button',
-	'dijit/form/Form',
-	'dijit/form/TextBox',
+	// Widgets in template
 	'dijit/layout/ContentPane',
-	'dijit/layout/StackContainer',
 	'dijit/layout/TabContainer'
 ], function (require, arrayUtil, declare, lang, aspect, domClass, on, string, topic, _TemplatedMixin,
-	_WidgetsInTemplateMixin, BorderContainer, MemoryStore, TrackableMixin, TreeStoreMixin, ColumnEditor, FeatureEditor,
+	_WidgetsInTemplateMixin, BorderContainer, Memory, Trackable, TreeStoreMixin, ColumnEditor, FeatureEditor,
 	toJavaScript, template, codeTemplate) {
 
-	return declare([BorderContainer, _TemplatedMixin, _WidgetsInTemplateMixin], {
+	return declare([ BorderContainer, _TemplatedMixin, _WidgetsInTemplateMixin ], {
 		templateString: template,
 
 		buildRendering: function () {
 			this.inherited(arguments);
 
 			this.featureEditor = new FeatureEditor({
-				region: 'leading',
+				region: 'left',
 				splitter: true,
-				minSize: 385
+				minSize: 360
 			}, this.featureEditorNode);
 
 			this.columnEditor = new ColumnEditor({
-				region: 'leading',
+				region: 'left',
 				splitter: true,
-				minSize: 452
+				minSize: 400
 			}, this.columnEditorNode);
 		},
 
@@ -54,24 +50,9 @@ define([
 			this.inherited(arguments);
 
 			this.own(
-				this.gridTypeForm.watch('value', lang.hitch(this, '_onSelectDataSource')),
 				topic.subscribe('/configuration/changed', lang.hitch(this, '_updateDemo')),
-				topic.subscribe('/set/gridtype', lang.hitch(this, '_onSetGridType')),
 				this.previewTabs.watch('selectedChildWidget', lang.hitch(this, '_updateDemo'))
 			);
-		},
-
-		_onSelectDataSource: function (propertyName, oldValue, newValue) {
-			this.featureEditor.set('gridModule', newValue.gridType);
-		},
-
-		_onSetGridType: function (value) {
-			var gridTypeFormValue = this.gridTypeForm.get('value');
-
-			if (gridTypeFormValue.gridType !== value) {
-				gridTypeFormValue.gridType = value;
-				this.gridTypeForm.set('value', gridTypeFormValue);
-			}
 		},
 
 		_updateDemo: function () {
@@ -88,11 +69,11 @@ define([
 				return;
 			}
 
-			if (domClass.contains(this.demoGridPane.domNode.parentNode, 'dijitHidden')) {
-				this._showCode();
+			if (this.previewTabs.selectedChildWidget === this.demoGridPane) {
+				this._showDemoGrid();
 			}
 			else {
-				this._showDemoGrid();
+				this._showCode();
 			}
 		},
 
@@ -102,20 +83,21 @@ define([
 
 		_getCode: function () {
 			var gridConfig = {
-				dependencies: "'dojo/_base/declare'",
-				callbackParams: 'declare',
-				gridModules: '',
 				gridOptions: '{\n',
 				dataDeclaration: '',
 				dataCreation: '',
 				gridRender: ''
 			};
+			// deps, prams, and grid modules are built as arrays then joined when assigned to gridConfig
+			var dependencies = [ 'dojo/_base/declare' ];
+			var callbackParams = [ 'declare' ];
+			var gridModules = [];
 			var gridOptions = this._getGridOptions();
 			var columnNames = [];
 			var columnName;
 			var treeExpandoColumn;
 			var storeModules;
-			var hasStore = this.gridTypeForm.get('value').gridType === 'OnDemandGrid' ||
+			var hasStore = this.featureEditor.isSelected('dgrid/OnDemandGrid') ||
 				this.featureEditor.isSelected('dgrid/extensions/Pagination');
 
 			// The expandoColumn for Tree is a special case:
@@ -127,7 +109,7 @@ define([
 			}
 
 			if (hasStore) {
-				storeModules = ['MemoryStore', 'Trackable'];
+				storeModules = ['Memory', 'Trackable'];
 
 				if (treeExpandoColumn) {
 						storeModules.push('TreeStoreMixin');
@@ -152,7 +134,7 @@ define([
 				'\n\t\t\tdata.push({});' +
 				'\n\t\t\tfor (column in { ' + columnNames.join(': 1, ') + ': 1 }) {' +
 				'\n\t\t\t\tdata[i].id = i;' +
-				"\n\t\t\t\tdata[i][column] = column + '_' + (i + 1);" +
+				'\n\t\t\t\tdata[i][column] = column + \'_\' + (i + 1);' +
 				'\n\t\t\t}';
 
 			if (treeExpandoColumn) {
@@ -167,19 +149,17 @@ define([
 				'\n\t}';
 
 			if (hasStore) {
-				gridConfig.dependencies += ",\n\t'dstore/Memory'";
-				gridConfig.callbackParams += ', MemoryStore';
-				gridConfig.dependencies += ",\n\t'dstore/Trackable'";
-				gridConfig.callbackParams += ', Trackable';
+				dependencies.push('dstore/Memory', 'dstore/Trackable');
+				callbackParams.push('Memory', 'Trackable');
 
 				if (treeExpandoColumn) {
-					gridConfig.dependencies += ",\n\t'dstore/Tree'";
-					gridConfig.callbackParams += ', TreeStoreMixin';
+					dependencies.push('dstore/Tree');
+					callbackParams.push('TreeStoreMixin');
 				}
 
-				gridConfig.storeDeclaration = '\n\tvar store = new (declare([MemoryStore, Trackable]))({\n' +
+				gridConfig.storeDeclaration = '\n\tvar store = new (declare([ Memory, Trackable ]))({\n' +
 					'\t\tdata: data\n\t});\n';
-				gridConfig.storeAssignment = "\n\tgrid.set('collection', store);";
+				gridConfig.storeAssignment = '\n\tgrid.set(\'collection\', store);';
 			}
 			else {
 				gridConfig.gridRender = '\n\tgrid.renderArray(data);';
@@ -193,16 +173,11 @@ define([
 					return;
 				}
 
-				var moduleReference = item.mid.substr(item.mid.lastIndexOf('/') + 1);
+				var moduleReference = item.mid.slice(item.mid.lastIndexOf('/') + 1);
 
-				gridConfig.dependencies += ",\n\t'" + item.mid + "'";
-				gridConfig.callbackParams += ', ' + moduleReference;
-
-				if (gridConfig.gridModules) {
-					gridConfig.gridModules += ', ';
-				}
-
-				gridConfig.gridModules += moduleReference;
+				dependencies.push(item.mid);
+				callbackParams.push(moduleReference);
+				gridModules.push(moduleReference);
 			}, this);
 
 			if (hasStore) {
@@ -211,6 +186,10 @@ define([
 
 			gridConfig.gridOptions += toJavaScript(gridOptions, { indent: 1, inline: true } );
 			gridConfig.gridOptions += '\n\t}';
+
+			gridConfig.dependencies = '\'' + dependencies.join('\',\n\t\'') + '\'';
+			gridConfig.callbackParams = callbackParams.join(', ');
+			gridConfig.gridModules = gridModules.join(', ');
 
 			return string.substitute(codeTemplate, gridConfig);
 		},
@@ -221,7 +200,7 @@ define([
 			var gridModules = [];
 			var isTree = this.featureEditor.isSelected('dgrid/Tree');
 			var data = this._getMockData();
-			var hasStore = this.gridTypeForm.get('value').gridType === 'OnDemandGrid' ||
+			var hasStore = this.featureEditor.isSelected('dgrid/OnDemandGrid') ||
 				this.featureEditor.isSelected('dgrid/extensions/Pagination');
 
 			arrayUtil.forEach(this.featureEditor.filter({ selected: true }), function (item) {
@@ -238,10 +217,10 @@ define([
 				var storeModules;
 				var store;
 
-				gridOptions.class = 'demoGrid';
+				gridOptions.className = 'demoGrid';
 
 				if (hasStore) {
-					storeModules = [MemoryStore, TrackableMixin];
+					storeModules = [Memory, Trackable];
 
 					if (isTree) {
 						storeModules.push(TreeStoreMixin);

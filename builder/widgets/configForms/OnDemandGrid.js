@@ -28,9 +28,9 @@ define([
 			var numericValue;
 
 			if ('maxEmptySpace' in returnValue) {
-				numericValue = Number(returnValue.maxEmptySpace);
+				numericValue = +returnValue.maxEmptySpace;
 
-				if (numericValue !== OnDemandGrid.prototype.maxEmptySpace &&
+				if (numericValue !== this.defaultsObject.maxEmptySpace &&
 					!isNaN(numericValue)) {
 					returnValue.maxEmptySpace = numericValue;
 				}

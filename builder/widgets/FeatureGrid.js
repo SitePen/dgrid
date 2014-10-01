@@ -2,35 +2,46 @@ define([
 	'dojo/_base/array',
 	'dojo/_base/declare',
 	'dojo/_base/lang',
+	'dojo/dom-geometry',
 	'dojo/topic',
+	'dijit/_WidgetBase',
+	'dijit/_TemplatedMixin',
+	'dijit/_WidgetsInTemplateMixin',
+	'dijit/Tooltip',
 	'dgrid/OnDemandGrid',
 	'dgrid/Tree',
 	'dgrid/Editor',
 	'dgrid/extensions/DijitRegistry',
-	'dijit/Tooltip',
-], function (arrayUtil, declare, lang, topic, OnDemandGrid, Tree, Editor, DijitRegistry, Tooltip) {
-	// Render the label cell, adding the doc link, tooltip icon, and config icon when appropriate
+	'dojo/text!./templates/FeatureGrid.html',
+	// Widgets in template
+	'dijit/form/Form',
+	'dijit/form/RadioButton'
+], function (arrayUtil, declare, lang, domGeometry, topic, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin,
+		Tooltip, OnDemandGrid, Tree, Editor, DijitRegistry, template) {
+
 	function renderLabelCell (item, value, node) {
+		// Render the label cell, adding the doc link, tooltip icon, and config icon when appropriate
 		var cellValue = item.label;
 
 		if (item.documentationUrl) {
-			cellValue = '<a href="' + item.documentationUrl + '" target="_blank">' + cellValue;
-			cellValue += '</a> <i class="fa fa-external-link"></i>';
+			cellValue = '<a href="' + item.documentationUrl + '" target="_blank">' + cellValue + '</a>';
 		}
 
 		if (item.info) {
-			cellValue += ' <i class="fa fa-info-circle"></i>';
+			cellValue += ' <i class="icon-info-circle"></i>';
 		}
 
 		// If configModule has not been defined there's no config widget to display
 		if (item.configLevel === 'grid' && item.configModule) {
-			cellValue += ' <i class="fa fa-cog"></i>';
+			cellValue += ' <i class="icon-gear"></i>';
 		}
 
 		node.innerHTML = cellValue;
 	}
 
-	return declare([OnDemandGrid, Tree, Editor, DijitRegistry], {
+	var CustomGrid = declare([ OnDemandGrid, Tree, Editor, DijitRegistry ], {
+		gridTypeForm: null, // Passed from FeatureGrid when instantiated
+
 		columns: {
 			label: {
 				label: 'Select grid features',
@@ -53,8 +64,8 @@ define([
 			this.inherited(arguments);
 
 			this.on('dgrid-datachange', lang.hitch(this, '_onDataChange'));
-			this.on('.fa-info-circle:mouseover', lang.hitch(this, '_showInfoTip'));
-			this.on('.fa-info-circle:mouseout', lang.hitch(this, '_hideInfoTip'));
+			this.on('.icon-info-circle:mouseover', lang.hitch(this, '_showInfoTip'));
+			this.on('.icon-info-circle:mouseout', lang.hitch(this, '_hideInfoTip'));
 		},
 
 		_onDataChange: function (event) {
@@ -91,22 +102,21 @@ define([
 
 					break;
 
-				case 'dgrid/Tree':
-					// fall through
 				case 'dgrid/extensions/Pagination':
 					otherRow = collection.filter({ mid: 'dgrid/OnDemandGrid' }).fetchSync()[0];
 
 					// If the user clicks to select Pagination...
 					if (event.value) {
-						// ...and OnDemandGrid was not selected, then we can assume gridType is 'array' and we need to
-						// switch it to 'store-based' (OnDemandGrid)
+						// ...and OnDemandGrid was not selected, then we can assume gridType is array and we need to
+						// switch it to store-based (OnDemandGrid)
 						if (!otherRow.selected) {
-							topic.publish('/set/gridtype', 'OnDemandGrid');
+							this.gridTypeForm.set('value', { gridType: 'OnDemandGrid' });
 						}
-
-						// ...but then we actually want to deselect OnDemandGrid
-						otherRow.selected = false;
-						collection.put(otherRow);
+						else {
+							// ...but we actually want to deselect OnDemandGrid
+							otherRow.selected = false;
+							collection.put(otherRow);
+						}
 					}
 					// If the user clicks to deselect Pagination then we want to select OnDemandGrid
 					else {
@@ -116,19 +126,23 @@ define([
 
 					break;
 
+				case 'dgrid/Selector':
+					// Fall through
+				case 'dgrid/Tree':
+					// Fall through
 				case 'dgrid/extensions/DnD':
-					// If the user clicks to select DnD, make sure a store-based config is active:
+					// If the user selects a mixin or extension that requires a store,
+					// make sure a store-based config is active:
 					// 1. If OnDemandGrid or Pagination is already selected, a store is in use
 					// 2. Otherwise select OnDemandGrid
 					if (event.value) {
 						otherRow = collection.filter({
-							mid: /dgrid\/(OnDemandGrid|extensions\/Pagination)/,
+							mid: /(OnDemandGrid|Pagination)$/,
 							selected: true
 						}).fetchSync();
 
 						if (!otherRow.length) {
-							// Tell the Builder to set the grid type to OnDemandGrid
-							topic.publish('/set/gridtype', 'OnDemandGrid');
+							this.gridTypeForm.set('value', { gridType: 'OnDemandGrid' });
 						}
 					}
 
@@ -140,46 +154,19 @@ define([
 			return true;
 		},
 
-		insertRow: function () {
+		insertRow: function (object) {
 			// This method ensures that the editor (checkbox) rendered for the Grid and OnDemandGrid rows
 			// is always disabled
 
 			var rowNode = this.inherited(arguments);
 			var cell = this.cell(rowNode, 'selected');
+			var mid = object.mid;
 
-			switch (cell.row.data.mid) {
-				case 'dgrid/Grid':
-					// fall through
-				case 'dgrid/OnDemandGrid':
-					cell.element.input.disabled = true;
-					break;
+			if (mid === 'dgrid/Grid' || mid === 'dgrid/OnDemandGrid') {
+				cell.element.input.disabled = true;
 			}
 
 			return rowNode;
-		},
-
-		_setGridModule: function (module) {
-			// 'module' should be either 'Grid' or 'OnDemandGrid'
-
-			var collection = this.collection.root || this.collection;
-			var items = collection.filter({ mid: 'dgrid/OnDemandGrid' }).fetchSync();
-
-			// Select/deselect OnDemandGrid depending on 'module'
-			items[0].selected = module !== 'Grid';
-			collection.put(items[0]);
-
-			if (module === 'Grid') {
-				// Tree, DnD and Pagination require a store/collection, so if module is set to 'Grid' deselect them
-				items = collection.filter({
-					mid: /dgrid\/(Tree|\/extensions\/(DnD|Pagination))/,
-					selected: true
-				}).fetchSync();
-
-				arrayUtil.forEach(items, function (item) {
-					item.selected = false;
-					collection.put(item);
-				});
-			}
 		},
 
 		_showInfoTip: function (event) {
@@ -190,6 +177,78 @@ define([
 
 		_hideInfoTip: function (event) {
 			Tooltip.hide(event.target);
+		}
+	});
+
+	return declare([ _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin ], {
+		className: 'featureGridContainer',
+		templateString: template,
+
+		collection: null,
+
+		buildRendering: function () {
+			this.inherited(arguments);
+			this.grid = new CustomGrid({
+				className: 'featureGrid',
+				collection: this.collection,
+				gridTypeForm: this.gridTypeForm
+			}, this.gridNode);
+			this._startupWidgets.push(this.grid);
+		},
+
+		postCreate: function () {
+			var self = this;
+			this.inherited(arguments);
+
+			this.own(
+				this.gridTypeForm.watch('value', function (name, oldValue, value) {
+					self.set('gridModule', value.gridType);
+				}),
+				this.grid.on('.icon-gear:click', function (event) {
+					self.emit('configure-module', { mid: self.grid.row(event).data.mid });
+				})
+			);
+		},
+
+		resize: function (changeSize) {
+			if (changeSize) {
+				domGeometry.setMarginBox(this.domNode, changeSize);
+			}
+			this.grid.resize();
+			this.inherited(arguments);
+		},
+
+		_setGridModuleAttr: function (module) {
+			// 'module' should be either 'Grid' or 'OnDemandGrid'
+
+			var collection = this.collection.root || this.collection;
+			var items;
+
+			if (module === 'OnDemandGrid') {
+				// Select OnDemandGrid, unless Pagination is already selected
+				items = collection.filter({
+					mid: 'dgrid/extensions/Pagination',
+					selected: true
+				}).fetchSync();
+
+				if (!items.length) {
+					items = collection.filter({ mid: 'dgrid/OnDemandGrid' }).fetchSync();
+					items[0].selected = true;
+					collection.put(items[0]);
+				}
+			}
+			else {
+				// Deselect any modules that require a store
+				items = collection.filter({
+					mid: /\/(OnDemandGrid|Selector|Tree|extensions\/(DnD|Pagination))$/,
+					selected: true
+				}).fetchSync();
+
+				arrayUtil.forEach(items, function (item) {
+					item.selected = false;
+					collection.put(item);
+				});
+			}
 		}
 	});
 });

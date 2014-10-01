@@ -1,0 +1,269 @@
+html,
+body {
+	height: 100%;
+	width: 100%;
+	margin: 0;
+	overflow: hidden;
+}
+
+body {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 16px;
+}
+
+.dijitBorderContainer {
+	height: 100%;
+	width: 100%;
+}
+
+/* Icon Font */
+
+@font-face {
+	font-family: 'icomoon';
+	src:url('fonts/icomoon.eot?kn321z');
+	src:url('fonts/icomoon.eot?#iefixkn321z') format('embedded-opentype'),
+		url('fonts/icomoon.woff?kn321z') format('woff'),
+		url('fonts/icomoon.ttf?kn321z') format('truetype'),
+		url('fonts/icomoon.svg?kn321z#icomoon') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+	font-family: 'icomoon';
+	speak: none;
+	font-style: normal;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: none;
+	line-height: 1;
+
+	/* Better Font Rendering =========== */
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.icon-times:before {
+	content: "\f00d";
+}
+.icon-gear:before {
+	content: "\f013";
+}
+.icon-info-circle:before {
+	content: "\f05a";
+}
+.icon-external-link:before {
+	content: "\f08e";
+}
+.icon-navicon:before {
+	content: "\f0c9";
+}
+.icon-angle-up:before {
+	content: "\f106";
+}
+.icon-angle-down:before {
+	content: "\f107";
+}
+.icon-mail-reply:before {
+	content: "\f112";
+}
+
+/* End Icon Font */
+
+[class^="icon-"], [class*=" icon-"] {
+	color: rgb(34, 85, 141);
+}
+
+textarea {
+	font-family: Consolas, monospace;
+	-moz-tab-size: 4;
+	tab-size: 4;
+}
+
+h1 {
+	background-color: rgb(53, 101, 143);
+	color: white;
+	font-size: 1.5em;
+	font-weight: normal;
+	margin: 0 0 6px 0;
+	padding: 5px;
+}
+
+.dijitBorderContainer-dijitContentPane.topPane {
+	padding: 0;
+}
+
+/* FIX: Claro's DnD styles don't adequately represent drop location and add excessive borders/padding */
+.dgrid-row.dojoDndItem {
+	border-width: 0;
+	border-top: 1px solid #fff;
+	border-bottom: 1px solid #edc;
+	padding: 0;
+}
+.dgrid-row.dojoDndItemBefore {
+	border-top-color: #759dc0;
+}
+.dgrid-row.dojoDndItemAfter {
+	border-bottom-color: #759dc0;
+}
+.dojoDndItem .dgrid-cell {
+	border-top: none;
+	border-bottom: none;
+}
+/* END DnD FIX */
+
+.actionLink {
+	color: rgb(53, 101, 143);
+	cursor: pointer;
+	text-decoration: underline;
+}
+
+.featureEditor {
+	width: 360px;
+}
+
+.gridTypeForm {
+	padding: 8px;
+}
+
+.featureGrid,
+.columnGrid {
+	height: auto;
+	position: absolute;
+	top: 35px;
+	bottom: 0;
+	left: 0;
+	right: 0;
+}
+
+.featureGrid .field-label .icon-gear {
+	cursor: pointer;
+	float: right;
+}
+
+.featureGrid .field-selected {
+	text-align: center;
+	width: 40px;
+}
+
+.columnEditor {
+	width: 400px;
+}
+
+.claro .columnEditor .dijitContentPane {
+	margin: 0;
+	padding: 0 0 0 4px;
+}
+
+.buttonBar {
+	text-align: right;
+}
+
+.columnEditor .dijitTextBox {
+	margin: 0 4px 0 0;
+	width: 135px;
+}
+
+.columnEditor .dijitButton {
+	margin-left: 0;
+	margin-right: 0;
+}
+
+.columnGridForm {
+	text-align: center;
+}
+
+.columnGrid .dgrid-content .dgrid-cell {
+	text-align: center;
+}
+
+.columnGrid .field-dragSource {
+	vertical-align: middle;
+	width: 26px;
+	font-size: 20px;
+}
+
+.columnGrid .field-config {
+	vertical-align: middle;
+	width: 45px;
+}
+
+.columnGrid .field-config [class^="icon-"] {
+	cursor: pointer;
+}
+
+.columnGrid input {
+	width: 97%;
+}
+
+.columnGrid .dojoDndHandle {
+	cursor: move;
+	cursor: -moz-grab;
+	cursor: -webkit-grab;
+	cursor: grab;
+}
+
+.configForm {
+	padding: 4px;
+}
+
+.configForm fieldset {
+	border: 1px solid #aaa;
+	margin-bottom: 8px;
+	padding: 4px;
+}
+
+.configForm legend {
+	font-weight: bold;
+}
+
+.configForm .label,
+.configForm .field {
+	margin-bottom: 5px;
+}
+
+.configForm .label {
+	clear: both;
+	float: left;
+	vertical-align: top;
+	width: 175px;
+}
+
+.featureEditor .configForm .dijitTextBox,
+.featureEditor .configForm .dijitMultiSelect {
+	width: 160px;
+}
+
+.featureEditor .configForm .dijitTextBox.halfWidth {
+	width: 80px;
+}
+
+.configForm.column .dijitTextBox,
+.configForm.column .dijitMultiSelect {
+	width: 195px;
+}
+
+.configForm .dijitMultiSelect {
+	font-size: 16px;
+}
+
+.dijitTabContainer .demoGridPane,
+.dijitTabContainer .demoCodePane {
+	padding: 0;
+}
+
+.demoGrid,
+.demoCode {
+	/*
+		position: absolute is required to prevent extra scrollbars (zeroing margin+padding+border doesn't help).
+		Blame Dijit Layout?
+	*/
+	position: absolute;
+	height: 100%;
+	width: 100%;
+}
+
+.demoCode {
+	border: none;
+	resize: none;
+}

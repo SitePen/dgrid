@@ -5,7 +5,7 @@ define([
 	// which is fine - they'll just get unnecessarily wrapped in quotes
 	var propertyNameRegex = /^[A-Za-z]+[A-Za-z0-9_]*$/;
 
-	function tab (count) {
+	function tab(count) {
 		var tabString = '';
 
 		while (count--) {
@@ -22,7 +22,7 @@ define([
 	 * @param {boolean} options.includeEmpty: if true, empty properties ('', null, undefined) will be included in output
 	 * @param {boolean} options.inline: if true, print just properties, not wrapping braces
 	 */
-	function toJavaScript (obj, options) {
+	function toJavaScript(obj, options) {
 		options = options || {};
 
 		var javascript = '';
@@ -72,7 +72,7 @@ define([
 		return javascript;
 	}
 
-	function printObject (obj, options, indent) {
+	function printObject(obj, options, indent) {
 		var javascript = '';
 		var property;
 		var firstProperty = true;
@@ -104,7 +104,7 @@ define([
 								javascript += obj[property];
 							}
 							else {
-								javascript += "'" + escapeString(obj[property]) + "'";
+								javascript += '\'' + escapeString(obj[property]) + '\'';
 							}
 
 							break;
@@ -120,7 +120,7 @@ define([
 		return javascript;
 	}
 
-	function printArray (array, options, indent) {
+	function printArray(array, options, indent) {
 		var javascript = '';
 		var i;
 
@@ -136,13 +136,13 @@ define([
 		return javascript;
 	}
 
-	function escapeString (str) {
+	function escapeString(str) {
 		return str.replace(/[\\']/g, '\\$&');
 	}
 
-	function formatPropertyName (str) {
+	function formatPropertyName(str) {
 		if (!propertyNameRegex.test(str)) {
-			return "'" + str + "'";
+			return '\'' + str + '\'';
 		}
 		else {
 			return str;

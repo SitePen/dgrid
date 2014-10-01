@@ -11,6 +11,7 @@ define([
 	'dijit/_TemplatedMixin',
 	'dijit/_WidgetsInTemplateMixin',
 	'dijit/form/_FormMixin',
+	'../data/config',
 	'dojo/text!./templates/ColumnConfigForm.html',
 	// for template
 	'dijit/form/Button',
@@ -19,7 +20,7 @@ define([
 	'dijit/form/RadioButton',
 	'dijit/form/TextBox'
 ], function (arrayUtil, declare, lang, domClass, on, query, topic, registry, _WidgetBase, _TemplatedMixin,
-	_WidgetsInTemplateMixin, _FormMixin, template) {
+	_WidgetsInTemplateMixin, _FormMixin, config, template) {
 
 	var defaultColumnValues = {
 		// Standard column properties
@@ -49,9 +50,10 @@ define([
 		selector: ''
 	};
 
-	return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, _FormMixin], {
+	return declare([ _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, _FormMixin ], {
 		baseClass: 'configForm column',
 		templateString: template,
+		docBaseUrl: config.docBaseUrl,
 
 		_featureMidToNodeMap: null,
 
@@ -72,18 +74,17 @@ define([
 		},
 
 		postCreate: function () {
+			this.inherited(arguments);
 			this.own(
-				on(this.doneButton, 'click', lang.hitch(this, 'onClose')),
 				topic.subscribe('/feature/select', lang.hitch(this, '_onFeatureSelect')),
+				on(this.doneButton, 'click', lang.hitch(this, function () {
+					this.emit('close');
+				})),
 				this.watch('value', function (propertyName, oldValue, newValue) {
 					// Let the ColumnGrid know the column config has changed so it an update the store
 					topic.publish('/column/changed', newValue);
 				})
 			);
-		},
-
-		// hook for external modules
-		onClose: function () {
 		},
 
 		_setValueAttr: function (value) {
