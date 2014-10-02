@@ -407,7 +407,8 @@ define([
 						// remove the old slot
 						rows.splice(from, 1);
 
-						if (event.type === 'remove' || (event.type === 'update' && event.from < event.to)) {
+						if (event.type === 'remove' ||
+								(event.type === 'update' && (from < to || to === undefined))) {
 							// adjust the rowIndex so adjustRowIndices has the right starting point
 							rows[from] && rows[from].rowIndex--;
 						}
