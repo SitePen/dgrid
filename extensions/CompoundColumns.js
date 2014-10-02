@@ -152,10 +152,11 @@ define([
 			}
 		},
 
-		_configColumn: function (column, columnId, rowColumns, prefix) {
+		_configColumn: function (column, rowColumns, prefix) {
 			// Updates the id on a column definition that is a child to include
 			// the parent's id.
 			var parent = column.parentColumn;
+			var columnId = column.id;
 			if (parent) {
 				// Adjust the id to incorporate the parent's id.
 				// Remove the prefix if it was used to create the id
@@ -163,7 +164,7 @@ define([
 				prefix = parent.id + '-';
 				columnId = column.id = prefix + id;
 			}
-			this.inherited(arguments, [column, columnId, rowColumns, prefix]);
+			this.inherited(arguments, [column, rowColumns, prefix]);
 		},
 
 		cell: function (target, columnId) {

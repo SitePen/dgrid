@@ -409,7 +409,7 @@ define([
 		},
 
 		/*=====
-		_configColumn: function (column, columnId, rowColumns, prefix) {
+		_configColumn: function (column, rowColumns, prefix) {
 			// summary:
 			//		Method called when normalizing base configuration of a single
 			//		column.  Can be used as an extension point for behavior requiring
@@ -431,7 +431,7 @@ define([
 				columnId = column.id = column.id || (isNaN(columnId) ? columnId : (prefix + columnId));
 				// allow further base configuration in subclasses
 				if (this._configColumn) {
-					this._configColumn(column, columnId, rowColumns, prefix);
+					this._configColumn(column, rowColumns, prefix);
 					// Allow the subclasses to modify the column id.
 					columnId = column.id;
 				}
