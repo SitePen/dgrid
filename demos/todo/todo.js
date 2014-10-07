@@ -38,7 +38,7 @@ define([
 				jsondata && this.setData(JSON.parse(jsondata));
 
 				this.on('add, update, delete', function () {
-					localStorage[self.STORAGE_KEY] = JSON.stringify(self.fetch());
+					localStorage[self.STORAGE_KEY] = JSON.stringify(self.fetchSync());
 				});
 			}
 		}));
