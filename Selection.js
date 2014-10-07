@@ -411,7 +411,7 @@ define([
 				signals = [
 					aspect.before(this, '_observeCollection', function (collection) {
 						signals.push(
-							collection.on('remove', function (event) {
+							collection.on('delete', function (event) {
 								if (typeof event.index === 'undefined') {
 									// Call deselect on the row if the object is being removed.  This allows the
 									// deselect event to reference the row element while it still exists in the DOM.

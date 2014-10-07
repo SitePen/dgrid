@@ -432,7 +432,7 @@ define([
 			var rowsPerPage = this.rowsPerPage;
 			var pageEnd = this._currentPage * rowsPerPage;
 			var needsRefresh = (event.type === 'add' && event.index < pageEnd) ||
-				(event.type === 'remove' && event.previousIndex < pageEnd) ||
+				(event.type === 'delete' && event.previousIndex < pageEnd) ||
 				(event.type === 'update' &&
 					Math.floor(event.index / rowsPerPage) !== Math.floor(event.previousIndex / rowsPerPage));
 

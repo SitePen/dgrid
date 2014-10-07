@@ -387,7 +387,7 @@ define([
 				row;
 
 			var handles = [
-				collection.on('remove, update', function (event) {
+				collection.on('delete, update', function (event) {
 					var from = event.previousIndex;
 					var to = event.index;
 
@@ -407,7 +407,7 @@ define([
 						// remove the old slot
 						rows.splice(from, 1);
 
-						if (event.type === 'remove' ||
+						if (event.type === 'delete' ||
 								(event.type === 'update' && (from < to || to === undefined))) {
 							// adjust the rowIndex so adjustRowIndices has the right starting point
 							rows[from] && rows[from].rowIndex--;
@@ -418,7 +418,7 @@ define([
 							self._processScroll();
 						}
 					}
-					if (event.type === 'remove') {
+					if (event.type === 'delete') {
 						// Reset row in case this is later followed by an add;
 						// only update events should retain the row variable below
 						row = null;
@@ -474,7 +474,7 @@ define([
 					row = null;
 				}),
 
-				collection.on('add, remove, update', function (event) {
+				collection.on('add, delete, update', function (event) {
 					var from = (typeof event.previousIndex !== 'undefined') ? event.previousIndex : Infinity,
 						to = (typeof event.index !== 'undefined') ? event.index : Infinity,
 						adjustAtIndex = Math.min(from, to);

@@ -16,14 +16,14 @@ define([
 	var itemForm = put(container, 'form#itemForm.actionArea.topArea');
 	var taskField = put(itemForm, 'input#txtTask[name=task]');
 	put(itemForm, 'button[type=submit]', 'Add');
-	
+
 	var listNode = put(container, 'div#list');
 	var removeArea = put(container, 'div.actionArea.bottomArea');
 	var removeSelectedButton = put(removeArea, 'button[type=button]', 'Remove Selected');
 	var removeCompletedButton = put(removeArea, 'button[type=button]', 'Remove Completed');
 
 	put(document.body, container);
-	
+
 	var storeMixins = [ Memory, Trackable ];
 
 	if (window.localStorage) {
@@ -37,7 +37,7 @@ define([
 
 				jsondata && this.setData(JSON.parse(jsondata));
 
-				this.on('add, update, remove', function () {
+				this.on('add, update, delete', function () {
 					localStorage[self.STORAGE_KEY] = JSON.stringify(self.fetch());
 				});
 			}
@@ -70,7 +70,7 @@ define([
 			}
 		}
 	}, listNode);
-	
+
 	on(itemForm, 'submit', function (event) {
 		event.preventDefault();
 
@@ -96,7 +96,7 @@ define([
 			store.remove(item[store.idProperty]);
 		});
 	});
-	
+
 	if (window.localStorage) {
 		// add extra button to clear the localStorage key we're using
 		var button = put(removeArea, 'button[type=button]',

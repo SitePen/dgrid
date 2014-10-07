@@ -122,7 +122,7 @@ define([
 			store.removeSync(item.id);
 			assert.equal(notificationCount, 1);
 			assert.isNotNull(lastNotificationEvent);
-			assert.equal(lastNotificationEvent.type, 'remove');
+			assert.equal(lastNotificationEvent.type, 'delete');
 			assert.equal(lastNotificationEvent.id, item.id);
 
 			lastNotificationEvent = null;
