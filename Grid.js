@@ -306,7 +306,7 @@ define([
 			// Force contentNode width to match up with header width.
 			contentNode.style.width = ''; // reset first
 			if (contentNode && headerTableNode) {
-				if ((width = headerTableNode.offsetWidth) !== contentNode.offsetWidth) {
+				if ((width = headerTableNode.offsetWidth) > contentNode.offsetWidth) {
 					// update size of content node if necessary (to match size of rows)
 					// (if headerTableNode can't be found, there isn't much we can do)
 					contentNode.style.width = width + 'px';
