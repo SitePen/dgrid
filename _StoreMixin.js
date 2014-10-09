@@ -108,7 +108,7 @@ function(kernel, declare, lang, Deferred, listen, aspect, put){
 				this._notifyHandle.remove();
 				delete this._notifyHandle;
 			}
-			if(store && typeof store.notify === "function"){
+			if(store && typeof store.notify === "function" && this.shouldObserveStore){
 				this._notifyHandle = aspect.after(store, "notify",
 					lang.hitch(this, "_onNotify"), true);
 				

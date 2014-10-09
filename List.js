@@ -146,6 +146,10 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 		//		Whether to add jQuery UI classes to various elements in dgrid's DOM.
 		addUiClasses: true,
 
+		// shouldObserveStore: Boolean
+		//		Whether this instance should observe any observable store it is passed.
+		shouldObserveStore: true,
+		
 		// cleanEmptyObservers: Boolean
 		//		Whether to clean up observers for empty result sets.
 		cleanEmptyObservers: true,
@@ -500,7 +504,7 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 			if(!beforeNode){
 				this._lastCollection = results;
 			}
-			if(results.observe){
+			if(results.observe && this.shouldObserveStore){
 				// observe the results for changes
 				self._numObservers++;
 				var observer = results.observe(function(object, from, to){

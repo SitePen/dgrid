@@ -2,13 +2,14 @@ define([
 	"intern!tdd",
 	"intern/chai!assert",
 	"dojo/_base/declare",
+	"dojo/aspect",
 	"dojo/dom-class",
 	"dojo/query",
 	"dojo/store/Memory",
 	"dojo/store/Observable",
 	"dgrid/OnDemandList",
 	"put-selector/put"
-], function(test, assert, declare, domClass, query, Memory, Observable, OnDemandList, put){
+], function(test, assert, declare, aspect, domClass, query, Memory, Observable, OnDemandList, put){
 
 	var widget,
 		storeCounter = 0;
@@ -44,7 +45,7 @@ define([
 		}));
 	}
 
-	function createList(numStoreItems, itemsPerQuery, overlap){
+	function createList(numStoreItems, itemsPerQuery, overlap, shouldObserveStore){
 		widget = new OnDemandList({
 			store: createStore(numStoreItems),
 			minRowsPerPage: itemsPerQuery,
@@ -53,6 +54,7 @@ define([
 			renderRow: function(object){
 				return put("div", object.value);
 			},
+			shouldObserveStore: shouldObserveStore !== false,
 			sort: "id"
 		});
 		document.body.appendChild(widget.domNode);
@@ -287,5 +289,65 @@ define([
 		itemActionTestSuite("Insert store items after", addAfterAction, config);
 
 		itemAddEmptyStoreTestSuite(config);
+	});
+
+	test.suite("shouldObserveStore = false + store modifications", function () {
+		var numItems = 3;
+		var store;
+		var handles = [];
+
+		test.before(function () {
+			createList(numItems, 25, 0, false);
+		});
+
+		test.beforeEach(function () {
+			store = createStore(numItems);
+			widget.set("store", store);
+		});
+
+		test.afterEach(function () {
+			for (var i = handles.length; i--;) {
+				handles[i].remove();
+			}
+			handles = [];
+		});
+
+		test.after(destroyWidget);
+
+		function countRows() {
+			var count = query(".dgrid-row", widget.contentNode).length;
+			return count;
+		}
+
+		test.test("shouldObserveStore = false + add", function () {
+			var numRows = countRows();
+			store.add(createItem(3));
+			assert.strictEqual(countRows(), numRows);
+		});
+
+		test.test("shouldObserveStore = false + put", function () {
+			var numRows = countRows();
+			var calls = 0;
+
+			handles.push(aspect.before(widget, "insertRow", function () {
+				calls++;
+			}));
+			handles.push(aspect.before(widget, "removeRow", function () {
+				calls++;
+			}));
+
+			for (var i = 0; i < numItems; i++) {
+				store.put(store.get(indexToId(i)));
+			}
+			assert.strictEqual(calls, 0, "insertRow and removeRow should not be called");
+		});
+
+		test.test("shouldObserveStore = false + remove", function () {
+			var numRows = countRows();
+			for (var i = 0; i < numItems; i++) {
+				store.remove(indexToId(i));
+			}
+			assert.strictEqual(countRows(), numRows);
+		});
 	});
 });

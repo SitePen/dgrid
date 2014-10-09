@@ -52,6 +52,7 @@ Property | Description
 `className` | A class (or classes, space- or period-delimited) to be set on the instance's `domNode` in addition to the defaults; if an existing DOM node is being passed to the constructor, extra classes may alternatively be specified via its `class` attribute or `className` property
 `cleanAddedRules` | Whether to clean up CSS rules added via the `addCssRule` method when the instance is destroyed; defaults to `true`.
 `cleanEmptyObservers` | Whether to clean up observers for result sets that are or become empty; defaults to `true` but is set to `false` by the `tree` plugin due to special considerations.
+`shouldObserveStore` | Whether this instance should observe any observable store it is passed; defaults to `true`.
 `showHeader` | Whether to display the header area; normally `false` for lists and `true` for grids.  Can be reset later via `set("showHeader", ...)`.
 `showFooter` | Whether to display the footer area; `false` by default, but enabled and used by some extensions (e.g. Pagination).  Can be reset later via `set("showFooter", ...)`.
 `sort` | How to initially sort the grid; may be either a string referencing a field name, or an array of objects with `attribute` and `descending` properties.  See also `set("sort", ...)` below.
