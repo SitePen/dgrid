@@ -80,10 +80,11 @@ Property | Description
 
 Property | Description
 -------- | -----------
-`noDataMessage` | An optional message to be displayed when no results are returned by a query.
-`loadingMessage` | An optional message to be displayed in the loading node which appears when a new page of results is requested.
-`getBeforePut` | If `true` (the default), any `save` operations will re-fetch the item from the store via a `get` call, before applying changes represented by dirty data.
 `collection` | An instance of a dstore implementation, from which to fetch data.  This may be a store instance, or a filtered collection returned from `store.filter()`.
+`getBeforePut` | If `true` (the default), any `save` operations will re-fetch the item from the store via a `get` call, before applying changes represented by dirty data.
+`loadingMessage` | An optional message to be displayed in the loading node which appears when a new page of results is requested.
+`noDataMessage` | An optional message to be displayed when no results are returned by a query.
+`shouldTrackCollection` | Whether this instance should track any trackable collection it is passed; default is `true`.
 
 ### Method Summary
 

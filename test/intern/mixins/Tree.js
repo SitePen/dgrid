@@ -8,14 +8,15 @@ define([
 	'dgrid/util/misc',
 	'dojo/_base/declare',
 	'dojo/_base/lang',
+	'dojo/aspect',
 	'dojo/Deferred',
 	'dojo/dom-style',
 	'dojo/on',
 	'dojo/query',
 	'put-selector/put',
 	'dgrid/test/data/createHierarchicalStore'
-], function (test, assert, OnDemandGrid, Editor, Tree, has, miscUtil, declare, lang, Deferred, domStyle, on, query, put,
-	createHierarchicalStore) {
+], function (test, assert, OnDemandGrid, Editor, Tree, has, miscUtil, declare, lang, aspect, Deferred,
+		domStyle, on, query, put, createHierarchicalStore) {
 
 	var grid,
 		testDelay = 15,
@@ -370,6 +371,68 @@ define([
 							parent: '0'
 						});
 					}, null, 'Modification of child should not throw error');
+				});
+			});
+		});
+
+		test.suite('Tree + Trackable + shouldTrackCollection: false', function () {
+			var handles = [];
+
+			test.beforeEach(function () {
+				createGrid({
+					gridOptions: {
+						shouldTrackCollection: false
+					}
+				});
+			});
+
+			test.afterEach(function () {
+				for (var i = handles.length; i--;) {
+					handles[i].remove();
+				}
+				handles = [];
+				destroyGrid();
+			});
+
+			test.test('child add', function () {
+				return expand(0).then(function () {
+					testRowExists('0:0');
+					grid.collection.add({
+						id: '0:0.5',
+						value: 'New',
+						parent: '0'
+					});
+					testRowExists('0:0.5', false);
+				});
+			});
+
+			test.test('child put', function () {
+				return expand(0).then(function () {
+					var calls = 0;
+
+					handles.push(aspect.before(grid, 'removeRow', function () {
+						calls++;
+					}));
+
+					handles.push(aspect.before(grid, 'insertRow', function () {
+						calls++;
+					}));
+
+					testRowExists('0:0');
+					grid.collection.put({
+						id: '0:0',
+						value: 'Modified',
+						parent: '0'
+					});
+					assert.strictEqual(calls, 0, 'insertRow and removeRow should never be called');
+				});
+			});
+
+			test.test('child remove', function () {
+				return expand(0).then(function () {
+					testRowExists('0:0');
+					grid.collection.remove('0:0');
+					testRowExists('0:0');
 				});
 			});
 		});

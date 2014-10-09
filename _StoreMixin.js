@@ -54,6 +54,10 @@ define([
 		//		The observer handle for the current collection, if trackable.
 		_observerHandle: null,
 
+		// shouldTrackCollection: Boolean
+		//		Whether this instance should track any trackable collection it is passed.
+		shouldTrackCollection: true,
+
 		// getBeforePut: boolean
 		//		If true, a get request will be performed to the store before each put
 		//		as a baseline when saving; otherwise, existing row data will be used.
@@ -118,7 +122,7 @@ define([
 					renderedCollection = collection.sort(this.sort);
 				}
 
-				if (renderedCollection.track) {
+				if (renderedCollection.track && this.shouldTrackCollection) {
 					renderedCollection = renderedCollection.track();
 					this._rows = [];
 

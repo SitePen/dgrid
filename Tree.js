@@ -90,7 +90,7 @@ define([
 						if (grid.sort) {
 							childCollection = childCollection.sort(grid.sort);
 						}
-						if (childCollection.track) {
+						if (childCollection.track && grid.shouldTrackCollection) {
 							container._rows = options.rows = [];
 
 							childCollection = childCollection.track();

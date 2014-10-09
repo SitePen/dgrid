@@ -2,12 +2,13 @@ define([
 	'intern!tdd',
 	'intern/chai!assert',
 	'dojo/_base/declare',
+	'dojo/aspect',
 	'dojo/dom-class',
 	'dojo/query',
 	'../../data/createSyncStore',
 	'dgrid/OnDemandList',
 	'put-selector/put'
-], function (test, assert, declare, domClass, query, createSyncStore, OnDemandList, put) {
+], function (test, assert, declare, aspect, domClass, query, createSyncStore, OnDemandList, put) {
 
 	var widget,
 		storeCounter = 0;
@@ -43,7 +44,7 @@ define([
 		});
 	}
 
-	function createList(numStoreItems, itemsPerQuery, overlap) {
+	function createList(numStoreItems, itemsPerQuery, overlap, shouldTrackCollection) {
 		widget = new OnDemandList({
 			collection: createStore(numStoreItems),
 			minRowsPerPage: itemsPerQuery,
@@ -52,6 +53,7 @@ define([
 			renderRow: function (object) {
 				return put('div', object.value);
 			},
+			shouldTrackCollection: shouldTrackCollection !== false,
 			sort: 'id'
 		});
 		document.body.appendChild(widget.domNode);
@@ -299,7 +301,7 @@ define([
 			var i;
 			var data = [];
 			for (i = 0; i < 10; i++) {
-				data.push({ id: i, value: "Value " + i, enabled: true });
+				data.push({ id: i, value: 'Value ' + i, enabled: true });
 			}
 			var store = createSyncStore({ data: data });
 			widget = new OnDemandList({
@@ -321,6 +323,65 @@ define([
 
 			assert.strictEqual(widget._rows.length, 5,
 				'5 items should remain in the _rows array (5 should be removed)');
+		});
+	});
+
+	test.suite('shouldTrackCollection = false + store modifications', function () {
+		var numItems = 3;
+		var store;
+		var handles = [];
+
+		test.before(function () {
+			createList(numItems, 25, 0, false);
+		});
+
+		test.beforeEach(function () {
+			store = createStore(numItems);
+			widget.set('collection', store);
+		});
+
+		test.afterEach(function () {
+			for (var i = handles.length; i--;) {
+				handles[i].remove();
+			}
+			handles = [];
+		});
+
+		test.after(destroyWidget);
+
+		function countRows() {
+			var count = query('.dgrid-row', widget.contentNode).length;
+			return count;
+		}
+
+		test.test('shouldTrackCollection = false + add', function () {
+			var numRows = countRows();
+			store.addSync(createItem(3));
+			assert.strictEqual(countRows(), numRows);
+		});
+
+		test.test('shouldTrackCollection = false + put', function () {
+			var calls = 0;
+
+			handles.push(aspect.before(widget, 'removeRow', function () {
+				calls++;
+			}));
+			handles.push(aspect.before(widget, 'insertRow', function () {
+				calls++;
+			}));
+
+			for (var i = 0; i < numItems; i++) {
+				store.putSync(store.getSync(indexToId(i)));
+			}
+			assert.strictEqual(calls, 0, 'insertRow and removeRow should never be called');
+		});
+
+		test.test('shouldTrackCollection = false + remove', function () {
+			var numRows = countRows();
+			for (var i = 0; i < numItems; i++) {
+				store.removeSync(indexToId(i));
+			}
+			assert.strictEqual(countRows(), numRows);
 		});
 	});
 });
