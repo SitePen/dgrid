@@ -2,7 +2,31 @@
 	<!-- Top pane -->
 	<div data-dojo-type="dijit/layout/ContentPane"
 		 data-dojo-props="region: 'top'" class="topPane">
-		<h1>dgrid builder</h1>
+		<div class="heading">
+			<span class="aboutToggle" data-dojo-attach-point="aboutToggleNode"
+					data-dojo-attach-event="click:_toggleAbout">
+				About
+				<i class="icon-angle-down" data-dojo-attach-point="aboutIconNode"></i>
+			</span>
+			dgrid builder
+		</div>
+		<div data-dojo-attach-point="aboutNode" class="dijitHidden">
+			<p>This application allows you to experiment with many of dgrid's features.</p>
+			<ol>
+				<li>Choose and configure mixins and extensions in the Features grid on the left</li>
+				<li>Create, reorder, and configure columns in the Columns grid in the middle</li>
+				<li>
+					As you make changes, the pane on the right will update to display a grid based on your
+					configuration.  The Source Code tab displays the code required to achieve the chosen configuration.
+				</li>
+			</ol>
+			<p>
+				Note that while this application demonstrates many of dgrid's features, it does not demonstrate
+				all of them.  Namely, it does not include a way to configure advanced column structures, such as
+				sub-rows, <a href="${docBaseUrl}components/mixins/ColumnSet.md" target="_blank">column sets</a>,
+				and <a href="${docBaseUrl}components/extensions/CompoundColumns.md" target="_blank">compound columns</a>.
+			</p>
+		</div>
 	</div>
 
 	<!-- Left pane with feature grid -->

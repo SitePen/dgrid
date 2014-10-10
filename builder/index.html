@@ -30,7 +30,12 @@
 			require([
 				'dgrid/builder/widgets/Builder'
 			], function (Builder) {
-				var builder = new Builder();
+				var key = window.localStorage && 'dgrid-builder-about-visible';
+				var aboutVisible = key ? localStorage[key] !== 'false' : false;
+				var builder = new Builder({
+					aboutVisible: aboutVisible,
+					aboutKey: key
+				});
 				builder.placeAt(document.body);
 				builder.startup();
 			});

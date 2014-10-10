@@ -11,9 +11,7 @@ OPTIONAL
 	configModule (String): relative (to the 'widgets' folder) mid of the module that provides the configuration UI
 	info (String): Tooltip text - longer description of the feature
 */
-define([], function () {
-	var baseUrl = 'https://github.com/SitePen/dgrid/blob/dev-0.4/';
-
+define([ './config' ], function (config) {
 	return [
 		{
 			id: 0,
@@ -26,7 +24,7 @@ define([], function () {
 			label: 'Grid',
 			configLevel: 'grid',
 			configModule: 'configForms/Grid',
-			documentationUrl: baseUrl + 'doc/components/core-components/Grid.md',
+			documentationUrl: config.docBaseUrl + 'components/core-components/Grid.md',
 			selected: true
 		},
 		{
@@ -36,7 +34,7 @@ define([], function () {
 			label: 'OnDemandGrid',
 			configLevel: 'grid',
 			configModule: 'configForms/OnDemandGrid',
-			documentationUrl: baseUrl + 'doc/components/core-components/OnDemandList-and-OnDemandGrid.md',
+			documentationUrl: config.docBaseUrl + 'components/core-components/OnDemandList-and-OnDemandGrid.md',
 			selected: true
 		},
 		{
@@ -46,7 +44,7 @@ define([], function () {
 			label: 'Keyboard',
 			configLevel: 'grid',
 			configModule: 'configForms/Keyboard',
-			documentationUrl: baseUrl + 'doc/components/mixins/Keyboard.md',
+			documentationUrl: config.docBaseUrl + 'components/mixins/Keyboard.md',
 			info: 'Keyboard navigation and selection'
 		},
 		{
@@ -56,7 +54,7 @@ define([], function () {
 			label: 'Row Selection',
 			configLevel: 'grid',
 			configModule: 'configForms/Selection',
-			documentationUrl: baseUrl + 'doc/components/mixins/Selection.md',
+			documentationUrl: config.docBaseUrl + 'components/mixins/Selection.md',
 			info: 'Row selection'
 		},
 		{
@@ -66,7 +64,7 @@ define([], function () {
 			label: 'Cell selection',
 			configLevel: 'grid',
 			configModule: 'configForms/CellSelection',
-			documentationUrl: baseUrl + 'doc/components/mixins/CellSelection.md',
+			documentationUrl: config.docBaseUrl + 'components/mixins/CellSelection.md',
 			info: 'Cell selection'
 		},
 		{
@@ -76,7 +74,7 @@ define([], function () {
 			label: 'Tree',
 			configLevel: 'grid',
 			configModule: 'configForms/Tree',
-			documentationUrl: baseUrl + 'doc/components/mixins/Tree.md',
+			documentationUrl: config.docBaseUrl + 'components/mixins/Tree.md',
 			info: 'Render hierarchical data under collapsible nodes'
 		},
 		{
@@ -86,7 +84,7 @@ define([], function () {
 			label: 'Pagination',
 			configLevel: 'grid',
 			configModule: 'configForms/Pagination',
-			documentationUrl: baseUrl + 'doc/components/extensions/Pagination.md',
+			documentationUrl: config.docBaseUrl + 'components/extensions/Pagination.md',
 			info: 'Paged data views'
 		},
 		{
@@ -94,7 +92,7 @@ define([], function () {
 			parentId: 0,
 			mid: 'dgrid/extensions/DijitRegistry',
 			label: 'Dijit registry',
-			documentationUrl: baseUrl + 'doc/components/extensions/DijitRegistry.md',
+			documentationUrl: config.docBaseUrl + 'components/extensions/DijitRegistry.md',
 			info: 'Add dgrid to Dijit\'s registry'
 		},
 		{
@@ -103,7 +101,7 @@ define([], function () {
 			mid: 'dgrid/extensions/DnD',
 			label: 'Row drag and drop',
 			configLevel: 'grid',
-			documentationUrl: baseUrl + 'doc/components/extensions/DnD.md',
+			documentationUrl: config.docBaseUrl + 'components/extensions/DnD.md',
 			info: 'Re-order rows with drag and drop'
 		},
 		{
@@ -115,7 +113,7 @@ define([], function () {
 			parentId: 1,
 			mid: 'dgrid/Editor',
 			label: 'Editor',
-			documentationUrl: baseUrl + 'doc/components/mixins/Editor.md',
+			documentationUrl: config.docBaseUrl + 'components/mixins/Editor.md',
 			info: 'Edit values in grid cells'
 		},
 		{
@@ -123,7 +121,7 @@ define([], function () {
 			parentId: 1,
 			mid: 'dgrid/extensions/ColumnHider',
 			label: 'Column hider',
-			documentationUrl: baseUrl + 'doc/components/extensions/ColumnHider.md',
+			documentationUrl: config.docBaseUrl + 'components/extensions/ColumnHider.md',
 			info: 'UI to show or hide individual columns'
 		},
 		{
@@ -131,7 +129,7 @@ define([], function () {
 			parentId: 1,
 			mid: 'dgrid/extensions/ColumnReorder',
 			label: 'Column reorder',
-			documentationUrl: baseUrl + 'doc/components/extensions/ColumnReorder.md',
+			documentationUrl: config.docBaseUrl + 'components/extensions/ColumnReorder.md',
 			info: 'Re-order columns with drag and drop'
 		},
 		{
@@ -141,7 +139,7 @@ define([], function () {
 			label: 'Column resize',
 			configLevel: 'grid',
 			configModule: 'configForms/ColumnResizer',
-			documentationUrl: baseUrl + 'doc/components/extensions/ColumnResizer.md',
+			documentationUrl: config.docBaseUrl + 'components/extensions/ColumnResizer.md',
 			info: 'Resize columns'
 		},
 		// There's no UI for configuring CompoundColumns or ColumnSet, so just omit them
@@ -151,7 +149,7 @@ define([], function () {
 			parentId: 1,
 			mid: 'dgrid/extensions/CompoundColumns',
 			label: 'Compound column headers',
-			documentationUrl: baseUrl + 'doc/components/extensions/CompoundColumns.md',
+			documentationUrl: config.docBaseUrl + 'components/extensions/CompoundColumns.md',
 			info: 'Define column headers that span multiple grid columns'
 		},
 		{
@@ -159,7 +157,7 @@ define([], function () {
 			parentId: 1,
 			mid: 'dgrid/ColumnSet',
 			label: 'Fixed column sets',
-			documentationUrl: baseUrl + 'doc/components/mixins/ColumnSet.md',
+			documentationUrl: config.docBaseUrl + 'components/mixins/ColumnSet.md',
 			info: 'Define column sets that scroll independently'
 		},
 */
@@ -168,7 +166,7 @@ define([], function () {
 			parentId: 1,
 			mid: 'dgrid/Selector',
 			label: 'Row selection column',
-			documentationUrl: baseUrl + 'doc/components/mixins/Selector.md',
+			documentationUrl: config.docBaseUrl + 'components/mixins/Selector.md',
 			info: 'Define a column with checkboxes/radios for selecting rows'
 		}
 	];

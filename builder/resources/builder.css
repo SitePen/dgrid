@@ -80,13 +80,24 @@ textarea {
 	tab-size: 4;
 }
 
-h1 {
+.heading {
 	background-color: rgb(53, 101, 143);
-	color: white;
+	color: #fff;
 	font-size: 1.5em;
 	font-weight: normal;
-	margin: 0 0 6px 0;
+	margin: 0;
 	padding: 5px;
+}
+
+.heading .aboutToggle {
+	cursor: pointer;
+	font-size: 0.67em;
+	padding-top: 0.33em;
+	float: right;
+}
+
+.heading i {
+	color: #fff;
 }
 
 .dijitBorderContainer-dijitContentPane.topPane {

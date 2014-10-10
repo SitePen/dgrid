@@ -17,6 +17,7 @@ define([
 	'./ColumnEditor',
 	'./FeatureEditor',
 	'../util/toJavaScript',
+	'../data/config',
 	'dojo/text!./templates/Builder.html',
 	'dojo/text!./templates/gridCode.js',
 	'dojo/query',
@@ -25,10 +26,14 @@ define([
 	'dijit/layout/TabContainer'
 ], function (require, arrayUtil, declare, lang, aspect, domClass, on, string, topic, _TemplatedMixin,
 	_WidgetsInTemplateMixin, BorderContainer, Memory, Trackable, TreeStoreMixin, ColumnEditor, FeatureEditor,
-	toJavaScript, template, codeTemplate) {
+	toJavaScript, config, template, codeTemplate) {
 
 	return declare([ BorderContainer, _TemplatedMixin, _WidgetsInTemplateMixin ], {
 		templateString: template,
+		docBaseUrl: config.docBaseUrl,
+
+		aboutVisible: true,
+		aboutKey: '', // Passed from index.html if localStorage is supported
 
 		buildRendering: function () {
 			this.inherited(arguments);
@@ -55,6 +60,24 @@ define([
 			);
 		},
 
+		_toggleAbout: function () {
+			this.set('aboutVisible', !this.get('aboutVisible'));
+		},
+
+		_setAboutVisibleAttr: function (visible) {
+			domClass.toggle(this.aboutNode, 'dijitHidden', !visible);
+			domClass.replace(this.aboutIconNode,
+				visible ? 'icon-angle-up' : 'icon-angle-down',
+				visible ? 'icon-angle-down' : 'icon-angle-up');
+			this.resize();
+
+			if (this.aboutKey) {
+				localStorage[this.aboutKey] = '' + visible;
+			}
+
+			this._set('aboutVisible', visible);
+		},
+
 		_updateDemo: function () {
 			if (this.demoGrid) {
 				this.demoGrid.destroy();
@@ -78,10 +101,10 @@ define([
 		},
 
 		_showCode: function () {
-			this.gridCodeTextArea.value = this._getCode();
+			this.gridCodeTextArea.value = this._generateCode();
 		},
 
-		_getCode: function () {
+		_generateCode: function () {
 			var gridConfig = {
 				gridOptions: '{\n',
 				dataDeclaration: '',
@@ -92,7 +115,7 @@ define([
 			var dependencies = [ 'dojo/_base/declare' ];
 			var callbackParams = [ 'declare' ];
 			var gridModules = [];
-			var gridOptions = this._getGridOptions();
+			var gridOptions = this._generateGridOptions();
 			var columnNames = [];
 			var columnName;
 			var treeExpandoColumn;
@@ -196,10 +219,10 @@ define([
 
 		_showDemoGrid: function () {
 			var self = this;
-			var gridOptions = this._getGridOptions();
+			var gridOptions = this._generateGridOptions();
 			var gridModules = [];
 			var isTree = this.featureEditor.isSelected('dgrid/Tree');
-			var data = this._getMockData();
+			var data = this._generateMockData();
 			var hasStore = this.featureEditor.isSelected('dgrid/OnDemandGrid') ||
 				this.featureEditor.isSelected('dgrid/extensions/Pagination');
 
@@ -243,7 +266,7 @@ define([
 			});
 		},
 
-		_getGridOptions: function () {
+		_generateGridOptions: function () {
 			var gridOptions = {};
 			var selectedFeatures = this.featureEditor.filter({ selected: true, configLevel: 'grid' });
 			var treeExpandoColumn;
@@ -304,7 +327,7 @@ define([
 			return obj;
 		},
 
-		_getMockData: function () {
+		_generateMockData: function () {
 			var mockData = [];
 			var fieldNames = [];
 			var i;
