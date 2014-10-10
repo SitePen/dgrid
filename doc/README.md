@@ -3,7 +3,7 @@
 This folder contains the official dgrid documentation. It includes
 information on dgrid's core components, as well as information on various
 mixins and extensions that are available to further expand dgrid's
-default functionality. 
+default functionality.
 
 ## Components
 
@@ -39,6 +39,10 @@ default functionality.
 * [Working with Widgets](usage/Working-with-Widgets.md)
 * [Styling dgrid](usage/Styling-dgrid.md)
 * [Limitations](usage/Limitations.md)
+
+## Upgrading dgrid
+
+* [0.4 Migration Guide](migrating/0.4-Migration.md)
 
 ## Migrating from dojox/grid
 
