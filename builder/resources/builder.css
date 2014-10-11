@@ -129,8 +129,13 @@ textarea {
 	text-decoration: underline;
 }
 
+.columnEditorChildWrapper,
+.featureEditorChildWrapper {
+	height: 100%;
+}
+
 .featureEditor {
-	width: 360px;
+	width: 380px;
 }
 
 .gridTypeForm {
@@ -158,7 +163,7 @@ textarea {
 }
 
 .columnEditor {
-	width: 400px;
+	width: 420px;
 }
 
 .claro .columnEditor .dijitContentPane {
@@ -215,6 +220,8 @@ textarea {
 }
 
 .configForm {
+	height: 100%;
+	overflow: auto;
 	padding: 4px;
 }
 

@@ -41,13 +41,13 @@ define([
 			this.featureEditor = new FeatureEditor({
 				region: 'left',
 				splitter: true,
-				minSize: 360
+				minSize: 380
 			}, this.featureEditorNode);
 
 			this.columnEditor = new ColumnEditor({
 				region: 'left',
 				splitter: true,
-				minSize: 400
+				minSize: 420
 			}, this.columnEditorNode);
 		},
 
