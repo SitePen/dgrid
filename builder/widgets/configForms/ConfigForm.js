@@ -11,8 +11,8 @@ define([
 	'dijit/_WidgetsInTemplateMixin',
 	'dijit/form/_FormMixin',
 	'dijit/form/Button'
-], function (arrayUtil, declare, lang, domConstruct, on, string, topic,
-		_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, _FormMixin, Button) {
+], function (arrayUtil, declare, lang, domConstruct, on, string, topic, _WidgetBase, _TemplatedMixin,
+		_WidgetsInTemplateMixin, _FormMixin, Button) {
 
 	return declare([ _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, _FormMixin ], {
 		baseClass: 'configForm',

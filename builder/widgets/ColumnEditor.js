@@ -1,12 +1,10 @@
 define([
 	'dojo/_base/declare',
 	'dojo/_base/lang',
-	'dojo/aspect',
-	'dojo/topic',
 	'dijit/layout/StackContainer',
 	'./ColumnConfigForm',
 	'./ColumnGrid'
-], function (declare, lang, aspect, topic, StackContainer, ColumnConfigForm, ColumnGrid) {
+], function (declare, lang, StackContainer, ColumnConfigForm, ColumnGrid) {
 	return declare(StackContainer, {
 		baseClass: 'columnEditor',
 

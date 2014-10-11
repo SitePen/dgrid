@@ -3,9 +3,7 @@ define([
 	'dojo/_base/array',
 	'dojo/_base/declare',
 	'dojo/_base/lang',
-	'dojo/aspect',
 	'dojo/dom-class',
-	'dojo/on',
 	'dojo/string',
 	'dojo/topic',
 	'dijit/_TemplatedMixin',
@@ -24,9 +22,9 @@ define([
 	// Widgets in template
 	'dijit/layout/ContentPane',
 	'dijit/layout/TabContainer'
-], function (require, arrayUtil, declare, lang, aspect, domClass, on, string, topic, _TemplatedMixin,
-	_WidgetsInTemplateMixin, BorderContainer, Memory, Trackable, TreeStoreMixin, ColumnEditor, FeatureEditor,
-	toJavaScript, config, template, codeTemplate) {
+], function (require, arrayUtil, declare, lang, domClass, string, topic, _TemplatedMixin, _WidgetsInTemplateMixin,
+	BorderContainer, Memory, Trackable, TreeStoreMixin, ColumnEditor, FeatureEditor, toJavaScript, config, template,
+	codeTemplate) {
 
 	return declare([ BorderContainer, _TemplatedMixin, _WidgetsInTemplateMixin ], {
 		templateString: template,
@@ -132,7 +130,7 @@ define([
 			}
 
 			if (hasStore) {
-				storeModules = ['Memory', 'Trackable'];
+				storeModules = [ 'Memory', 'Trackable' ];
 
 				if (treeExpandoColumn) {
 						storeModules.push('TreeStoreMixin');
@@ -243,7 +241,7 @@ define([
 				gridOptions.className = 'demoGrid';
 
 				if (hasStore) {
-					storeModules = [Memory, Trackable];
+					storeModules = [ Memory, Trackable ];
 
 					if (isTree) {
 						storeModules.push(TreeStoreMixin);

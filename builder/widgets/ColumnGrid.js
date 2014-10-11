@@ -3,8 +3,6 @@ define([
 	'dojo/_base/lang',
 	'dojo/dom-class',
 	'dojo/dom-geometry',
-	'dojo/keys',
-	'dojo/on',
 	'dojo/topic',
 	'dijit/_WidgetBase',
 	'dijit/_TemplatedMixin',
@@ -20,9 +18,8 @@ define([
 	'dijit/form/Form',
 	'dijit/form/Button',
 	'dijit/form/ValidationTextBox'
-], function (declare, lang, domClass, domGeometry, keys, on, topic,
-	_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, template,
-	OnDemandGrid, Editor, DijitRegistry, DnD, Memory, Trackable) {
+], function (declare, lang, domClass, domGeometry, topic, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin,
+	template, OnDemandGrid, Editor, DijitRegistry, DnD, Memory, Trackable) {
 
 	function renderDragSourceCell (item, value, node) {
 		domClass.add(node, 'dojoDndHandle');

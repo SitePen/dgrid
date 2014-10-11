@@ -3,7 +3,6 @@ define([
 	'dojo/_base/array',
 	'dojo/_base/declare',
 	'dojo/_base/lang',
-	'dojo/aspect',
 	'dojo/topic',
 	'dstore/Memory',
 	'dstore/Trackable',
@@ -11,8 +10,8 @@ define([
 	'dijit/layout/StackContainer',
 	'./FeatureGrid',
 	'../data/features'
-], function (require, arrayUtil, declare, lang, aspect, topic, Memory, Trackable, Tree, StackContainer,
-		FeatureGrid, featureData) {
+], function (require, arrayUtil, declare, lang, topic, Memory, Trackable, Tree, StackContainer, FeatureGrid,
+		featureData) {
 
 	return declare(StackContainer, {
 		baseClass: 'featureEditor',
