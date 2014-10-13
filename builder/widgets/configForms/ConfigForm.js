@@ -10,11 +10,12 @@ define([
 	'dijit/_TemplatedMixin',
 	'dijit/_WidgetsInTemplateMixin',
 	'dijit/form/_FormMixin',
+	'../_ResizeMixin',
 	'dijit/form/Button'
 ], function (arrayUtil, declare, lang, domConstruct, on, string, topic, _WidgetBase, _TemplatedMixin,
-		_WidgetsInTemplateMixin, _FormMixin, Button) {
+		_WidgetsInTemplateMixin, _FormMixin, _ResizeMixin, Button) {
 
-	return declare([ _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, _FormMixin ], {
+	return declare([ _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, _FormMixin, _ResizeMixin ], {
 		baseClass: 'configForm',
 		documentationUrlTemplate: '<a href="${documentationUrl}" target="_blank">${moduleName} documentation</a>',
 

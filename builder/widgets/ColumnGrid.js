@@ -2,11 +2,11 @@ define([
 	'dojo/_base/declare',
 	'dojo/_base/lang',
 	'dojo/dom-class',
-	'dojo/dom-geometry',
 	'dojo/topic',
 	'dijit/_WidgetBase',
 	'dijit/_TemplatedMixin',
 	'dijit/_WidgetsInTemplateMixin',
+	'./_ResizeMixin',
 	'dojo/text!./templates/ColumnGrid.html',
 	'dgrid/OnDemandGrid',
 	'dgrid/Editor',
@@ -18,7 +18,7 @@ define([
 	'dijit/form/Form',
 	'dijit/form/Button',
 	'dijit/form/ValidationTextBox'
-], function (declare, lang, domClass, domGeometry, topic, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin,
+], function (declare, lang, domClass, topic, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, _ResizeMixin,
 	template, OnDemandGrid, Editor, DijitRegistry, DnD, Memory, Trackable) {
 
 	function renderDragSourceCell (item, value, node) {
@@ -26,7 +26,7 @@ define([
 		node.innerHTML = '<i class="icon-navicon" title="Drag to move"></i>';
 	}
 
-	return declare([ _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin ], {
+	return declare([ _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, _ResizeMixin ], {
 		baseClass: 'columnGridContainer',
 		templateString: template,
 
@@ -86,14 +86,6 @@ define([
 				this.grid.on('.icon-gear:click', lang.hitch(this, '_editColumn')),
 				topic.subscribe('/column/changed', lang.hitch(this, '_onColumnChange'))
 			);
-		},
-
-		resize: function (changeSize) {
-			if (changeSize) {
-				domGeometry.setMarginBox(this.domNode, changeSize);
-			}
-			this.grid.resize();
-			this.inherited(arguments);
 		},
 
 		_getColumnsAttr: function () {

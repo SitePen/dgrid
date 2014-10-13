@@ -2,11 +2,11 @@ define([
 	'dojo/_base/array',
 	'dojo/_base/declare',
 	'dojo/_base/lang',
-	'dojo/dom-geometry',
 	'dojo/topic',
 	'dijit/_WidgetBase',
 	'dijit/_TemplatedMixin',
 	'dijit/_WidgetsInTemplateMixin',
+	'./_ResizeMixin',
 	'dijit/Tooltip',
 	'dgrid/OnDemandGrid',
 	'dgrid/Tree',
@@ -16,7 +16,7 @@ define([
 	// Widgets in template
 	'dijit/form/Form',
 	'dijit/form/RadioButton'
-], function (arrayUtil, declare, lang, domGeometry, topic, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin,
+], function (arrayUtil, declare, lang, topic, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, _ResizeMixin,
 		Tooltip, OnDemandGrid, Tree, Editor, DijitRegistry, template) {
 
 	function renderLabelCell (item, value, node) {
@@ -180,7 +180,7 @@ define([
 		}
 	});
 
-	return declare([ _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin ], {
+	return declare([ _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, _ResizeMixin ], {
 		className: 'featureGridContainer',
 		templateString: template,
 
@@ -208,14 +208,6 @@ define([
 					self.emit('configure-module', { mid: self.grid.row(event).data.mid });
 				})
 			);
-		},
-
-		resize: function (changeSize) {
-			if (changeSize) {
-				domGeometry.setMarginBox(this.domNode, changeSize);
-			}
-			this.grid.resize();
-			this.inherited(arguments);
 		},
 
 		_setGridModuleAttr: function (module) {

@@ -129,11 +129,6 @@ textarea {
 	text-decoration: underline;
 }
 
-.columnEditorChildWrapper,
-.featureEditorChildWrapper {
-	height: 100%;
-}
-
 .featureEditor {
 	width: 380px;
 }
@@ -220,7 +215,6 @@ textarea {
 }
 
 .configForm {
-	height: 100%;
 	overflow: auto;
 	padding: 4px;
 }
