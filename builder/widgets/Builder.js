@@ -26,6 +26,8 @@ define([
 	BorderContainer, Memory, Trackable, TreeStoreMixin, ColumnEditor, FeatureEditor, toJavaScript, config, template,
 	codeTemplate) {
 
+	var NUM_ITEMS = 50;
+
 	return declare([ BorderContainer, _TemplatedMixin, _WidgetsInTemplateMixin ], {
 		templateString: template,
 		docBaseUrl: config.docBaseUrl,
@@ -151,7 +153,7 @@ define([
 				'\n\t\tvar data = [];' +
 				'\n\t\tvar column;' +
 				'\n\t\tvar i;' +
-				'\n\t\tfor (i = 0; i < 10; i++) {' +
+				'\n\t\tfor (i = 0; i < ' + NUM_ITEMS + '; i++) {' +
 				'\n\t\t\tdata.push({});' +
 				'\n\t\t\tfor (column in { ' + columnNames.join(': 1, ') + ': 1 }) {' +
 				'\n\t\t\t\tdata[i].id = i;' +
@@ -335,7 +337,7 @@ define([
 			});
 
 			if (fieldNames.length > 0) {
-				for (i = 0; i < 10; i++) {
+				for (i = 0; i < NUM_ITEMS; i++) {
 					mockData.push({});
 					mockData[i].id = i;
 
