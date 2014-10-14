@@ -11,13 +11,16 @@ define([
 	'dijit/_WidgetsInTemplateMixin',
 	'dijit/form/_FormMixin',
 	'../_ResizeMixin',
-	'dijit/form/Button'
+	'dijit/form/Button',
+	'dojo/i18n!../../nls/builder'
 ], function (arrayUtil, declare, lang, domConstruct, on, string, topic, _WidgetBase, _TemplatedMixin,
-		_WidgetsInTemplateMixin, _FormMixin, _ResizeMixin, Button) {
+		_WidgetsInTemplateMixin, _FormMixin, _ResizeMixin, Button, i18n) {
 
 	return declare([ _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, _FormMixin, _ResizeMixin ], {
+		i18n: i18n,
 		baseClass: 'configForm',
-		documentationUrlTemplate: '<a href="${documentationUrl}" target="_blank">${moduleName} documentation</a>',
+		documentationUrlTemplate: '<a href="${documentationUrl}" target="_blank">' +
+			'${moduleName} ${i18n.documentation}</a>',
 
 		// This should be over-ridden by sub-classes and define an object with properties that specify default
 		// configuration values for the module
@@ -42,7 +45,7 @@ define([
 			});
 
 			this.doneButton = new Button({
-				label: 'Done',
+				label: i18n.done,
 				className: 'doneButton',
 				iconClass: 'icon-mail-reply'
 			}).placeAt(buttonBar);

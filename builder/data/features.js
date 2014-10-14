@@ -11,11 +11,14 @@ OPTIONAL
 	configModule (String): relative (to the 'widgets' folder) mid of the module that provides the configuration UI
 	info (String): Tooltip text - longer description of the feature
 */
-define([ './config' ], function (config) {
+define([
+	'./config',
+	'dojo/i18n!../nls/builder'
+], function (config, i18n) {
 	return [
 		{
 			id: 0,
-			label: 'Grid features'
+			label: i18n.gridFeatures
 		},
 		{
 			id: 1.1,
@@ -45,7 +48,7 @@ define([ './config' ], function (config) {
 			configLevel: 'grid',
 			configModule: 'configForms/Keyboard',
 			documentationUrl: config.docBaseUrl + 'components/mixins/Keyboard.md',
-			info: 'Keyboard navigation and selection'
+			info: i18n.infoKeyboard
 		},
 		{
 			id: 3,
@@ -55,7 +58,7 @@ define([ './config' ], function (config) {
 			configLevel: 'grid',
 			configModule: 'configForms/Selection',
 			documentationUrl: config.docBaseUrl + 'components/mixins/Selection.md',
-			info: 'Row selection'
+			info: i18n.infoSelection
 		},
 		{
 			id: 4,
@@ -65,7 +68,7 @@ define([ './config' ], function (config) {
 			configLevel: 'grid',
 			configModule: 'configForms/CellSelection',
 			documentationUrl: config.docBaseUrl + 'components/mixins/CellSelection.md',
-			info: 'Cell selection'
+			info: i18n.infoCellSelection
 		},
 		{
 			id: 5,
@@ -75,7 +78,7 @@ define([ './config' ], function (config) {
 			configLevel: 'grid',
 			configModule: 'configForms/Tree',
 			documentationUrl: config.docBaseUrl + 'components/mixins/Tree.md',
-			info: 'Render hierarchical data under collapsible nodes'
+			info: i18n.infoTree
 		},
 		{
 			id: 6,
@@ -85,7 +88,7 @@ define([ './config' ], function (config) {
 			configLevel: 'grid',
 			configModule: 'configForms/Pagination',
 			documentationUrl: config.docBaseUrl + 'components/extensions/Pagination.md',
-			info: 'Paged data views'
+			info: i18n.infoPagination
 		},
 		{
 			id: 7,
@@ -93,7 +96,7 @@ define([ './config' ], function (config) {
 			mid: 'dgrid/extensions/DijitRegistry',
 			label: 'Dijit registry',
 			documentationUrl: config.docBaseUrl + 'components/extensions/DijitRegistry.md',
-			info: 'Add dgrid to Dijit\'s registry'
+			info: i18n.infoDijitRegistry
 		},
 		{
 			id: 8,
@@ -102,11 +105,11 @@ define([ './config' ], function (config) {
 			label: 'Row drag and drop',
 			configLevel: 'grid',
 			documentationUrl: config.docBaseUrl + 'components/extensions/DnD.md',
-			info: 'Re-order rows with drag and drop'
+			info: i18n.infoDnD
 		},
 		{
 			id: 1,
-			label: 'Column features'
+			label: i18n.columnFeatures
 		},
 		{
 			id: 9,
@@ -114,7 +117,7 @@ define([ './config' ], function (config) {
 			mid: 'dgrid/Editor',
 			label: 'Editor',
 			documentationUrl: config.docBaseUrl + 'components/mixins/Editor.md',
-			info: 'Edit values in grid cells'
+			info: i18n.infoEditor
 		},
 		{
 			id: 10,
@@ -122,7 +125,7 @@ define([ './config' ], function (config) {
 			mid: 'dgrid/extensions/ColumnHider',
 			label: 'Column hider',
 			documentationUrl: config.docBaseUrl + 'components/extensions/ColumnHider.md',
-			info: 'UI to show or hide individual columns'
+			info: i18n.infoColumnHider
 		},
 		{
 			id: 11,
@@ -130,7 +133,7 @@ define([ './config' ], function (config) {
 			mid: 'dgrid/extensions/ColumnReorder',
 			label: 'Column reorder',
 			documentationUrl: config.docBaseUrl + 'components/extensions/ColumnReorder.md',
-			info: 'Re-order columns with drag and drop'
+			info: i18n.infoColumnReorder
 		},
 		{
 			id: 12,
@@ -140,7 +143,7 @@ define([ './config' ], function (config) {
 			configLevel: 'grid',
 			configModule: 'configForms/ColumnResizer',
 			documentationUrl: config.docBaseUrl + 'components/extensions/ColumnResizer.md',
-			info: 'Resize columns'
+			info: i18n.infoColumnResizer
 		},
 		// There's no UI for configuring CompoundColumns or ColumnSet, so just omit them
 /*
@@ -150,7 +153,7 @@ define([ './config' ], function (config) {
 			mid: 'dgrid/extensions/CompoundColumns',
 			label: 'Compound column headers',
 			documentationUrl: config.docBaseUrl + 'components/extensions/CompoundColumns.md',
-			info: 'Define column headers that span multiple grid columns'
+			info: 'TODO: i18n; Define column headers that span multiple grid columns'
 		},
 		{
 			id: 14,
@@ -158,7 +161,7 @@ define([ './config' ], function (config) {
 			mid: 'dgrid/ColumnSet',
 			label: 'Fixed column sets',
 			documentationUrl: config.docBaseUrl + 'components/mixins/ColumnSet.md',
-			info: 'Define column sets that scroll independently'
+			info: 'TODO: i18n; Define column sets that scroll independently'
 		},
 */
 		{
@@ -167,7 +170,7 @@ define([ './config' ], function (config) {
 			mid: 'dgrid/Selector',
 			label: 'Row selection column',
 			documentationUrl: config.docBaseUrl + 'components/mixins/Selector.md',
-			info: 'Define a column with checkboxes/radios for selecting rows'
+			info: i18n.infoSelector
 		}
 	];
 });

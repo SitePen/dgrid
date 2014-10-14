@@ -7,7 +7,7 @@
 
 	<div class="scrollContainer">
 		<fieldset>
-			<legend>General column properties</legend>
+			<legend>${i18n.generalColumnProperties}</legend>
 
 			<div class="label">
 				<code>field</code>
@@ -35,19 +35,19 @@
 			</div>
 			<div class="field">
 				<input data-dojo-type="dijit/form/RadioButton" name="sortable" value="true" id="${id}_sortableTrue" type="radio" checked>
-				<label for="${id}_sortableTrue">true</label>
+				<label for="${id}_sortableTrue">${i18n.true}</label>
 				<input data-dojo-type="dijit/form/RadioButton" name="sortable" value="false" id="${id}_sortableFalse" type="radio">
-				<label for="${id}_sortableFalse">false</label>
+				<label for="${id}_sortableFalse">${i18n.false}</label>
 			</div>
 		</fieldset>
 
-		<a href="${docBaseUrl}components/core-components/Grid.md" target="_blank">Grid documentation</a>
+		<a href="${docBaseUrl}components/core-components/Grid.md" target="_blank">Grid ${i18n.documentation}</a>
 
 
-		<h3>Plugin column properties</h3>
+		<h3>${i18n.mixinColumnProperties}</h3>
 
 		<fieldset data-dojo-attach-point="EditorFields" class="dijitHidden">
-			<legend>Editor properties</legend>
+			<legend>Editor ${i18n.properties}</legend>
 
 			<div class="label">
 				<code>editor</code>
@@ -75,9 +75,9 @@
 			</div>
 			<div class="field">
 				<input data-dojo-type="dijit/form/RadioButton" name="autoSave" value="true" id="${id}_autoSaveTrue" type="radio">
-				<label for="${id}_autoSaveTrue">true</label>
+				<label for="${id}_autoSaveTrue">${i18n.true}</label>
 				<input data-dojo-type="dijit/form/RadioButton" name="autoSave" value="false" id="${id}_autoSaveFalse" type="radio" checked>
-				<label for="${id}_autoSaveFalse">false</label>
+				<label for="${id}_autoSaveFalse">${i18n.false}</label>
 			</div>
 
 			<div class="label">
@@ -85,9 +85,9 @@
 			</div>
 			<div class="field">
 				<input data-dojo-type="dijit/form/RadioButton" name="autoSelect" value="true" id="${id}_autoSelectTrue" type="radio">
-				<label for="${id}_autoSelectTrue">true</label>
+				<label for="${id}_autoSelectTrue">${i18n.true}</label>
 				<input data-dojo-type="dijit/form/RadioButton" name="autoSelect" value="false" id="${id}_autoSelectFalse" type="radio" checked>
-				<label for="${id}_autoSelectFalse">false</label>
+				<label for="${id}_autoSelectFalse">${i18n.false}</label>
 			</div>
 
 			<div class="label">
@@ -95,23 +95,23 @@
 			</div>
 			<div class="field">
 				<input data-dojo-type="dijit/form/RadioButton" name="dismissOnEnter" value="true" id="${id}_dismissOnEnterTrue" type="radio" checked>
-				<label for="${id}_dismissOnEnterTrue">true</label>
+				<label for="${id}_dismissOnEnterTrue">${i18n.true}</label>
 				<input data-dojo-type="dijit/form/RadioButton" name="dismissOnEnter" value="false" id="${id}_dismissOnEnterFalse" type="radio">
-				<label for="${id}_dismissOnEnterFalse">false</label>
+				<label for="${id}_dismissOnEnterFalse">${i18n.false}</label>
 			</div>
 		</fieldset>
 
 		<fieldset data-dojo-attach-point="ColumnHiderFields" class="dijitHidden">
-			<legend>ColumnHider properties</legend>
+			<legend>ColumnHider ${i18n.properties}</legend>
 
 			<div class="label">
 				<code>hidden</code>
 			</div>
 			<div class="field">
 				<input data-dojo-type="dijit/form/RadioButton" name="hidden" value="true" id="${id}_hiddenTrue" type="radio">
-				<label for="${id}_hiddenTrue">true</label>
+				<label for="${id}_hiddenTrue">${i18n.true}</label>
 				<input data-dojo-type="dijit/form/RadioButton" name="hidden" value="false" id="${id}_hiddenFalse" type="radio" checked>
-				<label for="${id}_hiddenFalse">false</label>
+				<label for="${id}_hiddenFalse">${i18n.false}</label>
 			</div>
 
 			<div class="label">
@@ -119,42 +119,42 @@
 			</div>
 			<div class="field">
 				<input data-dojo-type="dijit/form/RadioButton" name="unhidable" value="true" id="${id}_unhidableTrue" type="radio">
-				<label for="${id}_unhidableTrue">true</label>
+				<label for="${id}_unhidableTrue">${i18n.true}</label>
 				<input data-dojo-type="dijit/form/RadioButton" name="unhidable" value="false" id="${id}_unhidableFalse" type="radio" checked>
-				<label for="${id}_unhidableFalse">false</label>
+				<label for="${id}_unhidableFalse">${i18n.false}</label>
 			</div>
 		</fieldset>
 
 		<fieldset data-dojo-attach-point="ColumnReorderFields" class="dijitHidden">
-			<legend>ColumnReorder properties</legend>
+			<legend>ColumnReorder ${i18n.properties}</legend>
 
 			<div class="label">
 				<code>reorderable</code>
 			</div>
 			<div class="field">
 				<input data-dojo-type="dijit/form/RadioButton" name="reorderable" value="true" id="${id}_reorderableTrue" type="radio" checked>
-				<label for="${id}_reorderableTrue">true</label>
+				<label for="${id}_reorderableTrue">${i18n.true}</label>
 				<input data-dojo-type="dijit/form/RadioButton" name="reorderable" value="false" id="${id}_reorderableFalse" type="radio">
-				<label for="${id}_reorderableFalse">false</label>
+				<label for="${id}_reorderableFalse">${i18n.false}</label>
 			</div>
 		</fieldset>
 
 		<fieldset data-dojo-attach-point="ColumnResizerFields" class="dijitHidden">
-			<legend>ColumnResizer properties</legend>
+			<legend>ColumnResizer ${i18n.properties}</legend>
 
 			<div class="label">
 				<code>resizable</code>
 			</div>
 			<div class="field">
 				<input data-dojo-type="dijit/form/RadioButton" name="resizable" value="true" id="${id}_resizableTrue" type="radio" checked>
-				<label for="${id}_resizableTrue">true</label>
+				<label for="${id}_resizableTrue">${i18n.true}</label>
 				<input data-dojo-type="dijit/form/RadioButton" name="resizable" value="false" id="${id}_resizableFalse" type="radio">
-				<label for="${id}_resizableFalse">false</label>
+				<label for="${id}_resizableFalse">${i18n.false}</label>
 			</div>
 		</fieldset>
 
 		<fieldset data-dojo-attach-point="SelectorFields" class="dijitHidden">
-			<legend>Selector properties</legend>
+			<legend>Selector ${i18n.properties}</legend>
 
 			<div class="label">
 				<code>selector</code>
@@ -164,7 +164,7 @@
 				<label for="${id}_selectorTrue">checkbox</label>
 				<input data-dojo-type="dijit/form/RadioButton" name="selector" value="radio" id="${id}_selectorFalse" type="radio">
 				<label for="${id}_selectorFalse">radio</label>
-				<span class="actionLink" data-dojo-attach-event="click: _clearField" data-field-name="selector">clear</span>
+				<span class="actionLink" data-dojo-attach-event="click: _clearField" data-field-name="selector">${i18n.clear}</span>
 			</div>
 		</fieldset>
 	</div>

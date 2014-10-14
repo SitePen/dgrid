@@ -7,6 +7,7 @@ define([
 	'dijit/_TemplatedMixin',
 	'dijit/_WidgetsInTemplateMixin',
 	'./_ResizeMixin',
+	'dojo/i18n!../nls/builder',
 	'dojo/text!./templates/ColumnGrid.html',
 	'dgrid/OnDemandGrid',
 	'dgrid/Editor',
@@ -18,17 +19,18 @@ define([
 	'dijit/form/Form',
 	'dijit/form/Button',
 	'dijit/form/ValidationTextBox'
-], function (declare, lang, domClass, topic, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, _ResizeMixin,
+], function (declare, lang, domClass, topic, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, _ResizeMixin, i18n,
 	template, OnDemandGrid, Editor, DijitRegistry, DnD, Memory, Trackable) {
 
 	function renderDragSourceCell (item, value, node) {
 		domClass.add(node, 'dojoDndHandle');
-		node.innerHTML = '<i class="icon-navicon" title="Drag to move"></i>';
+		node.innerHTML = '<i class="icon-navicon" title="' + i18n.dragToMove + '"></i>';
 	}
 
 	return declare([ _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, _ResizeMixin ], {
 		baseClass: 'columnGridContainer',
 		templateString: template,
+		i18n: i18n,
 
 		buildRendering: function () {
 			this.inherited(arguments);
@@ -46,14 +48,14 @@ define([
 					},
 					fieldName: {
 						field: 'field',
-						label: 'Field Name',
+						label: i18n.fieldNameLabel,
 						editor: 'text',
 						autoSave: true,
 						sortable: false
 					},
 					label: {
 						field: 'label',
-						label: 'Label',
+						label: i18n.label,
 						editor: 'text',
 						autoSave: true,
 						sortable: false
@@ -61,8 +63,8 @@ define([
 					config: {
 						label: '',
 						formatter: function () {
-							return '<i class="icon-gear" title="Edit"></i> ' +
-								'<i class="icon-times" title="Delete"></i>';
+							return '<i class="icon-gear" title="' + i18n.edit + '"></i> ' +
+								'<i class="icon-times" title="' + i18n.delete + '"></i>';
 						},
 						sortable: false
 					}

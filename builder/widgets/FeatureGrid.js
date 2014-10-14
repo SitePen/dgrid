@@ -12,12 +12,13 @@ define([
 	'dgrid/Tree',
 	'dgrid/Editor',
 	'dgrid/extensions/DijitRegistry',
+	'dojo/i18n!../nls/builder',
 	'dojo/text!./templates/FeatureGrid.html',
 	// Widgets in template
 	'dijit/form/Form',
 	'dijit/form/RadioButton'
 ], function (arrayUtil, declare, lang, topic, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, _ResizeMixin,
-		Tooltip, OnDemandGrid, Tree, Editor, DijitRegistry, template) {
+		Tooltip, OnDemandGrid, Tree, Editor, DijitRegistry, i18n, template) {
 
 	function renderLabelCell (item, value, node) {
 		// Render the label cell, adding the doc link, tooltip icon, and config icon when appropriate
@@ -44,7 +45,7 @@ define([
 
 		columns: {
 			label: {
-				label: 'Select grid features',
+				label: i18n.selectGridFeatures,
 				renderExpando: true,
 				renderCell: renderLabelCell,
 				sortable: false
@@ -183,6 +184,7 @@ define([
 	return declare([ _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, _ResizeMixin ], {
 		className: 'featureGridContainer',
 		templateString: template,
+		i18n: i18n,
 
 		collection: null,
 
