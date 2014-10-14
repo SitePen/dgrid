@@ -10,7 +10,7 @@ require([
     'dgrid/OnDemandGrid',
     'dgrid/extensions/CompoundColumns'
 ], function (declare, OnDemandGrid, CompoundColumns) {
-    var compoundGrid = new (declare([OnDemandGrid, CompoundColumns]))({
+    var compoundGrid = new (declare([ OnDemandGrid, CompoundColumns ]))({
         columns: [
             { label: 'Full Name', children: [
                 { label: 'Given', children: [

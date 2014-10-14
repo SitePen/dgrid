@@ -7,10 +7,6 @@ construct these instances with the DijitRegistry extension mixed in.
 This enables functions like `registry.findWidgets` (also used by
 `_WidgetBase.getChildren`) to report dgrid instances as well.
 
-**Note:** prior to version 0.3.5, dgrid components were unable to exist as direct
-children of Dijit layout widgets; they can, however, exist as children of
-ContentPanes.
-
 ## Destroying rendered widgets
 
 When creating custom `renderRow` or `renderCell` functions which populate rows

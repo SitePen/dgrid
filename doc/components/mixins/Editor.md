@@ -14,7 +14,7 @@ require([
     'dgrid/Selection',
     'dgrid/Editor'
 ], function (declare, OnDemandGrid, Keyboard, Selection, Editor) {
-    var editGrid = new (declare([OnDemandGrid, Keyboard, Selection, Editor]))({
+    var editGrid = new (declare([ OnDemandGrid, Keyboard, Selection, Editor ]))({
         collection: myStore,
         columns: [
             {

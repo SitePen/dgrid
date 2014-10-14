@@ -6,19 +6,19 @@ The Tree mixin enables expansion of rows to display children.
 require([
     'dojo/_base/declare',
     'dgrid/OnDemandGrid',
-    'dgrid/Tree',
     'dgrid/Keyboard',
-    'dgrid/Selection'
-], function (declare, OnDemandGrid, Tree, Keyboard, Selection) {
-    var treeGrid = new (declare([OnDemandGrid, Keyboard, Selection, Tree]))({
+    'dgrid/Selection',
+    'dgrid/Tree'
+], function (declare, OnDemandGrid, Keyboard, Selection, Tree) {
+    var treeGrid = new (declare([ OnDemandGrid, Keyboard, Selection, Tree ]))({
         collection: myStore,
-        columns: [
+        columns: {
             // Render expando icon and trigger expansion from first column
-            { label: 'Name', field: 'name', renderExpando: true }),
-            { label: 'Type', field: 'type', sortable: false},
-            { label: 'Population', field: 'population' },
-            { label: 'Timezone', field: 'timezone' }
-        ]
+            name: { label: 'Name', renderExpando: true },
+            type: 'Type',
+            population: 'Population',
+            timezone: 'Timezone'
+        }
     }, 'treeGrid');
 });
 ```
@@ -34,24 +34,12 @@ method to return the children for a given item. `getChildren` should return a
 collection as well; dgrid will track and request ranges from it just like it
 does for the top level.
 
-The following is a simple example of what a `getChildren` implementation could
-look like in an extension to `dstore/Memory`, where hierarchy is indicated
-by a `parent` property on child items:
-
-```js
-constructor: function () {
-    // Save a reference to the original store for use in getChildren()
-    this.root = this;
-},
-getChildren: function (parent, options) {
-    // Call filter on the original store to avoid the filter looking only for the root objects.
-    return this.root.filter({ parent: parent.id });
-}
-```
-
 The store may also (optionally) provide a `mayHaveChildren(object)` method which
 returns a boolean indicating whether or not the row can be expanded. If this
 is not provided, all items will be rendered with expand icons.
+
+The [`dstore/Tree`](https://github.com/SitePen/dstore/blob/master/docs/Stores.md#tree)
+module provides a reference implementation of these functions.
 
 ## Additional Column Definition Properties
 

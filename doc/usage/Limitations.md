@@ -47,8 +47,7 @@ var secondGrid = new Grid({
 
 ## Column Definitions: Coexistence of formatter and renderCell
 
-The default `renderCell` logic, as well as the logic within the `editor` and
-`tree` column plugins, is specifically written in such a way as to honor any
+The default `renderCell` logic is specifically written in such a way as to honor any
 `formatter` that is defined on the column definition.
 
 If a custom `renderCell` function is specified, however, it will override the

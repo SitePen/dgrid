@@ -15,7 +15,7 @@ require([
     'dgrid/OnDemandGrid',
     'dgrid/Keyboard'
 ], function (declare, OnDemandGrid, Keyboard) {
-    var grid = new (declare([OnDemandGrid, Keyboard]))({
+    var grid = new (declare([ OnDemandGrid, Keyboard ]))({
         pageSkip: 20,
         cellNavigation: false
     }, 'grid');
@@ -59,7 +59,7 @@ include the following properties:
 
 ## Customizing Mappings
 
-As of dgrid 0.3.6, the Keyboard mixin provides two ways to customize handling of keys pressed within the body or header of a grid.
+The Keyboard mixin provides two ways to customize handling of keys pressed within the body or header of a grid.
 
 ### Adding Mappings
 
@@ -88,7 +88,7 @@ function doSomethingOnPageDown(event) {
     // Do something in response to a keydown event for Page Down
 }
 
-var grid = new (declare([Grid, Keyboard]))({
+var grid = new (declare([ Grid, Keyboard ]))({
     // Override page up and page down, but keep the rest of the defaults.
     // Don't forget the first empty object parameter - this prevents from
     // accidentally mixing into defaultKeyMap instead!

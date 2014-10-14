@@ -10,8 +10,8 @@ require([
     'dojo/_base/declare',
     'dgrid/OnDemandGrid',
     'dgrid/extensions/ColumnReorder'
-], function (declare, OnDemandGrid, ColumnReorder, declare) {
-    var grid = new (declare([OnDemandGrid, ColumnReorder]))({
+], function (declare, OnDemandGrid, ColumnReorder) {
+    var grid = new (declare([ OnDemandGrid, ColumnReorder ]))({
         columns: {
             col1: {
                 label: 'Column1',

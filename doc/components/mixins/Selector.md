@@ -8,10 +8,9 @@ providing alternate means for selecting and deselecting rows in a grid.
 require([
     'dojo/_base/declare',
     'dgrid/OnDemandGrid',
-    'dgrid/Selection',
     'dgrid/Selector'
-], function (declare, OnDemandGrid, Selection, Selector) {
-    var grid = new (declare([OnDemandGrid, Selection, Selector]))({
+], function (declare, OnDemandGrid, Selector) {
+    var grid = new (declare([ OnDemandGrid, Selector ]))({
         collection: myStore,
         selectionMode: 'single',
         columns: {
@@ -43,27 +42,17 @@ Parameter | Description
 `object` | The data object that the current row represents.
 
 ```js
-require([
-    'dojo/_base/declare',
-    'dgrid/Grid',
-    'dgrid/Selection',
-    'dgrid/Selector'
-], function (declare, Grid, Selection, Selector) {
-    var grid = new (declare([Grid, Selection, Selector]))({
-        columns: {
-            col1: {
-                label: 'Select',
-                selector: function (column, selected, cell, object) {
-                    var inputNode;
-                    // ... render an input component ...
-                    return inputNode;
-                }
-            },
-            col2: 'Column 2'
+columns: {
+    col1: {
+        label: 'Select',
+        selector: function (column, selected, cell, object) {
+            var inputNode;
+            // ... render an input component ...
+            return inputNode;
         }
-    }, 'grid');
+    },
     // ...
-});
+}
 ```
 
 If you would like to augment the default input component, call the grid's `_defaultRenderSelectorInput` function to

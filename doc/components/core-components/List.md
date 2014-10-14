@@ -1,7 +1,7 @@
 # List
 
-This provides the basic facilities for taking an array of objects and rendering
-them as rows of HTML in a scrollable area.
+List provides the basic facilities for taking an array of objects and rendering
+them as rows in a scrollable area.
 
 The List module can be used to render an array of data as follows:
 

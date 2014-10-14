@@ -13,7 +13,7 @@ require([
     'dgrid/OnDemandGrid',
     'dgrid/extensions/ColumnHider'
 ], function (declare, OnDemandGrid, ColumnHider) {
-    var grid = new (declare([OnDemandGrid, ColumnHider]))({
+    var grid = new (declare([ OnDemandGrid, ColumnHider ]))({
         columns: {
             col1: {
                 label: 'Column 1',

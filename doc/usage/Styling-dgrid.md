@@ -41,7 +41,7 @@ While the column definition provides mechanisms for adding classes to individual
 columns, there is no similar construct at the row level.  However, it is possible
 to add classes to rows by aspecting `renderRow`.
 
-In Dojo 1.8 and newer, you can achieve this using `aspect.after` - when its
+However, you can achieve this using `dojo/aspect.after` - when its
 `receiveArguments` argument is `false` (the default), it passes the original
 arguments object as a second parameter to the advising function, allowing access
 to the original object:
@@ -50,19 +50,6 @@ to the original object:
 aspect.after(grid, 'renderRow', function(row, args) {
   // Add classes to `row` based on `args[0]` here
   return row;
-});
-```
-
-In Dojo 1.7, you need to use `aspect.around`, in order to have access to both the
-incoming object and the resulting row node:
-
-```js
-aspect.around(grid, 'renderRow', function (original) {
-  return function (object) {
-    var row = original.apply(this, arguments);
-    // Add classes to `row` based on `object` here
-    return row;
-  };
 });
 ```
 
@@ -107,3 +94,15 @@ names are also available for generic skinning (following the jQuery ThemeRoller 
 * `ui-state-default`: Applied to each row element
 * `ui-state-active`: Applied to selected rows or cells
 * `ui-state-highlight`: Applied to a row for a short time when the contents are changed (or it is newly created)
+
+## The `dgrid-autoheight` class
+
+There are various cases where it is desirable for a grid to adjust its height according to its contents.  dgrid
+contains styles for this under the `.dgrid-autoheight` selector.  Making a grid's height size to fit is as simple
+as adding the `dgrid-autoheight` class to the DOM node used to create the grid, or passing it via the `className`
+property to the instance.
+
+**Note:** Using the `dgrid-autoheight` class with `OnDemandList` is **not** recommended, as `OnDemandList` will
+end up ultimately rendering all of the grid's rows anyway, page by page.  `dgrid-autoheight` works well with
+`Pagination`.  If you are really interested in rendering all store data at once into an auto-height list or grid,
+have a look at our [tutorial](http://dojofoundation.org/packages/dgrid/tutorials/0.4/single_query) on the subject.

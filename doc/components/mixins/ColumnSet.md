@@ -15,7 +15,7 @@ require([
     'dgrid/OnDemandGrid',
     'dgrid/ColumnSet'
 ], function (declare, OnDemandGrid, ColumnSet) {
-    var grid = new (declare([OnDemandGrid, ColumnSet]))({
+    var grid = new (declare([ OnDemandGrid, ColumnSet ]))({
         columnSets: [
             // left columnset
             [

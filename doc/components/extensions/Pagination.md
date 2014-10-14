@@ -11,7 +11,7 @@ require([
     'dgrid/Grid',
     'dgrid/extensions/Pagination'
 ], function (declare, Grid, Pagination) {
-    var grid = new (declare([Grid, Pagination]))({
+    var grid = new (declare([ Grid, Pagination ]))({
         collection: myStore,
         columns: myColumns,
         pagingLinks: 1,

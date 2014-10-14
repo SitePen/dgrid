@@ -12,7 +12,7 @@ require([
     'dgrid/OnDemandGrid',
     'dgrid/extensions/DijitRegistry'
 ], function (declare, OnDemandGrid, DijitRegistry) {
-    var grid = new (declare([OnDemandGrid, DijitRegistry]))({
+    var grid = new (declare([ OnDemandGrid, DijitRegistry ]))({
         collection: myStore,
         columns: myColumns
     }, 'grid');

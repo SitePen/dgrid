@@ -6,11 +6,10 @@ The DnD extension can be used to add row drag'n'drop functionality.
 require([
     'dojo/_base/declare',
     'dgrid/OnDemandGrid',
-    'dgrid/Selection',
     'dgrid/extensions/DnD',
     'dojo/dnd/Source'
-], function (declare, OnDemandGrid, Selection, DnD, DnDSource) {
-    var grid = new (declare([OnDemandGrid, Selection, DnD, Keyboard]))({
+], function (declare, OnDemandGrid, DnD, DnDSource) {
+    var grid = new (declare([ OnDemandGrid, DnD ]))({
         collection: myStore,
         columns: {
             name: 'Name'
@@ -56,7 +55,7 @@ Property | Description
 
 ## Touch Support
 
-As of Dojo 1.8, the `dojo/dnd` package supports interaction via touch events.
+The `dojo/dnd` package supports interaction via touch events.
 However, since touch events are also used to control scrolling of dgrid
 components on touch devices, a conflict ensues and touch scrolling wins by default.
 There are generally two ways to resolve this conflict:

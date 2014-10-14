@@ -142,11 +142,11 @@ var columns = {
 };
 ```
 
-### Subrows
+### Sub-rows
 
-The Grid component also supports structures with multiple "subrows"; that is, it
+The Grid component also supports structures with multiple "sub-rows"; that is, it
 supports the idea of rendering multiple rows for each data item. Specification
-of multiple subrows is very much like specifying columns, except that one uses
+of multiple sub-rows is very much like specifying columns, except that one uses
 the `subRows` property instead of `columns`, and it receives an array of columns
 objects/arrays. Both the `columns` and `subRows` properties can be later reset
 by using the central `set` method.

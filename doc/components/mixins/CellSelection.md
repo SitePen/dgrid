@@ -9,7 +9,7 @@ require([
     'dgrid/OnDemandGrid',
     'dgrid/CellSelection'
 ], function (declare, OnDemandGrid, CellSelection) {
-    var grid = new (declare([OnDemandGrid, CellSelection]))({
+    var grid = new (declare([ OnDemandGrid, CellSelection ]))({
         selectionMode: 'single',
         // ...
     });

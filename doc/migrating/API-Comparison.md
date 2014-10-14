@@ -11,22 +11,24 @@ via a store's `sort` method; these options are retrievable via the sort getter
 
 ### rowSelector and indirect selection
 
-Indirect selection is available in dgrid via the Selector mixin.  This
-achieves similar effects to the DataGrid's `_CheckBoxSelector` and
+Indirect selection is available in dgrid via the [Selector](../components/mixins/Selector.md) mixin.
+This achieves similar effects to the DataGrid's `_CheckBoxSelector` and
 `_RadioButtonSelector` view types, and EnhancedGrid's IndirectSelection plugin.
 
 dgrid does not feature a direct analog to the `rowSelector` property.
 
 ### selectionMode
 
-dgrid supports this property via the Selection and CellSelection mixins.
+dgrid supports this property via the [Selection](../components/mixins/Selection.md) and
+[CellSelection](../components/mixins/CellSelection.md) mixins.
 It recognizes the same values supported by `dojox/grid` components
 (`none`, `single`, `multiple`, and `extended`, the latter being the default).
 
 ### keepSelection
 
 This is roughly the inverse equivalent to the `deselectOnRefresh` property
-supported by dgrid's Selection (and CellSelection) mixin.  Both `dojox/grid`
+supported by dgrid's [Selection](../components/mixins/Selection.md)
+(and [CellSelection](../components/mixins/CellSelection.md)) mixin.  Both `dojox/grid`
 and dgrid default to *not* maintaining selection between refreshes, sorts, etc.
 
 ### columnReordering
@@ -34,7 +36,7 @@ and dgrid default to *not* maintaining selection between refreshes, sorts, etc.
 Setting this `dojox/grid` property to `true` allows reordering of columns
 in grids with basic structures via drag'n'drop operations on column header cells.
 
-This feature is available in dgrid via the ColumnReorder extension.
+This feature is available in dgrid via the [ColumnReorder](../components/extensions/ColumnReorder.md) extension.
 
 ### headerMenu and other context menu scenarios
 
@@ -46,14 +48,14 @@ the basic steps one would need to follow:
 * An event handler listening for `contextmenu` events against a particular selector;
   for example:
     * `.dgrid-header:contextmenu` for a general header context menu
-    * `.dgrid-row:contextmenu` for a general body context menu
+    * `.dgrid-content .dgrid-row:contextmenu` for a general body context menu
     * `.dgrid-header .field-foo:contextmenu` for a context menu for a specific header cell
     * `.dgrid-content .field-foo:contextmenu` for a context menu for body cells in
       a particular column
 * within the event handler:
-    * A call to `preventDefault` on the event object, to stop the default
+    * Call `preventDefault` on the event object, to stop the default
       browser context menu from displaying.
-    * A call to `grid.row()` or `grid.cell()` to retrieve information on the
+    * Call `grid.row()` or `grid.cell()` to retrieve information on the
       pertinent row or cell.  If the menu is intended to apply to selected items,
       `grid.selection` can be checked for entries, and then `grid.row()` can be
       called with the IDs found.
@@ -84,7 +86,7 @@ Not supported.  Width (and height) should be dictated via CSS.
 ### singleClickEdit
 
 The effect of the `singleClickEdit` property can be achieved by specifying
-`editOn: "click"` in a column definition when the Editor mixin is in use.
+`editOn: "click"` in a column definition when the [Editor](../components/mixins/Editor.md) mixin is in use.
 (Alternatively, `dojox/grid`'s default double-click behavior can be
 achieved by specifying `editOn: "dblclick"` instead.)
 
@@ -96,16 +98,19 @@ store-related error occurs within dgrid's own logic, it will emit a `dgrid-error
 event.  When `grid.save()` is called directly, it will return a promise which
 will reject if an error occurs.
 
+The messages demo in the
+[Using Grids and Stores tutorial](http://dojofoundation.org/packages/dgrid/tutorials/0.4/grids_and_stores/)
+provides an example of showing an error notification when `dgrid-error` fires.
+
 ### selectable
 
-This is not exposed as a distinct option in dgrid, but is automatically managed
-by the `Selection` mixin.  Standard browser selection is disabled when a
-`selectionMode` other than `none` is in use.
-Otherwise, text selection operates as normal.
+This is automatically managed by the [Selection](../components/mixins/Selection.md) mixin by default.
+Standard browser text selection is disabled when a `selectionMode` other than `none` is in use.
+Otherwise, text selection operates as normal.  This can be overridden via the `allowTextSelection` property.
 
 ### formatterScope
 
-dgrid supports this option as of version 0.3.7.
+dgrid supports this option.
 
 ### updateDelay
 
@@ -129,8 +134,8 @@ Whereas `dojox/grid` always expects cell definitions to be specified via a
 
 * `columns`: an array or object hash, for simple single-row grid configurations
 * `subRows`: an array of arrays, for grid configurations with multiple sub-rows per item
-* `columnSets` (only when the ColumnSet mixin is in use): a nested array for
-  grid configurations containing distinct horizontal regions of one or more rows
+* `columnSets` (only when the [ColumnSet](../components/mixins/ColumnSet.md) mixin is in use):
+  a nested array for grid configurations containing distinct horizontal regions of one or more rows
   (analogous to multiple views in a `dojox/grid` instance)
 
 The following subsections outline how features of `dojox/grid` cell definitions
@@ -142,7 +147,7 @@ Supported by dgrid, including the special `"_item"` value supported by
 `dojox/grid` in Dojo >= 1.4.
 
 Also note that dgrid also supports specifying `columns` as an object hash instead
-of an array, in which case the key of each property is interpreted as the `field`.
+of an array, in which case the key of each property is interpreted as the `field` by default.
 
 ### fields
 
@@ -151,13 +156,17 @@ function in a column definition.
 
 ### width
 
-Use CSS with `.field-<fieldname>` selectors.  (Note that if any value is
-specified via the `className` property of the column definition object, it
-takes the place of `.field-<fieldname>`.)
+Use CSS with `.field-<fieldname>` (or custom `className`) selectors instead.
+
+The only time a `width` column property is supported is when using the
+[ColumnResizer](../components/extensions/ColumnResizer.md) extension, specifically
+for the purpose of allowing column sizes to be programmatically restored if they
+are persisted (e.g. via `localStorage`).  In all other cases, using CSS to set column widths
+is heavily recommended.
 
 ### cellType, widgetClass
 
-The Editor mixin provides capabilities equivalent to these properties.
+The [Editor](../components/mixins/Editor.md) mixin provides capabilities equivalent to these properties.
 It accepts an `editor` property, which can be either a widget constructor or a
 string indicating a native HTML input type.
 
@@ -166,7 +175,7 @@ string indicating a native HTML input type.
 Not directly applicable; in `dojox/grid` this applies only to cell definitions
 where `cellType` is set to `dojox.grid.cells.Select`.
 
-The Editor mixin does not currently offer support for standard HTML
+The [Editor](../components/mixins/Editor.md) mixin does not currently offer support for standard HTML
 select components; however, similar behavior can be achieved using the
 `dijit/form/Select` widget as the `editor`, and specifying `options` for the
 widget within the `editorArgs` property of the column definition object.
@@ -174,7 +183,7 @@ widget within the `editorArgs` property of the column definition object.
 ### editable
 
 In dgrid, cells are uneditable by default, and are made editable by including
-the Editor mixin and specifying an `editor` in each editable column's definition.
+the [Editor](../components/mixins/Editor.md) mixin and specifying an `editor` in each editable column's definition.
 
 ### draggable
 
@@ -208,8 +217,9 @@ row identities are generally far more meaningful.)
 ### hidden
 
 The `hidden` property on column definitions is only supported by the
-ColumnHider extension.  Otherwise, columns would ordinarily be suppressed simply
-by excluding them from the `columns`, `subRows` or `columnSets` property outright.
+[ColumnHider](../components/extensions/ColumnHider.md) extension.
+Otherwise, columns would ordinarily be suppressed simply by excluding them from the
+`columns`, `subRows` or `columnSets` property outright.
 
 ## DataGrid methods
 

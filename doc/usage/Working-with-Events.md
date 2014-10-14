@@ -2,19 +2,18 @@
 
 ## Listening for events with dojo/on and grid.on
 
-The [`dojo/on`](http://dojotoolkit.org/reference-guide/dojo/on.html) module,
-new to Dojo 1.7, provides a concise yet powerful API for registering listeners,
-especially for DOM events.  Listening for events of interest on a dgrid component
-is very straightforward using `dojo/on`; furthermore, dgrid components possess
-an `on` method, which is equivalent to calling `dojo/on` passing the
-component's top-level DOM node as the target.
+The [`dojo/on`](http://dojotoolkit.org/reference-guide/dojo/on.html) module provides a
+concise yet powerful API for registering listeners, especially for DOM events.
+Listening for events of interest on a dgrid component is very straightforward using `dojo/on`;
+furthermore, dgrid components possess an `on` method, which is equivalent to calling `dojo/on`
+passing the component's top-level DOM node as the target.
 
 Using the event delegation features of `dojo/on`, it is possible to listen for
 all manner of events.  For example, to listen for right-clicks on rows in the
 grid's body:
 
 ```js
-grid.on('.dgrid-row:contextmenu', function (event) {
+grid.on('.dgrid-content .dgrid-row:contextmenu', function (event) {
     /* ... */
 });
 ```
@@ -28,8 +27,8 @@ grid.on('.dgrid-header .dgrid-cell:click', function (event) {
 ```
 
 In summary, pretty much any combination desired can be achieved by using
-event delegation with selectors based on the `dgrid-header`, `dgrid-row`, and
-`dgrid-cell` CSS classes as appropriate.
+event delegation with selectors based on the `dgrid-header`, `dgrid-content`,
+`dgrid-row`, and `dgrid-cell` CSS classes as appropriate.
 
 ## Obtaining information about events
 
@@ -45,7 +44,7 @@ of `cell`, a second argument indicating column ID would also be passed.
 Expanding upon the examples above...
 
 ```js
-grid.on('.dgrid-row:contextmenu', function (event) {
+grid.on('.dgrid-content .dgrid-row:contextmenu', function (event) {
     var row = grid.row(evt);
     // row.element == the element with the dgrid-row class
     // row.id == the identity of the item represented by the row

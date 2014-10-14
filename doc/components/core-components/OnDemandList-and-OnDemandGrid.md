@@ -49,7 +49,7 @@ unique identifiers.
 
 OnDemandList requires that a store be specified via the `collection` property, and
 will call the `fetchRange` method so as to only retrieve the necessary objects
-needed to render the visible rows. As the list or grid is scrolled.  Additional
+needed to render the visible rows. As the list or grid is scrolled, additional
 `fetchRange` calls will be made to retrieve additional rows, and previous rows
 will be pruned from the DOM as they are scrolled far out of view.
 
@@ -58,7 +58,7 @@ a collection with a `track` method, which enables the list to keep its
 display up to date with any changes that occur in the store after the items are
 rendered. The
 [`dstore/Trackable`](https://github.com/SitePen/dstore/blob/master/docs/Collection.md#track)
-module can prove useful for adding this functionality.
+module can be used to add this functionality to a store.
 
 ## APIs
 

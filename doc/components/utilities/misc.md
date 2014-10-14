@@ -3,8 +3,8 @@
 The `util/misc` module provides miscellaneous utility functions. Currently this
 consists primarily of functions related to throttling or debouncing function
 calls, which can be particularly useful for events which tend to fire rapidly,
-such as scroll.  As of dgrid 0.3.5, `util/misc` is also home to the `addCssRule`
-function, used by various APIs across dgrid components.
+such as scroll.  `util/misc` is also home to the `addCssRule` function,
+used by various APIs across dgrid components.
 
 ```js
 require([ 'dgrid/util/misc' ], function (misc) {

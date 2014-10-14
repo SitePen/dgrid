@@ -1,9 +1,8 @@
 # dgrid Documentation
 
 This folder contains the official dgrid documentation. It includes
-information on dgrid's core components, as well as information on various
-mixins and extensions that are available to further expand dgrid's
-default functionality.
+information on dgrid's core components, mixins, and extensions that are
+available to further expand dgrid's functionality.
 
 ## Components
 
@@ -51,10 +50,3 @@ default functionality.
 ## Tutorials
 
 Various tutorials are available on [dgrid.io](http://dojofoundation.org/packages/dgrid/#tutorials).
-
-## Changelogs
-
-**Note:** this section contains older changelogs; for the most recent changes,
-see [CHANGES.md](../CHANGES.md) in the dgrid package.
-
-* [Beta Changelog](changelogs/Beta-Changelog.md)

@@ -47,18 +47,18 @@ following styles...
 
 ```js
 require([
+    'dojo/_base/declare',
     'dgrid/OnDemandGrid',
     'dgrid/Keyboard',
     'dgrid/Selection',
-    'dojo/_base/declare',
     'dstore/Memory',
     'dojo/domReady!'
-], function (OnDemandGrid, Keyboard, Selection, declare, Memory) {
+], function (declare, OnDemandGrid, Keyboard, Selection, Memory) {
     var memoryStore = new Memory({data: [
         // data here...
     ]});
 
-    var grid = new declare([OnDemandGrid, Keyboard, Selection])({
+    var grid = new declare([ OnDemandGrid, Keyboard, Selection ])({
         columns: {
             id: 'ID',
             name: 'Name',
@@ -117,7 +117,7 @@ grid.startup();
 (again assuming the same context as the previous example)
 
 ```js
-var grid = new declare([OnDemandGrid, Keyboard, Selection])({
+var grid = new declare([ OnDemandGrid, Keyboard, Selection ])({
     subRows: [
         [
             { field: 'id', label: 'ID' },
@@ -192,17 +192,17 @@ grid.startup();
 
 ```js
 require([
+    'dojo/_base/declare',
     'dgrid/OnDemandGrid',
     'dgrid/ColumnSet',
     'dgrid/Keyboard',
     'dgrid/Selection',
-    'dojo/_base/declare',
     'dstore/Memory',
     'dojo/domReady!'
-], function (OnDemandGrid, ColumnSet, Keyboard, Selection, declare, Memory) {
+], function (declare, OnDemandGrid, ColumnSet, Keyboard, Selection, Memory) {
     // ... create memoryStore here ...
 
-    var grid = new declare([OnDemandGrid, ColumnSet, Keyboard, Selection])({
+    var grid = new declare([ OnDemandGrid, ColumnSet, Keyboard, Selection ])({
         columnSets: [
             [ // first columnSet
                 [

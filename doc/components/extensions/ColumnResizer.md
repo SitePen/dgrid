@@ -8,7 +8,7 @@ require([
     'dgrid/OnDemandGrid',
     'dgrid/extensions/ColumnResizer'
 ], function (declare, OnDemandGrid, ColumnResizer) {
-    var grid = new (declare([OnDemandGrid, ColumnResizer]))({
+    var grid = new (declare([ OnDemandGrid, ColumnResizer ]))({
         columns: {
             col1: {
                 label: 'Column1',
