@@ -6,6 +6,10 @@ define([
 	return function createHierarchicalStore(kwArgs, async) {
 		var store = async ? createAsyncStore(kwArgs, Tree) : createSyncStore(kwArgs, Tree);
 
-		return store.filter('mayHaveChildren');
+		// Override getRootCollection to check for undefined parent rather than null
+		store.getRootCollection = function () {
+			return this.root.filter({ parent: undefined });
+		};
+		return store.getRootCollection();
 	};
 });
