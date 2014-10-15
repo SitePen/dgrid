@@ -29,7 +29,6 @@ default functionality.
     * [DijitRegistry](components/extensions/DijitRegistry.md)
     * [DnD](components/extensions/DnD.md)
 * Utilities
-    * [mouse](components/utilities/mouse.md)
     * [touch](components/utilities/touch.md)
     * [misc](components/utilities/misc.md)
 
