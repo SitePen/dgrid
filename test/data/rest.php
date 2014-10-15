@@ -18,7 +18,7 @@ foreach($_GET as $param => $value){
 }
 if($limit){
 	preg_match('/(\d+),*(\d+)*/', $limit, $matches);
-    if($matches[2]){
+    if(count($matches) > 2){
         $start = $matches[2];
         $end = $matches[1] + $start;
     }else{

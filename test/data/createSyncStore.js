@@ -5,13 +5,14 @@ define([
 	'dstore/Trackable'
 ], function (declare, lang, Memory, Trackable) {
 	var TrackableMemory = declare([ Memory, Trackable ]);
-	return function createSyncStore(kwArgs) {
+	return function createSyncStore(kwArgs, Mixin) {
 		kwArgs = kwArgs || {};
 
 		if (kwArgs.data) {
 			kwArgs = lang.mixin({}, kwArgs, { data: lang.clone(kwArgs.data) });
 		}
 
-		return new TrackableMemory(kwArgs);
+		var Ctor = Mixin ? declare([TrackableMemory, Mixin]) : TrackableMemory;
+		return new Ctor(kwArgs);
 	};
 });

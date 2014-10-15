@@ -35,21 +35,18 @@
 			
 			require([skinDep, "dgrid/Grid", "dgrid/extensions/Pagination", "dgrid/Selection", "dgrid/Tree",
 					"dojo/_base/lang", "dojo/_base/declare", "dojo/dom-construct", "dojo/dom-form", 
-					"dstore/Rest", "dstore/Cache", "dstore/Trackable", "dojo/domReady!"],
+					"dstore/Rest", "dstore/Cache", "dstore/Trackable", "dstore/Tree", "dojo/domReady!"],
 				function(skinResource, Grid, Pagination, Selection, Tree,
 						lang, declare, domConstruct, domForm, 
-						Rest, Cache, Trackable){
+						Rest, Cache, Trackable, TreeStore){
 					
 					var CustomGrid = declare([Grid, Selection, Pagination, Tree]);
 					var testStore;
 
 					function createStore(config){
-						testStore = new declare([ Rest, Cache, Trackable ])(lang.mixin({
+						testStore = new declare([ Rest, Cache, Trackable, TreeStore ])(lang.mixin({
 							target:"../data/rest.php"
 						}, config));
-						testStore.getChildren = function(parent){
-							return testStore.filter({parent: parent.id});
-						};
 					}
 					createStore();
 

@@ -33,14 +33,14 @@ define([
 			var parentId = '' + i;
 			data.push({
 				id: parentId,
-				value: 'Root ' + i,
-				hasChildren: true
+				value: 'Root ' + i
 			});
 			for (k = 0; k < 100; k++) {
 				data.push({
 					id: i + ':' + k,
 					parent: parentId,
-					value: 'Child ' + k
+					value: 'Child ' + k,
+					hasChildren: false
 				});
 			}
 		}

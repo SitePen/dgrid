@@ -1,20 +1,11 @@
 define([
-	'dojo/_base/lang',
+	'dstore/Tree',
 	'./createSyncStore',
 	'./createAsyncStore'
-], function (lang, createSyncStore, createAsyncStore) {
+], function (Tree, createSyncStore, createAsyncStore) {
 	return function createHierarchicalStore(kwArgs, async) {
-		kwArgs = lang.mixin({
-			getChildren: function (parent) {
-				return this.root.filter({ parent: parent.id });
-			},
-			mayHaveChildren: function (object) {
-				return object.hasChildren;
-			}
-		}, kwArgs);
+		var store = async ? createAsyncStore(kwArgs, Tree) : createSyncStore(kwArgs, Tree);
 
-		var store = async ? createAsyncStore(kwArgs) : createSyncStore(kwArgs);
-		store.root = store;
-		return store.filter({ parent: undefined });
+		return store.filter('mayHaveChildren');
 	};
 });
