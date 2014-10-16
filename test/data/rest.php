@@ -1,17 +1,17 @@
 <?php
-header("Content-Type: application/json");
+header('Content-Type: application/json');
 $total = 500;
-$id_prefix = "";
-if(isset($_GET["parent"])){
-	$id_prefix = ($_GET["parent"] + 1) * 1000;
+$id_prefix = '';
+if(isset($_GET['parent']) && is_numeric($_GET['parent'])){
+	$id_prefix = ($_GET['parent'] + 1) * 1000;
 }
 usleep(rand(0,500000));
 $start = 0;
 $end = 0;
-$limit = "";
-$debug = "";
+$limit = '';
+$debug = '';
 foreach($_GET as $param => $value){
-    if(strpos($param, "limit") === 0){
+    if(strpos($param, 'limit') === 0){
         $limit = $param;
         break;
     }
@@ -25,11 +25,11 @@ if($limit){
         $end = $matches[1];
     }
 }else{
-	$range = "";
-	if(isset($_SERVER["HTTP_RANGE"])){
-		$range = $_SERVER["HTTP_RANGE"];
-	}elseif(isset($_SERVER["HTTP_X_RANGE"])){
-		$range = $_SERVER["HTTP_X_RANGE"];
+	$range = '';
+	if(isset($_SERVER['HTTP_RANGE'])){
+		$range = $_SERVER['HTTP_RANGE'];
+	}elseif(isset($_SERVER['HTTP_X_RANGE'])){
+		$range = $_SERVER['HTTP_X_RANGE'];
 	}
 	if($range){
 		preg_match('/(\d+)-(\d+)/', $range, $matches);

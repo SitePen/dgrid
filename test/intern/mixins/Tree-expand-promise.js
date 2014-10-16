@@ -11,26 +11,20 @@ define([
 	'dojo/Deferred',
 	'dojo/on',
 	'dstore/Memory',
+	'dstore/Tree',
 	'dstore/QueryResults',
 	'dojo/query'
 ], function (test, assert, Grid, OnDemandGrid, _StoreMixin, Tree, declare, lang, arrayUtil, Deferred, on,
-		Memory, QueryResults, query) {
+		Memory, TreeStore, QueryResults, query) {
 
 	test.suite('tree (expand + promise)', function () {
 		var grid,
-			TreeStore = declare(Memory, {
-				constructor: function () {
-					this.root = this;
-				},
-
-				getChildren: function (parent) {
-					return this.root.filter({ parent: parent.id });
-				},
+			SyncTreeStore = declare([ Memory, TreeStore ], {
 				mayHaveChildren: function () {
 					return true;
 				}
 			}),
-			AsyncTreeStore = declare(TreeStore, {
+			AsyncTreeStore = declare(SyncTreeStore, {
 				// TreeStore with an asynchronous fetch method.
 				fetch: function () {
 					return asyncFetch.call(this);
@@ -48,7 +42,7 @@ define([
 				}
 			}),
 			StoreMixinGrid = declare([Grid, _StoreMixin, Tree]),
-			syncStore = new TreeStore({ data: createData() }),
+			syncStore = new SyncTreeStore({ data: createData() }),
 			asyncStore = new AsyncTreeStore({ data: createData() });
 
 		function asyncFetch(kwArgs) {
@@ -65,17 +59,17 @@ define([
 
 		function createData() {
 			return [
-				{ id: 1, node: 'Node 1', value: 'Value 1'},
-				{ id: 2, node: 'Node 2', value: 'Value 2', parent: 1},
-				{ id: 3, node: 'Node 3', value: 'Value 3', parent: 2},
-				{ id: 4, node: 'Node 4', value: 'Value 4', parent: 2},
-				{ id: 5, node: 'Node 5', value: 'Value 5'}
+				{ id: 1, node: 'Node 1', value: 'Value 1', parent: null },
+				{ id: 2, node: 'Node 2', value: 'Value 2', parent: 1 },
+				{ id: 3, node: 'Node 3', value: 'Value 3', parent: 2 },
+				{ id: 4, node: 'Node 4', value: 'Value 4', parent: 2 },
+				{ id: 5, node: 'Node 5', value: 'Value 5', parent: null }
 			];
 		}
 
 		function createGrid(store) {
-			grid = new (declare([OnDemandGrid, Tree]))({
-				collection: store.filter({ parent: undefined }),
+			grid = new (declare([ OnDemandGrid, Tree ]))({
+				collection: store.getRootCollection(),
 				columns: [
 					{renderExpando: true, field: 'node', label: 'Node'},
 					{field: 'value', label: 'Value'}
@@ -87,7 +81,7 @@ define([
 
 		function createNoRenderQueryGrid(store) {
 			grid = new StoreMixinGrid({
-				collection: store.filter({ parent: undefined }),
+				collection: store.getRootCollection(),
 				columns: [
 					{renderExpando: true, field: 'node', label: 'Node'},
 					{field: 'value', label: 'Value'}
