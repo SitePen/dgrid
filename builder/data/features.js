@@ -54,7 +54,7 @@ define([
 			id: 3,
 			parentId: 0,
 			mid: 'dgrid/Selection',
-			label: 'Row Selection',
+			label: 'Selection',
 			configLevel: 'grid',
 			configModule: 'configForms/Selection',
 			documentationUrl: config.docBaseUrl + 'components/mixins/Selection.md',
@@ -64,7 +64,7 @@ define([
 			id: 4,
 			parentId: 0,
 			mid: 'dgrid/CellSelection',
-			label: 'Cell selection',
+			label: 'CellSelection',
 			configLevel: 'grid',
 			configModule: 'configForms/CellSelection',
 			documentationUrl: config.docBaseUrl + 'components/mixins/CellSelection.md',
@@ -94,7 +94,7 @@ define([
 			id: 7,
 			parentId: 0,
 			mid: 'dgrid/extensions/DijitRegistry',
-			label: 'Dijit registry',
+			label: 'DijitRegistry',
 			documentationUrl: config.docBaseUrl + 'components/extensions/DijitRegistry.md',
 			info: i18n.infoDijitRegistry
 		},
@@ -102,7 +102,7 @@ define([
 			id: 8,
 			parentId: 0,
 			mid: 'dgrid/extensions/DnD',
-			label: 'Row drag and drop',
+			label: 'DnD',
 			configLevel: 'grid',
 			documentationUrl: config.docBaseUrl + 'components/extensions/DnD.md',
 			info: i18n.infoDnD
@@ -123,7 +123,7 @@ define([
 			id: 10,
 			parentId: 1,
 			mid: 'dgrid/extensions/ColumnHider',
-			label: 'Column hider',
+			label: 'ColumnHider',
 			documentationUrl: config.docBaseUrl + 'components/extensions/ColumnHider.md',
 			info: i18n.infoColumnHider
 		},
@@ -131,7 +131,7 @@ define([
 			id: 11,
 			parentId: 1,
 			mid: 'dgrid/extensions/ColumnReorder',
-			label: 'Column reorder',
+			label: 'ColumnReorder',
 			documentationUrl: config.docBaseUrl + 'components/extensions/ColumnReorder.md',
 			info: i18n.infoColumnReorder
 		},
@@ -139,7 +139,7 @@ define([
 			id: 12,
 			parentId: 1,
 			mid: 'dgrid/extensions/ColumnResizer',
-			label: 'Column resize',
+			label: 'ColumnResizer',
 			configLevel: 'grid',
 			configModule: 'configForms/ColumnResizer',
 			documentationUrl: config.docBaseUrl + 'components/extensions/ColumnResizer.md',
@@ -151,7 +151,7 @@ define([
 			id: 13,
 			parentId: 1,
 			mid: 'dgrid/extensions/CompoundColumns',
-			label: 'Compound column headers',
+			label: 'CompoundColumns',
 			documentationUrl: config.docBaseUrl + 'components/extensions/CompoundColumns.md',
 			info: 'TODO: i18n; Define column headers that span multiple grid columns'
 		},
@@ -159,7 +159,7 @@ define([
 			id: 14,
 			parentId: 1,
 			mid: 'dgrid/ColumnSet',
-			label: 'Fixed column sets',
+			label: 'ColumnSet',
 			documentationUrl: config.docBaseUrl + 'components/mixins/ColumnSet.md',
 			info: 'TODO: i18n; Define column sets that scroll independently'
 		},
@@ -168,7 +168,7 @@ define([
 			id: 15,
 			parentId: 1,
 			mid: 'dgrid/Selector',
-			label: 'Row selection column',
+			label: 'Selector',
 			documentationUrl: config.docBaseUrl + 'components/mixins/Selector.md',
 			info: i18n.infoSelector
 		}

@@ -1,11 +1,12 @@
 define({
 	root: {
-		true: 'true',
-		false: 'false',
+		// Common
 		clear: 'clear',
-		dgridBuilder: 'dgrid builder',
+		moduleDocumentation: '${0} documentation',
+		moduleConfiguration: '${0} configuration',
 
 		// Builder
+		dgridBuilder: 'dgrid builder',
 		about: 'About',
 		appDescription: 'This application allows you to experiment with many of dgrid\'s features.',
 		appInstructions1: 'Choose and configure mixins and extensions in the Features grid on the left',
@@ -34,7 +35,7 @@ define({
 		infoCellSelection: 'Cell selection',
 		infoTree: 'Render hierarchical data under collapsible nodes',
 		infoPagination: 'Paged data views',
-		infoDijitRegistry: 'Add dgrid to Dijit\'s registry',
+		infoDijitRegistry: 'Add dgrid instances to Dijit\'s registry',
 		infoDnD: 'Re-order rows with drag and drop',
 		infoEditor: 'Edit values in grid cells',
 		infoColumnHider: 'UI to show or hide individual columns',
@@ -49,17 +50,17 @@ define({
 		// Tree
 		parentNodeColumn: 'Parent node column',
 
-		// ColumnGrid
-		fieldName: 'Field name',
-		fieldNameLabel: 'Field Name',
-		fieldLabel: 'Field label',
+		// ColumnGrid and ColumnConfigForm
+		fieldNamePlaceholder: 'Field name',
+		fieldName: 'Field Name',
+		fieldLabelPlaceholder: 'Field label',
 		label: 'Label',
 		addColumn: 'Add column',
 		dragToMove: 'Drag to move',
 		edit: 'Edit',
-		delete: 'Delete',
+		'delete': 'Delete',
 		generalColumnProperties: 'General column properties',
 		mixinColumnProperties: 'Mixin column properties',
-		properties: 'properties'
+		moduleProperties: '${0} properties'
 	}
 });

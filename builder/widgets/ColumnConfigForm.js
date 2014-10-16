@@ -5,6 +5,7 @@ define([
 	'dojo/dom-class',
 	'dojo/on',
 	'dojo/query',
+	'dojo/string',
 	'dojo/topic',
 	'dijit/registry',
 	'dijit/_WidgetBase',
@@ -21,7 +22,7 @@ define([
 	'dijit/form/NumberTextBox',
 	'dijit/form/RadioButton',
 	'dijit/form/TextBox'
-], function (arrayUtil, declare, lang, domClass, on, query, topic, registry, _WidgetBase, _TemplatedMixin,
+], function (arrayUtil, declare, lang, domClass, on, query, string, topic, registry, _WidgetBase, _TemplatedMixin,
 	_WidgetsInTemplateMixin, _FormMixin, _ResizeMixin, config, i18n, template) {
 
 	var defaultColumnValues = {
@@ -67,13 +68,22 @@ define([
 				this.containerNode = this.domNode;
 			}
 
-			this._featureMidToNodeMap = {
-				'dgrid/Editor': this.EditorFields,
-				'dgrid/extensions/ColumnHider': this.ColumnHiderFields,
-				'dgrid/extensions/ColumnReorder': this.ColumnReorderFields,
-				'dgrid/extensions/ColumnResizer': this.ColumnResizerFields,
-				'dgrid/Selector': this.SelectorFields
+			var map = this._featureMidToNodeMap = {
+				'dgrid/Editor': this.editorFields,
+				'dgrid/extensions/ColumnHider': this.columnHiderFields,
+				'dgrid/extensions/ColumnReorder': this.columnReorderFields,
+				'dgrid/extensions/ColumnResizer': this.columnResizerFields,
+				'dgrid/Selector': this.selectorFields
 			};
+
+			for (var k in map) {
+				// Add legend labels programmatically
+				var moduleName = k.slice(k.lastIndexOf('/') + 1);
+				map[k].getElementsByTagName('legend')[0].innerHTML =
+					string.substitute(this.i18n.moduleProperties, [ moduleName ]);
+			}
+
+			this.docLink.innerHTML = string.substitute(this.i18n.moduleDocumentation, [ 'Grid' ]);
 		},
 
 		postCreate: function () {

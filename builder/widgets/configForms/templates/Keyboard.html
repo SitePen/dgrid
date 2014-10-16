@@ -1,15 +1,15 @@
 <form class="${baseClass}">
 	<fieldset>
-		<legend>${moduleName} configuration</legend>
+		<legend data-dojo-attach-point="legendNode"></legend>
 
 		<div class="label">
 			<code>cellNavigation</code>
 		</div>
 		<div class="field">
 			<input data-dojo-type="dijit/form/RadioButton" name="cellNavigation" value="true" id="${id}_navTrue" type="radio">
-			<label for="${id}_navTrue">${i18n.true}</label>
+			<label for="${id}_navTrue">true</label>
 			<input data-dojo-type="dijit/form/RadioButton" name="cellNavigation" value="false" id="${id}_navFalse" type="radio">
-			<label for="${id}_navFalse">${i18n.false}</label>
+			<label for="${id}_navFalse">false</label>
 		</div>
 
 		<div class="label">

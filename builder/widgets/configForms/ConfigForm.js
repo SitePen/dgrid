@@ -19,8 +19,6 @@ define([
 	return declare([ _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, _FormMixin, _ResizeMixin ], {
 		i18n: i18n,
 		baseClass: 'configForm',
-		documentationUrlTemplate: '<a href="${documentationUrl}" target="_blank">' +
-			'${moduleName} ${i18n.documentation}</a>',
 
 		// This should be over-ridden by sub-classes and define an object with properties that specify default
 		// configuration values for the module
@@ -54,8 +52,18 @@ define([
 
 			domConstruct.place(buttonBar, this.domNode, 'first');
 
-			if (this.documentationUrl && this.moduleName) {
-				domConstruct.place(string.substitute(this.documentationUrlTemplate, this), this.domNode);
+			if (this.moduleName) {
+				// Populate "x configuration" and "x documentation" strings
+				if (this.legendNode) {
+					this.legendNode.innerHTML =
+						string.substitute(this.i18n.moduleConfiguration, [ this.moduleName ]);
+				}
+
+				if (this.documentationUrl) {
+					var documentationUrlTemplate = '<a href="' + this.documentationUrl + '" target="_blank">' +
+						string.substitute(this.i18n.moduleDocumentation, [ this.moduleName ]) + '</a>';
+					domConstruct.place(documentationUrlTemplate, this.domNode);
+				}
 			}
 		},
 

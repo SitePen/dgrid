@@ -1,6 +1,6 @@
 <form class="${baseClass}">
 	<fieldset>
-		<legend>${moduleName} configuration</legend>
+		<legend data-dojo-attach-point="legendNode"></legend>
 
 		<div class="label">
 			<code>selectionMode</code>
@@ -20,9 +20,9 @@
 		</div>
 		<div class="field">
 			<input data-dojo-type="dijit/form/RadioButton" name="allowTextSelection" value="true" id="${id}_textTrue" type="radio">
-			<label for="${id}_textTrue">${i18n.true}</label>
+			<label for="${id}_textTrue">true</label>
 			<input data-dojo-type="dijit/form/RadioButton" name="allowTextSelection" value="false" id="${id}_textFalse" type="radio">
-			<label for="${id}_textFalse">${i18n.false}</label>
+			<label for="${id}_textFalse">false</label>
 			<span class="actionLink" data-dojo-attach-event="click: _clearField" data-field-name="allowTextSelection">${i18n.clear}</span>
 		</div>
 
@@ -31,9 +31,9 @@
 		</div>
 		<div class="field">
 			<input data-dojo-type="dijit/form/RadioButton" name="deselectOnRefresh" value="true" id="${id}_deselectTrue" type="radio">
-			<label for="${id}_deselectTrue">${i18n.true}</label>
+			<label for="${id}_deselectTrue">true</label>
 			<input data-dojo-type="dijit/form/RadioButton" name="deselectOnRefresh" value="false" id="${id}_deselectFalse" type="radio">
-			<label for="${id}_deselectFalse">${i18n.false}</label>
+			<label for="${id}_deselectFalse">false</label>
 		</div>
 
 		<div class="label">
@@ -41,9 +41,9 @@
 		</div>
 		<div class="field">
 			<input data-dojo-type="dijit/form/RadioButton" name="allowSelectAll" value="true" id="${id}_allowAllTrue" type="radio">
-			<label for="${id}_allowAllTrue">${i18n.true}</label>
+			<label for="${id}_allowAllTrue">true</label>
 			<input data-dojo-type="dijit/form/RadioButton" name="allowSelectAll" value="false" id="${id}_allowAllFalse" type="radio">
-			<label for="${id}_allowAllFalse">${i18n.false}</label>
+			<label for="${id}_allowAllFalse">false</label>
 		</div>
 	</fieldset>
 </form>

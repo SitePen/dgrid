@@ -1,14 +1,14 @@
 <form class="${baseClass}">
 	<fieldset>
-		<legend>${moduleName} configuration</legend>
+		<legend data-dojo-attach-point="legendNode"></legend>
 			<div class="label">
 				<code>adjustLastColumn</code>
 			</div>
 			<div class="field">
 				<input data-dojo-type="dijit/form/RadioButton" name="adjustLastColumn" value="true" id="${id}_adjustLastColumnTrue" type="radio">
-				<label for="${id}_adjustLastColumnTrue">${i18n.true}</label>
+				<label for="${id}_adjustLastColumnTrue">true</label>
 				<input data-dojo-type="dijit/form/RadioButton" name="adjustLastColumn" value="false" id="${id}_adjustLastColumnFalse" type="radio">
-				<label for="${id}_adjustLastColumnFalse">${i18n.false}</label>
+				<label for="${id}_adjustLastColumnFalse">false</label>
 			</div>
 
 			<div class="label">

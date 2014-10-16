@@ -48,7 +48,7 @@ define([
 					},
 					fieldName: {
 						field: 'field',
-						label: i18n.fieldNameLabel,
+						label: i18n.fieldName,
 						editor: 'text',
 						autoSave: true,
 						sortable: false
@@ -64,7 +64,7 @@ define([
 						label: '',
 						formatter: function () {
 							return '<i class="icon-gear" title="' + i18n.edit + '"></i> ' +
-								'<i class="icon-times" title="' + i18n.delete + '"></i>';
+								'<i class="icon-times" title="' + i18n['delete'] + '"></i>';
 						},
 						sortable: false
 					}

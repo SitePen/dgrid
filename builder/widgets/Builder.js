@@ -33,7 +33,6 @@ define([
 		templateString: template,
 		i18n: i18n,
 		docBaseUrl: config.docBaseUrl,
-		appTitle: i18n.dgridBuilder,
 
 		aboutVisible: true,
 		aboutKey: '', // Passed from index.html if localStorage is supported

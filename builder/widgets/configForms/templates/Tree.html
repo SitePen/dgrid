@@ -1,6 +1,6 @@
 <form class="${baseClass}">
 	<fieldset>
-		<legend>${moduleName} configuration</legend>
+		<legend data-dojo-attach-point="legendNode"></legend>
 
 		<div class="label">
 			${i18n.parentNodeColumn}
@@ -24,9 +24,9 @@
 		</div>
 		<div class="field">
 			<input data-dojo-type="dijit/form/RadioButton" name="collapseOnRefresh" value="true" id="${id}_collapseTrue" type="radio">
-			<label for="${id}_collapseTrue">${i18n.true}</label>
+			<label for="${id}_collapseTrue">true</label>
 			<input data-dojo-type="dijit/form/RadioButton" name="collapseOnRefresh" value="false" id="${id}_collapseFalse" type="radio">
-			<label for="${id}_collapseFalse">${i18n.false}</label>
+			<label for="${id}_collapseFalse">false</label>
 		</div>
 
 		<div class="label">
@@ -34,9 +34,9 @@
 		</div>
 		<div class="field">
 			<input data-dojo-type="dijit/form/RadioButton" name="enableTreeTransitions" value="true" id="${id}_transitionsTrue" type="radio">
-			<label for="${id}_transitionsTrue">${i18n.true}</label>
+			<label for="${id}_transitionsTrue">true</label>
 			<input data-dojo-type="dijit/form/RadioButton" name="enableTreeTransitions" value="false" id="${id}_transitionsFalse" type="radio">
-			<label for="${id}_transitionsFalse">${i18n.false}</label>
+			<label for="${id}_transitionsFalse">false</label>
 		</div>
 	</fieldset>
 </form>
