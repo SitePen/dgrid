@@ -71,6 +71,7 @@ define([
 				// update the expando display
 				put(target, '.ui-icon-triangle-1-' + (expanded ? 'se' : 'e') +
 					'!ui-icon-triangle-1-' + (expanded ? 'e' : 'se'));
+				put(row.element, (expanded ? '.' : '!') + 'dgrid-row-expanded');
 
 				var rowElement = row.element,
 					container = rowElement.connected,
