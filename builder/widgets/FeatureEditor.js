@@ -61,6 +61,8 @@ define([
 						configPane.on('close', function () {
 							self.selectChild(self.featureGrid);
 						});
+						
+						console.log('adding ', configPane.moduleName);
 
 						this.addChild(configPane);
 						this.configPanes[feature.mid] = configPane;
@@ -92,6 +94,7 @@ define([
 
 		_showModuleConfig: function (event) {
 			var configPane = this.configPanes[event.mid];
+			console.log('selecting ', configPane.moduleName);
 
 			if (configPane) {
 				this.selectChild(configPane);

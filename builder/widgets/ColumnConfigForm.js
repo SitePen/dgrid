@@ -82,8 +82,6 @@ define([
 				map[k].getElementsByTagName('legend')[0].innerHTML =
 					string.substitute(this.i18n.moduleProperties, [ moduleName ]);
 			}
-
-			this.docLink.innerHTML = string.substitute(this.i18n.moduleDocumentation, [ 'Grid' ]);
 		},
 
 		postCreate: function () {

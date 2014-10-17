@@ -1,11 +1,12 @@
 define([
 	'dojo/_base/declare',
 	'dojo/_base/lang',
-	'dijit/layout/StackContainer',
+	'dojo/dom-class',
+	'dijit/_WidgetBase',
 	'./ColumnConfigForm',
 	'./ColumnGrid'
-], function (declare, lang, StackContainer, ColumnConfigForm, ColumnGrid) {
-	return declare(StackContainer, {
+], function (declare, lang, domClass, _WidgetBase, ColumnConfigForm, ColumnGrid) {
+	return declare(_WidgetBase, {
 		baseClass: 'columnEditor',
 
 		buildRendering: function () {
@@ -15,8 +16,8 @@ define([
 			this.columnGrid = new ColumnGrid();
 			this.form = new ColumnConfigForm();
 
-			this.addChild(this.columnGrid);
-			this.addChild(this.form);
+			this.domNode.appendChild(this.columnGrid.domNode);
+			this.domNode.appendChild(this.form.domNode);
 		},
 
 		postCreate: function () {
@@ -26,17 +27,22 @@ define([
 			this.columnGrid.on('editcolumn', lang.hitch(this, '_onEditColumn'));
 		},
 
+		startup: function () {
+			this.columnGrid.startup();
+			this.form.startup();
+		},
+
 		_getColumnsAttr: function () {
 			return this.columnGrid.get('columns');
 		},
 
 		_showGrid: function () {
-			this.selectChild(this.columnGrid);
+			domClass.remove(this.domNode, 'slid');
 		},
 
 		_onEditColumn: function (event) {
+			domClass.add(this.domNode, 'slid');
 			this.form.set('value', event.data);
-			this.selectChild(this.form);
 		}
 	});
 });

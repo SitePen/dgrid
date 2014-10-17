@@ -1,46 +1,36 @@
 <div>
 	<!-- Top pane -->
-	<div data-dojo-type="dijit/layout/ContentPane"
-		 data-dojo-props="region: 'top'" class="topPane">
-		<div class="heading">
-			<span class="aboutToggle" data-dojo-attach-point="aboutToggleNode"
-					data-dojo-attach-event="click:_toggleAbout">
-				${i18n.about}
-				<i class="icon-angle-down" data-dojo-attach-point="aboutIconNode"></i>
-			</span>
-			${i18n.dgridBuilder}
+	<div class="header">
+		<div class="controlHeader">
+			<a class="logoLink" href="<?php echo $path; ?>"><img class="logo" src="resources/img/dgridLogo.png" alt="dgrid logo"></a>
+			laboratory
 		</div>
-		<div data-dojo-attach-point="aboutNode" class="dijitHidden">
-			<p>${i18n.appDescription}</p>
-			<ol>
-				<li>${i18n.appInstructions1}</li>
-				<li>${i18n.appInstructions2}</li>
-				<li>${i18n.appInstructions3}</li>
-			</ol>
-			<p data-dojo-attach-point="appInformationNode"></p>
-		</div>
+		<a href="#" class="menuLink">About</a>
+		<a href="#" class="menuLink">Docs</a>
+		<a href="http://sitepen.com/" class="splogo"><img src="resources/img/sitepenLogo.png" alt="SitePen logo"></a>
 	</div>
 
-	<!-- Left pane with feature grid -->
-	<div data-dojo-attach-point="featureEditorNode"></div>
-
-	<!-- Center pane with column configuration -->
-	<div data-dojo-attach-point="columnEditorNode"></div>
-
-	<!-- Right pane with demo grid and source code output -->
-	<div data-dojo-type="dijit/layout/TabContainer"
-		 data-dojo-attach-point="previewTabs"
-		 data-dojo-props="region: 'center'">
-
-		<div data-dojo-type="dijit/layout/ContentPane" class="demoGridPane"
-			 data-dojo-attach-point="demoGridPane"
-			 data-dojo-props="title: '${i18n.demoGrid}'">
+	<div class="control">
+		<div class="tabs">
+			<div class="tab active" data-target="columns" data-dojo-attach-event="click:selectTab">Columns</div>
+			<div class="tab" data-target="gridFeatures" data-dojo-attach-event="click:selectTab">Grid Features</div>
+			<div class="tab" data-target="columnFeatures" data-dojo-attach-event="click:selectTab">Column Features</div>
 		</div>
 
-		<div data-dojo-type="dijit/layout/ContentPane" class="demoCodePane"
-			 data-dojo-attach-point="demoCodePane"
-			 data-dojo-props="title: '${i18n.sourceCode}'">
+		<div data-dojo-attach-point="columnEditorNode" data-tab="columns" class="showing"></div>
+		<div data-dojo-attach-point="featureEditorNode" data-tab="gridFeatures"></div>
+	</div>
 
+	<div data-dojo-attach-point="previewTabs" data-selected-page="grid" class="render">
+		<div class="tabControl">
+			<span data-dojo-attach-event="click:_selectGrid" class="gridBtn">Demo</span>
+			<span data-dojo-attach-event="click:_selectCode" class="codeBtn">Code</span>
+		</div>
+		<div class="demoGridPane" data-dojo-attach-point="demoGridPane">
+			Use the controls to generate a dgrid instance.
+		</div>
+
+		<div class="demoCodePane" data-dojo-attach-point="demoCodePane">
 			<textarea data-dojo-attach-point="gridCodeTextArea" class="demoCode" readonly></textarea>
 		</div>
 	</div>

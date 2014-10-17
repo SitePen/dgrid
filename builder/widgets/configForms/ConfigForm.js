@@ -44,8 +44,7 @@ define([
 
 			this.doneButton = new Button({
 				label: i18n.done,
-				className: 'doneButton',
-				iconClass: 'icon-mail-reply'
+				className: 'doneButton'
 			}).placeAt(buttonBar);
 
 			this._startupWidgets.push(this.doneButton);

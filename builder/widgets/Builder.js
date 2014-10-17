@@ -4,11 +4,14 @@ define([
 	'dojo/_base/declare',
 	'dojo/_base/lang',
 	'dojo/dom-class',
+	'dojo/dom-attr',
+	'dojo/query',
 	'dojo/string',
+	'dojo/on',
 	'dojo/topic',
+	'dijit/_WidgetBase',
 	'dijit/_TemplatedMixin',
 	'dijit/_WidgetsInTemplateMixin',
-	'dijit/layout/BorderContainer',
 	'dstore/Memory',
 	'dstore/Trackable',
 	'dstore/Tree',
@@ -23,16 +26,16 @@ define([
 	// Widgets in template
 	'dijit/layout/ContentPane',
 	'dijit/layout/TabContainer'
-], function (require, arrayUtil, declare, lang, domClass, string, topic, _TemplatedMixin, _WidgetsInTemplateMixin,
-	BorderContainer, Memory, Trackable, TreeStoreMixin, ColumnEditor, FeatureEditor, toJavaScript, config, i18n,
+], function (require, arrayUtil, declare, lang, domClass, domAttr, query, string, on, topic, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, Memory, Trackable, TreeStoreMixin, ColumnEditor, FeatureEditor, toJavaScript, config, i18n,
 	template, codeTemplate) {
 
 	var NUM_ITEMS = 50;
 
-	return declare([ BorderContainer, _TemplatedMixin, _WidgetsInTemplateMixin ], {
+	return declare([ _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin ], {
 		templateString: template,
 		i18n: i18n,
 		docBaseUrl: config.docBaseUrl,
+		baseClass: 'builder',
 
 		aboutVisible: true,
 		aboutKey: '', // Passed from index.html if localStorage is supported
@@ -40,52 +43,62 @@ define([
 		buildRendering: function () {
 			this.inherited(arguments);
 
-			this.featureEditor = new FeatureEditor({
-				region: 'left',
-				splitter: true,
-				minSize: 380
-			}, this.featureEditorNode);
-
-			this.columnEditor = new ColumnEditor({
-				region: 'left',
-				splitter: true,
-				minSize: 420
-			}, this.columnEditorNode);
-
-			this.appInformationNode.innerHTML = string.substitute(i18n.appInformation, config);
+			this.featureEditor = new FeatureEditor({}, this.featureEditorNode);
+			this.columnEditor = new ColumnEditor({}, this.columnEditorNode);
 		},
 
 		postCreate: function () {
 			this.inherited(arguments);
 
 			this.own(
-				topic.subscribe('/configuration/changed', lang.hitch(this, '_updateDemo')),
-				this.previewTabs.watch('selectedChildWidget', lang.hitch(this, '_updateDemo'))
+				topic.subscribe('/configuration/changed', lang.hitch(this, '_updateDemo'))
+				// this.previewTabs.watch('selectedChildWidget', lang.hitch(this, '_updateDemo'))
 			);
+
+			this._selectedChildWidget = this.demoGridPane;
 		},
 
-		_toggleAbout: function () {
-			this.set('aboutVisible', !this.get('aboutVisible'));
+		startup: function () {
+			this.inherited(arguments);
+
+			this.featureEditor.startup();
+			this.columnEditor.startup();
 		},
 
-		_setAboutVisibleAttr: function (visible) {
-			domClass.toggle(this.aboutNode, 'dijitHidden', !visible);
-			domClass.replace(this.aboutIconNode,
-				visible ? 'icon-angle-up' : 'icon-angle-down',
-				visible ? 'icon-angle-down' : 'icon-angle-up');
-			this.resize();
+		selectTab: function (evt) {
+			var target = domAttr.get(evt.target, 'data-target');
+			query('.active', this.domNode).removeClass('active');
+			query('[data-target="' + target + '"]', this.domNode).addClass('active');
+			query('.showing', this.domNode).removeClass('showing');
+			query('[data-tab="' + target + '"', this.domNode).addClass('showing');
+		},
 
-			if (this.aboutKey) {
-				localStorage[this.aboutKey] = '' + visible;
-			}
+		// _toggleAbout: function () {
+		// 	this.set('aboutVisible', !this.get('aboutVisible'));
+		// },
 
-			this._set('aboutVisible', visible);
+		// _setAboutVisibleAttr: function (visible) {
+		// 	domClass.toggle(this.aboutNode, 'dijitHidden', !visible);
+		// 	domClass.replace(this.aboutIconNode,
+		// 		visible ? 'icon-angle-up' : 'icon-angle-down',
+		// 		visible ? 'icon-angle-down' : 'icon-angle-up');
+		// 	this.resize();
+
+		// 	if (this.aboutKey) {
+		// 		localStorage[this.aboutKey] = '' + visible;
+		// 	}
+
+		// 	this._set('aboutVisible', visible);
+		// },
+
+		_toggleColumns: function () {
+			domClass.toggle(this.columnEditorNode, 'open');
 		},
 
 		_updateDemo: function () {
 			if (this.demoGrid) {
 				this.demoGrid.destroy();
-				this.demoGridPane.set('content', '');
+				this.demoGridPane.innerHTML = '';
 			}
 
 			this.gridCodeTextArea.value = '';
@@ -96,7 +109,7 @@ define([
 				return;
 			}
 
-			if (this.previewTabs.selectedChildWidget === this.demoGridPane) {
+			if (this._selectedChildWidget === this.demoGridPane) {
 				this._showDemoGrid();
 			}
 			else {
@@ -104,8 +117,22 @@ define([
 			}
 		},
 
+		_selectCode: function () {
+			this._selectedChildWidget = this.demoCodePane;
+			domAttr.set(this.previewTabs, 'data-selected-page', 'code');
+			this._updateDemo();
+		},
+
+		_selectGrid: function () {
+			this._selectedChildWidget = this.demoGridPane;
+			domAttr.set(this.previewTabs, 'data-selected-page', 'grid');
+			this._updateDemo();
+		},
+
 		_showCode: function () {
 			this.gridCodeTextArea.value = this._generateCode();
+			this.gridCodeTextArea.style.height = '';
+			this.gridCodeTextArea.style.height = this.gridCodeTextArea.scrollHeight + 'px';
 		},
 
 		_generateCode: function () {
@@ -261,7 +288,8 @@ define([
 				}
 
 				self.demoGrid = new (declare(Array.prototype.slice.apply(arguments)))(gridOptions);
-				self.demoGridPane.addChild(self.demoGrid);
+				self.demoGridPane.innerHTML = '';
+				self.demoGridPane.appendChild(self.demoGrid.domNode);
 				self.demoGrid.startup();
 
 				if (!hasStore) {

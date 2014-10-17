@@ -46,29 +46,22 @@ define([
 						renderCell: renderDragSourceCell,
 						sortable: false
 					},
-					fieldName: {
-						field: 'field',
-						label: i18n.fieldName,
-						editor: 'text',
-						autoSave: true,
-						sortable: false
-					},
 					label: {
 						field: 'label',
 						label: i18n.label,
-						editor: 'text',
 						autoSave: true,
 						sortable: false
 					},
 					config: {
 						label: '',
 						formatter: function () {
-							return '<i class="icon-gear" title="' + i18n.edit + '"></i> ' +
-								'<i class="icon-times" title="' + i18n['delete'] + '"></i>';
+							return '<i class="icon-times" title="' + i18n['delete'] + '"></i>' +
+								'<i class="icon-gear" title="' + i18n.edit + '"></i> ';
 						},
 						sortable: false
 					}
 				},
+				showHeader: false,
 				dndParams: {
 					withHandles: true
 				}
@@ -107,14 +100,13 @@ define([
 			var columnObject;
 
 			columnObject = {
-				field: value.name,
+				field: value.label.replace(/\s/g, '_'),
 				label: value.label
 			};
 
 			this.store.put(columnObject);
 
 			form.reset();
-			this.fieldNameTextBox.focus();
 		},
 
 		// Removed the clicked column from the store

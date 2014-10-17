@@ -14,15 +14,8 @@ body {
 	background: #F8F8F8;
 }
 
-fieldset {
-	border: 0;
-	margin: 0;
-	padding: 0;
-}
-
 .builder {
 	font-size: 0;
-	height: 100%;
 }
 
 
@@ -82,38 +75,6 @@ fieldset {
 	color: rgb(34, 85, 141);
 }
 
-/*
- * Tabs
- */
-.tabs {
-	font-size: 0;
-	background: #1A374F;
-}
-
-.tab {
-	color: #C3F1FF;
-	font-size: 12px;
-	padding: 15px 10px;
-	display: inline-block;
-	cursor: pointer;
-}
-
-.tab.active {
-	background: #0B1E2A;
-}
-
-[data-tab] {
-	opacity: 0 !important;
-	z-index: 0  !important;
-	position: absolute !important;
-	top: 47px  !important;
-}
-
-[data-tab].showing {
-	opacity: 1 !important;
-	z-index: 1  !important;
-}
-
 
 /*
  * Header
@@ -129,7 +90,6 @@ fieldset {
 	color: white;
 	vertical-align: middle;
 	box-shadow: 0px 4px 10px -2px #0B1E2A;
-	z-index: 3;
 }
 
 .header .controlHeader {
@@ -163,22 +123,45 @@ fieldset {
 	right: 30px;
 }
 
+
 /*
- * Dijit overrides
+ * Responsiveness
  */
+
+@media only screen and (max-width: 480px) {
+	.header { height: 100px; }
+	.header .logo { max-width: 148px; }
+	.header .splogo { display: none; }
+}
+
+
+/*
+ * Editors (column and features)
+ */
+
+.claro .dijitButtonText {
+	padding: 0;
+}
+
+.claro .dijitButton {
+	margin: 0;
+}
+
+.claro .dijitButton .dijitButtonNode {
+	background: #144C66;
+	border: 0;
+	font-size: 16px;
+	color: white;
+	border-radius: 3px;
+	padding: 3px 5px;
+}
 
 .claro .dgrid {
 	background: #0B1E2A;
 }
 
-.claro .dijitButton .dijitButtonNode {
-	border: 1px solid #A8EAFF;
-	background: transparent;
-	color: #A8EAFF;
-	padding: 2px 7px 4px;
-}
-
-.claro .dijitTextBox {
+.claro .dijitTextBox,
+.claro .dgrid-input {
 	border-radius: 5px;
 	border: 0;
 	padding: 2px 1px;
@@ -187,7 +170,8 @@ fieldset {
 	color: #0B1E2A;
 }
 
-.claro .dijitTextBox .dijitInputInner {
+.claro .dijitTextBox .dijitInputInner,
+.claro .dgrid-input {
 	color: #144C66;
 }
 
@@ -211,36 +195,33 @@ fieldset {
 	border-color: transparent;
 }
 
-/*
- * Feature grid and Column grid
- */
-
-.claro .featureGrid .dgrid-row-even:hover,
-.claro .columnGrid .dgrid-row-even:hover {
-	background: #23343F;
-	line-height: 26px;
+.claro .featureGrid,
+.claro .columnGrid {
+	color: #144C66;
 }
 
-.claro .featureGrid .dgrid-row-odd:hover,
-.claro .columnGrid .dgrid-row-odd:hover {
-	background: #0B1E2A;
-	line-height: 26px;
+.claro .featureGrid .dgrid-row:hover,
+.claro .columnGrid .dgrid-row:hover {
+	background: transparent;
+}
+
+.claro .featureGrid .dgrid-row,
+.claro .columnGrid .dgrid-row {
+	position: relative;
 }
 
 .claro .featureGrid .dgrid-cell,
 .claro .columnGrid .dgrid-cell,
 .featureEditor .gridTypeForm {
-	line-height: 26px;
+	line-height: 31px;
 	border: 0;
 	padding: 0;
 }
 
 .claro .columnGrid .dgrid-row {
 	color: white;
-	font-size: 13px;
+	font-size: 12px;
 	font-weight: 100;
-	padding: 3px 14px;
-	border: 0 !important;
 }
 
 .claro .columnGrid .dgrid-row-odd {
@@ -251,11 +232,57 @@ fieldset {
 	background: #23343F;
 }
 
+.featureEditor .featureEditorChildWrapper {
+	padding-left: 20px;
+}
+
+.featureEditor .featureEditorChildWrapper:first-child {
+	padding: 0;
+}
+
+.gridTypeForm {
+	display: none;
+}
+
+.collapseHeader {
+	line-height: 31px;
+	color: #144C66;
+	position: relative;
+	font-weight: bold;
+	cursor: pointer;
+}
+
 .columnEditor {
 	margin: 0;
+	max-height: 0;
 	overflow: hidden;
-	position: relative;
 	transition: max-height .5s ease-in-out, margin .5s ease-in-out;
+}
+
+.columnEditor.open {
+	max-height: 500px;
+	margin-top: 7px;
+}
+
+.claro .featureGrid .dgrid-cell a,
+.claro .columnGrid .dgrid-cell a {
+	text-decoration: none;
+	color: #144C66;
+}
+
+.featureGrid .dgrid-row .dgrid-cell .dgrid-expando-icon {
+	margin-left: 4px !important;
+}
+
+.dgrid-expando-icon.ui-icon {
+	background: url('img/expando.png') no-repeat center center/contain;
+	width: 10px;
+	height: 6px;
+	position: absolute;
+	right: 4px;
+	float: none;
+	top: 50%;
+	transform: translateY(-50%);
 }
 
 .claro .featureGrid .dijitCheckBox,
@@ -282,6 +309,16 @@ fieldset {
 	background-color: #1ABC9C;
 }
 
+.claro .featureGrid .dgrid-row {
+	cursor: pointer !important;
+}
+
+.featureGrid .field-selected {
+	width: 18px;
+	padding: 0;
+	margin: 0;
+}
+
 .featureGrid,
 .columnGrid {
 	height: auto;
@@ -299,13 +336,16 @@ fieldset {
 	height: auto;
 }
 
-.claro .columnGrid .dgrid-column-dragSource {
-	width: 30px;
-	font-size: 16px;
+.featureGrid {
+	font-weight: bold;
 }
 
-.dgrid-column-dragSource i {
-	color: #1284CC;
+.featureGrid .dgrid-tree-container {
+	font-weight: normal;
+}
+
+.claro .columnGrid .dgrid-column-dragSource {
+	width: 20px;
 }
 
 .claro .columnGrid .dgrid-column-config  {
@@ -321,209 +361,9 @@ fieldset {
 	padding-right: 3px;
 }
 
-.columnGrid .icon-gear {
-	color: #9D9D9D;
-	font-size: 16px;
-	margin-left: 7px;
-	vertical-align: middle;
-}
-
-.featureGrid .icon-gear {
-	color: #9D9D9D;
-	font-size: 16px;
-	vertical-align: middle;
-}
-
-.columnGrid .icon-times {
-	color: #44525C;
-	vertical-align: middle;
-}
-
-/*
- * Feature Editor Grid
- */
-.featureEditor {
-	width: 100%;
-}
-
-.featureEditor .configForm {
-	width: 100% !important;
-}
-
-.featureEditor .configForm .dijitButton {
-	top: 10px !important;
-	right: 10px !important;
-	margin: 0 !important;
-	z-index: 1;
-}
-
-.configForm a {
-	color: white;
-}
-
-.featureEditor .gridTypeForm {
-	padding: 10px;
-}
-
-.claro .featureGrid .dgrid-row {
-	background: #0B1E2A;
-	padding: 0 10px;
-}
-
-.claro .featureGrid .dgrid-row a {
-	text-decoration: none;
-	color: white;
-	font-size: 14px;
-}
-
-.featureGrid .dgrid-column-selected {
-	width: 30px;
-}
-
-.featureGrid .dgrid-content > .dgrid-row {
-	display: none;
-}
-
-.featureGrid .dgrid-expando-icon {
-	display: none;
-}
-
-/*
- * Column grid form
- */
-
-.columnGridForm {
-	font-size: 0;
-	position: relative;
-	padding: 5px 0 14px 10px;
-}
-
-.columnGridForm .addBtn {
-	background: transparent;
-	border: 0;
-	color: #FFF;
-	font-size: 18px;
-	outline: 0;
-	width: 40px;
-}
-
-.columnGridForm .dijitTextBox:first-child {
-	display: inline-block;
-	width: calc(100% - 40px);
-}
-
-/*
- * Column configuration form
- */
-
-.columnEditor {
-	height: 100%;
-	width: 200%;
-	transition: transform .2s ease-in-out;
-}
-
-.columnEditor.slid {
-	transform: translateX(-50%);
-}
-
-.configForm {
-	color: white;
-	font-weight: 100;
-	font-size: 14px;
-	position: relative;
-	padding: 10px;
-	display: inline-block;
-	width: 50%;
-	vertical-align: top;
-}
-
-.columnGridContainer {
-	display: inline-block;
-	width: 50%;
-	vertical-align: top;
-}
-
-.configForm .dijitButton {
-	position: absolute;
-	top: 0;
-	right: 0;
-}
-
-.configForm .dijitButton .dijitButtonNode {
-	font-size: 14px;
-}
-
-.configForm fieldset {
-	font-size: 0;
-	position: relative;
-}
-
-.configForm legend {
-	font-size: 14px;
-	margin-bottom: 30px;
-}
-
-.configForm .label {
-	width: 90px;
-	display: inline-block;
-	font-size: 14px;
-	vertical-align: top;
-	height: 35px;
-	text-transform: capitalize;
-}
-
-.configForm .label:after {
-	content: ':';
-	display: inline-block;
-}
-
-.configForm .field {
-	width: calc(100% - 90px);
-	display: inline-block;
-	vertical-align: top;
-	font-size: 12px;
-}
-
-.configForm .field .dijitTextBox {
-	width: 100%;
-	margin-bottom:10px;
-}
-
-.configForm .mixinProp {
-	font-weight: bold;
-	margin-top: 20px;
-}
-
-.gridTypeForm {
-	color: white;
-	font-size: 14px;
-	font-weight: 100;
-	margin-bottom: 10px;
-}
-
 /*
  * Layout
  */
-.control {
-	width: 300px;
-	height: calc(100% - 70px);
-	display: inline-block;
-	vertical-align: top;
-	font-size: 16px;
-	background: #0B1E2A;
-	position: relative;
-}
-
-.render {
-	width: calc(100% - 300px);
-	display: inline-block;
-	vertical-align: top;
-	font-size: 16px;
-	padding: 25px;
-	position: relative;
-	z-index: 2;
-	background: #F8F8F8;
-}
 
 .tabControl {
 	line-height: 31px;
@@ -533,8 +373,7 @@ fieldset {
 }
 
 .render {
-	width: calc(100% - 300px);
-	height: calc(100% - 70px);
+	width: calc(100% - 370px);
 	display: inline-block;
 	vertical-align: top;
 	font-size: 16px;
@@ -580,4 +419,24 @@ fieldset {
 
 .render[data-selected-page="grid"] .demoCodePane {
 	display: none;
+}
+
+
+
+.columnEditor .configForm {
+	padding: 5px 0;
+	display: none;
+}
+
+.featureEditor .configForm {
+	width: 100% !important;
+	height: auto !important;
+}
+
+.columnGridForm .dijitButton,
+.columnGridForm .dijitButton .dijitButtonNode,
+.buttonBar .dijitButton,
+.buttonBar .dijitButton .dijitButtonNode{
+	width: 100%;
+	display: block;
 }

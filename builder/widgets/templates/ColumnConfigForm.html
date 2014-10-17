@@ -1,37 +1,33 @@
 <div class="${baseClass}">
-	<div class="buttonBar">
-		<button data-dojo-type="dijit/form/Button" class="doneButton"
-				data-dojo-attach-point="doneButton" type="button"
-				data-dojo-props="iconClass: 'icon-mail-reply'">Done</button>
-	</div>
-
 	<div class="scrollContainer">
 		<fieldset>
 			<legend>${i18n.generalColumnProperties}</legend>
-
+			<button data-dojo-type="dijit/form/Button" class="doneButton"
+				data-dojo-attach-point="doneButton" type="button"
+				data-dojo-props="">Done</button>
 			<div class="label">
-				<code>field</code>
+				field
 			</div>
 			<div class="field">
 				<input data-dojo-type="dijit/form/TextBox" name="field" type="text">
 			</div>
 
 			<div class="label">
-				<code>label</code>
+				label
 			</div>
 			<div class="field">
 				<input data-dojo-type="dijit/form/TextBox" name="label" type="text">
 			</div>
 
 			<div class="label">
-				<code>className</code>
+				className
 			</div>
 			<div class="field">
 				<input data-dojo-type="dijit/form/TextBox" name="className" type="text">
 			</div>
 
 			<div class="label">
-				<code>sortable</code>
+				sortable
 			</div>
 			<div class="field">
 				<input data-dojo-type="dijit/form/RadioButton" name="sortable" value="true" id="${id}_sortableTrue" type="radio" checked>
@@ -41,17 +37,14 @@
 			</div>
 		</fieldset>
 
-		<a href="${docBaseUrl}components/core-components/Grid.md" target="_blank"
-			data-dojo-attach-point="docLink"></a>
 
-
-		<h3>${i18n.mixinColumnProperties}</h3>
+		<div class="mixinProp">${i18n.mixinColumnProperties}</div>
 
 		<fieldset data-dojo-attach-point="editorFields" class="dijitHidden">
 			<legend></legend>
 
 			<div class="label">
-				<code>editor</code>
+				editor
 			</div>
 			<div class="field">
 				<select data-dojo-type="dijit/form/ComboBox" name="editor">
@@ -62,7 +55,7 @@
 			</div>
 
 			<div class="label">
-				<code>editOn</code>
+				editOn
 			</div>
 			<div class="field">
 				<select data-dojo-type="dijit/form/ComboBox" name="editOn">
@@ -72,7 +65,7 @@
 			</div>
 
 			<div class="label">
-				<code>autoSave</code>
+				autoSave
 			</div>
 			<div class="field">
 				<input data-dojo-type="dijit/form/RadioButton" name="autoSave" value="true" id="${id}_autoSaveTrue" type="radio">
@@ -82,7 +75,7 @@
 			</div>
 
 			<div class="label">
-				<code>autoSelect</code>
+				autoSelect
 			</div>
 			<div class="field">
 				<input data-dojo-type="dijit/form/RadioButton" name="autoSelect" value="true" id="${id}_autoSelectTrue" type="radio">
@@ -92,7 +85,7 @@
 			</div>
 
 			<div class="label">
-				<code>dismissOnEnter</code>
+				dismissOnEnter
 			</div>
 			<div class="field">
 				<input data-dojo-type="dijit/form/RadioButton" name="dismissOnEnter" value="true" id="${id}_dismissOnEnterTrue" type="radio" checked>
@@ -106,7 +99,7 @@
 			<legend></legend>
 
 			<div class="label">
-				<code>hidden</code>
+				hidden
 			</div>
 			<div class="field">
 				<input data-dojo-type="dijit/form/RadioButton" name="hidden" value="true" id="${id}_hiddenTrue" type="radio">
@@ -116,7 +109,7 @@
 			</div>
 
 			<div class="label">
-				<code>unhidable</code>
+				unhidable
 			</div>
 			<div class="field">
 				<input data-dojo-type="dijit/form/RadioButton" name="unhidable" value="true" id="${id}_unhidableTrue" type="radio">
@@ -130,7 +123,7 @@
 			<legend></legend>
 
 			<div class="label">
-				<code>reorderable</code>
+				reorderable
 			</div>
 			<div class="field">
 				<input data-dojo-type="dijit/form/RadioButton" name="reorderable" value="true" id="${id}_reorderableTrue" type="radio" checked>
@@ -144,7 +137,7 @@
 			<legend></legend>
 
 			<div class="label">
-				<code>resizable</code>
+				resizable
 			</div>
 			<div class="field">
 				<input data-dojo-type="dijit/form/RadioButton" name="resizable" value="true" id="${id}_resizableTrue" type="radio" checked>
@@ -158,7 +151,7 @@
 			<legend></legend>
 
 			<div class="label">
-				<code>selector</code>
+				selector
 			</div>
 			<div class="field">
 				<input data-dojo-type="dijit/form/RadioButton" name="selector" value="checkbox" id="${id}_selectorTrue" type="radio">

@@ -51,7 +51,7 @@ define({
 		parentNodeColumn: 'Parent node column',
 
 		// ColumnGrid and ColumnConfigForm
-		fieldNamePlaceholder: 'Field name',
+		fieldNamePlaceholder: 'Column Title',
 		fieldName: 'Field Name',
 		fieldLabelPlaceholder: 'Field label',
 		label: 'Label',
@@ -59,7 +59,7 @@ define({
 		dragToMove: 'Drag to move',
 		edit: 'Edit',
 		'delete': 'Delete',
-		generalColumnProperties: 'General column properties',
+		generalColumnProperties: 'Field Settings',
 		mixinColumnProperties: 'Mixin column properties',
 		moduleProperties: '${0} properties'
 	}
