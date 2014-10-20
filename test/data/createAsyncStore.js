@@ -36,9 +36,9 @@ define([
 		},
 
 		fetchRange: function (kwArgs) {
-			// dstore/Memory currently handles the data as potentially async
-			// but not the length.
-			// TODO: Revisit/remove when dstore is always-promise.
+			// dstore/Memory#fetchRange always uses fetchSync, which we aren't extending,
+			// so we need to extend this as well.
+
 			var results = this.fetch();
 			return new QueryResults(results.then(function (data) {
 				return data.slice(kwArgs.start, kwArgs.end);
@@ -51,7 +51,7 @@ define([
 	});
 
 	var TrackableAsyncStore = declare([ AsyncStore, Trackable ]);
-	
+
 	return function (kwArgs, Mixin) {
 		kwArgs = kwArgs || {};
 
