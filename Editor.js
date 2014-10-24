@@ -349,6 +349,13 @@ define([
 			this._editorsPendingStartup = [];
 		},
 
+		_handleEditorChange: function (evt, column) {
+			var target = evt.target;
+			if ('_dgridLastValue' in target && target.className.indexOf('dgrid-input') > -1) {
+				this._updatePropertyFromEditor(column || this.cell(target).column, target, evt);
+			}
+		},
+
 		_createEditor: function (column) {
 			// Creates an editor instance based on column definition properties,
 			// and hooks up events.
@@ -356,7 +363,7 @@ define([
 				editOn = column.editOn,
 				self = this,
 				Widget = typeof editor !== 'string' && editor,
-				args, cmp, node, putstr, handleChange;
+				args, cmp, node, putstr;
 
 			args = column.editorArgs || {};
 			if (typeof args === 'function') {
@@ -379,19 +386,12 @@ define([
 				});
 			}
 			else {
-				handleChange = function (evt) {
-					var target = evt.target;
-					if ('_dgridLastValue' in target && target.className.indexOf('dgrid-input') > -1) {
-						self._updatePropertyFromEditor(column, target, evt);
-					}
-				};
-
 				// considerations for standard HTML form elements
 				if (!this._hasInputListener) {
 					// register one listener at the top level that receives events delegated
 					this._hasInputListener = true;
 					this.on('change', function (evt) {
-						handleChange(evt);
+						self._handleEditorChange(evt);
 					});
 					// also register a focus listener
 				}
@@ -409,12 +409,12 @@ define([
 					if (editor === 'radio' || editor === 'checkbox') {
 						// listen for clicks since IE doesn't fire change events properly for checks/radios
 						this._editorColumnListeners.push(on(cmp, 'click', function (evt) {
-							handleChange(evt);
+							self._handleEditorChange(evt, column);
 						}));
 					}
 					else {
 						this._editorColumnListeners.push(on(cmp, 'change', function (evt) {
-							handleChange(evt);
+							self._handleEditorChange(evt, column);
 						}));
 					}
 				}
@@ -572,7 +572,7 @@ define([
 
 					// Also update dirty data for rows that are not currently rendered
 					for (id in this.dirty) {
-						if (editedRow.id !== id && this.dirty[id][column.field]) {
+						if (editedRow.id.toString() !== id && this.dirty[id][column.field]) {
 							this.updateDirty(id, column.field, false);
 						}
 					}

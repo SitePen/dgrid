@@ -9,6 +9,7 @@ define([
 	'intern/node_modules/dojo/has!host-browser?./extensions/CompoundColumns',
 	'intern/node_modules/dojo/has!host-browser?./extensions/Pagination',
 	'intern/node_modules/dojo/has!host-browser?./mixins/Editor',
+	'intern/node_modules/dojo/has!host-browser?./mixins/Editor-radio',
 	'intern/node_modules/dojo/has!host-browser?./mixins/Keyboard',
 	'intern/node_modules/dojo/has!host-browser?./mixins/Selection',
 	'intern/node_modules/dojo/has!host-browser?./mixins/Selector',
