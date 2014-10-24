@@ -113,7 +113,11 @@ define([
 
 			if (this._renderedCollection) {
 				this.cleanup();
-				this._cleanupCollection();
+				this._cleanupCollection({
+					// Only clear the dirty hash if the collection being used is actually from a different store
+					// (i.e. not just a re-sorted / re-filtered version of the same store)
+					shouldRevert: !collection || collection.storage !== this._renderedCollection.storage
+				});
 			}
 
 			if (collection) {
@@ -149,7 +153,15 @@ define([
 			return this._total;
 		},
 
-		_cleanupCollection: function () {
+		_cleanupCollection: function (options) {
+			// summary:
+			//		Handles cleanup duty for the previous collection;
+			//		called during _setCollection and destroy.
+			// options: Object?
+			//		* shouldRevert: Whether to clear the dirty hash
+
+			options = options || {};
+
 			if (this._renderedCollection.tracking) {
 				this._renderedCollection.tracking.remove();
 			}
@@ -161,7 +173,9 @@ define([
 			}
 
 			// Discard dirty map, as it applied to a previous collection
-			this.dirty = {};
+			if (options.shouldRevert !== false) {
+				this.dirty = {};
+			}
 
 			this._renderedCollection = this.collection = null;
 		},

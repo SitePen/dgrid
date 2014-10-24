@@ -75,32 +75,50 @@ define([
 			grid.destroy();
 		});
 
-		test.test('_StoreMixin#_setCollection(null)', function () {
-			var store = createSyncStore({ data: genericData });
-			grid = new OnDemandGrid({
-				collection: store
+		test.suite('_StoreMixin#_setCollection', function () {
+			var store;
+
+			test.beforeEach(function () {
+				store = createSyncStore({ data: genericData });
+				grid = new OnDemandGrid({
+					collection: store
+				});
+				document.body.appendChild(grid.domNode);
+				grid.startup();
 			});
-			document.body.appendChild(grid.domNode);
-			grid.startup();
 
-			assert.isDefined(grid._renderedCollection,
-				'grid._renderedCollection should be defined');
-			assert.notStrictEqual(grid.contentNode.children.length, 0,
-				'grid.contentNode should contain children when refreshing with a store');
+			test.test('null', function () {
+				assert.isDefined(grid._renderedCollection,
+					'grid._renderedCollection should be defined');
+				assert.notStrictEqual(grid.contentNode.children.length, 0,
+					'grid.contentNode should contain children when refreshing with a store');
 
-			grid.set('collection', null);
-			assert.isNull(grid._renderedCollection,
-				'grid._renderedCollection should be null after setting collection to null');
-			assert.strictEqual(grid.contentNode.children.length, 1,
-				'grid.contentNode should contain one child when refreshing with a null collection');
-			assert.strictEqual(grid.contentNode.children[0], grid.noDataNode,
-				'grid.contentNode should contain the noDataNode');
+				grid.set('collection', null);
+				assert.isNull(grid._renderedCollection,
+					'grid._renderedCollection should be null after setting collection to null');
+				assert.strictEqual(grid.contentNode.children.length, 1,
+					'grid.contentNode should contain one child when refreshing with a null collection');
+				assert.strictEqual(grid.contentNode.children[0], grid.noDataNode,
+					'grid.contentNode should contain the noDataNode');
 
-			grid.set('collection', store);
-			assert.isNotNull(grid._renderedCollection,
-				'grid._renderedCollection should not be null after setting collection to store again');
-			assert.notStrictEqual(grid.contentNode.children.length, 0,
-				'grid.contentNode should contain children when refreshing with a store');
+				grid.set('collection', store);
+				assert.isNotNull(grid._renderedCollection,
+					'grid._renderedCollection should not be null after setting collection to store again');
+				assert.notStrictEqual(grid.contentNode.children.length, 0,
+					'grid.contentNode should contain children when refreshing with a store');
+			});
+
+			test.test('dirty data preservation/cleanup', function () {
+				grid.updateDirty(0, 'col1', 'modified');
+				assert.isDefined(grid.dirty[0], 'Dirty hash should contain entry for item 0 after updateDirty');
+				grid.set('sort', 'col3');
+				assert.isDefined(grid.dirty[0], 'Dirty hash should still contain entry for item 0 after sort');
+				grid.set('collection', store.filter({ col2: false }));
+				assert.isDefined(grid.dirty[0], 'Dirty hash should still contain entry for item 0 after filter');
+				grid.set('collection', createSyncStore({ data: genericData }));
+				assert.isUndefined(grid.dirty[0],
+					'Dirty hash should be cleared after setting collection based on different store');
+			});
 		});
 
 		test.test('_StoreMixin#_onNotification', function () {
