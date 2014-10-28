@@ -94,8 +94,16 @@ function resizeColumnWidth(grid, colId, width, parentType, doResize){
 		if(width === "auto"){
 			delete column.width;
 		}else{
-			column.width = width;
-			width += "px";
+			// while using columnResizer and advanceRowSelection together, on resizing
+			// columns it gives an error Cannot set property 'width' of undefined,
+			// Added if condition when column is undefined then not to update column width.
+			// This extension consider columns created for placing Select All/Inverse/None Buttons
+			// as grid's column because they all share same class name. But we don't need
+			// to make them resizable atleast for now.
+			if(column) {
+				column.width = width;
+				width += "px";
+			}
 		}
 		
 		rule = grid._columnSizes[colId];
