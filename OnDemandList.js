@@ -266,12 +266,14 @@ return declare([List, _StoreMixin], {
 				// Emit on a separate turn to enable event to be used consistently for
 				// initial render, regardless of whether the backing store is async
 				setTimeout(function() {
-					listen.emit(self.domNode, "dgrid-refresh-complete", {
-						bubbles: true,
-						cancelable: false,
-						grid: self,
-						results: results // QueryResults object (may be a wrapped promise)
-					});
+					if (self.domNode) {
+						listen.emit(self.domNode, "dgrid-refresh-complete", {
+							bubbles: true,
+							cancelable: false,
+							grid: self,
+							results: results // QueryResults object (may be a wrapped promise)
+						});
+					}
 				}, 0);
 				
 				// Delete the Deferred immediately so nothing tries to re-resolve
