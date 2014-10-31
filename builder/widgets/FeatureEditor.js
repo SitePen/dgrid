@@ -24,19 +24,13 @@ define([
 
 			this.configPanes = {};
 
-			this.store = new (declare([ Memory, Trackable, Tree ], {
-				mayHaveChildren: function (item) {
-					return !('parentId' in item);
-				},
-				getChildren: function (item) {
-					return this.root.filter({ parentId: this.getIdentity(item) });
-				}
-			}))({
+			this.store = new (declare([ Memory, Trackable ]))({
 				data: featureData
 			});
 
 			this.featureGrid = new FeatureGrid({
-				collection: this.store.filter('mayHaveChildren')
+				store: this.store,
+				featureType: 'grid'
 			});
 			this.addChild(this.featureGrid);
 
@@ -61,8 +55,6 @@ define([
 						configPane.on('close', function () {
 							self.selectChild(self.featureGrid);
 						});
-						
-						console.log('adding ', configPane.moduleName);
 
 						this.addChild(configPane);
 						this.configPanes[feature.mid] = configPane;
@@ -94,8 +86,6 @@ define([
 
 		_showModuleConfig: function (event) {
 			var configPane = this.configPanes[event.mid];
-			console.log('selecting ', configPane.moduleName);
-
 			if (configPane) {
 				this.selectChild(configPane);
 			}
@@ -108,6 +98,10 @@ define([
 
 		_getExpandoColumnAttr: function () {
 			return this.configPanes['dgrid/Tree'].get('expandoColumn');
+		},
+
+		_setFeatureTypeAttr: function (featureType) {
+			this.featureGrid.set('featureType', featureType);
 		}
 	});
 });

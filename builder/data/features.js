@@ -17,12 +17,8 @@ define([
 ], function (config, i18n) {
 	return [
 		{
-			id: 0,
-			label: i18n.gridFeatures
-		},
-		{
 			id: 1.1,
-			parentId: 0,
+			featureType: 'grid',
 			mid: 'dgrid/Grid',
 			label: 'Grid',
 			configLevel: 'grid',
@@ -32,7 +28,7 @@ define([
 		},
 		{
 			id: 1.2,
-			parentId: 0,
+			featureType: 'grid',
 			mid: 'dgrid/OnDemandGrid',
 			label: 'OnDemandGrid',
 			configLevel: 'grid',
@@ -42,7 +38,7 @@ define([
 		},
 		{
 			id: 2,
-			parentId: 0,
+			featureType: 'grid',
 			mid: 'dgrid/Keyboard',
 			label: 'Keyboard',
 			configLevel: 'grid',
@@ -52,7 +48,7 @@ define([
 		},
 		{
 			id: 3,
-			parentId: 0,
+			featureType: 'grid',
 			mid: 'dgrid/Selection',
 			label: 'Selection',
 			configLevel: 'grid',
@@ -62,7 +58,7 @@ define([
 		},
 		{
 			id: 4,
-			parentId: 0,
+			featureType: 'grid',
 			mid: 'dgrid/CellSelection',
 			label: 'CellSelection',
 			configLevel: 'grid',
@@ -72,7 +68,7 @@ define([
 		},
 		{
 			id: 5,
-			parentId: 0,
+			featureType: 'grid',
 			mid: 'dgrid/Tree',
 			label: 'Tree',
 			configLevel: 'grid',
@@ -82,7 +78,7 @@ define([
 		},
 		{
 			id: 6,
-			parentId: 0,
+			featureType: 'grid',
 			mid: 'dgrid/extensions/Pagination',
 			label: 'Pagination',
 			configLevel: 'grid',
@@ -92,7 +88,7 @@ define([
 		},
 		{
 			id: 7,
-			parentId: 0,
+			featureType: 'grid',
 			mid: 'dgrid/extensions/DijitRegistry',
 			label: 'DijitRegistry',
 			documentationUrl: config.docBaseUrl + 'components/extensions/DijitRegistry.md',
@@ -100,7 +96,7 @@ define([
 		},
 		{
 			id: 8,
-			parentId: 0,
+			featureType: 'grid',
 			mid: 'dgrid/extensions/DnD',
 			label: 'DnD',
 			configLevel: 'grid',
@@ -108,12 +104,8 @@ define([
 			info: i18n.infoDnD
 		},
 		{
-			id: 1,
-			label: i18n.columnFeatures
-		},
-		{
 			id: 9,
-			parentId: 1,
+			featureType: 'column',
 			mid: 'dgrid/Editor',
 			label: 'Editor',
 			documentationUrl: config.docBaseUrl + 'components/mixins/Editor.md',
@@ -121,7 +113,7 @@ define([
 		},
 		{
 			id: 10,
-			parentId: 1,
+			featureType: 'column',
 			mid: 'dgrid/extensions/ColumnHider',
 			label: 'ColumnHider',
 			documentationUrl: config.docBaseUrl + 'components/extensions/ColumnHider.md',
@@ -129,7 +121,7 @@ define([
 		},
 		{
 			id: 11,
-			parentId: 1,
+			featureType: 'column',
 			mid: 'dgrid/extensions/ColumnReorder',
 			label: 'ColumnReorder',
 			documentationUrl: config.docBaseUrl + 'components/extensions/ColumnReorder.md',
@@ -137,7 +129,7 @@ define([
 		},
 		{
 			id: 12,
-			parentId: 1,
+			featureType: 'column',
 			mid: 'dgrid/extensions/ColumnResizer',
 			label: 'ColumnResizer',
 			configLevel: 'grid',
@@ -149,7 +141,7 @@ define([
 /*
 		{
 			id: 13,
-			parentId: 1,
+			featureType: 'column',
 			mid: 'dgrid/extensions/CompoundColumns',
 			label: 'CompoundColumns',
 			documentationUrl: config.docBaseUrl + 'components/extensions/CompoundColumns.md',
@@ -157,7 +149,7 @@ define([
 		},
 		{
 			id: 14,
-			parentId: 1,
+			featureType: 'column',
 			mid: 'dgrid/ColumnSet',
 			label: 'ColumnSet',
 			documentationUrl: config.docBaseUrl + 'components/mixins/ColumnSet.md',
@@ -166,7 +158,7 @@ define([
 */
 		{
 			id: 15,
-			parentId: 1,
+			featureType: 'column',
 			mid: 'dgrid/Selector',
 			label: 'Selector',
 			documentationUrl: config.docBaseUrl + 'components/mixins/Selector.md',

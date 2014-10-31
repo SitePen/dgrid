@@ -44,7 +44,7 @@ define([
 		node.innerHTML = cellValue;
 	}
 
-	var CustomGrid = declare([ OnDemandGrid, Selection, Tree, Editor, DijitRegistry ], {
+	var CustomGrid = declare([ OnDemandGrid, Selection, Editor, DijitRegistry ], {
 		gridTypeForm: null, // Passed from FeatureGrid when instantiated
 		showHeader: false,
 		selectionMode: 'single',
@@ -56,14 +56,10 @@ define([
 					value: true
 				},
 				autoSave: true,
-				canEdit: function (item) {
-					return 'parentId' in item;
-				},
 				sortable: false
 			},
 			label: {
 				label: i18n.selectGridFeatures,
-				renderExpando: true,
 				renderCell: renderLabelCell,
 				sortable: false
 			}
@@ -86,7 +82,7 @@ define([
 		},
 
 		_onDataChange: function (event) {
-			var collection = this.collection.root || this.collection;
+			var store = this._store;
 			var selectedMid = event.cell.row.data.mid;
 			var otherRow;
 
@@ -97,11 +93,11 @@ define([
 			switch (selectedMid) {
 				case 'dgrid/Selection':
 					if (event.value) {
-						otherRow = collection.filter({ mid: 'dgrid/CellSelection', selected: true }).fetchSync()[0];
+						otherRow = store.filter({ mid: 'dgrid/CellSelection', selected: true }).fetchSync()[0];
 
 						if (otherRow) {
 							otherRow.selected = false;
-							collection.put(otherRow);
+							store.put(otherRow);
 						}
 					}
 
@@ -109,18 +105,18 @@ define([
 
 				case 'dgrid/CellSelection':
 					if (event.value) {
-						otherRow = collection.filter({ mid: 'dgrid/Selection', selected: true }).fetchSync()[0];
+						otherRow = store.filter({ mid: 'dgrid/Selection', selected: true }).fetchSync()[0];
 
 						if (otherRow) {
 							otherRow.selected = false;
-							collection.put(otherRow);
+							store.put(otherRow);
 						}
 					}
 
 					break;
 
 				case 'dgrid/extensions/Pagination':
-					otherRow = collection.filter({ mid: 'dgrid/OnDemandGrid' }).fetchSync()[0];
+					otherRow = store.filter({ mid: 'dgrid/OnDemandGrid' }).fetchSync()[0];
 
 					// If the user clicks to select Pagination...
 					if (event.value) {
@@ -132,13 +128,13 @@ define([
 						else {
 							// ...but we actually want to deselect OnDemandGrid
 							otherRow.selected = false;
-							collection.put(otherRow);
+							store.put(otherRow);
 						}
 					}
 					// If the user clicks to deselect Pagination then we want to select OnDemandGrid
 					else {
 						otherRow.selected = true;
-						collection.put(otherRow);
+						store.put(otherRow);
 					}
 
 					break;
@@ -153,7 +149,7 @@ define([
 					// 1. If OnDemandGrid or Pagination is already selected, a store is in use
 					// 2. Otherwise select OnDemandGrid
 					if (event.value) {
-						otherRow = collection.filter({
+						otherRow = store.filter({
 							mid: /(OnDemandGrid|Pagination)$/,
 							selected: true
 						}).fetchSync();
@@ -165,10 +161,6 @@ define([
 
 					break;
 			}
-		},
-
-		shouldExpand: function () {
-			return true;
 		},
 
 		insertRow: function (object) {
@@ -201,13 +193,15 @@ define([
 		templateString: template,
 		i18n: i18n,
 
-		collection: null,
+		store: null,
+		featureType: null,
 
 		buildRendering: function () {
 			this.inherited(arguments);
 			this.grid = new CustomGrid({
 				className: 'featureGrid',
-				collection: this.collection,
+				_store: this.store,
+				collection: this.store.filter({featureType: this.featureType}),
 				gridTypeForm: this.gridTypeForm
 			}, this.gridNode);
 			this._startupWidgets.push(this.grid);
@@ -230,34 +224,38 @@ define([
 		_setGridModuleAttr: function (module) {
 			// 'module' should be either 'Grid' or 'OnDemandGrid'
 
-			var collection = this.collection.root || this.collection;
+			var store = this.store;
 			var items;
 
 			if (module === 'OnDemandGrid') {
 				// Select OnDemandGrid, unless Pagination is already selected
-				items = collection.filter({
+				items = store.filter({
 					mid: 'dgrid/extensions/Pagination',
 					selected: true
 				}).fetchSync();
 
 				if (!items.length) {
-					items = collection.filter({ mid: 'dgrid/OnDemandGrid' }).fetchSync();
+					items = store.filter({ mid: 'dgrid/OnDemandGrid' }).fetchSync();
 					items[0].selected = true;
-					collection.put(items[0]);
+					store.put(items[0]);
 				}
 			}
 			else {
 				// Deselect any modules that require a store
-				items = collection.filter({
+				items = store.filter({
 					mid: /\/(OnDemandGrid|Selector|Tree|extensions\/(DnD|Pagination))$/,
 					selected: true
 				}).fetchSync();
 
 				arrayUtil.forEach(items, function (item) {
 					item.selected = false;
-					collection.put(item);
+					store.put(item);
 				});
 			}
+		},
+
+		_setFeatureTypeAttr: function (featureType){
+			this.grid.set('collection', this.store.filter({featureType: featureType}));
 		}
 	});
 });
