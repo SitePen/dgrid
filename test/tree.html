@@ -133,7 +133,7 @@
 						store: testTopHeavyStore,
 						query: { parent: undefined },
 						columns: {
-							abbreviation: tree({ label: "Abbreviation", field: "abbreviation" }),
+							abbreviation: tree({ label: "Abbreviation", field: "abbreviation", allowDuplicates: true }),
 							name: "Name"
 						}
 					}, "treeTopHeavy");
