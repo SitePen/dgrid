@@ -307,7 +307,10 @@ define([
 			var gridOptions = {};
 			var selectedFeatures = this.featureEditor.filter({ selected: true, configLevel: 'grid' });
 			var treeExpandoColumn;
-			var columns = {};
+			var columns = [];
+			var column;
+			var tempColumns;
+			var numFieldName;
 
 			if (this.featureEditor.isSelected('dgrid/Tree')) {
 				treeExpandoColumn = this.featureEditor.get('expandoColumn');
@@ -327,11 +330,21 @@ define([
 				if (config.field === treeExpandoColumn) {
 					config.renderExpando = true;
 				}
+				numFieldName = numFieldName || isFinite(config.field);
 
-				columns[config.field] = config;
-				delete columns[config.field].id;
-				delete columns[config.field].field;
+				delete config.id;
+				columns.push(config);
 			}, this);
+
+			if (!numFieldName) {
+				// If there are no field names that are numbers, then use an object to define the columns.
+				tempColumns = {};
+				while ((column = columns.shift())) {
+					tempColumns[column.field] = column;
+					delete column.field;
+				}
+				columns = tempColumns;
+			}
 
 			if (this.featureEditor.isSelected('dgrid/ColumnSet')) {
 				gridOptions.columnSets = [[columns]];

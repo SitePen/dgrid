@@ -22,7 +22,7 @@ define([
 ], function (declare, lang, domClass, topic, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, _ResizeMixin, i18n,
 	template, OnDemandGrid, Editor, DijitRegistry, DnD, Memory, Trackable) {
 
-	function renderDragSourceCell (item, value, node) {
+	function renderDragSourceCell(item, value, node) {
 		domClass.add(node, 'dojoDndHandle');
 		node.innerHTML = '<i class="icon-navicon" title="' + i18n.dragToMove + '"></i>';
 	}
