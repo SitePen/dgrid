@@ -4,7 +4,6 @@ define([
 	'dojo/_base/declare',
 	'dojo/_base/lang',
 	'dojo/dom-class',
-	'dojo/dom-attr',
 	'dojo/query',
 	'dojo/string',
 	'dojo/on',
@@ -26,7 +25,7 @@ define([
 	// Widgets in template
 	'dijit/layout/ContentPane',
 	'dijit/layout/TabContainer'
-], function (require, arrayUtil, declare, lang, domClass, domAttr, query, string, on, topic, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, Memory, Trackable, TreeStoreMixin, ColumnEditor, FeatureEditor, toJavaScript, config, i18n,
+], function (require, arrayUtil, declare, lang, domClass, query, string, on, topic, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, Memory, Trackable, TreeStoreMixin, ColumnEditor, FeatureEditor, toJavaScript, config, i18n,
 	template, codeTemplate) {
 
 	var NUM_ITEMS = 50;
@@ -66,7 +65,7 @@ define([
 		},
 
 		selectTab: function (evt) {
-			var target = domAttr.get(evt.target, 'data-target');
+			var target = evt.target.getAttribute('data-target');
 			query('.showing', this.domNode).removeClass('showing');
 			query('.active', this.domNode).removeClass('active');
 
@@ -103,7 +102,6 @@ define([
 		_updateDemo: function () {
 			if (this.demoGrid) {
 				this.demoGrid.destroy();
-				this.demoGridPane.innerHTML = '';
 			}
 
 			this.gridCodeTextArea.value = '';
@@ -124,13 +122,13 @@ define([
 
 		_selectCode: function () {
 			this._selectedChildWidget = this.demoCodePane;
-			domAttr.set(this.previewTabs, 'data-selected-page', 'code');
+			this.previewTabs.setAttribute('data-selected-page', 'code');
 			this._updateDemo();
 		},
 
 		_selectGrid: function () {
 			this._selectedChildWidget = this.demoGridPane;
-			domAttr.set(this.previewTabs, 'data-selected-page', 'grid');
+			this.previewTabs.setAttribute('data-selected-page', 'grid');
 			this._updateDemo();
 		},
 
@@ -331,8 +329,6 @@ define([
 					config.renderExpando = true;
 				}
 				numFieldName = numFieldName || isFinite(config.field);
-
-				delete config.id;
 				columns.push(config);
 			}, this);
 

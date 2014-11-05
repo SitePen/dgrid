@@ -13,11 +13,8 @@ define([
 			this.inherited(arguments);
 
 			// columnGrid is a ContentPane that contains a grid
-			this.columnGrid = new ColumnGrid();
-			this.form = new ColumnConfigForm();
-
-			this.domNode.appendChild(this.columnGrid.domNode);
-			this.domNode.appendChild(this.form.domNode);
+			this.columnGrid = new ColumnGrid().placeAt(this.domNode);
+			this.form = new ColumnConfigForm().placeAt(this.domNode);
 		},
 
 		postCreate: function () {
@@ -28,6 +25,11 @@ define([
 		},
 
 		startup: function () {
+			if (this._started) {
+				return;
+			}
+			this.inherited(arguments);
+
 			this.columnGrid.startup();
 			this.form.startup();
 		},

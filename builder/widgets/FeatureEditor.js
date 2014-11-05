@@ -6,15 +6,15 @@ define([
 	'dojo/topic',
 	'dstore/Memory',
 	'dstore/Trackable',
-	'dstore/Tree',
 	'dijit/layout/StackContainer',
 	'./FeatureGrid',
 	'../data/features'
-], function (require, arrayUtil, declare, lang, topic, Memory, Trackable, Tree, StackContainer, FeatureGrid,
+], function (require, arrayUtil, declare, lang, topic, Memory, Trackable, StackContainer, FeatureGrid,
 		featureData) {
 
 	return declare(StackContainer, {
 		baseClass: 'featureEditor',
+		doLayout: false,
 
 		buildRendering: function () {
 			this.inherited(arguments);

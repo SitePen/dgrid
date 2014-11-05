@@ -97,14 +97,11 @@ define([
 			}
 
 			var value = form.get('value');
-			var columnObject;
 
-			columnObject = {
-				field: value.label.replace(/\s/g, '_'),
+			this.store.put({
+				field: value.label.replace(/[^\w-]/g, '_'),
 				label: value.label
-			};
-
-			this.store.put(columnObject);
+			});
 
 			form.reset();
 		},

@@ -2,17 +2,16 @@ define([
 	'dojo/_base/array',
 	'dojo/_base/declare',
 	'dojo/_base/lang',
-	'dojo/topic',
+	'dojo/mouse',
+	'dojo/on',
 	'dojo/query',
+	'dojo/topic',
 	'dijit/_WidgetBase',
 	'dijit/_TemplatedMixin',
 	'dijit/_WidgetsInTemplateMixin',
 	'./_ResizeMixin',
 	'dijit/Tooltip',
-	'dijit/registry',
 	'dgrid/OnDemandGrid',
-	'dgrid/Selection',
-	'dgrid/Tree',
 	'dgrid/Editor',
 	'dgrid/extensions/DijitRegistry',
 	'dijit/form/CheckBox',
@@ -21,8 +20,9 @@ define([
 	// Widgets in template
 	'dijit/form/Form',
 	'dijit/form/RadioButton'
-], function (arrayUtil, declare, lang, topic, query, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, _ResizeMixin,
-		Tooltip, registry, OnDemandGrid, Selection, Tree, Editor, DijitRegistry, CheckBox, i18n, template) {
+], function (arrayUtil, declare, lang, mouse, on, query, topic,
+		_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, _ResizeMixin,
+		Tooltip, OnDemandGrid, Editor, DijitRegistry, CheckBox, i18n, template) {
 
 	function renderLabelCell (item, value, node) {
 		// Render the label cell, adding the doc link, tooltip icon, and config icon when appropriate
@@ -44,10 +44,9 @@ define([
 		node.innerHTML = cellValue;
 	}
 
-	var CustomGrid = declare([ OnDemandGrid, Selection, Editor, DijitRegistry ], {
+	var CustomGrid = declare([ OnDemandGrid, Editor, DijitRegistry ], {
 		gridTypeForm: null, // Passed from FeatureGrid when instantiated
 		showHeader: false,
-		selectionMode: 'single',
 		columns: {
 			selected: {
 				label: '',
@@ -69,16 +68,8 @@ define([
 			this.inherited(arguments);
 
 			this.on('dgrid-datachange', lang.hitch(this, '_onDataChange'));
-			this.on('.dgrid-column-label:mouseover', lang.hitch(this, '_showInfoTip'));
-			this.on('.dgrid-column-label:mouseout', lang.hitch(this, '_hideInfoTip'));
-			this.on('dgrid-select', lang.hitch(this, '_toggleModule'));
-		},
-
-		_toggleModule: function (event) {
-			var node = query('.dijitCheckBox', event.rows[0].element)[0];
-			if (!node) { return; }
-			var checkbox = registry.byNode(node);
-			!checkbox.get('disabled') && checkbox.set('checked', !checkbox.get('checked'));
+			this.on(on.selector('.dgrid-column-label', mouse.enter), lang.hitch(this, '_showInfoTip'));
+			this.on(on.selector('.dgrid-column-label', mouse.leave), lang.hitch(this, '_hideInfoTip'));
 		},
 
 		_onDataChange: function (event) {
@@ -172,7 +163,7 @@ define([
 			var mid = object.mid;
 
 			if (mid === 'dgrid/Grid' || mid === 'dgrid/OnDemandGrid') {
-				registry.byNode(cell.element.firstChild).set('disabled', true);
+				cell.element.widget.set('disabled', true);
 			}
 
 			return rowNode;
@@ -180,11 +171,14 @@ define([
 
 		_showInfoTip: function (event) {
 			var row = this.row(event);
-			row.data.info && Tooltip.show(row.data.info, event.target);
+			var info = row.data.info;
+			if (info) {
+				Tooltip.show(info, row.element);
+			}
 		},
 
 		_hideInfoTip: function (event) {
-			Tooltip.hide(event.target);
+			Tooltip.hide(this.row(event).element);
 		}
 	});
 
@@ -201,7 +195,7 @@ define([
 			this.grid = new CustomGrid({
 				className: 'featureGrid',
 				_store: this.store,
-				collection: this.store.filter({featureType: this.featureType}),
+				collection: this.store.filter({ featureType: this.featureType }),
 				gridTypeForm: this.gridTypeForm
 			}, this.gridNode);
 			this._startupWidgets.push(this.grid);
@@ -210,7 +204,7 @@ define([
 		postCreate: function () {
 			var self = this;
 			this.inherited(arguments);
-			this.gridTypeForm.startup();
+
 			this.own(
 				this.gridTypeForm.watch('value', function (name, oldValue, value) {
 					self.set('gridModule', value.gridType);
@@ -255,7 +249,7 @@ define([
 		},
 
 		_setFeatureTypeAttr: function (featureType){
-			this.grid.set('collection', this.store.filter({featureType: featureType}));
+			this.grid.set('collection', this.store.filter({ featureType: featureType }));
 		}
 	});
 });

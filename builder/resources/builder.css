@@ -321,21 +321,21 @@ fieldset {
 	padding-right: 3px;
 }
 
-.columnGrid .icon-gear {
+.columnGrid .icon-gear,
+.featureGrid .icon-gear {
 	color: #9D9D9D;
+	cursor: pointer;
 	font-size: 16px;
-	margin-left: 7px;
 	vertical-align: middle;
 }
 
-.featureGrid .icon-gear {
-	color: #9D9D9D;
-	font-size: 16px;
-	vertical-align: middle;
+.columnGrid .icon-gear {
+	margin-left: 7px;
 }
 
 .columnGrid .icon-times {
 	color: #44525C;
+	cursor: pointer;
 	vertical-align: middle;
 }
 
@@ -351,9 +351,9 @@ fieldset {
 }
 
 .featureEditor .configForm .dijitButton {
-	top: 10px !important;
-	right: 10px !important;
-	margin: 0 !important;
+	top: 10px;
+	right: 10px;
+	margin: 0;
 	z-index: 1;
 }
 
@@ -466,7 +466,6 @@ fieldset {
 	font-size: 14px;
 	vertical-align: top;
 	height: 35px;
-	text-transform: capitalize;
 }
 
 .configForm .label:after {
@@ -566,7 +565,7 @@ fieldset {
 .demoCodePane textarea {
 	width: 100%;
 	border: 0;
-	font-family: Courier;
+	font-family: Consolas, Courier, monospace;
 	font-size: 12px;
 	background: #EBEBEB;
 	overflow-y: hidden;

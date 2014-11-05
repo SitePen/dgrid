@@ -2,10 +2,10 @@
 REQUIRED
 	id (Number): unique; sort key (any modules that depend on being loaded after another module should have a higher id)
 	label (String): Display value for the feature
+	mid (String): absolute mid of the module that provides the feature
+	featureType (String): 'grid' or 'column', determining which tab of the UI it appears under
 
 OPTIONAL
-	parentId (Number): id of the parent object
-	mid (String): absolute mid of the module that provides the feature
 	configLevel (String): if 'grid', feature will be applied to grid settings; otherwise feature will be applied to each
 		column's settings
 	configModule (String): relative (to the 'widgets' folder) mid of the module that provides the configuration UI
