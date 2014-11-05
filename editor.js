@@ -123,7 +123,7 @@ function setPropertyFromEditor(grid, cmp, triggerEvent) {
 		}
 
 		if(cmp.type === "radio" && cmp.name && !column.editOn && column.field){
-			editedRow = grid.row(cmp);
+			editedRow = grid.row(cmp.domNode || cmp);
 			
 			// Update all other rendered radio buttons in the group
 			query("input[type=radio][name=" + cmp.name + "]", grid.contentNode).forEach(function(radioBtn){
