@@ -456,10 +456,10 @@ return declare(null, {
 		}
 		eventObject[this._selectionTargetType] = queue;
 		
-		on.emit(this.contentNode, "dgrid-" + type, eventObject);
-		
 		// Clear the queue so that the next round of (de)selections starts anew
 		this._selectionEventQueues[type] = [];
+		
+		on.emit(this.contentNode, "dgrid-" + type, eventObject);
 	},
 	
 	_fireSelectionEvents: function(){
