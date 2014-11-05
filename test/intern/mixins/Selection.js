@@ -474,6 +474,7 @@ define([
 		var store = new Observable(new Memory({
 			data: _createTestData()
 		}));
+		var handles = [];
 		
 		test.beforeEach(function () {
 			grid = new (declare([OnDemandGrid, Selection]))({
@@ -487,6 +488,10 @@ define([
 		
 		test.afterEach(function(){
 			grid.destroy();
+			for (var i = handles.length; i--;) {
+				handles[i].remove();
+			}
+			handles = [];
 		});
 		
 		test.test("programmatic row deselection event", function() {
@@ -527,5 +532,17 @@ define([
 			assert.equal(expectedEventType, lastEventType);
 		});
 		
+		test.test("clearSelection() within event handler", function () {
+			var numCalls = 0;
+			handles.push(grid.on("dgrid-select", function (event) {
+				numCalls++;
+				assert.isTrue(numCalls < 2, "dgrid-select handler should only fire once");
+				// clearSelection will cause selection events to be fired,
+				// but that should not include the originally-queued event
+				grid.clearSelection();
+			}));
+			
+			grid.select("1");
+		});
 	});
 });
