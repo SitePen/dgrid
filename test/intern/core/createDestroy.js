@@ -40,7 +40,7 @@ define([
 		
 		// this test is for issue #1030
 		test.test("destroy grid with store before async refresh followup event should "
-		        + "not throw global error", function(){
+		          "not throw global error", function(){
 			var testResolution = this.async();
 		
 			var store = new MemoryStore([
@@ -68,8 +68,8 @@ define([
 				"Grid is removed from body after destroy");
 			
 			// Start watching for global error. There should be none.
-		    var errorCatchingHandle = on(window, "error",
-		    		testResolution.reject.bind(testResolution));
+			var errorCatchingHandle = on(window, "error",
+					testResolution.reject.bind(testResolution));
 			
 			// The error had been happening in a callback queued with setTimeout(0) in
 			// refresh(). Here we queue another which will run after that one to close
