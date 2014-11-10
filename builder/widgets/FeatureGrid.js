@@ -206,9 +206,6 @@ define([
 			this.inherited(arguments);
 
 			this.own(
-				this.gridTypeForm.watch('value', function (name, oldValue, value) {
-					self.set('gridModule', value.gridType);
-				}),
 				this.grid.on('.icon-gear:click', function (event) {
 					self.emit('configure-module', { mid: self.grid.row(event).data.mid });
 				})

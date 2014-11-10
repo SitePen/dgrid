@@ -22,7 +22,6 @@ define({
 		sourceCode: 'Source code',
 
 		// FeatureGrid
-		dataSource: 'Data source:',
 		dstoreObjectStore: 'dstore object store',
 		array: 'array',
 		selectGridFeatures: 'Select grid features',

@@ -1,0 +1,53 @@
+
+.gridTypeForm {
+	color: white;
+	font-size: 14px;
+	font-weight: 100;
+	margin-bottom: 10px;
+}
+
+.gridBtn,
+.codeBtn {
+	color: #E0E0E0;
+	cursor: pointer;
+}
+
+.render[data-selected-page="grid"] .gridBtn {
+	color: #144C66;
+}
+
+.codeBtn {
+	margin-left: 25px;
+}
+
+.demoGridPane {
+	color: #95a5a6;
+
+	.dojoDndItem,
+	.dojoDndItemOver {
+	    padding: 0;
+	    border: 0;
+	}
+}
+
+.demoCodePane textarea {
+	width: 100%;
+	border: 0;
+	font-family: Consolas, Courier, monospace;
+	font-size: 12px;
+	background: #EBEBEB;
+	overflow-y: hidden;
+	padding: 15px 5px;
+}
+
+.render[data-selected-page="code"] .demoGridPane {
+	display: none;
+}
+
+.render[data-selected-page="code"] .codeBtn {
+	color: #144C66;
+}
+
+.render[data-selected-page="grid"] .demoCodePane {
+	display: none;
+}

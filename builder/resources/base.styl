@@ -1,0 +1,204 @@
+* {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	height: 100%;
+	width: 100%;
+	margin: 0;
+	font-family: $fontFamily;
+	font-size: 16px;
+	background: #F8F8F8;
+}
+
+fieldset {
+	border: 0;
+	margin: 0;
+	padding: 0;
+}
+
+.builder {
+	font-size: 0;
+	height: 100%;
+}
+
+.control {
+	width: $sidebarWidth;
+	height: calc(100% - 70px);
+	display: inline-block;
+	vertical-align: top;
+	font-size: 16px;
+	background: $sidebarBackground;
+	position: relative;
+}
+
+.render {
+	display: inline-block;
+	vertical-align: top;
+	font-size: 16px;
+	padding: 25px;
+	position: relative;
+	z-index: 2;
+	background: #F8F8F8;
+	width: calc(100% - $sidebarWidth);
+	height: calc(100% - 70px);
+	display: inline-block;
+	vertical-align: top;
+	font-size: 16px;
+	padding: 25px;
+}
+
+.tabControl {
+	line-height: 31px;
+	color: #144C66;
+	position: relative;
+	font-weight: bold;
+}
+
+
+/*
+ * Header
+ */
+
+.header {
+	position: relative;
+	width: 100%;
+	background: white;
+	overflow: hidden;
+	font-size: 24px;
+	font-weight: 100;
+	color: white;
+	vertical-align: middle;
+	box-shadow: 0px 4px 10px -2px #0B1E2A;
+	z-index: 3;
+
+	.controlHeader {
+		background: #1284CC;
+		width: 300px;
+		display: inline-block;
+	}
+
+	.logoLink {
+		box-shadow: 1px 0 6px 0px #0E6AA4;
+		display: inline-block;
+		vertical-align: middle;
+		margin-right: 10px;
+	}
+
+	.menuLink {
+		color: black;
+		font-size: 18px;
+		margin-left: 16px;
+		text-decoration: none;
+	}
+	.logo {
+		width: 98px;
+		padding: 15px;
+	}
+
+	.splogo {
+		position: absolute;
+		top: 10px;
+		right: 30px;
+	}
+
+}
+
+
+
+/*
+ * Icon font
+ */
+
+@font-face {
+	font-family: 'icomoon';
+	src:url('fonts/icomoon.eot?kn321z');
+	src:url('fonts/icomoon.eot?#iefixkn321z') format('embedded-opentype'),
+		url('fonts/icomoon.woff?kn321z') format('woff'),
+		url('fonts/icomoon.ttf?kn321z') format('truetype'),
+		url('fonts/icomoon.svg?kn321z#icomoon') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+	font-family: 'icomoon';
+	speak: none;
+	font-style: normal;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: none;
+	line-height: 1;
+	transition: color 0.5s;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	&:hover {
+		cursor:pointer;
+	}
+}
+
+.icon-times:before {
+	content: "\f00d";
+}
+
+.icon-gear:before {
+	content: "\f013";
+}
+
+.icon-info-circle:before {
+	content: "\f05a";
+}
+.icon-external-link:before {
+	content: "\f08e";
+}
+.icon-navicon:before {
+	content: "\f0c9";
+}
+.icon-angle-up:before {
+	content: "\f106";
+}
+.icon-angle-down:before {
+	content: "\f107";
+}
+.icon-mail-reply:before {
+	content: "\f112";
+}
+
+
+/*
+ * Tabs
+ */
+.tabs {
+	font-size: 0;
+	background: $sidebarTabStripBg;
+}
+
+.tab {
+	color: #C3F1FF;
+	font-size: 12px;
+	padding: 15px 10px;
+	display: inline-block;
+	cursor: pointer;
+	transition: background 0.4s;
+
+	&:hover {
+		background: lighten($sidebarTabStripBg, 10%);
+	}
+}
+
+.tab.active {
+	background: $sidebarTabActiveBg;
+}
+
+[data-tab] {
+	opacity: 0 !important;
+	z-index: 0  !important;
+	position: absolute !important;
+	top: 47px  !important;
+}
+
+[data-tab].showing {
+	opacity: 1 !important;
+	z-index: 1  !important;
+}

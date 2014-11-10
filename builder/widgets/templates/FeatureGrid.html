@@ -1,13 +1,3 @@
 <div data-dojo-attach-point="containerNode">
-	<div data-dojo-type="dijit/form/Form" class="gridTypeForm"
-		 data-dojo-attach-point="gridTypeForm">
-		<label>${i18n.dataSource}</label>
-		<input data-dojo-type="dijit/form/RadioButton" id="${id}_gridTypeOnDemand"
-			name="gridType" type="radio" value="OnDemandGrid" checked>
-		<label for="${id}_gridTypeOnDemand">${i18n.dstoreObjectStore}</label>
-		<input data-dojo-type="dijit/form/RadioButton" id="${id}_gridTypeArray"
-			name="gridType" type="radio" value="Grid">
-		<label for="${id}_gridTypeArray">${i18n.array}</label>
-	</div>
 	<div data-dojo-attach-point="gridNode"></div>
 </div>

@@ -1,0 +1,86 @@
+/*
+ * Dijit overrides
+ */
+.claro {
+
+	.dijitButton .dijitButtonNode {
+		border: 1px solid $primaryButtonColor;
+		background: transparent;
+		color: $primaryButtonColor;
+		padding: 2px 7px 4px;
+		transition: background 0.3s, color 0.3s;
+		&:hover {
+			background:$primaryButtonColor;
+			color:#000;
+			border-color: darken($primaryButtonColor, 20%);
+		}
+	}
+
+	.dijitTextBox {
+		border-radius: 5px;
+		border: 0;
+		padding: 2px 1px;
+		background: #FFF !important;
+		font-size: 12px;
+		color: #0B1E2A;
+	}
+
+	.dijitTextBox .dijitInputInner {
+		color: #144C66;
+	}
+
+	.dijitTextBox,
+	.dijitPlaceHolder,
+	.dgrid-input {
+		font-style: normal;
+		font-family: $fontFamily;
+		outline: 0;
+	}
+
+	.dgrid-input:focus {
+		outline: 0;
+	}
+}
+
+/* Override DND Avatar */
+.claro table.dojoDndAvatar {
+
+	border-collapse: collapse;
+	background-color: none;
+	box-shadow: 3px 3px 4px 0px rgba(0, 0, 0, 0.67);
+
+	td {
+		border:0;
+	}
+
+	table {
+		width:300px;
+		line-height:26px;
+		border:0;
+	}
+
+	.dgrid-row:before,
+	.dgrid-row:after {
+		display:none;
+	}
+
+	.dgrid-row table td {
+		background: $draggedRowBg !important;
+		padding:5px;
+		border:none;
+	}
+
+	.dojoDndAvatarHeader {
+		display:none;
+	}
+	.dojoDndAvatarItem td {
+		padding: 0px;
+	}
+}
+
+.claro.dojoDndMove .dojoDndAvatarHeader {
+  background-color: red;
+}
+.claro.dojoDndMove .dojoDndAvatarCanDrop .dojoDndAvatarHeader {
+  background-color: green;
+}

@@ -1,0 +1,301 @@
+/*
+ * Feature grid and Column grid
+ */
+.columnGridContainer {
+	display: inline-block;
+	padding-top:1em;
+	width: 50%;
+	vertical-align: top;
+}
+
+.claro {
+
+	.featureGrid {
+		margin-top:1em;
+	}
+
+	.featureGrid,
+	.columnGrid,
+	.dojoDndAvatar {
+		background: transparent;
+		height: auto;
+		border: 0 !important;
+
+		.dgrid-scroller {
+			position: relative;
+			overflow: hidden;
+		}
+
+		.dgrid-content {
+			height: auto;
+		}
+
+		.dgrid-cell {
+			line-height: 26px;
+			border: 0;
+			padding: 0;
+		}
+		.dijitCheckBox {
+			background: none;
+			border-radius: 3px;
+			background-color: #ECF0F1;
+			width: 18px;
+			height: 18px;
+		}
+		.dijitCheckBox[disabled] {
+			background: none;
+			border-radius: 3px;
+			background-color: #ECF0F1;
+			width: 18px;
+			height: 18px;
+		}
+		.dijitCheckBoxChecked {
+			background: url('img/check.png') no-repeat center center/contain;
+			background-color: #1ABC9C;
+		}
+
+		.icon-gear {
+			color: $sidebarIconColor;
+			font-size: 16px;
+			vertical-align: middle;
+			&:hover {
+				color:$sidebarGearColor;
+			}
+		}
+	}
+
+	.columnGrid,
+	.dojoDndAvatar {
+		.dgrid-row {
+			background: transparent;
+			color: white;
+			font-size: 13px;
+			font-weight: 100;
+			border: 0 !important;
+			width:100%;
+			padding:0;
+			transition: padding 0.3s;
+			cursor: default;
+
+			table td {
+				padding:4px;
+			}
+		}
+
+		.dgrid-row-odd table td {
+			background: $sidebarRowOddBg;
+		}
+
+		.dgrid-row-even table td {
+			background: $sidebarRowEvenBg;
+		}
+
+		.dgrid-column-dragSource {
+			width: 30px;
+			font-size: 16px;
+			color: $sidebarIconColor;
+			i {
+				position:relative;
+				top:1px;
+				&:hover {
+					cursor: move;
+				}
+			}
+			&:hover,
+			&:active {
+				color: $dgridBlue;
+			}
+		}
+
+
+		.dgrid-column-config  {
+			width: 45px;
+			padding-left: 4px;
+		}
+		.dgrid-column-label {
+			padding-left: 2px;
+		}
+
+		.dgrid-column-fieldName {
+			padding-right: 3px;
+		}
+		.icon-gear {
+			margin-left: 7px;
+		}
+
+		.icon-times {
+			color: $sidebarIconColor;
+			&:hover {
+				color: $deleteColor;
+			}
+			vertical-align: middle;
+		}
+
+
+		.dojoDndItem {
+			&:before,
+			&:after {
+				border:1px dotted #3C5E79;
+				content: " ";
+				height:1px;
+				display:block;
+				transition: height 0.2s, opacity 0.3s, background 0.3s;
+				opacity: 0;
+			}
+
+			&:active,
+			.dgrid-selected {
+				opacity: 0.5;
+			}
+
+			.dojoDndHandle {
+				padding-left:10px;
+				&:hover {
+					cursor:move;
+				}
+			}
+		}
+
+		.dojoDndItemBefore:before,
+		.dojoDndItemAfter:after,
+		.dojoDndItemAfter:nth-last-child(2):after {
+			background: $dropTargetBg;
+			height:30px;
+			opacity: 1;
+			cursor:move;
+		}
+
+		.dojoDndItemAfter:nth-last-child(2):before {
+			height:1px;
+			opacity:0;
+		}
+
+
+		.dgrid-selected {
+			&:before,
+			&:after {
+				height:1px;
+				opacity:0;
+			}
+		}
+
+		.dojoDndItem .dgrid-cell {
+			border-top: none;
+			border-bottom: none;
+		}
+		/* END DnD FIX */
+	}
+}
+
+.columnEditor {
+	margin: 0;
+	overflow: hidden;
+	position: relative;
+	transition: max-height .5s ease-in-out, margin .5s ease-in-out;
+}
+
+
+/*
+ * Column grid form
+ */
+
+.columnGridForm {
+	font-size: 0;
+	position: relative;
+	padding: 5px 0 14px 10px;
+
+	.addBtn {
+		background: transparent;
+		border: 0;
+		color: #FFF;
+		font-size: 18px;
+		outline: 0;
+		transition: color 0.4s;
+		width: 40px;
+		&:hover {
+			color: lighten($confirmColor, 20%);
+			cursor:pointer;
+		}
+	}
+
+	.dijitTextBox:first-child {
+		display: inline-block;
+		width: calc(100% - 40px);
+	}
+
+}
+
+
+/*
+ * Column configuration form
+ */
+
+.columnEditor {
+	height: 100%;
+	width: 200%;
+	transition: transform .2s ease-in-out;
+}
+
+.columnEditor.slid {
+	transform: translateX(-50%);
+}
+
+.configForm {
+	color: white;
+	font-weight: 100;
+	font-size: 14px;
+	position: relative;
+	padding: 10px;
+	padding-top: 1em;
+	display: inline-block;
+	width: 50%;
+	vertical-align: top;
+
+	.dijitButton {
+		position: absolute;
+		top: 5px;
+		right: 0;
+	}
+
+	.dijitButton .dijitButtonNode {
+		font-size: 12px;
+	}
+
+	fieldset {
+		font-size: 0;
+		position: relative;
+	}
+
+	legend {
+		font-size: 14px;
+		font-weight:400;
+		margin:0 0 30px 0;
+    	padding: 10px 0 0 0;
+	}
+	.label {
+		width: 120px;
+		display: inline-block;
+		font-size: 14px;
+		vertical-align: top;
+		height: 35px;
+		&:after {
+			content: ':';
+			display: inline-block;
+		}
+	}
+
+	.field {
+		width: calc(100% - 120px);
+		display: inline-block;
+		vertical-align: top;
+		font-size: 12px;
+		.dijitTextBox {
+			width: 100%;
+			margin-bottom:10px;
+		}
+	}
+	.mixinProp {
+		font-weight: 400;
+		margin-top: 20px;
+	}
+}
