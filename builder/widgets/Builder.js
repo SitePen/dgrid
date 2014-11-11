@@ -34,6 +34,11 @@ define([
 		templateString: template,
 		i18n: i18n,
 		docBaseUrl: config.docBaseUrl,
+		dgridUrl: config.dgridUrl,
+
+		// resourcesBaseUrl is used for image paths; toUrl includes cacheBust so strip it
+		resourcesBaseUrl: require.toUrl('../resources').replace(/\?.*$/, ''),
+
 		baseClass: 'builder',
 
 		aboutVisible: true,
