@@ -11,7 +11,7 @@
 .claro {
 
 	.featureGrid {
-		margin-top:1em;
+		margin-top:0.5em;
 	}
 
 	.featureGrid,
@@ -61,19 +61,38 @@
 		.dijitCheckBox {
 			background: none;
 			border-radius: 3px;
-			background-color: #ECF0F1;
-			width: 18px;
-			height: 18px;
+			background-color: $checkBg;
+			box-shadow: inset 1px 1px 3px 0px rgba(50, 50, 50, 0.65);
+			width: $checkboxSize;
+			height: $checkboxSize;
+			transition: background-color 0.3s, box-shadow 0.3s;
+
+			&:hover{
+				box-shadow: inset 1px 1px 1px 0px rgba(50, 50, 50, 0.45);
+			}
+
+			&.dijitCheckBoxDisabled {
+				background-color: $checkDisabledBg;
+				box-shadow: none;
+			}
+
+			&.dijitCheckBoxChecked {
+				$sprite($checkboxChecked);
+				background-color: $checkFilledBg;
+				&:hover {
+					background-color: lighten(@background-color, 15%);
+				}
+			}
+
+			&.dijitCheckBoxCheckedDisabled {
+				$sprite($checkboxChecked);
+				background-color: darken($checkFilledBg, 30%);
+				&:hover {
+					background-color: @background-color;
+				}
+			}
 		}
-		.dijitCheckBoxDisabled {
-			border-radius: 3px;
-			background-color: $checkDisabledBg;
-			width: 18px;
-			height: 18px;
-		}
-		.dijitCheckBoxChecked {
-			background: $checkFilledBg;
-		}
+
 
 		.icon-gear {
 			color: $sidebarIconColor;
@@ -179,6 +198,14 @@
 		}
 		/* END DnD FIX */
 	}
+
+	.dijitRadio {
+		$sprite($radio);
+	}
+
+	.dijitRadioChecked {
+		$sprite($radioChecked);
+	}
 }
 
 .columnEditor {
@@ -239,7 +266,7 @@
 	font-weight: 100;
 	font-size: 14px;
 	position: relative;
-	padding: 10px;
+	padding: 15px;
 	padding-top: 1em;
 	display: inline-block;
 	width: 50%;
@@ -263,13 +290,14 @@
 	legend {
 		font-size: 14px;
 		font-weight:400;
-		margin:0 0 30px 0;
+		margin:0 0 20px 0;
     	padding: 10px 0 0 0;
+    	text-transform: uppercase;
 	}
 	.label {
-		width: 120px;
+		width: 150px;
 		display: inline-block;
-		font-size: 14px;
+		font-size: 13px;
 		vertical-align: top;
 		height: 35px;
 		&:after {
@@ -278,8 +306,16 @@
 		}
 	}
 
+	.propTitle {
+		margin-bottom:0.55em;
+		font-size:13px;
+		color: $primaryButtonColor;
+		text-transform:none;
+	}
+
 	.field {
-		width: calc(100% - 120px);
+		font-weight:400;
+		width: calc(100% - 180px);
 		display: inline-block;
 		vertical-align: top;
 		font-size: 12px;
@@ -287,9 +323,21 @@
 			width: 100%;
 			margin-bottom:10px;
 		}
+
+		.halfWidth {
+			width: 35%;
+		}
 	}
+
+
 	.mixinProp {
 		font-weight: 400;
 		margin-top: 20px;
+		text-transform: uppercase;
+	}
+	.actionLink {
+		cursor:pointer;
+		color: #A8EAFF;
+		margin-left:1em;
 	}
 }

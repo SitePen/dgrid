@@ -6,22 +6,10 @@
 	margin-bottom: 10px;
 }
 
-.gridBtn,
-.codeBtn {
-	color: #E0E0E0;
-	cursor: pointer;
-}
-
-.render[data-selected-page="grid"] .gridBtn {
-	color: #144C66;
-}
-
-.codeBtn {
-	margin-left: 25px;
-}
 
 .demoGridPane {
 	color: #95a5a6;
+	margin-top:1em;
 
 	.dojoDndItem,
 	.dojoDndItemOver {
@@ -30,24 +18,81 @@
 	}
 }
 
-.demoCodePane textarea {
-	width: 100%;
-	border: 0;
-	font-family: Consolas, Courier, monospace;
-	font-size: 12px;
-	background: #EBEBEB;
-	overflow-y: hidden;
-	padding: 15px 5px;
+.demoCodePane {
+	margin-top:1em;
+	textarea {
+		width: 100%;
+		border: 0;
+		font-family: Consolas, Courier, monospace;
+		font-size: 12px;
+		background: #EBEBEB;
+		overflow-y: hidden;
+		padding: 15px 5px;
+	}
 }
 
-.render[data-selected-page="code"] .demoGridPane {
-	display: none;
+.render {
+	padding-top:13px;
+
+	.gridBtn,
+	.codeBtn {
+		font-size:13px;
+		margin:0;
+		padding:0.55em 0.75em;
+		font-weight: normal;
+		cursor: pointer;
+		transition: background 0.3s;
+
+		i {
+			margin-right:0.45em;
+			position:relative;
+			top:1px;
+		}
+	}
+
+	.gridBtn {
+		border-radius: 4px 0 0 4px;
+	}
+
+	.codeBtn {
+		border-radius: 0 4px 4px 0;
+	}
+
+	&[data-selected-page="code"] {
+		.demoGridPane {
+			display: none;
+		}
+
+		.codeBtn {
+			background: $resultButtonOnBg;
+			color: $resultButtonOnText;
+		}
+		.gridBtn {
+			background: $resultButtonOffBg;
+			color: $resultButtonOffText;
+			&:hover {
+				background: lighten($resultButtonOnBg, 80%);
+			}
+		}
+	}
+
+	&[data-selected-page="grid"] {
+		.demoCodePane {
+			display: none;
+		}
+		.codeBtn {
+			background: $resultButtonOffBg;
+			color: $resultButtonOffText;
+			&:hover {
+				background: lighten($resultButtonOnBg, 80%);
+			}
+		}
+		.gridBtn {
+			background: $resultButtonOnBg;
+			color: $resultButtonOnText;
+		}
+	}
+
 }
 
-.render[data-selected-page="code"] .codeBtn {
-	color: #144C66;
-}
 
-.render[data-selected-page="grid"] .demoCodePane {
-	display: none;
-}
