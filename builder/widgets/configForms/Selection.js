@@ -3,23 +3,13 @@ define([
 	'./ConfigForm',
 	'dojo/text!./templates/Selection.html',
 	'dgrid/Selection',
-	'../MultiRowSingleSelect',
 	// for template
+	'dijit/form/FilteringSelect',
 	'dijit/form/RadioButton'
-], function (declare, ConfigForm, template, Selection, MultiRowSingleSelect) {
+], function (declare, ConfigForm, template, Selection) {
 	return declare(ConfigForm, {
 		templateString: template,
 		defaultsObject: Selection.prototype,
-
-		postCreate: function () {
-			this.inherited(arguments);
-
-			this.modeSelect = new MultiRowSingleSelect({
-				name: 'selectionMode',
-				size: 5,
-				className: 'modeSelect'
-			}, this.modeSelectNode);
-		},
 
 		_clearField: function (event) {
 			var fieldName = event.target.getAttribute('data-field-name');

@@ -206,12 +206,14 @@
 
 	.addBtn {
 		background: transparent;
-		border: 0;
-		color: #FFF;
+		border: none;
+		color: #fff;
 		font-size: 18px;
-		outline: 0;
+		outline: none;
+		padding: 0 0 0 16px;
 		transition: color 0.4s;
-		width: 40px;
+		vertical-align: middle;
+
 		&:hover {
 			color: lighten($confirmColor, 20%);
 			cursor:pointer;
@@ -222,7 +224,6 @@
 		display: inline-block;
 		width: calc(100% - 40px);
 	}
-
 }
 
 

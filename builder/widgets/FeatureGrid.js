@@ -26,22 +26,14 @@ define([
 
 	function renderLabelCell (item, value, node) {
 		// Render the label cell, adding the doc link, tooltip icon, and config icon when appropriate
-		var cellValue = item.label;
-
-		if (item.documentationUrl) {
-			cellValue = '<a href="' + item.documentationUrl + '" target="_blank">' + cellValue + '</a>';
-		}
-
-		// if (item.info) {
-		// 	cellValue += ' <i class="icon-info-circle"></i>';
-		// }
+		var cellHtml = '<a class="featureLabel" href="#">' + item.label + '</a>';
 
 		// If configModule has not been defined there's no config widget to display
 		if (item.configLevel === 'grid' && item.configModule) {
-			cellValue += ' <i class="icon-gear"></i>';
+			cellHtml = cellHtml + ' <i class="icon-gear"></i>';
 		}
 
-		node.innerHTML = cellValue;
+		node.innerHTML = cellHtml;
 	}
 
 	var CustomGrid = declare([ OnDemandGrid, Editor, DijitRegistry ], {
@@ -68,8 +60,19 @@ define([
 			this.inherited(arguments);
 
 			this.on('dgrid-datachange', lang.hitch(this, '_onDataChange'));
-			this.on(on.selector('.dgrid-column-label', mouse.enter), lang.hitch(this, '_showInfoTip'));
-			this.on(on.selector('.dgrid-column-label', mouse.leave), lang.hitch(this, '_hideInfoTip'));
+			this.on('.featureLabel:click', lang.hitch(this, '_onFeatureLabelClick'));
+			this.on(on.selector('.field-label', mouse.enter), lang.hitch(this, '_showInfoTip'));
+			this.on(on.selector('.field-label', mouse.leave), lang.hitch(this, '_hideInfoTip'));
+		},
+
+		_onFeatureLabelClick: function (event) {
+			event.preventDefault();
+			// Since we are using Dijit checkbox editors, updating one's checked state will fire
+			// change handlers, which will route into _onDataChange below
+			var checkbox = this.cell(this.row(event), 'selected').element.widget;
+			if (!checkbox.get('disabled')) {
+				checkbox.set('checked', !checkbox.get('checked'));
+			}
 		},
 
 		_onDataChange: function (event) {

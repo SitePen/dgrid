@@ -4,25 +4,20 @@ define([
 	'dojo/dom-construct',
 	'dojo/topic',
 	'dojo/when',
+	'dojo/store/Memory',
 	'./ConfigForm',
-	'../MultiRowSingleSelect',
 	'dojo/text!./templates/Tree.html',
 	'dgrid/Tree',
 	// for template
+	'dijit/form/FilteringSelect',
 	'dijit/form/RadioButton'
-], function (declare, lang, domConstruct, topic, when, ConfigForm, MultiRowSingleSelect, template, Tree) {
+], function (declare, lang, domConstruct, topic, when, Memory, ConfigForm, template, Tree) {
 	return declare(ConfigForm, {
 		templateString: template,
 		defaultsObject: Tree.prototype,
 
 		postCreate: function () {
 			this.inherited(arguments);
-
-			this.expandoSelect = new MultiRowSingleSelect({
-				name: 'renderExpando',
-				size: 8,
-				className: 'expandoSelect'
-			}, this.expandoSelectNode);
 
 			this.own(
 				topic.subscribe('/store/columns/update', lang.hitch(this, '_updateColumnNames'))
@@ -31,15 +26,22 @@ define([
 
 		_updateColumnNames: function (columnStore) {
 			var self = this;
-			var fragment = document.createDocumentFragment();
+			var data = [];
+			var firstValue;
 
 			when(columnStore.fetch().forEach(function (column) {
-				domConstruct.create('option', {
-					value: column.field,
-					innerHTML: column.field
-				}, fragment);
+				if (!firstValue) {
+					firstValue = column.field;
+				}
+				data.push({
+					id: column.field,
+					name: column.field
+				});
 			})).then(function () {
-				domConstruct.place(fragment, self.expandoSelect.containerNode, 'only');
+				self.expandoSelect.set('store', new Memory({ data: data }));
+				// Select the first column by default
+				// (in case the user selects tree without first visiting the options)
+				self.expandoSelect.set('value', firstValue);
 			});
 		},
 

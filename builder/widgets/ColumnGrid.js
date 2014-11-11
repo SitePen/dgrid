@@ -18,7 +18,7 @@ define([
 	// Widgets in template:
 	'dijit/form/Form',
 	'dijit/form/Button',
-	'dijit/form/ValidationTextBox'
+	'dijit/form/TextBox'
 ], function (declare, lang, domClass, topic, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, _ResizeMixin, i18n,
 	template, OnDemandGrid, Editor, DijitRegistry, DnD, Memory, Trackable) {
 
@@ -92,7 +92,7 @@ define([
 			event.preventDefault();
 			var form = this.columnGridForm;
 
-			if (!form.validate()) {
+			if (!form.get('value').label) {
 				return;
 			}
 
@@ -104,6 +104,7 @@ define([
 			});
 
 			form.reset();
+			this.fieldLabelTextBox.focus();
 		},
 
 		// Removed the clicked column from the store

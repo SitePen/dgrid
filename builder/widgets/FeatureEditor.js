@@ -102,6 +102,8 @@ define([
 
 		_setFeatureTypeAttr: function (featureType) {
 			this.featureGrid.set('featureType', featureType);
+			// Make sure the grid is actually the selected child (not one of the option panes)
+			this.selectChild(this.featureGrid);
 		}
 	});
 });
