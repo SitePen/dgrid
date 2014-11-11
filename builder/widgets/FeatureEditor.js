@@ -68,7 +68,7 @@ define([
 
 			this.own(
 				this.featureGrid.on('configure-module', lang.hitch(this, '_showModuleConfig')),
-				this.store.on(['add', 'delete', 'update'], lang.hitch(this, '_onUpdateStore'))
+				this.store.on('add,delete,update', lang.hitch(this, '_onUpdateStore'))
 			);
 		},
 

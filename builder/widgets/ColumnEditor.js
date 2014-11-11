@@ -12,7 +12,6 @@ define([
 		buildRendering: function () {
 			this.inherited(arguments);
 
-			// columnGrid is a ContentPane that contains a grid
 			this.columnGrid = new ColumnGrid().placeAt(this.domNode);
 			this.form = new ColumnConfigForm().placeAt(this.domNode);
 		},

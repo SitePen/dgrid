@@ -83,7 +83,7 @@ define([
 				this.featureEditor.set('featureType', (target === 'gridFeatures') ? 'grid' : 'column');
 				target = 'features';
 			}
-			query('[data-tab="' + target + '"', this.domNode).addClass('showing');
+			query('[data-tab="' + target + '"]', this.domNode).addClass('showing');
 		},
 
 		_showAbout: function (event) {
@@ -320,6 +320,10 @@ define([
 
 			arrayUtil.forEach(this.columnEditor.get('columns'), function (columnConfig) {
 				var config = this._fixDataTypes(lang.clone(columnConfig));
+
+				// The builder needs the store items to have a unique id property,
+				// but we don't want to include it in our output
+				delete config.id;
 
 				if (config.field === treeExpandoColumn) {
 					config.renderExpando = true;

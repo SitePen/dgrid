@@ -28,8 +28,6 @@ define([
 
 		moduleName: '',
 
-		_isValueBroadcastEnabled: true,
-
 		buildRendering: function () {
 			this.inherited(arguments);
 
@@ -43,8 +41,7 @@ define([
 			});
 
 			this.doneButton = new Button({
-				label: i18n.done,
-				className: 'doneButton'
+				label: i18n.done
 			}).placeAt(buttonBar);
 
 			this._startupWidgets.push(this.doneButton);
@@ -72,10 +69,8 @@ define([
 					this.emit('close');
 				})),
 				this.watch('value', lang.hitch(this, function () {
-					if (this._isValueBroadcastEnabled) {
-						// Let the Builder know that is should update the demo display (grid or generated code)
-						topic.publish('/configuration/changed');
-					}
+					// Let the Builder know that it should update the demo display (grid or generated code)
+					topic.publish('/configuration/changed');
 				}))
 			);
 		},
@@ -118,9 +113,9 @@ define([
 				}
 			}, this);
 
-			this._isValueBroadcastEnabled = false;
+			// TODO: it would be ideal to ignore this in the 'value' watcher registered in postCreate
+			// but it's difficult since `this.set` fires change handlers async and does not return a promise
 			this.set('value', defaultValues);
-			this._isValueBroadcastEnabled = true;
 		}
 	});
 });
