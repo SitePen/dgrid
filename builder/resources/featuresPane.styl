@@ -29,10 +29,9 @@
 	}
 
 	.dgrid-row {
-		background: transparent;
 		padding: 0 10px;
 		position:relative;
-		transition: background 0.4s;
+
 		a {
 			text-decoration: none;
 			color: white;
@@ -49,24 +48,17 @@
 		}
 	}
 
-	.dgrid-row-even {
-		background: $sidebarRowEvenBg;
-		&:hover {
-			background: @background;
-		}
+	.dgrid-row-even:hover {
+		background: lighten($sidebarRowEvenBg, 5%);
+		transition: background 0.4s;
 	}
 
-	.dgrid-row-odd {
-		background: $sidebarRowOddBg;
-		&:hover {
-			background: @background;
-		}
+	.dgrid-row-odd:hover {
+		background: lighten($sidebarRowOddBg, 5%);
+		transition: background 0.4s;
 	}
 
-	.dgrid-column-selected {
+	.field-selected {
 		width: 30px;
-	}
-	.dgrid-expando-icon {
-		display: none;
 	}
 }

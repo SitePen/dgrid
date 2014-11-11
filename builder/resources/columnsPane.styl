@@ -30,6 +30,29 @@
 			height: auto;
 		}
 
+		.dgrid-row {
+			color: #fff;
+			font-size: 13px;
+			font-weight: 100;
+			border: none !important;
+			width:100%;
+			padding:0;
+			transition: padding 0.3s;
+			cursor: default;
+
+			.dgrid-cell {
+				padding: 4px;
+			}
+		}
+
+		.dgrid-row-odd {
+			background: $sidebarRowOddBg;
+		}
+
+		.dgrid-row-even {
+			background: $sidebarRowEvenBg;
+		}
+
 		.dgrid-cell {
 			line-height: 26px;
 			border: 0;
@@ -64,31 +87,7 @@
 
 	.columnGrid,
 	.dojoDndAvatar {
-		.dgrid-row {
-			background: transparent;
-			color: white;
-			font-size: 13px;
-			font-weight: 100;
-			border: 0 !important;
-			width:100%;
-			padding:0;
-			transition: padding 0.3s;
-			cursor: default;
-
-			table td {
-				padding:4px;
-			}
-		}
-
-		.dgrid-row-odd table td {
-			background: $sidebarRowOddBg;
-		}
-
-		.dgrid-row-even table td {
-			background: $sidebarRowEvenBg;
-		}
-
-		.dgrid-column-dragSource {
+		.field-dragSource {
 			width: 30px;
 			font-size: 16px;
 			color: $sidebarIconColor;
@@ -106,17 +105,14 @@
 		}
 
 
-		.dgrid-column-config  {
+		.field-config  {
 			width: 45px;
 			padding-left: 4px;
 		}
-		.dgrid-column-label {
+		.field-label {
 			padding-left: 2px;
 		}
 
-		.dgrid-column-fieldName {
-			padding-right: 3px;
-		}
 		.icon-gear {
 			margin-left: 7px;
 		}
