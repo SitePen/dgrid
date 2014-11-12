@@ -218,9 +218,40 @@ fieldset {
 /*
  * About Dialog
  */
-.aboutDialog {
+.claro .aboutDialog {
+	overflow: visible;
+	width:60%;
+	border-radius: 8px;
+	border:none;
+	background:#fff;
+	box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.70);
+	padding:2em;
+
 	// dijit/Dialog's sizing logic does not expect border-box, so reset it
 	* {
 		box-sizing: content-box;
+
+	}
+
+	.dijitDialogCloseIcon {
+		background-image: url("img/lab.png");
+		background-position: 0 0;
+		width:286px;
+		height: 241px;
+		top:-130px;
+		right:-60px;
+		z-index: 951;
+		position: absolute;
+	}
+
+	.dijitDialogTitleBar,
+	.dijitDialogPaneContent {
+		background: none;
+		border:none;
+	}
+
+	.dijitDialogTitleBar {
+		text-align:center;
+		font-size:42px;
 	}
 }
