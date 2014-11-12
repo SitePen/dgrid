@@ -75,7 +75,7 @@ define([
 			this.inherited(arguments);
 			this.own(
 				this.store.on('add,delete,update', lang.hitch(this, '_onStoreChange')),
-				this.grid.on('.icon-times:click', lang.hitch(this, '_removeColumn')),
+				this.grid.on('.icon-times:click', lang.hitch(this, 'removeColumn')),
 				this.grid.on('.icon-gear:click', lang.hitch(this, '_editColumn')),
 				topic.subscribe('/column/changed', lang.hitch(this, '_onColumnChange'))
 			);
@@ -85,34 +85,46 @@ define([
 			return this.store.fetchSync();
 		},
 
-		// Add a column to the store from the UI values
-		_addColumn: function (event) {
+		addColumn: function (label) {
+			// summary:
+			//		Adds a column to the store with the given label;
+			//		the column's field name will be based on the label provided
+			this.store.put({
+				field: label.replace(/[^\w-]/g, '_'),
+				label: label
+			});
+		},
+
+		removeColumn: function (target) {
+			// summary:
+			//		Removes the column from the store corresponding to the given target
+			//		(whether an event, element, ID, or item)
+
+			this.store.remove(this.grid.row(target).id);
+		},
+
+		_onFormSubmit: function (event) {
+			// summary:
+			//		Adds a column to the store from the UI values
+
 			event.preventDefault();
 			var form = this.columnGridForm;
+			var value = form.get('value');
 
-			if (!form.get('value').label) {
+			if (!value.label) {
 				return;
 			}
 
-			var value = form.get('value');
-
-			this.store.put({
-				field: value.label.replace(/[^\w-]/g, '_'),
-				label: value.label
-			});
+			this.addColumn(value.label);
 
 			form.reset();
 			this.fieldLabelTextBox.focus();
 		},
 
-		// Removed the clicked column from the store
-		_removeColumn: function (event) {
-			var row = this.grid.row(event);
-			this.store.remove(row.id);
-		},
-
-		// Show the column configuration for a column
 		_editColumn: function (event) {
+			// summary:
+			//		Shows the column configuration for a column
+
 			var row = this.grid.row(event);
 
 			// Let the ColumnEditor know that is should set the form data and display the form

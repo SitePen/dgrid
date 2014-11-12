@@ -44,6 +44,14 @@ define([
 		_onEditColumn: function (event) {
 			domClass.add(this.domNode, 'slid');
 			this.form.set('value', event.data);
+		},
+
+		addColumn: function (label) {
+			this.columnGrid.addColumn(label);
+		},
+
+		removeColumn: function (target) {
+			this.columnGrid.removeColumn(target);
 		}
 	});
 });
