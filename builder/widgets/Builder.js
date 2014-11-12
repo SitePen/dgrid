@@ -14,6 +14,7 @@ define([
 	'dstore/Memory',
 	'dstore/Trackable',
 	'dstore/Tree',
+	'./aboutDialog',
 	'./ColumnEditor',
 	'./FeatureEditor',
 	'../util/toJavaScript',
@@ -25,8 +26,9 @@ define([
 	// Widgets in template
 	'dijit/layout/ContentPane',
 	'dijit/layout/TabContainer'
-], function (require, arrayUtil, declare, lang, domClass, query, string, on, topic, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, Memory, Trackable, TreeStoreMixin, ColumnEditor, FeatureEditor, toJavaScript, config, i18n,
-	template, codeTemplate) {
+], function (require, arrayUtil, declare, lang, domClass, query, string, on, topic,
+		_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, Memory, Trackable, TreeStoreMixin,
+		aboutDialog, ColumnEditor, FeatureEditor, toJavaScript, config, i18n, template, codeTemplate) {
 
 	var NUM_ITEMS = 50;
 
@@ -84,23 +86,10 @@ define([
 			query('[data-tab="' + target + '"', this.domNode).addClass('showing');
 		},
 
-		// _toggleAbout: function () {
-		// 	this.set('aboutVisible', !this.get('aboutVisible'));
-		// },
-
-		// _setAboutVisibleAttr: function (visible) {
-		// 	domClass.toggle(this.aboutNode, 'dijitHidden', !visible);
-		// 	domClass.replace(this.aboutIconNode,
-		// 		visible ? 'icon-angle-up' : 'icon-angle-down',
-		// 		visible ? 'icon-angle-down' : 'icon-angle-up');
-		// 	this.resize();
-
-		// 	if (this.aboutKey) {
-		// 		localStorage[this.aboutKey] = '' + visible;
-		// 	}
-
-		// 	this._set('aboutVisible', visible);
-		// },
+		_showAbout: function (event) {
+			event.preventDefault();
+			aboutDialog.show();
+		},
 
 		_toggleColumns: function () {
 			domClass.toggle(this.columnEditorNode, 'open');

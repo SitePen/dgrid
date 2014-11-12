@@ -17,7 +17,6 @@
 				packages: [
 					'dojo',
 					'dijit',
-					'dojox',
 					'dgrid',
 					'dstore',
 					'put-selector',
@@ -30,13 +29,7 @@
 			require([
 				'dgrid/builder/widgets/Builder'
 			], function (Builder) {
-				var key = window.localStorage && 'dgrid-builder-about-visible';
-				var aboutVisible = key ? localStorage[key] !== 'false' : false;
-				var builder = new Builder({
-					aboutVisible: aboutVisible,
-					aboutKey: key
-				});
-				builder.placeAt(document.body);
+				var builder = new Builder().placeAt(document.body);
 				builder.startup();
 			});
 		</script>

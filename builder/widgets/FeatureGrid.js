@@ -50,7 +50,6 @@ define([
 				sortable: false
 			},
 			label: {
-				label: i18n.selectGridFeatures,
 				renderCell: renderLabelCell,
 				sortable: false
 			}
