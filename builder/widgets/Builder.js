@@ -78,7 +78,6 @@ define([
 
 		selectTab: function (evt) {
 			var target = evt.target.getAttribute('data-target');
-			query('.showing', this.domNode).removeClass('showing');
 			query('.active', this.domNode).removeClass('active');
 
 			query('[data-target="' + target + '"]', this.domNode).addClass('active');
@@ -88,7 +87,7 @@ define([
 				this.featureEditor.set('featureType', (target === 'gridFeatures') ? 'grid' : 'column');
 				target = 'features';
 			}
-			query('[data-tab="' + target + '"]', this.domNode).addClass('showing');
+			query('[data-tab="' + target + '"]', this.domNode).addClass('active');
 		},
 
 		_showAbout: function (event) {

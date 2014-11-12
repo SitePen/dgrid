@@ -11,10 +11,11 @@ define([
 	'dijit/_WidgetsInTemplateMixin',
 	'./_ResizeMixin',
 	'dijit/Tooltip',
-	'dgrid/OnDemandGrid',
+	'dijit/form/CheckBox',
+	'dgrid/Grid',
 	'dgrid/Editor',
 	'dgrid/extensions/DijitRegistry',
-	'dijit/form/CheckBox',
+	'../grid/SingleQuery',
 	'dojo/i18n!../nls/builder',
 	'dojo/text!./templates/FeatureGrid.html',
 	// Widgets in template
@@ -22,7 +23,7 @@ define([
 	'dijit/form/RadioButton'
 ], function (arrayUtil, declare, lang, mouse, on, query, topic,
 		_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, _ResizeMixin,
-		Tooltip, OnDemandGrid, Editor, DijitRegistry, CheckBox, i18n, template) {
+		Tooltip, CheckBox, Grid, Editor, DijitRegistry, SingleQuery, i18n, template) {
 
 	function renderLabelCell (item, value, node) {
 		// Render the label cell, adding the doc link, tooltip icon, and config icon when appropriate
@@ -36,7 +37,7 @@ define([
 		node.innerHTML = cellHtml;
 	}
 
-	var CustomGrid = declare([ OnDemandGrid, Editor, DijitRegistry ], {
+	var CustomGrid = declare([ Grid, SingleQuery, Editor, DijitRegistry ], {
 		gridTypeForm: null, // Passed from FeatureGrid when instantiated
 		showHeader: false,
 		columns: {
@@ -195,7 +196,7 @@ define([
 		buildRendering: function () {
 			this.inherited(arguments);
 			this.grid = new CustomGrid({
-				className: 'featureGrid',
+				className: 'featureGrid dgrid-autoheight',
 				_store: this.store,
 				collection: this.store.filter({ featureType: this.featureType }),
 				gridTypeForm: this.gridTypeForm

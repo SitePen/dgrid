@@ -3,13 +3,10 @@
  */
 .columnGridContainer {
 	display: inline-block;
-	padding-top:1em;
-	width: 50%;
-	vertical-align: top;
+	padding-top: 1em;
 }
 
 .claro {
-
 	.featureGrid {
 		margin-top:0.5em;
 	}
@@ -20,15 +17,6 @@
 		background: transparent;
 		height: auto;
 		border: 0 !important;
-
-		.dgrid-scroller {
-			position: relative;
-			overflow: hidden;
-		}
-
-		.dgrid-content {
-			height: auto;
-		}
 
 		.dgrid-row {
 			color: #fff;
@@ -208,14 +196,6 @@
 	}
 }
 
-.columnEditor {
-	margin: 0;
-	overflow: hidden;
-	position: relative;
-	transition: max-height .5s ease-in-out, margin .5s ease-in-out;
-}
-
-
 /*
  * Column grid form
  */
@@ -253,24 +233,37 @@
  */
 
 .columnEditor {
-	width: 200%;
-	transition: transform .2s ease-in-out;
-}
+	margin: 0;
+	overflow-x: hidden;
 
-.columnEditor.slid {
-	transform: translateX(-50%);
+	.configForm {
+		display: none;
+	}
+
+	// TODO: Ideally we'd like to use transitions here, but they're problematic
+	// because keeping both elements rendered affects scrollHeight of the full container
+	&.slid .columnGridContainer {
+		display: none;
+	}
+	&.slid .configForm {
+		display: block;
+	}
 }
 
 .configForm {
-	color: white;
+	color: #fff;
 	font-weight: 100;
 	font-size: 14px;
 	position: relative;
 	padding: 15px;
 	padding-top: 1em;
 	display: inline-block;
-	width: 50%;
 	vertical-align: top;
+
+	legend {
+		// IE reverts to #000 for legends unless specifically told otherwise
+		color: #fff;
+	}
 
 	.dijitButton {
 		margin: 0;
@@ -302,10 +295,6 @@
 		font-size: 13px;
 		vertical-align: top;
 		height: 35px;
-		&:after {
-			content: ':';
-			display: inline-block;
-		}
 	}
 
 	.propTitle {

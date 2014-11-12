@@ -9,10 +9,11 @@ define([
 	'./_ResizeMixin',
 	'dojo/i18n!../nls/builder',
 	'dojo/text!./templates/ColumnGrid.html',
-	'dgrid/OnDemandGrid',
+	'dgrid/Grid',
 	'dgrid/Editor',
 	'dgrid/extensions/DijitRegistry',
 	'dgrid/extensions/DnD',
+	'../grid/SingleQuery',
 	'dstore/Memory',
 	'dstore/Trackable',
 	// Widgets in template:
@@ -20,7 +21,7 @@ define([
 	'dijit/form/Button',
 	'dijit/form/TextBox'
 ], function (declare, lang, domClass, topic, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, _ResizeMixin, i18n,
-	template, OnDemandGrid, Editor, DijitRegistry, DnD, Memory, Trackable) {
+	template, Grid, Editor, DijitRegistry, DnD, SingleQuery, Memory, Trackable) {
 
 	function renderDragSourceCell(item, value, node) {
 		domClass.add(node, 'dojoDndHandle');
@@ -37,7 +38,7 @@ define([
 
 			this.store = new (declare([ Memory, Trackable ]))();
 
-			this.grid = new (declare([ OnDemandGrid, Editor, DnD, DijitRegistry ], {
+			this.grid = new (declare([ Grid, SingleQuery, Editor, DnD, DijitRegistry ], {
 				columns: {
 					dragSource: {
 						label: '',
@@ -65,7 +66,7 @@ define([
 				}
 			}))({
 				collection: this.store,
-				className: 'columnGrid'
+				className: 'columnGrid dgrid-autoheight'
 			}, this.gridNode);
 
 			this._startupWidgets.push(this.grid);

@@ -194,27 +194,26 @@ fieldset {
 	cursor: pointer;
 	transition: background 0.4s;
 
+	&.active {
+		background: $sidebarTabActiveBg;
+	}
+
 	&:hover {
 		background: lighten($sidebarTabStripBg, 10%);
 	}
 }
 
-.tab.active {
-	background: $sidebarTabActiveBg;
-}
+.tabContent {
+	display: none;
+	overflow: auto;
+	position: absolute;
+	bottom: 0;
+	top: $tabHeight;
 
-[data-tab] {
-	opacity: 0 !important;
-	z-index: 0  !important;
-	position: absolute !important;
-	top: 47px  !important;
+	&.active {
+		display: block;
+	}
 }
-
-[data-tab].showing {
-	opacity: 1 !important;
-	z-index: 1  !important;
-}
-
 
 /*
  * About Dialog
