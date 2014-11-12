@@ -41,6 +41,27 @@
 	.dgrid-input:focus {
 		outline: 0;
 	}
+
+	.dijitMenuItem {
+		font-size:12px;
+	}
+
+	.dijitArrowButton {
+		background-color:#fff !important;
+	}
+
+	.dijitComboBoxMenu {
+		border-radius: 0 0 4px 4px;
+
+		.dijitMenuItem {
+			transition:background-color 0.3s;
+		}
+		.dijitMenuItemSelected,
+		.dijitMenuItemHover {
+			background-image:none;
+			border-color:#fff;
+		}
+	}
 }
 
 /* Override DND Avatar */
