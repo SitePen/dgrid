@@ -133,10 +133,14 @@ non-trivial modifications.
 
 ## Getting Support
 
-Questions about dgrid usage can be discussed on the
-[dojo-interest mailing list](http://mail.dojotoolkit.org/mailman/listinfo/dojo-interest)
-or in the #dojo IRC channel on irc.freenode.net. Web interfaces are available
-from the [Dojo Toolkit Community page](https://dojotoolkit.org/community/).
+Questions about dgrid usage can be asked in the following places:
+
+* [Stack Overflow](http://stackoverflow.com/questions/tagged/dgrid)
+* The #dojo IRC channel on irc.freenode.net
+* The [dojo-interest mailing list](http://mail.dojotoolkit.org/mailman/listinfo/dojo-interest)
+
+Web interfaces for IRC and the mailing list are available from the
+[Dojo Toolkit Community page](https://dojotoolkit.org/community/).
 
 SitePen also offers [commercial support](https://www.sitepen.com/support/)
 for dgrid, as well as Dojo and a number of other JavaScript libraries.
