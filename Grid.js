@@ -1,12 +1,13 @@
 define([
 	'dojo/_base/declare',
+	'dojo/_base/kernel',
 	'dojo/on',
 	'dojo/has',
 	'put-selector/put',
 	'./List',
 	'./util/misc',
 	'dojo/_base/sniff'
-], function (declare, listen, has, put, List, miscUtil) {
+], function (declare, kernel, listen, has, put, List, miscUtil) {
 	function appendIfNode(parent, subNode) {
 		if (subNode && subNode.nodeType) {
 			parent.appendChild(subNode);
@@ -442,6 +443,9 @@ define([
 				// add grid reference to each column object for potential use by plugins
 				column.grid = this;
 				if (typeof column.init === 'function') {
+					kernel.deprecated('colum.init',
+						'Column plugins are being phased out in favor of mixins for better extensibility. ' +
+							'column.init may be removed in a future release.');
 					column.init();
 				}
 
@@ -473,6 +477,9 @@ define([
 				for (j = 0, len = subRows[i].length; j < len; j++) {
 					column = subRows[i][j];
 					if (typeof column.destroy === 'function') {
+						kernel.deprecated('colum.destroy',
+							'Column plugins are being phased out in favor of mixins for better extensibility. ' +
+								'column.destroy may be removed in a future release.');
 						column.destroy();
 					}
 				}
