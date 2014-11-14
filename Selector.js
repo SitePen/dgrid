@@ -195,16 +195,17 @@ define([
 			}
 		},
 
-		_configColumns: function () {
-			var columnArray = this.inherited(arguments);
+		configStructure: function () {
+			this.inherited(arguments);
+			var columns = this.columns;
 			this._selectorColumns = [];
 			this._hasSelectorHeaderCheckbox = this._selectorSingleRow = false;
-			for (var i = 0, l = columnArray.length; i < l; i++) {
-				if (columnArray[i].selector) {
-					this._configureSelectorColumn(columnArray[i]);
+
+			for (var k in columns) {
+				if (columns[k].selector) {
+					this._configureSelectorColumn(columns[k]);
 				}
 			}
-			return columnArray;
 		},
 
 		_handleSelect: function (event) {
