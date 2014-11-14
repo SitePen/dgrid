@@ -144,6 +144,12 @@ define([
 			this.refresh();
 		},
 
+		_setStore: function () {
+			if (!this.collection) {
+				console.debug('set(\'store\') call detected, but you probably meant set(\'collection\') for 0.4');
+			}
+		},
+
 		_getTotal: function () {
 			// summary:
 			//		Retrieves the currently-tracked total (as updated by
@@ -183,6 +189,10 @@ define([
 		_applySort: function () {
 			if (this.collection) {
 				this.set('collection', this.collection);
+			}
+			else if (this.store) {
+				console.debug('_StoreMixin found store property but not collection; ' +
+					'this is often the sign of a mistake during migration from 0.3 to 0.4');
 			}
 		},
 
