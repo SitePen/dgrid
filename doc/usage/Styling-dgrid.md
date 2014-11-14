@@ -105,4 +105,4 @@ property to the instance.
 **Note:** Using the `dgrid-autoheight` class with `OnDemandList` is **not** recommended, as `OnDemandList` will
 end up ultimately rendering all of the grid's rows anyway, page by page.  `dgrid-autoheight` works well with
 `Pagination`.  If you are really interested in rendering all store data at once into an auto-height list or grid,
-have a look at our [tutorial](http://dojofoundation.org/packages/dgrid/tutorials/0.4/single_query) on the subject.
+have a look at our [tutorial](http://dgrid.io/tutorials/0.4/single_query) on the subject.

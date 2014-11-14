@@ -49,4 +49,4 @@ available to further expand dgrid's functionality.
 
 ## Tutorials
 
-Various tutorials are available on [dgrid.io](http://dojofoundation.org/packages/dgrid/#tutorials).
+Various tutorials are available on [dgrid.io](http://dgrid.io/#tutorials).

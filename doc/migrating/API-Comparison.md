@@ -99,7 +99,7 @@ event.  When `grid.save()` is called directly, it will return a promise which
 will reject if an error occurs.
 
 The messages demo in the
-[Using Grids and Stores tutorial](http://dojofoundation.org/packages/dgrid/tutorials/0.4/grids_and_stores/)
+[Using Grids and Stores tutorial](http://dgrid.io/tutorials/0.4/grids_and_stores/)
 provides an example of showing an error notification when `dgrid-error` fires.
 
 ### selectable
