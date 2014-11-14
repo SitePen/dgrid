@@ -14,7 +14,7 @@ define([
 	'dijit/form/_FormMixin',
 	'./_ResizeMixin',
 	'../data/config',
-	'dojo/i18n!../nls/builder',
+	'dojo/i18n!../nls/laboratory',
 	'dojo/text!./templates/ColumnConfigForm.html',
 	// for template
 	'dijit/form/Button',

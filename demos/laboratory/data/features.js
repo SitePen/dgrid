@@ -13,7 +13,7 @@ OPTIONAL
 */
 define([
 	'./config',
-	'dojo/i18n!../nls/builder'
+	'dojo/i18n!../nls/laboratory'
 ], function (config, i18n) {
 	return [
 		{

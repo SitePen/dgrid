@@ -5,7 +5,7 @@ define([
 	'dijit/_TemplatedMixin',
 	'dijit/Dialog',
 	'dojo/text!./templates/AboutDialog.html',
-	'dojo/i18n!../nls/builder',
+	'dojo/i18n!../nls/laboratory',
 	'../data/config'
 ], function (declare, string, _WidgetBase, _TemplatedMixin, Dialog, template, i18n, config) {
 	var AboutContent = declare([ _WidgetBase, _TemplatedMixin ], {

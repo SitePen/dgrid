@@ -92,7 +92,7 @@ define([
 		},
 
 		_onUpdateStore: function () {
-			// Let the Builder know that is should update the demo display (grid or generated code)
+			// Let the Laboratory know that it should update the demo display (grid or generated code)
 			topic.publish('/configuration/changed');
 		},
 

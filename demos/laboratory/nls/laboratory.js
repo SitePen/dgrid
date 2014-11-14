@@ -5,7 +5,7 @@ define({
 		moduleDocumentation: '${0} documentation',
 		moduleConfiguration: '${0} configuration',
 
-		// Builder
+		// Laboratory
 		laboratory: 'laboratory',
 		about: 'About',
 		docs: 'Docs',

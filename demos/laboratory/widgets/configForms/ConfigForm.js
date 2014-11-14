@@ -12,7 +12,7 @@ define([
 	'dijit/form/_FormMixin',
 	'../_ResizeMixin',
 	'dijit/form/Button',
-	'dojo/i18n!../../nls/builder'
+	'dojo/i18n!../../nls/laboratory'
 ], function (arrayUtil, declare, lang, domConstruct, on, string, topic, _WidgetBase, _TemplatedMixin,
 		_WidgetsInTemplateMixin, _FormMixin, _ResizeMixin, Button, i18n) {
 
@@ -69,7 +69,7 @@ define([
 					this.emit('close');
 				})),
 				this.watch('value', lang.hitch(this, function () {
-					// Let the Builder know that it should update the demo display (grid or generated code)
+					// Let the Laboratory know that it should update the demo display (grid or generated code)
 					topic.publish('/configuration/changed');
 				}))
 			);

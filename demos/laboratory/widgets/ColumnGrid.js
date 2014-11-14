@@ -7,7 +7,7 @@ define([
 	'dijit/_TemplatedMixin',
 	'dijit/_WidgetsInTemplateMixin',
 	'./_ResizeMixin',
-	'dojo/i18n!../nls/builder',
+	'dojo/i18n!../nls/laboratory',
 	'dojo/text!./templates/ColumnGrid.html',
 	'dgrid/Grid',
 	'dgrid/Editor',
@@ -137,7 +137,7 @@ define([
 		},
 
 		_onStoreChange: function () {
-			// Let the Builder know that is should update the demo display (grid or generated code)
+			// Let the Laboratory know that it should update the demo display (grid or generated code)
 			topic.publish('/configuration/changed');
 			// Let the Tree config module know that is should update its list of column names
 			topic.publish('/store/columns/update', this.store);

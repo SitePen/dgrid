@@ -16,7 +16,7 @@ define([
 	'dgrid/Editor',
 	'dgrid/extensions/DijitRegistry',
 	'../grid/SingleQuery',
-	'dojo/i18n!../nls/builder',
+	'dojo/i18n!../nls/laboratory',
 	'dojo/text!./templates/FeatureGrid.html',
 	// Widgets in template
 	'dijit/form/Form',

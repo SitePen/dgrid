@@ -19,8 +19,8 @@ define([
 	'./FeatureEditor',
 	'../util/toJavaScript',
 	'../data/config',
-	'dojo/i18n!../nls/builder',
-	'dojo/text!./templates/Builder.html',
+	'dojo/i18n!../nls/laboratory',
+	'dojo/text!./templates/Laboratory.html',
 	'dojo/text!./templates/gridCode.js',
 	'dojo/query',
 	// Widgets in template
@@ -41,7 +41,7 @@ define([
 		// resourcesBaseUrl is used for image paths; toUrl includes cacheBust so strip it
 		resourcesBaseUrl: require.toUrl('../resources').replace(/\?.*$/, ''),
 
-		baseClass: 'builder',
+		baseClass: 'laboratory',
 
 		aboutVisible: true,
 		aboutKey: '', // Passed from index.html if localStorage is supported
@@ -325,7 +325,7 @@ define([
 			arrayUtil.forEach(this.columnEditor.get('columns'), function (columnConfig) {
 				var config = this._fixDataTypes(lang.clone(columnConfig));
 
-				// The builder needs the store items to have a unique id property,
+				// The laboratory needs the store items to have a unique id property,
 				// but we don't want to include it in our output
 				delete config.id;
 
