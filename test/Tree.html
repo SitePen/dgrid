@@ -11,36 +11,36 @@
 				width: 700px;
 				margin: 10px;
 			}
-			
+
 			.field-bool {
 				width: 4em;
 			}
-			
+
 			#treeGrid .field-type {
 				width: 5em;
 			}
-			
+
 			#treeSelector .selector {
 				width: 2em;
 			}
 		</style>
-		<script src="../../dojo/dojo.js" 
+		<script src="../../dojo/dojo.js"
 			data-dojo-config="async: true"></script>
 		<script>
 			require(["dojo/on", "dgrid/OnDemandGrid","dgrid/Tree","dgrid/Editor", "dgrid/Keyboard",
 					"dgrid/Selection", "dgrid/Selector", "dgrid/ColumnSet", "dojo/_base/declare",
 					"dgrid/test/data/createHierarchicalStore", "dgrid/test/data/hierarchicalCountryData",
-					"dgrid/test/data/testTopHeavyHierarchicalStore", "dojo/domReady!"], 
+					"dgrid/test/data/testTopHeavyHierarchicalStore", "dojo/domReady!"],
 				function(
 					on, Grid, Tree, Editor, Keyboard, Selection, Selector, ColumnSet, declare,
 					createHierarchicalStore, hierarchicalCountryData, testTopHeavyHierarchicalStore
 					){
 					var count = 0; // for incrementing edits from button under 1st grid
-					
+
 					function byId(id){
 						return document.getElementById(id);
 					}
-					
+
 					function nbspFormatter(value){
 						// returns "&nbsp;" for blank content, to prevent cell collapsing
 						return value === undefined || value === "" ? "&nbsp;" : value;
@@ -48,7 +48,7 @@
 
 					var StandardGrid = declare([Grid, Keyboard, Selection, Selector, Editor, Tree]);
 					var testCountryStore = createHierarchicalStore({ data: hierarchicalCountryData }, true);
-					
+
 					var treeGrid = window.treeGrid = new StandardGrid({
 						collection: testCountryStore,
 						columns: [
@@ -61,7 +61,9 @@
 					}, "treeGrid");
 
 					on(byId("filter"), "click", function(){
-						treeGrid.set("collection", testCountryStore.filter({ name: /a$/ }));
+						var collection = testCountryStore.root.filter({ name: /a$/ });
+						collection.root = collection;
+						treeGrid.set("collection", collection.getRootCollection());
 					});
 					on(byId("clearFilter"), "click", function(){
 						treeGrid.set("collection", testCountryStore);
@@ -90,12 +92,12 @@
 						}
 					});
 					on(byId("edit-continent"), "click", function(){
-						var item = testCountryStore.get("EU");
+						var item = testCountryStore.getSync("EU");
 						item.name = "Europe Edit " + (++count);
 						testCountryStore.put(item);
 					});
 					on(byId("move-rome-na"), "click", function(){
-						var item = testCountryStore.get("Rome");
+						var item = testCountryStore.getSync("Rome");
 						item.parent = "NA";
 						testCountryStore.put(item);
 					});
@@ -185,7 +187,7 @@
 			<button id="edit-continent">Edit Europe</button>
 			<button id="move-rome-na">Move Rome to North America</button>
 		</div>
-		
+
 		<h2>Tree grid with formatter on tree column, and a checkbox selector to test select-all on children</h2>
 		<div id="treeSelector"></div>
 		<button id="resetColumns">Reset Columns</button> (to test column.init/destroy)
