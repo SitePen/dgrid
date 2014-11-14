@@ -30,7 +30,7 @@ is stored, which is then accessed and destroyed when `removeRow` is called:
 aspect.before(grid, 'removeRow', function (rowElement) {
     // destroy our widget during the row removal operation
     var cellElement = grid.cell(rowElement, column.id).element,
-        widget = (cellElement.contents || cellElement).widget;
+        widget = cellElement.widget;
     if (widget) {
         widget.destroyRecursive();
     }
