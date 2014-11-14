@@ -224,19 +224,15 @@
 				
 				on(document.getElementById("setstore"), "click", function(){
 					console.log("setting store to colorcollection: ", colorStore);
-					window.grid.set("collection", colorStore);//no query
+					window.grid.set("collection", colorStore);
 				});
 				on(document.getElementById("restore"), "click", function(){
 					console.log("setting store to testStore");
-					grid.set("collection", testStore);//no query
+					grid.set("collection", testStore);
 				});
 				on(document.getElementById("colorQuery"), "click", function(){
 					console.log("setting store to colorStore and setting query to show only primary colors");
-					grid.set("collection", colorStore.filter({col3: "Primary"}));//query set to only show primary colors
-				});
-				on(document.getElementById("resetQuery"), "click", function(){
-					console.log("reset query to show all");
-					grid.set("collection", grid.collection.store || grid.collection);
+					grid.set("collection", colorStore.filter({col3: "Primary"}));// store filtered to only show primary colors
 				});
 				
 				var sortDescending = true;
@@ -250,15 +246,15 @@
 
 
 				on(document.getElementById("emptyAsync"), "click", function(){
-					grid.set("collection", emptyAsyncStore, {});
+					grid.set("collection", emptyAsyncStore);
 				});
 				
 				on(document.getElementById("error"), "click", function(){
-					grid.set("collection", errorStores.asyncFetch, {});
+					grid.set("collection", errorStores.asyncFetch);
 				});
 				
 				on(document.getElementById("null"), "click", function(){
-					grid.set("collection", null, {});
+					grid.set("collection", null);
 				});
 				
 				// buttons / listeners for 2nd grid
@@ -285,12 +281,12 @@
 				});
 				
 				on(document.getElementById("setorigeditstore"), "click", function(){
-					grid2.set("collection", testTypesStore, {});
+					grid2.set("collection", testTypesStore);
 					updateDirty();
 				});
 				
 				on(document.getElementById("setdeferrorputstore"), "click", function(){
-					grid2.set("collection", errorStores.asyncPut, {});
+					grid2.set("collection", errorStores.asyncPut);
 					updateDirty();
 				});
 				
@@ -323,7 +319,6 @@
 		<h2>Simple test to show setting a new store and query to dgrid</h2>
 		<div id="grid"></div>
 		<button id="colorQuery">Set color store and query</button>
-		<button id="resetQuery">Reset query</button>
 		<button id="sort">sort</button>
 		<br>
 		<button id="setstore">Set Color Store</button>
