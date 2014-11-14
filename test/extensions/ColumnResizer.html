@@ -84,7 +84,7 @@
 		<script src="../../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script>
-			require(["dgrid/OnDemandGrid", "dgrid/extensions/ColumnResizer", "dgrid/Keyboard", "dgrid/Selection", "dojo/_base/declare", "dojo/_base/lang", "dojo/on", "dojo/cookie", "dojo/json", "dgrid/test/data/base", "dojo/domReady!"],
+			require(["dgrid/OnDemandGrid", "dgrid/extensions/ColumnResizer", "dgrid/Keyboard", "dgrid/Selection", "dojo/_base/declare", "dojo/_base/lang", "dojo/on", "dojo/cookie", "dojo/json", "dgrid/test/data/testStore", "dojo/domReady!"],
 				function(Grid, ColumnResizer, Keyboard, Selection, declare, lang, on, cookie, json, testStore){
 					var columns = { // you can declare columns as an object hash (key translates to field)
 						col1: 'Column 1Column1Column 1 Column 1',
@@ -106,24 +106,20 @@
 
 					var ResizeGrid = declare([Grid, Selection, ColumnResizer]);
 					window.grid = new ResizeGrid({
-						sort: "id",
-						store: testStore,
+						collection: testStore,
 						columns: columns1
 					}, "grid");
 					window.gridPeriod = new (declare([Grid, Keyboard, Selection, ColumnResizer]))({
 						id: "gridPeriod",
-						sort: "id",
-						store: testStore,
+						collection: testStore,
 						columns: columns1
 					}, "grid.period");
 					window.gridWide = new ResizeGrid({
-						sort: "id",
-						store: testStore,
+						collection: testStore,
 						columns: lang.clone(columns)
 					}, "gridWide");
 					window.gridPrevent = new ResizeGrid({
-						sort: "id",
-						store: testStore,
+						collection: testStore,
 						columns: lang.clone(columns)
 					}, "gridPrevent");
 
@@ -140,8 +136,7 @@
 						}
 					}
 					window.gridPersist = new ResizeGrid({
-						sort: "id",
-						store: testStore,
+						collection: testStore,
 						columns: persistentColumns
 					}, "gridPersist");
 

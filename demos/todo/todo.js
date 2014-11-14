@@ -1,154 +1,112 @@
 define([
-	"dgrid/OnDemandGrid",
-	"dgrid/Selection",
-	"dgrid/editor",
-	"dgrid/extensions/DnD",
-	"dojo/_base/declare",
-	"dojo/json",
-	"dojo/store/Memory",
-	"dojo/store/Observable",
-	"put-selector/put",
-	"dojo/domReady!"
-], function(Grid, Selection, editor, DnD, declare, json, Memory, Observable, put){
+	'dgrid/OnDemandGrid',
+	'dgrid/Selection',
+	'dgrid/Editor',
+	'dgrid/extensions/DnD',
+	'dojo/_base/declare',
+	'dojo/json',
+	'dojo/on',
+	'dstore/Memory',
+	'dstore/Trackable',
+	'put-selector/put',
+	'dojo/domReady!'
+], function (OnDemandGrid, Selection, Editor, DnD, declare, JSON, on, Memory, Trackable, put) {
 	// Create DOM
-	var container = put("div#container"),
-		itemForm = put(container, "form#itemForm.actionArea.topArea"),
-		taskField = put(itemForm, "input#txtTask[name=task]"),
-		submitButton = put(itemForm, "button[type=submit]", "Add"),
-		listNode = put(container, "div#list"),
-		removeArea = put(container, "div.actionArea.bottomArea"),
-		removeSelectedButton = put(removeArea, "button[type=button]", "Remove Selected"),
-		removeCompletedButton = put(removeArea, "button[type=button]", "Remove Completed");
+	var container = put('div#container');
+	var itemForm = put(container, 'form#itemForm.actionArea.topArea');
+	var taskField = put(itemForm, 'input#txtTask[name=task]');
+	put(itemForm, 'button[type=submit]', 'Add');
+
+	var listNode = put(container, 'div#list');
+	var removeArea = put(container, 'div.actionArea.bottomArea');
+	var removeSelectedButton = put(removeArea, 'button[type=button]', 'Remove Selected');
+	var removeCompletedButton = put(removeArea, 'button[type=button]', 'Remove Completed');
+
 	put(document.body, container);
-	
-	// function used to support ordered insertion of store items
-	function calculateOrder(store, object, before, orderField){
-		// Calculates proper value of order for an item to be placed before another
-		var afterOrder, beforeOrder = 0;
-		if (!orderField) { orderField = "order"; }
-		
-		if(before){
-			// calculate midpoint between two items' orders to fit this one
-			afterOrder = before[orderField];
-			store.query({}, {}).forEach(function(object){
-				var ord = object[orderField];
-				if(ord > beforeOrder && ord < afterOrder){
-					beforeOrder = ord;
-				}
-			});
-			return (afterOrder + beforeOrder) / 2;
-		}else{
-			// find maximum order and place this one after it
-			afterOrder = 0;
-			store.query({}, {}).forEach(function(object){
-				var ord = object[orderField];
-				if(ord > afterOrder){ afterOrder = ord; }
-			});
-			return afterOrder + 1;
-		}
-	}
-	
-	// Augment Memory store to support ordering, and to
-	// persist to localStorage if the browser supports it.
-	var key = "dgrid_demo_todo_list",
-		OrderedStoreMixin = declare(null, {
-			put: function(object, options){
-				// honor order if present
-				options = options || {};
-				if(options.before !== undefined || !object.order){
-					// if options.before is provided or this item doesn't have any order,
-					// calculate a new one
-					object.order = calculateOrder(this, object, options.before);
-				}
-				return this.inherited(arguments);
-			},
-			query: function(query, options){
-				// sort by order field
-				options = options || {};
-				options.sort = [{ attribute: "order" }];
-				return this.inherited(arguments);
-			}
-		}),
-		storeMixins = [Memory, OrderedStoreMixin];
-	
-	if (window.localStorage){
+
+	var storeMixins = [ Memory, Trackable ];
+
+	if (window.localStorage) {
 		// add functionality for saving/recalling from localStorage
 		storeMixins.push(declare(null, {
-			constructor: function(){
-				var jsondata = localStorage[key];
-				jsondata && this.setData(json.parse(jsondata));
-			},
-			put: function(object, options){
-				// persist new/updated item to localStorage
-				var r = this.inherited(arguments);
-				localStorage[key] = json.stringify(this.data);
-				return r;
-			},
-			remove: function(id){
-				// update localStorage to reflect removed item
-				var r = this.inherited(arguments);
-				localStorage[key] = json.stringify(this.data);
-				return r;
+			STORAGE_KEY: 'dgrid_demo_todo_list',
+
+			constructor: function () {
+				var self = this;
+				var jsondata = localStorage[this.STORAGE_KEY];
+
+				jsondata && this.setData(JSON.parse(jsondata));
+
+				this.on('add, update, delete', function () {
+					localStorage[self.STORAGE_KEY] = JSON.stringify(self.fetchSync());
+				});
 			}
 		}));
 	}
-	var Store = declare(storeMixins),
-		store = Observable(new Store({ idProperty: "summary" })),
-		grid = new (declare([Grid, Selection, DnD]))({
-			sort: "order",
-			store: store,
-			columns: {
-				completed: editor({
-					label: " ",
-					autoSave: true,
-					sortable: false
-				}, "checkbox"),
-				summary: {
-					field: "_item", // get whole item for use by formatter
-					label: "TODOs",
-					sortable: false,
-					formatter: function(item){
-						return "<div" + (item.completed ? ' class="completed"' : "") +
-							">" + item.summary + "</div>";
-					}
+
+	var Store = declare(storeMixins);
+
+	var store = new Store({
+		idProperty: 'summary'
+	});
+
+	var grid = new (declare([OnDemandGrid, Selection, DnD, Editor]))({
+		collection: store,
+		columns: {
+			completed: {
+				editor: 'checkbox',
+				label: ' ',
+				autoSave: true,
+				sortable: false
+			},
+			summary: {
+				field: '_item', // get whole item for use by formatter
+				label: 'TODOs',
+				sortable: false,
+				formatter: function (item) {
+					return '<div' + (item.completed ? ' class="completed"' : '') +
+						'>' + item.summary + '</div>';
 				}
 			}
-		}, listNode);
-	
-	grid.sort("order");
-	
-	itemForm.onsubmit = function(){
+		}
+	}, listNode);
+
+	on(itemForm, 'submit', function (event) {
+		event.preventDefault();
+
 		// allow overwrite if already exists (by using put, not add)
 		store.put({
 			completed: false,
 			summary: taskField.value
 		});
-		taskField.value = "";
-		return false;
-	};
-	removeSelectedButton.onclick = function(){
+		taskField.value = '';
+	});
+
+	on(removeSelectedButton, 'click', function () {
 		for (var i in grid.selection) {
 			// Each key in the selection map is the id of the item,
 			// so we can pass it directly to store.remove.
 			store.remove(i);
 		}
-	};
-	removeCompletedButton.onclick = function(){
+	});
+
+	on(removeCompletedButton, 'click', function () {
 		// query for all completed items and remove them
-		store.query({ completed: true }).forEach(function(item){
+		store.filter({ completed: true }).fetch().forEach(function (item) {
 			store.remove(item[store.idProperty]);
 		});
-	};
-	
-	if(window.localStorage){
+	});
+
+	if (window.localStorage) {
 		// add extra button to clear the localStorage key we're using
-		var button = put(removeArea, "button[type=button]",
-			"Clear localStorage");
-		button.onclick = function(){
-			localStorage.removeItem(key);
+		var button = put(removeArea, 'button[type=button]',
+			'Clear localStorage');
+
+		on(button, 'click', function () {
+			localStorage.removeItem(store.STORAGE_KEY);
 			// remove all items in grid the quick way (no need to iteratively remove)
 			store.setData([]);
 			grid.refresh();
-		};
+		});
 	}
 });

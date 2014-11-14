@@ -54,10 +54,10 @@
 				"dgrid/ColumnSet", "dgrid/Selection", "dgrid/Keyboard",
 				"dgrid/extensions/ColumnResizer", "dgrid/extensions/ColumnHider",
 				"dojo/_base/declare", "dojo/_base/lang", "dojo/on",
-				"dgrid/test/data/base", "dojo/domReady!"],
+				"dgrid/test/data/testStore", "dojo/domReady!"],
 				function(Grid, CompoundColumns, ColumnSet, Selection, Keyboard, ColumnResizer, ColumnHider,
 						declare, lang, on, testStore){
-
+					
 					function byId(id){
 						return document.getElementById(id);
 					}
@@ -257,14 +257,12 @@
 					}
 
 					window.grid = new (declare([Grid, Selection, Keyboard, CompoundColumns]))({
-						sort: "id",
-						store: testStore,
+						collection: testStore,
 						columns: getColumns()
 					}, "grid");
 
 					window.gridcscc = new (declare([Grid, CompoundColumns, ColumnSet, Selection, Keyboard]))({
-						sort: "id",
-						store: testStore,
+						collection: testStore,
 						columnSets: getColumnSets(1)
 					}, "gridcscc");
 					
@@ -287,10 +285,7 @@
 						hasCombinedColumnSets;
 					function createCombinedGrid(event){
 						var mixins = [Grid],
-							args = {
-								sort: "id",
-								store: testStore
-							};
+							args = { collection: testStore };
 						
 						hasCombinedColumnSets = form.elements.set.checked;
 						

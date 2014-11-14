@@ -28,8 +28,8 @@
 		data-dojo-config="async: true"></script>
 
 	<script>
-	require(["dojox/grid/DataGrid", "dojo/data/ObjectStore", "dgrid/test/data/perf", "dojo/domReady!"],
-		function(DataGrid, ObjectStore, testPerfStore){
+	require(["dojox/grid/DataGrid", "dojo/data/ObjectStore", "dojo/store/Memory", "dgrid/test/data/testPerformanceStore", "dojo/domReady!"],
+		function(DataGrid, ObjectStore, LegacyMemory, testPerformanceStore){
 			var layout = [
 					{ name: 'id', field: 'id', width: '10%' },
 					{ name: 'integer', field: 'integer', width: '10%' },
@@ -43,7 +43,7 @@
 					{ name: 'today', field: 'today', width: '10%' }
 			];
 
-			var store = new ObjectStore({"objectStore":testPerfStore});
+			var store = new ObjectStore({"objectStore": new LegacyMemory({ data: testPerformanceStore.data })});
 			var start = new Date().getTime();
 			var grid = new DataGrid({
 				id: "perfGrid",

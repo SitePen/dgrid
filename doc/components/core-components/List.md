@@ -1,15 +1,14 @@
 # List
 
-This provides the basic facilities for taking an array of objects and rendering
-them as rows of HTML in a scrollable area. This will automatically include touch
-scrolling capabilities (via the `TouchScroll` module) on mobile devices.
+List provides the basic facilities for taking an array of objects and rendering
+them as rows in a scrollable area.
 
 The List module can be used to render an array of data as follows:
 
 ```js
-require(["dgrid/List"], function(List){
+require([ 'dgrid/List' ], function (List) {
     // attach to a DOM element indicated by its ID
-    var list = new List({}, "list");
+    var list = new List({}, 'list');
     // render some data
     list.renderArray(arrayOfData);
 });
@@ -51,12 +50,9 @@ Property | Description
 `addUiClasses` | Boolean indicating whether to add `ui-` classes (corresponding to jQuery UI) to nodes within the grid.  The default is `true`.
 `className` | A class (or classes, space- or period-delimited) to be set on the instance's `domNode` in addition to the defaults; if an existing DOM node is being passed to the constructor, extra classes may alternatively be specified via its `class` attribute or `className` property
 `cleanAddedRules` | Whether to clean up CSS rules added via the `addCssRule` method when the instance is destroyed; defaults to `true`.
-`cleanEmptyObservers` | Whether to clean up observers for result sets that are or become empty; defaults to `true` but is set to `false` by the `tree` plugin due to special considerations.
-`shouldObserveStore` | Whether this instance should observe any observable store it is passed; defaults to `true`.
 `showHeader` | Whether to display the header area; normally `false` for lists and `true` for grids.  Can be reset later via `set("showHeader", ...)`.
 `showFooter` | Whether to display the footer area; `false` by default, but enabled and used by some extensions (e.g. Pagination).  Can be reset later via `set("showFooter", ...)`.
-`sort` | How to initially sort the grid; may be either a string referencing a field name, or an array of objects with `attribute` and `descending` properties.  See also `set("sort", ...)` below.
-`useTouchScroll` | Whether to use the `TouchScroll` module if touch support is available on the device, or defer to native capabilities if they exist; `true` by default for backwards compatibility.  Setting this to `false` is particularly useful for devices which support both touch and mouse input.
+`sort` | How to initially sort the grid; may be either a string referencing a field name, or an array of objects with `property` and `descending` properties.  See also `set("sort", ...)` below.
 
 ### Method Summary
 
@@ -71,8 +67,8 @@ Method | Description
 `down(row[, steps])` | Same as `up()`, but operating downward.
 `renderArray(array, beforeNode, options)` | This can be called to render an array directly into the list.  The `beforeNode` parameter can be used to render at a specific point in the list.  Note that when using store-backed components, this is called automatically.
 `renderRow(item, options)` | This method can be overridden to provide custom rendering logic for rows.  (The [Grid](Grid.md) module actually overrides this method.) `item` refers to the record from the array or store for the row.
-`removeRow(rowElement, justCleanup)` | This method can be extended/aspected to perform cleanup logic when an individual row is removed.
-`set("sort", property, descending)` | This can be called to sort the List by a given property; if `true` is passed for `descending`, the sort will be in descending order. Multiple sort criteria can be specified in the format expected by stores' `queryOptions` (an array of objects with `attribute` and `descending` properties); this is also the format `get("sort")` will return in. The [Grid](Grid.md) and [OnDemandList)(OnDemandList-and-OnDemandGrid.md) modules further extend sort functionality.
+`removeRow(rowElement, preserveDom, options)` | This method can be extended/aspected to perform cleanup logic when an individual row is removed.
+`set("sort", property, descending)` | This can be called to sort the List by a given property; if `true` is passed for `descending`, the sort will be in descending order. Multiple sort criteria can be specified in the format expected by store's `sort` method (an array of objects with `property` and `descending` properties); this is also the format `get("sort")` will return in. The [Grid](Grid.md) and [OnDemandList](OnDemandList-and-OnDemandGrid.md) modules further extend sort functionality.
 `scrollTo(options)` | scrolls to a given point in the grid.  Accepts `x` and `y` properties; if one is not given, position along that axis is not modified.
 `getScrollPosition()` | returns the current position that the grid is scrolled to, in the form of an object containing `x` and `y` properties.
-`addCssRule(selector, css)` | Programmatically adds styles for a given CSS selector by injecting the given rule string into a stylesheet in the document.  Returns a handle with a`remove` function, which can be called to later remove the added style rule.  Styles added via this method will be removed when the instance is destroyed if `cleanAddedRules` is set to `true`.
+`addCssRule(selector, css)` | Programmatically adds styles for a given CSS selector by injecting the given rule string into a stylesheet in the document.  Returns a handle with a `remove` function, which can be called to later remove the added style rule.  Styles added via this method will be removed when the instance is destroyed if `cleanAddedRules` is set to `true`.

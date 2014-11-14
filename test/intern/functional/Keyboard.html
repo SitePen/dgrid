@@ -3,67 +3,66 @@
 	<head>
 		<meta charset="utf-8">
 		<title>Test Keyboard Mixin</title>
-		<script>
-			var dojoConfig = {
-				async: true,
-				baseUrl: "../../../../",
-				packages: [
-					"dojo",
-					"dijit",
-					"dojox",
-					"dgrid",
-					"put-selector",
-					"xstyle"
-				],
-			};
-		</script>
 		<script src="../../../../dojo/dojo.js"></script>
 		<script>
 			var grid, list, rowGrid, ready;
-			require(["dgrid/OnDemandList", "dgrid/List", "dgrid/OnDemandGrid", "dgrid/Grid", "dgrid/Keyboard", "dojo/_base/declare", "dojo/on", "dojo/query", "put-selector/put", "dgrid/test/data/base"],
-			function(OnDemandList, List, OnDemandGrid, Grid, Keyboard, declare, on, query, put){
+			require([
+				'dgrid/OnDemandList',
+				'dgrid/List',
+				'dgrid/OnDemandGrid',
+				'dgrid/Grid',
+				'dgrid/Keyboard',
+				'dojo/_base/declare',
+				'dojo/on',
+				'dojo/query',
+				'put-selector/put',
+				'dgrid/test/data/createSyncStore',
+				'dgrid/test/data/genericData'
+			], function(OnDemandList, List, OnDemandGrid, Grid, Keyboard, declare, on, query, put, createSyncStore, genericData){
 				var columns = {
-						col1: "Column 1",
-						col2: "Column 2",
-						col5: "Column 5"
+						col1: 'Column 1',
+						col2: 'Column 2',
+						col5: 'Column 5'
 					},
 					KeyboardGrid = declare([Grid, Keyboard]),
 					KeyboardList = declare([List, Keyboard]),
 					KeyboardOnDemandGrid = declare([OnDemandGrid, Keyboard]),
-					KeyboardOnDemandList = declare([OnDemandList, Keyboard]);
-					
+					KeyboardOnDemandList = declare([OnDemandList, Keyboard]),
+					store = createSyncStore({ data: genericData });
+
 				// Simple Grid, List, and cell navigation Grid
 				list = new KeyboardList({
-					renderRow: function(item){ return put("div", item.col5); }
-				}, "list");
-				list.renderArray(data.items);
+					renderRow: function (item) {
+						return put('div', item.col5);
+					}
+				}, 'list');
+				list.renderArray(genericData.items);
 				grid = new KeyboardGrid({
 					columns: columns
-				}, "grid");
-				grid.renderArray(data.items);
+				}, 'grid');
+				grid.renderArray(genericData.items);
 				rowGrid = new KeyboardGrid({
 					columns: columns,
 					cellNavigation: false
-				}, "rowGrid");
-				rowGrid.renderArray(data.items);
+				}, 'rowGrid');
+				rowGrid.renderArray(genericData.items);
 
 				// OnDemand Grid, List, and cell navigation Grid
 				onDemandList = new KeyboardOnDemandList({
-					sort: "id",
-					store: testStore,
-					renderRow: function(item){ return put("div", item.col5); }
-				}, "list-ondemand");
+					collection: store,
+					renderRow: function (item) {
+						return put('div', item.col5);
+					}
+				}, 'list-ondemand');
 				onDemandGrid = new KeyboardOnDemandGrid({
-					sort: "id",
-					store: testStore,
+					collection: store,
 					columns: columns
-				}, "grid-ondemand");
+				}, 'grid-ondemand');
 				onDemandRowGrid = new KeyboardOnDemandGrid({
-					sort: "id",
-					store: testStore,
+					collection: store,
 					columns: columns,
 					cellNavigation: false
-				}, "rowGrid-ondemand");
+				}, 'rowGrid-ondemand');
 				ready = true;
 			});
 		</script>

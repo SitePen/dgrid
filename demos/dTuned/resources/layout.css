@@ -49,14 +49,6 @@ body {
 	cursor: default;
 }
 
-/* IE<7 doesn't support height/width: auto w/ top/bottom / left/right. */
-.has-ie-6 #genres, .has-ie-6 #artists, .has-ie-6 #albums {
-	height: 120px;
-}
-.has-ie-6 #list-container {
-	width: 100%;
-}
-
 #artists { left: 33.3%; }
 #albums { right: 0; }
 
@@ -67,12 +59,6 @@ body {
 	top: 187px;
 	bottom: 0;
 	height: auto; /* override default height: 30em; in dgrid.css */
-}
-
-.has-ie-6 #grid {
-	width: 100%;
-	/* Give the grid a height.  Not optimal, but we'd need more JS for better. */
-	height: 20em;
 }
 
 #grid .dgrid-cell {

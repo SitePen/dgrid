@@ -4,15 +4,18 @@
 
 OnDemandList extends List to provide on-demand lazy loading of data as the user
 scrolls through the list. This provides a seamless, intuitive interface for
-viewing large sets of data in scalable manner.
+viewing large sets of data in a scalable manner.
 
 ```js
-require(["dgrid/OnDemandList", "put-selector/put"], function(OnDemandList, put){
+require([
+    'dgrid/OnDemandList',
+    'put-selector/put'
+], function (OnDemandList, put) {
     var list = new OnDemandList({
-        store: myStore, // a Dojo object store
-        renderRow: function(object, options){
+        collection: myStore, // a dstore collection
+        renderRow: function (object, options) {
             // Override renderRow to accommodate store items
-            return put("div", object.myField);
+            return put('div', object.myField);
         }
     });
 });
@@ -23,15 +26,15 @@ require(["dgrid/OnDemandList", "put-selector/put"], function(OnDemandList, put){
 This module is simply the composition of [Grid](Grid.md) and OnDemandList. For example:
 
 ```js
-define(["dgrid/OnDemandGrid"], function(OnDemandGrid){
+define([ 'dgrid/OnDemandGrid' ], function (OnDemandGrid) {
     grid = new OnDemandGrid({
-        store: myStore, // a Dojo object store
+        collection: myStore, // a dstore store
         columns: [
-            {label: "Column 1", field: "col1", sortable: false},
-            {label: "Column 2", field: "col2"},
+            { label: 'Column 1', field: 'col1', sortable: false },
+            { label: 'Column 2', field: 'col2' },
             // ...
         ]
-    }, "grid");
+    }, 'grid');
     // ...
 });
 ```
@@ -39,25 +42,23 @@ define(["dgrid/OnDemandGrid"], function(OnDemandGrid){
 ## Usage
 
 OnDemandList inherits the \_StoreMixin module, which implements a basis for
-interacting with a [Dojo object
-store](http://dojotoolkit.org/reference-guide/dojo/store.html) for querying of
+interacting with a [dstore store](https://github.com/SitePen/dstore) for querying of
 data. At minimum, this implementation expects a store which supports the `get`,
-`getIdentity`, and `query` methods, and whose items include unique identifiers.
+`getIdentity`, `fetch`, `fetchRange`, and `sort` methods, and whose items include
+unique identifiers.
 
-OnDemandList requires that a store be specified via the `store` property, and
-will call the `query` method on the store to retrieve the data to be rendered.
-OnDemandList will call `query` with `start` and `count` options so as to only
-retrieve the necessary objects needed to render the visible rows. As the list or
-grid is scrolled, more `query` calls will be made to retrieve additional rows,
-and previous rows will be pruned from the DOM as they are scrolled well out of
-view.
+OnDemandList requires that a store be specified via the `collection` property, and
+will call the `fetchRange` method so as to only retrieve the necessary objects
+needed to render the visible rows. As the list or grid is scrolled, additional
+`fetchRange` calls will be made to retrieve additional rows, and previous rows
+will be pruned from the DOM as they are scrolled far out of view.
 
 When working with a writable store, for best results, the store should return
-query results with an `observe` method, which enables the list to keep its
+a collection with a `track` method, which enables the list to keep its
 display up to date with any changes that occur in the store after the items are
 rendered. The
-[`dojo/store/Observable`](http://dojotoolkit.org/reference-guide/dojo/store/Observable.html)
-module can prove useful for adding this functionality.
+[`dstore/Trackable`](https://github.com/SitePen/dstore/blob/master/docs/Collection.md#track)
+module can be used to add this functionality to a store.
 
 ## APIs
 
@@ -79,14 +80,13 @@ Property | Description
 
 Property | Description
 -------- | -----------
-`noDataMessage` | An optional message to be displayed when no results are returned by a query.
-`loadingMessage` | An optional message to be displayed in the loading node which appears when a new page of results is requested.
+`collection` | An instance of a dstore implementation, from which to fetch data.  This may be a store instance, or a filtered collection returned from `store.filter()`.
 `getBeforePut` | If `true` (the default), any `save` operations will re-fetch the item from the store via a `get` call, before applying changes represented by dirty data.
-`query` | An object to be passed when issuing store queries, which may contain filter criteria.
-`queryOptions` | An object to be passed along with `query` when issuing store queries.  Note that the standard `start`, `count`, and `sort` properties are already managed by OnDemandList itself.
-`store` | An instance of a `dojo/store` implementation, from which to fetch data.
+`loadingMessage` | An optional message to be displayed in the loading node which appears when a new page of results is requested.
+`noDataMessage` | An optional message to be displayed when no results are returned by a query.
+`shouldTrackCollection` | Whether this instance should track any trackable collection it is passed; default is `true`.
 
-### Method Summary 
+### Method Summary
 
 Method | Description
 ------ | -----------
@@ -96,8 +96,7 @@ Method | Description
 
 Method | Description
 ------ | -----------
-`set("query", query[, queryOptions])` | Specifies a new `query` object (and optionally, also `queryOptions`) to be used by the list when issuing queries to the store.
-`set("store", store[, query[, queryOptions]])` | Specifies a new store (and optionally, also `query` and `queryOptions`) for the list to reference.
+`set("collection", collection)` | Specifies a new collection for the list to reference.
 `set("sort", property, descending)` | \_StoreMixin's version of this defers sorting to the store.
 `updateDirty(id, field, value)` | Updates an entry in the component's dirty data hash, to be persisted to the store on the next call to `save()`.
 `save()` | Instructs the list to relay any dirty data back to the store. Returns a promise which resolves when all necessary put operations have completed successfully (even if the store operates synchronously).
@@ -107,12 +106,11 @@ Method | Description
 
 ### dgrid-refresh-complete
 
-As of dgrid 0.3.5, OnDemandList emits a `dgrid-refresh-complete` event when
+OnDemandList emits a `dgrid-refresh-complete` event when
 results finish rendering as the result of a `refresh` call (also including the
 initial render). The event includes the following properties:
 
 * `grid`: The Grid (or List) instance responsible for firing the event
-* `results`: The QueryResults returned by the store query
 
 ### dgrid-error
 

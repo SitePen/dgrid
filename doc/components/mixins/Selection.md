@@ -8,25 +8,27 @@ which will possess a `rows` property containing an array of Row objects (with
 
 ```js
 require([
-    "dojo/_base/declare", "dgrid/OnDemandGrid", "dgrid/Selection"
-], function(declare, OnDemandGrid, Selection){
-    var grid = new (declare([OnDemandGrid, Selection]))({
-        selectionMode: "single",
+    'dojo/_base/declare',
+    'dgrid/OnDemandGrid',
+    'dgrid/Selection'
+], function (declare, OnDemandGrid, Selection) {
+    var grid = new (declare([ OnDemandGrid, Selection ]))({
+        selectionMode: 'single',
         // ...
-    }, "grid");
-    grid.on("dgrid-select", function(event){
+    }, 'grid');
+    grid.on('dgrid-select', function (event) {
         // Get the rows that were just selected
         var rows = event.rows;
         // ...
-        
+
         // Iterate through all currently-selected items
-        for(var id in grid.selection){
-            if(grid.selection[id]){
+        for (var id in grid.selection) {
+            if (grid.selection[id]) {
                 // ...
             }
         }
     });
-    grid.on("dgrid-deselect", function(event){
+    grid.on('dgrid-deselect', function (event) {
         // Get the rows that were just deselected
         var rows = event.rows;
         // ...
@@ -94,15 +96,14 @@ Mode | Description
 `extended` | The default mode; allows multiple selection via keyboard modifiers (Shift to select ranges, Ctrl/Cmd to select/deselect multiple separate rows).  Clicks or keypresses without holding Shift or Ctrl/Cmd will select only the current target.
 `multiple` | Like `extended`, except that clicks or keypresses without holding Shift or Ctrl/Cmd will add to the existing selection.
 `single` | Allows only one row to be selected at a time.
-`toggle` | (New in 0.3.7) Toggles the selected state of the row being acted upon; useful for touch input.
-`none` | Does not allow direct selection of rows via keyboard or mouse events, but still allows selection via direct API calls, or via a [selector](../column-plugins/selector.md) column.
+`toggle` | Toggles the selected state of the row being acted upon; useful for touch input.
+`none` | Does not allow direct selection of rows via keyboard or mouse events, but still allows selection via direct API calls, or via a [Selector](Selector.md) column.
 
 ### Implementing a Custom Selection Mode
 
-As of dgrid 0.3.7, adding support for a custom selection mode is as simple as
-adding a single method.  For example, to add support for a custom mode named
-`mymode`, implement a method named `_mymodeSelectionHandler`.  This method
-receives 2 arguments: the event object, and the target that is being selected (a
+Adding support for a custom selection mode is as simple as adding a single method.
+For example, to add support for a custom mode named `mymode`, implement a method named `_mymodeSelectionHandler`.
+This method receives 2 arguments: the event object, and the target that is being selected (a
 dgrid row or cell element, depending on whether Selection or [CellSelection](CellSelection.md)
 is being used).  The method should call `this.select` as appropriate based on
 the details of the event.

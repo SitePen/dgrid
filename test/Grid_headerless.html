@@ -66,44 +66,77 @@
 		<script src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script>
-			require(["dojo/on", "dgrid/List", "dgrid/OnDemandGrid", "dgrid/tree", "dgrid/editor", "dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dijit/form/DateTextBox", "dijit/form/HorizontalSlider", "dijit/form/NumberSpinner", "dgrid/test/data/base", "dojo/domReady!"],
-				function(on, List, Grid, tree, editor, Selection, Keyboard, declare, DateTextBox, Slider, NumberSpinner, testStore){
+			require(["dojo/on",
+				"dgrid/List",
+				"dgrid/OnDemandGrid",
+				"dgrid/Tree",
+				"dgrid/Editor",
+				"dgrid/Selection",
+				"dgrid/Keyboard",
+				"dojo/_base/declare",
+				"dijit/form/DateTextBox",
+				"dijit/form/HorizontalSlider",
+				"dijit/form/NumberSpinner",
+				"dgrid/test/data/createSyncStore",
+				"dgrid/test/data/createHierarchicalStore",
+				"dgrid/test/data/genericData",
+				"dgrid/test/data/typesData",
+				"dgrid/test/data/hierarchicalCountryData",
+				"dojo/domReady!"
+			], function(
+				on,
+				List,
+				Grid,
+				Tree,
+				Editor,
+				Selection,
+				Keyboard,
+				declare,
+				DateTextBox,
+				Slider,
+				NumberSpinner,
+				createSyncStore,
+				createHierarchicalStore,
+				genericData,
+				typesData,
+				hierarchicalCountryData){
 
-					var StandardGrid = declare([Grid, Selection, Keyboard]);
+					var StandardGrid = declare([Grid, Selection, Keyboard, Editor, Tree]),
+						testStore = createSyncStore({ data: genericData }),
+						typesStore = createSyncStore({ data: typesData }),
+						testCountryStore = createHierarchicalStore({ data: hierarchicalCountryData }, true);
+
 
 					window.grid = new StandardGrid({
-						sort: "id",
-						store: testStore,
+						collection: testStore,
 						columns: { // you can declare columns as an object hash (key translates to field)
-							col1: editor({label: 'Column 1 column 1 column 1'}, "text", "dblclick"),
+							col1: {label: 'Column 1 column 1 column 1', editor: "text", editOn: "dblclick"},
 							col2: {label: 'Column 2', sortable: false},
-							col3: editor({label: 'Column 3'}, "text", "dblclick"),
+							col3: {label: 'Column 3', editor: "text", editOn: "dblclick"},
 							col4: 'Column444444444444444444',
-							col5: editor({label: 'Column 5'}, "text", "dblclick")
+							col5: {label: 'Column 5', editor: "text", editOn: "dblclick"}
 						},
 						showHeader: false
 					}, "grid");
 					
 					window.scrollgrid = new StandardGrid({
-						sort: "id",
-						store: testStore,
+						collection: testStore,
 						columns: { // same as previous, repeated to keep objects/plugins unique
-							col1: editor({label: 'Column 1 column 1 column 1'}, "text", "dblclick"),
+							col1: {label: 'Column 1 column 1 column 1', editor: "text", editOn: "dblclick"},
 							col2: {label: 'Column 2', sortable: false},
-							col3: editor({label: 'Column 3'}, "text", "dblclick"),
+							col3: {label: 'Column 3', editor: "text", editOn: "dblclick"},
 							col4: 'Column444444444444444444',
-							col5: editor({label: 'Column 5'}, "text", "dblclick")
+							col5: {label: 'Column 5', editor: "text", editOn: "dblclick"}
 						},
 						showHeader: false
 					}, "scrollgrid");
 					
 					window.tree = new StandardGrid({
-						sort: "id",
-						store: testCountryStore,
+						collection: testCountryStore,
 						selectionMode: "single",
 						columns: {
-							name: tree({label:'Name', sortable: false}),
-							bool: editor({label: 'A CheckBox', sortable: false}, "checkbox"),
+							name: {label:'Name', sortable: false, renderExpando: true},
+							bool: {label: 'A CheckBox', sortable: false, editor: "checkbox"},
 							type: {label: 'Type', sortable: false},
 							population: 'Population',
 							timezone: 'Timezone'
@@ -112,18 +145,31 @@
 					}, "tree");
 					
 					window.editGrid = new StandardGrid({
-						sort: "id",
-						store: testTypesStore,
+						collection: typesStore,
 						columns: [ // columns specified as array, with field in each item
-							editor({label: 'A Date', field: 'date'}, DateTextBox),
-							editor({label: 'Real Number', field: 'floatNum'}, Slider),
-							editor({label: 'Integer', field: 'integer', editorArgs: {style: 'width: 5em;', constraints: {min:9,max:1550,places:0}}}, NumberSpinner),
-							editor({label: 'Text editable if checkbox checked + saved', field: 'text', canEdit: function(object){
-								return object.bool;
-							}}, "text", "dblclick"),
+							{label: 'A Date', field: 'date', editor: DateTextBox},
+							{label: 'Real Number', field: 'floatNum', editor: Slider},
+							{
+								label: 'Integer',
+								field: 'integer',
+								editor: NumberSpinner,
+								editorArgs: {
+									style: 'width: 5em;',
+									constraints: {min: 9, max: 1550, places: 0}
+								}
+							},
+							{
+								label: 'Text editable if checkbox checked + saved',
+								field: 'text',
+								editor: "text",
+								editOn: "dblclick",
+								canEdit: function (object) {
+									return object.bool;
+								}
+							},
 							{label: 'Non editable text', field: 'text', sortable: false},
-							editor({label: 'Another Date', field: 'date2'}, DateTextBox, "focus"),
-							editor({label: 'CheckBox', field: 'bool'}, "checkbox")
+							{label: 'Another Date', field: 'date2', editor: DateTextBox, editOn: "focus"},
+							{label: 'CheckBox', field: 'bool', editor: "checkbox"}
 						],
 						selectionMode: "single",
 						showHeader: false

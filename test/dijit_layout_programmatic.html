@@ -45,7 +45,7 @@
 				"dijit/layout/TabContainer",
 				"dijit/Toolbar",
 				"dijit/form/Button",
-				"dgrid/test/data/base",
+				"dgrid/test/data/testStore",
 				"dojo/domReady!"
 			], function(Grid, Selection, DijitRegistry, Dialog, lang, declare, BC, TC, Toolbar, Button, testStore){
 				
@@ -60,8 +60,7 @@
 					gridLeft = new CustomGrid({
 						id: "gridLeft",
 						className: "bcLeft",
-						sort: "id",
-						store: testStore,
+						collection: testStore,
 						columns: lang.clone(gridCols),
 						selectionMode: "single",
 						region: "left",
@@ -69,16 +68,14 @@
 					}),
 					gridTab1 = new CustomGrid({
 						id: "gridTab1",
-						sort: "id",
-						store: testStore,
+						collection: testStore,
 						columns: lang.clone(gridCols),
 						selectionMode: "single",
 						title: "Tab 1"
 					}),
 					gridTab2 = new CustomGrid({
 						id: "gridTab2",
-						sort: "id",
-						store: testStore,
+						collection: testStore,
 						columns: lang.clone(gridCols),
 						selectionMode: "single",
 						title: "Tab 2"
@@ -120,8 +117,7 @@
 				window.dlgProgContent = new Dialog({
 					content: new CustomGrid({
 						id: "gridDlgProgContent",
-						sort: "id",
-						store: testStore,
+						collection: testStore,
 						columns: lang.clone(gridCols),
 						selectionMode: "single"
 					})

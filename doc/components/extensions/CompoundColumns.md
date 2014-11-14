@@ -6,20 +6,22 @@ grid.
 
 ```js
 require([
-    "dojo/_base/declare", "dgrid/OnDemandGrid", "dgrid/extensions/CompoundColumns"
-], function(declare, OnDemandGrid, CompoundColumns){
-    var compoundGrid = new (declare([OnDemandGrid, CompoundColumns]))({
-        columns:[
-            { label: "Full Name", children: [
-                { label: "Given", children: [
-                    { field: "firstname", label: "First" },
-                    { field: "middlename", label: "Middle", sortable: false }
+    'dojo/_base/declare',
+    'dgrid/OnDemandGrid',
+    'dgrid/extensions/CompoundColumns'
+], function (declare, OnDemandGrid, CompoundColumns) {
+    var compoundGrid = new (declare([ OnDemandGrid, CompoundColumns ]))({
+        columns: [
+            { label: 'Full Name', children: [
+                { label: 'Given', children: [
+                    { field: 'firstname', label: 'First' },
+                    { field: 'middlename', label: 'Middle', sortable: false }
                 ] },
-                { field: "lastname", label: "Last" }
+                { field: 'lastname', label: 'Last' }
             ] },
-            { field: "age", label: "Age" }
+            { field: 'age', label: 'Age' }
         ]
-    }, "compoundGrid");
+    }, 'compoundGrid');
     // ...
 });
 ```

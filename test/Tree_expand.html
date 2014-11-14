@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Test Tree Grid</title>
+		<meta name="viewport" content="width=570">
+		<style>
+			@import "../../dojo/resources/dojo.css";
+			@import "../css/skins/claro.css";
+			.container {
+				float: left;
+				margin: 10px;
+				width: 550px;
+			}
+			.dgrid {
+				width: 100%;
+			}
+			.field-bool {
+				width: 4em;
+			}
+			.field-type {
+				width: 5em;
+			}
+			.field-population {
+				width: 7em;
+			}
+		</style>
+		<script>
+			var start= new Date().getTime();
+		</script>
+		<script src="../../dojo/dojo.js" 
+			data-dojo-config="async: true"></script>
+		<script>
+			require(["dojo/on", "dgrid/OnDemandGrid","dgrid/Tree","dgrid/Editor", "dgrid/Keyboard",
+					"dgrid/Selection", "dojo/_base/declare", "dojo/_base/array",
+					"dgrid/test/data/createHierarchicalStore",
+					"dgrid/test/data/hierarchicalCountryData",
+					"dojo/domReady!"], 
+				function(
+					on, Grid, Tree, Editor, Keyboard, Selection, declare, arrayUtil,
+					createHierarchicalStore, hierarchicalCountryData
+				){
+					var count = 0; // for incrementing edits from button under 1st grid
+					
+					function nbspFormatter(value){
+						// returns "&nbsp;" for blank content, to prevent cell collapsing
+						return value === undefined || value === "" ? "&nbsp;" : value;
+					}
+
+					var StandardGrid = declare([Grid, Keyboard, Selection, Editor, Tree]);
+					
+					arrayUtil.forEach([{
+						id: "asyncGrid",
+						collection: createHierarchicalStore({ data: hierarchicalCountryData }, true)
+					}, {
+						id: "syncGrid",
+						collection: createHierarchicalStore({ data: hierarchicalCountryData })
+					}], function(info){
+						var grid = window[info.id] = new StandardGrid({
+							collection: info.collection,
+							columns: [
+								{renderExpando: true, label: "Name", field:"name", sortable: false},
+								{label: "Visited", field: "bool", sortable: false, editor: "checkbox"},
+								{label:"Type", field:"type", sortable: false},
+								{label:"Population", field:"population"},
+								{label:"Timezone", field:"timezone"}
+							],
+							shouldExpand: function(){
+								return true;
+							}
+						}, info.id);
+						
+						on(document.getElementById(info.id + "Save"), "click", function(){
+							grid.save();
+						});
+						on(document.getElementById(info.id + "Revert"), "click", function(){
+							grid.revert();
+						});
+					});
+				});
+		</script>
+	</head>
+	<body class="claro">
+		<p>This page tests auto-expansion of tree grids.</p>
+		<p><strong>NOTE:</strong> it is <em>strongly</em> recommended that you <em>only</em>
+			automatically expand for synchronous stores (or at least, stores which aren't
+			going back to the server for each child request); otherwise you are likely
+			to put a significant strain on your server, and the performance of the client
+			will suffer as a result.
+		</p>
+		
+		<div class="container">
+			<h2>Auto-expanding tree grid, asynchronous store</h2>
+			<div id="asyncGrid"></div>
+			<button id="asyncGridSave">Save</button>
+			<button id="asyncGridRevert">Revert</button>
+		</div>
+		
+		<div class="container">
+			<h2>Auto-expanding tree grid, synchronous store</h2>
+			<div id="syncGrid"></div>
+			<button id="syncGridSave">Save</button>
+			<button id="syncGridRevert">Revert</button>
+		</div>
+	</body>
+</html>

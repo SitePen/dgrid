@@ -22,7 +22,7 @@
 			require(["dojo/_base/lang", "dojo/_base/declare",
 				"dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Keyboard",
 				"dgrid/extensions/ColumnHider",
-				"dojo/store/Memory", "dojo/domReady!"],
+				"dstore/Memory", "dojo/domReady!"],
 			function(lang, declare, Grid, Selection, Keyboard, ColumnHider, Memory){
 				var columns = {}, data = {id: "1"};
 
@@ -36,7 +36,7 @@
 				});
 
 				var grid = window.grid = new (declare([Grid, Selection, Keyboard, ColumnHider]))({
-					store: store,
+					collection: store,
 					columns: columns
 				}, "grid");
 				

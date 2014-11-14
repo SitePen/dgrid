@@ -50,29 +50,32 @@
 		<script src="../../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script>
-			require(["dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/extensions/DnD", "dgrid/Keyboard", "dojo/dnd/Source", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/Deferred",  "dgrid/test/data/base", "dojo/domReady!"],
-				function(Grid, Selection, DnD, Keyboard, DnDSource, declare, lang, arrayUtil, Deferred){
+			require([
+				"dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/extensions/DnD", "dgrid/Keyboard", "dojo/dnd/Source",
+				"dojo/_base/declare", "dojo/_base/lang", "dojo/_base/array", "dojo/when",
+				"dgrid/test/data/createOrderedStore", "dgrid/test/data/orderedData",
+				"dojo/domReady!"],
+				function(
+					Grid, Selection, DnD, Keyboard, DnDSource, declare, lang, arrayUtil, when, 
+					createOrderedStore, orderedData
+				){
 					var DnDGrid = declare([Grid, Selection, DnD, Keyboard]);
 					
-					// Create a custom data array based on testOrderedData, but looping
+					// Create a custom data array based on orderedData, but looping
 					// several times to create enough items to reasonably test node removal,
 					// and also adding an extra item to test item-specific DnD types.
-					var orderedData = [],
-						len = testOrderedData.length,
-						i, j, obj;
-					
-					orderedData.push({
+					var data = [{
 						order: 1,
 						name: "grue",
 						description: "A grue! Run away!",
 						type: "grue"
-					});
+					}];
 					
-					for(i = 0; i < 10; i++){
-						for(j = 0; j < len; j++){
-							obj = lang.clone(testOrderedData[j]);
+					for(var i = 0, len = orderedData.items.length; i < 10; i++){
+						for(var j = 0, obj; j < len; j++){
+							obj = lang.clone(orderedData.items[j]);
 							obj.order = obj.id = i * len + j + 2;
-							orderedData.push(obj);
+							data.push(obj);
 						}
 					}
 					
@@ -81,8 +84,7 @@
 					window.grid1 = new DnDGrid({
 						bufferRows: 5,
 						farOffRemoval: 400,
-						sort: "order",
-						store: store = createOrderedStore(orderedData, { idProperty: "id" }),
+						collection: store = createOrderedStore({ data: data }),
 						columns: [
 							{label:"Name", field:"name", sortable: false},
 							{label:"Description", field:"description", sortable: false}
@@ -92,8 +94,7 @@
 						}
 					}, "grid1");
 					window.grid2 = new DnDGrid({
-						sort: "order",
-						store: createOrderedStore([]),
+						collection: createOrderedStore(),
 						columns: [
 							{label:"Name", field:"name", sortable: false}
 						]
@@ -170,11 +171,13 @@
 							// Re-implement to simply swap flag on store item
 							var grid = this.grid;
 							arrayUtil.forEach(nodes, function(node){
-								Deferred.when(source.getObject(node), function(object){
+								when(source.getObject(node), function(object){
 									object.added = grid.addedSide;
 									// If we wanted to support copy, we would probably want
 									// to check the copy flag and call copy instead of put here.
-									grid.store.put(object, { before: targetItem });
+									grid.collection.put(object, {
+										beforeId: targetItem ? grid.collection.getIdentity(targetItem) : null
+									});
 								});
 							});
 						}
@@ -190,17 +193,16 @@
 						postMixInProperties: function(){
 							this.inherited(arguments);
 							// Filter according to which "side" is represented
-							this.query.added = this.addedSide;
+							this.collection = this.collection.filter({ added: this.addedSide });
 						}
 					});
 					
 					// set up store to use for these grids
-					var sharedStore = createOrderedStore(lang.clone(testOrderedData));
+					var sharedStore = createOrderedStore({ data: orderedData });
 					
 					window.grid3 = new SharedDnDGrid({
 						dndSourceType: "dgrid-row-swap",
-						sort: "order",
-						store: sharedStore,
+						collection: sharedStore,
 						columns: [
 							{label:"Name", field:"name", sortable: false},
 							{label:"Description", field:"description", sortable: false}
@@ -209,8 +211,7 @@
 					window.grid4 = new SharedDnDGrid({
 						dndSourceType: "dgrid-row-swap", // same as grid3
 						addedSide: true, // flag to extension above
-						sort: "order",
-						store: sharedStore,
+						collection: sharedStore,
 						columns: [
 							{label:"Name", field:"name", sortable: false},
 							{label:"Description", field:"description", sortable: false}

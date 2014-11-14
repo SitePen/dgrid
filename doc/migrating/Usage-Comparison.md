@@ -5,22 +5,25 @@
 Given the following programmatic example using `dojox/grid`...
 
 ```js
-require(["dojox/grid/DataGrid", "dojo/store/Memory", "dojo/data/ObjectStore",
-    "dojo/domReady!"],
-function(DataGrid, Memory, ObjectStore){
-    var memoryStore = new Memory({data: [
+require([
+    'dojox/grid/DataGrid',
+    'dojo/store/Memory',
+    'dojo/data/ObjectStore',
+    'dojo/domReady!'
+], function (DataGrid, Memory, ObjectStore) {
+    var memoryStore = new Memory({ data: [
         // data here...
     ]});
     var objectStore = new ObjectStore({ objectStore: memoryStore });
-    
+
     var grid = new DataGrid({
         structure: [
-            { field: "id", name: "ID", width: "10%" },
-            { field: "name", name: "Name", width: "20%" },
-            { field: "description", name: "Description", width: "70%" }
+            { field: 'id', name: 'ID', width: '10%' },
+            { field: 'name', name: 'Name', width: '20%' },
+            { field: 'description', name: 'Description', width: '70%' }
         ],
         store: objectStore
-    }, "grid");
+    }, 'grid');
     grid.startup();
 });
 ```
@@ -43,21 +46,26 @@ following styles...
 ...and the following JavaScript...
 
 ```js
-require(["dgrid/OnDemandGrid", "dgrid/Keyboard", "dgrid/Selection",
-    "dojo/_base/declare", "dojo/store/Memory", "dojo/domReady!"],
-function(OnDemandGrid, Keyboard, Selection, declare, Memory){
+require([
+    'dojo/_base/declare',
+    'dgrid/OnDemandGrid',
+    'dgrid/Keyboard',
+    'dgrid/Selection',
+    'dstore/Memory',
+    'dojo/domReady!'
+], function (declare, OnDemandGrid, Keyboard, Selection, Memory) {
     var memoryStore = new Memory({data: [
         // data here...
     ]});
-    
-    var grid = new declare([OnDemandGrid, Keyboard, Selection])({
+
+    var grid = new declare([ OnDemandGrid, Keyboard, Selection ])({
         columns: {
-            id: { label: "ID" },
-            name: { label: "Name" },
-            description: { label: "Description" }
+            id: 'ID',
+            name: 'Name',
+            description: 'Description'
         },
-        store: memoryStore
-    }, "grid");
+        collection: memoryStore
+    }, 'grid');
     // dgrid will call startup for you if the node appears to be in flow
 });
 ```
@@ -71,10 +79,10 @@ There are a few key differences worth pointing out:
 * `dojox/grid` operates with stores implementing the earlier `dojo/data` APIs;
   in order to use it with a store instance implementing the `dojo/store` APIs,
   the store must first be wrapped using the `dojo/data/ObjectStore` module.
-  On the other hand, dgrid communicates with `dojo/store` APIs out of the box.
+  On the other hand, dgrid communicates with dstore APIs out of the box.
   (Conversely, however, if you *do* need to work with a `dojo/data` store, you
-  would then have to pass it through the `dojo/store/DataStore` wrapper in order
-  for dgrid to work with it.)
+  would then have to pass it through the `dojo/store/DataStore` and `dstore/legacy/StoreAdapter`
+  wrappers in order for dgrid to work with it.)
 * Note that in the dgrid version of the example, the Selection and Keyboard
   modules are required and mixed into the constructor to be instantiated, in
   order to enable those pieces of functionality which are baked-in by default
@@ -93,15 +101,15 @@ contrived example demonstrating use of sub-rows in `dojox/grid`...
 var grid = new DataGrid({
     structure: [
         [
-            { field: "id", name: "ID", width: "10%" },
-            { field: "name", name: "Name", width: "20%" }
+            { field: 'id', name: 'ID', width: '10%' },
+            { field: 'name', name: 'Name', width: '20%' }
         ],
         [
-            { field: "description", name: "Description", width: "70%", colSpan: 2 }
+            { field: 'description', name: 'Description', width: '70%', colSpan: 2 }
         ]
     ],
     store: objectStore
-}, "grid");
+}, 'grid');
 grid.startup();
 ```
 
@@ -109,18 +117,18 @@ grid.startup();
 (again assuming the same context as the previous example)
 
 ```js
-var grid = new declare([OnDemandGrid, Keyboard, Selection])({
+var grid = new declare([ OnDemandGrid, Keyboard, Selection ])({
     subRows: [
         [
-            { field: "id", label: "ID" },
-            { field: "name", label: "Name" }
+            { field: 'id', label: 'ID' },
+            { field: 'name', label: 'Name' }
         ],
         [
-            { field: "description", label: "Description", colSpan: 2 }
+            { field: 'description', label: 'Description', colSpan: 2 }
         ]
     ],
-    store: memoryStore
-}, "grid");
+    collection: memoryStore
+}, 'grid');
 ```
 
 Notice that `subRows` is now defined instead of `columns`.  The `columns`
@@ -148,20 +156,20 @@ sections, the following `dojox/grid` structure with multiple views...
 var grid = new DataGrid({
     structure: [
         { // first view
-            width: "10%",
+            width: '10%',
             cells: [
-                { field: "id", name: "ID", width: "auto" }
+                { field: 'id', name: 'ID', width: 'auto' }
             ]
         },
         [ // second view
             [
-                { field: "name", name: "Name", width: "20%" },
-                { field: "description", name: "Description", width: "80%" }
+                { field: 'name', name: 'Name', width: '20%' },
+                { field: 'description', name: 'Description', width: '80%' }
             ]
         ]
     ],
     store: objectStore
-}, "grid");
+}, 'grid');
 grid.startup();
 ```
 
@@ -183,27 +191,33 @@ grid.startup();
 (require call included, to demonstrate additional dependency)
 
 ```js
-require(["dgrid/OnDemandGrid", "dgrid/ColumnSet", "dgrid/Keyboard", "dgrid/Selection",
-    "dojo/_base/declare", "dojo/store/Memory", "dojo/domReady!"],
-function(OnDemandGrid, ColumnSet, Keyboard, Selection, declare, Memory){
+require([
+    'dojo/_base/declare',
+    'dgrid/OnDemandGrid',
+    'dgrid/ColumnSet',
+    'dgrid/Keyboard',
+    'dgrid/Selection',
+    'dstore/Memory',
+    'dojo/domReady!'
+], function (declare, OnDemandGrid, ColumnSet, Keyboard, Selection, Memory) {
     // ... create memoryStore here ...
-    
-    var grid = new declare([OnDemandGrid, ColumnSet, Keyboard, Selection])({
+
+    var grid = new declare([ OnDemandGrid, ColumnSet, Keyboard, Selection ])({
         columnSets: [
             [ // first columnSet
                 [
-                    { field: "id", label: "ID" }
+                    { field: 'id', label: 'ID' }
                 ]
             ],
             [ // second columnSet
                 [
-                    { field: "name", label: "Name" },
-                    { field: "description", label: "Description" }
+                    { field: 'name', label: 'Name' },
+                    { field: 'description', label: 'Description' }
                 ]
             ]
         ],
-        store: memoryStore
-    }, "grid");
+        collection: memoryStore
+    }, 'grid');
 });
 ```
 
@@ -227,7 +241,7 @@ usage.
 For instance, the following declarative `dojox/grid` layout...
 
 ```html
-<table id="grid" data-dojo-type="dojox.grid.DataGrid"
+<table id="grid" data-dojo-type="dojox/grid/DataGrid"
     data-dojo-props="store: objectStore">
     <thead>
         <tr>
@@ -242,8 +256,9 @@ For instance, the following declarative `dojox/grid` layout...
 ...could be achieved declaratively using dgrid as follows...
 
 ```html
-<table id="grid" data-dojo-type="dgrid.CustomGrid"
-    data-dojo-props="store: memoryStore">
+<table id="grid" data-dojo-type="dgrid/GridFromHtml"
+    data-dojo-mixins="dgrid/OnDemandList, dgrid/Keyboard, dgrid/Selection"
+    data-dojo-props="collection: memoryStore">
     <thead>
         <tr>
             <th data-dgrid-column="{ field: 'id' }">ID</th>
@@ -252,26 +267,6 @@ For instance, the following declarative `dojox/grid` layout...
         </tr>
     </thead>
 </table>
-```
-
-...provided the following script is used...
-
-```js
-require(["dgrid/GridFromHtml", "dgrid/Keyboard", "dgrid/Selection",
-    "dojo/store/Memory", "dojo/_base/declare", "dojo/parser", "dojo/domReady!"],
-function(GridFromHtml, Keyboard, Selection, Memory, declare, parser){
-    var memoryStore = window.memoryStore = new Memory({data: [
-        // ... data here ...
-    ]});
-    
-    // Globally expose a Grid constructor including the mixins we want.
-    window.dgrid = {
-        CustomGrid: declare([GridFromHtml, Keyboard, Selection])
-    };
-    
-    // Parse the markup after exposing the global.
-    parser.parse();
-});
 ```
 
 Notice that rather than specifying individual non-standard attributes inside the
@@ -285,24 +280,13 @@ Note that some properties which have standard equivalents, such as `colspan` and
 `rowspan`, can be specified directly as HTML attributes in the element instead.
 Additionally, the innerHTML of the `th` becomes the column's label.
 
-The script block above demonstrates the main catch to using dgrid declaratively
-with `dojo/parser`: since the modules in the dgrid package are written to be
-pure AMD, they do not expose globals, which means whatever constructors are to
-be used need to be exposed manually.  Furthermore, rather than simply exposing
-the GridFromHtml constructor, the above example exposes a custom-declared
-constructor which mixes in desired functionality.
-
-Note that if column plugins are to be employed, these will also need to be
-similarly globally exposed.  Column plugins may be specified in the column
-definitions of declarative grid layouts within the `data-dgrid-column` attribute;
-for example:
-
-```html
-<th data-dgrid-column="dgrid.editor({ field: 'name', editOn: 'dblclick' })">Name</th>
-```
+Note that since the modules in the dgrid package are written to be
+pure AMD, they do not expose globals, so module ID syntax *must* be used when
+parsing declarative dgrid instances.  `data-dojo-mixins` can be used to incorporate
+the desired functionality, analogous to using `declare` programmatically.
 
 ### Column Layout via HTML with views / columnsets
-    
+
 While both `dojox/grid` and dgrid also enable declarative creation
 of grids with multiple views/columnsets, in dgrid's case this is again separated
 to its own module, GridWithColumnSetsFromHtml.  This separation exists due to
@@ -314,7 +298,7 @@ As a quick example, here is what a simple declarative grid with two views could
 look like with `dojox/grid`...
 
 ```html
-<table id="grid" data-dojo-type="dojox.grid.DataGrid"
+<table id="grid" data-dojo-type="dojox/grid/DataGrid"
     data-dojo-props="store: objectStore">
     <colgroup span="1" width="10%"></colgroup>
     <colgroup span="2"></colgroup>
@@ -333,8 +317,9 @@ look like with `dojox/grid`...
 example)
 
 ```html
-<table id="grid" data-dojo-type="dgrid.CustomGrid"
-    data-dojo-props="store: memoryStore">
+<table id="grid" data-dojo-type="dgrid/GridWithColumnSetsFromHtml"
+    data-dojo-mixins="dgrid/OnDemandList, dgrid/Keyboard, dgrid/Selection"
+    data-dojo-props="collection: memoryStore">
     <colgroup span="1"></colgroup>
     <colgroup span="2"></colgroup>
     <thead>
@@ -382,8 +367,8 @@ grid.connect(grid, "onRowClick", function(evt){
 ...and using dgrid...
 
 ```js
-grid.on(".dgrid-row:click", function(evt){
-    var item = grid.row(evt).data;
-    console.log("Clicked item with name: " + item.name);
+grid.on('.dgrid-row:click', function (event) {
+    var item = grid.row(event).data;
+    console.log('Clicked item with name: ' + item.name);
 });
 ```

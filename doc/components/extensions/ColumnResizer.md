@@ -4,18 +4,20 @@ The ColumnResizer extension can be used to add column resizing functionality (ac
 
 ```js
 require([
-    "dojo/_base/declare", "dgrid/OnDemandGrid", "dgrid/extensions/ColumnResizer"
-], function(declare, OnDemandGrid, ColumnResizer){
-    var grid = new (declare([OnDemandGrid, ColumnResizer]))({
+    'dojo/_base/declare',
+    'dgrid/OnDemandGrid',
+    'dgrid/extensions/ColumnResizer'
+], function (declare, OnDemandGrid, ColumnResizer) {
+    var grid = new (declare([ OnDemandGrid, ColumnResizer ]))({
         columns: {
             col1: {
-                label: "Column1",
+                label: 'Column1',
                 resizable: false
             },
-            col2: "Column 2",
-            col3: "Column 3"
+            col2: 'Column 2',
+            col3: 'Column 3'
         }
-    }, "grid");
+    }, 'grid');
     // ...
 });
 ```

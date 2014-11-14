@@ -5,10 +5,12 @@ to provide selection at the cell level instead.
 
 ```js
 require([
-    "dojo/_base/declare", "dgrid/OnDemandGrid", "dgrid/CellSelection"
-], function(declare, OnDemandGrid, CellSelection){
-    var grid = new (declare([OnDemandGrid, CellSelection]))({
-        selectionMode: "single",
+    'dojo/_base/declare',
+    'dgrid/OnDemandGrid',
+    'dgrid/CellSelection'
+], function (declare, OnDemandGrid, CellSelection) {
+    var grid = new (declare([ OnDemandGrid, CellSelection ]))({
+        selectionMode: 'single',
         // ...
     });
 });

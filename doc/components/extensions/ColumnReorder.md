@@ -7,18 +7,20 @@ same subrow or columnset.
 
 ```js
 require([
-    "dojo/_base/declare", "dgrid/OnDemandGrid", "dgrid/extensions/ColumnReorder"
-], function(declare, OnDemandGrid, ColumnReorder, declare){
-    var grid = new (declare([OnDemandGrid, ColumnReorder]))({
+    'dojo/_base/declare',
+    'dgrid/OnDemandGrid',
+    'dgrid/extensions/ColumnReorder'
+], function (declare, OnDemandGrid, ColumnReorder) {
+    var grid = new (declare([ OnDemandGrid, ColumnReorder ]))({
         columns: {
             col1: {
-                label: "Column1",
+                label: 'Column1',
                 reorderable: false
             },
-            col2: "Column 2",
-            col3: "Column 3"
+            col2: 'Column 2',
+            col3: 'Column 3'
         }
-    }, "grid");
+    }, 'grid');
     // ...
 });
 ```

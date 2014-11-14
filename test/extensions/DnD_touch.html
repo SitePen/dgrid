@@ -39,22 +39,21 @@
 			data-dojo-config="async: true"></script>
 		<script>
 			require(["dgrid/OnDemandGrid", "dgrid/extensions/DnD", "put-selector/put",
-				"dojo/_base/declare", "dojo/_base/lang", "dgrid/test/data/base", "dojo/domReady!"],
-			function(Grid, DnD, put, declare, lang){
+				"dojo/_base/declare", "dojo/_base/lang", 
+				"dgrid/test/data/createOrderedStore", "dgrid/test/data/orderedData",
+				"dojo/domReady!"],
+			function(Grid, DnD, put, declare, lang, createOrderedStore, orderedData){
 				var DnDGrid = declare([Grid, DnD]);
 				
 				// Create a custom data array based on testOrderedData, but looping
-				// several times to create enough items to reasonably test node removal,
-				// and also adding an extra item to test item-specific DnD types.
-				var orderedData = [],
-					len = testOrderedData.length,
-					i, j, obj;
+				// several times to create enough items to reasonably test node removal.
+				var data = [];
 				
-				for(i = 0; i < 5; i++){
-					for(j = 0; j < len; j++){
-						obj = lang.clone(testOrderedData[j]);
-						obj.order = obj.id = i * len + j + 1;
-						orderedData.push(obj);
+				for(var i = 0, len = orderedData.items.length; i < 5; i++){
+					for(var j = 0, obj; j < len; j++){
+						obj = lang.clone(orderedData.items[j]);
+						obj.order = obj.id = i * len + j + 2;
+						data.push(obj);
 					}
 				}
 				
@@ -62,15 +61,16 @@
 					return {
 						bufferRows: 5,
 						farOffRemoval: 400,
-						sort: "order",
-						store: createOrderedStore(orderedData, { idProperty: "id" }),
+						collection: createOrderedStore({
+							data: data
+						}),
 						getObjectDndType: function(item){
 							return [item.type ? item.type : this.dndSourceType];
 						}
 					};
 				}
 				
-				// Note: testOrderedStore hard-wires sorting anyway,
+				// Note: createOrderedStore hard-wires sorting anyway,
 				// so leaving sort disabled on columns in this grid.
 				var grid = window.grid = new DnDGrid(lang.mixin(getCommonProperties(), {
 					columns: [

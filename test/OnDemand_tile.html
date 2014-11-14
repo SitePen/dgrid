@@ -33,7 +33,7 @@
 			data-dojo-config="async: true"></script>
 		<script>
 			var logRendered; // Function defined in require factory
-			require(["dgrid/OnDemandList", "dojo/query", "dojo/store/Memory", "put-selector/put", "dojo/domReady!"],
+			require(["dgrid/OnDemandList", "dojo/query", "dstore/Memory", "put-selector/put", "dojo/domReady!"],
 			function(OnDemandList, query, Memory, put){
 				// Create dummy array to make list show a number of entries.
 				var data = [], i, store;
@@ -47,7 +47,7 @@
 				document.getElementById("logRendered").onclick = logRendered;
 				
 				window.list = new OnDemandList({
-					store: store,
+					collection: store,
 					farOffRemoval: 500,
 					renderRow: function(object){
 						return put("span", object.id);
@@ -55,7 +55,7 @@
 				}, "list");
 				
 				window.imglist = new OnDemandList({
-					store: store,
+					collection: store,
 					farOffRemoval: 500,
 					renderRow: function(object){
 						return put("img[src=../demos/multiview/resources/dojo-64.png]");

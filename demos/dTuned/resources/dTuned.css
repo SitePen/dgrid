@@ -26,9 +26,6 @@
 	transition-property: background-color, border-color;
 	background: url("../../../css/skins/images/row_back.png") #fff repeat-x;
 }
-.has-ie-6 .dTuned .dgrid-row {
-	background-image: none;
-}
 
 .dTuned .dgrid-row:hover {
 	background-color: #e9f2fe;

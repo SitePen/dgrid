@@ -2,30 +2,33 @@
 
 ## Listening for events with dojo/on and grid.on
 
-The [`dojo/on`](http://dojotoolkit.org/reference-guide/dojo/on.html) module,
-new to Dojo 1.7, provides a concise yet powerful API for registering listeners,
-especially for DOM events.  Listening for events of interest on a dgrid component
-is very straightforward using `dojo/on`; furthermore, dgrid components possess
-an `on` method, which is equivalent to calling `dojo/on` passing the
-component's top-level DOM node as the target.
+The [`dojo/on`](http://dojotoolkit.org/reference-guide/dojo/on.html) module provides a
+concise yet powerful API for registering listeners, especially for DOM events.
+Listening for events of interest on a dgrid component is very straightforward using `dojo/on`;
+furthermore, dgrid components possess an `on` method, which is equivalent to calling `dojo/on`
+passing the component's top-level DOM node as the target.
 
 Using the event delegation features of `dojo/on`, it is possible to listen for
 all manner of events.  For example, to listen for right-clicks on rows in the
 grid's body:
 
 ```js
-grid.on(".dgrid-row:contextmenu", function(evt){ /* ... */ });
+grid.on('.dgrid-content .dgrid-row:contextmenu', function (event) {
+    /* ... */
+});
 ```
 
 Or, to listen to clicks on individual header cells:
 
 ```js
-grid.on(".dgrid-header .dgrid-cell:click", function(evt){ /* ... */ });
+grid.on('.dgrid-header .dgrid-cell:click', function (event) {
+    /* ... */
+});
 ```
 
 In summary, pretty much any combination desired can be achieved by using
-event delegation with selectors based on the `dgrid-header`, `dgrid-row`, and
-`dgrid-cell` CSS classes as appropriate.
+event delegation with selectors based on the `dgrid-header`, `dgrid-content`,
+`dgrid-row`, and `dgrid-cell` CSS classes as appropriate.
 
 ## Obtaining information about events
 
@@ -41,14 +44,14 @@ of `cell`, a second argument indicating column ID would also be passed.
 Expanding upon the examples above...
 
 ```js
-grid.on(".dgrid-row:contextmenu", function(evt){
+grid.on('.dgrid-content .dgrid-row:contextmenu', function (event) {
     var row = grid.row(evt);
     // row.element == the element with the dgrid-row class
     // row.id == the identity of the item represented by the row
     // row.data == the item represented by the row
 });
 
-grid.on(".dgrid-header .dgrid-cell:click", function(evt){
+grid.on('.dgrid-header .dgrid-cell:click', function (event) {
     var cell = grid.cell(evt);
     // cell.element == the element with the dgrid-cell class
     // cell.column == the column definition object for the column the cell is within
@@ -67,8 +70,8 @@ Event name|Emitted by
 `dgrid-columnresize`|[`ColumnResizer`](../components/extensions/ColumnResizer.md#events) module
 `dgrid-columnreorder`|[`ColumnReorder`](../components/extensions/ColumnReorder.md#events) module
 `dgrid-columnstatechange`|[`ColumnHider`](../components/extensions/ColumnHider.md#events) module
-`dgrid-datachange`|[`editor`](../components/column-plugins/editor.md#events) module when an editor field loses focus after being changed
-`dgrid-editor-show`|[`editor`](../components/column-plugins/editor.md#events) module before placing a shared editor
-`dgrid-editor-hide`|[`editor`](../components/column-plugins/editor.md#events) module before removing an `editOn` editor
+`dgrid-datachange`|[`Editor`](../components/mixins/Editor.md#events) module when an editor field loses focus after being changed
+`dgrid-editor-show`|[`Editor`](../components/mixins/Editor.md#events) module before placing a shared editor
+`dgrid-editor-hide`|[`Editor`](../components/mixins/Editor.md#events) module before removing an `editOn` editor
 `dgrid-select`|[`Selection`](../components/mixins/Selection.md#events) module when one or more rows are selected
 `dgrid-deselect`|[`Selection`](../components/mixins/Selection.md#events) module when one or more rows are deselected
