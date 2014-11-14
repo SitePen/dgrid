@@ -63,7 +63,7 @@ define({
 		dragToMove: 'Drag to move',
 		edit: 'Edit',
 		'delete': 'Delete',
-		generalColumnProperties: 'Field Settings',
+		generalColumnProperties: 'Column Settings',
 		mixinColumnProperties: 'Mixin column properties',
 		moduleProperties: '${0} properties'
 	}

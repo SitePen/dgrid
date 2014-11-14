@@ -134,8 +134,6 @@ define([
 
 		_showCode: function () {
 			this.gridCodeTextArea.value = this._generateCode();
-			this.gridCodeTextArea.style.height = '';
-			this.gridCodeTextArea.style.height = this.gridCodeTextArea.scrollHeight + 'px';
 		},
 
 		_generateCode: function () {

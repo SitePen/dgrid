@@ -1,4 +1,3 @@
-
 .gridTypeForm {
 	color: white;
 	font-size: 14px;
@@ -6,28 +5,41 @@
 	margin-bottom: 10px;
 }
 
+.demoGridPane,
+.demoCodePane {
+	position: absolute;
+	top: 59px;
+	bottom: $renderPadding;
+	left: $renderPadding;
+	right: $renderPadding;
+}
 
 .demoGridPane {
 	color: #95a5a6;
-	margin-top:1em;
 
-	.dojoDndItem,
-	.dojoDndItemOver {
-	    padding: 0;
-	    border: 0;
+	.dgrid {
+		height: 100%;
+	}
+
+	.dgrid-content {
+		.dojoDndItem,
+		.dojoDndItemOver {
+		    padding: 0;
+		    border: 0;
+		}
 	}
 }
 
 .demoCodePane {
-	margin-top:1em;
 	textarea {
-		width: 100%;
+		background: #EBEBEB;
 		border: 0;
 		font-family: Consolas, Courier, monospace;
 		font-size: 12px;
-		background: #EBEBEB;
-		overflow-y: hidden;
-		padding: 15px 5px;
+		height: 100%;
+		padding: 5px;
+		resize: none;
+		width: 100%;
 	}
 }
 
@@ -92,7 +104,4 @@
 			color: $resultButtonOnText;
 		}
 	}
-
 }
-
-
