@@ -8,10 +8,11 @@ define([
 	'dojo/_base/declare',
 	'dojo/_base/array',
 	'dojo/Stateful',
+	'dojo/when',
 	'dstore/RequestMemory',
 	'put-selector/put',
 	'dojo/domReady!'
-], function (require, List, Grid, Selection, Keyboard, Hider, declare, arrayUtil, Stateful, RequestMemory, put) {
+], function (require, List, Grid, Selection, Keyboard, Hider, declare, arrayUtil, Stateful, when, RequestMemory, put) {
 	// Create DOM
 	var headerNode = put('div#header');
 	var listNode = put('div#list-container');
@@ -25,7 +26,7 @@ define([
 	put(document.body, headerNode, 'div#header-content', 'dTuned');
 	put(document.body, listNode);
 	put(document.body, gridNode);
-	
+
 	// a formatting function for the Duration column.
 	function timeFormatter(t) {
 		var tmp = parseInt(t, 10);
@@ -41,7 +42,7 @@ define([
 		// don't forget to pad seconds.
 		return '' + min + ':' + (sec < 10 ? '0' : '') + sec;
 	}
-	
+
 	function unique(arr) {
 		// Create a unique list of items from the passed array
 		// (removing duplicates).
@@ -95,12 +96,12 @@ define([
 
 	// create the unique lists and render them
 	var genres, artists, albums;
-	
+
 	songStore.fetch().then(function (songs) {
 		genres = unique(arrayUtil.map(songs, pickField('genre')));
 		artists = unique(arrayUtil.map(songs, pickField('artist')));
 		albums = unique(arrayUtil.map(songs, pickField('album')));
-		
+
 		genres.unshift('All (' + genres.length + ' Genre' + (genres.length !== 1 ? 's' : '') + ')');
 		artists.unshift('All (' + artists.length + ' Artist' + (artists.length !== 1 ? 's' : '') + ')');
 		albums.unshift('All (' + albums.length + ' Album' + (albums.length !== 1 ? 's' : '') + ')');
@@ -109,7 +110,7 @@ define([
 		artistsList.renderArray(artists);
 		albumsList.renderArray(albums);
 	});
-	
+
 	// As items are selected in each of the genre, artist, and album dgrid lists the
 	// associated value will be set on this stateful object so the main grid can
 	// watch for updates and filter accordingly
@@ -119,8 +120,6 @@ define([
 	// It builds a filtered list of album names depending on the selected genre and artist.
 	function getFilteredAlbumList(gridFilter, songStore, selectedArtist) {
 		var filterOptions = {};
-		var filteredObjects;
-		var filteredAlbumList;
 
 		if (gridFilter.get('genre')) {
 			filterOptions.genre = gridFilter.get('genre');
@@ -129,12 +128,13 @@ define([
 		if (selectedArtist) {
 			filterOptions.artist = selectedArtist;
 		}
-		filteredObjects = songStore.filter(filterOptions).fetch();
-		filteredAlbumList = unique(arrayUtil.map(filteredObjects, pickField('album')));
-		filteredAlbumList.unshift('All (' + filteredAlbumList.length +
-			' Album' + (filteredAlbumList.length !== 1 ? 's' : '') + ')');
 
-		return filteredAlbumList;
+		return songStore.filter(filterOptions).fetch().then(function (filteredObjects) {
+			var list = unique(arrayUtil.map(filteredObjects, pickField('album')));
+			list.unshift('All (' + list.length +
+				' Album' + (list.length !== 1 ? 's' : '') + ')');
+			return list;
+		});
 	}
 
 	gridFilter.watch(function () {
@@ -167,7 +167,6 @@ define([
 		// filter the albums, artists and grid
 		var row = event.rows[0];
 		var selectedGenre = row.data;
-		var filteredObjects;
 		var filteredArtistList;
 
 		if (row.id === '0') {
@@ -178,17 +177,21 @@ define([
 		else {
 			gridFilter.set('genre', selectedGenre);
 			// filter the store on the current genre
-			filteredObjects = songStore.filter({ genre: selectedGenre }).fetch();
-			// map the full album objects to a unique array of artist names (strings)
-			filteredArtistList = unique(arrayUtil.map(filteredObjects, pickField('artist')));
-			// add the "All" option at the top
-			filteredArtistList.unshift('All (' + filteredArtistList.length +
-				' Artist' + (filteredArtistList.length !== 1 ? 's' : '') + ')');
+			filteredArtistList = songStore.filter({ genre: selectedGenre }).fetch().then(function (filteredObjects) {
+				// map the full album objects to a unique array of artist names (strings)
+				var list = unique(arrayUtil.map(filteredObjects, pickField('artist')));
+				// add the "All" option at the top
+				list.unshift('All (' + list.length +
+					' Artist' + (list.length !== 1 ? 's' : '') + ')');
+				return list;
+			});
 		}
-		
-		artistsList.refresh();	// clear contents
-		artistsList.renderArray(filteredArtistList);
-		artistsList.select('0'); // reselect "all", triggering albums+grid refresh
+
+		when(filteredArtistList, function (list) {
+			artistsList.refresh(); // clear contents
+			artistsList.renderArray(list);
+			artistsList.select('0'); // reselect "all", triggering albums+grid refresh
+		});
 	});
 
 	artistsList.on('dgrid-select', function (event) {
@@ -214,9 +217,11 @@ define([
 			filteredAlbumList = getFilteredAlbumList(gridFilter, songStore, selectedArtist);
 		}
 
-		albumsList.refresh(); // clear contents
-		albumsList.renderArray(filteredAlbumList);
-		albumsList.select('0'); // reselect "all" item, triggering grid refresh
+		when(filteredAlbumList, function (list) {
+			albumsList.refresh(); // clear contents
+			albumsList.renderArray(list);
+			albumsList.select('0'); // reselect "all" item, triggering grid refresh
+		});
 	});
 
 	albumsList.on('dgrid-select', function (event) {
