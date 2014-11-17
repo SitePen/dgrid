@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Test Grid Row Selectors</title>
+		<meta name="viewport" content="width=570">
+		<style>
+			@import "../../dojo/resources/dojo.css";
+			@import "../css/skins/claro.css";
+			.heading {
+				font-weight: bold;
+				padding-bottom: 0.25em;
+			}
+			.dgrid {
+				width: 70%;
+				margin: 10px;
+			}
+			.field-col1 {
+				width: 40px;
+			}
+
+			#grid-complex .dgrid-cell {
+				height: 2em; /* force consistent heights across columnset cells */
+			}
+			.dgrid-column-set-0 {
+				width: 42px;
+			}
+		</style>
+		<script src="../../dojo/dojo.js" data-dojo-config="async: true"></script>
+		<script>
+var getColumns;
+
+require(["dojo/_base/lang", "dojo/on", "dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Selector", "dgrid/Keyboard", "dgrid/ColumnSet",
+			"dojo/_base/declare", "dojo/_base/array", "dojo/json", "dgrid/test/data/testStore", "put-selector/put", "dojo/domReady!"],
+		function(lang, on, Grid, Selection, Selector, Keyboard, ColumnSet, declare, arrayUtil, json, testStore, put){
+			on(document.body, "dgrid-select,dgrid-deselect",
+					function(event){
+						var msg = (event.type == "dgrid-deselect" ? "de" : "") + "selected";
+						console.log(event.grid.id + ": " + msg +
+										(event.parentType ? " (via " + event.parentType + "): " : ": "),
+								arrayUtil.map(event.rows, function(row){ return row.id; }).join(", "));
+						console.log("selection: ", json.stringify(event.grid.selection, null, "  "));
+					}
+			);
+
+			getColumns = function(){
+				return {
+					col1: { selector: 'checkbox' },
+					id: "ID",
+					col2: { label: 'Column 2', sortable: false },
+					col3: { label: 'Column 3' }
+				};
+			};
+			getColumnsWithoutSelector = function(){
+				return {
+					col1: "Note",
+					id: "ID",
+					col2: { label: 'Column 2', sortable: false },
+					col3: { label: 'Column 3' }
+				};
+			};
+
+			var SelectionGrid = declare([Grid, Selection, Selector, Keyboard]);
+
+			window.grid = new SelectionGrid({
+				collection: testStore,
+				selectionMode: "none",
+				allowSelect: function(row){
+					return row.data.col1 !== "note";
+				},
+				columns: getColumns(),
+				allowSelectAll: true
+			}, "grid");
+			window.grid2 = new SelectionGrid({
+				collection: testStore,
+				selectionMode: "none",
+				columns: {
+					col1: { selector: 'checkbox', label: "" }, // Test blank label
+					id: "ID",
+					col2: {label: 'Column 2', sortable: false},
+					col3: {label: 'Column 3'}
+				},
+				allowSelectAll: false
+			}, "grid2");
+
+			window.gridRadio = new SelectionGrid({
+				collection: testStore,
+				selectionMode: "none",
+				allowSelect: function(row){
+					return row.data.col3 !== "read";
+				},
+				columns: {
+					col1: { selector: 'radio', label: 'Radio' },
+					id: "ID",
+					col2: {label: 'Column 2', sortable: false},
+					col3: {label: 'Column 3'}
+				}
+			}, "grid-radio");
+
+			window.gridNoSelector = new SelectionGrid({
+				collection: testStore,
+				selectionMode: "none",
+				columns: getColumnsWithoutSelector()
+			}, "gridNoSelector");
+
+			window.gridMultipleSelector = new SelectionGrid({
+				collection: testStore,
+				selectionMode: "none",
+				columns: {
+					col1: { selector: 'checkbox', label: '' },
+					id: "ID",
+					col2: {label: 'Column 2'},
+					col3: {label: 'Column 3'},
+					col4: { selector: 'checkbox' }
+				},
+				allowSelectAll: true
+			}, "gridMultipleSelector");
+
+			window.gridMultipleSelectorRadio = new SelectionGrid({
+				collection: testStore,
+				selectionMode: "none",
+				columns: {
+					col1: { selector: "radio", label: '' },
+					id: "ID",
+					col2: {label: 'Column 2'},
+					col3: {label: 'Column 3'},
+					col4: { selector: "radio" }
+				},
+				allowSelectAll: true
+			}, "gridMultipleSelectorRadio");
+
+			window.gridMultipleSelectorNoAll = new SelectionGrid({
+				collection: testStore,
+				selectionMode: "none",
+				columns: {
+					col1: { selector: 'checkbox', label: '' },
+					id: "ID",
+					col2: {label: 'Column 2'},
+					col3: {label: 'Column 3'},
+					col4: { selector: 'checkbox' }
+				}
+			}, "gridMultipleSelectorNoAll");
+
+			window.gridComplex = new (declare([Grid, ColumnSet, Selection, Selector, Keyboard]))({
+				collection: testStore,
+				allowSelect: function(row){
+					return row.data.col1 !== "note";
+				},
+				columnSets: [
+					[
+						[
+							{ selector: 'checkbox', field: "col1" }
+						]
+					],
+					[
+						[
+							{ field: "id", label: "ID" },
+							{ field: "col2", label: "Column 2", sortable: false },
+							{ field: "col3", label: "Column 3" }
+						]
+					]
+				]
+			}, "grid-complex");
+
+			window.gridCustomRender = new SelectionGrid({
+				collection: testStore,
+				selectionMode: "none",
+				columns: {
+					col1: {
+						selector: function(column, value, cell, object){
+							var input = column.grid._defaultRenderSelectorInput(lang.delegate(column, {selector: 'checkbox'}), value, cell, object);
+							put(input, "-span", ">");
+							put(input, "+span", "<");
+							return input;
+						}
+					},
+					id: "ID",
+					col2: {label: 'Column 2'},
+					col3: {label: 'Column 3'}
+				},
+				allowSelectAll: true
+			}, "gridCustomRender");
+		}
+);
+		</script>
+	</head>
+	<body class="claro">
+		<h2>A grid with checkbox selectors, with select-all enabled
+			(top checkbox, and Ctrl/Cmd+A)</h2>
+		<div>
+			<button type="button" onclick="grid.set('selectionMode', 'none');">
+				Set selection mode to "none"</button>
+			<button type="button" onclick="grid.set('selectionMode', 'single');">
+				Set selection mode to "single"</button>
+			<button type="button" onclick="grid.set('selectionMode', 'multiple');">
+				Set selection mode to "multiple"</button>
+			<button type="button" onclick="grid.set('selectionMode', 'extended');">
+				Set selection mode to "extended"</button>
+		</div>
+		<div id="grid"></div>
+		<div> Tests for resetting columns (should not cause errors):
+			<button type="button" onclick="grid.set('columns', getColumns());">
+				Reset columns, including selector
+			</button>
+			<button type="button" onclick="grid.set('columns', getColumnsWithoutSelector());">
+				Reset columns, without selector
+			</button>
+		</div>
+		<h2>A grid with radio selectors</h2>
+		<div>
+			<button type="button" onclick="gridRadio.set('selectionMode', 'none');">
+				Set selection mode to "none"</button>
+			<button type="button" onclick="gridRadio.set('selectionMode', 'single');">
+				Set selection mode to "single" (to test sync)</button>
+		</div>
+		<div id="grid-radio"></div>
+		<h2>A grid with checkbox selectors, with select-all disabled, blank label in selector column</h2>
+		<div id="grid2"></div>
+		<h2>A grid, initially without a selector column</h2>
+		<div id="gridNoSelector"></div>
+		<div> Tests for resetting columns (should not cause errors,x and selectors should work):
+			<button type="button" onclick="gridNoSelector.set('columns', getColumns());">
+				Reset columns, including selector
+			</button>
+			<button type="button" onclick="gridNoSelector.set('columns', getColumnsWithoutSelector());">
+				Reset columns, without selector
+			</button>
+		</div>
+		<h2>A grid with checkbox selectors and column sets</h2>
+		<div id="grid-complex"></div>
+		<h2>A grid with multiple row selector columns</h2>
+		<div id="gridMultipleSelector"></div>
+		<h2>A grid with multiple selector columns and no select all</h2>
+		<div id="gridMultipleSelectorNoAll"></div>
+		<h2>A grid with multiple radio selector columns</h2>
+		<div id="gridMultipleSelectorRadio"></div>
+		<h2>A grid with a custom selector rendering function</h2>
+		<div id="gridCustomRender"></div>
+	</body>
+</html>

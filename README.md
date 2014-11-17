@@ -1,30 +1,45 @@
 The dgrid project provides widgets for lists of data, including simple sets of scrolling rows,
-grids of data, on-demand lazy-loaded data, and various plugins for additional functionality. 
-This project also provides touch scrolling for mobile devices with native style
-momentum, bouncing, and scrollbars.
+grids of data, on-demand lazy-loaded data, and various mixins for additional functionality.
 
 dgrid is available under the same dual BSD/AFLv2 license as the Dojo Toolkit.
 
 # Installation
 
-## Automatic Download with CPM
+## Installing with bower
 
-dgrid can be installed via [CPM](https://github.com/kriszyp/cpm)
-using the following command:
+dgrid and its dependencies can be installed via [bower](http://bower.io/) using the following command:
 
-    cpm install dgrid
+```
+bower install dgrid
+```
 
-The above command will automatically find the highest tagged version of dgrid and
-install it.  Alternatively, the latest development version of dgrid can be
-installed by instructing CPM to install from the master branch:
+Note that by default, bower installs to a `bower_components` subdirectory.  If you'd
+like to install to the current directory instead (which tends to be more appropriate
+for AMD projects), add a `.bowerrc` with the following:
 
-    cpm install dgrid master
+```json
+{
+    "directory": "."
+}
+```
 
-Note that while dgrid lists the dojo package as a dependency, it does not install
-dijit, as it is not a hard requirement.  Dijit can be additionally installed by
+By default, bower will automatically find the highest tagged version of dgrid and
+install it along with its dependencies.  Alternatively, the latest development version of dgrid can be
+installed by instructing bower to install from the master branch:
+
+```
+bower install dgrid#master
+```
+
+Note that while dgrid lists the `dojo` package as a dependency, it will not automatically
+install `dijit`, as it is not a hard requirement.  Dijit can be additionally installed by
 running:
 
-    cpm install dijit
+```
+bower install dijit#<target>
+```
+
+...where `<target>` corresponds to the version of Dojo you have installed.
 
 ## Manual Download
 
@@ -32,7 +47,8 @@ Alternatively, dgrid and its dependencies can be downloaded individually:
 
 * [xstyle](https://github.com/kriszyp/xstyle)
 * [put-selector](https://github.com/kriszyp/put-selector)
-* [The Dojo Toolkit](http://dojotoolkit.org) SDK version 1.7 or higher
+* [dstore](https://github.com/SitePen/dstore) for store-backed grids
+* [The Dojo Toolkit](http://dojotoolkit.org) SDK version 1.8 or higher
     * Out of the DTK components, Dojo core is the only hard dependency for dgrid;
       however, some of the test pages also use components from Dijit, and
       Dojox (namely grid for a comparison test, and mobile for a mobile page).
@@ -41,46 +57,114 @@ It is recommended to arrange all dependencies as siblings, resulting in a
 directory structure like the following:
 
 * `dgrid`
-* `dijit` (optional, dependency of some dgrid tests)
+* `dijit` (optional, dependency of some dgrid tests/components)
 * `dojo`
 * `dojox` (optional, dependency of some dgrid tests)
+* `dstore`
 * `put-selector`
 * `xstyle`
 * `util` (optional, e.g. if pursuing a custom build)
 
-dgrid works best with the latest revision of Dojo 1.7 or higher.  As of this
-writing, [Dojo 1.10.0](http://download.dojotoolkit.org/release-1.10.0/) is
-recommended.
+## CDN
 
-Note that while dgrid 0.3 supports Dojo 1.8 and 1.9 and may take advantage of features
-or fix issues specific to them where possible, it does not have any hard dependency
-on APIs new to 1.8 or 1.9, so as to maintain compatibility with 1.7.
+[RawGit](http://rawgit.com/) now offers CDN hosting of raw tagged git URLs.
+It can serve any version of dgrid, xstyle, and put-selector via MaxCDN.
+
+For example, here's a `packages` configuration for dgrid 0.4.0, xstyle 0.2.1, and put-selector 0.3.5:
+
+```js
+packages: [
+    {
+        name: 'dgrid',
+        location: '//cdn.rawgit.com/SitePen/dgrid/v0.4.0'
+    },
+    {
+        name: 'xstyle',
+        location: '//cdn.rawgit.com/kriszyp/xstyle/v0.2.1'
+    },
+    {
+        name: 'put-selector',
+        location: '//cdn.rawgit.com/kriszyp/put-selector/v0.3.5'
+    }
+]
+```
+
+# Browser and Dojo Version Support
+
+dgrid 0.4 works with Dojo 1.8 or higher, and supports the following browsers:
+
+* IE 8+
+* Firefox latest + ESR
+* Chrome latest (desktop and mobile)
+* Safari latest (desktop and mobile)
+* Opera latest
+
+dgrid 0.4 *does not* support quirks mode.  You are *heavily* encouraged to
+include the HTML5 DOCTYPE (`<!DOCTYPE html>`) at the beginning of your pages.
 
 # Documentation
 
-The [doc folder](./doc) contains documentation for dgrid components.
-In addition, the website hosts a number of [tutorials](http://dgrid.io/#tutorials).
+Documentation for dgrid components is available in the
+[doc folder](doc).  In addition, the website hosts a number of
+[tutorials](http://dgrid.io/#tutorials).
 
 If upgrading from a previous dgrid release, please be sure to read the
-[release notes](https://github.com/SitePen/dgrid/releases).
+[release notes on GitHub](https://github.com/SitePen/dgrid/releases).
+
+# Community
+
+## Reporting Issues
+
+Bugs or enhancements can be filed by opening an issue in the
+[issue tracker on GitHub](https://github.com/SitePen/dgrid/issues?state=open).
+
+When reporting a bug, please provide the following information:
+
+* Affected browsers and Dojo versions
+* A clear list of steps to reproduce the problem
+* If the problem cannot be easily reproduced in an existing dgrid test page,
+  include a [Gist](https://gist.github.com/) with code for a page containing a
+  reduced test case
+
+If you would like to suggest a fix for a particular issue, you are welcome to
+fork dgrid, create a branch, and submit a pull request.  Please note that a
+[Dojo CLA](http://www.dojofoundation.org/about/cla) is required for any
+non-trivial modifications.
+
+## Getting Support
+
+Questions about dgrid usage can be asked in the following places:
+
+* [Stack Overflow](http://stackoverflow.com/questions/tagged/dgrid)
+* The #dojo IRC channel on irc.freenode.net
+* The [dojo-interest mailing list](http://mail.dojotoolkit.org/mailman/listinfo/dojo-interest)
+
+Web interfaces for IRC and the mailing list are available from the
+[Dojo Toolkit Community page](https://dojotoolkit.org/community/).
+
+SitePen also offers [commercial support](https://www.sitepen.com/support/)
+for dgrid, as well as Dojo and a number of other JavaScript libraries.
 
 # Testing
 
 dgrid uses [Intern](http://theintern.io/) as its test runner. Tests can
-either be run using the browser, or using [Sauce Labs](https://saucelabs.com/).
-More information on writing your own tests with Intern can be found in the
-[Intern wiki](https://github.com/theintern/intern/wiki). 
+either be run using the browser, or using a cloud provider such as
+[Sauce Labs](https://saucelabs.com/). More information on writing your own tests
+with Intern can be found in the [Intern wiki](https://github.com/theintern/intern/wiki).
+
+*Note that installing dgrid via bower will not include the test folder; if you
+wish to run dgrid's unit tests, download the package directly.*
 
 ## Setting up
 
 **Note:** Commands listed in this section are all written assuming they are
-run in the parent directory containing `dgrid`, `dojo`, etc.
+run inside the `dgrid` directory.
 
-Install the latest *geezer* version of Intern, which supports IE 6, 7, and 8
-in addition to modern browsers.
+Run `npm install` to install the latest *geezer* version of Intern 2,
+which supports IE 8 in addition to modern browsers:
 
 ```
-npm install intern-geezer
+npm install
 ```
 
 ## Running via the browser
@@ -100,7 +184,7 @@ export SAUCE_ACCESS_KEY=<your_sauce_access_key>
 Then kick off the runner with the following command:
 
 ```
-node node_modules/intern-geezer/runner config=dgrid/test/intern/intern
+node node_modules/intern-geezer/runner config=test/intern/intern
 ```
 
 ## Running via local Selenium server
@@ -140,39 +224,9 @@ Once the Selenium server is running, kick off the Intern test runner with the
 following command (run from the directory containing dgrid):
 
 ```
-node node_modules/intern-geezer/runner config=dgrid/test/intern/intern.local
+node node_modules/intern-geezer/runner config=test/intern/intern.local
 ```
 
 The configuration in `intern.local.js` overrides `intern.js` to not use
 Sauce Connect, and to attempt to run Firefox and Chrome by default (this can
 be customized as desired according to the browsers you have installed).
-
-# Community
-
-## Reporting Issues
-
-Bugs or enhancements can be filed by opening an issue in the
-[issue tracker on GitHub](https://github.com/SitePen/dgrid/issues?state=open).
-
-When reporting a bug, please provide the following information:
-
-* Affected browsers and Dojo versions
-* A clear list of steps to reproduce the problem
-* If the problem cannot be easily reproduced in an existing dgrid test page,
-  include a [Gist](https://gist.github.com/) with code for a page containing a
-  reduced test case
-
-If you would like to suggest a fix for a particular issue, you are welcome to
-fork dgrid, create a branch, and submit a pull request.  Please note that a
-[Dojo CLA](http://www.dojofoundation.org/about/cla) is required for any
-non-trivial modifications.
-
-## Getting Support
-
-Questions about dgrid usage can be discussed on the
-[dojo-interest mailing list](http://mail.dojotoolkit.org/mailman/listinfo/dojo-interest)
-or in the #dojo IRC channel on irc.freenode.net. Web interfaces are available
-from the [Dojo Toolkit Community page](https://dojotoolkit.org/community/).
-
-SitePen also offers [commercial support](https://www.sitepen.com/support/)
-for dgrid, as well as Dojo and a number of other JavaScript libraries.

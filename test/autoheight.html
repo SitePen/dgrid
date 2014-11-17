@@ -19,15 +19,24 @@
 		<script src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script>
-			require(["dgrid/List", "dgrid/OnDemandGrid","dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!"], 
-				function(List, Grid, Selection, Keyboard, declare){
+			require([
+				"dgrid/List",
+				"dgrid/OnDemandGrid",
+				"dgrid/Selection",
+				"dgrid/Keyboard",
+				"dojo/_base/declare",
+				"dgrid/test/data/createAsyncStore",
+				"dgrid/test/data/smallColorData",
+				"dojo/domReady!"
+			], function(List, Grid, Selection, Keyboard, declare, createAsyncStore, smallColorData){
 					window.grid = new (declare([Grid, Selection, Keyboard]))({
 						className: "dgrid-autoheight",
-						sort: "id",
-						store: testCountryStore,
+						collection: createAsyncStore({ data: smallColorData }),
 						columns: {
-							name: "Name",
-							type: "Type"
+							col1: "Color",
+							col5: "R",
+							col6: "G",
+							col7: "B"
 						}
 					}, "grid");
 				});

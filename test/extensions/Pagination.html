@@ -44,12 +44,20 @@
 			
 			require([skinDep, "dgrid/Grid", "dgrid/extensions/Pagination",
 					"dgrid/Selection", "dgrid/Keyboard", "dgrid/ColumnSet", "dgrid/GridFromHtml",
-					"dojo/_base/lang", "dojo/_base/declare", "dojo/on", "dojo/dom-construct",
-					"dojo/dom-form", "dgrid/test/data/errorStores", "dgrid/test/data/base", "dojo/domReady!"],
-				function(skinResource, Grid, Pagination, Selection, Keyboard, ColumnSet, GridFromHtml,
-						lang, declare, on, domConstruct, domForm, errorStores, testStore){
+					"dojo/_base/lang", "dojo/_base/declare", "dojo/on", "dojo/dom-construct", "dojo/dom-form", 
+					"dgrid/test/data/errorStores", "dgrid/test/data/testStore", "dgrid/test/data/createSyncStore",
+					"dgrid/test/data/createAsyncStore", "dgrid/test/data/genericData",
+					"dojo/domReady!"],
+				function(
+					skinResource, Grid, Pagination, Selection, Keyboard, ColumnSet, GridFromHtml,
+					lang, declare, on, domConstruct, domForm, errorStores, testStore, 
+					createSyncStore, createAsyncStore, genericData
+				){
 					
 					window.errorStores = errorStores; // for easy access by button handlers
+					window.testStore = testStore;
+					window.testAsyncStore = createAsyncStore({ data: genericData });
+					window.emptyAsyncStore = createAsyncStore();
 					
 					var CustomGrid = declare([Grid, Keyboard, Selection, Pagination]);
 					
@@ -76,8 +84,7 @@
 					
 					function createGrid(args){
 						window.grid = new CustomGrid(lang.mixin({
-									sort: "id",
-									store: testAsyncStore,
+									collection: testAsyncStore,
 									columns: getColumns(),
 									noDataMessage: "No results.",
 									loadingMessage: "Loading..."
@@ -109,8 +116,7 @@
 					// auto-height grid
 					var grid2 = window.grid2 = new CustomGrid({
 						className: "dgrid-autoheight",
-						sort: "id",
-						store: testStore,
+						collection: testStore,
 						columns: getColumns2(),
 						pagingLinks: false,
 						pagingTextBox: true,
@@ -131,14 +137,12 @@
 					
 					// GridFromHtml
 					window.gridfromhtml = new (declare([GridFromHtml, Keyboard, Selection, Pagination]))({
-						sort: "id",
-						store: testStore
+						collection: testStore
 					}, "gridfromhtml");
 					
 					// ColumnSet grid
 					window.gridColumnSet = new (declare([Grid, Keyboard, Selection, ColumnSet, Pagination]))({
-						sort: "id",
-						store: testStore,
+						collection: testStore,
 						columnSets: [
 							[[
 								{ label: "ID", field: "id" }
@@ -182,16 +186,14 @@
 			<button onclick="grid.set('columns', getColumns());">Original Structure</button>
 		</div>
 		<div>Buttons to test different stores:
-			<button onclick="grid.set('store', testAsyncStore);">Set to async store</button>
-			<button onclick="grid.set('store', testStore);">Set to sync store</button>
-			<button onclick="grid.set('store', emptyAsyncStore);">Set to async empty store</button>
-			<button onclick="grid.set('store', emptyStore);">Set to sync empty store</button>
-			<button onclick="grid.set('store', errorStores.asyncQuery);">Set to async error store</button>
-			<button onclick="grid.set('store', errorStores.query);">Set to sync error store</button>
+			<button onclick="grid.set('collection', testAsyncStore);">Set to async store</button>
+			<button onclick="grid.set('collection', testStore);">Set to sync store</button>
+			<button onclick="grid.set('collection', emptyAsyncStore);">Set to empty store</button>
+			<button onclick="grid.set('collection', errorStores.asyncFetch);">Set to error store</button>
 		</div>
 		<div>Buttons to test store operations:
-			<button onclick="grid.store.remove(5);">Delete item with id 5 from store</button>
-			<button onclick="grid.store.add({col1:'new', col2:true});">Add item to store</button>
+			<button onclick="grid.collection.remove(5);">Delete item with id 5 from store</button>
+			<button onclick="grid.collection.add({col1:'new', col2:true});">Add item to store</button>
 			<button onclick="grid.set('showFooter', !grid.get('showFooter'));">Toggle footer</button>
 		</div>
 		

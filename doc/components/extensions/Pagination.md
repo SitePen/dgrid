@@ -7,16 +7,18 @@ switch between pages.
 
 ```js
 require([
-    "dojo/_base/declare", "dgrid/Grid", "dgrid/extensions/Pagination"
-], function(declare, Grid, Pagination){
-    var grid = new (declare([Grid, Pagination]))({
-        store: myStore,
+    'dojo/_base/declare',
+    'dgrid/Grid',
+    'dgrid/extensions/Pagination'
+], function (declare, Grid, Pagination) {
+    var grid = new (declare([ Grid, Pagination ]))({
+        collection: myStore,
         columns: myColumns,
         pagingLinks: 1,
         pagingTextBox: true,
         firstLastArrows: true,
         pageSizeOptions: [10, 15, 25]
-    }, "grid");
+    }, 'grid');
     // ...
 });
 ```
@@ -25,7 +27,7 @@ require([
 one of the OnDemand constructors, since those contain their own virtual
 scrolling logic. Internally, Pagination inherits from the same \_StoreMixin
 module inherited by the OnDemand prototypes for common integration with
-`dojo/store`.
+dstore.
 
 ## API
 
@@ -53,7 +55,7 @@ Property | Description
 Method | Description
 ------ | -----------
 `gotoPage(page)` | Loads the indicated page; returns a promise yielding an object containing the `rows` rendered as well as the `results` they represent.  **Note:** Page numbers start at 1.
-`refresh()` | Clears the grid and re-queries the store for the first page of data.  The Pagination extension returns a promise from `refresh`, which resolves when items in the first page finish rendering.  The promise resolves with the QueryResults that were rendered.
+`refresh(options)` | Clears the grid and re-queries the store for the first page of data.  The Pagination extension returns a promise from `refresh`, which resolves when items in the first page finish rendering.  The promise resolves with the QueryResults that were rendered.  `options` is an optional object which may include a `keepCurrentPage` option; if true, the current page will be reloaded, rather than the first page.  (If the current page no longer exists due to item removal, the last page will be loaded.)
 
 ## Events
 

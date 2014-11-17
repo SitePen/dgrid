@@ -14,8 +14,8 @@
 		<script src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script>
-			require(["dgrid/Grid", "dgrid/OnDemandGrid", "dojo/_base/lang", "dojo/store/Memory", "dojo/domReady!"],
-			function(Grid, OnDemandGrid, lang, Memory){
+			require(["dgrid/Grid", "dgrid/OnDemandGrid", "dojo/_base/lang", "dgrid/test/data/createSyncStore", "dojo/domReady!"],
+			function(Grid, OnDemandGrid, lang, createSyncStore){
 				var data = [
 					{order: 1, name:"preheat"},
 					{order: 2, name:"mix dry", description:"In a medium bowl, combine flour, salt, and baking soda"},
@@ -29,7 +29,7 @@
 					{order: 10, name:"eat"}
 				];
 				
-				var store = Memory({data: data});
+				var store = createSyncStore({data: data});
 				
 				var columns = {
 					name: "Name",
@@ -44,7 +44,7 @@
 				
 				window.gridStore = new OnDemandGrid({
 					columns: lang.clone(columns),
-					store: store
+					collection: store
 				}, "gridStore");
 			});
 				

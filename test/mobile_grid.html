@@ -14,11 +14,10 @@
 		</script>
 		<script  src="../../dojo/dojo.js"></script>
 		<script>
-			require(["dojo/on", "dgrid/OnDemandGrid", "dgrid/extensions/ColumnResizer", "dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!"],
+			require(["dojo/on", "dgrid/OnDemandGrid", "dgrid/extensions/ColumnResizer", "dojo/_base/declare", "dgrid/test/data/testStore", "dojo/domReady!"],
 				function(on, Grid, ColumnResizer, declare, testStore){
 					window.grid = new (declare([Grid, ColumnResizer]))({
-						sort: "id",
-						store: testStore,
+						collection: testStore,
 						columns: { // you can declare columns as an object hash (key translates to field)
 							col1: "Status",
 							col4: "Expired",

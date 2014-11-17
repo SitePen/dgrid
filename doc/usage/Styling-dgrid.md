@@ -22,14 +22,14 @@ For example, you could define a grid and style it like so:
     }
 </style>
 <script>
-    require(["dgrid/Grid"], function(Grid){
+    require([ 'dgrid/Grid' ], function (Grid) {
         var grid = new Grid({
             columns: {
-                age: "Age",
-                first: "First Name",
+                age: 'Age',
+                first: 'First Name',
                 // ...
             }
-        }, "grid");
+        }, 'grid');
         grid.renderArray(someData);
     });
 </script>
@@ -41,28 +41,15 @@ While the column definition provides mechanisms for adding classes to individual
 columns, there is no similar construct at the row level.  However, it is possible
 to add classes to rows by aspecting `renderRow`.
 
-In Dojo 1.8 and newer, you can achieve this using `aspect.after` - when its
+However, you can achieve this using `dojo/aspect.after` - when its
 `receiveArguments` argument is `false` (the default), it passes the original
 arguments object as a second parameter to the advising function, allowing access
 to the original object:
 
 ```js
-aspect.after(grid, "renderRow", function(row, args) {
+aspect.after(grid, 'renderRow', function(row, args) {
   // Add classes to `row` based on `args[0]` here
   return row;
-});
-```
-
-In Dojo 1.7, you need to use `aspect.around`, in order to have access to both the
-incoming object and the resulting row node:
-
-```js
-aspect.around(grid, "renderRow", function(original) {
-  return function(object) {
-    var row = original.apply(this, arguments);
-    // Add classes to `row` based on `object` here
-    return row;
-  };
 });
 ```
 
@@ -93,12 +80,9 @@ structuring of dgrid components:
   Applying a different color to alternating rows can help visually distinguish individual items.
 * `dgrid-selected`: Applied to selected rows or cells
 * `dgrid-cell`: Applied to each cell element
-* `dgrid-cell-padding`: Applied to each cell element, or to an
-  inner element within the cell in older versions of non-quirks mode IE to
-  properly apply padding to keep the padding within the box measurements
-  (box-sizing is preferred by the grid).
 * `dgrid-focus`: Applied to the element (cell or row) with the focus (for keyboard based navigation)
 * `dgrid-expando-icon`: Applied to the expando icon on tree nodes
+* `dgrid-row-expanded`: Applied to rows that have been expanded when using the `Tree` mixin
 * `dgrid-header-scroll`: Applied to the node in the top right corner of a Grid,
   above the vertical scrollbar
 
@@ -110,3 +94,15 @@ names are also available for generic skinning (following the jQuery ThemeRoller 
 * `ui-state-default`: Applied to each row element
 * `ui-state-active`: Applied to selected rows or cells
 * `ui-state-highlight`: Applied to a row for a short time when the contents are changed (or it is newly created)
+
+## The `dgrid-autoheight` class
+
+There are various cases where it is desirable for a grid to adjust its height according to its contents.  dgrid
+contains styles for this under the `.dgrid-autoheight` selector.  Making a grid's height size to fit is as simple
+as adding the `dgrid-autoheight` class to the DOM node used to create the grid, or passing it via the `className`
+property to the instance.
+
+**Note:** Using the `dgrid-autoheight` class with `OnDemandList` is **not** recommended, as `OnDemandList` will
+end up ultimately rendering all of the grid's rows anyway, page by page.  `dgrid-autoheight` works well with
+`Pagination`.  If you are really interested in rendering all store data at once into an auto-height list or grid,
+have a look at our [tutorial](http://dgrid.io/tutorials/0.4/single_query) on the subject.

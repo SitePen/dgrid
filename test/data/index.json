@@ -1,5 +1,137 @@
 [
     {
+        "name": "Editor.html",
+        "url": "Editor.html",
+        "title": "Test Cell Editors",
+        "parent": ""
+    },
+    {
+        "name": "Editor_autosave.html",
+        "url": "Editor_autosave.html",
+        "title": "Test Dijit Cell Editors with autoSave",
+        "parent": ""
+    },
+    {
+        "name": "Editor_more_widgets.html",
+        "url": "Editor_more_widgets.html",
+        "title": "Test Dijit Cell Editors",
+        "parent": ""
+    },
+    {
+        "name": "Editor_no_store.html",
+        "url": "Editor_no_store.html",
+        "title": "Test Editors in Store-less Grid",
+        "parent": ""
+    },
+    {
+        "name": "Editor_widgets.html",
+        "url": "Editor_widgets.html",
+        "title": "Test Dijit Cell Editors",
+        "parent": ""
+    },
+    {
+        "name": "GridFromHtml.html",
+        "url": "GridFromHtml.html",
+        "title": "GridFromHtml Tests",
+        "parent": ""
+    },
+    {
+        "name": "GridFromHtml_Editors.html",
+        "url": "GridFromHtml_Editors.html",
+        "title": "Test declarative cell editors ",
+        "parent": ""
+    },
+    {
+        "name": "Grid_headerless.html",
+        "url": "Grid_headerless.html",
+        "title": "Test Grid Common Cases with showHeader: false",
+        "parent": ""
+    },
+    {
+        "name": "Grid_mouseevents.html",
+        "url": "Grid_mouseevents.html",
+        "title": "Test delegated mouse events",
+        "parent": ""
+    },
+    {
+        "name": "Grid_rendering.html",
+        "url": "Grid_rendering.html",
+        "title": "Test get, formatter, and renderCell",
+        "parent": ""
+    },
+    {
+        "name": "Keyboard.html",
+        "url": "Keyboard.html",
+        "title": "Test Keyboard Mixin",
+        "parent": ""
+    },
+    {
+        "name": "OnDemand.html",
+        "url": "OnDemand.html",
+        "title": "Test Grid Store Observation",
+        "parent": ""
+    },
+    {
+        "name": "OnDemand_promises.html",
+        "url": "OnDemand_promises.html",
+        "title": "Test OnDemandGrids with promise-based stores",
+        "parent": ""
+    },
+    {
+        "name": "OnDemand_tile.html",
+        "url": "OnDemand_tile.html",
+        "title": "Test Tile Layout in OnDemandList",
+        "parent": ""
+    },
+    {
+        "name": "Rest.html",
+        "url": "Rest.html",
+        "title": "Test Rest store",
+        "parent": ""
+    },
+    {
+        "name": "Selection.html",
+        "url": "Selection.html",
+        "title": "Test Selection",
+        "parent": ""
+    },
+    {
+        "name": "Selector.html",
+        "url": "Selector.html",
+        "title": "Test Grid Row Selectors",
+        "parent": ""
+    },
+    {
+        "name": "TouchScroll.html",
+        "url": "TouchScroll.html",
+        "title": "Test TouchScroll Mixin",
+        "parent": ""
+    },
+    {
+        "name": "Tree.html",
+        "url": "Tree.html",
+        "title": "Test Tree Grid",
+        "parent": ""
+    },
+    {
+        "name": "Tree_editor.html",
+        "url": "Tree_editor.html",
+        "title": "Test tree and editor in same column",
+        "parent": ""
+    },
+    {
+        "name": "Tree_expand.html",
+        "url": "Tree_expand.html",
+        "title": "Test Tree Grid",
+        "parent": ""
+    },
+    {
+        "name": "Tree_extra_filter.html",
+        "url": "Tree_extra_filter.html",
+        "title": "Test Tree Grid with Extra Filtering",
+        "parent": ""
+    },
+    {
         "name": "autoheight.html",
         "url": "autoheight.html",
         "title": "Test height:auto",
@@ -33,36 +165,6 @@
         "name": "dijit_layout_programmatic.html",
         "url": "dijit_layout_programmatic.html",
         "title": "Test Programmatic Dijit Layout",
-        "parent": ""
-    },
-    {
-        "name": "editor.html",
-        "url": "editor.html",
-        "title": "Test Cell Editors",
-        "parent": ""
-    },
-    {
-        "name": "editor_autosave.html",
-        "url": "editor_autosave.html",
-        "title": "Test Dijit Cell Editors with autoSave",
-        "parent": ""
-    },
-    {
-        "name": "editor_more_widgets.html",
-        "url": "editor_more_widgets.html",
-        "title": "Test Dijit Cell Editors",
-        "parent": ""
-    },
-    {
-        "name": "editor_no_store.html",
-        "url": "editor_no_store.html",
-        "title": "Test Editors in Store-less Grid",
-        "parent": ""
-    },
-    {
-        "name": "editor_widgets.html",
-        "url": "editor_widgets.html",
-        "title": "Test Dijit Cell Editors",
         "parent": ""
     },
     {
@@ -119,15 +221,15 @@
         "parent": "extensions"
     },
     {
-        "name": "DnD_touch.html",
-        "url": "extensions/DnD_touch.html",
-        "title": "Test Grid DnD on Touch Devices",
+        "name": "DnD_Tree.html",
+        "url": "extensions/DnD_Tree.html",
+        "title": "DnD test dragging tree children",
         "parent": "extensions"
     },
     {
-        "name": "DnD_tree.html",
-        "url": "extensions/DnD_tree.html",
-        "title": "DnD test dragging tree children",
+        "name": "DnD_touch.html",
+        "url": "extensions/DnD_touch.html",
+        "title": "Test Grid DnD on Touch Devices",
         "parent": "extensions"
     },
     {
@@ -137,46 +239,16 @@
         "parent": "extensions"
     },
     {
-        "name": "Pagination_i18n.html",
-        "url": "extensions/Pagination_i18n.html",
-        "title": "Test Pagination Extension with i18n override",
-        "parent": "extensions"
-    },
-    {
-        "name": "Pagination_tree.html",
-        "url": "extensions/Pagination_tree.html",
+        "name": "Pagination_Tree.html",
+        "url": "extensions/Pagination_Tree.html",
         "title": "Test Pagination Extension with tree plugin",
         "parent": "extensions"
     },
     {
-        "name": "GridFromHtml.html",
-        "url": "GridFromHtml.html",
-        "title": "GridFromHtml Tests",
-        "parent": ""
-    },
-    {
-        "name": "GridFromHtml_Editors.html",
-        "url": "GridFromHtml_Editors.html",
-        "title": "Test declarative cell editors ",
-        "parent": ""
-    },
-    {
-        "name": "Grid_headerless.html",
-        "url": "Grid_headerless.html",
-        "title": "Test Grid Common Cases with showHeader: false",
-        "parent": ""
-    },
-    {
-        "name": "Grid_mouseevents.html",
-        "url": "Grid_mouseevents.html",
-        "title": "Test delegated mouse events",
-        "parent": ""
-    },
-    {
-        "name": "Grid_rendering.html",
-        "url": "Grid_rendering.html",
-        "title": "Test get, formatter, and renderCell",
-        "parent": ""
+        "name": "Pagination_i18n.html",
+        "url": "extensions/Pagination_i18n.html",
+        "title": "Test Pagination Extension with i18n override",
+        "parent": "extensions"
     },
     {
         "name": "has-css3.html",
@@ -196,45 +268,9 @@
         "parent": "intern"
     },
     {
-        "name": "JsonRest.html",
-        "url": "JsonRest.html",
-        "title": "Test JsonRest store",
-        "parent": ""
-    },
-    {
-        "name": "JsonRest_duplicates.html",
-        "url": "JsonRest_duplicates.html",
-        "title": "Test JsonRest Tree with objects repeated in different places in hierarchy",
-        "parent": ""
-    },
-    {
-        "name": "Keyboard.html",
-        "url": "Keyboard.html",
-        "title": "Test Keyboard Mixin",
-        "parent": ""
-    },
-    {
         "name": "mobile_grid.html",
         "url": "mobile_grid.html",
         "title": "Mobile dgrid test",
-        "parent": ""
-    },
-    {
-        "name": "OnDemand.html",
-        "url": "OnDemand.html",
-        "title": "Test Grid Store Observation",
-        "parent": ""
-    },
-    {
-        "name": "OnDemand_promises.html",
-        "url": "OnDemand_promises.html",
-        "title": "Test OnDemandGrids with promise-based stores",
-        "parent": ""
-    },
-    {
-        "name": "OnDemand_tile.html",
-        "url": "OnDemand_tile.html",
-        "title": "Test Tile Layout in OnDemandList",
         "parent": ""
     },
     {
@@ -268,18 +304,6 @@
         "parent": ""
     },
     {
-        "name": "Selection.html",
-        "url": "Selection.html",
-        "title": "Test Selection",
-        "parent": ""
-    },
-    {
-        "name": "selector.html",
-        "url": "selector.html",
-        "title": "Test Grid Selectors",
-        "parent": ""
-    },
-    {
         "name": "simple_grid.html",
         "url": "simple_grid.html",
         "title": "Test Simple Grid Creation",
@@ -295,30 +319,6 @@
         "name": "sparse_sort.html",
         "url": "sparse_sort.html",
         "title": "Test sorting of sparsely-populated fields",
-        "parent": ""
-    },
-    {
-        "name": "tree.html",
-        "url": "tree.html",
-        "title": "Test Tree Grid",
-        "parent": ""
-    },
-    {
-        "name": "tree_editor.html",
-        "url": "tree_editor.html",
-        "title": "Test tree and editor in same column",
-        "parent": ""
-    },
-    {
-        "name": "tree_expand.html",
-        "url": "tree_expand.html",
-        "title": "Test Tree Grid",
-        "parent": ""
-    },
-    {
-        "name": "tundra_custom.html",
-        "url": "tundra_custom.html",
-        "title": "Test Tundra Theme",
         "parent": ""
     },
     {

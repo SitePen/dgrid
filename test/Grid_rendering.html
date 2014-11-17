@@ -105,37 +105,40 @@
 				name: {},
 				description: {label: "", sortable: false} // Test blank label
 			};
-			require(["dgrid/Grid", "dgrid/OnDemandGrid", "dojo/store/Memory", "dojo/store/Observable", "dojo/_base/declare", "dojo/_base/lang", "dojo/parser", "dojo/query", "dgrid/test/data/base", "dojo/domReady!"],
-			function(Grid, OnDemandGrid, Memory, Observable, declare, lang, parser, query){
+			require(["dgrid/Grid", "dgrid/OnDemandGrid",
+				"dgrid/test/data/createSyncStore", "dgrid/test/data/orderedData",
+				"dojo/_base/declare", "dojo/_base/lang", "dojo/parser", "dojo/query", "dojo/domReady!"
+			], function(Grid, OnDemandGrid, createSyncStore, orderedData, declare, lang, parser, query){
 				
 				// fully-programmatic tests
+
 				
 				window.gridLegacyFormatter = new Grid({
 					columns: columnsLegacyFormatter
 				}, "gridLegacyFormatter");
-				gridLegacyFormatter.renderArray(testOrderedData);
+				gridLegacyFormatter.renderArray(orderedData.items);
 				
 				window.gridLegacyFormatterScope = new Grid({
 					columns: columnsLegacyFormatterScope,
 					formatterScope: testFormatterScope
 				}, "gridLegacyFormatterScope");
-				gridLegacyFormatterScope.renderArray(testOrderedData);
+				gridLegacyFormatterScope.renderArray(orderedData.items);
 				
 				
 				window.gridLegacyGet = new Grid({
 					columns: columnsLegacyGet
 				}, "gridLegacyGet");
-				gridLegacyGet.renderArray(testOrderedData);
+				gridLegacyGet.renderArray(orderedData.items);
 				
 				window.gridNew = new Grid({
 					columns: lang.clone(columnsNew)
 				}, "gridNew");
-				gridNew.renderArray(testOrderedData);
+				gridNew.renderArray(orderedData.items);
 
 				
 				// also, need a store, since there's currently no way to effectively
 				// invoke renderArray from HTML.
-				store = Observable(Memory({data: testOrderedData}));
+				store = createSyncStore({data: orderedData.items});
 				parser.parse();
 				
 				// Test 2x: testing dgrid w/o srcNodeRef, or w/ srcNodeRef w/o id
@@ -144,23 +147,20 @@
 				
 				// Test 2a: srcNodeRef + no id, specify id to dgrid
 				window.grid2a = new OnDemandGrid({
-					sort: "order",
-					store: store,
+					collection: store,
 					columns: lang.clone(columnsNew),
 					id: "test2a"
 				}, query(".test2a")[0]);
 				
 				// Test 2b: srcNodeRef + no id - should end up with id=dgrid_0
 				window.grid2b = new OnDemandGrid({
-					sort: "order",
-					store: store,
+					collection: store,
 					columns: lang.clone(columnsNew)
 				}, query(".test2b")[0]);
 				
 				// Test 2c: no srcNodeRef, specify id to dgrid
 				window.grid2c = new OnDemandGrid({
-					sort: "order",
-					store: store,
+					collection: store,
 					columns: lang.clone(columnsNew),
 					id: "test2c"
 				});
@@ -170,8 +170,7 @@
 				
 				// Test 2d: no srcNodeRef, no id - should end up with id=dgrid_1
 				window.grid2d = new OnDemandGrid({
-					sort: "order",
-					store: store,
+					collection: store,
 					columns: lang.clone(columnsNew)
 				});
 				query(".test2d")[0].appendChild(grid2d.domNode);

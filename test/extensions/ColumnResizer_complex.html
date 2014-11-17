@@ -35,11 +35,10 @@
 		<script src="../../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script>
-			require(["dgrid/OnDemandGrid", "dgrid/ColumnSet", "dgrid/Selection", "dgrid/Keyboard", "dgrid/extensions/ColumnResizer", "dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!"],
+			require(["dgrid/OnDemandGrid", "dgrid/ColumnSet", "dgrid/Selection", "dgrid/Keyboard", "dgrid/extensions/ColumnResizer", "dojo/_base/declare", "dgrid/test/data/testStore", "dojo/domReady!"],
 				function(Grid, ColumnSet, Selection, Keyboard, ColumnResizer, declare, testStore){
 					window.grid = new (declare([Grid, ColumnSet, Selection, Keyboard, ColumnResizer]))({
-						sort: "id",
-						store: testStore,
+						collection: testStore,
 						columnSets: [
 							[
 								[{label: 'Column 1', field: 'col1'},
@@ -52,8 +51,7 @@
 					}, "grid");
 					// same structure as above, without being split into ColumnSets
 					window.gridNoColumnSets = new (declare([Grid, Selection, Keyboard, ColumnResizer]))({
-						sort: "id",
-						store: testStore,
+						collection: testStore,
 						subRows: [[
 							{label: 'Column 1', field: 'col1'},
 							{label: 'Column 2', field: 'col2', sortable: false},

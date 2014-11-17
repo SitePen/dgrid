@@ -40,60 +40,62 @@
 				};
 			}
 			
-			require(["dgrid/OnDemandGrid",
-				"dgrid/extensions/DijitRegistry",
-				"dijit/Dialog",
-				"dojo/_base/declare",
-				"dojo/parser",
+			require(["dojo/parser",
+				"dgrid/test/data/testStore",
 				// widgets only used declaratively
+				"dijit/Dialog",
 				"dijit/layout/BorderContainer",
 				"dijit/layout/TabContainer",
 				"dijit/Toolbar",
 				"dijit/form/Button",
+				"dgrid/OnDemandGrid",
+				"dgrid/extensions/DijitRegistry",
 				// non-returns
-				"dgrid/test/data/base",
 				"dojo/domReady!"
-			], function(Grid, DijitRegistry, Dialog, declare, parser){
-			
-				var CustomGrid = declare([Grid, DijitRegistry]);
-				
-				// Simply passing columns via data-dojo-props, don't want GridFromHtml
-				window.dgrid = { Grid: CustomGrid };
-				
+			], function(parser, testStore){
+				window.testStore = testStore;
 				parser.parse();
 			});
 		</script>
 	</head>
 	<body class="claro">
-		<div data-dojo-type="dijit.layout.BorderContainer" id="bc">
-			<div data-dojo-type="dijit.Toolbar" class="bcTop"
+		<div data-dojo-type="dijit/layout/BorderContainer" id="bc">
+			<div data-dojo-type="dijit/Toolbar" class="bcTop"
 				data-dojo-props="id:'tbTop', region:'top'">
-				<span data-dojo-type="dijit.form.Button"
+				<span data-dojo-type="dijit/form/Button"
 					data-dojo-props="onClick: showDeclDialog">
 					Show declarative dialog
 				</span>
 			</div>
 			<!-- left: dgrid as direct child -->
-			<div data-dojo-type="dgrid.Grid" id="gridBCCP" class="bcLeft"
-				data-dojo-props="region: 'left', splitter: true, sort: 'id', store: testStore, columns: getGridCols()">
+			<div id="gridBCCP" class="bcLeft"
+				data-dojo-type="dgrid/OnDemandGrid"
+				data-dojo-mixins="dgrid/extensions/DijitRegistry"
+				data-dojo-props="region: 'left', splitter: true, collection: testStore, columns: getGridCols()">
 			</div>
 			<!-- center: tabcontainer -->
-			<div data-dojo-type="dijit.layout.TabContainer" class="bcCenter" id="tc"
+			<div data-dojo-type="dijit/layout/TabContainer" class="bcCenter" id="tc"
 				data-dojo-props="region: 'center'">
 				<!-- initial tab: dgrid as direct child -->
-				<div data-dojo-type="dgrid.Grid" id="gridTab1" class="gridTab"
-					data-dojo-props="title: 'Tab 1', sort: 'id', store: testStore, columns: getGridCols()">
+				<div id="gridTab1" class="gridTab"
+					data-dojo-type="dgrid/OnDemandGrid"
+					data-dojo-mixins="dgrid/extensions/DijitRegistry"
+					data-dojo-props="title: 'Tab 1', collection: testStore, columns: getGridCols()">
 				</div>
 				<!-- tab 2: dgrid as direct child again, but not initially visible -->
-				<div data-dojo-type="dgrid.Grid" id="gridTab2" class="gridTab"
-					data-dojo-props="title: 'Tab 2', sort: 'id', store: testStore, columns: getGridCols()">
+				<div id="gridTab2" class="gridTab"
+					data-dojo-type="dgrid/OnDemandGrid"
+					data-dojo-mixins="dgrid/extensions/DijitRegistry"
+					data-dojo-props="title: 'Tab 2', collection: testStore, columns: getGridCols()">
 				</div>
 			</div>
 		</div>
 		<!-- declarative dialog w/ dgrid inside -->
-		<div data-dojo-type="dijit.Dialog" id="dlgDecl" data-dojo-id="dlgDecl">
-			<div data-dojo-type="dgrid.Grid" id="gridDlgDecl"
-				data-dojo-props="sort: 'id', store: testStore, columns: getGridCols()"></div>
+		<div data-dojo-type="dijit/Dialog" id="dlgDecl" data-dojo-id="dlgDecl">
+			<div id="gridDlgDecl"
+				data-dojo-type="dgrid/OnDemandGrid"
+				data-dojo-mixins="dgrid/extensions/DijitRegistry"
+				data-dojo-props="collection: testStore, columns: getGridCols()"></div>
 		</div>
 	</body>
 </html>

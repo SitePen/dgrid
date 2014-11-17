@@ -62,7 +62,7 @@
 				"dgrid/OnDemandGrid",
 				"dgrid/Keyboard",
 				"dgrid/Selection",
-				"dgrid/editor",
+				"dgrid/Editor",
 				"dijit/form/DateTextBox",
 				"dijit/form/HorizontalSlider",
 				"dijit/form/NumberSpinner",
@@ -70,13 +70,21 @@
 				"dojo/_base/declare",
 				"dojo/_base/array",
 				"dojo/Stateful",
-				"dojo/store/Memory",
+				"dstore/Memory",
 				"put-selector/put",
 				"dgrid/test/data/errorStores",
-				"dgrid/test/data/base",
+				"dgrid/test/data/testStore",
+				"dgrid/test/data/createSyncStore",
+				"dgrid/test/data/createAsyncStore",
+				"dgrid/test/data/typesData",
+				"dgrid/test/data/largeColorData",
+				"dgrid/test/data/smallColorData",
+				"dgrid/test/data/stateData",
 				"dojo/domReady!"
-			], function(on, List, Grid, Keyboard, Selection, editor, DateTextBox, Slider, NumberSpinner,
-					lang, declare, arrayUtil, Stateful, Memory, put, errorStores){
+			], function(on, List, Grid, Keyboard, Selection, Editor, DateTextBox, Slider, NumberSpinner,
+					lang, declare, arrayUtil, Stateful, Memory, put, errorStores, testStore,
+					createSyncStore, createAsyncStore, typesData, largeColorData, smallColorData, stateData
+			){
 				
 				function createStatefulStore() {
 					var data = [],
@@ -117,13 +125,19 @@
 				};
 
 				var columns2 = [
-					editor({label: 'Real Number', field: 'floatNum'}, Slider),
-					editor({label: 'Integer', field: 'integer', editorArgs: {style: 'width: 5em;'}}, NumberSpinner),
-					editor({label: 'Text editable if checkbox checked', field: 'text', canEdit: function(object){
-						return object.bool;
-					}}, "text", "dblclick"),
-					editor({label: 'Another Date (autoSave)', field: 'date2', autoSave:true}, DateTextBox, "focus"),
-					editor({label: 'Check', field: 'bool'}, "checkbox")
+					{label: 'Real Number', field: 'floatNum', editor: Slider},
+					{label: 'Integer', field: 'integer', editor: NumberSpinner, editorArgs: {style: 'width: 5em;'}},
+					{
+						label: 'Text editable if checkbox checked',
+						field: 'text',
+						editor: "text",
+						editOn: "dblclick",
+						canEdit: function (object) {
+							return object.bool;
+						}
+					},
+					{label: 'Another Date (autoSave)', field: 'date2', autoSave:true, editor: DateTextBox, editOn: "focus"},
+					{label: 'Check', field: 'bool', editor: "checkbox"}
 				];
 
 				var columns3 = {
@@ -142,10 +156,15 @@
 					col6: 'G',
 					col7: 'B'
 				};
-				var StandardGrid = declare([Grid, Selection, Keyboard]);
+				var testTypesStore = createSyncStore({ data: typesData });
+				var colorStore = createSyncStore({ data: largeColorData });
+				var smallColorStore = createSyncStore({ data: smallColorData });
+				var testStateStore = createSyncStore({ data: stateData });
+				var emptyAsyncStore = createAsyncStore();
+
+				var StandardGrid = declare([Grid, Selection, Keyboard, Editor]);
 				var grid = window.grid = new StandardGrid({
-					sort: "id",
-					store: testStore,
+					collection: testStore,
 					columns: columns,
 					sort: "col3", // initially sort by col3 ascending
 					noDataMessage: "Nobody here but us chickens!",
@@ -153,29 +172,25 @@
 				}, "grid");
 
 				var grid2 = window.grid2 = new StandardGrid({
-					sort: "id",
-					store: testTypesStore,
+					collection: testTypesStore,
 					columns: columns2,
 					selectionMode: "single"
 				},"grid2");
 
 				var grid3 = window.grid3 = new StandardGrid({
-					sort: "id",
-					store: testTypesStore,
+					collection: testTypesStore,
 					columns: columns3
 				}, "grid3");
 
 				var gridAddDel = window.gridAddDel = new StandardGrid({
-					sort: "id",
-					store: smallColorStore,
+					collection: smallColorStore,
 					columns: lang.clone(columns4)
 				}, "gridAddDel");
 				
 				// also throw in a List connected to the same store
 				// (so additions/deletions should show up in both)
 				window.listAddDel = new (declare([List, Keyboard, Selection]))({
-					sort: "id",
-					store: smallColorStore,
+					collection: smallColorStore,
 					columns: lang.clone(columns4),
 					renderRow: function(object, options){
 						// need to define renderRow to accommodate store items
@@ -184,21 +199,20 @@
 				}, "listAddDel");
 				
 				window.statefulGrid = new StandardGrid({
-					sort: "abbreviation",
-					store: createStatefulStore(),
+					collection: createStatefulStore(),
 					columns: [
-						editor({
+						{
 							label: "Abbreviation",
 							field: "abbreviation",
 							editor: "text",
 							editOn: "dblclick"
-						}),
-						editor({
+						},
+						{
 							label: "Name",
 							field: "name",
 							editor: "text",
 							editOn: "dblclick"
-						})
+						}
 					]
 				}, "statefulGrid");
 				
@@ -209,46 +223,20 @@
 				});
 				
 				on(document.getElementById("setstore"), "click", function(){
-					console.log("setting store to colorStore: ", colorStore);
-					window.grid.set("store", colorStore);//no query
+					console.log("setting store to colorcollection: ", colorStore);
+					window.grid.set("collection", colorStore);
 				});
 				on(document.getElementById("restore"), "click", function(){
 					console.log("setting store to testStore");
-					grid.set("store", testStore);//no query
+					grid.set("collection", testStore);
 				});
 				on(document.getElementById("colorQuery"), "click", function(){
 					console.log("setting store to colorStore and setting query to show only primary colors");
-					grid.set("store", colorStore, {col3: "Primary"});//query set to only show primary colors
-				});
-				on(document.getElementById("resetQuery"), "click", function(){
-					console.log("reset query to show all");
-					grid.set("query", {});
+					grid.set("collection", colorStore.filter({col3: "Primary"}));// store filtered to only show primary colors
 				});
 				
 				var sortDescending = true;
-				
-				on(document.getElementById("setQueryWithOptions"), "click", function(){
-					// set sort for the col1 field
-					sortDescending = !sortDescending;
-					
-					// get existing sort order
-					var sortByCol1 = arrayUtil.filter(
-							grid.get("sort") || [], 
-							function(sortBy){
-								return sortBy.attribute == "col1";
-							}
-					).shift();
-					if(sortByCol1){
-						console.log("modifying existing sort direction for col1: ", sortByCol1);
-					} else {
-						sortByCol1 = { attribute: "col1" };
-					}
-					sortByCol1.descending = sortDescending;
-					grid.set("query", grid.query, { sort: [sortByCol1] });
-					
-					console.log("sort after setting query + queryOptions w/ sort: ",
-						grid.get("sort"), grid.queryOptions);
-				});
+			
 				on(document.getElementById("sort"), "click", function(){
 					sortDescending = !sortDescending;
 					grid.set("sort", "col1", sortDescending);
@@ -257,21 +245,16 @@
 				});
 
 
-				on(document.getElementById("empty"), "click", function(){
-					grid.set("store", emptyStore, {});
-				});
 				on(document.getElementById("emptyAsync"), "click", function(){
-					grid.set("store", emptyAsyncStore, {});
-				});
-				on(document.getElementById("error"), "click", function(){
-					grid.set("store", errorStores.query, {});
+					grid.set("collection", emptyAsyncStore);
 				});
 				
-				on(document.getElementById("error2"), "click", function(){
-					grid.set("store", errorStores.asyncQuery, {});
+				on(document.getElementById("error"), "click", function(){
+					grid.set("collection", errorStores.asyncFetch);
 				});
+				
 				on(document.getElementById("null"), "click", function(){
-					grid.set("store", null, {});
+					grid.set("collection", null);
 				});
 				
 				// buttons / listeners for 2nd grid
@@ -298,17 +281,12 @@
 				});
 				
 				on(document.getElementById("setorigeditstore"), "click", function(){
-					grid2.set("store", testTypesStore, {});
-					updateDirty();
-				});
-				
-				on(document.getElementById("seterrorputstore"), "click", function(){
-					grid2.set("store", errorStores.put, {});
+					grid2.set("collection", testTypesStore);
 					updateDirty();
 				});
 				
 				on(document.getElementById("setdeferrorputstore"), "click", function(){
-					grid2.set("store", errorStores.asyncPut, {});
+					grid2.set("collection", errorStores.asyncPut);
 					updateDirty();
 				});
 				
@@ -341,16 +319,12 @@
 		<h2>Simple test to show setting a new store and query to dgrid</h2>
 		<div id="grid"></div>
 		<button id="colorQuery">Set color store and query</button>
-		<button id="resetQuery">Reset query</button>
-		<button id="setQueryWithOptions">Set query with queryOptions</button>
 		<button id="sort">sort</button>
 		<br>
 		<button id="setstore">Set Color Store</button>
 		<button id="restore">Set Original Store</button>
-		<button id="empty">Set to empty store</button>
-		<button id="emptyAsync">Set to empty store (async)</button>
+		<button id="emptyAsync">Set to empty store</button>
 		<button id="error">Set to error store</button>
-		<button id="error2">Set to error store (async)</button>
 		<button id="null">Set store to null</button>
 
 		<br><br>
@@ -370,7 +344,6 @@
 			the grid which initiated the operation.</p>
 		<div>
 			<button id="setorigeditstore">Set to original store</button>
-			<button id="seterrorputstore">Set to store which causes error on put</button>
 			<button id="setdeferrorputstore">Set to store which rejects Deferred on put</button>
 		</div>
 		<h2>Simple test to show adding/deleting items</h2>

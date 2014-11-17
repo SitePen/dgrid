@@ -50,17 +50,18 @@
 		<script src="../../dojo/dojo.js" data-dojo-config="async: true"></script>
 		<script>
 			require([
+				"dojo/_base/declare",
 				"dojo/_base/xhr",
 				"dojo/on",
 				"dojo/json",
-				"dojo/store/Memory",
+				"dstore/Memory",
 				"dojo/cookie",
 				"dgrid/OnDemandGrid",
-				"dgrid/tree",
+				"dgrid/Tree",
 				"put-selector/put",
 				"dojo/query",
 				"dojo/domReady!"
-			], function(xhr, on, json, Memory, cookie, OnDemandGrid, tree, put){
+			], function(declare, xhr, on, json, Memory, cookie, OnDemandGrid, Tree, put){
 				xhr.get({
 					url: "data/index.json",
 					handleAs: "json"
@@ -68,13 +69,14 @@
 					var store = window.store = new Memory({
 						data: data,
 						idProperty: "url",
-						getChildren: function(parent, options){
-							return this.query({ parent: parent.url }, options);
+						getChildren: function(parent){
+							return this.root.filter({ parent: parent.url });
 						},
 						mayHaveChildren: function(parent){
 							return !parent.title; // Items with title are html pages, leaves
 						}
 					});
+					store.root = store;
 					
 					var cookieName = "dgrid-test-index",
 						persistedInfo = cookie(cookieName);
@@ -92,22 +94,23 @@
 							value || "");
 					}
 					
-					var grid = new OnDemandGrid({
+					var grid = new (declare([OnDemandGrid, Tree]))({
 						className: "toc",
 						columns: {
-							name: tree({
-								shouldExpand: shouldExpand,
+							name: {
+								renderExpando: true,
 								renderCell: renderLinkCell,
 								expandOn: ".dgrid-row:click"
-							}),
+							},
 							title: { renderCell: renderLinkCell }
 						},
+						shouldExpand: shouldExpand,
 						renderHeader: function(){
 							put(this.headerNode, "div.header-title", "dgrid Tests");
 						},
 						query: { parent: "" },
 						sort: "name",
-						store: store
+						collection: store.filter({ parent: "" })
 					}, "grid");
 					
 					if(persistedInfo.scroll){

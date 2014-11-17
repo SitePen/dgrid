@@ -38,127 +38,129 @@
 		<script src="../../dojo/dojo.js" 
 			data-dojo-config="async: true"></script>
 		<script>
-			require(["dgrid/OnDemandGrid", "dgrid/GridWithColumnSetsFromHtml", "dgrid/ColumnSet", "dgrid/Selection", "dgrid/Keyboard", "dojo/_base/declare", "dojo/on", "dojo/parser", "dgrid/test/data/base", "dgrid/test/data/DeferredWrapper", "dojo/domReady!"],
-				function(OnDemandGrid, GridFromHtml, ColumnSet, Selection, Keyboard, declare, on, parser, testStore, DeferredWrapper){
-					var columnSets1 = [
-							[
-								[{label: 'Column 1', field: 'col1'},
-										{label: 'Column 2', field: 'col2', sortable: false}],
-									[{label: 'Column 3', field: 'col3', colSpan: 2}]],
-							[
-								[{label: 'Column 1', field: 'col1', rowSpan: 2},
-									{label: 'Column 4', field: 'col4'}],
-									[{label: 'Column 5', field: 'col5'}]
-							]],
-						columnSets2 = [
-							[
-								[{label: 'Column 1', field: 'col1'},
-									{label: 'Column 3', field: 'col3', rowSpan: 2}],
-								[{label: 'Column 2', field: 'col2', sortable: false}]],
-							[
-								[{label: 'Column 1', field: 'col1', colSpan: 2}],
-								[{label: 'Column 4', field: 'col4'},
-									{label: 'Column 5', field: 'col5'}]
-							]],
-						columnSets3 = [
-							[
-								[{label: 'Column 1', field: 'col1'},
-										{label: 'Column 2', field: 'col2', sortable: false}],
-									[{label: 'Column 3', field: 'col3', colSpan: 2}]],
-							[[{label: 'Column 1', field: 'col1', rowSpan: 2}]],
-							[
-								[{label: 'Column 4', field: 'col4'}],
-									[{label: 'Column 5', field: 'col5'}]
-							]],
-						// same structures as above, without being split into ColumnSets
-						subRows1 = [
+			require([
+				"dgrid/OnDemandGrid", "dgrid/GridWithColumnSetsFromHtml", "dgrid/ColumnSet", "dgrid/Selection",
+				"dgrid/Keyboard", "dojo/_base/declare", "dojo/on", "dojo/parser",
+				"dgrid/test/data/testStore", "dgrid/test/data/genericData", "dgrid/test/data/createAsyncStore",
+				"dojo/domReady!"
+			], function(OnDemandGrid, GridFromHtml, ColumnSet, Selection, Keyboard,
+					declare, on, parser, testStore, genericData, createAsyncStore){
+				window.testStore = testStore;
+				var columnSets1 = [
+						[
+							[{label: 'Column 1', field: 'col1'},
+									{label: 'Column 2', field: 'col2', sortable: false}],
+								[{label: 'Column 3', field: 'col3', colSpan: 2}]],
+						[
+							[{label: 'Column 1', field: 'col1', rowSpan: 2},
+								{label: 'Column 4', field: 'col4'}],
+								[{label: 'Column 5', field: 'col5'}]
+						]],
+					columnSets2 = [
+						[
+							[{label: 'Column 1', field: 'col1'},
+								{label: 'Column 3', field: 'col3', rowSpan: 2}],
+							[{label: 'Column 2', field: 'col2', sortable: false}]],
+						[
+							[{label: 'Column 1', field: 'col1', colSpan: 2}],
+							[{label: 'Column 4', field: 'col4'},
+								{label: 'Column 5', field: 'col5'}]
+						]],
+					columnSets3 = [
+						[
+							[{label: 'Column 1', field: 'col1'},
+									{label: 'Column 2', field: 'col2', sortable: false}],
+								[{label: 'Column 3', field: 'col3', colSpan: 2}]],
+						[[{label: 'Column 1', field: 'col1', rowSpan: 2}]],
+						[
+							[{label: 'Column 4', field: 'col4'}],
+								[{label: 'Column 5', field: 'col5'}]
+						]],
+					// same structures as above, without being split into ColumnSets
+					subRows1 = [
+						[
+							{label: 'Column 1', field: 'col1'},
+							{label: 'Column 2', field: 'col2', sortable: false},
+							{label: 'Column 1', field: 'col1', rowSpan: 2},
+							{label: 'Column 4', field: 'col4'}
+						], [
+							{label: 'Column 3', field: 'col3', colSpan: 2},
+							{label: 'Column 5', field: 'col5'}
+						]],
+					subRows2 = [
+						[
+							{label: 'Column 1', field: 'col1'},
+							{label: 'Column 2', field: 'col2', sortable: false},
+							{label: 'Column 4', field: 'col4'},
+							{label: 'Column 1', field: 'col1', rowSpan: 2}
+						], [
+							{label: 'Column 5', field: 'col5'},
+							{label: 'Column 3', field: 'col3', colSpan: 2}
+						]],
+					columnSetsSingleRow = [
+						[
 							[
 								{label: 'Column 1', field: 'col1'},
-								{label: 'Column 2', field: 'col2', sortable: false},
-								{label: 'Column 1', field: 'col1', rowSpan: 2},
+								{label: 'Column 2', field: 'col2', sortable: false}
+							]
+						], [
+							[
+								{label: 'Column 1', field: 'col1'},
 								{label: 'Column 4', field: 'col4'}
-							], [
-								{label: 'Column 3', field: 'col3', colSpan: 2},
-								{label: 'Column 5', field: 'col5'}
-							]],
-						subRows2 = [
-							[
-								{label: 'Column 1', field: 'col1'},
-								{label: 'Column 2', field: 'col2', sortable: false},
-								{label: 'Column 4', field: 'col4'},
-								{label: 'Column 1', field: 'col1', rowSpan: 2}
-							], [
-								{label: 'Column 5', field: 'col5'},
-								{label: 'Column 3', field: 'col3', colSpan: 2}
-							]],
-						columnSetsSingleRow = [
-							[
-								[
-									{label: 'Column 1', field: 'col1'},
-									{label: 'Column 2', field: 'col2', sortable: false}
-								]
-							], [
-								[
-									{label: 'Column 1', field: 'col1'},
-									{label: 'Column 4', field: 'col4'}
-								]
-							]];
-					
-					function byId(id){ return document.getElementById(id); }
+							]
+						]];
+				
+				function byId(id){ return document.getElementById(id); }
 
-					var ComplexGrid = declare([OnDemandGrid, ColumnSet, Selection, Keyboard]);
+				var ComplexGrid = declare([OnDemandGrid, ColumnSet, Selection, Keyboard]);
+				var asyncStore = createAsyncStore({ data: genericData, delay: 0 });
 
-					window.gridNoColumnSets = new (declare([OnDemandGrid, Selection, Keyboard]))({
-						sort: "id",
-						store: DeferredWrapper(testStore),
-						subRows: subRows1
-					}, "gridNoColumnSets");
-					
-					window.gridSingleRow = new ComplexGrid({
-						sort: "id",
-						store: DeferredWrapper(testStore),
-						columnSets: columnSetsSingleRow
-					}, "gridSingleRow");
-					
-					window.grid = new ComplexGrid({
-						sort: "id",
-						store: DeferredWrapper(testStore),
-						columnSets: columnSets1
-					}, "grid");
-					
-					// hook up buttons for testing setSubRows / setColumnSets
-					on(byId("btnSubRows1"), "click", function(){
-						gridNoColumnSets.set("subRows", subRows1);
-					});
-					on(byId("btnSubRows2"), "click", function(){
-						gridNoColumnSets.set("subRows", subRows2);
-					});
-					
-					on(byId("btnColumnSets1"), "click", function(){
-						grid.set("columnSets", columnSets1);
-					});
-					on(byId("btnColumnSets2"), "click", function(){
-						grid.set("columnSets", columnSets2);
-					});
-					on(byId("btnColumnSets3"), "click", function(){
-						grid.set("columnSets", columnSets3);
-					});
-
-					var HtmlGrid = declare([OnDemandGrid, GridFromHtml, Selection, Keyboard]);
-
-					window.gridFromHtml = new HtmlGrid({
-						sort: "id",
-						store: DeferredWrapper(testStore)
-					}, "gridFromHtml");
-					window.gridFromHtml2 = new HtmlGrid({
-						sort: "id",
-						store: testStore
-					}, "gridFromHtml2");
-					
-					// test declarative instantiation (need a global for parser)
-					window.dgrid = { GridFromHtml: HtmlGrid };
-					parser.parse();
+				window.gridNoColumnSets = new (declare([OnDemandGrid, Selection, Keyboard]))({
+					collection: asyncStore,
+					subRows: subRows1
+				}, "gridNoColumnSets");
+				
+				window.gridSingleRow = new ComplexGrid({
+					collection: asyncStore,
+					columnSets: columnSetsSingleRow
+				}, "gridSingleRow");
+				
+				window.grid = new ComplexGrid({
+					collection: asyncStore,
+					columnSets: columnSets1
+				}, "grid");
+				
+				// hook up buttons for testing setSubRows / setColumnSets
+				on(byId("btnSubRows1"), "click", function(){
+					gridNoColumnSets.set("subRows", subRows1);
 				});
+				on(byId("btnSubRows2"), "click", function(){
+					gridNoColumnSets.set("subRows", subRows2);
+				});
+				
+				on(byId("btnColumnSets1"), "click", function(){
+					grid.set("columnSets", columnSets1);
+				});
+				on(byId("btnColumnSets2"), "click", function(){
+					grid.set("columnSets", columnSets2);
+				});
+				on(byId("btnColumnSets3"), "click", function(){
+					grid.set("columnSets", columnSets3);
+				});
+
+				var HtmlGrid = declare([OnDemandGrid, GridFromHtml, Selection, Keyboard]);
+
+				window.gridFromHtml = new HtmlGrid({
+					collection: asyncStore
+				}, "gridFromHtml");
+				window.gridFromHtml2 = new HtmlGrid({
+					collection: testStore
+				}, "gridFromHtml2");
+				
+				// test declarative instantiation (need a global for parser)
+				window.dgrid = { GridFromHtml: HtmlGrid };
+				parser.parse();
+			});
 		</script>
 	</head>
 	<body class="claro">
@@ -224,7 +226,7 @@
 		<hr>
 		<h2>Same as previous two tables, instantiated declaratively</h2>
 		<table id="gridFromHtmlDecl" class="grid" data-dojo-type="dgrid.GridFromHtml"
-			data-dojo-props="sort: 'id', store: testStore">
+			data-dojo-props="collection:testStore">
 			<colgroup span="2"></colgroup>
 			<colgroup span="2"></colgroup>
 			<thead>
@@ -241,7 +243,7 @@
 			</thead>
 		</table>
 		<table id="gridFromHtmlDecl2" data-dojo-type="dgrid.GridFromHtml"
-			data-dojo-props="sort: 'id', store: testStore">
+			data-dojo-props="collection:testStore">
 			<colgroup span="3"></colgroup>
 			<colgroup span="4"></colgroup>
 			<thead>

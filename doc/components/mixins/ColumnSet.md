@@ -11,9 +11,11 @@ in pseudocode:
 
 ```js
 require([
-    "dojo/_base/declare", "dgrid/OnDemandGrid", "dgrid/ColumnSet"
-], function(declare, OnDemandGrid, ColumnSet){
-    var grid = new (declare([OnDemandGrid, ColumnSet]))({
+    'dojo/_base/declare',
+    'dgrid/OnDemandGrid',
+    'dgrid/ColumnSet'
+], function (declare, OnDemandGrid, ColumnSet) {
+    var grid = new (declare([ OnDemandGrid, ColumnSet ]))({
         columnSets: [
             // left columnset
             [
@@ -39,7 +41,7 @@ require([
             ]
         ],
         // ...
-    }, "grid");
+    }, 'grid');
 });
 ```
 

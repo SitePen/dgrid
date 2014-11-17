@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Test TouchScroll Mixin</title>
+		<meta name="viewport" content="width=570">
+		<style>
+			@import "../../dojo/resources/dojo.css";
+			@import "../css/dgrid.css";
+			@import "../css/skins/tundra.css";
+			.heading {
+				font-weight: bold;
+				margin-left: 12px;
+				padding-bottom: 0.25em;
+			}
+			.dgrid {
+				margin: 10px;
+			}
+			.dgrid-row-odd {
+				background: #F2F5F9;
+			}
+		</style>
+		<script src="../../dojo/dojo.js" 
+			data-dojo-config="async: true"></script>
+		<script>
+			require(["dgrid/OnDemandGrid", "dgrid/TouchScroll", "dojo/_base/declare", "dgrid/test/data/testPerformanceStore", "dojo/domReady!"], 
+				function(OnDemandGrid, TouchScroll, declare, testPerformanceStore){
+					var columns = [
+						{ name: 'Column 0', field: 'id', width: '10%' },
+						{ name: 'Column 1', field: 'integer', width: '10%' },
+						{ name: 'Column 2', field: 'floatNum', width: '10%' },
+						{ name: 'Column 3', field: 'date', width: '10%' },
+						{ name: 'Column 4', field: 'date2', width: '10%' },
+						{ name: 'Column 5', field: 'text', width: '10%' },
+						{ name: 'Column 6', field: 'bool', width: '10%' },
+						{ name: 'Column 7', field: 'bool2', width: '10%' },
+						{ name: 'Column 8', field: 'price', width: '10%' },
+						{ name: 'Column 9', field: 'today', width: '10%' }
+					];
+					var start = new Date();
+					var grid = window.grid = new (declare([OnDemandGrid, TouchScroll]))({
+						collection: testPerformanceStore,
+						columns: columns
+					}, "grid");
+					
+					var processScroll = grid._processScroll;
+					grid._processScroll = function(evt){
+						var start = new Date();
+						processScroll.call(this, evt);
+						console.log("scroll time: " + (new Date() - start) + "ms");
+					};
+				});
+		</script>
+	</head>
+	<body class="tundra">
+		<h2 class="heading">A grid with the TouchScroll module mixed in</h2>
+		<p>
+			<strong>Note:</strong> The TouchScroll module is intended mainly for
+			use on tablets/phones if their native scroll behavior is undesirable
+			(such as on iOS, where the UI thread is blocked while momentum is active).
+			It only supports webkit touch events (<code>touchstart</code>, etc.),
+			not pointer events, as currently browsers with pointer events do not
+			exhibit a need for this module.
+		</p>
+		<div id="grid"></div>
+	</body>
+</html>

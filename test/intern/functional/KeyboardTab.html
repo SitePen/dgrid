@@ -20,41 +20,45 @@
 <script>
 var ready;
 require([
-	"dojo/_base/declare", "dgrid/Grid", "dgrid/Keyboard", "dgrid/List", "dojo/on"
-], function(declare, Grid, Keyboard, List, on){
+	'dojo/_base/declare',
+	'dgrid/Grid',
+	'dgrid/Keyboard',
+	'dgrid/List',
+	'dojo/on'
+], function (declare, Grid, Keyboard, List, on) {
 	var i;
 	var data;
-	var button = document.getElementById("showHeaderButton");
+	var button = document.getElementById('showHeaderButton');
 	var KeyboardGrid = declare([Grid, Keyboard]);
 	var grid1 = new KeyboardGrid({
 		showHeader: true,
 		columns: {
-			id: "ID",
-			value: "Value"
+			id: 'ID',
+			value: 'Value'
 		}
-	}, "grid1");
+	}, 'grid1');
 	data = [];
-	for(i = 0; i < 10; i++){
-		data.push({id: i, value: "Value " + i});
+	for(i = 0; i < 10; i++) {
+		data.push({id: i, value: 'Value ' + i});
 	}
 	grid1.renderArray(data);
 
 	var grid2 = new KeyboardGrid({
 		showHeader: false,
 		columns: {
-			id: "ID",
-			value: "Value"
+			id: 'ID',
+			value: 'Value'
 		}
-	}, "grid2");
+	}, 'grid2');
 	data = [];
-	for(; i < 20; i++){
-		data.push({id: i, value: "Value " + i});
+	for(; i < 20; i++) {
+		data.push({id: i, value: 'Value ' + i});
 	}
 	grid2.renderArray(data);
 	button.focus();
 
-	on(button, "click", function(){
-		grid2.set("showHeader", true);
+	on(button, 'click', function () {
+		grid2.set('showHeader', true);
 		button.focus();
 	});
 

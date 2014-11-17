@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Test Tree Grid with Extra Filtering</title>
+<meta name="viewport" content="width=570">
+<style>
+	@import "../../dojo/resources/dojo.css";
+	@import "../css/skins/claro.css";
+
+	.dgrid {
+		width: 700px;
+		margin: 10px;
+	}
+</style>
+<script src="../../dojo/dojo.js"
+		data-dojo-config="async: true"></script>
+<script>
+require([
+	"dojo/_base/declare", "dojo/_base/lang", "dgrid/OnDemandGrid", "dgrid/Tree",
+	"dstore/Memory",
+	"dojo/domReady!"
+], function(declare, lang, OnDemandGrid, Tree, Memory){
+
+	function formatName(name){
+		return name.charAt(0).toUpperCase() + name.slice(1);
+	}
+
+	var Grid = declare([OnDemandGrid, Tree]);
+
+	var id = 0;
+	var iItemType, lItem;
+	var iColor, lColor;
+	var itemType, color;
+	var items = [
+		{ id: id++, name: "Socks", type: "basket", contains: "sock" },
+		{ id: id++, name: "Shirts", type: "basket", contains: "shirt" },
+		{ id: id++, name: "Pants", type: "basket", contains: "pants" },
+		{ id: id++, name: "Hats", type: "basket", contains: "hat" }
+	];
+	var itemTypes = ["sock", "shirt", "pants", "hat"];
+	var colors = ["red", "green", "blue", "white"];
+	for(iItemType = 0, lItem = itemTypes.length; iItemType < lItem; iItemType++){
+		for(iColor = 0, lColor = colors.length; iColor < lColor; iColor++){
+			itemType = itemTypes[iItemType];
+			color = colors[iColor];
+			items.push({
+				id: id++,
+				name: formatName(color) + " " + formatName(itemType),
+				type: itemType,
+				color: color
+			});
+		}
+	}
+
+	var store = new Memory({
+		data: items,
+		getChildren: function(parent){
+			if(parent.contains){
+				// Call filter from the original store to search all objects.
+				return store.filter({ type: parent.contains });
+			}
+		},
+		mayHaveChildren: function(obj){
+			return obj.type === "basket";
+		}
+	});
+
+	var treeGrid = new Grid({
+		collection: store.filter({ type: "basket" }),
+		columns: [
+			{renderExpando: true, label: "Name", field: "name", sortable: false}
+		]
+	}, "treeGrid");
+
+	// Create a delegate of the original store with a new getChildren method.
+	var noBlueStore = lang.delegate(store, {
+		getChildren: function(parent){
+			var children = store.getChildren(parent);
+			return children.filter(function(obj){
+				return obj.color !== "blue";
+			});
+		}
+	});
+
+	var treeGridNoBlue = new Grid({
+		collection: noBlueStore.filter({ type: "basket" }),
+		columns: [
+			{renderExpando: true, label: "Name", field: "name", sortable: false}
+		]
+	}, "treeGridNoBlue");
+});
+</script>
+</head>
+<body class="claro">
+<h2>Apply additional filtering to hierarchical store</h2>
+
+<h3>No additional filtering</h3>
+
+<div id="treeGrid"></div>
+
+<h3>Additional filtering to remove blue items</h3>
+
+<div id="treeGridNoBlue"></div>
+
+</body>
+</html>

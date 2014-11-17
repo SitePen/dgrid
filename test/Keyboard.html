@@ -33,8 +33,8 @@
 		<script>
 			var getFirstTarget; // function, defined within require callback
 			
-			require(["dgrid/OnDemandList", "dgrid/OnDemandGrid", "dgrid/Keyboard", "dojo/_base/declare", "dojo/on", "dojo/query", "put-selector/put", "dgrid/test/data/base", "dojo/domReady!"],
-			function(OnDemandList, OnDemandGrid, Keyboard, declare, on, query, put){
+			require(["dgrid/OnDemandList", "dgrid/OnDemandGrid", "dgrid/Keyboard", "dojo/_base/declare", "dojo/on", "dojo/query", "put-selector/put", "dgrid/test/data/testStore", "dojo/domReady!"],
+			function(OnDemandList, OnDemandGrid, Keyboard, declare, on, query, put, testStore){
 				var columns = {
 						col1: "Column 1",
 						col3: "Column 3",
@@ -43,18 +43,15 @@
 					KeyboardList = declare([OnDemandList, Keyboard]),
 					KeyboardGrid = declare([OnDemandGrid, Keyboard]),
 					list = window.list = new KeyboardList({
-						sort: "id",
-						store: testStore,
+						collection: testStore,
 						renderRow: function(item){ return put("div", item.col5); }
 					}, "list"),
 					grid = window.grid = new KeyboardGrid({
-						sort: "id",
-						store: testStore,
+						collection: testStore,
 						columns: columns
 					}, "grid"),
 					rowGrid = window.rowGrid = new KeyboardGrid({
-						sort: "id",
-						store: testStore,
+						collection: testStore,
 						columns: columns,
 						cellNavigation: false
 					}, "rowGrid");
