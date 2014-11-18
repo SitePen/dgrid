@@ -107,15 +107,11 @@ define([
 
 		_getValueAttr: function () {
 			var returnValue = this.inherited(arguments);
-			var hiddenFieldsets = query('fieldset.dijitHidden', this.domNode);
-			var propertyName;
+			var propertyName, k;
 
-			// Remove values from hidden fields
-			hiddenFieldsets.forEach(function (fieldset) {
-				arrayUtil.forEach(registry.findWidgets(fieldset), function (childWidget) {
-					delete returnValue[childWidget.name];
-				});
-			});
+			for (k in this._getHiddenFieldNames()) {
+				delete returnValue[k];
+			}
 
 			// Omit properties with default values
 			for (propertyName in returnValue) {
@@ -130,11 +126,29 @@ define([
 			return returnValue;
 		},
 
+		_getHiddenFieldNames: function () {
+			var hiddenFieldNames = {};
+			// Remove values from hidden fields
+			query('fieldset.dijitHidden', this.domNode).forEach(function (fieldset) {
+				arrayUtil.forEach(registry.findWidgets(fieldset), function (childWidget) {
+					hiddenFieldNames[childWidget.name] = true;
+				});
+			});
+
+			return hiddenFieldNames;
+		},
+
 		_onFeatureSelect: function (featureMid, isEnabled) {
 			var featureNode = this._featureMidToNodeMap[featureMid];
 
 			if (featureNode) {
 				domClass.toggle(featureNode, 'dijitHidden', !isEnabled);
+
+				if (!isEnabled) {
+					// Close the dialog so input fields will reset if the user reenables the feature.
+					this.emit('close');
+					topic.publish('/columnConfig/hidden', this._getHiddenFieldNames());
+				}
 			}
 		},
 
