@@ -146,7 +146,12 @@ function(kernel, declare, lang, Deferred, listen, aspect, query, has, miscUtil, 
 			});
 			return rows;
 		},
-
+		insertRow: function(object){
+			var row = this.inherited(arguments);
+			adjustScrollLeft(this, row);
+			return row;
+		},
+		
 		renderHeader: function(){
 			// summary:
 			//		Setup the headers for the grid
