@@ -214,6 +214,7 @@ define([
 			}
 			return row;
 		},
+
 		renderArray: function () {
 			var rows = this.inherited(arguments);
 
@@ -221,6 +222,12 @@ define([
 				adjustScrollLeft(this, rows[i]);
 			}
 			return rows;
+		},
+
+		insertRow: function (object) {
+			var row = this.inherited(arguments);
+			adjustScrollLeft(this, row);
+			return row;
 		},
 
 		renderHeader: function () {
