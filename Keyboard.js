@@ -346,6 +346,13 @@ define([
 
 			var isFocusableClass = this.cellNavigation ? hasGridCellClass : hasGridRowClass;
 			if (!inputFocused && isFocusableClass.test(element.className)) {
+				var scroll = this.getScrollPosition(),
+				    row = this.row(element).element;
+				if(scroll.y > row.offsetTop) { // element is above the viewport
+					this.scrollTo({x: scroll.x, y: row.offsetTop});
+				} else if ((scroll.y + this.bodyNode.clientHeight) <= row.offsetTop) { // element is below the viewport
+					this.scrollTo({x: scroll.x, y: row.offsetTop - this.bodyNode.clientHeight + row.clientHeight});				
+				}				
 				element.tabIndex = this.tabIndex;
 				element.focus();
 			}
