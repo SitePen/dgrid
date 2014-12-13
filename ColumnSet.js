@@ -379,7 +379,7 @@ define([
 			this._updateColumns();
 		},
 
-		_scrollColumnSetTo: function (grid, columnSetNode, offsetLeft) {
+		_scrollColumnSet: function (grid, columnSetNode, offsetLeft) {
 			var id = columnSetNode.getAttribute(colsetidAttr);
 			var scroller = grid._columnSetScrollers[id];
 			scroller.scrollLeft = offsetLeft < 0 ? 0 : offsetLeft;
@@ -395,7 +395,7 @@ define([
 
 			if (elementEdge > columnSetNode.offsetWidth ||
 				columnScroller.scrollLeft > focusedNode.offsetLeft) {
-				this._scrollColumnSetTo(this, columnSetNode, focusedNode.offsetLeft);
+				this._scrollColumnSet(this, columnSetNode, focusedNode.offsetLeft);
 			}
 		}
 	});

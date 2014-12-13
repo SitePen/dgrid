@@ -53,7 +53,7 @@ define([
 
 		test.test('Grid - Scroll right', function () {
 			var columnSets = query('.dgrid-column-set-0 [data-dgrid-column-set-id="0"]');
-			grid._scrollColumnSetTo(grid, columnSets[0], 1000);
+			grid._scrollColumnSet(grid, columnSets[0], 1000);
 			syncStore.putSync({
 				id: 1,
 				column1: 'Column 1 Mod', 
