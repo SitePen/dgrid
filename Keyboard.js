@@ -1,13 +1,13 @@
 define([
 	'dojo/_base/declare',
 	'dojo/aspect',
+	'dojo/dom-class',
 	'dojo/on',
 	'dojo/_base/lang',
 	'dojo/has',
-	'put-selector/put',
 	'./util/misc',
 	'dojo/_base/sniff'
-], function (declare, aspect, on, lang, has, put, miscUtil) {
+], function (declare, aspect, domClass, on, lang, has, miscUtil) {
 
 	var delegatingInputTypes = {
 			checkbox: 1,
@@ -255,7 +255,7 @@ define([
 				else {
 					// Row/cell was not focused or is not visible, but we still need to
 					// update _focusedNode and the element's tabIndex/class
-					put(newTarget.element, '.dgrid-focus');
+					domClass.add(newTarget.element, 'dgrid-focus');
 					newTarget.element.tabIndex = this.tabIndex;
 					this._focusedNode = newTarget.element;
 				}
@@ -378,7 +378,8 @@ define([
 			if (focusedNode) {
 				// Clean up previously-focused element
 				// Remove the class name and the tabIndex attribute
-				put(focusedNode, '!dgrid-focus[!tabIndex]');
+				domClass.remove(focusedNode, 'dgrid-focus');
+				focusedNode.removeAttribute('tabindex');
 
 				// Expose object representing focused cell or row losing focus, via
 				// event.cell or event.row; which is set depends on cellNavigation.
@@ -402,7 +403,7 @@ define([
 				element.tabIndex = this.tabIndex;
 				element.focus();
 			}
-			put(element, '.dgrid-focus');
+			domClass.add(element, 'dgrid-focus');
 
 			if (event) {
 				on.emit(focusedNode, 'dgrid-cellfocusin', event);

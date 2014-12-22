@@ -1,11 +1,11 @@
 define([
 	'dojo/_base/declare',
 	'dojo/aspect',
+	'dojo/dom-class',
 	'dojo/on',
 	'dojo/has',
-	'./Selection',
-	'put-selector/put'
-], function (declare, aspect, listen, has, Selection, put) {
+	'./Selection'
+], function (declare, aspect, domClass, listen, has, Selection) {
 
 	return declare(Selection, {
 		// summary:
@@ -79,11 +79,11 @@ define([
 				if (element) {
 					// add or remove classes as appropriate
 					if (value) {
-						put(element, '.dgrid-selected' +
-							(this.addUiClasses ? '.ui-state-active' : ''));
+						domClass.add(element, 'dgrid-selected' +
+							(this.addUiClasses ? ' ui-state-active' : ''));
 					}
 					else {
-						put(element, '!dgrid-selected!ui-state-active');
+						domClass.remove(element, 'dgrid-selected ui-state-active');
 					}
 				}
 				/* jshint eqeqeq: false */

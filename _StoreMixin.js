@@ -3,11 +3,11 @@ define([
 	'dojo/_base/lang',
 	'dojo/Deferred',
 	'dojo/aspect',
+	'dojo/dom-construct',
 	'dojo/has',
 	'dojo/on',
-	'dojo/when',
-	'put-selector/put'
-], function (declare, lang, Deferred, aspect, has, on, when, put) {
+	'dojo/when'
+], function (declare, lang, Deferred, aspect, domConstruct, has, on, when) {
 	// This module isolates the base logic required by store-aware list/grid
 	// components, e.g. OnDemandList/Grid and the Pagination extension.
 
@@ -214,8 +214,10 @@ define([
 			var result = this.inherited(arguments);
 
 			if (!this.collection) {
-				this.noDataNode = put(this.contentNode, 'div.dgrid-no-data');
-				this.noDataNode.innerHTML = this.noDataMessage;
+				this.noDataNode = domConstruct.create('div', {
+					className: 'dgrid-no-data',
+					innerHTML: this.noDataMessage
+				}, this.contentNode);
 			}
 
 			return result;
@@ -226,7 +228,7 @@ define([
 
 			if (!this.collection) {
 				if (rows.length && this.noDataNode) {
-					put(this.noDataNode, '!');
+					domConstruct.destroy(this.noDataNode);
 				}
 			}
 			return rows;
@@ -258,7 +260,7 @@ define([
 			// Run after inherited logic to prevent confusion due to noDataNode
 			// no longer being present as a sibling.
 			if (this.noDataNode) {
-				put(this.noDataNode, '!');
+				domConstruct.destroy(this.noDataNode);
 				this.noDataNode = null;
 			}
 
@@ -399,8 +401,10 @@ define([
 					(this.up(row).element === rowElement) &&
 					(this.down(row).element === rowElement)) {
 				// ...we are empty, so show the no data message.
-				this.noDataNode = put(this.contentNode, 'div.dgrid-no-data');
-				this.noDataNode.innerHTML = this.noDataMessage;
+				this.noDataNode = domConstruct.create('div', {
+					className: 'dgrid-no-data',
+					innerHTML: this.noDataMessage
+				}, this.contentNode);
 			}
 
 			var rows = (options && options.rows) || this._rows;

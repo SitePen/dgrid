@@ -1,12 +1,12 @@
 define([
 	'dojo/_base/declare',
+	'dojo/dom-construct',
 	'dojo/has',
 	'dojo/on',
 	'../util/misc',
-	'put-selector/put',
 	'dojo/i18n!./nls/columnHider',
 	'xstyle/css!../css/extensions/ColumnHider.css'
-], function (declare, has, listen, miscUtil, put, i18n) {
+], function (declare, domConstruct, has, listen, miscUtil, i18n) {
 /*
  *	Column Hider plugin for dgrid
  *	Originally contributed by TRT 2011-09-28
@@ -105,20 +105,22 @@ define([
 			}
 
 			// Create the checkbox and label for each column selector.
-			div = put('div.dgrid-hider-menu-row');
+			div = domConstruct.create('div', { className: 'dgrid-hider-menu-row' });
 			checkId = this.domNode.id + '-hider-menu-check-' + replacedId;
 
-			// put-selector can't handle invalid selector characters, and the
-			// ID could have some, so add it directly
-			checkbox = this._columnHiderCheckboxes[id] =
-				put(div, 'input.dgrid-hider-menu-check.hider-menu-check-' + replacedId + '[type=checkbox]');
-			checkbox.id = checkId;
+			checkbox = this._columnHiderCheckboxes[id] = domConstruct.create('input', {
+				className: 'dgrid-hider-menu-check hider-menu-check-' + replacedId,
+				id: checkId,
+				type: 'checkbox'
+			}, div);
 
-			label = put(div, 'label.dgrid-hider-menu-label.hider-menu-label-' + replacedId +
-				'[for=' + checkId + ']',
-				col.label || col.field || '');
+			label = domConstruct.create('label', {
+				className: 'dgrid-hider-menu-label hider-menu-label-' + replacedId,
+				'for': checkId
+			}, div);
+			label.appendChild(document.createTextNode(col.label || col.field || ''));
 
-			put(this.hiderMenuNode, div);
+			this.hiderMenuNode.appendChild(div);
 
 			if (!col.hidden) {
 				// Hidden state is false; checkbox should be initially checked.
@@ -143,19 +145,23 @@ define([
 				// First run
 				// Assume that if this plugin is used, then columns are hidable.
 				// Create the toggle node.
-				hiderToggleNode = this.hiderToggleNode =
-					put(this.domNode, 'button.ui-icon.dgrid-hider-toggle[type=button][aria-label=' +
-						this.i18nColumnHider.popupTriggerLabel + ']');
+				hiderToggleNode = this.hiderToggleNode = domConstruct.create('button', {
+					'aria-label': this.i18nColumnHider.popupTriggerLabel,
+					className: 'ui-icon dgrid-hider-toggle',
+					type: 'button'
+				}, this.domNode);
 
 				this._listeners.push(listen(hiderToggleNode, 'click', function (e) {
 					grid._toggleColumnHiderMenu(e);
 				}));
 
 				// Create the column list, with checkboxes.
-				hiderMenuNode = this.hiderMenuNode =
-					put('div.dgrid-hider-menu[role=dialog][aria-label=' +
-						this.i18nColumnHider.popupLabel + ']');
-				hiderMenuNode.id = this.id + '-hider-menu';
+				hiderMenuNode = this.hiderMenuNode = domConstruct.create('div', {
+					'aria-label': this.i18nColumnHider.popupLabel,
+					className: 'dgrid-hider-menu',
+					id: this.id + '-hider-menu',
+					role: 'dialog'
+				});
 
 				this._listeners.push(listen(hiderMenuNode, 'keyup', function (e) {
 					var charOrCode = e.charCode || e.keyCode;
@@ -167,7 +173,7 @@ define([
 
 				// Make sure our menu is initially hidden, then attach to the document.
 				hiderMenuNode.style.display = 'none';
-				put(this.domNode, hiderMenuNode);
+				this.domNode.appendChild(hiderMenuNode);
 
 				// Hook up delegated listener for modifications to checkboxes.
 				this._listeners.push(listen(hiderMenuNode,

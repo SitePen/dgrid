@@ -1,8 +1,8 @@
 define([
 	'./Grid',
 	'dojo/_base/declare',
-	'put-selector/put'
-], function (Grid, declare, put) {
+	'dojo/dom-construct'
+], function (Grid, declare, domConstruct) {
 	// summary:
 	//		This module supports parsing grid structure information from an HTML table.
 	//		This module does NOT support ColumnSets; see GridWithColumnSetsFromHtml
@@ -71,7 +71,7 @@ define([
 			this.inherited(arguments, [params, div]);
 
 			// destroy srcNodeRef for good now that we're done with it
-			put(srcNodeRef, '!');
+			domConstruct.destroy(srcNodeRef);
 		}
 	});
 

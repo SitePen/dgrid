@@ -50,7 +50,6 @@ define([
 				{ name: 'dojo', location: 'dojo' },
 				{ name: 'dijit', location: 'dijit' },
 				{ name: 'dgrid', location: 'dgrid' },
-				{ name: 'put-selector', location: 'put-selector' },
 				{ name: 'xstyle', location: 'xstyle' }
 			]
 		},

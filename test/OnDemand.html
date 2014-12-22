@@ -69,9 +69,9 @@
 				"dojo/_base/lang",
 				"dojo/_base/declare",
 				"dojo/_base/array",
+				"dojo/dom-construct",
 				"dojo/Stateful",
 				"dstore/Memory",
-				"put-selector/put",
 				"dgrid/test/data/errorStores",
 				"dgrid/test/data/testStore",
 				"dgrid/test/data/createSyncStore",
@@ -82,7 +82,7 @@
 				"dgrid/test/data/stateData",
 				"dojo/domReady!"
 			], function(on, List, Grid, Keyboard, Selection, Editor, DateTextBox, Slider, NumberSpinner,
-					lang, declare, arrayUtil, Stateful, Memory, put, errorStores, testStore,
+					lang, declare, arrayUtil, domConstruct, Stateful, Memory, errorStores, testStore,
 					createSyncStore, createAsyncStore, typesData, largeColorData, smallColorData, stateData
 			){
 
@@ -194,7 +194,9 @@
 					columns: lang.clone(columns4),
 					renderRow: function(object, options){
 						// need to define renderRow to accommodate store items
-						return put("div", object.col1);
+						var div = document.createElement('div');
+						div.appendChild(document.createTextNode(object.col1));
+						return div;
 					}
 				}, "listAddDel");
 
@@ -262,7 +264,9 @@
 						// clear "dirty items" list after change has been processed
 						dirtyDiv.innerHTML = "";
 						for(var rowId in grid2.dirty){
-							put(dirtyDiv, "div", "rowId: "+rowId);
+							domConstruct.create('div', {
+								innerHTML: 'rowId: ' + rowId
+							}, dirtyDiv);
 						}
 					}, 0);
 				}

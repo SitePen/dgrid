@@ -5,19 +5,19 @@ define([
 	'dgrid/Keyboard',
 	'dojo/_base/declare',
 	'dojo/dom-construct',
+	'dojo/dom-class',
 	'dojo/on',
 	'dstore/RequestMemory',
-	'put-selector/put',
 	'dojo/text!./resources/description.html',
 	'dojo/query'
-], function (require, Grid, Selection, Keyboard, declare, domConstruct, on, RequestMemory, put, descriptionHtml) {
+], function (require, Grid, Selection, Keyboard, declare, domConstruct, domClass, on, RequestMemory, descriptionHtml) {
 	// Render DOM
-	var containerNode = put(document.body, 'div');
-	var switchNode = put('div.controls', 'Select View: ');
-	var tableButton = put(switchNode, 'button[type=button]', 'Table');
-	var detailsButton = put(switchNode, 'button[type=button]', 'Details');
-	var galleryButton = put(switchNode, 'button[type=button]', 'Gallery');
-	var contentNode = put('div.content');
+	var containerNode = domConstruct.create('div', null, document.body);
+	var switchNode = domConstruct.create('div', { className: 'controls', innerHTML: 'Select View: ' });
+	var tableButton = domConstruct.create('button', { innerHTML: 'Table', type: 'button' }, switchNode);
+	var detailsButton = domConstruct.create('button', { innerHTML: 'Details', type: 'button' }, switchNode);
+	var galleryButton = domConstruct.create('button', { innerHTML: 'Gallery', type: 'button' }, switchNode);
+	var contentNode = domConstruct.create('div', { className: 'content' });
 	var gridNode;
 
 	var grid;
@@ -27,22 +27,24 @@ define([
 	var renderers = {
 		gallery: function (obj) {
 			// function used for renderRow for gallery view (large tiled thumbnails)
-			var div = put('div');
-			div.innerHTML = '<div class="icon" style="background-image:url(resources/' +
-				obj.icon + '-128.png);">&nbsp;</div><div class="name">' + obj.name + '</div>';
-			return div;
+			return domConstruct.create('div', {
+				innerHTML: '<div class="icon" style="background-image:url(resources/' +
+					obj.icon + '-128.png);">&nbsp;</div><div class="name">' + obj.name + '</div>'
+			});
 		},
 		details: function (obj) {
 			// function used for renderRow for details view (items w/ summary)
-			var div = put('div');
-			div.innerHTML = '<div class="icon" style="background-image:url(resources/' +
-				obj.icon + '-64.png);">&nbsp;</div><div class="name">' +
-				obj.name + '</div><div class="summary">' + obj.summary + '</div>';
-			return div;
+			return domConstruct.create('div', {
+				innerHTML: '<div class="icon" style="background-image:url(resources/' +
+					obj.icon + '-64.png);">&nbsp;</div><div class="name">' +
+					obj.name + '</div><div class="summary">' + obj.summary + '</div>'
+			});
 		},
 		table: function (obj) {
-			var div = put('div.collapsed', Grid.prototype.renderRow.apply(this, arguments));
-			put(div, 'div.expando', obj.summary);
+			var div = domConstruct.create('div', { className: 'collapsed' });
+			div.appendChild(Grid.prototype.renderRow.apply(this, arguments));
+			var summaryDiv = domConstruct.create('div', { className: 'expando' }, div);
+			summaryDiv.appendChild(document.createTextNode(obj.summary));
 			return div;
 		}
 	};
@@ -56,7 +58,7 @@ define([
 			// update renderRow function
 			grid.renderRow = renderers[view];
 			// update class on grid domNode
-			put(grid.domNode, '!table!gallery!details.' + view);
+			domClass.replace(grid.domNode, view, 'table gallery details');
 			// only show headers if we're in "table" view
 			grid.set('showHeader', view === 'table');
 			// force redraw of rows
@@ -64,11 +66,11 @@ define([
 		};
 	}
 
-	put(containerNode, switchNode);
+	containerNode.appendChild(switchNode);
 
-	gridNode = put(contentNode, 'div#grid.table');
+	gridNode = domConstruct.create('div', { className: 'table', id: 'grid' }, contentNode);
 	domConstruct.place(descriptionHtml, contentNode);
-	put(containerNode, contentNode);
+	containerNode.appendChild(contentNode);
 
 	// Use require.toUrl for portability (looking up via module path)
 	store = new RequestMemory({ target: require.toUrl('./data.json') });
@@ -97,14 +99,14 @@ define([
 	// listen for clicks to trigger expand/collapse in table view mode
 	expandoListener = on.pausable(grid.domNode, '.dgrid-row:click', function (event) {
 		var node = grid.row(event).element;
-		var collapsed = node.className.indexOf('collapsed') >= 0;
-		
+		var collapsed = domClass.contains(node, 'collapsed');
+
 		// toggle state of node which was clicked
-		put(node, (collapsed ? '!' : '.') + 'collapsed');
-		
+		domClass.toggle(node, 'collapsed', !collapsed);
+
 		// if clicked row wasn't expanded, collapse any previously-expanded row
-		collapsed && expandedNode && put(expandedNode, '.collapsed');
-		
+		collapsed && expandedNode && domClass.add(expandedNode, 'collapsed');
+
 		// if the row clicked was previously expanded, nothing is expanded now
 		expandedNode = collapsed ? node : null;
 	});

@@ -5,13 +5,12 @@ define([
 	'dojo/on',
 	'dojo/query',
 	'dojo/string',
-	'put-selector/put',
 	'dgrid/Grid',
 	'dgrid/extensions/Pagination',
 	'dgrid/test/data/createSyncStore',
 	'dgrid/test/data/genericData',
 	'dojo/domReady!'
-], function (test, assert, declare, on, query, string, put, Grid, Pagination, createSyncStore, genericData) {
+], function (test, assert, declare, on, query, string, Grid, Pagination, createSyncStore, genericData) {
 	var grid,
 		PaginationGrid = declare([Grid, Pagination]);
 

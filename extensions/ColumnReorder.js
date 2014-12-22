@@ -2,12 +2,12 @@ define([
 	'dojo/_base/lang',
 	'dojo/_base/declare',
 	'dojo/_base/array',
+	'dojo/dom-class',
 	'dojo/on',
 	'dojo/query',
 	'dojo/dnd/Source',
-	'put-selector/put',
 	'xstyle/css!../css/extensions/ColumnReorder.css'
-], function (lang, declare, arrayUtil, on, query, DndSource, put) {
+], function (lang, declare, arrayUtil, domClass, on, query, DndSource) {
 	var dndTypeRx = /(\d+)(?:-(\d+))?$/; // used to determine subrow from dndType
 
 	// The following 2 functions are used by onDropInternal logic for
@@ -145,7 +145,8 @@ define([
 
 				th = col.headerNode;
 				// Add dojoDndItem class, and a dndType unique to this subrow.
-				put(th, '.dojoDndItem[dndType=' + dndType + ']');
+				domClass.add(th, 'dojoDndItem');
+				th.setAttribute('dndType', dndType);
 
 				if (!dndParent) {
 					dndParent = th.parentNode;

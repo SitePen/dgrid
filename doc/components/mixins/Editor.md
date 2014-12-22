@@ -44,7 +44,7 @@ Property | Description
 -------- | -----------
 `editor` | The type of component to use for editors in this column; either a string specifying a type of standard HTML input to create, or a Dijit widget constructor to instantiate.  If unspecified, the column will not be editable.
 `editOn` | A string containing the event (or multiple events, comma-separated) upon which the editor should activate.  If unspecified, editors are always displayed in this column's cells.
-`editorArgs` | An object containing input attributes or widget arguments.  For HTML inputs, the object will have its key/value pairs applied as node attributes via `put-selector`; for widgets, the object will be passed to the widget constructor.
+`editorArgs` | An object containing input attributes or widget arguments.  For HTML inputs, the object will have its key/value pairs applied as attributes/properties via `dojo/dom-construct.create`; for widgets, the object will be passed to the widget constructor.
 `canEdit(object, value)` | A function returning a boolean value indicating whether or not the cell for this column should be editable in a particular row.  Receives the item for the current row, and the value to be rendered (i.e. the return from the column's `get` function if any, or the value of the `field` specified in the column).
 `autoSave` | If `true`, the grid's `save` method will be called as soon as a change is detected in an editor in this column.  Defaults to `false`. **Note:** if an error is encountered as a result of a store operation triggered by `autoSave`, a `dgrid-error` event will be emitted.
 `autoSelect` | If `true` and `editor` is `'text'` or a `TextBox`-based widget, the contents of the field will be selected when the editor is activated/focused.
