@@ -6,7 +6,8 @@ define([
 	'dojo/_base/declare',
 	'dojo/_base/lang',
 	'dojo/query',
-	'dstore/Memory'
+	'dstore/Memory',
+	'../addCss'
 ], function (test, assert, OnDemandGrid, Tree, declare, lang, query, Memory) {
 
 	function formatName(name) {

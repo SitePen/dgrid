@@ -6,12 +6,13 @@
 		<meta name="viewport" content="width=570">
 		<style>
 			@import "../../dojo/resources/dojo.css";
+			@import "../css/dgrid.css";
 			@import "../css/skins/claro.css";
 			body {
 				padding: 0 80px; /* side padding to make it easier to scroll doc */
 			}
 		</style>
-		<script src="../../dojo/dojo.js" 
+		<script src="../../dojo/dojo.js"
 			data-dojo-config="async: true"></script>
 		<script>
 			require(["dgrid/Grid", "dgrid/OnDemandGrid", "dojo/_base/lang", "dgrid/test/data/createSyncStore", "dojo/domReady!"],
@@ -28,26 +29,26 @@
 					{order: 9, name:"remove", description:"Using a spatula, lift cookies off onto wax paper or a cooling rack"},
 					{order: 10, name:"eat"}
 				];
-				
+
 				var store = createSyncStore({data: data});
-				
+
 				var columns = {
 					name: "Name",
 					description: "Description",
 					idontexist: "Empty Column"
 				};
-				
+
 				window.gridArray = new Grid({
 					columns: lang.clone(columns)
 				}, "gridArray");
 				gridArray.renderArray(lang.clone(data));
-				
+
 				window.gridStore = new OnDemandGrid({
 					columns: lang.clone(columns),
 					collection: store
 				}, "gridStore");
 			});
-				
+
 		</script>
 	</head>
 	<body class="claro">

@@ -6,6 +6,7 @@
 		<meta name="viewport" content="width=570">
 		<style>
 			@import "../../dojo/resources/dojo.css";
+			@import "../css/dgrid.css";
 			@import "../css/skins/claro.css";
 			.dgrid {
 				width: 700px;
@@ -18,7 +19,7 @@
 				width: 5em;
 			}
 		</style>
-		<script src="../../dojo/dojo.js" 
+		<script src="../../dojo/dojo.js"
 			data-dojo-config="async: true"></script>
 		<script>
 			require([
@@ -29,14 +30,14 @@
 				on, Grid, Tree, Editor, Keyboard, declare, createHierarchicalStore, hierarchicalCountryData
 			){
 				var count = 0; // for incrementing edits from button under 1st grid
-				
+
 				function nbspFormatter(value){
 					// returns "&nbsp;" for blank content, to prevent cell collapsing
 					return value === undefined || value === "" ? "&nbsp;" : value;
 				}
 
 				var StandardGrid = declare([Grid, Keyboard, Editor, Tree]);
-				
+
 				window.grid = new StandardGrid({
 					collection: createHierarchicalStore({ data: hierarchicalCountryData }, true),
 					columns: [

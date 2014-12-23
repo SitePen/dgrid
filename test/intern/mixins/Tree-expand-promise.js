@@ -13,7 +13,8 @@ define([
 	'dstore/Memory',
 	'dstore/Tree',
 	'dstore/QueryResults',
-	'dojo/query'
+	'dojo/query',
+	'../addCss'
 ], function (test, assert, Grid, OnDemandGrid, _StoreMixin, Tree, declare, lang, arrayUtil, Deferred, on,
 		Memory, TreeStore, QueryResults, query) {
 

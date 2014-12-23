@@ -6,6 +6,7 @@
 		<meta name="viewport" content="width=570">
 		<style>
 			@import "../../dojo/resources/dojo.css";
+			@import "../css/dgrid.css";
 			@import "../../dijit/themes/claro/claro.css";
 			@import "../css/skins/claro.css";
 			.heading {
@@ -16,7 +17,7 @@
 				margin: 10px;
 			}
 		</style>
-		<script src="../../dojo/dojo.js" 
+		<script src="../../dojo/dojo.js"
 			data-dojo-config="async: true, isDebug: true"></script>
 		<script>
 			require(["dojo/_base/declare", "dojo/_base/array", "dgrid/List", "dgrid/OnDemandGrid", "dgrid/Keyboard",
@@ -50,7 +51,7 @@
 						collection: testTypesStore,
 						columns: getColumns()
 					}, "grid");
-					
+
 					grid.on("dgrid-datachange", function(evt){
 						console.log("data changed: ", evt.oldValue, " -> ", evt.value);
 						console.log("cell: ", evt.cell.row.id, evt.cell.column.field);
@@ -62,12 +63,12 @@
 						console.log("hide editOn editor: ", evt);
 					});
 				});
-				
+
 		</script>
 	</head>
 	<body class="claro">
 		<h2>A grid with autoSave-enabled editors</h2>
-		(This test requires dijit to be installed)	
+		(This test requires dijit to be installed)
 		<div id="grid"></div>
 		Editor type:
 		<button type="button" onclick="grid.set('columns', getColumns());">always-on</button>

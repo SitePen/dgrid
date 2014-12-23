@@ -18,9 +18,7 @@
 	},
 	"dependencies": {
 		"dojo": ">=1.8.9",
-		"dstore": "~1.0",
-		"xstyle": ">=0.1.3",
-		"put-selector": ">=0.3.6"
+		"dstore": "~1.0"
 	},
 	"ignore": [
 		".*",

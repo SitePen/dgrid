@@ -5,8 +5,7 @@ define([
 	'dojo/dom-class',
 	'dojo/on',
 	'dojo/query',
-	'dojo/dnd/Source',
-	'xstyle/css!../css/extensions/ColumnReorder.css'
+	'dojo/dnd/Source'
 ], function (lang, declare, arrayUtil, domClass, on, query, DndSource) {
 	var dndTypeRx = /(\d+)(?:-(\d+))?$/; // used to determine subrow from dndType
 

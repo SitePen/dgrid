@@ -12,8 +12,7 @@ define([
 	'dojo/when',
 	'../util/misc',
 	'dojo/i18n!./nls/pagination',
-	'dojo/_base/sniff',
-	'xstyle/css!../css/extensions/Pagination.css'
+	'dojo/_base/sniff'
 ], function (_StoreMixin, declare, arrayUtil, lang, domConstruct, domClass, on, query, string, has, when,
 		miscUtil, i18n) {
 	function cleanupContent(grid) {

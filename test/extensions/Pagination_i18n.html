@@ -6,6 +6,8 @@
 		<meta name="viewport" content="width=570">
 		<style>
 			@import "../../../dojo/resources/dojo.css";
+			@import "../../css/dgrid.css";
+			@import "../../css/skins/claro.css";
 			.heading {
 				font-weight: bold;
 				padding-bottom: 0.25em;
@@ -15,24 +17,16 @@
 				margin: 10px;
 			}
 		</style>
-		<script src="../../../dojo/dojo.js" 
+		<script src="../../../dojo/dojo.js"
 			data-dojo-config="async: true"></script>
 		<script>
-			// allow retrieving skin from GET param
-			var skin = "claro",
-				match = /\bskin=([^&]*)/.exec(location.search),
-				skinDep, updateGrid,
-				getColumns, getColumns2;
-			if(match){ skin = match[1]; }
-			skinDep = "xstyle/css!dgrid/css/skins/" + skin + ".css";
-			
-			require([skinDep, "dgrid/Grid", "dgrid/extensions/Pagination",
+			require(["dgrid/Grid", "dgrid/extensions/Pagination",
 					"dojo/i18n!dgrid/extensions/nls/pagination", "dgrid/Selection", "dgrid/Keyboard",
 					"dojo/_base/lang", "dojo/_base/declare", "dojo/dom-construct", "dojo/dom-form",
 					"dgrid/test/data/createAsyncStore", "dgrid/test/data/genericData", "dojo/domReady!"],
-				function(skinResource, Grid, Pagination, i18nPagination, Selection, Keyboard,
+				function(Grid, Pagination, i18nPagination, Selection, Keyboard,
 						lang, declare, domConstruct, domForm, createAsyncStore, genericData){
-					
+
 					// Create a custom Pagination class with a distinct i18n bundle
 					// In this case, we're overriding just one value, so we're
 					// loading the original one to serve as a basis
@@ -45,9 +39,7 @@
 
 					// Create our custom grid using MyPagination
 					var CustomGrid = declare([Grid, Keyboard, Selection, MyPagination]);
-					
-					document.body.className = skin;
-					
+
 					window.grid = new CustomGrid({
 						collection: createAsyncStore({ data: genericData }),
 						columns: {
@@ -61,7 +53,7 @@
 				});
 		</script>
 	</head>
-	<body>
+	<body class="claro">
 		<h2>A paginated grid with custom i18n</h2>
 		<p>Assuming success, the status in the lower left should read "Total: 100 - Showing from 1 to 10"</p>
 		<div id="grid"></div>

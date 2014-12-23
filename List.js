@@ -5,12 +5,17 @@ define([
 	'dojo/on',
 	'dojo/has',
 	'./util/misc',
-	'xstyle/has-class',
-	'dojo/_base/sniff',
-	'xstyle/css!./css/dgrid.css'
-], function (declare, domConstruct, domClass, listen, has, miscUtil, hasClass) {
-	// Add user agent/feature CSS classes
-	hasClass('mozilla', 'touch');
+	'dojo/_base/sniff'
+], function (declare, domConstruct, domClass, listen, has, miscUtil) {
+	// Add user agent/feature CSS classes needed for structural CSS
+	var featureClasses = [];
+	if (has('mozilla')) {
+		featureClasses.push('has-mozilla');
+	}
+	if (has('touch')) {
+		featureClasses.push('has-touch');
+	}
+	domClass.add(document.documentElement, featureClasses);
 
 	// Add a feature test for pointer (only Dojo 1.10 has pointer-events and MSPointer tests)
 	has.add('pointer', function (global) {

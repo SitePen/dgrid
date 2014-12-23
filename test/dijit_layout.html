@@ -6,6 +6,7 @@
 		<meta name="viewport" content="width=570">
 		<style>
 			@import "../../dijit/themes/claro/document.css";
+			@import "../css/dgrid.css";
 			@import "../../dijit/themes/claro/claro.css";
 			@import "../css/skins/claro.css";
 			html, body {
@@ -24,12 +25,12 @@
 				width: 500px;
 			}
 		</style>
-		<script src="../../dojo/dojo.js" 
+		<script src="../../dojo/dojo.js"
 			data-dojo-config="async: true"></script>
 		<script>
 			// callbacks for button clicks
 			function showDeclDialog(){ dlgDecl.show(); }
-			
+
 			// function to get a unique set of column definitions for each grid
 			function getGridCols(){
 				return {
@@ -39,7 +40,7 @@
 					col4: 'Column 4'
 				};
 			}
-			
+
 			require(["dojo/parser",
 				"dgrid/test/data/testStore",
 				// widgets only used declaratively

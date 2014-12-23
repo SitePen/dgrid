@@ -6,16 +6,17 @@
 		<meta name="viewport" content="width=570">
 		<style>
 			@import "../../dojo/resources/dojo.css";
+			@import "../css/dgrid.css";
 			@import "../css/skins/claro.css";
-			@import "../css/dgrid.css"; /* this ensures that are rules come after dgrid.css */
+
 			.heading {
 				font-weight: bold;
 				padding-bottom: 0.25em;
 			}
-			.grid { 
+			.grid {
 				width: 700px;
 			}
-			.grid .dgrid-column-set-0 { 
+			.grid .dgrid-column-set-0 {
 				width: 50%;
 			}
 			.grid .field-col1 {
@@ -35,7 +36,7 @@
 			}
 		</style>
 
-		<script src="../../dojo/dojo.js" 
+		<script src="../../dojo/dojo.js"
 			data-dojo-config="async: true"></script>
 		<script>
 			require([
@@ -109,7 +110,7 @@
 								{label: 'Column 4', field: 'col4'}
 							]
 						]];
-				
+
 				function byId(id){ return document.getElementById(id); }
 
 				var ComplexGrid = declare([OnDemandGrid, ColumnSet, Selection, Keyboard]);
@@ -119,17 +120,17 @@
 					collection: asyncStore,
 					subRows: subRows1
 				}, "gridNoColumnSets");
-				
+
 				window.gridSingleRow = new ComplexGrid({
 					collection: asyncStore,
 					columnSets: columnSetsSingleRow
 				}, "gridSingleRow");
-				
+
 				window.grid = new ComplexGrid({
 					collection: asyncStore,
 					columnSets: columnSets1
 				}, "grid");
-				
+
 				// hook up buttons for testing setSubRows / setColumnSets
 				on(byId("btnSubRows1"), "click", function(){
 					gridNoColumnSets.set("subRows", subRows1);
@@ -137,7 +138,7 @@
 				on(byId("btnSubRows2"), "click", function(){
 					gridNoColumnSets.set("subRows", subRows2);
 				});
-				
+
 				on(byId("btnColumnSets1"), "click", function(){
 					grid.set("columnSets", columnSets1);
 				});
@@ -156,7 +157,7 @@
 				window.gridFromHtml2 = new HtmlGrid({
 					collection: testStore
 				}, "gridFromHtml2");
-				
+
 				// test declarative instantiation (need a global for parser)
 				window.dgrid = { GridFromHtml: HtmlGrid };
 				parser.parse();

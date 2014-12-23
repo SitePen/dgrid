@@ -45,8 +45,6 @@ bower install dijit#<target>
 
 Alternatively, dgrid and its dependencies can be downloaded individually:
 
-* [xstyle](https://github.com/kriszyp/xstyle)
-* [put-selector](https://github.com/kriszyp/put-selector)
 * [dstore](https://github.com/SitePen/dstore) for store-backed grids
 * [The Dojo Toolkit](http://dojotoolkit.org) SDK version 1.8 or higher
     * Out of the DTK components, Dojo core is the only hard dependency for dgrid;
@@ -61,16 +59,14 @@ directory structure like the following:
 * `dojo`
 * `dojox` (optional, dependency of some dgrid tests)
 * `dstore`
-* `put-selector`
-* `xstyle`
 * `util` (optional, e.g. if pursuing a custom build)
 
 ## CDN
 
 [RawGit](http://rawgit.com/) now offers CDN hosting of raw tagged git URLs.
-It can serve any version of dgrid, xstyle, and put-selector via MaxCDN.
+It can serve any version of dgrid and dstore via MaxCDN.
 
-For example, here's a `packages` configuration for dgrid 0.4.0, xstyle 0.2.1, and put-selector 0.3.5:
+For example, here's a `packages` configuration for dgrid 0.4.0 and dstore 1.0.0:
 
 ```js
 packages: [
@@ -79,12 +75,8 @@ packages: [
         location: '//cdn.rawgit.com/SitePen/dgrid/v0.4.0'
     },
     {
-        name: 'xstyle',
-        location: '//cdn.rawgit.com/kriszyp/xstyle/v0.2.1'
-    },
-    {
-        name: 'put-selector',
-        location: '//cdn.rawgit.com/kriszyp/put-selector/v0.3.5'
+        name: 'dstore',
+        location: '//cdn.rawgit.com/SitePen/dstore/v1.0.0'
     }
 ]
 ```

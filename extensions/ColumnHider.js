@@ -4,8 +4,7 @@ define([
 	'dojo/has',
 	'dojo/on',
 	'../util/misc',
-	'dojo/i18n!./nls/columnHider',
-	'xstyle/css!../css/extensions/ColumnHider.css'
+	'dojo/i18n!./nls/columnHider'
 ], function (declare, domConstruct, has, listen, miscUtil, i18n) {
 /*
  *	Column Hider plugin for dgrid

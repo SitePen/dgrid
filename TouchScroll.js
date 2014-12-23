@@ -7,8 +7,7 @@ define([
 	'dojo/dom-class',
 	'dojo/on',
 	'./util/touch',
-	'./util/has-css3',
-	'xstyle/css!./css/TouchScroll.css'
+	'./util/has-css3'
 ], function (declare, domConstruct, domClass, on, touchUtil, has) {
 	var calcTimerRes = 50, // ms between drag velocity measurements
 		glideTimerRes = 30, // ms between glide animation ticks

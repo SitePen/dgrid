@@ -6,16 +6,16 @@
 		<meta name="viewport" content="width=570">
 		<style>
 			@import "../../../dojo/resources/dojo.css";
+			@import "../../css/dgrid.css";
 			@import "../../css/skins/claro.css";
-			@import "../../css/dgrid.css"; /* this ensures that our rules come after dgrid.css */
 			.heading {
 				font-weight: bold;
 				padding-bottom: 0.25em;
 			}
-			.grid { 
+			.grid {
 				width: 700px;
 			}
-			.grid .dgrid-column-set-0 { 
+			.grid .dgrid-column-set-0 {
 				width: 50%;
 			}
 			.grid .field-col1 {
@@ -32,7 +32,7 @@
 			}
 		</style>
 
-		<script src="../../../dojo/dojo.js" 
+		<script src="../../../dojo/dojo.js"
 			data-dojo-config="async: true"></script>
 		<script>
 			require(["dgrid/OnDemandGrid", "dgrid/ColumnSet", "dgrid/Selection", "dgrid/Keyboard", "dgrid/extensions/ColumnResizer", "dojo/_base/declare", "dgrid/test/data/testStore", "dojo/domReady!"],

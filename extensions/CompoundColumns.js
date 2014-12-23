@@ -3,8 +3,7 @@ define([
 	'dojo/_base/declare',
 	'dojo/sniff',
 	'dojo/query',
-	'../util/misc',
-	'xstyle/css!../css/extensions/CompoundColumns.css'
+	'../util/misc'
 ], function (lang, declare, has, query, miscUtil) {
 	return declare(null, {
 		// summary:

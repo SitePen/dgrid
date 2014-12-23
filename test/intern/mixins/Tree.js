@@ -15,7 +15,8 @@ define([
 	'dojo/dom-style',
 	'dojo/on',
 	'dojo/query',
-	'dgrid/test/data/createHierarchicalStore'
+	'dgrid/test/data/createHierarchicalStore',
+	'../addCss'
 ], function (test, assert, OnDemandGrid, Editor, Tree, has, miscUtil, declare, lang, aspect, Deferred,
 		domClass, domConstruct, domStyle, on, query, createHierarchicalStore) {
 

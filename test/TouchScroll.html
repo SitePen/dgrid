@@ -7,6 +7,7 @@
 		<style>
 			@import "../../dojo/resources/dojo.css";
 			@import "../css/dgrid.css";
+			@import "../css/TouchScroll.css";
 			@import "../css/skins/tundra.css";
 			.heading {
 				font-weight: bold;
@@ -20,10 +21,10 @@
 				background: #F2F5F9;
 			}
 		</style>
-		<script src="../../dojo/dojo.js" 
+		<script src="../../dojo/dojo.js"
 			data-dojo-config="async: true"></script>
 		<script>
-			require(["dgrid/OnDemandGrid", "dgrid/TouchScroll", "dojo/_base/declare", "dgrid/test/data/testPerformanceStore", "dojo/domReady!"], 
+			require(["dgrid/OnDemandGrid", "dgrid/TouchScroll", "dojo/_base/declare", "dgrid/test/data/testPerformanceStore", "dojo/domReady!"],
 				function(OnDemandGrid, TouchScroll, declare, testPerformanceStore){
 					var columns = [
 						{ name: 'Column 0', field: 'id', width: '10%' },
@@ -42,7 +43,7 @@
 						collection: testPerformanceStore,
 						columns: columns
 					}, "grid");
-					
+
 					var processScroll = grid._processScroll;
 					grid._processScroll = function(evt){
 						var start = new Date();

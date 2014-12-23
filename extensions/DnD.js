@@ -13,8 +13,7 @@ define([
 	'dojo/_base/NodeList',
 	'../Selection',
 	'dojo/has!touch?../util/touch',
-	'dojo/has!touch?./_DnD-touch-autoscroll',
-	'xstyle/css!dojo/resources/dnd.css'
+	'dojo/has!touch?./_DnD-touch-autoscroll'
 ], function (declare, lang, arrayUtil, aspect, domClass, on, topic, has, when, DnDSource,
 		DnDManager, NodeList, Selection, touchUtil) {
 	// Requirements

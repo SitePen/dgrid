@@ -1,11 +1,11 @@
-/* rtl support 
+// rtl support
 
-	IMPORTANT:
-	Safari places the scrollbars on the right even when in RTL mode.
-	.dgrid-rtl is added to the domNode if the grid's isRTL is true
-	.dgrid-rtl-swap is also added to the domNode if isRTL is true and the
-		client swaps the vertical scrollbar to the left side
-*/
+// IMPORTANT:
+// Safari places the scrollbars on the right even when in RTL mode.
+// .dgrid-rtl is added to the domNode if the grid's isRTL is true
+// .dgrid-rtl-swap is also added to the domNode if isRTL is true and
+//   the client swaps the vertical scrollbar to the left side
+
 .dgrid-rtl-swap .dgrid-header-row {
 	right: 0;
 	left: 17px;
@@ -20,13 +20,13 @@
 	text-align: right;
 }
 
-/* Reverse position of sort arrow */
+// Reverse position of sort arrow
 .dgrid-rtl .dgrid-sort-arrow {
 	float: left;
 	margin: 0 5px 0 4px;
 }
 
-/* Reverse arrows for tree expando states */
+// Reverse arrows for tree expando states
 .dgrid-rtl .ui-icon-triangle-1-e {
 	background-position: -96px -16px;
 }
@@ -34,7 +34,7 @@
 	background-position: -80px -16px;
 }
 
-/* Reverse Pagination */
+// Reverse Pagination
 
 .dgrid-rtl .dgrid-pagination .dgrid-status {
 	float: right;
@@ -50,5 +50,3 @@
 .dgrid-rtl.dgrid-autoheight .dgrid-header {
 	left: 0;
 }
-
-#dgrid-css-dgrid_rtl-loaded { display: none; }

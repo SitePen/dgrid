@@ -8,8 +8,7 @@ define([
 	'dojo/dom-geometry',
 	'dojo/has',
 	'../util/misc',
-	'dojo/_base/html',
-	'xstyle/css!../css/extensions/ColumnResizer.css'
+	'dojo/_base/html'
 ], function (declare, listen, query, lang, dom, domConstruct, geom, has, miscUtil) {
 
 	function addRowSpan(table, span, startRow, column, id) {
