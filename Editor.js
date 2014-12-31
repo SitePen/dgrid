@@ -172,7 +172,7 @@ define([
 			} : function (object, value, cell, options) {
 				// always-on: create editor immediately upon rendering each cell
 				if (!column.canEdit || column.canEdit(object, value)) {
-					var cmp = self._createEditor(column);
+					var cmp = self._createEditor(column, object);
 					self._showEditor(cmp, column, cell, value);
 					// Maintain reference for later use.
 					cell[isWidget ? 'widget' : 'input'] = cmp;
@@ -356,9 +356,13 @@ define([
 			}
 		},
 
-		_createEditor: function (column) {
+		_createEditor: function (column, object) {
 			// Creates an editor instance based on column definition properties,
 			// and hooks up events.
+            //
+            // object is undefined when creating a shared editor.  For
+            // an always-on editor, object is the row data. If
+            // editorArgs is a function, object will be passed to this function
 			var editor = column.editor,
 				editOn = column.editOn,
 				self = this,
@@ -367,7 +371,7 @@ define([
 
 			args = column.editorArgs || {};
 			if (typeof args === 'function') {
-				args = args.call(this, column);
+				args = args.call(this, column, object);
 			}
 
 			if (Widget) {
