@@ -68,12 +68,13 @@ define([
 			var columnEditor = this.columnEditor;
 			this.inherited(arguments);
 
-			this.featureEditor.startup();
-			columnEditor.startup();
+			this.featureEditor.startup().then(function () {
+				columnEditor.startup();
 
-			// Add a couple of columns by default
-			columnEditor.addColumn('First Name');
-			columnEditor.addColumn('Last Name');
+				// Add a couple of columns by default
+				columnEditor.addColumn('First Name');
+				columnEditor.addColumn('Last Name');
+			});
 		},
 
 		selectTab: function (evt) {
@@ -167,7 +168,7 @@ define([
 				storeModules = [ 'Memory', 'Trackable' ];
 
 				if (treeExpandoColumn) {
-						storeModules.push('TreeStoreMixin');
+					storeModules.push('TreeStoreMixin');
 				}
 
 				gridConfig.dataDeclaration = 'var store = new (declare([' + storeModules.join(', ') + ']))({\n' +
