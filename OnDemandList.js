@@ -71,6 +71,13 @@ return declare([List, _StoreMixin], {
 				null, this.pagingDelay));
 	},
 	
+	destroy: function(){
+		this.inherited(arguments);
+		if (this._refreshTimeout) {
+			clearTimeout(this._refreshTimeout);
+		}
+	},
+	
 	renderQuery: function(query, options){
 		// summary:
 		//		Creates a preload node for rendering a query into, and executes the query
@@ -265,13 +272,14 @@ return declare([List, _StoreMixin], {
 			return dfd.then(function(results){
 				// Emit on a separate turn to enable event to be used consistently for
 				// initial render, regardless of whether the backing store is async
-				setTimeout(function() {
+				self._refreshTimeout = setTimeout(function() {
 					listen.emit(self.domNode, "dgrid-refresh-complete", {
 						bubbles: true,
 						cancelable: false,
 						grid: self,
 						results: results // QueryResults object (may be a wrapped promise)
 					});
+					self._refreshTimeout = null;
 				}, 0);
 				
 				// Delete the Deferred immediately so nothing tries to re-resolve
