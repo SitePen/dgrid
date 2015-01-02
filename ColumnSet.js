@@ -34,13 +34,6 @@ define([
 		});
 	}
 
-	function scrollColumnSetTo(grid, columnSetNode, offsetLeft) {
-		var id = columnSetNode.getAttribute(colsetidAttr);
-		var scroller = grid._columnSetScrollers[id];
-
-		scroller.scrollLeft = offsetLeft < 0 ? 0 : offsetLeft;
-	}
-
 	function getColumnSetSubRows(subRows, columnSetId) {
 		// Builds a subRow collection that only contains columns that correspond to
 		// a given column set id.
@@ -224,7 +217,7 @@ define([
 			return rows;
 		},
 
-		insertRow: function (object) {
+		insertRow: function () {
 			var row = this.inherited(arguments);
 			adjustScrollLeft(this, row);
 			return row;
@@ -386,6 +379,12 @@ define([
 			this._updateColumns();
 		},
 
+		_scrollColumnSet: function (nodeOrId, offsetLeft) {
+			var id = nodeOrId.tagName ? nodeOrId.getAttribute(colsetidAttr) : nodeOrId;
+			var scroller = this._columnSetScrollers[id];
+			scroller.scrollLeft = offsetLeft < 0 ? 0 : offsetLeft;
+		},
+
 		_onColumnSetCellFocus: function (event, columnSetNode) {
 			var focusedNode = event.target;
 			var columnSetId = columnSetNode.getAttribute(colsetidAttr);
@@ -396,7 +395,7 @@ define([
 
 			if (elementEdge > columnSetNode.offsetWidth ||
 				columnScroller.scrollLeft > focusedNode.offsetLeft) {
-				scrollColumnSetTo(this, columnSetNode, focusedNode.offsetLeft);
+				this._scrollColumnSet(columnSetNode, focusedNode.offsetLeft);
 			}
 		}
 	});
