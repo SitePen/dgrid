@@ -184,25 +184,27 @@ define([
 				columnNames.push(toJavaScript.formatPropertyName(columnName));
 			}
 
-			gridConfig.dataCreation = '\n\n\tfunction createData () {' +
+			gridConfig.dataCreation = '\n\n\tfunction createData() {' +
 				'\n\t\tvar data = [];' +
 				'\n\t\tvar column;' +
 				'\n\t\tvar i;' +
+				'\n\t\tvar item;' + '\n' +
 				'\n\t\tfor (i = 0; i < ' + NUM_ITEMS + '; i++) {' +
-				'\n\t\t\tdata.push({});' +
+				'\n\t\t\titem = {};' +
 				'\n\t\t\tfor (column in { ' + columnNames.join(': 1, ') + ': 1 }) {' +
-				'\n\t\t\t\tdata[i].id = i;' +
-				'\n\t\t\t\tdata[i][column] = column + \'_\' + (i + 1);' +
+				'\n\t\t\t\titem.id = i;' +
+				'\n\t\t\t\titem[column] = column + \'_\' + (i + 1);' +
 				'\n\t\t\t}';
 
 			if (treeExpandoColumn) {
 				gridConfig.dataCreation += '\n\t\t\tif (i > 1) {';
-				gridConfig.dataCreation += '\n\t\t\t\tdata[i].hasChildren = false;';
-				gridConfig.dataCreation += '\n\t\t\t\tdata[i].parent = i % 2;';
+				gridConfig.dataCreation += '\n\t\t\t\titem.hasChildren = false;';
+				gridConfig.dataCreation += '\n\t\t\t\titem.parent = i % 2;';
 				gridConfig.dataCreation += '\n\t\t\t}';
 			}
 
-			gridConfig.dataCreation += '\n\t\t}' +
+			gridConfig.dataCreation += '\n\t\t\tdata.push(item);' +
+				'\n\t\t}' + '\n' +
 				'\n\t\treturn data;' +
 				'\n\t}';
 
