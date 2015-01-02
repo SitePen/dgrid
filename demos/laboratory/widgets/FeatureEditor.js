@@ -81,7 +81,7 @@ define([
 		},
 
 		isSelected: function (moduleId) {
-			return this.store.filter({ mid: moduleId, selected: true }).fetchSync().length;
+			return !!this.store.filter({ mid: moduleId, selected: true }).fetchSync().length;
 		},
 
 		filter: function (query) {
