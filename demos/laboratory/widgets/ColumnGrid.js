@@ -78,7 +78,8 @@ define([
 				this.store.on('add,delete,update', lang.hitch(this, '_onStoreChange')),
 				this.grid.on('.icon-times:click', lang.hitch(this, 'removeColumn')),
 				this.grid.on('.icon-gear:click', lang.hitch(this, '_editColumn')),
-				topic.subscribe('/column/changed', lang.hitch(this, '_onColumnChange'))
+				topic.subscribe('/column/changed', lang.hitch(this, '_onColumnChange')),
+				topic.subscribe('/columnConfig/hidden', lang.hitch(this, '_onFieldsHidden'))
 			);
 		},
 
@@ -129,7 +130,7 @@ define([
 			var row = this.grid.row(event);
 
 			// Let the ColumnEditor know that is should set the form data and display the form
-			this.emit('editcolumn', { data: row.data } );
+			this.emit('editcolumn', { data: row.data });
 		},
 
 		_onColumnChange: function (value) {
@@ -141,6 +142,19 @@ define([
 			topic.publish('/configuration/changed');
 			// Let the Tree config module know that is should update its list of column names
 			topic.publish('/store/columns/update', this.store);
+		},
+
+		_onFieldsHidden: function (hiddenFieldNames) {
+			this.store.forEach(function (columnConfig) {
+				var k, updated;
+				for (k in columnConfig) {
+					if (hiddenFieldNames[k]) {
+						delete columnConfig[k];
+						updated = true;
+					}
+				}
+				updated && this.store.put(columnConfig);
+			}, this);
 		}
 	});
 });

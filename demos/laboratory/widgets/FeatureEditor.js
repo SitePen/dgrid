@@ -3,13 +3,14 @@ define([
 	'dojo/_base/array',
 	'dojo/_base/declare',
 	'dojo/_base/lang',
+	'dojo/Deferred',
 	'dojo/topic',
 	'dstore/Memory',
 	'dstore/Trackable',
 	'dijit/layout/StackContainer',
 	'./FeatureGrid',
 	'../data/features'
-], function (require, arrayUtil, declare, lang, topic, Memory, Trackable, StackContainer, FeatureGrid,
+], function (require, arrayUtil, declare, lang, Deferred, topic, Memory, Trackable, StackContainer, FeatureGrid,
 		featureData) {
 
 	return declare(StackContainer, {
@@ -18,9 +19,6 @@ define([
 
 		buildRendering: function () {
 			this.inherited(arguments);
-
-			var self = this;
-			var configModuleIds = [];
 
 			this.configPanes = {};
 
@@ -33,7 +31,23 @@ define([
 				featureType: 'grid'
 			});
 			this.addChild(this.featureGrid);
+		},
 
+		postCreate: function () {
+			this.inherited(arguments);
+
+			this.own(
+				this.featureGrid.on('configure-module', lang.hitch(this, '_showModuleConfig')),
+				this.store.on('add,delete,update', lang.hitch(this, '_onUpdateStore'))
+			);
+		},
+
+		startup: function () {
+			this.inherited(arguments);
+
+			var self = this;
+			var configModuleIds = [];
+			var dfd = new Deferred();
 			arrayUtil.forEach(featureData, function (feature) {
 				if (feature.configModule) {
 					configModuleIds.push('./' + feature.configModule);
@@ -60,20 +74,14 @@ define([
 						this.configPanes[feature.mid] = configPane;
 					}
 				}, self);
+				dfd.resolve();
 			});
-		},
 
-		postCreate: function () {
-			this.inherited(arguments);
-
-			this.own(
-				this.featureGrid.on('configure-module', lang.hitch(this, '_showModuleConfig')),
-				this.store.on('add,delete,update', lang.hitch(this, '_onUpdateStore'))
-			);
+			return dfd.promise;
 		},
 
 		isSelected: function (moduleId) {
-			return this.store.filter({ mid: moduleId, selected: true }).fetchSync().length;
+			return !!this.store.filter({ mid: moduleId, selected: true }).fetchSync().length;
 		},
 
 		filter: function (query) {
