@@ -175,7 +175,7 @@ define([
 							self._total = total;
 						}
 						// now we need to adjust the height and total count based on the first result set
-						if (total === 0) {
+						if (total === 0 && parentNode) {
 							if (noDataNode) {
 								put(noDataNode, '!');
 								delete self.noDataNode;
