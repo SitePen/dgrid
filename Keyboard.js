@@ -159,6 +159,8 @@ define([
 				});
 			}
 			enableNavigation(this.contentNode);
+
+			this._debouncedEnsureRowScroll = miscUtil.debounce(this._ensureRowScroll, this);
 		},
 
 		removeRow: function (rowElement) {
@@ -280,6 +282,22 @@ define([
 				this[isHeader ? 'headerKeyMap' : 'keyMap'], key, callback, true);
 		},
 
+		_ensureRowScroll: function (rowElement) {
+			// summary:
+			//		Ensures that the entire row is visible within the viewport.
+			//		Called for cell navigation in complex structures.
+
+			var scrollY = this.getScrollPosition().y;
+			if (scrollY > rowElement.offsetTop) {
+				// Row starts above the viewport
+				this.scrollTo({ y: rowElement.offsetTop });
+			}
+			else if (scrollY + this.contentNode.offsetHeight < rowElement.offsetTop + rowElement.offsetHeight) {
+				// Row ends below the viewport
+				this.scrollTo({ y: rowElement.offsetTop - this.contentNode.offsetHeight + rowElement.offsetHeight });
+			}
+		},
+
 		_focusOnNode: function (element, isHeader, event) {
 			var focusedNodeProperty = '_focused' + (isHeader ? 'Header' : '') + 'Node',
 				focusedNode = this[focusedNodeProperty],
@@ -353,6 +371,10 @@ define([
 
 			if (event) {
 				on.emit(focusedNode, 'dgrid-cellfocusin', event);
+			}
+
+			if (this.cellNavigation && (this.columnSets || this.subRows.length > 1) && !isHeader) {
+				this._debouncedEnsureRowScroll(cell.row.element);
 			}
 		},
 
