@@ -1,18 +1,10 @@
 define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/on", "dojo/aspect", "dojo/query", "dojo/has", "./util/misc", "put-selector/put", "xstyle/has-class", "./Grid", "dojo/_base/sniff", "xstyle/css!./css/columnset.css"],
 function(kernel, declare, lang, Deferred, listen, aspect, query, has, miscUtil, put, hasClass, Grid){
 	has.add("event-mousewheel", function(global, document, element){
-		return typeof element.onmousewheel !== "undefined";
+		return 'onmousewheel' in element;
 	});
 	has.add("event-wheel", function(global, document, element){
-		var supported = false;
-		// From https://developer.mozilla.org/en-US/docs/Mozilla_event_reference/wheel
-		try{
-			WheelEvent("wheel");
-			supported = true;
-		}catch(e){
-			// empty catch block; prevent debuggers from snagging
-		}
-		return supported;
+		return 'onwheel' in element;
 	});
 
 	var colsetidAttr = "data-dgrid-column-set-id";
@@ -59,7 +51,7 @@ function(kernel, declare, lang, Deferred, listen, aspect, query, has, miscUtil, 
 
 	var horizMouseWheel = has("event-mousewheel") || has("event-wheel") ? function(grid){
 		return function(target, listener){
-			return listen(target, has("event-wheel") ? "wheel" : "mousewheel", function(event){
+			return listen(target, has("event-mousewheel") ? "mousewheel" : "wheel", function(event){
 				var node = event.target, deltaX;
 				// WebKit will invoke mousewheel handlers with an event target of a text
 				// node; check target and if it's not an element node, start one node higher
