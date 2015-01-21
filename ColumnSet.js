@@ -253,7 +253,11 @@ function(kernel, declare, lang, Deferred, listen, aspect, query, has, miscUtil, 
 		_putScroller: function (columnSet, i){
 			// function called for each columnSet
 			var scroller = this._columnSetScrollers[i] =
-				put(this._columnSetScrollerNode, "span.dgrid-column-set-scroller.dgrid-column-set-scroller-" + i +
+				put(this._columnSetScrollerNode, "span" +
+					// IE8 and old FF need dgrid-scrollbar-height class for scrollbar to be visible,
+					// but for some reason IE11's scrollbar arrows become unresponsive, so avoid applying it there
+					(has("ie") < 9 || has("ff") ? ".dgrid-scrollbar-height" : "") +
+					".dgrid-column-set-scroller.dgrid-column-set-scroller-" + i +
 					"[" + colsetidAttr + "=" + i +"]");
 			this._columnSetScrollerContents[i] = put(scroller, "div.dgrid-column-set-scroller-content");
 			listen(scroller, "scroll", lang.hitch(this, '_onColumnSetScroll'));
