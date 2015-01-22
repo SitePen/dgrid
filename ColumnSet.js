@@ -351,8 +351,12 @@ define([
 		_putScroller: function (columnSet, i) {
 			// function called for each columnSet
 			var scroller = this._columnSetScrollers[i] =
-				put(this._columnSetScrollerNode, 'span.dgrid-column-set-scroller.dgrid-column-set-scroller-' + i +
-					'[' + colsetidAttr + '=' + i + ']');
+				put(this._columnSetScrollerNode, 'span' +
+					// IE8 needs dgrid-scrollbar-height class for scrollbar to be visible,
+					// but for some reason IE11's scrollbar arrows become unresponsive, so avoid applying it there
+					(has('ie') < 9 ? '.dgrid-scrollbar-height' : '') +
+					'.dgrid-column-set-scroller.dgrid-column-set-scroller-' + i +
+					'[' + colsetidAttr + '=' + i +']');
 			this._columnSetScrollerContents[i] = put(scroller, 'div.dgrid-column-set-scroller-content');
 			on(scroller, 'scroll', lang.hitch(this, '_onColumnSetScroll'));
 		},
@@ -364,7 +368,7 @@ define([
 
 			if (this._columnSetScrollLefts[colSetId] !== scrollLeft) {
 				query('.dgrid-column-set[' + colsetidAttr + '="' + colSetId +
-						'"], .dgrid-column-set-scroller[' + colsetidAttr + '="' + colSetId + '"]', this.domNode
+						'"],.dgrid-column-set-scroller[' + colsetidAttr + '="' + colSetId + '"]', this.domNode
 					).forEach(function (element, i) {
 						element.scrollLeft = scrollLeft;
 						if (!i) {
