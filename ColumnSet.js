@@ -11,18 +11,10 @@ define([
 	'xstyle/css!./css/columnset.css'
 ], function (declare, lang, on, aspect, query, has, miscUtil, put) {
 	has.add('event-mousewheel', function (global, document, element) {
-		return typeof element.onmousewheel !== 'undefined';
+		return 'onmousewheel' in element;
 	});
-	has.add('event-wheel', function (global) {
-		var supported = false;
-		// From https://developer.mozilla.org/en-US/docs/Mozilla_event_reference/wheel
-		try {
-			global.WheelEvent('wheel');
-			supported = true;
-		} catch (e) {
-			// empty catch block; prevent debuggers from snagging
-		}
-		return supported;
+	has.add('event-wheel', function (global, document, element) {
+		return 'onwheel' in element;
 	});
 
 	var colsetidAttr = 'data-dgrid-column-set-id';
