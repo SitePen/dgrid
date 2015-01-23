@@ -142,10 +142,13 @@ function(kernel, declare, lang, Deferred, listen, aspect, put){
 			this.query = query !== undefined ? query : this.query;
 			this.queryOptions = queryOptions || this.queryOptions;
 			
-			// If we have new sort criteria, pass them through sort
-			// (which will update _sort and call refresh in itself).
-			// Otherwise, just refresh.
-			sort ? this.set("sort", sort) : this.refresh();
+			// Avoid unnecessary refresh if instance hasn't started yet (startup will refresh)
+			if (this._started) {
+				// If we have new sort criteria, pass them through sort
+				// (which will update _sort and call refresh in itself).
+				// Otherwise, just refresh.
+				sort ? this.set("sort", sort) : this.refresh();
+			}
 		},
 		setStore: function(store, query, queryOptions){
 			kernel.deprecated("setStore(...)", 'use set("store", ...) instead', "dgrid 0.4");
