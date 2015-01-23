@@ -141,7 +141,11 @@ define([
 			}
 
 			this.collection = collection;
-			this.refresh();
+
+			// Avoid unnecessary refresh if instance hasn't started yet (startup will refresh)
+			if (this._started) {
+				this.refresh();
+			}
 		},
 
 		_setStore: function () {

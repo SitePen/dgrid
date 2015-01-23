@@ -3,6 +3,7 @@ define([
 	'intern/chai!assert',
 	'dojo/_base/lang',
 	'dojo/_base/declare',
+	'dojo/aspect',
 	'dojo/Deferred',
 	// column.set can't be tested independently from a Grid,
 	// so we are testing through OnDemandGrid for now.
@@ -11,7 +12,7 @@ define([
 	'dgrid/test/data/createSyncStore',
 	'dgrid/test/data/genericData',
 	'dojo/domReady!'
-], function (test, assert, lang, declare, Deferred, OnDemandGrid, ColumnSet, createSyncStore, genericData) {
+], function (test, assert, lang, declare, aspect, Deferred, OnDemandGrid, ColumnSet, createSyncStore, genericData) {
 
 	// Helper method used to set column set() methods for various grid compositions
 	function testSetMethod(grid, dfd) {
@@ -275,6 +276,28 @@ define([
 					]
 				});
 				testSetMethod(grid, this.async());
+			});
+		});
+
+		test.suite('Effect of set-before-startup on refresh calls', function(){
+			test.test('set(\'collection\') before startup should not cause superfluous refresh',  function () {
+				var numCalls = 0;
+
+				grid = new OnDemandGrid({
+					columns: {
+						col1: 'Column 1'
+					}
+				});
+
+				aspect.before(grid, 'refresh', function () {
+					numCalls++;
+				});
+
+				grid.set('collection', createSyncStore(genericData));
+				document.body.appendChild(grid.domNode);
+				grid.startup();
+
+				assert.strictEqual(numCalls, 1, 'refresh should only have been called once');
 			});
 		});
 	});
