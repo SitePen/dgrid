@@ -176,7 +176,7 @@ export SAUCE_ACCESS_KEY=<your_sauce_access_key>
 Then kick off the runner with the following command:
 
 ```
-node node_modules/intern-geezer/runner config=test/intern/intern
+grunt intern:remote
 ```
 
 ## Running via local Selenium server
@@ -212,13 +212,12 @@ script which can be used to start up the server.  For additional information
 
 ### Running the tests
 
-Once the Selenium server is running, kick off the Intern test runner with the
-following command (run from the directory containing dgrid):
+Once the Selenium server is running, kick off the Intern test runner with the following command:
 
 ```
-node node_modules/intern-geezer/runner config=test/intern/intern.local
+grunt test
 ```
 
-The configuration in `intern.local.js` overrides `intern.js` to not use
-Sauce Connect, and to attempt to run Firefox and Chrome by default (this can
-be customized as desired according to the browsers you have installed).
+This runs the `intern:local` Grunt task, which uses the configuration in `intern.local.js`.
+This configuration overrides `intern.js` to use `NullTunnel`, and to test in Chrome by default
+(this can be customized as desired according to the browsers you have installed).

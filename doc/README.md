@@ -36,6 +36,7 @@ available to further expand dgrid's functionality.
 * [Working with Events](usage/Working-with-Events.md)
 * [Working with Widgets](usage/Working-with-Widgets.md)
 * [Styling dgrid](usage/Styling-dgrid.md)
+* [Customizing Skins](usage/Customizing-Skins.md)
 * [Limitations](usage/Limitations.md)
 
 ## Upgrading dgrid
