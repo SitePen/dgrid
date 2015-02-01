@@ -282,7 +282,8 @@ define([
 				store = this.collection,
 				dirty = this.dirty,
 				dfd = new Deferred(), promise = dfd.promise,
-				getFunc = function (id) {
+           			results = {},
+				getFunc = function(id) {
 					// returns a function to pass as a step in the promise chain,
 					// with the id variable closured
 					var data;
@@ -325,10 +326,13 @@ define([
 
 					updating[id] = true;
 					// Put it in the store, returning the result/promise
-					return when(store.put(object), function () {
+					return Deferred.when(store.put(object), function(valueOrPromise) {
 						// Clear the item now that it's been confirmed updated
 						delete dirty[id];
 						delete updating[id];
+            					// Return the result (a Promise or a resolved value) of the PUT request.
+            					results[id] = valueOrPromise;
+						return results;
 					});
 				};
 			}
@@ -342,11 +346,10 @@ define([
 				// getting the item from the store first if desired.
 				promise = promise.then(getFunc(id)).then(put);
 			}
-
 			// Kick off and return the promise representing all applicable get/put ops.
 			// If the success callback is fired, all operations succeeded; otherwise,
 			// save will stop at the first error it encounters.
-			dfd.resolve();
+      			dfd.resolve();
 			return promise;
 		},
 
