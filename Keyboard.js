@@ -159,6 +159,7 @@ var Keyboard = declare(null, {
 		enableNavigation(this.contentNode);
 		
 		this._debouncedEnsureRowScroll = miscUtil.debounce(this._ensureRowScroll, this);
+		this._debouncedEnsureColumnScroll = miscUtil.debounce(this._ensureColumnScroll, this);
 	},
 	
 	removeRow: function(rowElement){
@@ -294,6 +295,19 @@ var Keyboard = declare(null, {
 			this.scrollTo({ y: rowElement.offsetTop - this.contentNode.offsetHeight + rowElement.offsetHeight });
 		}
 	},
+
+	_ensureColumnScroll: function (cellElement) {
+		// summary:
+		//		Ensures that the entire cell is visible in the viewport, such as when
+		//		the grid has a horizontal scroll
+		var scrollX = this.getScrollPosition().x;
+		if (scrollX > cellElement.offsetLeft) {
+			this.scrollTo({ x: cellElement.offsetLeft });
+		}
+		else if (scrollX + this.contentNode.offsetWidth <= cellElement.offsetLeft + cellElement.offsetWidth + cellElement.clientLeft) {
+			this.scrollTo({ x: cellElement.offsetLeft + this.contentNode.offsetWidth + cellElement.offsetWidth });
+		}
+	},
 	
 	_focusOnNode: function(element, isHeader, event){
 		var focusedNodeProperty = "_focused" + (isHeader ? "Header" : "") + "Node",
@@ -384,6 +398,8 @@ var Keyboard = declare(null, {
 		if(this.cellNavigation && (this.columnSets || this.subRows.length > 1) && !isHeader){
 			this._debouncedEnsureRowScroll(cell.row.element);
 		}
+
+		this._debouncedEnsureColumnScroll(cell.element);
 	},
 	
 	focusHeader: function(element){
