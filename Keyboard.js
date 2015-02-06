@@ -158,7 +158,7 @@ var Keyboard = declare(null, {
 		}
 		enableNavigation(this.contentNode);
 		
-		this._debouncedEnsureRowScroll = miscUtil.debounce(this._ensureRowScroll, this);
+		this._debouncedEnsureScroll = miscUtil.debounce(this._ensureScroll, this);
 	},
 	
 	removeRow: function(rowElement){
@@ -294,6 +294,41 @@ var Keyboard = declare(null, {
 			this.scrollTo({ y: rowElement.offsetTop - this.contentNode.offsetHeight + rowElement.offsetHeight });
 		}
 	},
+
+	_ensureColumnScroll: function (cellElement) {
+		// summary:
+		//		Ensures that the entire cell is visible in the viewport.
+		//		Called in cases where the grid can scroll horizontally.
+		
+		var scrollX = this.getScrollPosition().x;
+		var cellLeft = cellElement.offsetLeft;
+		if (scrollX > cellLeft) {
+			this.scrollTo({ x: cellLeft });
+		}
+		else {
+			var bodyWidth = this.bodyNode.clientWidth;
+			var cellWidth = cellElement.offsetWidth;
+			var cellRight = cellLeft + cellWidth;
+			if (scrollX + bodyWidth < cellRight) {
+				// Adjust so that the right side of the cell and grid body align,
+				// unless the cell is actually wider than the body - then align the left sides
+				this.scrollTo({ x: bodyWidth > cellWidth ? cellRight - bodyWidth : cellLeft });
+			}
+		}
+	},
+	
+	_ensureScroll: function (cell, isHeader) {
+		// summary:
+		//		Corrects scroll based on the position of the newly-focused row/cell
+		//		as necessary based on grid configuration and dimensions.
+		
+		if(this.cellNavigation && (this.columnSets || this.subRows.length > 1) && !isHeader){
+			this._ensureRowScroll(cell.row.element);
+		}
+		if(this.bodyNode.clientWidth < this.contentNode.offsetWidth){
+			this._ensureColumnScroll(cell.element);
+		}
+	},
 	
 	_focusOnNode: function(element, isHeader, event){
 		var focusedNodeProperty = "_focused" + (isHeader ? "Header" : "") + "Node",
@@ -381,9 +416,7 @@ var Keyboard = declare(null, {
 			on.emit(focusedNode, "dgrid-cellfocusin", event);
 		}
 		
-		if(this.cellNavigation && (this.columnSets || this.subRows.length > 1) && !isHeader){
-			this._debouncedEnsureRowScroll(cell.row.element);
-		}
+		this._debouncedEnsureScroll(cell, isHeader);
 	},
 	
 	focusHeader: function(element){
