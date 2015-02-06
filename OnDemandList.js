@@ -76,13 +76,14 @@ define([
 			// check visibility on scroll events
 			this._scrollEvent();
 		},
+
 		destroy: function () {
 			this.inherited(arguments);
 			if (this._refreshTimeout) {
 				clearTimeout(this._refreshTimeout);
 			}
- 		},
- 
+		},
+
 		renderQuery: function (query, options) {
 			// summary:
 			//		Creates a preload node for rendering a query into, and executes the query
@@ -366,19 +367,18 @@ define([
 			if (this._hasAutoHeight()){
 				var parentNode=this.params.parentNode||window;
 
-var cumulativeOffset = function(element) {
-    var top = 0, left = 0;
-    do {
-        top += element.offsetTop  || 0;
-        left += element.offsetLeft || 0;
-        element = element.offsetParent;
-    } while(element);
-
-    return {
-        top: top,
-        left: left
-    };
-};
+				var cumulativeOffset = function(element) {
+    					var top = 0, left = 0;
+    					do {
+        					top += element.offsetTop  || 0;
+        					left += element.offsetLeft || 0;
+        					element = element.offsetParent;
+    					} while(element);
+					return {
+        					top: top,
+        					left: left
+    					};
+				};
 				visibleTop=Math.max(0,parentNode.scrollY-cumulativeOffset(scrollNode).top);
 				visibleBottom=parentNode.innerHeight+visibleTop;
 			}
