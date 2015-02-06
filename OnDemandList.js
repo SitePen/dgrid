@@ -72,7 +72,6 @@ define([
 
 		postCreate: function () {
 			this.inherited(arguments);
-			var self = this;
 			// check visibility on scroll events
 			this._scrollEvent();
 		},
@@ -325,24 +324,24 @@ define([
 		},
 
 		lastScrollTop: 0,
-		_hasAutoHeight:function(){
-		  return this._class&&this._class.indexOf('dgrid-autoheight')>=0;
+		_hasAutoHeight: function () {
+		  return this._class && this._class.indexOf('dgrid-autoheight') >= 0;
 		},
-		_setClass:function(){
-			var before=this._hasAutoHeight();
+		_setClass: function () {
+			var before = this._hasAutoHeight();
 			this.inherited(arguments);
-			if (before!==this._hasAutoHeight()) //relink event
+			if (before !== this._hasAutoHeight()) //relink event
 				this._scrollEvent();
 		},
-		_scrollSignal:undefined,
-		_scrollEvent:function(){
-			var self=this;
+		_scrollSignal: undefined,
+		_scrollEvent: function () {
+			var self = this;
 			if (this._scrollSignal)
 			  this._scrollSignal.remove();
-			var node=this.bodyNode;
+			var node = this.bodyNode;
 			if (this._hasAutoHeight())
-			  node=this.params.parentNode||window;
-			this._scrollSignal=on(node, 'scroll',
+			  node = this.params.parentNode || window;
+			this._scrollSignal = on(node, 'scroll',
 				miscUtil[this.pagingMethod](function (event) {
 					self._processScroll(event);
 				}, null, this.pagingDelay)
@@ -364,9 +363,9 @@ define([
 				// References related to emitting dgrid-refresh-complete if applicable
 				lastRows,
 				preloadSearchNext = true;
+				
 			if (this._hasAutoHeight()){
-				var parentNode=this.params.parentNode||window;
-
+				var parentNode = this.params.parentNode||window;
 				var cumulativeOffset = function(element,parent) {
     					var top = 0, left = 0;
     					do {
@@ -381,8 +380,8 @@ define([
         					left: left
     					};
 				};
-				visibleTop=Math.max(0,parentNode.scrollY-cumulativeOffset(scrollNode,parentNode).top);
-				visibleBottom=parentNode.innerHeight+visibleTop;
+				visibleTop = Math.max(0,parentNode.scrollY - cumulativeOffset(scrollNode,parentNode).top);
+				visibleBottom = parentNode.innerHeight + visibleTop;
 			}
 			// XXX: I do not know why this happens.
 			// munging the actual location of the viewport relative to the preload node by a few pixels in either
