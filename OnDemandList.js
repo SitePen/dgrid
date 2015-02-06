@@ -367,19 +367,21 @@ define([
 			if (this._hasAutoHeight()){
 				var parentNode=this.params.parentNode||window;
 
-				var cumulativeOffset = function(element) {
+				var cumulativeOffset = function(element,parent) {
     					var top = 0, left = 0;
     					do {
         					top += element.offsetTop  || 0;
         					left += element.offsetLeft || 0;
         					element = element.offsetParent;
+        					if (element == parent)
+        						break;
     					} while(element);
 					return {
         					top: top,
         					left: left
     					};
 				};
-				visibleTop=Math.max(0,parentNode.scrollY-cumulativeOffset(scrollNode).top);
+				visibleTop=Math.max(0,parentNode.scrollY-cumulativeOffset(scrollNode,parentNode).top);
 				visibleBottom=parentNode.innerHeight+visibleTop;
 			}
 			// XXX: I do not know why this happens.
