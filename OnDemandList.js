@@ -76,7 +76,13 @@ define([
 			// check visibility on scroll events
 			this._scrollEvent();
 		},
-
+		destroy: function () {
+			this.inherited(arguments);
+			if (this._refreshTimeout) {
+				clearTimeout(this._refreshTimeout);
+			}
+ 		},
+ 
 		renderQuery: function (query, options) {
 			// summary:
 			//		Creates a preload node for rendering a query into, and executes the query
@@ -164,7 +170,7 @@ define([
 							self._total = total;
 						}
 						// now we need to adjust the height and total count based on the first result set
-						if (total === 0) {
+						if (total === 0 && parentNode) {
 							if (noDataNode) {
 								put(noDataNode, '!');
 								delete self.noDataNode;
@@ -247,12 +253,13 @@ define([
 				}).then(function () {
 					// Emit on a separate turn to enable event to be used consistently for
 					// initial render, regardless of whether the backing store is async
-					setTimeout(function () {
+					self._refreshTimeout = setTimeout(function () {
 						on.emit(self.domNode, 'dgrid-refresh-complete', {
 							bubbles: true,
 							cancelable: false,
 							grid: self
 						});
+						self._refreshTimeout = null;
 					}, 0);
 				});
 			}
