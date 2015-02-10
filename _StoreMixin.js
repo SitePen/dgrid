@@ -325,7 +325,7 @@ define([
 
 					updating[id] = true;
 					// Put it in the store, returning the result/promise
-					return when(store.put(object), function () {
+					return store.put(object).then(function () {
 						// Clear the item now that it's been confirmed updated
 						delete dirty[id];
 						delete updating[id];
@@ -417,7 +417,7 @@ define([
 			options = lang.mixin({ rows: this._rows }, options);
 			var self = this;
 
-			return when(results).then(function (resolvedResults) {
+			return results.then(function (resolvedResults) {
 				var resolvedRows = self.renderArray(resolvedResults, beforeNode, options);
 				delete self._lastCollection; // used only for non-store List/Grid
 				return resolvedRows;

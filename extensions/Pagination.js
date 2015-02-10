@@ -461,7 +461,7 @@ define([
 					this._topLevelRequest = rows;
 				}
 
-				when(rows, function () {
+				rows.then(function () {
 					if (grid._topLevelRequest) {
 						// Remove reference to request now that it's finished
 						delete grid._topLevelRequest;
@@ -547,7 +547,7 @@ define([
 						grid._rows.max = start + count - 1;
 					}
 
-					when(results.totalLength, function (total) {
+					results.totalLength.then(function (total) {
 						if (!total) {
 							if (grid.noDataNode) {
 								put(grid.noDataNode, '!');

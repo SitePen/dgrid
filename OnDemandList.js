@@ -160,7 +160,7 @@ define([
 
 				// Render the result set
 				return self.renderQueryResults(results, preloadNode, options).then(function (trs) {
-					return when(results.totalLength, function (total) {
+					return results.totalLength.then(function (total) {
 						var trCount = trs.length,
 							parentNode = preloadNode.parentNode,
 							noDataNode = self.noDataNode;
@@ -285,12 +285,12 @@ define([
 			var collection = this._renderedCollection;
 
 			if (collection && collection.releaseRange) {
-				when(rows, function (resolvedRows) {
+				rows.then(function (resolvedRows) {
 					if (resolvedRows[0] && !resolvedRows[0].parentNode.tagName) {
 						// Release this range, since it was never actually rendered;
 						// need to wait until totalLength promise resolves, since
 						// Trackable only adds the range then to begin with
-						when(results.totalLength, function () {
+						results.totalLength.then(function () {
 							collection.releaseRange(resolvedRows[0].rowIndex,
 								resolvedRows[resolvedRows.length - 1].rowIndex + 1);
 						});
@@ -623,7 +623,7 @@ define([
 									});
 								}
 
-								when(rangeResults.totalLength, function (total) {
+								rangeResults.totalLength.then(function (total) {
 									if (!('queryLevel' in options)) {
 										grid._total = total;
 										if (grid._rows && grid._rows.max >= grid._total - 1) {

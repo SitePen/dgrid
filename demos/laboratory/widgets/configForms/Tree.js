@@ -3,7 +3,6 @@ define([
 	'dojo/_base/lang',
 	'dojo/dom-construct',
 	'dojo/topic',
-	'dojo/when',
 	'dojo/store/Memory',
 	'./ConfigForm',
 	'dojo/text!./templates/Tree.html',
@@ -11,7 +10,7 @@ define([
 	// for template
 	'dijit/form/FilteringSelect',
 	'dijit/form/RadioButton'
-], function (declare, lang, domConstruct, topic, when, Memory, ConfigForm, template, Tree) {
+], function (declare, lang, domConstruct, topic, Memory, ConfigForm, template, Tree) {
 	return declare(ConfigForm, {
 		templateString: template,
 		defaultsObject: Tree.prototype,
@@ -29,7 +28,7 @@ define([
 			var data = [];
 			var firstValue;
 
-			when(columnStore.fetch().forEach(function (column) {
+			columnStore.fetch().forEach(function (column) {
 				if (!firstValue) {
 					firstValue = column.field;
 				}
@@ -37,7 +36,7 @@ define([
 					id: column.field,
 					name: column.field
 				});
-			})).then(function () {
+			}).then(function () {
 				self.expandoSelect.set('store', new Memory({ data: data }));
 				// Select the first column by default
 				// (in case the user selects tree without first visiting the options)
