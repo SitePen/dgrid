@@ -3,10 +3,11 @@ define([
 	'dojo/_base/lang',
 	'dojo/Deferred',
 	'dojo/aspect',
+	'dojo/has',
 	'dojo/on',
 	'dojo/when',
 	'put-selector/put'
-], function (declare, lang, Deferred, aspect, on, when, put) {
+], function (declare, lang, Deferred, aspect, has, on, when, put) {
 	// This module isolates the base logic required by store-aware list/grid
 	// components, e.g. OnDemandList/Grid and the Pagination extension.
 
@@ -416,6 +417,16 @@ define([
 
 			options = lang.mixin({ rows: this._rows }, options);
 			var self = this;
+
+			if (!has('dojo-built')) {
+				// Check for null/undefined totalResults to help diagnose faulty services/stores
+				results.totalLength.then(function (total) {
+					if (total == null) {
+						console.warn('Store reported null or undefined totalLength. ' +
+							'Make sure your store (and service, if applicable) are reporting total correctly!');
+					}
+				});
+			}
 
 			return results.then(function (resolvedResults) {
 				var resolvedRows = self.renderArray(resolvedResults, beforeNode, options);
