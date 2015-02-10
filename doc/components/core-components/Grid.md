@@ -28,6 +28,7 @@ component also exposes the following properties and methods.
 Property | Description
 -------- | -----------
 `formatterScope` | Optional object; if specified, column formatters may be specified as strings instead of functions, in which case they will be searched for as properties within the given `formatterScope` object, and executed in the context of that object.
+`hasNeutralSort` | Boolean; controls behavior when clicking the same column heading repeatedly.  `false` (the default) alternates between sorting ascending and descending.  `true` alternates between ascending, descending, and no sort.
 
 ### Method Summary
 
