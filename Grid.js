@@ -22,11 +22,20 @@ define([
 
 	var Grid = declare(List, {
 		columns: null,
+
+		// hasNeutralSort: Boolean
+		//		Determines behavior of toggling sort on the same column.
+		//		If false, sort toggles between ascending and descending and cannot be
+		//		reset to neutral without sorting another column.
+		//		If true, sort toggles between ascending, descending, and neutral.
+		hasNeutralSort: false,
+
 		// cellNavigation: Boolean
 		//		This indicates that focus is at the cell level. This may be set to false to cause
 		//		focus to be at the row level, which is useful if you want only want row-level
 		//		navigation.
 		cellNavigation: true,
+
 		tabableHeader: true,
 		showHeader: true,
 		column: function (target) {
@@ -260,17 +269,30 @@ define([
 				// respond to click, space keypress, or enter keypress
 				if (event.type === 'click' || event.keyCode === 32 ||
 						(!has('opera') && event.keyCode === 13)) {
-					var target = event.target,
-						field, sort, newSort, eventObj;
+					var target = event.target;
+					var field;
+					var sort;
+					var newSort;
+					var eventObj;
+
 					do {
 						if (target.sortable) {
-							// If the click is on the same column as the active sort,
-							// reverse sort direction
-							newSort = [{
-								property: (field = target.field || target.columnId),
-								descending: (sort = grid.sort[0]) && sort.property === field &&
-									!sort.descending
-							}];
+							field = target.field || target.columnId;
+							sort = grid.sort[0];
+							if (!grid.hasNeutralSort || !sort || sort.property !== field || !sort.descending) {
+								// If the user toggled the same column as the active sort,
+								// reverse sort direction
+								newSort = [{
+									property: field,
+									descending: sort && sort.property === field &&
+										!sort.descending
+								}];
+							}
+							else {
+								// If the grid allows neutral sort and user toggled an already-descending column,
+								// clear sort entirely
+								newSort = [];
+							}
 
 							// Emit an event with the new sort
 							eventObj = {
