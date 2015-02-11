@@ -68,7 +68,10 @@ define([
 		//		specific calls to refresh.
 		keepScrollPosition: false,
 
-		rowHeight: 22,
+		// rowHeight: Number
+		//		Average row height, computed in renderQuery during the rendering of
+		//		the first range of data.
+		rowHeight: 0,
 
 		postCreate: function () {
 			this.inherited(arguments);
@@ -333,6 +336,11 @@ define([
 			// summary:
 			//		Checks to make sure that everything in the viewable area has been
 			//		downloaded, and triggering a request for the necessary data when needed.
+
+			if (!this.rowHeight) {
+				return;
+			}
+
 			var grid = this,
 				scrollNode = grid.bodyNode,
 				// grab current visible top from event if provided, otherwise from node

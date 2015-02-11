@@ -5,6 +5,7 @@ define([
 	'dojo/_base/declare',
 	'dojo/aspect',
 	'dojo/Deferred',
+	'dgrid/OnDemandList',
 	// column.set can't be tested independently from a Grid,
 	// so we are testing through OnDemandGrid for now.
 	'dgrid/OnDemandGrid',
@@ -12,7 +13,8 @@ define([
 	'dgrid/test/data/createSyncStore',
 	'dgrid/test/data/genericData',
 	'dojo/domReady!'
-], function (test, assert, lang, declare, aspect, Deferred, OnDemandGrid, ColumnSet, createSyncStore, genericData) {
+], function (test, assert, lang, declare, aspect, Deferred,
+		OnDemandList, OnDemandGrid, ColumnSet, createSyncStore, genericData) {
 
 	// Helper method used to set column set() methods for various grid compositions
 	function testSetMethod(grid, dfd) {
@@ -81,7 +83,7 @@ define([
 
 			test.beforeEach(function () {
 				store = createSyncStore({ data: genericData });
-				grid = new OnDemandGrid({
+				grid = new OnDemandList({
 					collection: store
 				});
 				document.body.appendChild(grid.domNode);
@@ -127,7 +129,7 @@ define([
 				notificationCount = 0,
 				lastNotificationEvent = null;
 
-			grid = new OnDemandGrid({
+			grid = new OnDemandList({
 				collection: store,
 				_onNotification: function (rows, event) {
 					notificationCount++;
@@ -184,7 +186,7 @@ define([
 			}
 
 			test.beforeEach(function () {
-				grid = new OnDemandGrid();
+				grid = new OnDemandList();
 
 				grid.on('dgrid-error', function (event) {
 					emittedErrorCount++;
@@ -283,11 +285,7 @@ define([
 			test.test('set(\'collection\') before startup should not cause superfluous refresh',  function () {
 				var numCalls = 0;
 
-				grid = new OnDemandGrid({
-					columns: {
-						col1: 'Column 1'
-					}
-				});
+				grid = new OnDemandList();
 
 				aspect.before(grid, 'refresh', function () {
 					numCalls++;
