@@ -258,7 +258,7 @@ define([
 			this.gotoPage(1);
 		},
 
-		_updateNavigation: function () {
+		_updateNavigation: function (total) {
 			// summary:
 			//		Update status and navigation controls based on total count from query
 
@@ -268,7 +268,7 @@ define([
 				currentPage = this._currentPage,
 				pagingLinks = this.pagingLinks,
 				paginationNavigationNode = this.paginationNavigationNode,
-				end = Math.ceil(this._total / this.rowsPerPage),
+				end = Math.ceil(total / this.rowsPerPage),
 				pagingTextBoxHandle = this._pagingTextBoxHandle,
 				focused = document.activeElement,
 				focusedPage,
@@ -441,7 +441,7 @@ define([
 			// If we're not updating the whole page, check if we at least need to update status/navigation
 			else if (collection === this._renderedCollection && event.totalLength !== this._total) {
 				this._updatePaginationStatus(event.totalLength);
-				this._updateNavigation();
+				this._updateNavigation(event.totalLength);
 			}
 		},
 
@@ -566,7 +566,7 @@ define([
 
 						// It's especially important that _updateNavigation is called only
 						// after renderQueryResults is resolved as well (to prevent jumping).
-						grid._updateNavigation();
+						grid._updateNavigation(total);
 					});
 
 					return results;
