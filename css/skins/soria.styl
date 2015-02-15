@@ -1,0 +1,25 @@
+@require 'nib/gradients';
+@require 'nib/vendor';
+
+$dgrid-border-color ?= #bba;
+$dgrid-background ?= #fff;
+$dgrid-color ?= #000;
+
+$dgrid-header-background ?= #f2f4fe;
+$dgrid-header-background-image ?= linear-gradient(top, #f2f4fe 0%,#d0dff5 50%,#c6d8f0 51%,#c2d5ef 100%);
+$dgrid-header-filter ?= unquote("progid:DXImageTransform.Microsoft.gradient( startColorstr='#f2f4fe', endColorstr='#c2d5ef',GradientType=0 )");
+$dgrid-header-cell-border-color ?= #bba;
+$dgrid-header-cell-font-weight ?= bold;
+$dgrid-header-cell-hover-background ?= #d4deec;
+$dgrid-header-cell-hover-background-image ?= linear-gradient(top, #dae2ed 0%,#b2c7e8 49%,#a8c1eb 50%,#9ebaec 100%);
+
+$dgrid-body-cell-border-color ?= #ddc;
+
+$dgrid-body-row-hover-background-color ?= #60a1ea;
+
+$dgrid-selected-background-color ?= #aec7e3;
+$dgrid-highlight-background-color ?= #ff6;
+
+.soria {
+	@import 'skin';
+}

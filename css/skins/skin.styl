@@ -1,0 +1,96 @@
+@require 'nib/gradients';
+@require 'nib/vendor';
+
+addStyleIfDefined($property, $varname) {
+	$value = lookup($varname);
+	{$property}: $value if ($value);
+}
+
+applyVariables(name) {
+	// Applies variables (if defined) with a given prefix for several common styles.
+	// Used to implement variables for header/footer and various row states while avoiding repetition.
+	addStyleIfDefined(background, '$dgrid-' + name + '-background');
+	addStyleIfDefined(background-color, '$dgrid-' + name + '-background-color');
+	addStyleIfDefined(background-image, '$dgrid-' + name + '-background-image');
+	addStyleIfDefined(filter, '$dgrid-' + name + '-filter');
+	addStyleIfDefined(border-color, '$dgrid-' + name + '-border-color');
+	addStyleIfDefined(color, '$dgrid-' + name + '-color');
+}
+
+.dgrid {
+	background: $dgrid-background if ($dgrid-background is defined);
+	border-color: $dgrid-border-color if ($dgrid-border-color is defined);
+	color: $dgrid-color if ($dgrid-color is defined);
+}
+
+.dgrid-header,
+.dgrid-footer {
+	applyVariables(header);
+}
+
+.dgrid-header {
+	text-transform: $dgrid-header-text-transform if ($dgrid-header-text-transform is defined);
+
+	.dgrid-cell {
+		border-color: $dgrid-header-cell-border-color if ($dgrid-header-cell-border-color is defined);
+		font-weight: $dgrid-header-cell-font-weight if ($dgrid-header-cell-font-weight is defined);
+
+		&:hover {
+			if ($dgrid-header-cell-hover-background is defined) {
+				background: $dgrid-header-cell-hover-background;
+			}
+			if ($dgrid-header-cell-hover-background-image is defined) {
+				background-image: $dgrid-header-cell-hover-background-image;
+			}
+		}
+	}
+}
+
+.dgrid-row {
+	applyVariables(body-row);
+	transition-duration: $dgrid-body-row-transition-duration if ($dgrid-body-row-transition-duration is defined);
+	transition-property: $dgrid-body-row-transition-property if ($dgrid-body-row-transition-property is defined);
+}
+.dgrid-row-odd {
+	applyVariables(body-row-odd);
+}
+.dgrid-row:hover {
+	applyVariables(body-row-hover);
+}
+
+.dgrid-selected {
+	applyVariables(selected);
+}
+.dgrid-selected:hover {
+	applyVariables(selected-hover);
+}
+
+.dgrid-highlight {
+	applyVariables(highlight);
+}
+
+.dgrid-cell {
+	border-color: $dgrid-body-cell-border-color if ($dgrid-body-cell-border-color is defined);
+}
+
+if ($dgrid-suppress-cell-borders == true) {
+	.dgrid-cell {
+		border-left: none;
+		border-right: none;
+	}
+}
+
+if ($dgrid-use-white-sort-arrow == true) {
+	.dgrid-sort-arrow {
+		background-image: url('../images/ui-icons_ffffff_256x240.png');
+	}
+}
+
+if ($dgrid-column-reorder-border is defined) {
+	.dgrid-header .dojoDndItemBefore {
+		border-left: $dgrid-column-reorder-border;
+	}
+	.dgrid-header .dojoDndItemAfter {
+		border-right: $dgrid-column-reorder-border;
+	}
+}

@@ -1,0 +1,31 @@
+$dgrid-border-color ?= #bba;
+$dgrid-background ?= #fff;
+$dgrid-color ?= #000;
+
+$dgrid-header-background-color ?= #fff;
+$dgrid-header-cell-border-color ?= #bba;
+$dgrid-header-cell-font-weight ?= bold;
+
+$dgrid-body-cell-border-color ?= #ddc;
+
+$dgrid-body-row-hover-background-color ?= #ffe284;
+
+$dgrid-selected-background-color ?= #aec7e3;
+$dgrid-highlight-background-color ?= #ff6;
+
+$dgrid-header-cell-border-right-color ?= #acab99;
+$dgrid-footer-border-color ?= #919191;
+
+.nihilo {
+	@import 'skin';
+
+	.dgrid-header {
+		.dgrid-cell {
+			border-right-color: $dgrid-header-cell-border-right-color;
+		}
+	}
+
+	.dgrid-footer {
+		border-top: 1px solid $dgrid-footer-border-color;
+	}
+}

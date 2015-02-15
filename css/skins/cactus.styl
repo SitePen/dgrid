@@ -1,0 +1,65 @@
+@require 'nib/gradients';
+@require 'nib/vendor';
+
+$dgrid-background ?= #faffef;
+$dgrid-color ?= #000;
+
+$dgrid-header-background ?= #333;
+$dgrid-header-background-image ?= linear-gradient(top, #4e4e4e 0%,#555555 12%,#636363 25%,#505050 39%,#303030 49%,#000000 50%,#1c1c1c 60%,#292929 76%,#1e1e1e 91%,#141414 100%);
+$dgrid-header-filter ?= unquote("progid:DXImageTransform.Microsoft.gradient( startColorstr='#4e4e4e', endColorstr='#141414',GradientType=0 )");
+$dgrid-header-color ?= #fff;
+$dgrid-header-cell-border-color ?= #111;
+$dgrid-header-cell-font-weight ?= bold;
+$dgrid-header-text-transform ?= uppercase;
+
+$dgrid-body-cell-border-color ?= #bbc581;
+
+$dgrid-body-row-odd-background ?= #9a6;
+$dgrid-body-row-odd-background-image ?= linear-gradient(top, rgba(185,203,127,1) 0%,rgba(143,160,91,1) 100%);
+$dgrid-body-row-odd-filter ?= unquote("progid:DXImageTransform.Microsoft.gradient( startColorstr='#b9cb7f', endColorstr='#8fa05b',GradientType=0 )");
+$dgrid-body-row-odd-border ?= 1px solid #ccd595;
+$dgrid-body-row-odd-color ?= #fff;
+$dgrid-body-cell-odd-border ?= 1px solid #e9efbd;
+$dgrid-body-row-even-border ?= 1px solid #fff;
+
+$dgrid-body-row-hover-background ?= none;
+$dgrid-body-row-hover-background-color ?= #555;
+$dgrid-body-row-hover-filter ?= none;
+$dgrid-body-row-hover-color ?= #fff;
+$dgrid-body-row-hover-border-color ?= $dgrid-body-row-hover-background-color;
+
+$dgrid-selected-background ?= none;
+$dgrid-selected-background-color ?= #333;
+$dgrid-selected-filter ?= none;
+$dgrid-selected-border-color ?= $dgrid-selected-background-color;
+$dgrid-selected-color ?= #fff;
+
+$dgrid-selected-hover-background ?= $dgrid-selected-background-color;
+$dgrid-selected-hover-border-color ?= $dgrid-selected-border-color;
+
+$dgrid-highlight-background ?= none;
+$dgrid-highlight-background-color ?= #d6e5a5;
+$dgrid-highlight-filter ?= none;
+$dgrid-highlight-color ?= #000;
+
+$dgrid-use-white-sort-arrow ?= true;
+$dgrid-suppress-cell-borders ?= true;
+
+$dgrid-column-reorder-border ?= 2px dotted #fff !important;
+
+.cactus {
+	@import 'skin';
+
+	.dgrid-header-row {
+		border-bottom: none;
+	}
+
+	.dgrid-header .dgrid-cell {
+		padding: 7px 3px;
+		text-shadow: 0 -1px 0 rgba(0,0,0,.9);
+	}
+
+	.dgrid-highlight {
+		text-shadow: none;
+	}
+}
