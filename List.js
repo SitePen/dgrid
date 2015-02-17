@@ -73,9 +73,9 @@ define([
 	});
 
 	// var and function for autogenerating ID when one isn't provided
-	var autogen = 0;
+	var autoId = 0;
 	function generateId() {
-		return 'dgrid_' + autogen++;
+		return List.autoIdPrefix + autoId++;
 	}
 
 	// common functions for class and className setters/getters
@@ -98,7 +98,7 @@ define([
 		}
 	};
 
-	return declare(null, {
+	var List = declare(null, {
 		tabableHeader: false,
 
 		// showHeader: Boolean
@@ -381,7 +381,7 @@ define([
 			//		refreshes the contents of the grid
 			this.cleanup();
 			this._rowIdToObject = {};
-			this._autoId = 0;
+			this._autoRowId = 0;
 
 			// make sure all the content has been removed so it can be recreated
 			this.contentNode.innerHTML = '';
@@ -468,7 +468,7 @@ define([
 			// no-op in a plain list
 		},
 
-		_autoId: 0,
+		_autoRowId: 0,
 		insertRow: function (object, parent, beforeNode, i, options) {
 			// summary:
 			//		Creates a single row in the grid.
@@ -477,7 +477,7 @@ define([
 			// (This is used by tree to allow the same object to appear under
 			// multiple parents.)
 			var id = this.id + '-row-' + ((this.collection && this.collection.getIdentity) ?
-					this.collection.getIdentity(object) : this._autoId++),
+					this.collection.getIdentity(object) : this._autoRowId++),
 				row = byId(id),
 				previousRow = row && row.previousSibling;
 
@@ -827,4 +827,8 @@ define([
 			this.resize(); // to account for (dis)appearance of footer
 		}
 	});
+
+	List.autoIdPrefix = 'dgrid_';
+
+	return List;
 });

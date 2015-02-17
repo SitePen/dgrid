@@ -72,3 +72,12 @@ Method | Description
 `scrollTo(options)` | scrolls to a given point in the grid.  Accepts `x` and `y` properties; if one is not given, position along that axis is not modified.
 `getScrollPosition()` | returns the current position that the grid is scrolled to, in the form of an object containing `x` and `y` properties.
 `addCssRule(selector, css)` | Programmatically adds styles for a given CSS selector by injecting the given rule string into a stylesheet in the document.  Returns a handle with a `remove` function, which can be called to later remove the added style rule.  Styles added via this method will be removed when the instance is destroyed if `cleanAddedRules` is set to `true`.
+
+## Overriding the Prefix for Auto-generated IDs
+
+When a dgrid instance is created with no ID specified (via the `id` property in the constructor arguments, or the
+`id` attribute of an existing DOM node), an ID is automatically generated.  Auto-generated IDs follow the pattern
+`dgrid_` followed by an automatically-incremented number.
+
+As of dgrid 0.4.1, the `dgrid_` prefix for auto-generated IDs is exposed via `List.autoIdPrefix` (a property on the
+constructor, not the prototype) and can be overridden if desired.
