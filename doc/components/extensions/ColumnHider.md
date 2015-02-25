@@ -31,7 +31,15 @@ require([
 ```
 
 **Note:** This extension is only fully supported for cases of simple, single-row
-column layouts.
+column layouts.  It can also be used with the [CompoundColumns](./CompoundColumns.md) extension.
+
+## API
+
+### Method Summary
+
+Method | Description
+------ | -----------
+`toggleColumnHiddenState(id, hidden)` | Toggles or sets the hidden state of the column with the specified `id`.  Hides the column if `hidden` is `true`, shows it if `false`, and toggles the current state if unspecified.
 
 ## Additional Column Definition Properties
 
