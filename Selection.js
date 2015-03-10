@@ -62,12 +62,8 @@ define([
 
 	function setSelectable(grid, selectable) {
 		// Alternative version of dojo/dom.setSelectable based on feature detection.
-
-		// For FF < 21, use -moz-none, which will respect -moz-user-select: text on
-		// child elements (e.g. form inputs).  In FF 21, none behaves the same.
-		// See https://developer.mozilla.org/en-US/docs/CSS/user-select
 		var node = grid.bodyNode,
-			value = selectable ? 'text' : has('ff') < 21 ? '-moz-none' : 'none';
+			value = selectable ? 'text' : 'none';
 
 		// In IE10+, -ms-user-select: none will block selection from starting within the
 		// element, but will not block an existing selection from entering the element.
