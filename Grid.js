@@ -258,8 +258,7 @@ define([
 			}
 			this._sortListener = listen(row, 'click,keydown', function (event) {
 				// respond to click, space keypress, or enter keypress
-				if (event.type === 'click' || event.keyCode === 32 ||
-						(!has('opera') && event.keyCode === 13)) {
+				if (event.type === 'click' || event.keyCode === 32 || event.keyCode === 13) {
 					var target = event.target,
 						field, sort, newSort, eventObj;
 					do {
