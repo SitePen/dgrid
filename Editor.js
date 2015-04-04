@@ -402,7 +402,7 @@ define([
 				}
 
 				if (editor === 'textarea') {
-					tagName === 'textarea';
+					tagName = 'textarea';
 				}
 				else {
 					tagName = 'input';
