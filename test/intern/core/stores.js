@@ -11,12 +11,14 @@ define([
 	'dgrid/test/data/createSyncStore',
 	'dgrid/test/data/createAsyncStore',
 	'dgrid/test/data/genericData',
-	'dgrid/test/data/testPerformanceStore'
+	'dgrid/test/data/testPerformanceStore',
+	'../addCss!'
 ], function (test, assert, declare, aspect, on, Grid, OnDemandGrid, Pagination,
 		errorStores, createSyncStore, createAsyncStore, genericData, testPerformanceStore) {
 
-	var PaginationGrid = declare([Grid, Pagination]),
-		grid;
+	var PaginationGrid = declare([Grid, Pagination]);
+	var grid;
+	var handles = [];
 
 	// Common reusable function for tests
 	function storeTest(CustomGrid, store, expectSuccess, dfd) {
@@ -29,7 +31,7 @@ define([
 
 		// Hook up event handler before calling startup, to be able to
 		// test both synchronous and asynchronous stores
-		on.once(grid, expectedEvent, function () {
+		handles.push(on.once(grid, expectedEvent, function () {
 			// After receiving the expected event, perform a refresh,
 			// to also test resolution/rejection of the promise it returns.
 			grid.refresh().then(function () {
@@ -37,13 +39,13 @@ define([
 			}, function () {
 				dfd[!expectSuccess ? 'resolve' : 'reject']();
 			});
-		});
+		}));
 
 		// Also hook up the opposite event handler, to signal failure
-		on.once(grid, unexpectedEvent, function () {
+		handles.push(on.once(grid, unexpectedEvent, function () {
 			dfd.reject(new Error('Expected ' + expectedEvent + ' to fire, but ' +
 				unexpectedEvent + ' fired instead.'));
-		});
+		}));
 
 		document.body.appendChild(grid.domNode);
 		grid.startup();
@@ -55,15 +57,35 @@ define([
 			collection: testPerformanceStore,
 			columns: {
 				id: 'ID'
-			}
+			},
+			sort: 'id'
 		});
 		document.body.appendChild(grid.domNode);
 		grid.startup();
 	}
 
+	function testReleaseRange(visibleId) {
+		var numInserts = 0;
+
+		handles.push(aspect.after(grid, 'insertRow', function () {
+			numInserts++;
+		}, true));
+
+		testPerformanceStore.putSync(testPerformanceStore.getSync(0));
+		assert.strictEqual(numInserts, 0,
+			'Item from unrendered range should not be added to grid when updated');
+		testPerformanceStore.putSync(testPerformanceStore.getSync(visibleId || 19999));
+		assert.strictEqual(numInserts, 1,
+			'Item from rendered range should be re-added to grid when updated');
+	}
+
 	test.suite('stores', function () {
 		// Setup / teardown
 		test.afterEach(function () {
+			for (var i = handles.length; i--;) {
+				handles[i].remove();
+			}
+			handles = [];
 			grid.destroy();
 		});
 
@@ -86,17 +108,14 @@ define([
 			storeTest(OnDemandGrid, errorStores.asyncFetchTotal, false, this.async());
 		});
 
-		test.test('OnDemandGrid releases ranges appropriately', function () {
+		test.test('OnDemandGrid observes/releases ranges appropriately', function () {
 			var dfd = this.async();
 			createReleaseRangeGrid(OnDemandGrid);
 
 			// Since _processScroll gets called on a debounce, need to wait for it
-			aspect.after(grid, '_processScroll', dfd.callback(function () {
-				assert.isUndefined(grid._renderedCollection._partialResults[0],
-					'Observed partial results should not include first item after scrolling');
-				assert.isDefined(grid._renderedCollection._partialResults[testPerformanceStore.data.length - 1],
-					'Observed partial results should include last item after scrolling');
-			}));
+			handles.push(aspect.after(grid, '_processScroll', dfd.callback(function () {
+				testReleaseRange();
+			}), true));
 
 			grid.scrollTo({ y: grid.bodyNode.scrollHeight });
 			return dfd;
@@ -114,13 +133,10 @@ define([
 			storeTest(PaginationGrid, errorStores.asyncFetch, false, this.async());
 		});
 
-		test.test('Pagination releases ranges appropriately', function () {
+		test.test('Pagination observes/releases ranges appropriately', function () {
 			createReleaseRangeGrid(PaginationGrid);
 			grid.gotoPage(2);
-			assert.isUndefined(grid._renderedCollection._partialResults[0],
-				'Observed partial results should not include first item after going to next page');
-			assert.isDefined(grid._renderedCollection._partialResults[grid.rowsPerPage],
-				'Observed partial results should include first item on second page after going to next page');
+			testReleaseRange(10);
 		});
 	});
 
