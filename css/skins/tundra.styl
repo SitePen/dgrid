@@ -1,0 +1,25 @@
+@require 'nib/gradients';
+@require 'nib/vendor';
+
+$dgrid-background ?= #fff;
+$dgrid-color ?= #000;
+$dgrid-border-color ?= #bba;
+
+$dgrid-header-background ?= #e8e8e8;
+$dgrid-header-background-image ?= linear-gradient(top, #ffffff 0%,#e8e8e8 100%);
+$dgrid-header-filter ?= unquote("progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#e8e8e8',GradientType=0 )");
+$dgrid-header-cell-border-color ?= #bba;
+$dgrid-header-cell-font-weight ?= bold;
+$dgrid-header-cell-hover-background ?= #f6f6f6;
+$dgrid-header-cell-hover-background-image ?= linear-gradient(top, #ffffff 0%,#eeeeee 100%);
+
+$dgrid-body-cell-border-color ?= #ddc;
+
+$dgrid-body-row-hover-background-color ?= #60a1ea;
+
+$dgrid-selected-background-color ?= #aec7e3;
+$dgrid-highlight-background-color ?= #ff6;
+
+.tundra {
+	@import 'skin';
+}

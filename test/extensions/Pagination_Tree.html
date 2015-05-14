@@ -6,6 +6,8 @@
 		<meta name="viewport" content="width=570">
 		<style>
 			@import "../../../dojo/resources/dojo.css";
+			@import "../../css/dgrid.css";
+			@import "../../css/skins/claro.css";
 			.heading {
 				font-weight: bold;
 				padding-bottom: 0.25em;
@@ -14,7 +16,7 @@
 				width: 750px;
 				margin: 10px;
 			}
-			
+
 			#grid2 .dgrid-row {
 				height: 22px;
 			}
@@ -23,23 +25,16 @@
 				white-space: nowrap;
 			}
 		</style>
-		<script src="../../../dojo/dojo.js" 
+		<script src="../../../dojo/dojo.js"
 			data-dojo-config="async: true"></script>
 		<script>
-			// allow retrieving skin from GET param
-			var skin = "claro",
-				match = /\bskin=([^&]*)/.exec(location.search),
-				skinDep, updateGrid;
-			if(match){ skin = match[1]; }
-			skinDep = "xstyle/css!dgrid/css/skins/" + skin + ".css";
-			
-			require([skinDep, "dgrid/Grid", "dgrid/extensions/Pagination", "dgrid/Selection", "dgrid/Tree",
-					"dojo/_base/lang", "dojo/_base/declare", "dojo/dom-construct", "dojo/dom-form", 
+			require(["dgrid/Grid", "dgrid/extensions/Pagination", "dgrid/Selection", "dgrid/Tree",
+					"dojo/_base/lang", "dojo/_base/declare", "dojo/dom-construct", "dojo/dom-form",
 					"dstore/Rest", "dstore/Cache", "dstore/Trackable", "dstore/Tree", "dojo/domReady!"],
-				function(skinResource, Grid, Pagination, Selection, Tree,
-						lang, declare, domConstruct, domForm, 
+				function(Grid, Pagination, Selection, Tree,
+						lang, declare, domConstruct, domForm,
 						Rest, Cache, Trackable, TreeStore){
-					
+
 					var CustomGrid = declare([Grid, Selection, Pagination, Tree]);
 					var testStore;
 
@@ -57,9 +52,7 @@
 							{label:'Comment', field:'comment', sortable: false}
 						];
 					}
-					
-					document.body.className = skin;
-					
+
 					window.grid2 = new CustomGrid({
 						className: "dgrid-autoheight",
 						collection: testStore,
@@ -69,7 +62,7 @@
 						firstLastArrows: true,
 						pageSizeOptions: [10, 15, 25]
 					}, "grid2");
-					
+
 					function createGrid(args){
 						window.grid = new CustomGrid(lang.mixin({
 									collection: testStore,
@@ -78,7 +71,7 @@
 							"grid");
 					}
 					createGrid();
-					
+
 					var form = document.getElementById("configForm");
 					form.onsubmit = function() {
 						var args = domForm.toObject(form);
@@ -98,7 +91,7 @@
 				});
 		</script>
 	</head>
-	<body>
+	<body class="claro">
 		<h2>A basic grid with the Pagination extension with tree plugin</h2>
 		<h3>Configuration</h3>
 		<form id="configForm">

@@ -5,45 +5,47 @@
 		<title>DnD test dragging tree children</title>
 		<style>
 			@import "../../../dojo/resources/dojo.css";
+			@import "../../../dojo/resources/dnd.css";
+			@import "../../css/dgrid.css";
 			/* need a theme for some dnd styles (e.g. before/after indicators).
 			   Using tundra because claro has a silly dojoDndItemBefore/After bug
 			*/
 			@import "../../../dijit/themes/tundra/tundra.css";
 			@import "../../css/skins/tundra.css";
-			
+
 			.clear { clear: both; }
-			
+
 			.dojoDndItem { padding: 0; } /* override dijit.css */
-			
+
 			#treegrid, #targetlist {
 				float: left;
 				height: 20em;
 			}
-			
+
 			#treegrid {
 				width: 500px;
 			}
-			
+
 			#targetlist {
 				width: 400px;
 				margin-left: 20px;
 			}
 		</style>
-		<script src="../../../dojo/dojo.js" 
+		<script src="../../../dojo/dojo.js"
 			data-dojo-config="async: true"></script>
 		<script>
 			require(["dojo/_base/declare",
 				"dgrid/OnDemandList", "dgrid/OnDemandGrid", "dgrid/Keyboard", "dgrid/Selection",
-				"dgrid/extensions/DnD", "dgrid/Tree", "put-selector/put",
+				"dgrid/extensions/DnD", "dgrid/Tree",
 				"dgrid/test/data/createHierarchicalStore", "dgrid/test/data/hierarchicalCountryData",
 				"dgrid/test/data/createOrderedStore", "dojo/domReady!"],
 			function(
-				declare, OnDemandList, OnDemandGrid, Keyboard, Selection, DnD, Tree, put,
+				declare, OnDemandList, OnDemandGrid, Keyboard, Selection, DnD, Tree,
 				createHierarchicalStore, hierarchicalCountryData, createOrderedStore
 			){
 				var DnDList = declare([OnDemandList, Keyboard, Selection, DnD]),
 					DnDGrid = declare([OnDemandGrid, Keyboard, Selection, Tree, DnD]);
-				
+
 				// Create a grid with hierarchical items to be dragged to the target list.
 				window.treegrid = new DnDGrid({
 					columns: [
@@ -60,12 +62,14 @@
 						}
 					}
 				}, "treegrid");
-				
+
 				// Create the target list.
 				window.targetgrid = new DnDList({
 					collection: createOrderedStore(),
 					renderRow: function(object) {
-						return put("div", object.name);
+						var div = document.createElement('div');
+						div.appendChild(document.createTextNode(object.name));
+						return div;
 					},
 					dndParams: {
 						isSource: false
@@ -79,6 +83,6 @@
 			tree parents and children.  Note that this requires Dojo 1.8 or higher.</p>
 		<div id="treegrid"></div>
 		<div id="targetlist"></div>
-		
+
 	</body>
 </html>

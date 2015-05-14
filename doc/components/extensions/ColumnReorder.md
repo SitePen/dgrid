@@ -5,6 +5,8 @@ via drag'n'drop operations on column headers. In the case of more complex grid
 structures, note that reordering is only supported between columns within the
 same subrow or columnset.
 
+**Note:** Be sure to include `dojo/resources/dnd.css` or equivalent custom styles when using this extension.
+
 ```js
 require([
     'dojo/_base/declare',

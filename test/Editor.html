@@ -6,6 +6,7 @@
 		<meta name="viewport" content="width=570">
 		<style>
 			@import "../../dojo/resources/dojo.css";
+			@import "../css/dgrid.css";
 			@import "../../dijit/themes/claro/claro.css";
 			@import "../css/skins/claro.css";
 
@@ -39,11 +40,11 @@
 			var grid, // stores global reference to grid instance
 					editFirst; // function defined within require callback
 
-			require(["dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Keyboard", "dgrid/Editor", "put-selector/put",
+			require(["dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Keyboard", "dgrid/Editor",
 				"dojo/_base/lang", "dojo/_base/declare", "dojo/on", "dojo/dom-construct",
 				"dojo/store/Memory", "dstore/Memory", "dstore/Trackable", "dojo/data/ObjectStore",
 				"dgrid/test/data/createAsyncStore", "dojo/domReady!"
-			], function(Grid, Selection, Keyboard, Editor, put, lang, declare, on, domConstruct, LegacyMemory, Memory, Trackable, ObjectStore, createAsyncStore){
+			], function(Grid, Selection, Keyboard, Editor, lang, declare, on, domConstruct, LegacyMemory, Memory, Trackable, ObjectStore, createAsyncStore){
 				var today = new Date(),
 						form = document.getElementById("editorForm"),
 						typesArea = document.getElementById("editorComponentTypes"),
@@ -114,7 +115,9 @@
 								label: "dijit/form/DateTextBox",
 								generate: generateDate,
 								renderCell: function(object, value){
-									return put("div", value ? value.toString() : "No Date");
+									var div = document.createElement("div");
+									div.appendChild(document.createTextNode(value ? value.toString() : "No Date"));
+									return div;
 								}
 							},
 							{

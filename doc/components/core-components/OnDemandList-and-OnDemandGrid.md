@@ -8,14 +8,17 @@ viewing large sets of data in a scalable manner.
 
 ```js
 require([
-    'dgrid/OnDemandList',
-    'put-selector/put'
-], function (OnDemandList, put) {
+    'dgrid/OnDemandList'
+], function (OnDemandList) {
     var list = new OnDemandList({
         collection: myStore, // a dstore collection
         renderRow: function (object, options) {
             // Override renderRow to accommodate store items
-            return put('div', object.myField);
+            var div = document.createElement('div');
+            // createTextNode is recommended for inserting data values,
+            // to avoid malicious tag injection
+            div.appendChild(document.createTextNode(object.myField));
+            return div;
         }
     });
 });

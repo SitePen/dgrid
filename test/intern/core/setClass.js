@@ -7,31 +7,29 @@ define([
 	'dojo/_base/array',
 	'dojo/parser',
 	'dojo/dom-class',
-	'put-selector/put',
 	'dojo/dom-construct',
 	'dojo/text!../resources/setClass.html'
-], function (test, assert, List, Grid, GridFromHtml, arrayUtil, parser, domClass, put, domConstruct, gridTemplate) {
+], function (test, assert, List, Grid, GridFromHtml, arrayUtil, parser, domClass, domConstruct, gridTemplate) {
 
 	test.suite('setClass', function () {
 		// Tests
 		test.test('Lists + initially-defined classes', function () {
+			function renderRow(item) {
+				var div = document.createElement('div');
+				div.appendChild(document.createTextNode(item.name));
+				return div;
+			}
 			// Build three lists
 			var listC = window.listC = new List({
 					'class': 'c',
-					renderRow: function (item) {
-						return put('div', item.name);
-					}
+					renderRow: renderRow
 				}),
 				listCN = window.listCN = new List({
 					className: 'cn',
-					renderRow: function (item) {
-						return put('div', item.name);
-					}
+					renderRow: renderRow
 				}),
 				listDOM = window.listDOM = new List({
-					renderRow: function (item) {
-						return put('div', item.name);
-					}
+					renderRow: renderRow
 				}, domConstruct.create('div', {'class': 'dom'}));
 
 			// Check the classes on each List.domNode

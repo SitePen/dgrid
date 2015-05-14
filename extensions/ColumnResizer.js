@@ -4,13 +4,12 @@ define([
 	'dojo/query',
 	'dojo/_base/lang',
 	'dojo/dom',
+	'dojo/dom-construct',
 	'dojo/dom-geometry',
 	'dojo/has',
 	'../util/misc',
-	'put-selector/put',
-	'dojo/_base/html',
-	'xstyle/css!../css/extensions/ColumnResizer.css'
-], function (declare, listen, query, lang, dom, geom, has, miscUtil, put) {
+	'dojo/_base/html'
+], function (declare, listen, query, lang, dom, domConstruct, geom, has, miscUtil) {
 
 	function addRowSpan(table, span, startRow, column, id) {
 		// loop through the rows of the table and add this column's id to
@@ -143,17 +142,17 @@ define([
 	var resizer = {
 		// This object contains functions for manipulating the shared resizerNode
 		create: function () {
-			resizerNode = put('div.dgrid-column-resizer');
+			resizerNode = domConstruct.create('div', { className: 'dgrid-column-resizer' });
 		},
 		destroy: function () {
-			put(resizerNode, '!');
+			domConstruct.destroy(resizerNode);
 			resizerNode = null;
 		},
 		show: function (grid) {
 			var pos = geom.position(grid.domNode, true);
 			resizerNode.style.top = pos.y + 'px';
 			resizerNode.style.height = pos.h + 'px';
-			put(document.body, resizerNode);
+			document.body.appendChild(resizerNode);
 		},
 		move: function (x) {
 			resizerNode.style.left = x + 'px';
@@ -281,16 +280,18 @@ define([
 					continue;
 				}
 
-				var headerTextNode = put('div.dgrid-resize-header-container');
+				var headerTextNode = domConstruct.create('div', { className: 'dgrid-resize-header-container' });
 				colNode.contents = headerTextNode;
 
 				// move all the children to the header text node
 				while (childNodes.length > 0) {
-					put(headerTextNode, childNodes[0]);
+					headerTextNode.appendChild(childNodes[0]);
 				}
 
-				resizeHandle = put(colNode, headerTextNode, 'div.dgrid-resize-handle.resizeNode-' +
-					miscUtil.escapeCssIdentifier(id, '-'));
+				resizeHandle = domConstruct.create('div', {
+					className: 'dgrid-resize-handle resizeNode-' + miscUtil.escapeCssIdentifier(id, '-')
+				}, headerTextNode);
+				colNode.appendChild(headerTextNode);
 				resizeHandle.columnId = assoc && assoc[id] || id;
 			}
 

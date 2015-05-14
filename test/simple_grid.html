@@ -6,6 +6,7 @@
 		<meta name="viewport" content="width=570">
 		<style>
 			@import "../../dojo/resources/dojo.css";
+			@import "../css/dgrid.css";
 			@import "../css/skins/claro.css";
 			.heading {
 				font-weight: bold;
@@ -26,7 +27,7 @@
 				width: 18%;
 			}
 		</style>
-		<script src="../../dojo/dojo.js" 
+		<script src="../../dojo/dojo.js"
 			data-dojo-config="async: true"></script>
 		<script>
 			var columns = {
@@ -38,7 +39,7 @@
 				name: {},
 				description: {label: "what to do", sortable: false}
 			};
-			
+
 			require(["dgrid/Grid", "dojo/domReady!"], function(Grid){
 				var data = [
 					{order: 1, name:"preheat", description:"Preheat your oven to 350F"},
@@ -51,13 +52,13 @@
 					{order: 8, name:"remove", description:"Using a spatula, lift cookies off onto wax paper or a cooling rack"},
 					{order: 9, name:"eat", description:"Eat and enjoy!"}
 				];
-				
+
 				window.grid = new Grid({
 					columns: columns
 				}, "grid");
 				grid.renderArray(data);
 			});
-				
+
 		</script>
 	</head>
 	<body class="claro">

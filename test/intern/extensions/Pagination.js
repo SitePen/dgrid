@@ -5,13 +5,12 @@ define([
 	'dojo/on',
 	'dojo/query',
 	'dojo/string',
-	'put-selector/put',
 	'dgrid/Grid',
 	'dgrid/extensions/Pagination',
 	'dgrid/test/data/createSyncStore',
 	'dgrid/test/data/genericData',
 	'dojo/domReady!'
-], function (test, assert, declare, on, query, string, put, Grid, Pagination, createSyncStore, genericData) {
+], function (test, assert, declare, on, query, string, Grid, Pagination, createSyncStore, genericData) {
 	var grid,
 		PaginationGrid = declare([Grid, Pagination]);
 
@@ -29,7 +28,7 @@ define([
 	}
 
 	test.suite('Pagination', function () {
-		test.before(function () {
+		test.beforeEach(function () {
 			grid = new PaginationGrid({
 				collection: createTestStore(),
 				columns: getColumns()
@@ -37,18 +36,19 @@ define([
 			document.body.appendChild(grid.domNode);
 			grid.startup();
 		});
-		test.after(function () {
+
+		test.afterEach(function () {
 			grid.destroy();
 		});
 
-		test.test('pagination info updates on page switch', function () {
+		test.test('Pagination info updates on page switch', function () {
 			// switch pages and ensure that the status message and links are
 			// updated
 			var disabledLinks = query('span.dgrid-page-disabled', grid.paginationLinksNode),
 				expectedText = string.substitute(grid.i18nPagination.status,
 					{ start: 1, end: 10, total: 100 });
 
-			function testPaginationAssertions(expectedPage) {
+			function testAssertions(expectedPage) {
 				assert.strictEqual(grid.paginationStatusNode.innerHTML, expectedText,
 					'should find expected status message; received \'' + status + '\'');
 				assert.strictEqual(disabledLinks.length, 1,
@@ -61,13 +61,36 @@ define([
 				}
 			}
 
-			testPaginationAssertions('1');
+			testAssertions('1');
 
 			grid.gotoPage(2);
 			disabledLinks = query('span.dgrid-page-disabled', grid.paginationLinksNode);
 			expectedText = string.substitute(grid.i18nPagination.status, {start: 11, end: 20, total: 100});
 
-			testPaginationAssertions('2');
+			testAssertions('2');
+		});
+
+		test.test('Pagination info updates when an item is added/removed', function () {
+			function testAssertions(expectedTotal, expectedLastPage) {
+				assert.strictEqual(grid.paginationStatusNode.innerHTML,
+					string.substitute(grid.i18nPagination.status, {
+						start: 1,
+						end: 10,
+						total: expectedTotal
+					}),
+					'total displayed in status area should be ' + expectedTotal
+				);
+				assert.strictEqual(grid.paginationLinksNode.lastChild.innerHTML, '' + expectedLastPage,
+					'last page number displayed should be ' + expectedLastPage);
+			}
+
+			testAssertions(100, 10);
+
+			grid.collection.addSync({ id: 100 });
+			testAssertions(101, 11);
+
+			grid.collection.removeSync(100);
+			testAssertions(100, 10);
 		});
 	});
 

@@ -8,7 +8,6 @@
 			@import "../../../dojo/resources/dojo.css";
 			@import "../../../dojo/resources/dnd.css";
 			@import "../../css/dgrid.css";
-			@import "../../css/dgrid_rtl.css";
 			@import "../../css/skins/claro.css";
 			.dgrid {
 				width: 750px;
@@ -35,12 +34,12 @@
 		<script>
 			// Functions defined within require callback
 			var getColumns, getAltColumns, createGrid, destroyGrid;
-			
-			require(["dojo/_base/lang", "dojo/_base/declare",
+
+			require(["dojo/_base/lang", "dojo/_base/declare", "dojo/dom-construct",
 				"dgrid/OnDemandGrid", "dgrid/Keyboard", "dgrid/Selection",
 				"dgrid/extensions/ColumnHider", "dgrid/extensions/ColumnResizer", "dgrid/extensions/ColumnReorder",
-				"put-selector/put", "dgrid/test/data/testStore", "dojo/domReady!"],
-			function(lang, declare, Grid, Keyboard, Selection, ColumnHider, ColumnResizer, ColumnReorder, put, testStore){
+				"dgrid/test/data/testStore", "dojo/domReady!"],
+			function(lang, declare, domConstruct, Grid, Keyboard, Selection, ColumnHider, ColumnResizer, ColumnReorder, testStore){
 				var columns = {
 						col1: "Column 1Column1Column 1 Column 1",
 						col2: { label: "Column2 (unhidable)", sortable: false, unhidable: true },
@@ -59,45 +58,46 @@
 						{ id: "col:1", field: "col1", label: "Col1" },
 						{ id: "col:5", field: "col5" } // no label, to test fallback to field
 					],
-					body = document.body,
 					rtl = location.search.indexOf("rtl") !== -1,
 					grid,
 					gridResize,
 					gridReorder;
-				
+
 				if(rtl) {
 					document.documentElement.setAttribute("dir", "rtl");
 				}
-				body.insertBefore(put('a[href="ColumnHider.html' + (rtl ? '' : '?rtl') + '"]',
-					"Switch to " + (rtl ? "LTR" : "RTL")), body.firstChild);
-				
+				domConstruct.create('a', {
+					href: 'ColumnHider.html' + (rtl ? '' : '?rtl'),
+					innerHTML: 'Switch to ' + (rtl ? 'LTR' : 'RTL')
+				}, document.body, 'first');
+
 				getColumns = function(){
 					return lang.clone(columns);
 				};
-				
+
 				getAltColumns = function(){
 					return lang.clone(altColumns);
 				};
-				
+
 				createGrid = function(){
 					if(grid){
 						var next = grid.domNode.nextSibling;
 						grid.destroy();
-						document.body.insertBefore(put("div#grid"), next);
+						domConstruct.create('div', { id: 'grid' }, next, 'before');
 					}
 					grid = window.grid = new (declare([Grid, Keyboard, Selection, ColumnHider]))({
 						collection: testStore,
 						columns: getColumns()
 					}, "grid");
-					
+
 					grid.on("dgrid-columnstatechange", function(evt){
 						console.log("Column for field " + evt.column.field + " is now " +
 							(evt.hidden ? "hidden" : "shown"));
 					});
 				};
-				
+
 				createGrid();
-				
+
 				gridResize = window.gridResize = new (declare([Grid, Selection, ColumnHider, ColumnResizer]))({
 					collection: testStore,
 					columns: lang.clone(columns)

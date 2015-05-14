@@ -1,13 +1,13 @@
 define([
 	'dojo/_base/declare',
 	'dojo/aspect',
+	'dojo/dom-class',
 	'dojo/on',
 	'dojo/_base/lang',
 	'dojo/has',
-	'put-selector/put',
 	'./util/misc',
 	'dojo/_base/sniff'
-], function (declare, aspect, on, lang, has, put, miscUtil) {
+], function (declare, aspect, domClass, on, lang, has, miscUtil) {
 
 	var delegatingInputTypes = {
 			checkbox: 1,
@@ -160,7 +160,7 @@ define([
 			}
 			enableNavigation(this.contentNode);
 
-			this._debouncedEnsureRowScroll = miscUtil.debounce(this._ensureRowScroll, this);
+			this._debouncedEnsureScroll = miscUtil.debounce(this._ensureScroll, this);
 		},
 
 		removeRow: function (rowElement) {
@@ -255,7 +255,7 @@ define([
 				else {
 					// Row/cell was not focused or is not visible, but we still need to
 					// update _focusedNode and the element's tabIndex/class
-					put(newTarget.element, '.dgrid-focus');
+					domClass.add(newTarget.element, 'dgrid-focus');
 					newTarget.element.tabIndex = this.tabIndex;
 					this._focusedNode = newTarget.element;
 				}
@@ -295,6 +295,41 @@ define([
 			else if (scrollY + this.contentNode.offsetHeight < rowElement.offsetTop + rowElement.offsetHeight) {
 				// Row ends below the viewport
 				this.scrollTo({ y: rowElement.offsetTop - this.contentNode.offsetHeight + rowElement.offsetHeight });
+			}
+		},
+
+		_ensureColumnScroll: function (cellElement) {
+			// summary:
+			//		Ensures that the entire cell is visible in the viewport.
+			//		Called in cases where the grid can scroll horizontally.
+
+			var scrollX = this.getScrollPosition().x;
+			var cellLeft = cellElement.offsetLeft;
+			if (scrollX > cellLeft) {
+				this.scrollTo({ x: cellLeft });
+			}
+			else {
+				var bodyWidth = this.bodyNode.clientWidth;
+				var cellWidth = cellElement.offsetWidth;
+				var cellRight = cellLeft + cellWidth;
+				if (scrollX + bodyWidth < cellRight) {
+					// Adjust so that the right side of the cell and grid body align,
+					// unless the cell is actually wider than the body - then align the left sides
+					this.scrollTo({ x: bodyWidth > cellWidth ? cellRight - bodyWidth : cellLeft });
+				}
+			}
+		},
+
+		_ensureScroll: function (cell, isHeader) {
+			// summary:
+			//		Corrects scroll based on the position of the newly-focused row/cell
+			//		as necessary based on grid configuration and dimensions.
+
+			if(this.cellNavigation && (this.columnSets || this.subRows.length > 1) && !isHeader){
+				this._ensureRowScroll(cell.row.element);
+			}
+			if(this.bodyNode.clientWidth < this.contentNode.offsetWidth){
+				this._ensureColumnScroll(cell.element);
 			}
 		},
 
@@ -343,7 +378,8 @@ define([
 			if (focusedNode) {
 				// Clean up previously-focused element
 				// Remove the class name and the tabIndex attribute
-				put(focusedNode, '!dgrid-focus[!tabIndex]');
+				domClass.remove(focusedNode, 'dgrid-focus');
+				focusedNode.removeAttribute('tabindex');
 
 				// Expose object representing focused cell or row losing focus, via
 				// event.cell or event.row; which is set depends on cellNavigation.
@@ -367,15 +403,13 @@ define([
 				element.tabIndex = this.tabIndex;
 				element.focus();
 			}
-			put(element, '.dgrid-focus');
+			domClass.add(element, 'dgrid-focus');
 
 			if (event) {
 				on.emit(focusedNode, 'dgrid-cellfocusin', event);
 			}
 
-			if (this.cellNavigation && (this.columnSets || this.subRows.length > 1) && !isHeader) {
-				this._debouncedEnsureRowScroll(cell.row.element);
-			}
+			this._debouncedEnsureScroll(cell, isHeader);
 		},
 
 		focusHeader: function (element) {

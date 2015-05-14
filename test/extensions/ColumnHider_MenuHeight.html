@@ -6,6 +6,7 @@
 		<meta name="viewport" content="width=570">
 		<style>
 			@import "../../../dojo/resources/dojo.css";
+			@import "../../css/dgrid.css";
 			@import "../../css/skins/claro.css";
 
 			/* This selector made more specific to cleanly override height */
@@ -15,7 +16,7 @@
 				height: 20em;
 			}
 		</style>
-		<script src="../../../dojo/dojo.js" 
+		<script src="../../../dojo/dojo.js"
 			data-dojo-config="async: true"></script>
 		<script>
 			var columns1, columns2;
@@ -39,7 +40,7 @@
 					collection: store,
 					columns: columns
 				}, "grid");
-				
+
 				grid.on("dgrid-columnstatechange", function(evt){
 					console.log("Column for field " + evt.column.field + " is now " +
 						(evt.hidden ? "hidden" : "shown"));

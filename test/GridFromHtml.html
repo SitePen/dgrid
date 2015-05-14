@@ -6,11 +6,12 @@
 		<meta name="viewport" content="width=570">
 		<style>
 			@import "../../dojo/resources/dojo.css";
+			@import "../css/dgrid.css";
 			@import "../css/skins/claro.css";
 			body {
 				padding: 0 80px; /* side padding to make it easier to scroll doc */
 			}
-			
+
 			/* tests for renderCell / renderHeaderCell */
 			.renderedCell {
 				font-style: italic;
@@ -19,11 +20,11 @@
 				text-decoration: underline;
 			}
 		</style>
-		<script src="../../dojo/dojo.js" 
+		<script src="../../dojo/dojo.js"
 			data-dojo-config="async: true"></script>
 		<script>
 			var store; // defined later, Memory store containing data
-			
+
 			function getOrdinal(num){
 				// returns a String consisting of num + the appropriate ordinal suffix
 				var ord = 'th';
@@ -64,29 +65,29 @@
 				return div;
 			}
 
-	
+
 
 			require(["dgrid/GridFromHtml", "dgrid/OnDemandList",
 				"dojo/_base/declare", "dgrid/test/data/createSyncStore", "dgrid/test/data/orderedData",
 				"dojo/parser", "dojo/domReady!"],
 			function(GridFromHtml, OnDemandList, declare, createSyncStore, orderedData, parser){
-				
+
 				window.gridFromHtmlLegacyFormatter = new GridFromHtml({},
 					"gridFromHtmlLegacyFormatter");
 				gridFromHtmlLegacyFormatter.renderArray(orderedData.items);
-				
+
 				window.gridFromHtmlLegacyGet = new GridFromHtml({},
 					"gridFromHtmlLegacyGet");
 				gridFromHtmlLegacyGet.renderArray(orderedData.items);
-				
+
 				window.gridFromHtmlNew = new GridFromHtml({},
 					"gridFromHtmlNew");
 				gridFromHtmlNew.renderArray(orderedData.items);
-				
+
 				window.gridFromHtmlTestProps = new GridFromHtml({},
 					"gridFromHtmlTestProps");
 				gridFromHtmlTestProps.renderArray(orderedData.items);
-				
+
 				// Need to expose GridFromHtml as a global for parser to find.
 				// Mix in OnDemandList and create a store, since otherwise there's not
 				// much of a way to add data.
@@ -94,7 +95,7 @@
 				store = createSyncStore({data: orderedData});
 				parser.parse();
 			});
-			
+
 		</script>
 	</head>
 	<body class="claro">
@@ -132,9 +133,9 @@
 				<th data-dgrid-column="{field:'description', sortable:false}">what to do</th>
 			</tr>
 		</table>
-		
+
 		<hr>
-		
+
 		<h2>2a: same as 1a, parsed from declarative markup (using a store)</h2>
 		<table id="gridDeclarativeLegacyFormatter" data-dojo-id="gridDeclarativeLegacyFormatter"
 			data-dojo-type="dgrid.GridFromHtml" data-dojo-props="collection: store">
@@ -165,9 +166,9 @@
 				<th data-dgrid-column="{field:'description', sortable:false}">what to do</th>
 			</tr>
 		</table>
-		
+
 		<hr>
-		
+
 		<h2>3a: Testing boolean property (un)specification in GridFromHtml</h2>
 		<table id="gridFromHtmlTestProps">
 			<thead>
@@ -180,6 +181,6 @@
 				</tr>
 			</thead>
 		</table>
-		
+
 	</body>
 </html>

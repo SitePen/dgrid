@@ -6,6 +6,7 @@
 		<meta name="viewport" content="width=570">
 		<style>
 			@import "../../dijit/themes/claro/document.css";
+			@import "../css/dgrid.css";
 			@import "../../dijit/themes/claro/claro.css";
 			@import "../css/skins/claro.css";
 			html, body {
@@ -17,11 +18,11 @@
 			#bc {
 				height: 100%;
 			}
-			
+
 			.bcLeft {
 				width: 300px;
 			}
-			
+
 			.dijitDialog {
 				width: 500px;
 			}
@@ -48,7 +49,7 @@
 				"dgrid/test/data/testStore",
 				"dojo/domReady!"
 			], function(Grid, Selection, DijitRegistry, Dialog, lang, declare, BC, TC, Toolbar, Button, testStore){
-				
+
 				var
 					gridCols = window.gridCols = {
 						col1: "Column 1",
@@ -80,39 +81,39 @@
 						selectionMode: "single",
 						title: "Tab 2"
 					});
-				
+
 				var bc = new BC({
 					design: "headline"
 				}, "bc");
-				
+
 				// Toolbar
 				var tb = new Toolbar({
 					id: "tbTop",
 					region: "top"
 				});
-				
+
 				tb.addChild(new Button ({
 					id: "btnDialog",
 					label: "Programmatic dialog w/ dgrid",
 					onClick: showProgContentDialog
 				}));
-				
+
 				// TabContainer
 				var tc = new TC({
 					id: "tab",
 					"class": "bcCenter",
 					region: "center"
 				});
-				
+
 				tc.addChild(gridTab1);
 				tc.addChild(gridTab2);
 
 				bc.addChild(tb);
 				bc.addChild(gridLeft);
 				bc.addChild(tc);
-				
+
 				bc.startup();
-				
+
 				// test setting a dgrid as content of a dialog programmatically
 				window.dlgProgContent = new Dialog({
 					content: new CustomGrid({

@@ -6,6 +6,7 @@
 		<meta name="viewport" content="width=570">
 		<style>
 			@import "../../dojo/resources/dojo.css";
+			@import "../css/dgrid.css";
 			@import "../css/skins/claro.css";
 			/* add styles to size this grid appropriately */
 			.dgrid {
@@ -23,18 +24,18 @@
 			#list {
 				width: 15%;
 			}
-			
+
 			.clear {
 				clear: both;
 			}
 		</style>
-		<script src="../../dojo/dojo.js" 
+		<script src="../../dojo/dojo.js"
 			data-dojo-config="async: true"></script>
 		<script>
 			var getFirstTarget; // function, defined within require callback
-			
-			require(["dgrid/OnDemandList", "dgrid/OnDemandGrid", "dgrid/Keyboard", "dojo/_base/declare", "dojo/on", "dojo/query", "put-selector/put", "dgrid/test/data/testStore", "dojo/domReady!"],
-			function(OnDemandList, OnDemandGrid, Keyboard, declare, on, query, put, testStore){
+
+			require(["dgrid/OnDemandList", "dgrid/OnDemandGrid", "dgrid/Keyboard", "dojo/_base/declare", "dojo/on", "dojo/query", "dgrid/test/data/testStore", "dojo/domReady!"],
+			function(OnDemandList, OnDemandGrid, Keyboard, declare, on, query, testStore){
 				var columns = {
 						col1: "Column 1",
 						col3: "Column 3",
@@ -44,7 +45,11 @@
 					KeyboardGrid = declare([OnDemandGrid, Keyboard]),
 					list = window.list = new KeyboardList({
 						collection: testStore,
-						renderRow: function(item){ return put("div", item.col5); }
+						renderRow: function (item) {
+							var div = document.createElement('div');
+							div.appendChild(document.createTextNode(item.col5));
+							return div;
+						}
 					}, "list"),
 					grid = window.grid = new KeyboardGrid({
 						collection: testStore,
@@ -55,12 +60,12 @@
 						columns: columns,
 						cellNavigation: false
 					}, "rowGrid");
-				
+
 				getFirstTarget = function(grid){
 					return query(".dgrid-content .dgrid-cell", grid.domNode)[0] ||
 						query(".dgrid-content .dgrid-row", grid.domNode)[0];
 				};
-				
+
 				on(document.body, "dgrid-cellfocusin,dgrid-cellfocusout",
 					function(event){
 						var msg = "focus " + (event.type == "dgrid-cellfocusin" ? "gained" : "lost");

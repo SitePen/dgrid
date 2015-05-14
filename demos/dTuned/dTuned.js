@@ -7,25 +7,30 @@ define([
 	'dgrid/extensions/ColumnHider',
 	'dojo/_base/declare',
 	'dojo/_base/array',
+	'dojo/dom-construct',
 	'dojo/Stateful',
 	'dojo/when',
 	'dstore/RequestMemory',
-	'put-selector/put',
 	'dojo/domReady!'
-], function (require, List, Grid, Selection, Keyboard, Hider, declare, arrayUtil, Stateful, when, RequestMemory, put) {
+], function (require, List, Grid, Selection, Keyboard, Hider,
+		declare, arrayUtil, domConstruct, Stateful, when, RequestMemory) {
 	// Create DOM
-	var headerNode = put('div#header');
-	var listNode = put('div#list-container');
-	var genresNode = put(listNode, 'div#genres');
-	var artistsNode = put(listNode, 'div#artists');
-	var albumsNode = put(listNode, 'div#albums');
-	var gridNode = put('div#grid');
+	var headerNode = domConstruct.create('div', { id: 'header' });
+	var listNode = domConstruct.create('div', { id: 'list-container' });
+	var genresNode = domConstruct.create('div', { id: 'genres' }, listNode);
+	var artistsNode = domConstruct.create('div', { id: 'artists' }, listNode);
+	var albumsNode = domConstruct.create('div', { id: 'albums' }, listNode);
+	var gridNode = domConstruct.create('div', { id: 'grid' });
 	// Use require.toUrl for portability (looking up via module path)
 	var songStore = new RequestMemory({ target: require.toUrl('./data.json') });
 
-	put(document.body, headerNode, 'div#header-content', 'dTuned');
-	put(document.body, listNode);
-	put(document.body, gridNode);
+	domConstruct.create('div', {
+		id: 'header-content',
+		innerHTML: 'dTuned'
+	}, headerNode);
+	arrayUtil.forEach([ headerNode, listNode, gridNode ], function (node) {
+		document.body.appendChild(node);
+	});
 
 	// a formatting function for the Duration column.
 	function timeFormatter(t) {

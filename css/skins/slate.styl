@@ -1,0 +1,40 @@
+@require 'nib/gradients';
+@require 'nib/vendor';
+
+$dgrid-background ?= #fff;
+$dgrid-color ?= #000;
+
+$dgrid-header-background ?= #333;
+$dgrid-header-background-image ?= linear-gradient(top, #4e4e4e 0%,#555555 12%,#636363 25%,#505050 39%,#303030 49%,#000000 50%,#1c1c1c 60%,#292929 76%,#1e1e1e 91%,#141414 100%);
+$dgrid-header-filter ?= unquote("progid:DXImageTransform.Microsoft.gradient( startColorstr='#4e4e4e', endColorstr='#141414',GradientType=0 )");
+$dgrid-header-color ?= #fff;
+$dgrid-header-text-transform ?= uppercase;
+$dgrid-header-cell-border-color ?= #111;
+$dgrid-header-cell-font-weight ?= bold;
+
+$dgrid-body-row-odd-background ?= #f7f7f7;
+
+$dgrid-body-row-hover-background-color ?= #ddd;
+
+$dgrid-selected-background-color ?= #555;
+$dgrid-selected-color ?= #fff;
+$dgrid-selected-hover-background-color ?= $dgrid-selected-background-color;
+$dgrid-selected-hover-color ?= $dgrid-selected-color;
+
+$dgrid-highlight-background ?= #999;
+
+$dgrid-column-reorder-border ?= 2px dotted #fff !important;
+
+$dgrid-use-white-sort-arrow ?= true;
+
+.slate {
+	@import 'skin';
+
+	.dgrid-header-row {
+		border-bottom: none;
+	}
+
+	.dgrid-header .dgrid-cell {
+		padding: 7px 3px;
+	}
+}

@@ -2,13 +2,14 @@ define([
 	'dojo/_base/declare',
 	'dojo/_base/lang',
 	'dojo/Deferred',
+	'dojo/dom-construct',
+	'dojo/dom-class',
 	'dojo/on',
 	'dojo/has',
 	'dojo/query',
 	'./Grid',
-	'put-selector/put',
 	'dojo/_base/sniff'
-], function (declare, lang, Deferred, on, has, query, Grid, put) {
+], function (declare, lang, Deferred, domConstruct, domClass, on, has, query, Grid) {
 
 	return declare(null, {
 		constructor: function () {
@@ -291,8 +292,8 @@ define([
 			}
 
 			cellElement.innerHTML = '';
-			put(cellElement, '.dgrid-cell-editing');
-			put(cellElement, cmp.domNode || cmp);
+			domClass.add(cellElement, 'dgrid-cell-editing');
+			cellElement.appendChild(cmp.domNode || cmp);
 
 			if (isWidget && !column.editOn) {
 				// Queue arguments to be run once editor is in DOM
@@ -367,7 +368,11 @@ define([
 				editOn = column.editOn,
 				self = this,
 				Widget = typeof editor !== 'string' && editor,
-				args, cmp, node, putstr;
+				args,
+				cmp,
+				node,
+				tagName,
+				tagArgs = {};
 
 			args = column.editorArgs || {};
 			if (typeof args === 'function') {
@@ -400,9 +405,15 @@ define([
 					// also register a focus listener
 				}
 
-				putstr = editor === 'textarea' ? 'textarea' :
-					'input[type=' + editor + ']';
-				cmp = node = put(putstr + '.dgrid-input', lang.mixin({
+				if (editor === 'textarea') {
+					tagName === 'textarea';
+				}
+				else {
+					tagName = 'input';
+					tagArgs.type = editor;
+				}
+				cmp = node = domConstruct.create(tagName, lang.mixin(tagArgs, {
+					className: 'dgrid-input',
 					name: column.field,
 					tabIndex: isNaN(column.tabIndex) ? -1 : column.tabIndex
 				}, args));
@@ -476,7 +487,6 @@ define([
 
 			function onblur() {
 				var parentNode = node.parentNode,
-					i = parentNode.children.length - 1,
 					options = { alreadyHooked: true },
 					cell = self.cell(node);
 
@@ -496,10 +506,8 @@ define([
 				if (cell.row) {
 					// If the row is still present (i.e. we didn't blur due to removal),
 					// clear out the rest of the cell's contents, then re-render with new value.
-					put(cell.element, '!dgrid-cell-editing');
-					while (i--) {
-						put(parentNode.firstChild, '!');
-					}
+					domClass.remove(cell.element, 'dgrid-cell-editing');
+					domConstruct.empty(parentNode);
 					Grid.appendIfNode(parentNode, column.renderCell(cell.row.data, self._activeValue, parentNode,
 						self._activeOptions ? lang.delegate(options, self._activeOptions) : options));
 				}

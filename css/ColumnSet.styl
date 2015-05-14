@@ -1,9 +1,9 @@
 .dgrid-column-set {
 	overflow: hidden;
 	width: 100%;
-	position: relative; /* This is needed because we setting position: relative on cells in the grid for focus in IE7*/
+	position: relative; // This is needed because we set position: relative on cells in the grid for focus in IE7
 	height: 100%;
-	/* On touch devices, disable default X-axis drag behavior but allow vertical scrolling */
+	// On touch devices, disable default X-axis drag behavior but allow vertical scrolling
 	-ms-touch-action: pan-y;
 	touch-action: pan-y;
 }
@@ -29,9 +29,4 @@
 }
 .dgrid-column-set-scroller-content {
 	height: 1px;
-}
-
-/* indicator of a successful load */
-#dgrid-css-columnset-loaded {
-	display: none;
 }

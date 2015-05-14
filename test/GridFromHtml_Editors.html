@@ -6,12 +6,13 @@
 		<meta name="viewport" content="width=570">
 		<style>
 			@import "../../dojo/resources/dojo.css";
+			@import "../css/dgrid.css";
 			@import "../../dijit/themes/claro/claro.css";
 			@import "../css/skins/claro.css";
 			body {
 				padding: 0 80px; /* side padding to make it easier to scroll doc */
 			}
-			
+
 			/* tests for renderCell / renderHeaderCell */
 			.renderedCell {
 				font-style: italic;
@@ -20,7 +21,7 @@
 				text-decoration: underline;
 			}
 		</style>
-		<script src="../../dojo/dojo.js" 
+		<script src="../../dojo/dojo.js"
 			data-dojo-config="async: true"></script>
 		<script>
 			require(["dgrid/GridFromHtml", "dgrid/OnDemandList", "dgrid/Keyboard",
@@ -49,12 +50,12 @@
 				}, "gridProgrammatic");
 				parser.parse();
 			});
-			
+
 		</script>
 	</head>
 	<body class="claro">
 
-		
+
 		<!-- GridFromHtml should look for TRs with THs anywhere.
 			Testing here with one thead, one tbody, and one implicit. -->
 

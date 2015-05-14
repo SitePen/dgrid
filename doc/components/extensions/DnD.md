@@ -2,6 +2,8 @@
 
 The DnD extension can be used to add row drag'n'drop functionality.
 
+**Note:** Be sure to include `dojo/resources/dnd.css` or equivalent custom styles when using this extension.
+
 ```js
 require([
     'dojo/_base/declare',

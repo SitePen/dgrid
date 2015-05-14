@@ -6,6 +6,7 @@
 		<meta name="viewport" content="width=570">
 		<style>
 			@import "../../dojo/resources/dojo.css";
+			@import "../css/dgrid.css";
 			@import "../css/skins/claro.css";
 			.heading {
 				font-weight: bold;
@@ -15,7 +16,7 @@
 				height: 20em;
 				margin: 10px;
 			}
-			
+
 			/* add styles to size this grid appropriately */
 			#grid .field-order {
 				width: 7%;
@@ -24,7 +25,7 @@
 				width: 18%;
 			}
 		</style>
-		<script src="../../dojo/dojo.js" 
+		<script src="../../dojo/dojo.js"
 			data-dojo-config="async: true"></script>
 		<script>
 			require([
@@ -55,12 +56,12 @@
 					name: {},
 					description: { label: 'what to do', sortable: false }
 				};
-				
+
 				var grid = window.grid = new Grid({
 					columns: columns
 				}, 'grid');
 				grid.renderArray(data);
-				
+
 				function makeHandler (grid, type, dir) {
 					return function (event) {
 						var obj = grid[type](event),
@@ -74,14 +75,14 @@
 							grid.cell(event).column.id);
 					};
 				}
-				
+
 				grid.on(on.selector('.dgrid-content .dgrid-row', mouse.enter), makeHandler(grid, 'row', 'entered'));
 				grid.on(on.selector('.dgrid-content .dgrid-row', mouse.leave), makeHandler(grid, 'row', 'left'));
 				grid.on(on.selector('.dgrid-content .dgrid-cell', mouse.enter), makeHandler(grid, 'cell', 'entered'));
 				grid.on(on.selector('.dgrid-content .dgrid-cell', mouse.leave), makeHandler(grid, 'cell', 'left'));
 				grid.on(on.selector('.dgrid-header .dgrid-cell', mouse.enter), makeHeaderCellHandler(grid, 'entered'));
 				grid.on(on.selector('.dgrid-header .dgrid-cell', mouse.leave), makeHeaderCellHandler(grid, 'left'));
-				
+
 				var treegrid = window.treegrid = new (declare([OnDemandGrid, Tree]))({
 					collection: createHierarchicalStore({ data: hierarchicalCountryData }, true),
 					columns: [
@@ -91,7 +92,7 @@
 						{ label: 'Timezone', field: 'timezone' }
 					]
 				}, 'treegrid');
-				
+
 				treegrid.on(on.selector('.dgrid-content .dgrid-row', mouse.enter), makeHandler(treegrid, 'row', 'entered'));
 				treegrid.on(on.selector('.dgrid-content .dgrid-row', mouse.leave), makeHandler(treegrid, 'row', 'left'));
 				treegrid.on(on.selector('.dgrid-content .dgrid-cell', mouse.enter), makeHandler(treegrid, 'cell', 'entered'));

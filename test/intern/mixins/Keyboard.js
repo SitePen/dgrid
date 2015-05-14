@@ -6,14 +6,14 @@ define([
 	'dgrid/Keyboard',
 	'dgrid/ColumnSet',
 	'dojo/_base/declare',
+	'dojo/dom-construct',
 	'dojo/on',
 	'dojo/query',
 	'dstore/Memory',
-	'put-selector/put',
 	'dgrid/test/data/createSyncStore',
 	'dgrid/test/data/genericData'
 ], function (test, assert, OnDemandList, OnDemandGrid, Keyboard, ColumnSet,
-		declare, on, query, Memory, put, createSyncStore, genericData) {
+		declare, domConstruct, on, query, Memory, createSyncStore, genericData) {
 	var handles = [],
 		columns = {
 			col1: 'Column 1',
@@ -364,7 +364,7 @@ define([
 				'focus(id) call focused a cell');
 
 			// Hide the grid
-			put(grid.domNode, '[style="display:none;"]');
+			grid.domNode.style.display = 'none';
 
 			// Modify the item in the store
 			grid.collection.put(item);
@@ -414,13 +414,13 @@ define([
 			grid.startup();
 
 			// Add a button as a target to move focus out of grid
-			button = put(document.body, 'button');
+			button = domConstruct.create('button', null, document.body);
 		});
 
 		test.afterEach(afterEach);
 		test.after(function () {
 			after();
-			put(button, '!');
+			domConstruct.destroy(button);
 		});
 
 		test.test('grid.focus + item update', function () {
@@ -492,7 +492,9 @@ define([
 				sort: 'id',
 				collection: testStore,
 				renderRow: function (item) {
-					return put('div', item.col5);
+					var div = document.createElement('div');
+					div.appendChild(document.createTextNode(item.col5));
+					return div;
 				}
 			});
 			document.body.appendChild(grid.domNode);

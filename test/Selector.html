@@ -6,6 +6,7 @@
 		<meta name="viewport" content="width=570">
 		<style>
 			@import "../../dojo/resources/dojo.css";
+			@import "../css/dgrid.css";
 			@import "../css/skins/claro.css";
 			.heading {
 				font-weight: bold;
@@ -31,8 +32,8 @@
 var getColumns;
 
 require(["dojo/_base/lang", "dojo/on", "dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Selector", "dgrid/Keyboard", "dgrid/ColumnSet",
-			"dojo/_base/declare", "dojo/_base/array", "dojo/json", "dgrid/test/data/testStore", "put-selector/put", "dojo/domReady!"],
-		function(lang, on, Grid, Selection, Selector, Keyboard, ColumnSet, declare, arrayUtil, json, testStore, put){
+			"dojo/_base/declare", "dojo/_base/array", "dojo/dom-construct", "dojo/json", "dgrid/test/data/testStore", "dojo/domReady!"],
+		function(lang, on, Grid, Selection, Selector, Keyboard, ColumnSet, declare, arrayUtil, domConstruct, json, testStore){
 			on(document.body, "dgrid-select,dgrid-deselect",
 					function(event){
 						var msg = (event.type == "dgrid-deselect" ? "de" : "") + "selected";
@@ -169,8 +170,8 @@ require(["dojo/_base/lang", "dojo/on", "dgrid/OnDemandGrid", "dgrid/Selection", 
 					col1: {
 						selector: function(column, value, cell, object){
 							var input = column.grid._defaultRenderSelectorInput(lang.delegate(column, {selector: 'checkbox'}), value, cell, object);
-							put(input, "-span", ">");
-							put(input, "+span", "<");
+							domConstruct.create('span', { innerHTML: '>' }, input, 'before');
+							domConstruct.create('span', { innerHTML: '<' }, input, 'after');
 							return input;
 						}
 					},

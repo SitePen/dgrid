@@ -6,20 +6,21 @@
 		<meta name="viewport" content="width=570">
 		<style>
 			@import "../../dojo/resources/dojo.css";
+			@import "../css/dgrid.css";
 			@import "../../dijit/themes/claro/claro.css";
 			@import "../css/skins/claro.css";
-			
+
 			.dgrid {
 				margin: 10px;
 			}
-			
+
 			.dgrid-grid {
 				width: 700px;
 			}
 			.dgrid-list {
 				width: 200px;
 			}
-			
+
 			#grid2 {
 				width: 500px;
 				float: left;
@@ -28,14 +29,14 @@
 				width: 500px;
 				float: right;
 			}
-			
+
 			.dgrid .field-bool {
 				width: 6em;
 			}
 			.dgrid .field-type {
 				width: 80px;
 			}
-			
+
 			#grid2 .field-date, #grid2 .field-date2 {
 				width: 16em;
 			}
@@ -45,7 +46,7 @@
 			#grid2 .field-bool { /* checkbox */
 				width: 4em;
 			}
-			
+
 			#gridAddDel, #listAddDel {
 				float: left;
 			}
@@ -53,7 +54,7 @@
 		<script>
 			var start= new Date().getTime();
 		</script>
-		<script src="../../dojo/dojo.js" 
+		<script src="../../dojo/dojo.js"
 			data-dojo-config="async: true"></script>
 		<script>
 			require([
@@ -69,9 +70,9 @@
 				"dojo/_base/lang",
 				"dojo/_base/declare",
 				"dojo/_base/array",
+				"dojo/dom-construct",
 				"dojo/Stateful",
 				"dstore/Memory",
-				"put-selector/put",
 				"dgrid/test/data/errorStores",
 				"dgrid/test/data/testStore",
 				"dgrid/test/data/createSyncStore",
@@ -82,10 +83,10 @@
 				"dgrid/test/data/stateData",
 				"dojo/domReady!"
 			], function(on, List, Grid, Keyboard, Selection, Editor, DateTextBox, Slider, NumberSpinner,
-					lang, declare, arrayUtil, Stateful, Memory, put, errorStores, testStore,
+					lang, declare, arrayUtil, domConstruct, Stateful, Memory, errorStores, testStore,
 					createSyncStore, createAsyncStore, typesData, largeColorData, smallColorData, stateData
 			){
-				
+
 				function createStatefulStore() {
 					var data = [],
 						states = testStateStore.data,
@@ -93,11 +94,11 @@
 						statefulState,
 						i,
 						total = states.length;
-					
+
 					function watcher(name, oldValue, value) {
 						console.log(name, " updating from ", oldValue, " to ", value);
 					}
-					
+
 					for (i = 0; i < total; i++) {
 						state = states[i];
 						statefulState = new Stateful({
@@ -113,7 +114,7 @@
 						idProperty: "abbreviation"
 					});
 				}
-				
+
 				var columns = {
 					col1: 'Column 1',
 					col2: {label: 'Column 2'},
@@ -186,7 +187,7 @@
 					collection: smallColorStore,
 					columns: lang.clone(columns4)
 				}, "gridAddDel");
-				
+
 				// also throw in a List connected to the same store
 				// (so additions/deletions should show up in both)
 				window.listAddDel = new (declare([List, Keyboard, Selection]))({
@@ -194,10 +195,12 @@
 					columns: lang.clone(columns4),
 					renderRow: function(object, options){
 						// need to define renderRow to accommodate store items
-						return put("div", object.col1);
+						var div = document.createElement('div');
+						div.appendChild(document.createTextNode(object.col1));
+						return div;
 					}
 				}, "listAddDel");
-				
+
 				window.statefulGrid = new StandardGrid({
 					collection: createStatefulStore(),
 					columns: [
@@ -215,13 +218,13 @@
 						}
 					]
 				}, "statefulGrid");
-				
+
 				// buttons / listeners for 1st grid
-				
+
 				grid.on("dgrid-error", function(evt) {
 					console.warn("error on grid: ", evt.error);
 				});
-				
+
 				on(document.getElementById("setstore"), "click", function(){
 					console.log("setting store to colorcollection: ", colorStore);
 					window.grid.set("collection", colorStore);
@@ -234,66 +237,65 @@
 					console.log("setting store to colorStore and setting query to show only primary colors");
 					grid.set("collection", colorStore.filter({col3: "Primary"}));// store filtered to only show primary colors
 				});
-				
-				var sortDescending = true;
-			
-				on(document.getElementById("sort"), "click", function(){
-					sortDescending = !sortDescending;
-					grid.set("sort", "col1", sortDescending);
-					
-					console.log("sort after setting sort: ", grid.get("sort"));
-				});
 
+				var sortDescending = true;
+
+				on(document.getElementById('hasNeutralSort'), 'click', function(){
+					grid.set('hasNeutralSort', !grid.get('hasNeutralSort'));
+					console.log('hasNeutralSort is now ' + grid.get('hasNeutralSort'));
+				});
 
 				on(document.getElementById("emptyAsync"), "click", function(){
 					grid.set("collection", emptyAsyncStore);
 				});
-				
+
 				on(document.getElementById("error"), "click", function(){
 					grid.set("collection", errorStores.asyncFetch);
 				});
-				
+
 				on(document.getElementById("null"), "click", function(){
 					grid.set("collection", null);
 				});
-				
+
 				// buttons / listeners for 2nd grid
-				
+
 				function updateDirty(){
 					setTimeout(function(){
 						var dirtyDiv = document.getElementById("dirty");
 						// clear "dirty items" list after change has been processed
 						dirtyDiv.innerHTML = "";
 						for(var rowId in grid2.dirty){
-							put(dirtyDiv, "div", "rowId: "+rowId);
+							domConstruct.create('div', {
+								innerHTML: 'rowId: ' + rowId
+							}, dirtyDiv);
 						}
 					}, 0);
 				}
-				
+
 				grid2.on("dgrid-error", function(evt) {
 					console.warn("error on grid2: ", evt.error);
 				});
-				
+
 				on(document.getElementById("save"), "click", function(){
 					console.log("save to store");
 					grid2.save();
 					updateDirty();
 				});
-				
+
 				on(document.getElementById("setorigeditstore"), "click", function(){
 					grid2.set("collection", testTypesStore);
 					updateDirty();
 				});
-				
+
 				on(document.getElementById("setdeferrorputstore"), "click", function(){
 					grid2.set("collection", errorStores.asyncPut);
 					updateDirty();
 				});
-				
+
 				grid2.on("dgrid-datachange", updateDirty);
-				
+
 				// buttons for 3rd grid
-				
+
 				on(document.getElementById("add"), "click", function(){
 					var id = smallColorStore.data.length+Math.floor(Math.random()*1001);
 					console.log("id: ", id);
@@ -304,7 +306,7 @@
 						smallColorStore.remove(id);
 					}
 				});
-				
+
 				// hook up a listener for error events on the document to test bubbling
 				// (currently error events don't seem to bubble,
 				// but perhaps we want them to?)
@@ -319,7 +321,7 @@
 		<h2>Simple test to show setting a new store and query to dgrid</h2>
 		<div id="grid"></div>
 		<button id="colorQuery">Set color store and query</button>
-		<button id="sort">sort</button>
+		<button id="hasNeutralSort">Toggle hasNeutralSort</button>
 		<br>
 		<button id="setstore">Set Color Store</button>
 		<button id="restore">Set Original Store</button>

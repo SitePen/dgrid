@@ -7,6 +7,7 @@
 		<style>
 			@import "../../../dojo/resources/dojo.css";
 			@import "../../../dojo/resources/dnd.css";
+			@import "../../css/dgrid.css";
 			@import "../../css/skins/claro.css";
 			.heading {
 				font-weight: bold;
@@ -52,9 +53,9 @@
 				{ id: "name", field: "name", label: "name" },
 				{ id: "description", field: "description", label: "what to do", sortable: false }
 			];
-			
+
 			var prevent;
-			
+
 			require(["dgrid/Grid", "dgrid/extensions/ColumnReorder", "dgrid/extensions/ColumnResizer",
 					"dojo/_base/declare", "dojo/domReady!"],
 				function(Grid, ColumnReorder, ColumnResizer, declare){
@@ -62,7 +63,7 @@
 						columns: columns1
 					}, "grid");
 					grid.renderArray(data);
-					
+
 					window.grid2 = new (declare([Grid, ColumnReorder, ColumnResizer]))({
 						columns: {
 							order: { label: "step", reorderable: false },
@@ -71,7 +72,7 @@
 						}
 					}, "grid2");
 					grid2.renderArray(data);
-					
+
 					window.grid.on("dgrid-columnreorder", function(evt){
 						console.log("dgrid-columnreorder" + (prevent ? " (canceled): " : ": "),
 							evt);
@@ -83,7 +84,7 @@
                     }, "grid-99");
                     gridDash1.renderArray(data);
 				});
-				
+
 		</script>
 	</head>
 	<body class="claro">

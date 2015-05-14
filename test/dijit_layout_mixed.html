@@ -6,6 +6,7 @@
 		<meta name="viewport" content="width=570">
 		<style>
 			@import "../../dijit/themes/claro/document.css";
+			@import "../css/dgrid.css";
 			@import "../../dijit/themes/claro/claro.css";
 			@import "../css/skins/claro.css";
 			html, body {
@@ -47,9 +48,9 @@
 					CustomGrid = declare([Grid, Selection, DijitRegistry]),
 					grid1,
 					grid2;
-					
+
 				parser.parse();
-				
+
 				// Add grids to TabContainer parsed within page
 				grid1 = window.grid1 = new CustomGrid({
 					id: "grid1",
@@ -59,7 +60,7 @@
 					title: "Tab 1"
 				});
 				registry.byId("tc").addChild(grid1);
-				
+
 				grid2 = window.grid2 = new CustomGrid({
 					id: "grid2",
 					collection: testStore,

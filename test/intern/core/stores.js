@@ -123,4 +123,40 @@ define([
 				'Observed partial results should include first item on second page after going to next page');
 		});
 	});
+
+	test.suite('Async empty stores', function () {
+		test.afterEach(function () {
+			grid.destroy();
+		});
+
+		var emptyStore = createAsyncStore({ data: [] });
+
+		function createTest(Grid) {
+			return function () {
+				var dfd = this.async(1000);
+				grid = new Grid({
+					columns: {
+						id: 'ID'
+					},
+					collection: emptyStore
+				});
+				document.body.appendChild(grid.domNode);
+				grid.startup();
+
+				grid.on('dgrid-error', function () {
+					dfd.reject('dgrid-error should not be emitted on consecutive synchronous refresh');
+				});
+
+				grid.refresh().then(function () {
+					dfd.resolve();
+				});
+			};
+		}
+
+		test.test('OnDemandGrid consecutive refresh with async empty store (#1065)',
+			createTest(OnDemandGrid));
+
+		test.test('Pagination consecutive refresh with async empty store',
+			createTest(PaginationGrid));
+	});
 });

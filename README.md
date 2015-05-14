@@ -45,8 +45,6 @@ bower install dijit#<target>
 
 Alternatively, dgrid and its dependencies can be downloaded individually:
 
-* [xstyle](https://github.com/kriszyp/xstyle)
-* [put-selector](https://github.com/kriszyp/put-selector)
 * [dstore](https://github.com/SitePen/dstore) for store-backed grids
 * [The Dojo Toolkit](http://dojotoolkit.org) SDK version 1.8 or higher
     * Out of the DTK components, Dojo core is the only hard dependency for dgrid;
@@ -61,16 +59,14 @@ directory structure like the following:
 * `dojo`
 * `dojox` (optional, dependency of some dgrid tests)
 * `dstore`
-* `put-selector`
-* `xstyle`
 * `util` (optional, e.g. if pursuing a custom build)
 
 ## CDN
 
 [RawGit](http://rawgit.com/) now offers CDN hosting of raw tagged git URLs.
-It can serve any version of dgrid, xstyle, and put-selector via MaxCDN.
+It can serve any version of dgrid and dstore via MaxCDN.
 
-For example, here's a `packages` configuration for dgrid 0.4.0, xstyle 0.2.1, and put-selector 0.3.5:
+For example, here's a `packages` configuration for dgrid 0.4.0 and dstore 1.0.0:
 
 ```js
 packages: [
@@ -79,12 +75,8 @@ packages: [
         location: '//cdn.rawgit.com/SitePen/dgrid/v0.4.0'
     },
     {
-        name: 'xstyle',
-        location: '//cdn.rawgit.com/kriszyp/xstyle/v0.2.1'
-    },
-    {
-        name: 'put-selector',
-        location: '//cdn.rawgit.com/kriszyp/put-selector/v0.3.5'
+        name: 'dstore',
+        location: '//cdn.rawgit.com/SitePen/dstore/v1.0.0'
     }
 ]
 ```
@@ -184,7 +176,7 @@ export SAUCE_ACCESS_KEY=<your_sauce_access_key>
 Then kick off the runner with the following command:
 
 ```
-node node_modules/intern-geezer/runner config=test/intern/intern
+grunt intern:remote
 ```
 
 ## Running via local Selenium server
@@ -220,13 +212,12 @@ script which can be used to start up the server.  For additional information
 
 ### Running the tests
 
-Once the Selenium server is running, kick off the Intern test runner with the
-following command (run from the directory containing dgrid):
+Once the Selenium server is running, kick off the Intern test runner with the following command:
 
 ```
-node node_modules/intern-geezer/runner config=test/intern/intern.local
+grunt test
 ```
 
-The configuration in `intern.local.js` overrides `intern.js` to not use
-Sauce Connect, and to attempt to run Firefox and Chrome by default (this can
-be customized as desired according to the browsers you have installed).
+This runs the `intern:local` Grunt task, which uses the configuration in `intern.local.js`.
+This configuration overrides `intern.js` to use `NullTunnel`, and to test in Chrome by default
+(this can be customized as desired according to the browsers you have installed).

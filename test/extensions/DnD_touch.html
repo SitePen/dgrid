@@ -6,26 +6,28 @@
 		<meta name="viewport" content="width=570">
 		<style>
 			@import "../../../dojo/resources/dojo.css";
+			@import "../../../dojo/resources/dnd.css";
+			@import "../../css/dgrid.css";
 			/* need a theme for some dnd styles (e.g. before/after indicators).
 			   Using tundra because claro has a silly dojoDndItemBefore/After bug
 			*/
 			@import "../../../dijit/themes/tundra/tundra.css";
 			@import "../../css/skins/tundra.css";
-			
+
 			.clear { clear: both; }
-			
+
 			.dojoDndItem { padding: 0; } /* override dijit.css */
-			
+
 			.gridcontainer {
 				float: left;
 				width: 40%;
 				padding: 0 5%;
 			}
-			
+
 			.dgrid {
 				height: 400px;
 			}
-			
+
 			/* styles for handles in 2nd grid */
 			.handleColumn {
 				width: 3em;
@@ -38,17 +40,17 @@
 		<script src="../../../dojo/dojo.js"
 			data-dojo-config="async: true"></script>
 		<script>
-			require(["dgrid/OnDemandGrid", "dgrid/extensions/DnD", "put-selector/put",
-				"dojo/_base/declare", "dojo/_base/lang", 
+			require(["dgrid/OnDemandGrid", "dgrid/extensions/DnD",
+				"dojo/_base/declare", "dojo/_base/lang",
 				"dgrid/test/data/createOrderedStore", "dgrid/test/data/orderedData",
 				"dojo/domReady!"],
-			function(Grid, DnD, put, declare, lang, createOrderedStore, orderedData){
+			function(Grid, DnD, declare, lang, createOrderedStore, orderedData){
 				var DnDGrid = declare([Grid, DnD]);
-				
+
 				// Create a custom data array based on testOrderedData, but looping
 				// several times to create enough items to reasonably test node removal.
 				var data = [];
-				
+
 				for(var i = 0, len = orderedData.items.length; i < 5; i++){
 					for(var j = 0, obj; j < len; j++){
 						obj = lang.clone(orderedData.items[j]);
@@ -56,7 +58,7 @@
 						data.push(obj);
 					}
 				}
-				
+
 				function getCommonProperties(){
 					return {
 						bufferRows: 5,
@@ -69,7 +71,7 @@
 						}
 					};
 				}
-				
+
 				// Note: createOrderedStore hard-wires sorting anyway,
 				// so leaving sort disabled on columns in this grid.
 				var grid = window.grid = new DnDGrid(lang.mixin(getCommonProperties(), {
@@ -79,7 +81,7 @@
 					touchesToScroll: 2,
 					dndSourceType: "grid-row"
 				}), "grid");
-				
+
 				var gridWithHandles = window.gridWithHandles = new DnDGrid(lang.mixin(getCommonProperties(), {
 					columns: [
 						{

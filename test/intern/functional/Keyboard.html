@@ -3,6 +3,16 @@
 	<head>
 		<meta charset="utf-8">
 		<title>Test Keyboard Mixin</title>
+		<link rel="stylesheet" href="../../../css/dgrid.css">
+	</head>
+	<body class="claro">
+		<h2>Keyboard/focus-enabled List and Grids</h2>
+		<div id="list"></div>
+		<div id="grid"></div>
+		<div id="rowGrid"></div>
+		<div id="list-ondemand"></div>
+		<div id="grid-ondemand"></div>
+		<div id="rowGrid-ondemand"></div>
 		<script src="../../../../dojo/dojo.js"></script>
 		<script>
 			var grid, list, rowGrid, ready;
@@ -15,10 +25,9 @@
 				'dojo/_base/declare',
 				'dojo/on',
 				'dojo/query',
-				'put-selector/put',
 				'dgrid/test/data/createSyncStore',
 				'dgrid/test/data/genericData'
-			], function(OnDemandList, List, OnDemandGrid, Grid, Keyboard, declare, on, query, put, createSyncStore, genericData){
+			], function(OnDemandList, List, OnDemandGrid, Grid, Keyboard, declare, on, query, createSyncStore, genericData){
 				var columns = {
 						col1: 'Column 1',
 						col2: 'Column 2',
@@ -30,11 +39,15 @@
 					KeyboardOnDemandList = declare([OnDemandList, Keyboard]),
 					store = createSyncStore({ data: genericData });
 
+				function renderRow(item) {
+					var div = document.createElement('div');
+					div.appendChild(document.createTextNode(item.col5));
+					return div;
+				}
+
 				// Simple Grid, List, and cell navigation Grid
 				list = new KeyboardList({
-					renderRow: function (item) {
-						return put('div', item.col5);
-					}
+					renderRow: renderRow
 				}, 'list');
 				list.renderArray(genericData.items);
 				grid = new KeyboardGrid({
@@ -50,9 +63,7 @@
 				// OnDemand Grid, List, and cell navigation Grid
 				onDemandList = new KeyboardOnDemandList({
 					collection: store,
-					renderRow: function (item) {
-						return put('div', item.col5);
-					}
+					renderRow: renderRow
 				}, 'list-ondemand');
 				onDemandGrid = new KeyboardOnDemandGrid({
 					collection: store,
@@ -66,14 +77,5 @@
 				ready = true;
 			});
 		</script>
-	</head>
-	<body class="claro">
-		<h2>Keyboard/focus-enabled List and Grids</h2>
-		<div id="list"></div>
-		<div id="grid"></div>
-		<div id="rowGrid"></div>
-		<div id="list-ondemand"></div>
-		<div id="grid-ondemand"></div>
-		<div id="rowGrid-ondemand"></div>
 	</body>
 </html>

@@ -6,20 +6,22 @@
 		<meta name="viewport" content="width=570">
 		<style>
 			@import "../../../dojo/resources/dojo.css";
+			@import "../../../dojo/resources/dnd.css";
+			@import "../../css/dgrid.css";
 			/* need a theme for some dnd styles (e.g. before/after indicators).
 			   Using tundra because claro has a silly dojoDndItemBefore/After bug
 			*/
 			@import "../../../dijit/themes/tundra/tundra.css";
 			@import "../../css/skins/tundra.css";
-			
+
 			.clear { clear: both; }
-			
+
 			.dojoDndItem { padding: 0; } /* override dijit.css */
-			
+
 			.dgrid {
 				margin: 10px;
 			}
-			
+
 			#another-target, #another-source, #invalid-source {
 				float: left;
 				width: 204px;
@@ -28,13 +30,13 @@
 				border: 1px solid green;
 			}
 			#another-target .dojoDndItem, #another-source .dojoDndItem, #invalid-source .dojoDndItem {
-				margin: 1px; 
+				margin: 1px;
 				padding: 4px 8px;
 				background-color: #eee;
 				border-bottom: 2px solid #9c9;
 				border-top: 2px solid #fff;
 			}
-			
+
 			#grid1 {
 				height: 200px;
 			}
@@ -47,7 +49,7 @@
 				float: left;
 			}
 		</style>
-		<script src="../../../dojo/dojo.js" 
+		<script src="../../../dojo/dojo.js"
 			data-dojo-config="async: true"></script>
 		<script>
 			require([
@@ -56,11 +58,11 @@
 				"dgrid/test/data/createOrderedStore", "dgrid/test/data/orderedData",
 				"dojo/domReady!"],
 				function(
-					Grid, Selection, DnD, Keyboard, DnDSource, declare, lang, arrayUtil, when, 
+					Grid, Selection, DnD, Keyboard, DnDSource, declare, lang, arrayUtil, when,
 					createOrderedStore, orderedData
 				){
 					var DnDGrid = declare([Grid, Selection, DnD, Keyboard]);
-					
+
 					// Create a custom data array based on orderedData, but looping
 					// several times to create enough items to reasonably test node removal,
 					// and also adding an extra item to test item-specific DnD types.
@@ -70,7 +72,7 @@
 						description: "A grue! Run away!",
 						type: "grue"
 					}];
-					
+
 					for(var i = 0, len = orderedData.items.length; i < 10; i++){
 						for(var j = 0, obj; j < len; j++){
 							obj = lang.clone(orderedData.items[j]);
@@ -78,7 +80,7 @@
 							data.push(obj);
 						}
 					}
-					
+
 					// Note: testOrderedStore hard-wires sorting anyway,
 					// so leaving sort disabled on columns in this grid.
 					window.grid1 = new DnDGrid({
@@ -99,7 +101,7 @@
 							{label:"Name", field:"name", sortable: false}
 						]
 					}, "grid2");
-					
+
 					// set up other targets
 					var anotherTargetDiv = document.getElementById("another-target");
 					var target = new DnDSource("another-target", {
@@ -111,7 +113,7 @@
 							});
 						}
 					});
-					
+
 					// Set up a dnd source with items that can drag into the grid.
 					// This is one way of doing it; there are likely several...
 					var source = new DnDSource("another-source", {
@@ -140,7 +142,7 @@
 					source.getObject = function(node){
 						return this.getItem(node.id).data;
 					};
-					
+
 					var invalidSource = new DnDSource("invalid-source", {
 						accept: ["grue"]
 					});
@@ -156,8 +158,8 @@
 							description: "Evil god of darkness."
 						})}
 					], false, null);
-					
-					
+
+
 					// Set up 2 more grids sharing the same store, to DnD between.
 					// Again, there are potentially many ways to accomplish this;
 					// here, we declare an extension to the DnD Source constructor defined
@@ -187,19 +189,19 @@
 						//		Indicates whether this grid represents the "added" side, i.e.
 						//		items initially start on the other side then get moved here.
 						addedSide: undefined,
-						
+
 						dndConstructor: SharedDndGridSource, // use extension defined above
-						
+
 						postMixInProperties: function(){
 							this.inherited(arguments);
 							// Filter according to which "side" is represented
 							this.collection = this.collection.filter({ added: this.addedSide });
 						}
 					});
-					
+
 					// set up store to use for these grids
 					var sharedStore = createOrderedStore({ data: orderedData });
-					
+
 					window.grid3 = new SharedDnDGrid({
 						dndSourceType: "dgrid-row-swap",
 						collection: sharedStore,
@@ -218,7 +220,7 @@
 						]
 					}, "grid4");
 				});
-				
+
 		</script>
 	</head>
 	<body class="tundra">

@@ -6,6 +6,7 @@
 		<meta name="viewport" content="width=570">
 		<style>
 			@import "../../dojo/resources/dojo.css";
+			@import "../css/dgrid.css";
 			@import "../css/skins/claro.css";
 			.container {
 				float: left;
@@ -28,27 +29,27 @@
 		<script>
 			var start= new Date().getTime();
 		</script>
-		<script src="../../dojo/dojo.js" 
+		<script src="../../dojo/dojo.js"
 			data-dojo-config="async: true"></script>
 		<script>
 			require(["dojo/on", "dgrid/OnDemandGrid","dgrid/Tree","dgrid/Editor", "dgrid/Keyboard",
 					"dgrid/Selection", "dojo/_base/declare", "dojo/_base/array",
 					"dgrid/test/data/createHierarchicalStore",
 					"dgrid/test/data/hierarchicalCountryData",
-					"dojo/domReady!"], 
+					"dojo/domReady!"],
 				function(
 					on, Grid, Tree, Editor, Keyboard, Selection, declare, arrayUtil,
 					createHierarchicalStore, hierarchicalCountryData
 				){
 					var count = 0; // for incrementing edits from button under 1st grid
-					
+
 					function nbspFormatter(value){
 						// returns "&nbsp;" for blank content, to prevent cell collapsing
 						return value === undefined || value === "" ? "&nbsp;" : value;
 					}
 
 					var StandardGrid = declare([Grid, Keyboard, Selection, Editor, Tree]);
-					
+
 					arrayUtil.forEach([{
 						id: "asyncGrid",
 						collection: createHierarchicalStore({ data: hierarchicalCountryData }, true)
@@ -69,7 +70,7 @@
 								return true;
 							}
 						}, info.id);
-						
+
 						on(document.getElementById(info.id + "Save"), "click", function(){
 							grid.save();
 						});
@@ -88,14 +89,14 @@
 			to put a significant strain on your server, and the performance of the client
 			will suffer as a result.
 		</p>
-		
+
 		<div class="container">
 			<h2>Auto-expanding tree grid, asynchronous store</h2>
 			<div id="asyncGrid"></div>
 			<button id="asyncGridSave">Save</button>
 			<button id="asyncGridRevert">Revert</button>
 		</div>
-		
+
 		<div class="container">
 			<h2>Auto-expanding tree grid, synchronous store</h2>
 			<div id="syncGrid"></div>

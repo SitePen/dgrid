@@ -1,15 +1,21 @@
 define([
 	'dojo/_base/declare',
+	'dojo/dom-construct',
+	'dojo/dom-class',
 	'dojo/on',
 	'dojo/has',
 	'./util/misc',
-	'xstyle/has-class',
-	'put-selector/put',
-	'dojo/_base/sniff',
-	'xstyle/css!./css/dgrid.css'
-], function (declare, listen, has, miscUtil, hasClass, put) {
-	// Add user agent/feature CSS classes
-	hasClass('mozilla', 'touch');
+	'dojo/_base/sniff'
+], function (declare, domConstruct, domClass, listen, has, miscUtil) {
+	// Add user agent/feature CSS classes needed for structural CSS
+	var featureClasses = [];
+	if (has('mozilla')) {
+		featureClasses.push('has-mozilla');
+	}
+	if (has('touch')) {
+		featureClasses.push('has-touch');
+	}
+	domClass.add(document.documentElement, featureClasses);
 
 	// Add a feature test for pointer (only Dojo 1.10 has pointer-events and MSPointer tests)
 	has.add('pointer', function (global) {
@@ -34,7 +40,8 @@ define([
 
 	function getScrollbarSize(element, dimension) {
 		// Used by has tests for scrollbar width/height
-		put(document.body, element, '.dgrid-scrollbar-measure');
+		element.className = 'dgrid-scrollbar-measure';
+		document.body.appendChild(element);
 		var size = element['offset' + dimension] - element['client' + dimension];
 		cleanupTestElement(element);
 		return size;
@@ -47,40 +54,35 @@ define([
 	});
 
 	has.add('dom-rtl-scrollbar-left', function (global, doc, element) {
-		var div = put('div'),
+		var div = document.createElement('div'),
 			isLeft;
 
-		put(document.body, element, '.dgrid-scrollbar-measure[dir=rtl]');
-		put(element, div);
+		element.className = 'dgrid-scrollbar-measure';
+		element.setAttribute('dir', 'rtl');
+		element.appendChild(div);
+		document.body.appendChild(element);
 
 		// position: absolute makes IE always report child's offsetLeft as 0,
 		// but it conveniently makes other browsers reset to 0 as base, and all
 		// versions of IE are known to move the scrollbar to the left side for rtl
 		isLeft = !!has('ie') || !!has('trident') || div.offsetLeft >= has('dom-scrollbar-width');
 		cleanupTestElement(element);
-		put(div, '!');
+		domConstruct.destroy(div);
 		element.removeAttribute('dir');
 		return isLeft;
 	});
 
 	// var and function for autogenerating ID when one isn't provided
-	var autogen = 0;
+	var autoId = 0;
 	function generateId() {
-		return 'dgrid_' + autogen++;
+		return List.autoIdPrefix + autoId++;
 	}
 
 	// common functions for class and className setters/getters
 	// (these are run in instance context)
-	var spaceRx = / +/g;
 	function setClass(cls) {
-		// Format input appropriately for use with put...
-		var putClass = cls ? '.' + cls.replace(spaceRx, '.') : '';
-
-		// Remove any old classes, and add new ones.
-		if (this._class) {
-			putClass = '!' + this._class.replace(spaceRx, '!') + putClass;
-		}
-		put(this.domNode, putClass);
+		// TODO: unit test
+		domClass.replace(this.domNode, cls, this._class || '');
 
 		// Store for later retrieval/removal.
 		this._class = cls;
@@ -96,7 +98,7 @@ define([
 		}
 	};
 
-	return declare(null, {
+	var List = declare(null, {
 		tabableHeader: false,
 
 		// showHeader: Boolean
@@ -153,7 +155,7 @@ define([
 		listType: 'list',
 
 		create: function (params, srcNodeRef) {
-			var domNode = this.domNode = srcNodeRef || put('div'),
+			var domNode = this.domNode = srcNodeRef || document.createElement('div'),
 				cls;
 
 			if (params) {
@@ -194,7 +196,10 @@ define([
 			var domNode = this.domNode,
 				addUiClasses = this.addUiClasses,
 				self = this,
-				headerNode, bodyNode, footerNode, isRTL;
+				headerNode,
+				bodyNode,
+				footerNode,
+				isRTL;
 
 			// Detect RTL on html/body nodes; taken from dojo/dom-geometry
 			isRTL = this.isRTL = (document.body.dir || document.documentElement.dir ||
@@ -204,15 +209,19 @@ define([
 			// class / className setter), then apply standard classes/attributes
 			domNode.className = '';
 
-			put(domNode, '[role=grid].dgrid.dgrid-' + this.listType +
-				(addUiClasses ? '.ui-widget' : ''));
+			domNode.setAttribute('role', 'grid');
+			domClass.add(domNode, 'dgrid dgrid-' + this.listType +
+				(addUiClasses ? ' ui-widget' : ''))
 
 			// Place header node (initially hidden if showHeader is false).
-			headerNode = this.headerNode = put(domNode,
-				'div.dgrid-header.dgrid-header-row' +
-				(addUiClasses ? '.ui-widget-header' : '') +
-				(this.showHeader ? '' : '.dgrid-header-hidden'));
-			bodyNode = this.bodyNode = put(domNode, 'div.dgrid-scroller');
+			headerNode = this.headerNode = domConstruct.create('div', {
+				className: 'dgrid-header dgrid-header-row' + (addUiClasses ? ' ui-widget-header' : '') +
+					(this.showHeader ? '' : ' dgrid-header-hidden')
+			}, domNode);
+
+			bodyNode = this.bodyNode = domConstruct.create('div', {
+				className: 'dgrid-scroller'
+			}, domNode);
 
 			// Firefox 4+ adds overflow: auto elements to the tab index by default;
 			// force them to not be tabbable, but restrict this to Firefox,
@@ -221,13 +230,15 @@ define([
 				bodyNode.tabIndex = -1;
 			}
 
-			this.headerScrollNode = put(domNode, 'div.dgrid-header.dgrid-header-scroll.dgrid-scrollbar-width' +
-				(addUiClasses ? '.ui-widget-header' : ''));
+			this.headerScrollNode = domConstruct.create('div', {
+				className: 'dgrid-header dgrid-header-scroll dgrid-scrollbar-width' +
+					(addUiClasses ? ' ui-widget-header' : '')
+			}, domNode);
 
 			// Place footer node (initially hidden if showFooter is false).
-			footerNode = this.footerNode = put('div.dgrid-footer' +
-				(this.showFooter ? '' : '.dgrid-footer-hidden'));
-			put(domNode, footerNode);
+			footerNode = this.footerNode = domConstruct.create('div', {
+				className: 'dgrid-footer' + (this.showFooter ? '' : ' dgrid-footer-hidden')
+			}, domNode);
 
 			if (isRTL) {
 				domNode.className += ' dgrid-rtl' +
@@ -246,8 +257,10 @@ define([
 			this.configStructure();
 			this.renderHeader();
 
-			this.contentNode = this.touchNode = put(this.bodyNode,
-				'div.dgrid-content' + (addUiClasses ? '.ui-widget-content' : ''));
+			this.contentNode = this.touchNode = domConstruct.create('div', {
+				className: 'dgrid-content' + (addUiClasses ? ' ui-widget-content' : '')
+			}, this.bodyNode);
+
 			// add window resize handler, with reference for later removal if needed
 			this._listeners.push(this._resizeHandle = listen(window, 'resize',
 				miscUtil.throttleDelayed(winResizeHandler, this)));
@@ -361,14 +374,14 @@ define([
 			this._started = false;
 			this.cleanup();
 			// destroy DOM
-			put(this.domNode, '!');
+			domConstruct.destroy(this.domNode);
 		},
 		refresh: function () {
 			// summary:
 			//		refreshes the contents of the grid
 			this.cleanup();
 			this._rowIdToObject = {};
-			this._autoId = 0;
+			this._autoRowId = 0;
 
 			// make sure all the content has been removed so it can be recreated
 			this.contentNode.innerHTML = '';
@@ -387,11 +400,12 @@ define([
 			//		Number of milliseconds between adding and removing the
 			//		ui-state-highlight class.
 
+			var classes = 'dgrid-highlight' + (this.addUiClasses ? ' ui-state-highlight' : '');
+
 			rowElement = rowElement.element || rowElement;
-			put(rowElement, '.dgrid-highlight' +
-				(this.addUiClasses ? '.ui-state-highlight' : ''));
+			domClass.add(rowElement, classes);
 			setTimeout(function () {
-				put(rowElement, '!dgrid-highlight!ui-state-highlight');
+				domClass.remove(rowElement, classes);
 			}, delay || this.highlightDuration);
 		},
 
@@ -404,8 +418,8 @@ define([
 					// Skip non-numeric, non-rows
 					if (next.rowIndex > -1) {
 						if (this.maintainOddEven) {
-							if ((next.className + ' ').indexOf('dgrid-row ') > -1) {
-								put(next, '.' + (rowIndex % 2 === 1 ? oddClass : evenClass) + '!' +
+							if (domClass.contains(next, 'dgrid-row')) {
+								domClass.replace(next, (rowIndex % 2 === 1 ? oddClass : evenClass),
 									(rowIndex % 2 === 0 ? oddClass : evenClass));
 							}
 						}
@@ -454,7 +468,7 @@ define([
 			// no-op in a plain list
 		},
 
-		_autoId: 0,
+		_autoRowId: 0,
 		insertRow: function (object, parent, beforeNode, i, options) {
 			// summary:
 			//		Creates a single row in the grid.
@@ -463,7 +477,7 @@ define([
 			// (This is used by tree to allow the same object to appear under
 			// multiple parents.)
 			var id = this.id + '-row-' + ((this.collection && this.collection.getIdentity) ?
-					this.collection.getIdentity(object) : this._autoId++),
+					this.collection.getIdentity(object) : this._autoRowId++),
 				row = byId(id),
 				previousRow = row && row.previousSibling;
 
@@ -498,7 +512,9 @@ define([
 			// options: Object?
 			//		Optional object with additional options
 
-			return put('div', '' + value);
+			var div = document.createElement('div');
+			div.appendChild(document.createTextNode(value));
+			return div;
 		},
 		removeRow: function (rowElement, preserveDom) {
 			// summary:
@@ -517,7 +533,7 @@ define([
 			rowElement = rowElement.element || rowElement;
 			delete this._rowIdToObject[rowElement.id];
 			if (!preserveDom) {
-				put(rowElement, '!');
+				domConstruct.destroy(rowElement);
 			}
 		},
 
@@ -791,7 +807,7 @@ define([
 			this.showHeader = show;
 
 			// add/remove class which has styles for "hiding" header
-			put(headerNode, (show ? '!' : '.') + 'dgrid-header-hidden');
+			domClass.toggle(headerNode, 'dgrid-header-hidden', !show);
 
 			this.renderHeader();
 			this.resize(); // resize to account for (dis)appearance of header
@@ -806,9 +822,13 @@ define([
 			this.showFooter = show;
 
 			// add/remove class which has styles for hiding footer
-			put(this.footerNode, (show ? '!' : '.') + 'dgrid-footer-hidden');
+			domClass.toggle(this.footerNode, 'dgrid-footer-hidden', !show);
 
 			this.resize(); // to account for (dis)appearance of footer
 		}
 	});
+
+	List.autoIdPrefix = 'dgrid_';
+
+	return List;
 });

@@ -13,56 +13,56 @@
 				height: 400px;
 				float: left;
 			}
-			
+
 			#list .dgrid-row {
 				display: inline-block;
 				width: 100px;
 				height: 100px;
 			}
-			
+
 			#imglist .dgrid-row {
 				width: 64px;
 				height: 64px;
 			}
-			
+
 			.clear {
 				clear: both;
 			}
 		</style>
-		<script src="../../dojo/dojo.js" 
+		<script src="../../dojo/dojo.js"
 			data-dojo-config="async: true"></script>
 		<script>
 			var logRendered; // Function defined in require factory
-			require(["dgrid/OnDemandList", "dojo/query", "dstore/Memory", "put-selector/put", "dojo/domReady!"],
-			function(OnDemandList, query, Memory, put){
+			require(["dgrid/OnDemandList", "dojo/dom-construct", "dojo/query", "dstore/Memory", "dojo/domReady!"],
+			function(OnDemandList, domConstruct, query, Memory){
 				// Create dummy array to make list show a number of entries.
 				var data = [], i, store;
 				for(i = 0; i < 500; i++){ data[i] = { id: i }; }
 				store = new Memory({ data: data });
-				
+
 				logRendered = function(){
 					console.log("list: " + query("#list .dgrid-row").length);
 					console.log("imglist: " + query("#imglist .dgrid-row").length);
 				};
 				document.getElementById("logRendered").onclick = logRendered;
-				
+
 				window.list = new OnDemandList({
 					collection: store,
 					farOffRemoval: 500,
 					renderRow: function(object){
-						return put("span", object.id);
+						return domConstruct.create('span', { innerHTML: object.id });
 					}
 				}, "list");
-				
+
 				window.imglist = new OnDemandList({
 					collection: store,
 					farOffRemoval: 500,
 					renderRow: function(object){
-						return put("img[src=../demos/multiview/resources/dojo-64.png]");
+						return domConstruct.create('img', { src: '../demos/multiview/resources/dojo-64.png' });
 					}
 				}, "imglist");
 			});
-				
+
 		</script>
 	</head>
 	<body class="claro">

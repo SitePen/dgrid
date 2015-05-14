@@ -1,0 +1,30 @@
+@require 'nib/gradients';
+@require 'nib/vendor';
+
+$dgrid-background ?= #fff;
+$dgrid-color ?= #000;
+$dgrid-border-color ?= #aaa;
+
+$dgrid-header-background ?= #ebf0f5;
+$dgrid-header-background-image ?= linear-gradient(top, #ebf0f5 0%,#d5e0ea 100%);
+$dgrid-header-filter ?= unquote("progid:DXImageTransform.Microsoft.gradient( startColorstr='#ebf0f5', endColorstr='#d5e0ea',GradientType=0 )");
+$dgrid-header-cell-border-color ?= #bbb;
+$dgrid-header-cell-font-weight ?= bold;
+$dgrid-header-cell-hover-background ?= #ebf1f6;
+$dgrid-header-cell-hover-background-image ?= linear-gradient(top, #ffffff 0%,#d2e0eb 100%);
+
+$dgrid-body-cell-border-color ?= #edc;
+$dgrid-body-row-transition-duration ?= 0.2s;
+$dgrid-body-row-transition-property ?= unquote('background-color, border-color');
+$dgrid-body-row-background ?= #fff url('images/row_back.png') repeat-x;
+
+$dgrid-body-row-hover-background-color ?= #e9f2fe;
+
+$dgrid-selected-background-color ?= #cee6fa;
+$dgrid-selected-hover-background-color ?= #9bc6f2;
+
+$dgrid-highlight-background-color ?= #ff6;
+
+.claro {
+	@import 'skin';
+}

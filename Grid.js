@@ -1,13 +1,14 @@
 define([
 	'dojo/_base/declare',
 	'dojo/_base/kernel',
+	'dojo/dom-construct',
+	'dojo/dom-class',
 	'dojo/on',
 	'dojo/has',
-	'put-selector/put',
 	'./List',
 	'./util/misc',
 	'dojo/_base/sniff'
-], function (declare, kernel, listen, has, put, List, miscUtil) {
+], function (declare, kernel, domConstruct, domClass, listen, has, List, miscUtil) {
 	function appendIfNode(parent, subNode) {
 		if (subNode && subNode.nodeType) {
 			parent.appendChild(subNode);
@@ -22,11 +23,20 @@ define([
 
 	var Grid = declare(List, {
 		columns: null,
+
+		// hasNeutralSort: Boolean
+		//		Determines behavior of toggling sort on the same column.
+		//		If false, sort toggles between ascending and descending and cannot be
+		//		reset to neutral without sorting another column.
+		//		If true, sort toggles between ascending, descending, and neutral.
+		hasNeutralSort: false,
+
 		// cellNavigation: Boolean
 		//		This indicates that focus is at the cell level. This may be set to false to cause
 		//		focus to be at the row level, which is useful if you want only want row-level
 		//		navigation.
 		cellNavigation: true,
+
 		tabableHeader: true,
 		showHeader: true,
 		column: function (target) {
@@ -92,9 +102,12 @@ define([
 		createRowCells: function (tag, each, subRows, object) {
 			// summary:
 			//		Generates the grid for each row (used by renderHeader and and renderRow)
-			var row = put('table.dgrid-row-table[role=presentation]'),
+			var row = domConstruct.create('table', {
+					className: 'dgrid-row-table',
+					role: 'presentation'
+				}),
 				// IE < 9 needs an explicit tbody; other browsers do not
-				tbody = (has('ie') < 9) ? put(row, 'tbody') : row,
+				tbody = (has('ie') < 9) ? domConstruct.create('tbody', null, row) : row,
 				tr,
 				si, sl, i, l, // iterators
 				subRow, column, id, extraClasses, className,
@@ -108,9 +121,9 @@ define([
 				subRow = subRows[si];
 				// for single-subrow cases in modern browsers, TR can be skipped
 				// http://jsperf.com/table-without-trs
-				tr = put(tbody, 'tr');
+				tr = domConstruct.create('tr', null, tbody);
 				if (subRow.className) {
-					put(tr, '.' + subRow.className);
+					tr.className = subRow.className;
 				}
 
 				for (i = 0, l = subRow.length; i < l; i++) {
@@ -119,19 +132,19 @@ define([
 					id = column.id;
 
 					extraClasses = column.field ?
-						'.field-' + replaceInvalidChars(column.field) :
+						' field-' + replaceInvalidChars(column.field) :
 						'';
 					className = typeof column.className === 'function' ?
 						column.className(object) : column.className;
 					if (className) {
-						extraClasses += '.' + className;
+						extraClasses += ' ' + className;
 					}
 
-					cell = put(tag +
-						'.dgrid-cell' +
-						(id ? '.dgrid-column-' + replaceInvalidChars(id) : '') +
-						extraClasses.replace(/ +/g, '.') +
-						'[role=' + (tag === 'th' ? 'columnheader' : 'gridcell') + ']');
+					cell = domConstruct.create(tag, {
+						className: 'dgrid-cell' +
+							(id ? ' dgrid-column-' + replaceInvalidChars(id) : '') + extraClasses,
+						role: tag === 'th' ? 'columnheader' : 'gridcell'
+					});
 					cell.columnId = id;
 					colSpan = column.colSpan;
 					if (colSpan) {
@@ -212,21 +225,20 @@ define([
 			// 1. So that one can set a fixed height on rows (heights can't be set on <table>'s AFAICT)
 			// 2. So that outline style can be set on a row when it is focused,
 			// and Safari's outline style is broken on <table>
-			return put('div[role=row]>', row);
+			var div = domConstruct.create('div', { role: 'row' });
+			div.appendChild(row);
+			return div;
 		},
 		renderHeader: function () {
 			// summary:
 			//		Setup the headers for the grid
 			var grid = this,
-				headerNode = this.headerNode,
-				i = headerNode.childNodes.length;
+				headerNode = this.headerNode;
 
 			headerNode.setAttribute('role', 'row');
 
 			// clear out existing header in case we're resetting
-			while (i--) {
-				put(headerNode.childNodes[i], '!');
-			}
+			domConstruct.empty(headerNode);
 
 			var row = this.createRowCells('th', function (th, column) {
 				var contentNode = column.headerNode = th;
@@ -260,17 +272,30 @@ define([
 				// respond to click, space keypress, or enter keypress
 				if (event.type === 'click' || event.keyCode === 32 ||
 						(!has('opera') && event.keyCode === 13)) {
-					var target = event.target,
-						field, sort, newSort, eventObj;
+					var target = event.target;
+					var field;
+					var sort;
+					var newSort;
+					var eventObj;
+
 					do {
 						if (target.sortable) {
-							// If the click is on the same column as the active sort,
-							// reverse sort direction
-							newSort = [{
-								property: (field = target.field || target.columnId),
-								descending: (sort = grid.sort[0]) && sort.property === field &&
-									!sort.descending
-							}];
+							field = target.field || target.columnId;
+							sort = grid.sort[0];
+							if (!grid.hasNeutralSort || !sort || sort.property !== field || !sort.descending) {
+								// If the user toggled the same column as the active sort,
+								// reverse sort direction
+								newSort = [{
+									property: field,
+									descending: sort && sort.property === field &&
+										!sort.descending
+								}];
+							}
+							else {
+								// If the grid allows neutral sort and user toggled an already-descending column,
+								// clear sort entirely
+								newSort = [];
+							}
 
 							// Emit an event with the new sort
 							eventObj = {
@@ -367,9 +392,9 @@ define([
 			// Clean up UI from any previous sort
 			if (this._lastSortedArrow) {
 				// Remove the sort classes from the parent node
-				put(this._lastSortedArrow, '<!dgrid-sort-up!dgrid-sort-down');
+				domClass.remove(this._lastSortedArrow.parentNode, 'dgrid-sort-up dgrid-sort-down');
 				// Destroy the lastSortedArrow node
-				put(this._lastSortedArrow, '!');
+				domConstruct.destroy(this._lastSortedArrow);
 				delete this._lastSortedArrow;
 			}
 
@@ -392,10 +417,12 @@ define([
 			if (target) {
 				target = target.contents || target;
 				// Place sort arrow under clicked node, and add up/down sort class
-				arrowNode = this._lastSortedArrow = put('div.dgrid-sort-arrow.ui-icon[role=presentation]');
-				arrowNode.innerHTML = '&nbsp;';
-				target.insertBefore(arrowNode, target.firstChild);
-				put(target, desc ? '.dgrid-sort-down' : '.dgrid-sort-up');
+				arrowNode = this._lastSortedArrow = domConstruct.create('div', {
+					className: 'dgrid-sort-arrow ui-icon',
+					innerHTML: '&nbsp;',
+					role: 'presentation'
+				}, target, 'first');
+				domClass.add(target, 'dgrid-sort-' + (desc ? 'down' : 'up'));
 				// Call resize in case relocation of sort arrow caused any height changes
 				this.resize();
 			}
@@ -541,6 +568,7 @@ define([
 			// After re-rendering the header, re-apply the sort arrow if needed.
 			if (this._started) {
 				if (this.sort.length) {
+					this._lastSortedArrow = null;
 					this.updateSortArrow(this.sort);
 				} else {
 					// Only call resize directly if we didn't call updateSortArrow,

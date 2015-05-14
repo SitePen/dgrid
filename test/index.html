@@ -6,7 +6,7 @@
 		<style>
 			@import "../css/dgrid.css";
 			@import "../css/skins/slate.css";
-			
+
 			html, body {
 				height: 100%;
 				margin: 0;
@@ -22,6 +22,7 @@
 			}
 			.toc .header-title {
 				padding: 7px 20px;
+				text-transform: none; /* Override uppercase in slate skin */
 			}
 			.toc .dgrid-cell {
 				border: none;
@@ -39,7 +40,7 @@
 				color: #000;
 				text-decoration: none;
 			}
-			
+
 			.toc .field-name {
 				width: 20em;
 			}
@@ -52,16 +53,16 @@
 			require([
 				"dojo/_base/declare",
 				"dojo/_base/xhr",
+				"dojo/dom-construct",
 				"dojo/on",
 				"dojo/json",
 				"dstore/Memory",
 				"dojo/cookie",
 				"dgrid/OnDemandGrid",
 				"dgrid/Tree",
-				"put-selector/put",
 				"dojo/query",
 				"dojo/domReady!"
-			], function(declare, xhr, on, json, Memory, cookie, OnDemandGrid, Tree, put){
+			], function(declare, xhr, domConstruct, on, json, Memory, cookie, OnDemandGrid, Tree){
 				xhr.get({
 					url: "data/index.json",
 					handleAs: "json"
@@ -77,23 +78,26 @@
 						}
 					});
 					store.root = store;
-					
+
 					var cookieName = "dgrid-test-index",
 						persistedInfo = cookie(cookieName);
 					persistedInfo = persistedInfo ?
 						json.parse(persistedInfo) : { expanded: {} };
-					
+
 					function shouldExpand(row, level, previouslyExpanded) {
 						return previouslyExpanded || !!persistedInfo.expanded[row.id];
 					}
-					
+
 					function renderLinkCell(object, value){
 						// Render a link for cells in rows representing pages
 						// (not parent directories)
-						return put(object.title ? "a[href=" + object.url + "]" : "div",
-							value || "");
+						var node = object.title ?
+							domConstruct.create('a', { href: object.url }) :
+							domConstruct.create('div');
+						node.appendChild(document.createTextNode(value || ''));
+						return node;
 					}
-					
+
 					var grid = new (declare([OnDemandGrid, Tree]))({
 						className: "toc",
 						columns: {
@@ -106,20 +110,23 @@
 						},
 						shouldExpand: shouldExpand,
 						renderHeader: function(){
-							put(this.headerNode, "div.header-title", "dgrid Tests");
+							domConstruct.create('div', {
+								className: 'header-title',
+								innerHTML: 'dgrid Tests'
+							}, this.headerNode);
 						},
 						query: { parent: "" },
 						sort: "name",
 						collection: store.filter({ parent: "" })
 					}, "grid");
-					
+
 					if(persistedInfo.scroll){
 						// Restore scroll position on initial refresh
 						on.once(grid, "dgrid-refresh-complete", function(){
 							grid.scrollTo({ y: persistedInfo.scroll });
 						});
 					}
-					
+
 					grid.on(".dgrid-row:click", function(evt){
 						var item = grid.row(evt).data;
 						if(item.title){

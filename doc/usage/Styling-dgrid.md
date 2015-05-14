@@ -3,6 +3,41 @@
 dgrid components are designed to be highly CSS-driven for optimal performance and
 organization, so visual styling should be controlled through CSS.
 
+## Getting Started
+
+The first thing to do when using dgrid components is to add `dgrid.css` to your page via a `link` tag or `@import`.
+
+```html
+<link rel="stylesheet" href="dgrid/css/dgrid.css">
+```
+
+You may also need to include the following stylesheets under specific circumstances:
+
+* `dojo/resources/dnd.css` (or equivalent custom styles), if you are using the `ColumnReorder` or `DnD` extensions
+* `dgrid/css/TouchScroll.css`, if you are using the `dgrid/TouchScroll` module
+
+### Notes on Structural Styles
+
+As of dgrid 0.5, dgrid no longer uses xstyle to automatically load structural CSS on a per-module basis.
+`dgrid.css` now includes all structural styles, so that is the only stylesheet that needs to be referenced.
+
+The structural styles are now organized using [Stylus](http://learnboost.github.io/stylus/), to keep each component's
+structural styles separate while still generating a single CSS file.  If you are also using Stylus in your own
+project, it is feasible to directly reference the `styl` files for only the specific dgrid components you need,
+rather than all of the files referenced in `dgrid.styl`.  (You will always need `base.styl` at minimum.)
+
+## Skins
+
+dgrid includes a number of skins out of the box, in the `dgrid/css/skins` folder.  The `skin.html` test page under
+`dgrid/test` provides a demonstration of all included skins.
+
+There are two steps to using a dgrid skin:
+
+1. Add its CSS via a `link` tag or `@import`
+2. Include its namespace class at a level above your grids in the DOM (e.g. `<body class="claro">`)
+
+For details on customizing skins, see [Customizing Skins](./Customizing-Skins.md).
+
 ## Styling Grid Columns
 
 The Grid module creates classes based on the field names and column IDs of the columns
@@ -53,48 +88,6 @@ aspect.after(grid, 'renderRow', function(row, args) {
 });
 ```
 
-## Skinning dgrid Components
-
-dgrid automatically loads the necessary structural CSS to work properly using
-xstyle's css module.  However, to make the component far more visually attractive,
-it is common to also apply one of the the included skins.  There are various
-CSS files under the `css/skins` directory which can be used to significantly
-alter the look and feel of dgrid components.  The `skin.html` test page provides
-a quick demonstration of all included skins.
-
-Many of the classes commonly involved in customizing layout and skin can be discovered
-by examining the CSS of existing skins, or by inspecting elements in your browser's
-developer tools.
-
-To help get started, the following is a list of classes commonly employed in the
-structuring of dgrid components:
-
-* `dgrid`: Applied to each dgrid list or grid at the top-level element
-* `dgrid-header`: Applied to the element which contains the header area
-* `dgrid-scroller`: Applied to the element responsible for scrolling the data content
-* `dgrid-content`: Applied to the element inside of the scroller area,
-  which holds all the data contents
-* `dgrid-row`: Applied to each row element
-* `dgrid-row-even`: Applied to each even row element
-* `dgrid-row-odd`: Applied to each odd row element
-  Applying a different color to alternating rows can help visually distinguish individual items.
-* `dgrid-selected`: Applied to selected rows or cells
-* `dgrid-cell`: Applied to each cell element
-* `dgrid-focus`: Applied to the element (cell or row) with the focus (for keyboard based navigation)
-* `dgrid-expando-icon`: Applied to the expando icon on tree nodes
-* `dgrid-row-expanded`: Applied to rows that have been expanded when using the `Tree` mixin
-* `dgrid-header-scroll`: Applied to the node in the top right corner of a Grid,
-  above the vertical scrollbar
-
-When `addUiClasses` is set to `true` (the default), the following generic class
-names are also available for generic skinning (following the jQuery ThemeRoller convention):
-
-* `ui-widget-content`: Applied to each dgrid list or grid at the top element
-* `ui-widget-header`: Applied to the element that contains the header rendering
-* `ui-state-default`: Applied to each row element
-* `ui-state-active`: Applied to selected rows or cells
-* `ui-state-highlight`: Applied to a row for a short time when the contents are changed (or it is newly created)
-
 ## The `dgrid-autoheight` class
 
 There are various cases where it is desirable for a grid to adjust its height according to its contents.  dgrid
@@ -103,6 +96,6 @@ as adding the `dgrid-autoheight` class to the DOM node used to create the grid, 
 property to the instance.
 
 **Note:** Using the `dgrid-autoheight` class with `OnDemandList` is **not** recommended, as `OnDemandList` will
-end up ultimately rendering all of the grid's rows anyway, page by page.  `dgrid-autoheight` works well with
+end up ultimately rendering all of the grid's rows immediately, page by page.  `dgrid-autoheight` works well with
 `Pagination`.  If you are really interested in rendering all store data at once into an auto-height list or grid,
 have a look at our [tutorial](http://dgrid.io/tutorials/0.4/single_query) on the subject.

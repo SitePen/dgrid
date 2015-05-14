@@ -6,6 +6,7 @@
 		<meta name="viewport" content="width=570">
 		<style>
 			@import "../../dojo/resources/dojo.css";
+			@import "../css/dgrid.css";
 			@import "../../dijit/themes/claro/claro.css";
 			@import "../css/skins/claro.css";
 			.heading {
@@ -25,7 +26,7 @@
 				margin: 10px;
 			}
 		</style>
-		<script src="../../dojo/dojo.js" 
+		<script src="../../dojo/dojo.js"
 			data-dojo-config="async: true"></script>
 		<script>
 			require([
@@ -117,7 +118,7 @@
 						columns: columns,
 						selectionMode: "none"
 					}, "grid");
-					
+
 					grid.on("dgrid-datachange", function(evt){
 						console.log("data changed: ", evt.oldValue, " -> ", evt.value);
 						console.log("cell: ", evt.cell, evt.cell.row.id);
@@ -129,7 +130,7 @@
 						console.log("hide editOn editor: ", evt);
 					});
 				});
-				
+
 		</script>
 	</head>
 	<body class="claro">

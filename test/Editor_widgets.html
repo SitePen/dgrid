@@ -6,6 +6,7 @@
 		<meta name="viewport" content="width=570">
 		<style>
 			@import "../../dojo/resources/dojo.css";
+			@import "../css/dgrid.css";
 			@import "../../dijit/themes/claro/claro.css";
 			@import "../css/skins/claro.css";
 			.heading {
@@ -25,7 +26,7 @@
 				margin: 10px;
 			}
 		</style>
-		<script src="../../dojo/dojo.js" 
+		<script src="../../dojo/dojo.js"
 			data-dojo-config="async: true, isDebug: true"></script>
 		<script>
 			require(["dgrid/List", "dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Keyboard", "dgrid/Editor", "dijit/form/DateTextBox", "dijit/form/HorizontalSlider", "dijit/form/NumberSpinner", "dojo/_base/declare", "dgrid/test/data/createSyncStore", "dgrid/test/data/typesData", "dojo/domReady!"],
@@ -85,7 +86,7 @@
 						columns: columns,
 						selectionMode: "single"
 					}, "grid");
-					
+
 					grid.on("dgrid-datachange", function(evt){
 						console.log("data changed: ", evt.oldValue, " -> ", evt.value);
 						console.log("cell: ", evt.cell, evt.cell.row.id);
@@ -96,7 +97,7 @@
 					grid.on("dgrid-editor-hide", function(evt){
 						console.log("hide editOn editor: ", evt);
 					});
-					
+
 					grid.on(".field-integer:dgrid-datachange", function(evt){
 						if(evt.value > 1000){
 							evt.preventDefault();
@@ -109,12 +110,12 @@
 						}
 					});
 				});
-				
+
 		</script>
 	</head>
 	<body class="claro">
 		<h2>A basic grid with editors</h2>
-		(This test requires dijit to be installed)	
+		(This test requires dijit to be installed)
 		<div id="grid"></div>
 		<button type="button" id="save" onclick="grid.save()">Save</button>
 	</body>

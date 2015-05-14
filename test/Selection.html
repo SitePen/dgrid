@@ -6,17 +6,18 @@
 		<meta name="viewport" content="width=570">
 		<style>
 			@import "../../dojo/resources/dojo.css";
+			@import "../css/dgrid.css";
 			@import "../css/skins/nihilo.css";
 			.heading {
 				font-weight: bold;
 				padding-bottom: 0.25em;
 			}
-			.dgrid { 
+			.dgrid {
 				width: 70%;
 				margin: 10px;
 			}
 		</style>
-		<script src="../../dojo/dojo.js" 
+		<script src="../../dojo/dojo.js"
 			data-dojo-config="async: true"></script>
 		<script>
 			require(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array", "dojo/json", "dojo/on",
@@ -51,7 +52,7 @@
 						},
 						allowSelectAll: true
 					}, "grid-row-navigation");
-					
+
 					var columns2 = {
 						col1: 'Column 1',
 						col2: {label: 'Column 2', sortable: false},
@@ -78,7 +79,7 @@
 						selectionMode: "none",
 						allowSelectAll: true
 					}, "grid-cell-navigation-none");
-					
+
 					// cell navigation + row selection
 					gridMixed = new SelectionGrid({
 						collection: testStore,

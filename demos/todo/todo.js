@@ -4,25 +4,27 @@ define([
 	'dgrid/Editor',
 	'dgrid/extensions/DnD',
 	'dojo/_base/declare',
+	'dojo/dom-construct',
 	'dojo/json',
 	'dojo/on',
 	'dstore/Memory',
 	'dstore/Trackable',
-	'put-selector/put',
 	'dojo/domReady!'
-], function (OnDemandGrid, Selection, Editor, DnD, declare, JSON, on, Memory, Trackable, put) {
+], function (OnDemandGrid, Selection, Editor, DnD, declare, domConstruct, JSON, on, Memory, Trackable) {
 	// Create DOM
-	var container = put('div#container');
-	var itemForm = put(container, 'form#itemForm.actionArea.topArea');
-	var taskField = put(itemForm, 'input#txtTask[name=task]');
-	put(itemForm, 'button[type=submit]', 'Add');
+	var container = domConstruct.create('div', { id: 'container' });
+	var itemForm = domConstruct.create('form', { className: 'actionArea topArea', id: 'itemForm' }, container);
+	var taskField = domConstruct.create('input', { id: 'txtTask', name: 'task' }, itemForm);
+	domConstruct.create('button', { innerHTML: 'add', type: 'submit' }, itemForm);
 
-	var listNode = put(container, 'div#list');
-	var removeArea = put(container, 'div.actionArea.bottomArea');
-	var removeSelectedButton = put(removeArea, 'button[type=button]', 'Remove Selected');
-	var removeCompletedButton = put(removeArea, 'button[type=button]', 'Remove Completed');
+	var listNode = domConstruct.create('div', { id: 'list' }, container);
+	var removeArea = domConstruct.create('div', { className: 'actionArea bottomArea' }, container);
+	var removeSelectedButton = domConstruct.create('button', { innerHTML: 'Remove Selected', type: 'button' },
+			removeArea);
+	var removeCompletedButton = domConstruct.create('button', { innerHTML: 'Remove Completed', type: 'button' },
+			removeArea);
 
-	put(document.body, container);
+	document.body.appendChild(container);
 
 	var storeMixins = [ Memory, Trackable ];
 
@@ -99,8 +101,10 @@ define([
 
 	if (window.localStorage) {
 		// add extra button to clear the localStorage key we're using
-		var button = put(removeArea, 'button[type=button]',
-			'Clear localStorage');
+		var button = domConstruct.create('button', {
+			innerHTML: 'Clear localStorage',
+			type: 'button'
+		}, removeArea);
 
 		on(button, 'click', function () {
 			localStorage.removeItem(store.STORAGE_KEY);

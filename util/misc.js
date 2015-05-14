@@ -1,7 +1,6 @@
 define([
-	'dojo/has',
-	'put-selector/put'
-], function (has, put) {
+	'dojo/has'
+], function (has) {
 	// summary:
 	//		This module defines miscellaneous utility methods for purposes of
 	//		adding styles, and throttling/debouncing function calls.
@@ -150,7 +149,8 @@ define([
 
 			if (!extraSheet) {
 				// First time, create an extra stylesheet for adding rules
-				extraSheet = put(document.getElementsByTagName('head')[0], 'style');
+				extraSheet = document.createElement('style');
+				document.getElementsByTagName('head')[0].appendChild(extraSheet);
 				// Keep reference to actual StyleSheet object (`styleSheet` for IE < 9)
 				extraSheet = extraSheet.sheet || extraSheet.styleSheet;
 				// Store name of method used to remove rules (`removeRule` for IE < 9)
