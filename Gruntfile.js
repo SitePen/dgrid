@@ -4,7 +4,7 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-stylus');
 	grunt.loadNpmTasks('grunt-contrib-watch');
-	grunt.loadNpmTasks('intern-geezer');
+	grunt.loadNpmTasks('intern');
 
 	// grunt-contrib-stylus does not appear to support globbed destination filenames,
 	// so generate the desired destination/source configuration ahead of time
