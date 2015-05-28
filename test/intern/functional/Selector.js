@@ -97,7 +97,7 @@ define([
 				}
 
 				var selector = '#' + gridId + '-row-',
-					remote = this.get('remote'),
+					remote = this.remote,
 					rowIndex;
 
 				function each(rowIndex) {
@@ -134,7 +134,7 @@ define([
 		}
 
 		test.before(function () {
-			var remote = this.get('remote');
+			var remote = this.remote;
 			return remote.get(require.toUrl('./Selector.html'))
 				.then(pollUntil(function () {
 					return window.ready;
@@ -152,7 +152,7 @@ define([
 
 		test.beforeEach(function () {
 			// Clear selections from previous tests
-			return this.get('remote').execute(function () {
+			return this.remote.execute(function () {
 				/* global gridExtended, gridMultiple, gridSingle, gridToggle, gridNone */
 				gridExtended.clearSelection();
 				gridMultiple.clearSelection();
