@@ -25,6 +25,15 @@ define([
 			return this._trackError(function () {
 				return self.renderQueryResults(self._renderedCollection.fetch());
 			});
+		},
+
+		renderArray: function () {
+			var rows = this.inherited(arguments);
+
+			// Clear _lastCollection which is ordinarily only used for store-less grids
+			this._lastCollection = null;
+
+			return rows;
 		}
 	});
 });
