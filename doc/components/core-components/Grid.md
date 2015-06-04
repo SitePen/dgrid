@@ -18,6 +18,12 @@ require(["dgrid/Grid"], function(Grid){
 });
 ```
 
+**Note:** `dgrid/Grid` does not directly support `dojo/store` stores. `dojo/store` stores are supported by the following:
+
+* [`dgrid/OnDemandList` and `dgrid/OnDemandGrid`](OnDemandList-and-OnDemandGrid.md)
+* [`dgrid/extensions/Pagination`](../extensions/Pagination.md)
+* Anything else that extends `dgrid/_StoreMixin`
+
 ## APIs
 
 In addition to the methods and properties inherited from [List](List.md), the Grid
