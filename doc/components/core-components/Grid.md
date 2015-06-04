@@ -18,6 +18,15 @@ require([ 'dgrid/Grid' ], function (Grid) {
 });
 ```
 
+## Considerations
+
+Please note that `dgrid/Grid` alone does not support `dstore` stores. `dstore` stores are supported in the following:
+
+* `dgrid/OnDemandList`
+* `dgrid/OnDemandGrid`
+* `dgrid/extensions/Pagination`
+* `dgrid/_StoreMixin`
+
 ## APIs
 
 In addition to the methods and properties inherited from [List](List.md), the Grid

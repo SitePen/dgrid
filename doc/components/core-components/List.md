@@ -14,6 +14,15 @@ require([ 'dgrid/List' ], function (List) {
 });
 ```
 
+## Considerations
+
+Please note that `dgrid/List` alone does not support `dstore` stores. `dstore` stores are supported in the following:
+
+* `dgrid/OnDemandList`
+* `dgrid/OnDemandGrid`
+* `dgrid/extensions/Pagination`
+* `dgrid/_StoreMixin`
+
 ## APIs
 
 The base List class (inherited by all other classes) exposes specific methods
