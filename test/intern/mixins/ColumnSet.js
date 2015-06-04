@@ -161,6 +161,7 @@ define([
 
 			grid = new TreeColumnSetGrid({
 				collection: store,
+				enableTreeTransitions: false,
 				columnSets: [[
 					[ {renderExpando: true, label:"Name", field:"name", sortable: false} ],
 					[ {label:"Type", field:"type", sortable: false} ]
