@@ -182,6 +182,19 @@ define([
 			this.on('.dgrid-column-set:dgrid-cellfocusin', function (event) {
 				self._onColumnSetCellFocus(event, this);
 			});
+
+			if ('expand' in this) {
+				aspect.after(this, 'expand', this.afterRowExpand, true);
+			}
+		},
+
+		afterRowExpand: function (row, expand) {
+			if (this._expanded[this.row(row).id]) {
+				// scrollLeft changes can't take effect on collapsed child rows;
+				// ensure they are properly updated once re-expanded.
+				this._columnSetScrollLefts[1] = -1;
+				adjustScrollLeft(this, row);
+			}
 		},
 
 		columnSets: [],
