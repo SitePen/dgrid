@@ -1,8 +1,11 @@
 define([
 	'dojo/_base/declare',
 	'dojo/dom-geometry',
+	'dijit/_WidgetBase',
 	'dijit/registry'
-], function (declare, domGeometry, registry) {
+], function (declare, domGeometry, _WidgetBase, registry) {
+	var wbPrototype = _WidgetBase.prototype;
+
 	return declare(null, {
 		// summary:
 		//		A dgrid extension which will add the grid to the dijit registry,
@@ -28,7 +31,7 @@ define([
 			}
 			this.inherited(arguments);
 
-			var widget = registry.getEnclosingWidget(this.domNode.parentNode);
+			var widget = this.getParent();
 			// If we have a parent layout container widget, it will handle resize,
 			// so remove the window resize listener added by List.
 			if (widget && widget.isLayoutContainer) {
@@ -51,9 +54,23 @@ define([
 			return [];
 		},
 
+		getParent: function () {
+			// summary:
+			//		Analogous to _WidgetBase#getParent, for compatibility with e.g. dijit._KeyNavContainer.
+			return registry.getEnclosingWidget(this.domNode.parentNode);
+		},
+
 		isLeftToRight: function () {
 			// Implement method expected by Dijit layout widgets
 			return !this.isRTL;
+		},
+
+		placeAt: function (/*String|DomNode|DocumentFragment|dijit/_WidgetBase*/ reference, /*String|Int?*/ position) {
+			// summary:
+			//		Analogous to dijit/_WidgetBase#placeAt;
+			//		places this widget in the DOM based on domConstruct.place() conventions.
+
+			return wbPrototype.placeAt.call(this, reference, position);
 		},
 
 		resize: function (changeSize) {
@@ -76,13 +93,6 @@ define([
 			// summary:
 			//		dgrid doesn't support watch; this is a no-op for compatibility with
 			//		some Dijit layout widgets which assume its existence.
-		},
-
-		getParent: function () {
-			// summary:
-			//		Analogue of _WidgetBase#getParent for compatibility with for example
-			//		dijit._KeyNavContainer.
-			return registry.getEnclosingWidget(this.domNode.parentNode);
 		}
 	});
 });
