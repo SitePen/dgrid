@@ -3,15 +3,49 @@ define([
 	'intern/chai!assert',
 	'dojo/_base/declare',
 	'dojo/aspect',
+	'dojo/Deferred',
+	'dojo/on',
 	'dojo/query',
 	'dgrid/test/data/createSyncStore',
+	'dgrid/test/data/createHierarchicalStore',
 	'dgrid/OnDemandGrid',
 	'dgrid/ColumnSet',
 	'dgrid/Keyboard',
+	'dgrid/Tree',
+	'dgrid/util/misc',
 	'../addCss'
-], function (test, assert, declare, aspect, query, createSyncStore, OnDemandGrid, ColumnSet, Keyboard) {
+], function (test, assert, declare, aspect, Deferred, on, query, createSyncStore, createHierarchicalStore,
+	OnDemandGrid, ColumnSet, Keyboard, Tree, miscUtil) {
+
 	var grid;
 	var handles;
+
+	var expand = function (id) {
+		var dfd = new Deferred();
+		grid.expand(id);
+		dfd.resolve();
+		return dfd.promise;
+	};
+
+	var collapse = function (id) {
+		var dfd = new Deferred();
+		grid.expand(id, false);
+		dfd.resolve();
+		return dfd.promise;
+	};
+
+	function scrollDistance(node, direction, distance) {
+		var dfd = new Deferred(),
+			handle;
+
+		handle = on.once(node, 'scroll', miscUtil.debounce(function () {
+			dfd.resolve();
+		}));
+
+		node[direction === 'x' ? 'scrollLeft' : 'scrollTop'] = distance;
+
+		return dfd.promise;
+	}
 
 	test.suite('ColumnSet mixin', function () {
 		test.before(function () {
@@ -92,6 +126,79 @@ define([
 			})));
 
 			grid.focus(grid.cell(1, '1-0-1'));
+		});
+	});
+
+	test.suite('ColumnSet + Tree mixins', function () {
+		test.before(function () {
+			var TreeColumnSetGrid = declare([ OnDemandGrid, ColumnSet, Tree ]);
+			var data = [];
+			var store;
+
+			for (i = 0; i < 5; i++) {
+				var parentId = '' + i;
+				data.push({
+					id: parentId,
+					value: 'Root ' + i,
+					name: 'Root ' + i,
+					type: 'country'
+				});
+				for (k = 0; k < 100; k++) {
+					data.push({
+						id: i + ':' + k,
+						parent: parentId,
+						value: 'Child ' + k,
+						name: 'Child ' + i,
+						type: 'city',
+						hasChildren: false
+					});
+				}
+			}
+
+			store = createHierarchicalStore({
+				data: data
+			});
+
+			grid = new TreeColumnSetGrid({
+				collection: store,
+				enableTreeTransitions: false,
+				columnSets: [[
+					[ {renderExpando: true, label:"Name", field:"name", sortable: false} ],
+					[ {label:"Type", field:"type", sortable: false} ]
+				]]
+			});
+
+			document.body.appendChild(grid.domNode);
+			grid.startup();
+		});
+
+		test.afterEach(function () {
+			for (var i = handles.length; i--;) {
+				handles[i].remove();
+			}
+		});
+
+		test.after(function () {
+			grid.destroy();
+		});
+
+		test.test('expand after scroll-x should reset scrollLeft', function () {
+			var column = query('#' + grid.id + '-row-0 .dgrid-column-set')[0];
+			grid.styleColumn('0-0-0', 'width: 10000px; overflow-x: scroll;');
+
+			return expand(0)
+				.then(function () {
+					collapse(0)
+						.then(function () {
+							scrollDistance(column, 'x', 300)
+								.then(function () {
+									expand(0)
+										.then(function () {
+											assert.strictEqual(column.scrollLeft, 0);
+										});
+								});
+						});
+				});
 		});
 	});
 });
