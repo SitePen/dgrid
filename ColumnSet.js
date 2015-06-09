@@ -18,9 +18,11 @@ define([
 
 	var colsetidAttr = 'data-dgrid-column-set-id';
 
-	function adjustScrollLeft(grid, row) {
+	function adjustScrollLeft(grid, root) {
+		// Adjusts the scroll position of each column set in each row under the given root.
+		// (root can be a row, or e.g. a tree parent row element's connected property to adjust children)
 		var scrollLefts = grid._columnSetScrollLefts;
-		query('.dgrid-column-set', row).forEach(function (element) {
+		query('.dgrid-column-set', root).forEach(function (element) {
 			element.scrollLeft = scrollLefts[element.getAttribute(colsetidAttr)];
 		});
 	}
@@ -182,6 +184,20 @@ define([
 			this.on('.dgrid-column-set:dgrid-cellfocusin', function (event) {
 				self._onColumnSetCellFocus(event, this);
 			});
+
+			if (typeof this.expand === 'function') {
+				aspect.after(this, 'expand', function (promise, args) {
+					promise.then(function () {
+						var row = self.row(args[0]);
+						if (self._expanded[row.id]) {
+							// scrollLeft changes can't take effect on collapsed child rows;
+							// ensure they are properly updated once re-expanded.
+							adjustScrollLeft(self, row.element.connected);
+						}
+					});
+					return promise;
+				});
+			}
 		},
 
 		columnSets: [],
