@@ -139,13 +139,12 @@ define([
 
 		_findSortArrowParent: function () {
 			var parent = this.inherited(arguments),
+				spacerRow = query('.dgrid-spacer-row', this.headerNode)[0],
 				columnId,
 				nodes;
 
-			if (parent && miscUtil.contains(query('.dgrid-spacer-row', this.headerNode)[0], parent)) {
-				// Determine column that the sort arrow is in
-				// (fallback is for the padding node in IE < 8)
-				columnId = parent.columnId || parent.parentNode.columnId;
+			if (parent && spacerRow.contains(parent)) {
+				columnId = parent.columnId;
 				nodes = query('.dgrid-column-' + columnId, this.headerNode);
 				return nodes[nodes.length - 1];
 			}

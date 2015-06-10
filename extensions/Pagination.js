@@ -354,7 +354,7 @@ define([
 				}, linksNode);
 			}
 
-			if (!focused || !miscUtil.contains(this.paginationNavigationNode, focused)) {
+			if (!focused || !this.paginationNavigationNode.contains(focused)) {
 				focused = null;
 			}
 			else if (focused.className === 'dgrid-page-link') {
