@@ -127,20 +127,6 @@ define([
 			}
 		},
 
-		// DOM-related functions
-
-		contains: function (parent, node) {
-			// summary:
-			//		Checks to see if an element is contained in another element.
-
-			if (has('dom-contains')) {
-				return parent.contains(node);
-			}
-			else {
-				return parent.compareDocumentPosition(node) & /* DOCUMENT_POSITION_CONTAINS */ 8;
-			}
-		},
-
 		// CSS-related functions
 
 		addCssRule: function (selector, css) {

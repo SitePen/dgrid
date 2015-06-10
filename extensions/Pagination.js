@@ -327,7 +327,7 @@ define([
 				link.tabIndex = disabled ? -1 : 0;
 			}
 
-			if (!focused || !miscUtil.contains(this.paginationNavigationNode, focused)) {
+			if (!focused || !this.paginationNavigationNode.contains(focused)) {
 				focused = null;
 			}
 			else if (focused.className === 'dgrid-page-link') {
