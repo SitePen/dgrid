@@ -364,7 +364,9 @@ define([
 			this._updateColumnHiddenState(id, hidden);
 
 			// Since this can be called directly, re-sync the appropriate checkbox.
-			this._columnHiderCheckboxes[id].checked = !hidden;
+			if (this._columnHiderCheckboxes[id]) {
+				this._columnHiderCheckboxes[id].checked = !hidden;
+			}
 		}
 	});
 });
