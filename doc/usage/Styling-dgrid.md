@@ -71,6 +71,9 @@ structuring of dgrid components:
 
 * `dgrid`: Applied to each dgrid list or grid at the top-level element
 * `dgrid-header`: Applied to the element which contains the header area
+* `dgrid-header-scroll`: Applied to the node in the top right corner of a Grid,
+  above the vertical scrollbar
+* `dgrid-footer`: Applied to the (optional) element at the bottom of the grid (e.g. used for Pagination controls)
 * `dgrid-scroller`: Applied to the element responsible for scrolling the data content
 * `dgrid-content`: Applied to the element inside of the scroller area,
   which holds all the data contents
@@ -82,9 +85,8 @@ structuring of dgrid components:
 * `dgrid-cell`: Applied to each cell element
 * `dgrid-focus`: Applied to the element (cell or row) with the focus (for keyboard based navigation)
 * `dgrid-expando-icon`: Applied to the expando icon on tree nodes
-* `dgrid-row-expanded`: Applied to rows that have been expanded when using the `Tree` mixin
-* `dgrid-header-scroll`: Applied to the node in the top right corner of a Grid,
-  above the vertical scrollbar
+* `dgrid-row-expandable`: Applied to parent rows that can be expanded with the `Tree` mixin
+* `dgrid-row-expanded`: Applied to parent rows that have been expanded when using the `Tree` mixin
 
 When `addUiClasses` is set to `true` (the default), the following generic class
 names are also available for generic skinning (following the jQuery ThemeRoller convention):
