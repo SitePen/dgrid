@@ -219,7 +219,7 @@ define([
 			}
 
 			if (expanded || (!this.collection.mayHaveChildren || this.collection.mayHaveChildren(object))) {
-				domClass.add(rowElement, 'dgrid-row-expandable');
+				put(rowElement, '.dgrid-row-expandable');
 			}
 
 			return rowElement; // pass return value through
