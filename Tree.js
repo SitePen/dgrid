@@ -207,7 +207,7 @@ define([
 			return columnArray;
 		},
 
-		insertRow: function () {
+		insertRow: function (object) {
 			var rowElement = this.inherited(arguments);
 
 			// Auto-expand (shouldExpand) considerations
@@ -216,6 +216,10 @@ define([
 
 			if (expanded) {
 				this.expand(rowElement, true, true);
+			}
+
+			if (expanded || (!this.collection.mayHaveChildren || this.collection.mayHaveChildren(object))) {
+				domClass.add(rowElement, 'dgrid-row-expandable');
 			}
 
 			return rowElement; // pass return value through
