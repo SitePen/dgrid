@@ -51,7 +51,8 @@ visually distinguish individual items
 * `dgrid-selected`: Each selected row or cell
 * `dgrid-focus`: The focused element (row or cell); added by the Keyboard mixin
 * `dgrid-expando-icon`: The expando icon in Tree cells
-* `dgrid-row-expanded`: Added to rows that have been expanded when using the `Tree` mixin
+* `dgrid-row-expandable`: Added to parent rows that can be expanded with the `Tree` mixin
+* `dgrid-row-expanded`: Added to parent rows that have been expanded when using the `Tree` mixin
 
 When `addUiClasses` is set to `true` (the default), the following generic class
 names are also available for generic skinning (following the jQuery ThemeRoller convention):
