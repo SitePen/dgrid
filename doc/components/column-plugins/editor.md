@@ -69,9 +69,15 @@ Method | Description
 
 ## Events
 
-The editor plugin emits a `dgrid-datachange` event whenever an editor field
-loses focus after its value is changed. This event includes the following
-properties:
+The editor plugin emits a `dgrid-datachange` event to reflect changes made to the editor input/widget.
+When this fires varies depending on whether a native input or Dijit widget is used:
+
+* It fires on the `change` event of native inputs, which at minimum should correspond to the input losing focus,
+  but may correspond to more direct interactions for some types of inputs
+* It fires on the `blur` event of Dijit widgets, because Dijit's `change` events often fire on a delay which
+  would involve additional complexity to handle
+
+The `dgrid-datachange` event includes the following properties:
 
 * `grid`: The Grid instance in which the edit occurred
 * `cell`: The `cell` object to which the edit applied, as reported by the
