@@ -132,6 +132,14 @@
 	width: 99%;
 }
 
+html.has-mozilla .dgrid {
+	// Fix: Firefox's focus outline doesn't work by default for divs prior to actually tabbing into it
+	.dgrid-row:focus,
+	.dgrid-cell:focus {
+		outline: 1px dotted;
+	}
+}
+
 html.has-mozilla .dgrid-focus {
 	// Tighten outline to fit within cells (avoids cutting off top/bottom outlines)
 	outline-offset: -1px;

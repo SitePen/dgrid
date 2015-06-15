@@ -110,6 +110,10 @@
 .dgrid-input {
   width: 99%;
 }
+html.has-mozilla .dgrid .dgrid-row:focus,
+html.has-mozilla .dgrid .dgrid-cell:focus {
+  outline: 1px dotted;
+}
 html.has-mozilla .dgrid-focus {
   outline-offset: -1px;
 }
