@@ -74,7 +74,7 @@
 	vertical-align: top;
 	border: 1px solid #ddd;
 	border-top-style: none;
-	
+
 	box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	-ms-box-sizing: border-box;
@@ -163,6 +163,12 @@
 
 .dgrid-input {
 	width: 99%;
+}
+
+html.has-mozilla .dgrid .dgrid-row:focus,
+html.has-mozilla .dgrid .dgrid-cell:focus {
+	/* Fix: Firefox's focus outline doesn't work by default for divs prior to actually tabbing into it */
+	outline: 1px dotted;
 }
 
 html.has-mozilla .dgrid-focus {
