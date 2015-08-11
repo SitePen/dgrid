@@ -601,7 +601,9 @@ define([
 
 					return results;
 				}, function (error) {
-					cleanupLoading(grid);
+					if (this._topLevelRequest) {
+						cleanupLoading(grid);
+					}
 					throw error;
 				});
 			});
