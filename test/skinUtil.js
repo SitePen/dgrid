@@ -7,7 +7,7 @@ define([
 	// Honor skin and RTL specification from query param
 	var skin = params.skin || 'claro';
 	var rtl = params.dir === 'rtl';
-	var skins = ['claro', 'tundra', 'nihilo', 'soria', 'slate', 'sage', 'cactus'];
+	var skins = ['claro', 'tundra', 'nihilo', 'soria', 'slate', 'sage', 'cactus', 'flat'];
 
 	// Add skin class to body
 	document.body.className = skin;
