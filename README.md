@@ -221,7 +221,7 @@ script which can be used to start up the server.  For additional information
 ### Running the tests
 
 Once the Selenium server is running, kick off the Intern test runner with the
-following command (run from the directory containing dgrid):
+following command (run from within the dgrid directory):
 
 ```
 node node_modules/intern-geezer/runner config=test/intern/intern.local
