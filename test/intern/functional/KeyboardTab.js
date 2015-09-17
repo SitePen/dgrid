@@ -12,7 +12,7 @@ define([
 			// since this functional test module runs on the server and can't load
 			// such scripts. Further, in the html page, set a global "ready" var
 			// to true to tell the runner to continue.
-			return this.get('remote')
+			return this.remote
 				.get(require.toUrl('./KeyboardTab.html'))
 				.then(pollUntil(function () {
 					return window.ready;
@@ -20,7 +20,7 @@ define([
 		});
 
 		test.test('grids with and without headers -> tab key', function () {
-			return this.get('remote')
+			return this.remote
 				.getActiveElement()
 					.getAttribute('id')
 					.then(function (id) {
