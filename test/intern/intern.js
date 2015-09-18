@@ -7,38 +7,22 @@ define({
 	// A fully qualified URL to the Intern proxy
 	proxyUrl: 'http://localhost:9000/',
 
-	// Default desired capabilities for all environments. Individual capabilities can be overridden by any of the
-	// specified browser environments in the `environments` array below as well. See
-	// https://code.google.com/p/selenium/wiki/DesiredCapabilities for standard Selenium capabilities and
-	// https://saucelabs.com/docs/additional-config#desired-capabilities for Sauce Labs capabilities.
-	// Note that the `build` capability will be filled in with the current commit ID from the Travis CI environment
-	// automatically
+	// Username and key should be set in the BROWSERSTACK_USERNAME and BROWSERSTACK_ACCESS_KEY environment variables
+	tunnel: 'BrowserStackTunnel',
+
+	// See https://www.browserstack.com/automate/capabilities for capabilities and environments
 	capabilities: {
-		// Limit duration of each job to avoid waste of resources during hangs
-		'max-duration': 600,
-		// Increase timeout if Sauce Labs receives no new commands
-		// (no commands are sent during non-functional unit tests)
-		'idle-timeout': 180
+		name: 'dgrid'
 	},
 
-	// Browsers to run integration testing against. Note that version numbers must be strings if used with Sauce
-	// OnDemand. Options that will be permutated are browserName, version, platform, and platformVersion; any other
-	// capabilities options specified for an environment will be copied as-is
 	environments: [
-		{ browserName: 'internet explorer', version: '11', platform: 'Windows 8.1' },
-		{ browserName: 'internet explorer', version: '10', platform: 'Windows 8' },
-		{ browserName: 'internet explorer', version: '9', platform: 'Windows 7' },
-		{ browserName: 'firefox', platform: [ 'Linux', 'OS X 10.6', 'Windows 7' ] },
-		{ browserName: 'chrome', platform: [ 'Linux', 'OS X 10.8', 'Windows 7' ] },
-		{ browserName: 'safari', version: '6', platform: 'OS X 10.8' }
+		{ browserName: 'internet explorer', version: [ '9', '10', '11' ], platform: 'WINDOWS' },
+		{ browserName: 'firefox', platform: [ 'WINDOWS', 'MAC' ] },
+		{ browserName: 'chrome', platform: [ 'WINDOWS', 'MAC' ] }
 	],
 
 	// Maximum number of simultaneous integration tests that should be executed on the remote WebDriver service
-	maxConcurrency: 3,
-
-	// If using Sauce Labs, keep your username and password in the SAUCE_USERNAME and SAUCE_ACCESS_KEY
-	// environment variables.
-	tunnel: 'SauceLabsTunnel',
+	maxConcurrency: 2,
 
 	basePath: '..',
 

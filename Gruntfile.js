@@ -45,15 +45,17 @@ module.exports = function (grunt) {
 		},
 
 		intern: {
+			options: {
+				reporters: [ 'LcovHtml', 'Pretty' ],
+				runType: 'runner'
+			},
 			local: {
 				options: {
-					runType: 'runner',
 					config: 'test/intern/intern.local'
 				}
 			},
 			remote: {
 				options: {
-					runType: 'runner',
 					config: 'test/intern/intern'
 				}
 			}
