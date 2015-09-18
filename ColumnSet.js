@@ -1,6 +1,7 @@
 define([
 	'dojo/_base/declare',
 	'dojo/_base/lang',
+	'dojo/dom-class',
 	'dojo/on',
 	'dojo/aspect',
 	'dojo/query',
@@ -9,7 +10,7 @@ define([
 	'put-selector/put',
 	'dojo/_base/sniff',
 	'xstyle/css!./css/columnset.css'
-], function (declare, lang, on, aspect, query, has, miscUtil, put) {
+], function (declare, lang, domClass, on, aspect, query, has, miscUtil, put) {
 	has.add('event-mousewheel', function (global, document, element) {
 		return 'onmousewheel' in element;
 	});
@@ -52,6 +53,22 @@ define([
 		return subset;
 	}
 
+	function isRootNode(node, rootNode) {
+		// If we've reached the top-level node for the grid then there is no parent column set.
+		// This guard prevents an error when scroll is initated over some node in the grid that is not a descendant of
+		// a column set. This can happen in a grid that has empty space below its rows (grid is taller than the rows).
+		if (rootNode) {
+			if (node === rootNode) {
+				return true;
+			}
+		}
+		else if (domClass.contains(node, '.dgrid-grid')) {
+			return true;
+		}
+
+		return false;
+	}
+
 	function findParentColumnSet(node, root) {
 		// WebKit will invoke mousewheel handlers with an event target of a text
 		// node; check target and if it's not an element node, start one node higher
@@ -59,9 +76,12 @@ define([
 		if (node.nodeType !== 1) {
 			node = node.parentNode;
 		}
-		while (node && !query.matches(node, '.dgrid-column-set[' + colsetidAttr + ']', root)) {
+
+		while (node && !isRootNode(node, root) && !query.matches(node, '.dgrid-column-set[' + colsetidAttr + ']', root))
+		{
 			node = node.parentNode;
 		}
+
 		return node;
 	}
 
