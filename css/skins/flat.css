@@ -1,0 +1,56 @@
+.flat .dgrid {
+  background: #fff;
+  border-color: #d0d0d0;
+}
+.flat .dgrid-header,
+.flat .dgrid-footer {
+  background: #fff;
+}
+.flat .dgrid-header {
+  text-transform: uppercase;
+}
+.flat .dgrid-header .dgrid-cell {
+  border-color: #d0d0d0;
+  font-weight: bold;
+}
+.flat .dgrid-header .dgrid-cell:hover {
+  background: #f2f2f2;
+}
+.flat .dgrid-row {
+  background: transparent;
+  -webkit-transition-duration: 0.1s;
+  -moz-transition-duration: 0.1s;
+  -o-transition-duration: 0.1s;
+  -ms-transition-duration: 0.1s;
+  transition-duration: 0.1s;
+  -webkit-transition-property: background-color;
+  -moz-transition-property: background-color;
+  -o-transition-property: background-color;
+  -ms-transition-property: background-color;
+  transition-property: background-color;
+}
+.flat .dgrid-row:hover {
+  background-color: #f2f2f2;
+}
+.flat .dgrid-selected {
+  background-color: #fff;
+}
+.flat .dgrid-selected:hover {
+  background-color: #f2f2f2;
+}
+.flat .dgrid-cell {
+  border-color: #d0d0d0;
+}
+.flat .dgrid-cell-padding {
+  padding: 5px 10px;
+}
+.flat .dgrid-header .dgrid-cell {
+  border-bottom-width: 2px;
+}
+.flat .dgrid-cell {
+  border-left: 0;
+  border-right: 0;
+}
+.flat .dgrid-selected {
+  border: 1px solid #007ac2;
+}
