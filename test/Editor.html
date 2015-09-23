@@ -64,7 +64,7 @@
 						TestStoreMixin = declare(null, {
 							put: function(object, options){
 								console.log("put called for ID: ", object.id, object);
-								this.inherited(arguments);
+								return this.inherited(arguments);
 							}
 						}),
 						TestStore = declare([ Memory, Trackable, TestStoreMixin ]),

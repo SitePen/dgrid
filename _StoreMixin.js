@@ -282,7 +282,7 @@ define([
 			var self = this,
 				store = this.collection,
 				dirty = this.dirty,
-				dfd = new Deferred(), promise = dfd.promise,
+				dfd = new Deferred(),
 				results = {},
 				getFunc = function (id) {
 					// returns a function to pass as a step in the promise chain,
@@ -336,6 +336,11 @@ define([
 					});
 				};
 			}
+
+			var promise = dfd.then(function () {
+				// Ensure empty object is returned even if nothing was dirty, for consistency
+				return results;
+			});
 
 			// For every dirty item, grab the ID
 			for (var id in dirty) {
