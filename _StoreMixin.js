@@ -283,6 +283,7 @@ define([
 				store = this.collection,
 				dirty = this.dirty,
 				dfd = new Deferred(), promise = dfd.promise,
+				results = {},
 				getFunc = function (id) {
 					// returns a function to pass as a step in the promise chain,
 					// with the id variable closured
@@ -326,10 +327,12 @@ define([
 
 					updating[id] = true;
 					// Put it in the store, returning the result/promise
-					return store.put(object).then(function () {
+					return store.put(object).then(function (result) {
 						// Clear the item now that it's been confirmed updated
 						delete dirty[id];
 						delete updating[id];
+						results[id] = result;
+						return results;
 					});
 				};
 			}
