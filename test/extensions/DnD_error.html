@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Test Grid DnD on stores returning rejected promises</title>
+		<meta name="viewport" content="width=570">
+		<style>
+			@import "../../../dojo/resources/dojo.css";
+			@import "../../../dojo/resources/dnd.css";
+			@import "../../css/dgrid.css";
+			@import "../../../dijit/themes/tundra/tundra.css";
+			@import "../../css/skins/tundra.css";
+
+			.dojoDndItem { padding: 0; } /* override dijit.css */
+
+			.gridcontainer {
+				float: left;
+				width: 40%;
+				padding: 2em 5% 0;
+			}
+
+			.dgrid {
+				height: 400px;
+			}
+		</style>
+	</head>
+	<body class="tundra">
+		<p>This page allows testing DnD behavior when stores return error responses.</p>
+		<p>If writing an item to a collection fails on an inter-grid move, then that item should not be removed from
+			the first grid.</p>
+		<div><label>
+			<input type="checkbox" id="errorOnRemove">
+			Reject removals on collection for 1st grid
+		</label></div>
+		<div><label>
+			<input type="checkbox" id="errorOnCopy">
+			Reject copy operations on collection for 2nd grid (incl. moves from 1st grid)
+		</label></div>
+		</div>
+		<div class="gridcontainer">
+			<div id="grid1"></div>
+		</div>
+		<div class="gridcontainer">
+			<div id="grid2"></div>
+		</div>
+
+		<script src="../../../dojo/dojo.js" data-dojo-config="async: true"></script>
+		<script>
+			require(['dgrid/OnDemandGrid', 'dgrid/extensions/DnD',
+				'dojo/_base/declare', 'dojo/_base/lang', 'dojo/Deferred', 'dojo/on',
+				'dgrid/test/data/createOrderedStore', 'dgrid/test/data/orderedData'],
+			function(Grid, DnD, declare, lang, Deferred, on, createOrderedStore, orderedData){
+				var DnDGrid = declare([Grid, DnD]);
+
+				// Create a custom data array based on testOrderedData, but looping
+				// several times to create enough items to reasonably test node removal.
+				var data = [];
+
+				for (var i = 0, len = orderedData.items.length; i < 5; i++) {
+					for(var j = 0, obj; j < len; j++){
+						obj = lang.clone(orderedData.items[j]);
+						obj.order = obj.id = i * len + j + 2;
+						data.push(obj);
+					}
+				}
+
+				var grid1 = window.grid1 = new DnDGrid({
+					collection: createOrderedStore({ data: lang.clone(data) }),
+					columns: [
+						{ label: 'Name', field: 'name', sortable: false }
+					]
+				}, 'grid1');
+
+				var grid2 = window.grid2 = new DnDGrid({
+					collection: createOrderedStore({ data: data }),
+					columns: [
+						{ label: 'Name', field: 'name', sortable: false }
+					]
+				}, 'grid2');
+
+				function createErrorFunction(name) {
+					return function () {
+						var dfd = new Deferred();
+						dfd.reject(new Error('Error on ' + name));
+						return dfd.promise;
+					};
+				}
+
+				var originalRemove = grid1.collection.remove;
+				var errorRemove = createErrorFunction('remove');
+
+				var originalCopy = grid2.collection.copy;
+				var errorCopy = createErrorFunction('copy');
+
+				on(document.getElementById('errorOnRemove'), 'change', function () {
+					grid1.collection.remove = this.checked ? errorRemove : originalRemove;
+				});
+
+				on(document.getElementById('errorOnCopy'), 'change', function () {
+					grid2.collection.copy = this.checked ? errorCopy : originalCopy;
+				});
+
+				on(document.body, 'dgrid-error', function (event) {
+					event.preventDefault();
+					console.log('dgrid-error fired with error:', event.error);
+				});
+			});
+		</script>
+	</body>
+</html>

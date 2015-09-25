@@ -26,7 +26,6 @@ define([
 
 	// TODOs
 	// * consider sending items rather than nodes to onDropExternal/Internal
-	// * consider emitting store errors via OnDemandList._trackError
 
 	var GridDnDSource = declare(DnDSource, {
 		grid: null,
@@ -38,7 +37,9 @@ define([
 
 			var grid = this.grid;
 			// Extract item id from row node id (gridID-row-*).
-			return grid.collection.get(node.id.slice(grid.id.length + 5));
+			return grid._trackError(function () {
+				return grid.collection.get(node.id.slice(grid.id.length + 5));
+			});
 		},
 		_legalMouseDown: function (evt) {
 			// Fix _legalMouseDown to only allow starting drag from an item
@@ -105,15 +106,17 @@ define([
 					// For copy DnD operations, copy object, if supported by store;
 					// otherwise settle for put anyway.
 					// (put will relocate an existing item with the same id, i.e. move).
-					store[copy && store.copy ? 'copy' : 'put'](object, {
-						beforeId: targetItem ? store.getIdentity(targetItem) : null
+					grid._trackError(function () {
+						return store[copy && store.copy ? 'copy' : 'put'](object, {
+							beforeId: targetItem ? store.getIdentity(targetItem) : null
+						}).then(function () {
+							// Self-drops won't cause the dgrid-select handler to re-fire,
+							// so update the cached node manually
+							if (targetSource._selectedNodes[id]) {
+								targetSource._selectedNodes[id] = grid.row(id).element;
+							}
+						});
 					});
-
-					// Self-drops won't cause the dgrid-select handler to re-fire,
-					// so update the cached node manually
-					if (targetSource._selectedNodes[id]) {
-						targetSource._selectedNodes[id] = grid.row(id).element;
-					}
 				});
 			});
 		},
@@ -122,33 +125,36 @@ define([
 			// share the same store.  There may be more ideal implementations in the
 			// case of two grids using the same store (perhaps differentiated by
 			// query), dragging to each other.
-			var store = this.grid.collection,
+			var grid = this.grid,
+				store = this.grid.collection,
 				sourceGrid = sourceSource.grid;
 
 			// TODO: bail out if sourceSource.getObject isn't defined?
 			nodes.forEach(function (node, i) {
 				when(sourceSource.getObject(node), function (object) {
-					if (!copy) {
-						if (sourceGrid) {
-							// Remove original in the case of inter-grid move.
-							// (Also ensure dnd source is cleaned up properly)
-							when(sourceGrid.collection.getIdentity(object), function (id) {
-								!i && sourceSource.selectNone(); // deselect all, one time
-								sourceSource.delItem(node.id);
-								sourceGrid.collection.remove(id);
-							});
-						}
-						else {
-							sourceSource.deleteSelectedNodes();
-						}
-					}
 					// Copy object, if supported by store; otherwise settle for put
 					// (put will relocate an existing item with the same id).
 					// Note that we use store.copy if available even for non-copy dnd:
 					// since this coming from another dnd source, always behave as if
 					// it is a new store item if possible, rather than replacing existing.
-					store[store.copy ? 'copy' : 'put'](object, {
-						beforeId: targetItem ? store.getIdentity(targetItem) : null
+					grid._trackError(function () {
+						return store[store.copy ? 'copy' : 'put'](object, {
+							beforeId: targetItem ? store.getIdentity(targetItem) : null
+						}).then(function () {
+							if (!copy) {
+								if (sourceGrid) {
+									// Remove original in the case of inter-grid move.
+									// (Also ensure dnd source is cleaned up properly)
+									var id = sourceGrid.collection.getIdentity(object);
+									!i && sourceSource.selectNone(); // Deselect all, one time
+									sourceSource.delItem(node.id);
+									return sourceGrid.collection.remove(id);
+								}
+								else {
+									sourceSource.deleteSelectedNodes();
+								}
+							}
+						});
 					});
 				});
 			});
