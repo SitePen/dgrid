@@ -227,6 +227,12 @@
 		"parent": "extensions"
 	},
 	{
+		"name": "DnD_error.html",
+		"url": "extensions/DnD_error.html",
+		"title": "Test Grid DnD on stores returning rejected promises",
+		"parent": "extensions"
+	},
+	{
 		"name": "DnD_touch.html",
 		"url": "extensions/DnD_touch.html",
 		"title": "Test Grid DnD on Touch Devices",

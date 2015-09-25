@@ -14,7 +14,7 @@ define([
 				var newObj = lang.mixin({}, object);
 				// Ensure unique ID by removing it from the cloned item
 				newObj[this.idProperty] = null;
-				this.add(newObj, options);
+				return this.add(newObj, options);
 			}
 		}, kwArgs));
 	};
