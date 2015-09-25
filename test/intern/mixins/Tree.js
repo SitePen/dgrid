@@ -15,10 +15,11 @@ define([
 	'dojo/dom-style',
 	'dojo/on',
 	'dojo/query',
+	'dstore/Memory',
 	'dgrid/test/data/createHierarchicalStore',
 	'../addCss!'
 ], function (test, assert, OnDemandGrid, Editor, Tree, has, miscUtil, declare, lang, aspect, Deferred,
-		domClass, domConstruct, domStyle, on, query, createHierarchicalStore) {
+		domClass, domConstruct, domStyle, on, query, Memory, createHierarchicalStore) {
 
 	var grid,
 		testDelay = 15,
@@ -480,6 +481,40 @@ define([
 						assert.strictEqual(element.style.marginLeft, treeIndentWidth + 'px');
 					});
 				});
+			});
+		});
+
+		test.suite('#_configureTreeColumn', function () {
+			test.beforeEach(function () {
+				grid = new (declare([ OnDemandGrid, Tree ]))({
+					columns: {
+						col1: {
+							label: 'Column 1',
+							renderExpando: true
+						},
+						col2: 'Column 2'
+					},
+					collection: new Memory({
+						data: [ {
+							col1: 'val',
+							col2: 'val'
+						} ]
+					})
+				});
+				document.body.appendChild(grid.domNode);
+				grid.startup();
+			});
+
+			test.test('renderingExpando', function () {
+				assert.strictEqual(grid.domNode.querySelectorAll('.dgrid-expando-icon').length, 1,
+					'Should have rendered one expando icon');
+
+				grid._configureTreeColumn(grid.get('columns').col1);
+
+				grid.refresh();
+
+				assert.strictEqual(grid.domNode.querySelectorAll('.dgrid-expando-icon').length, 1,
+					'Should not have rendered another expando icon');
 			});
 		});
 	});

@@ -289,8 +289,9 @@ define([
 		_configureTreeColumn: function (column) {
 			// summary:
 			//		Adds tree navigation capability to a column.
-			if (!column.originalRenderCell) {
-				column.originalRenderCell = column.renderCell || this._defaultRenderCell;
+			if (!column.isConfiguredTreeColumn) {
+				var originalRenderCell = column.renderCell || this._defaultRenderCell;
+				column.isConfiguredTreeColumn = true;
 				column.renderCell = function (object, value, td, options) {
 					// summary:
 					//		Renders a cell that can be expanded, creating more rows
@@ -306,7 +307,7 @@ define([
 					expando.level = level;
 					expando.mayHaveChildren = mayHaveChildren;
 
-					node = column.originalRenderCell.call(column, object, value, td, options);
+					node = originalRenderCell.call(column, object, value, td, options);
 					if (node && node.nodeType) {
 						td.appendChild(expando);
 						td.appendChild(node);
