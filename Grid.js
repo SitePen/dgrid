@@ -1,6 +1,7 @@
 define([
 	'dojo/_base/declare',
 	'dojo/_base/kernel',
+	'dojo/_base/lang',
 	'dojo/dom-construct',
 	'dojo/dom-class',
 	'dojo/on',
@@ -8,7 +9,7 @@ define([
 	'./List',
 	'./util/misc',
 	'dojo/_base/sniff'
-], function (declare, kernel, domConstruct, domClass, listen, has, List, miscUtil) {
+], function (declare, kernel, lang, domConstruct, domClass, listen, has, List, miscUtil) {
 	function appendIfNode(parent, subNode) {
 		if (subNode && subNode.nodeType) {
 			parent.appendChild(subNode);
@@ -99,7 +100,7 @@ define([
 			}
 		},
 
-		createRowCells: function (tag, each, subRows, object) {
+		createRowCells: function (tag, createCell, subRows, item, options) {
 			// summary:
 			//		Generates the grid for each row (used by renderHeader and and renderRow)
 			var row = domConstruct.create('table', {
@@ -135,7 +136,7 @@ define([
 						' field-' + replaceInvalidChars(column.field) :
 						'';
 					className = typeof column.className === 'function' ?
-						column.className(object) : column.className;
+						column.className(item) : column.className;
 					if (className) {
 						extraClasses += ' ' + className;
 					}
@@ -154,12 +155,53 @@ define([
 					if (rowSpan) {
 						cell.rowSpan = rowSpan;
 					}
-					each(cell, column);
+					createCell(cell, column, item, options);
 					// add the td to the tr at the end for better performance
 					tr.appendChild(cell);
 				}
 			}
 			return row;
+		},
+
+		_createBodyRowCell: function (cellElement, column, item, options) {
+			var cellData = item;
+
+			// Support get function or field property (similar to DataGrid)
+			if (column.get) {
+				cellData = column.get(item);
+			}
+			else if ('field' in column && column.field !== '_item') {
+				cellData = item[column.field];
+			}
+
+			if (column.renderCell) {
+				// A column can provide a renderCell method to do its own DOM manipulation,
+				// event handling, etc.
+				appendIfNode(cellElement, column.renderCell(item, cellData, cellElement, options));
+			}
+			else {
+				this._defaultRenderCell.call(column, item, cellData, cellElement, options);
+			}
+		},
+
+		_createHeaderRowCell: function (cellElement, column) {
+			var contentNode = column.headerNode = cellElement;
+			var field = column.field;
+			if (field) {
+				cellElement.field = field;
+			}
+			// allow for custom header content manipulation
+			if (column.renderHeaderCell) {
+				appendIfNode(contentNode, column.renderHeaderCell(contentNode));
+			}
+			else if ('label' in column || column.field) {
+				contentNode.appendChild(document.createTextNode(
+					'label' in column ? column.label : column.field));
+			}
+			if (column.sortable !== false && field && field !== '_item') {
+				cellElement.sortable = true;
+				cellElement.className += ' dgrid-sortable';
+			}
 		},
 
 		left: function (cell, steps) {
@@ -200,27 +242,10 @@ define([
 			}
 		},
 
-		renderRow: function (object, options) {
-			var self = this;
-			var row = this.createRowCells('td', function (td, column) {
-				var data = object;
-				// Support get function or field property (similar to DataGrid)
-				if (column.get) {
-					data = column.get(object);
-				}
-				else if ('field' in column && column.field !== '_item') {
-					data = data[column.field];
-				}
+		renderRow: function (item, options) {
+			var row = this.createRowCells('td', lang.hitch(this, '_createBodyRowCell'),
+				options && options.subRows, item, options);
 
-				if (column.renderCell) {
-					// A column can provide a renderCell method to do its own DOM manipulation,
-					// event handling, etc.
-					appendIfNode(td, column.renderCell(object, data, td, options));
-				}
-				else {
-					self._defaultRenderCell.call(column, object, data, td, options);
-				}
-			}, options && options.subRows, object);
 			// row gets a wrapper div for a couple reasons:
 			// 1. So that one can set a fixed height on rows (heights can't be set on <table>'s AFAICT)
 			// 2. So that outline style can be set on a row when it is focused,
@@ -229,6 +254,7 @@ define([
 			div.appendChild(row);
 			return div;
 		},
+
 		renderHeader: function () {
 			// summary:
 			//		Setup the headers for the grid
@@ -240,25 +266,8 @@ define([
 			// clear out existing header in case we're resetting
 			domConstruct.empty(headerNode);
 
-			var row = this.createRowCells('th', function (th, column) {
-				var contentNode = column.headerNode = th;
-				var field = column.field;
-				if (field) {
-					th.field = field;
-				}
-				// allow for custom header content manipulation
-				if (column.renderHeaderCell) {
-					appendIfNode(contentNode, column.renderHeaderCell(contentNode));
-				}
-				else if ('label' in column || column.field) {
-					contentNode.appendChild(document.createTextNode(
-						'label' in column ? column.label : column.field));
-				}
-				if (column.sortable !== false && field && field !== '_item') {
-					th.sortable = true;
-					th.className += ' dgrid-sortable';
-				}
-			}, this.subRows && this.subRows.headerRows);
+			var row = this.createRowCells('th', lang.hitch(this, '_createHeaderRowCell'),
+				this.subRows && this.subRows.headerRows);
 			this._rowIdToObject[row.id = this.id + '-header'] = this.columns;
 			headerNode.appendChild(row);
 
