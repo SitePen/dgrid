@@ -5,6 +5,7 @@ define([
 	'dojo/_base/declare',
 	'dojo/aspect',
 	'dojo/Deferred',
+	'dijit/form/TextBox',
 	'dgrid/OnDemandList',
 	// column.set can't be tested independently from a Grid,
 	// so we are testing through OnDemandGrid for now.
@@ -13,7 +14,7 @@ define([
 	'dgrid/test/data/createSyncStore',
 	'dgrid/test/data/genericData',
 	'dojo/domReady!'
-], function (test, assert, lang, declare, aspect, Deferred,
+], function (test, assert, lang, declare, aspect, Deferred, TextBox,
 		OnDemandList, OnDemandGrid, ColumnSet, createSyncStore, genericData) {
 
 	// Helper method used to set column set() methods for various grid compositions
@@ -76,6 +77,54 @@ define([
 
 		test.afterEach(function () {
 			grid.destroy();
+		});
+
+		test.suite('_StoreMixin#refreshCell', function () {
+			var store;
+
+			test.beforeEach(function () {
+				store = createSyncStore({ data: genericData });
+				grid = new OnDemandList({
+					columns: {
+						col1: 'Column 1',
+						col3: {
+							label: 'Column 3',
+							editor: 'TextBox'
+						}
+					},
+					collection: store
+				});
+				document.body.appendChild(grid.domNode);
+				grid.startup();
+			});
+
+			test.test('no change', function () {
+				// TODO: debug: why is grid rendering as if no columns have been specified?
+				var cell = grid.cell('2', 'col1');
+				var oldValue = cell.element.innerHTML;
+
+				grid.refreshCell(cell);
+				assert.strictEqual(cell.element.innerHTML, oldValue, 'Cell value should not have changed');
+			});
+
+			test.test('change', function () {
+				// TODO: debug: why is grid rendering as if no columns have been specified?
+				var cell = grid.cell('2', 'col1');
+				var newValue = 'new value';
+
+				cell.row.data.col3 = newValue;
+				grid.refreshCell(cell);
+				assert.strictEqual(cell.element.innerHTML, newValue, 'Cell value should have changed');
+			});
+
+			test.test('widget destruction', function () {
+				// TODO: debug: why is grid rendering as if no columns have been specified?
+				var cell = grid.cell('2', 'col3');
+				var widget = cell.element.widget;
+
+				grid.refreshCell(cell);
+				assert.isTrue(widget._destroyed, 'Cell\'s editor widget should be destroyed');
+			});
 		});
 
 		test.suite('_StoreMixin#_setCollection', function () {
