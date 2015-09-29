@@ -503,11 +503,6 @@ define([
 							// adjust the rowIndex so adjustRowIndices has the right starting point
 							rows[from] && rows[from].rowIndex--;
 						}
-
-						// the removal of rows could cause us to need to page in more items
-						if (self._processScroll) {
-							self._processScroll();
-						}
 					}
 					if (event.type === 'delete') {
 						// Reset row in case this is later followed by an add;
@@ -570,6 +565,11 @@ define([
 						to = (typeof event.index !== 'undefined') ? event.index : Infinity,
 						adjustAtIndex = Math.min(from, to);
 					from !== to && rows[adjustAtIndex] && self.adjustRowIndices(rows[adjustAtIndex]);
+
+					// the removal of rows could cause us to need to page in more items
+					if (from !== Infinity && self._processScroll && (rows[from] || rows[from - 1])) {
+						self._processScroll();
+					}
 
 					// Fire _onNotification, even for out-of-viewport notifications,
 					// since some things may still need to update (e.g. Pagination's status/navigation)
