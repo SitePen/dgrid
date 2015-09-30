@@ -109,7 +109,7 @@ define([
 						var focusedNode = grid._focusedNode || initialNode;
 
 						// do not update the focused element if we already have a valid one
-						if (isFocusableClass.test(focusedNode.className) && miscUtil.contains(areaNode, focusedNode)) {
+						if (isFocusableClass.test(focusedNode.className) && areaNode.contains(focusedNode)) {
 							return rows;
 						}
 

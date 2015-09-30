@@ -3,13 +3,18 @@ define([
 	'intern/chai!assert',
 	'dojo/_base/declare',
 	'dojo/aspect',
+	'dojo/Deferred',
 	'dojo/query',
 	'dgrid/test/data/createSyncStore',
+	'dgrid/test/data/createHierarchicalStore',
 	'dgrid/OnDemandGrid',
 	'dgrid/ColumnSet',
 	'dgrid/Keyboard',
-	'../addCss'
-], function (test, assert, declare, aspect, query, createSyncStore, OnDemandGrid, ColumnSet, Keyboard) {
+	'dgrid/Tree',
+	'../addCss!'
+], function (test, assert, declare, aspect, Deferred, query, createSyncStore, createHierarchicalStore,
+		OnDemandGrid, ColumnSet, Keyboard, Tree) {
+
 	var grid;
 	var handles;
 
@@ -92,6 +97,76 @@ define([
 			})));
 
 			grid.focus(grid.cell(1, '1-0-1'));
+		});
+	});
+
+	test.suite('ColumnSet + Tree mixins', function () {
+		test.beforeEach(function () {
+			var TreeColumnSetGrid = declare([ OnDemandGrid, ColumnSet, Tree ]);
+			var data = [];
+
+			for (var i = 0; i < 5; i++) {
+				var parentId = '' + i;
+				data.push({
+					id: parentId,
+					name: 'Root ' + i
+				});
+				for (var k = 0; k < 5; k++) {
+					data.push({
+						id: i + ':' + k,
+						parent: parentId,
+						name: 'Child ' + k,
+						hasChildren: false
+					});
+				}
+			}
+
+			var store = createHierarchicalStore({
+				data: data
+			});
+
+			grid = new TreeColumnSetGrid({
+				collection: store,
+				enableTreeTransitions: false,
+				columnSets: [ [
+					[ { renderExpando: true, label: 'Name', field: 'name', sortable: false } ]
+				] ]
+			});
+
+			document.body.appendChild(grid.domNode);
+			grid.startup();
+		});
+
+		test.afterEach(function () {
+			for (var i = handles.length; i--;) {
+				handles[i].remove();
+			}
+			grid.destroy();
+		});
+
+		test.test('re-expand after horizontal scroll should restore correct scrollLeft', function () {
+			var scrollAmount = 250;
+			grid.styleColumn('0-0-0', 'width: 10000px;');
+
+			return grid.expand(0, true).then(function () {
+				return grid.expand(0, false);
+			}).then(function () {
+				var scrollDfd = new Deferred();
+				handles.push(aspect.after(grid, '_onColumnSetScroll', function () {
+					scrollDfd.resolve();
+				}));
+
+				grid._scrollColumnSet('0', scrollAmount);
+				return scrollDfd.promise;
+			}).then(function () {
+				return grid.expand(0, true);
+			}).then(function () {
+				var element = query('.dgrid-column-set-0 [data-dgrid-column-set-id="0"]',
+					grid.row('0:0').element)[0];
+
+				assert.strictEqual(element.scrollLeft, scrollAmount,
+					'Column Set should have expected scroll position for re-expanded rows');
+			});
 		});
 	});
 });

@@ -22,7 +22,7 @@
 		"grunt-contrib-clean": "~0.6.0",
 		"grunt-contrib-stylus": "~0.20",
 		"grunt-contrib-watch": "~0.6.1",
-		"intern-geezer": "~2.2",
+		"intern": "~3.0.3",
 		"nib": "~1.0.4"
 	},
 	"directories": {

@@ -88,7 +88,7 @@ define([
 					var query = function (options) {
 						var childCollection = grid._renderedCollection.getChildren(row.data),
 							results;
-						if (grid.sort) {
+						if (grid.sort && grid.sort.length > 0) {
 							childCollection = childCollection.sort(grid.sort);
 						}
 						if (childCollection.track && grid.shouldTrackCollection) {
@@ -208,7 +208,7 @@ define([
 			return columnArray;
 		},
 
-		insertRow: function () {
+		insertRow: function (object) {
 			var rowElement = this.inherited(arguments);
 
 			// Auto-expand (shouldExpand) considerations
@@ -217,6 +217,10 @@ define([
 
 			if (expanded) {
 				this.expand(rowElement, true, true);
+			}
+
+			if (expanded || (!this.collection.mayHaveChildren || this.collection.mayHaveChildren(object))) {
+				domClass.add(rowElement, 'dgrid-row-expandable');
 			}
 
 			return rowElement; // pass return value through

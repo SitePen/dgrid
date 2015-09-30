@@ -284,7 +284,8 @@ define([
 			var self = this,
 				store = this.collection,
 				dirty = this.dirty,
-				dfd = new Deferred(), promise = dfd.promise,
+				dfd = new Deferred(),
+				results = {},
 				getFunc = function (id) {
 					// returns a function to pass as a step in the promise chain,
 					// with the id variable closured
@@ -328,13 +329,20 @@ define([
 
 					updating[id] = true;
 					// Put it in the store, returning the result/promise
-					return store.put(object).then(function () {
+					return store.put(object).then(function (result) {
 						// Clear the item now that it's been confirmed updated
 						delete dirty[id];
 						delete updating[id];
+						results[id] = result;
+						return results;
 					});
 				};
 			}
+
+			var promise = dfd.then(function () {
+				// Ensure empty object is returned even if nothing was dirty, for consistency
+				return results;
+			});
 
 			// For every dirty item, grab the ID
 			for (var id in dirty) {

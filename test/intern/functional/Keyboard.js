@@ -8,7 +8,7 @@ define([
 	function testUpDownKeys(gridId, cellNavigation) {
 		var rootQuery = '#' + gridId + ' #' + gridId + '-row-';
 		return function () {
-			return this.get('remote')
+			return this.remote
 				.findByCssSelector(rootQuery + '0' + (cellNavigation ? ' .dgrid-column-col1' : ''))
 					.click()
 					.type([keys.ARROW_DOWN])
@@ -36,7 +36,7 @@ define([
 	function testLeftRightKeys(gridId, header) {
 		var rootQuery = header ? ('#' + gridId + ' .dgrid-header') : ('#' + gridId + ' #' + gridId + '-row-0');
 		return function () {
-			return this.get('remote')
+			return this.remote
 				.findByCssSelector(rootQuery + ' .dgrid-column-col1')
 					.click()
 					.type([keys.ARROW_RIGHT])
@@ -64,7 +64,7 @@ define([
 	function testHomeEndKeys(gridId, cellNavigation) {
 		var rootQuery = '#' + gridId + ' #' + gridId + '-row-';
 		return function () {
-			return this.get('remote')
+			return this.remote
 				.findByCssSelector(rootQuery + '0' + (cellNavigation ? ' .dgrid-column-col1' : ''))
 					.click()
 					.type([keys.END])
@@ -97,7 +97,7 @@ define([
 			// since this functional test module runs on the server and can't load
 			// such scripts. Further, in the html page, set a global "ready" var
 			// to true to tell the runner to continue.
-			return this.get('remote')
+			return this.remote
 				.get(require.toUrl('./Keyboard.html'))
 				.then(pollUntil(function () {
 					return window.ready;

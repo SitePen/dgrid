@@ -16,7 +16,7 @@ define([
 	'dojo/on',
 	'dojo/query',
 	'dgrid/test/data/createHierarchicalStore',
-	'../addCss'
+	'../addCss!'
 ], function (test, assert, OnDemandGrid, Editor, Tree, has, miscUtil, declare, lang, aspect, Deferred,
 		domClass, domConstruct, domStyle, on, query, createHierarchicalStore) {
 
@@ -359,6 +359,25 @@ define([
 					inputNode = query('.dgrid-input', rowObject.element)[0];
 					assert.isDefined(inputNode, 'Row ' + i + ' should have an input node');
 				}
+			});
+		});
+
+		test.suite('large family expansion without sort', function () {
+			test.beforeEach(function () {
+				createGrid({ gridOptions: { sort: null } });
+				return wait();
+			});
+
+			test.afterEach(destroyGrid);
+
+			test.test('expand first row', function () {
+				return expand(0)
+					.then(function () {
+						testRowExists('0:0');
+						var row = grid.row('0:0').element;
+						assert.strictEqual(row.previousSibling.className, 'dgrid-preload',
+							'Item 0:0 should be the first item even with no sort order specified');
+					});
 			});
 		});
 

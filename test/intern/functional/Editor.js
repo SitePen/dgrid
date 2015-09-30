@@ -106,7 +106,7 @@ define([
 			// Generates test functions for enter/blur value registration tests
 			return function () {
 				this.async(60000);
-				var command = new EditorCommand(this.get('remote'));
+				var command = new EditorCommand(this.remote);
 
 				command = command.get(require.toUrl('./Editor.html'))
 					.then(pollUntil(function () {
@@ -128,7 +128,7 @@ define([
 		function createFocusTest(selector, initFunction) {
 			// Generates test functions for focus preservation tests
 			return function () {
-				var command = new EditorCommand(this.get('remote')),
+				var command = new EditorCommand(this.remote),
 					rowIndex;
 
 				function each(rowIndex) {
@@ -181,7 +181,7 @@ define([
 
 		function createEscapeRevertTest(initFunction) {
 			return function () {
-				var command = new EditorCommand(this.get('remote')),
+				var command = new EditorCommand(this.remote),
 					rowIndex;
 
 				function each(rowIndex) {
@@ -237,7 +237,7 @@ define([
 
 		function createAutosaveTest(initFunction) {
 			return function () {
-				var command = new EditorCommand(this.get('remote')),
+				var command = new EditorCommand(this.remote),
 					appendValue = 'abc',
 					rowIndex;
 
@@ -301,7 +301,7 @@ define([
 			// In order to function properly on all platforms, we need to know
 			// what the proper character sequence is to go to the end of a text field.
 			// End key works generally everywhere except Mac OS X.
-			return util.isInputHomeEndSupported(this.get('remote')).then(function (isSupported) {
+			return util.isInputHomeEndSupported(this.remote).then(function (isSupported) {
 				gotoEnd = isSupported ? function (command) {
 					return command.type(keys.END);
 				} : function (command) {

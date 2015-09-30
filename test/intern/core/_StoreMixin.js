@@ -124,6 +124,22 @@ define([
 			});
 		});
 
+		test.test('set(\'collection\') before startup should not cause superfluous refresh',  function () {
+			var numCalls = 0;
+
+			grid = new OnDemandList();
+
+			aspect.before(grid, 'refresh', function () {
+				numCalls++;
+			});
+
+			grid.set('collection', createSyncStore(genericData));
+			document.body.appendChild(grid.domNode);
+			grid.startup();
+
+			assert.strictEqual(numCalls, 1, 'refresh should only have been called once');
+		});
+
 		test.test('_StoreMixin#_onNotification', function () {
 			var store = createSyncStore({ data: genericData }),
 				notificationCount = 0,
@@ -235,6 +251,48 @@ define([
 			});
 		});
 
+		test.suite('_StoreMixin#save', function () {
+			var store;
+
+			test.beforeEach(function () {
+				store = createSyncStore({ data: genericData });
+				grid = new OnDemandList({
+					collection: store
+				});
+				document.body.appendChild(grid.domNode);
+				grid.startup();
+			});
+
+			test.test('API', function () {
+				this.async(1000);
+				grid.updateDirty(0, 'col1', 'important');
+				grid.updateDirty(1, 'col1', 'normal');
+
+				return grid.save().then(function (results) {
+					assert.strictEqual(results.toString(), '[object Object]', 'Resolved value should be an object');
+					assert.strictEqual(results[0], store.getSync(0),
+						'Each key in results should correspond to a saved item (0)');
+					assert.strictEqual(results[1], store.getSync(1),
+						'Each key in results should correspond to a saved item (1)');
+				});
+			});
+
+			test.test('Should return promise even if nothing needs to be put', function () {
+				this.async(1000);
+				var promise = grid.save();
+				assert.isDefined(promise.then, 'grid.save() should return a promise');
+				return promise.then(function (results) {
+					assert.strictEqual(results.toString(), '[object Object]', 'Resolved value should be an object');
+					var count = 0;
+					// jshint unused: false
+					for (var k in results) {
+						count++;
+					}
+					assert.strictEqual(count, 0, 'Resolved object should have no keys');
+				});
+			});
+		});
+
 		test.suite('_StoreMixin#save / column.set tests', function () {
 			test.test('column.set in subRows', function () {
 				grid = new OnDemandGrid({
@@ -251,7 +309,7 @@ define([
 						]
 					]
 				});
-				testSetMethod(grid, this.async());
+				testSetMethod(grid, this.async(1000));
 			});
 
 			test.test('column.set in columnSets', function () {
@@ -277,25 +335,7 @@ define([
 						]
 					]
 				});
-				testSetMethod(grid, this.async());
-			});
-		});
-
-		test.suite('Effect of set-before-startup on refresh calls', function(){
-			test.test('set(\'collection\') before startup should not cause superfluous refresh',  function () {
-				var numCalls = 0;
-
-				grid = new OnDemandList();
-
-				aspect.before(grid, 'refresh', function () {
-					numCalls++;
-				});
-
-				grid.set('collection', createSyncStore(genericData));
-				document.body.appendChild(grid.domNode);
-				grid.startup();
-
-				assert.strictEqual(numCalls, 1, 'refresh should only have been called once');
+				testSetMethod(grid, this.async(1000));
 			});
 		});
 	});

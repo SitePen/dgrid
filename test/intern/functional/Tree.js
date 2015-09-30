@@ -13,7 +13,7 @@ define([
 			var xOffset = 0;
 			// Nudge the y-offset of the cursor down a bit for good measure (default seems to be 0,0 in the target
 			// element; in Firefox the click has been known to hit just above the target element)
-			var remote = this.get('remote');
+			var remote = this.remote;
 
 			if (remote.environmentType.browserName === 'safari') {
 				console.warn('Warning: skipping a tree functional test because ' +
@@ -58,7 +58,7 @@ define([
 	test.suite('dgrid/tree functional tests', function () {
 
 		test.before(function () {
-			var remote = this.get('remote');
+			var remote = this.remote;
 
 			return remote.get(require.toUrl('./Tree.html'))
 				.then(pollUntil(function () {

@@ -16,13 +16,16 @@ define([
 	asyncFetchStore.fetchRange = function () {
 		var dfd = new Deferred();
 		setTimeout(function () { dfd.reject('Error on async query'); }, 200);
-		return new QueryResults(dfd, { totalLength: 0 });
+		return new QueryResults(dfd);
 	};
 
 	asyncFetchTotalStore.fetchRange = function () {
+		// dstore/QueryResults doesn't ensure the results return a promise; we have to ourselves
+		var dfd = new Deferred();
+		dfd.resolve([]);
 		var total = new Deferred();
 		total.reject('Error getting the total');
-		return new QueryResults([], {
+		return new QueryResults(dfd.promise, {
 			totalLength: total
 		});
 	};
