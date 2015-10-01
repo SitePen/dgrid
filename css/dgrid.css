@@ -243,6 +243,7 @@ html.has-mozilla .dgrid-focus {
   border-right: 2px dotted #000 !important;
 }
 .dgrid-column-resizer {
+  cursor: col-resize;
   position: absolute;
   width: 2px;
   background-color: #666;
@@ -261,6 +262,14 @@ html.has-mozilla .dgrid-focus {
 }
 .dgrid-resize-header-container {
   height: 100%;
+}
+.dgrid-resize-guard {
+  cursor: col-resize;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  top: 0;
 }
 html.has-touch .dgrid-resize-handle {
   border-left: 20px solid transparent;
