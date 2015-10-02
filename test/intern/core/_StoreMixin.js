@@ -6,6 +6,7 @@ define([
 	'dojo/aspect',
 	'dojo/Deferred',
 	'dijit/form/TextBox',
+	'dgrid/Editor',
 	'dgrid/OnDemandList',
 	// column.set can't be tested independently from a Grid,
 	// so we are testing through OnDemandGrid for now.
@@ -14,7 +15,7 @@ define([
 	'dgrid/test/data/createSyncStore',
 	'dgrid/test/data/genericData',
 	'dojo/domReady!'
-], function (test, assert, lang, declare, aspect, Deferred, TextBox,
+], function (test, assert, lang, declare, aspect, Deferred, TextBox, Editor,
 		OnDemandList, OnDemandGrid, ColumnSet, createSyncStore, genericData) {
 
 	// Helper method used to set column set() methods for various grid compositions
@@ -84,12 +85,12 @@ define([
 
 			test.beforeEach(function () {
 				store = createSyncStore({ data: genericData });
-				grid = new OnDemandList({
+				grid = new declare([OnDemandGrid, Editor])({
 					columns: {
 						col1: 'Column 1',
 						col3: {
 							label: 'Column 3',
-							editor: 'TextBox'
+							editor: TextBox
 						}
 					},
 					collection: store
@@ -99,31 +100,34 @@ define([
 			});
 
 			test.test('no change', function () {
-				// TODO: debug: why is grid rendering as if no columns have been specified?
 				var cell = grid.cell('2', 'col1');
 				var oldValue = cell.element.innerHTML;
 
-				grid.refreshCell(cell);
-				assert.strictEqual(cell.element.innerHTML, oldValue, 'Cell value should not have changed');
+				return grid.refreshCell(cell).then(function () {
+					assert.strictEqual(cell.element.innerHTML, oldValue, 'Cell value should not change');
+				});
 			});
 
 			test.test('change', function () {
-				// TODO: debug: why is grid rendering as if no columns have been specified?
 				var cell = grid.cell('2', 'col1');
+				var oldValue = cell.element.innerHTML;
 				var newValue = 'new value';
 
-				cell.row.data.col3 = newValue;
-				grid.refreshCell(cell);
-				assert.strictEqual(cell.element.innerHTML, newValue, 'Cell value should have changed');
+				cell.row.data.col1 = newValue;
+				assert.strictEqual(cell.element.innerHTML, oldValue, 'Cell value should not change');
+
+				return grid.refreshCell(cell).then(function () {
+					assert.strictEqual(cell.element.innerHTML, newValue, 'Cell value should change');
+				});
 			});
 
 			test.test('widget destruction', function () {
-				// TODO: debug: why is grid rendering as if no columns have been specified?
 				var cell = grid.cell('2', 'col3');
 				var widget = cell.element.widget;
 
-				grid.refreshCell(cell);
-				assert.isTrue(widget._destroyed, 'Cell\'s editor widget should be destroyed');
+				return grid.refreshCell(cell).then(function () {
+					assert.isTrue(widget._destroyed, 'Cell\'s editor widget should be destroyed');
+				});
 			});
 		});
 
