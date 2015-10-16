@@ -305,6 +305,13 @@ define([
 
 			cellElement.innerHTML = '';
 			domClass.add(cellElement, 'dgrid-cell-editing');
+
+			// If a shared editor is a validation widget, reset it to clear validation state
+			// (The value will be preserved since it is explicitly set in _startupEditor)
+			if (isWidget && column.editOn && cmp.validate && cmp.reset) {
+				cmp.reset();
+			}
+
 			cellElement.appendChild(cmp.domNode || cmp);
 
 			if (isWidget && !column.editOn) {
