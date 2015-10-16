@@ -306,6 +306,12 @@ define([
 			put(cellElement, '.dgrid-cell-editing');
 			put(cellElement, cmp.domNode || cmp);
 
+			// If a shared editor is a validation widget, reset it to clear validation state
+			// (The value will be preserved since it is explicitly set in _startupEditor)
+			if (isWidget && column.editOn && cmp.validate && cmp.reset) {
+				cmp.reset();
+			}
+
 			if (isWidget && !column.editOn) {
 				// Queue arguments to be run once editor is in DOM
 				this._editorsPendingStartup.push([cmp, column, cellElement, value]);
