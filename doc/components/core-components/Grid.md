@@ -177,6 +177,10 @@ require([
 });
 ```
 
+#### Column and row spanning with sub-rows
+
+When using the `subRows` property to define columns the `colSpan` and `rowSpan` properties (documented [below](#column-definition-properties)) can be specified on column definitions. Examples of these properties in action can be seen in the test page [complex_columns.html](../../../test/complex_columns.html).
+
 ## Column Definition Properties
 
 In any of the above formats, each individual column definition object may have
@@ -194,3 +198,5 @@ Property | Description
 `formatter(value, object)` | An optional function that will return a string of HTML for rendering.  The function is passed the value that would normally be rendered, and the object from the collection.  If `formatterScope` is used, this can be a string instead of a function, in which case a function will be looked up on the `formatterScope` object using the given string. (Note: if a custom `renderCell` is specified, `formatter` will be ignored unless the custom `renderCell` accounts for it.)
 `renderCell(object, value, node, options)` | An optional function that will be called to render the value into the target cell. `object` refers to the record from the grid's collection for the row, and `value` refers to the specific value for the current cell (which may have been modified by the column definition's `get` function). `node` refers to the table cell that will be placed in the grid if nothing is returned by `renderCell`; if `renderCell` returns a node, that returned node will be placed inside the table cell. (Note: if a custom `renderCell` is specified, `formatter` will be ignored unless the custom `renderCell` accounts for it.)
 `renderHeaderCell(node)` | An optional function that will be called to render the column's header cell. Like `renderCell`, this may either operate on the node directly, or return a new node to be placed within it.
+`colSpan` | If the columns have been defined in the `subRows` property the `colSpan` property can be a number specifying how many columns the current column should span.
+`rowSpan` | If the columns have been defined in the `subRows` property the `rowSpan` property can be a number specifying how many rows each cell in the current column should span.
