@@ -93,6 +93,22 @@ define([
 			grid.collection.removeSync(100);
 			testAssertions(100, 10);
 		});
+
+		test.test('Should not pass 0 to gotoPage when removing last item (#1192)', function() {
+			var store = createSyncStore({ data: [ { id: 1 } ] });
+			grid.set('collection', store);
+
+			var pageNumber;
+			grid.gotoPage = function (page) {
+				pageNumber = page;
+			};
+
+			store.removeSync(1);
+			assert.strictEqual(pageNumber, 1, 'Should have refreshed page 1 after removing the last item');
+
+			store.putSync({ id: 2 });
+			assert.strictEqual(pageNumber, 1, 'Should have refreshed page 1 after adding the first item');
+		});
 	});
 
 	test.suite('Pagination size selector initialization tests', function () {
