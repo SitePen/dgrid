@@ -41,7 +41,7 @@ of the `th` is interpreted as the column's `label` by default.
 Note that *unlike* `data-dojo-props`, `data-dgrid-column` requires that you
 include the surrounding curly braces around the object.
 Examples of creating grids from
-HTML can be found in the `GridFromHtml.html` and `complex_columns.html` test
+HTML can be found in the `GridFromHtml.html` and `complex_column.html` test
 pages.
 
 It is also possible to specify columnsets (for the `ColumnSet` mixin) via
