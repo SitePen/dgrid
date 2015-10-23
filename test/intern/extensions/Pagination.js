@@ -92,6 +92,17 @@ define([
 			grid.collection.removeSync(100);
 			testAssertions(100, 10);
 		});
+
+		test.test('Should never pass 0 to gotoPage in _onNotification', function() {
+			var pageNumber;
+			grid.gotoPage = function(page) {
+				pageNumber = page;
+			};
+
+			grid._onNotification([], { previousIndex: 0, totalLength: 0, type: 'delete'});
+
+			assert.strictEqual(pageNumber, 1, 'Should have passed page 1');
+		});
 	});
 
 	test.suite('Pagination size selector initialization tests', function () {
