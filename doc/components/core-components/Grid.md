@@ -179,7 +179,7 @@ require([
 
 #### Column and row spanning with sub-rows
 
-When using the `subRows` property to define columns the `colSpan` and `rowSpan` properties (documented [below](#column-definition-properties)) can be specified on column definitions. Examples of these properties in action can be seen in the test page [complex_columns.html](../../../test/complex_column.html).
+When using the `subRows` property to define columns the `colSpan` and `rowSpan` properties (documented [below](#column-definition-properties)) can be specified on column definitions. Examples of these properties in action can be seen in the test page [complex_column.html](../../../test/complex_column.html).
 
 ## Column Definition Properties
 
