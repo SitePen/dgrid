@@ -78,6 +78,20 @@ define([
 		},
 
 		_handleSelectorClick: function (event) {
+			// Prevent this handler from running twice for a single event.
+			// In some cases pressing SPACE or ENTER will also trigger a 'click' event. When a 'click' event originates
+			// from an actual mouse click, the 'event.detail' property contains the number of mouse clicks, which is 1
+			// or more. When a 'click' event originates from a keyboard event, 'event.detail' is 0 since there were no
+			// actual mouse clicks involved.
+			if (event.type === 'click' && event.detail === 0) {
+				// If the input (checkbox/radio) is the focused element (as opposed to the '.dgrid-selector' table cell)
+				// then the default event action is to change its selection state, which we want to prevent.
+				// (Otherwise you end up in the state where the input element's checked state is the opposite of the
+				// row's selected state.)
+				event.preventDefault();
+				return;
+			}
+
 			var cell = this.cell(event);
 			var row = cell.row;
 
