@@ -113,9 +113,11 @@ define([
 			createReleaseRangeGrid(OnDemandGrid);
 
 			// Since _processScroll gets called on a debounce, need to wait for it
-			handles.push(aspect.after(grid, '_processScroll', dfd.callback(function () {
+			var handle = aspect.after(grid, '_processScroll', dfd.callback(function () {
+				handle.remove();
 				testReleaseRange();
-			}), true));
+			}), true);
+			handles.push(handle);
 
 			grid.scrollTo({ y: grid.bodyNode.scrollHeight });
 			return dfd;
