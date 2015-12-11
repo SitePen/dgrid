@@ -141,11 +141,10 @@ define([
 						});
 					}
 
-					if (hasTransitionend && !noTransition) {
-						on.once(container, hasTransitionend, this._onTreeTransitionEnd);
-					}
-					else {
-						this._onTreeTransitionEnd.call(container);
+					if (hasTransitionend) {
+						// Update height whenever a collapse/expand transition ends.
+						// (This handler is only registered when each child container is first created.)
+						on(container, hasTransitionend, this._onTreeTransitionEnd);
 					}
 				}
 
