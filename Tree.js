@@ -140,10 +140,12 @@ define([
 						});
 					}
 
-					if (hasTransitionend && !noTransition) {
-						on.once(container, hasTransitionend, this._onTreeTransitionEnd);
+					if (hasTransitionend) {
+						// we transitions are supported, always listen
+						on(container, hasTransitionend, this._onTreeTransitionEnd);
 					}
-					else {
+					if (!hasTransitionend || noTransition) {
+						// if we are not, or can not do transition, end the transition immediately
 						this._onTreeTransitionEnd.call(container);
 					}
 				}
