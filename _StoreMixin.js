@@ -6,8 +6,9 @@ define([
 	'dojo/dom-construct',
 	'dojo/has',
 	'dojo/on',
-	'dojo/when'
-], function (declare, lang, Deferred, aspect, domConstruct, has, on, when) {
+	'dojo/when',
+	'./Grid'
+], function (declare, lang, Deferred, aspect, domConstruct, has, on, when, Grid) {
 	// This module isolates the base logic required by store-aware list/grid
 	// components, e.g. OnDemandList/Grid and the Pagination extension.
 
@@ -221,6 +222,26 @@ define([
 			}
 
 			return result;
+		},
+
+		refreshCell: function (cell) {
+			var row = cell.row;
+			var self = this;
+
+			return this.collection.get(row.id).then(function (item) {
+				var cellElement = cell.element;
+				if (cellElement.widget) {
+					cellElement.widget.destroyRecursive();
+				}
+				domConstruct.empty(cellElement);
+
+				var dirtyItem = self.dirty && self.dirty[row.id];
+				if (dirtyItem) {
+					item = lang.delegate(item, dirtyItem);
+				}
+
+				self._createBodyRowCell(cellElement, cell.column, item);
+			});
 		},
 
 		renderArray: function () {
