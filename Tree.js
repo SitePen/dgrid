@@ -288,8 +288,40 @@ define([
 		_configureTreeColumn: function (column) {
 			// summary:
 			//		Adds tree navigation capability to a column.
+			if (!column.isConfiguredTreeColumn) {
+				var originalRenderCell = column.renderCell || this._defaultRenderCell;
+				column.isConfiguredTreeColumn = true;
+				column.renderCell = function (object, value, td, options) {
+					// summary:
+					//		Renders a cell that can be expanded, creating more rows
 
-			var originalRenderCell = column.renderCell || this._defaultRenderCell;
+					var grid = column.grid,
+						level = Number(options && options.queryLevel) + 1,
+						mayHaveChildren = !grid.collection.mayHaveChildren || grid.collection.mayHaveChildren(object),
+						expando, node;
+
+					level = grid._currentLevel = isNaN(level) ? 0 : level;
+					expando = column.renderExpando(level, mayHaveChildren,
+						grid._expanded[grid.collection.getIdentity(object)], object);
+					expando.level = level;
+					expando.mayHaveChildren = mayHaveChildren;
+
+					node = originalRenderCell.call(column, object, value, td, options);
+					if (node && node.nodeType) {
+						td.appendChild(expando);
+						td.appendChild(node);
+					}
+					else {
+						td.insertBefore(expando, td.firstChild);
+					}
+				};
+			} else {
+				// Remove existing event listeners
+				for (var i = this._treeColumnListeners.length; i--;) {
+					this._treeColumnListeners[i].remove();
+				}
+			}
+
 			var clicked; // tracks row that was clicked (for expand dblclick event handling)
 
 			this._treeColumn = column;
@@ -341,30 +373,6 @@ define([
 					}));
 			}
 
-			column.renderCell = function (object, value, td, options) {
-				// summary:
-				//		Renders a cell that can be expanded, creating more rows
-
-				var grid = column.grid,
-					level = Number(options && options.queryLevel) + 1,
-					mayHaveChildren = !grid.collection.mayHaveChildren || grid.collection.mayHaveChildren(object),
-					expando, node;
-
-				level = grid._currentLevel = isNaN(level) ? 0 : level;
-				expando = column.renderExpando(level, mayHaveChildren,
-					grid._expanded[grid.collection.getIdentity(object)], object);
-				expando.level = level;
-				expando.mayHaveChildren = mayHaveChildren;
-
-				node = originalRenderCell.call(column, object, value, td, options);
-				if (node && node.nodeType) {
-					td.appendChild(expando);
-					td.appendChild(node);
-				}
-				else {
-					td.insertBefore(expando, td.firstChild);
-				}
-			};
 		},
 
 		_defaultRenderExpando: function (level, hasChildren, expanded) {
