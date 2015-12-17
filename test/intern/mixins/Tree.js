@@ -360,6 +360,18 @@ define([
 					assert.isDefined(inputNode, 'Row ' + i + ' should have an input node');
 				}
 			});
+
+			// Test goal: ensure renderCell does not get re-wrapped over itself if the same column definition object
+			// is received during a column reset (e.g. via ColumnReorder).  See #1157
+			test.test('renderCell after same structure is recomputed', function () {
+				function countRowExpandos() {
+					return grid.row('0').element.querySelectorAll('.dgrid-expando-icon').length;
+				}
+
+				assert.strictEqual(countRowExpandos(), 1, 'Each parent row should have one expando icon');
+				grid.set('columns', grid.get('columns'));
+				assert.strictEqual(countRowExpandos(), 1,'Each parent row should still have only one expando icon');
+			});
 		});
 
 		test.suite('large family expansion without sort', function () {
