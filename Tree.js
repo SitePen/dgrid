@@ -268,6 +268,7 @@ define([
 		},
 
 		_destroyColumns: function () {
+			this.inherited(arguments);
 			var listeners = this._treeColumnListeners;
 
 			for (var i = listeners.length; i--;) {

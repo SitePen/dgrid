@@ -1,6 +1,5 @@
 define([
 	'dojo/_base/declare',
-	'dojo/_base/kernel',
 	'dojo/_base/lang',
 	'dojo/dom-construct',
 	'dojo/dom-class',
@@ -9,7 +8,7 @@ define([
 	'./List',
 	'./util/misc',
 	'dojo/_base/sniff'
-], function (declare, kernel, lang, domConstruct, domClass, listen, has, List, miscUtil) {
+], function (declare, lang, domConstruct, domClass, listen, has, List, miscUtil) {
 	function appendIfNode(parent, subNode) {
 		if (subNode && subNode.nodeType) {
 			parent.appendChild(subNode);
@@ -478,13 +477,6 @@ define([
 
 				// add grid reference to each column object for potential use by plugins
 				column.grid = this;
-				if (typeof column.init === 'function') {
-					kernel.deprecated('colum.init',
-						'Column plugins are being phased out in favor of mixins for better extensibility. ' +
-							'column.init may be removed in a future release.');
-					column.init();
-				}
-
 				subRow.push(column); // make sure it can be iterated on
 			}
 
@@ -494,32 +486,14 @@ define([
 
 		_destroyColumns: function () {
 			// summary:
-			//		Iterates existing subRows looking for any column definitions with
-			//		destroy methods (defined by plugins) and calls them.  This is called
-			//		immediately before configuring a new column structure.
-
-			var subRows = this.subRows,
-				// If we have column sets, then we don't need to do anything with the missing subRows,
-				// ColumnSet will handle it
-				subRowsLength = subRows && subRows.length,
-				i, j, column, len;
+			//		Extension point for column-related cleanup.  This is called
+			//		immediately before configuring a new column structure,
+			//		and when the grid is destroyed.
 
 			// First remove rows (since they'll be refreshed after we're done),
-			// so that anything aspected onto removeRow by plugins can run.
+			// so that anything temporarily extending removeRow can run.
 			// (cleanup will end up running again, but with nothing to iterate.)
 			this.cleanup();
-
-			for (i = 0; i < subRowsLength; i++) {
-				for (j = 0, len = subRows[i].length; j < len; j++) {
-					column = subRows[i][j];
-					if (typeof column.destroy === 'function') {
-						kernel.deprecated('colum.destroy',
-							'Column plugins are being phased out in favor of mixins for better extensibility. ' +
-								'column.destroy may be removed in a future release.');
-						column.destroy();
-					}
-				}
-			}
 		},
 
 		configStructure: function () {
