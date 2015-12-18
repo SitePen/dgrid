@@ -324,10 +324,6 @@ define([
 			var grid = this,
 				colSelector = '.dgrid-content .dgrid-column-' + column.id;
 
-			if (!grid.collection) {
-				throw new Error('dgrid Tree mixin requires a collection to operate.');
-			}
-
 			if (typeof column.renderExpando !== 'function') {
 				column.renderExpando = this._defaultRenderExpando;
 			}

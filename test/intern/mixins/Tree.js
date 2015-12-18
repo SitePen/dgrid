@@ -24,7 +24,7 @@ define([
 		testDelay = 15,
 		hasTransitionEnd = has('transitionend');
 
-	function createGrid(options) {
+	function createGrid(options, setStoreAfterStartup) {
 		var data = [],
 			store,
 			treeColumnOptions,
@@ -70,7 +70,7 @@ define([
 
 		grid = new GridConstructor(lang.mixin({
 			sort: 'id',
-			collection: store,
+			collection: setStoreAfterStartup ? null : store,
 			columns: [
 				treeColumnOptions,
 				{ label: 'value', field: 'value'}
@@ -78,6 +78,10 @@ define([
 		}, options && options.gridOptions));
 		document.body.appendChild(grid.domNode);
 		grid.startup();
+
+		if (setStoreAfterStartup) {
+			grid.set('collection', store);
+		}
 	}
 
 	function destroyGrid() {
@@ -135,15 +139,42 @@ define([
 	}
 
 	test.suite('Tree', function () {
-		test.suite('large family expansion', function () {
 
-			test.beforeEach(function () {
-				createGrid();
+		function makeBeforeEach(setStoreAfterStartup) {
+			return function () {
+				createGrid({}, setStoreAfterStartup);
 
 				// Firefox in particular seems to skip transitions sometimes
 				// if we don't wait a bit after creating and placing the grid
 				return wait();
+			};
+		}
+
+		test.suite('configure store last', function () {
+
+			test.beforeEach(makeBeforeEach(true));
+
+			test.afterEach(destroyGrid);
+
+			test.test('expand first row', function () {
+				return expand(0)
+					.then(function () {
+						testRowExists('0:0');
+						testRowExists('0:99', false);
+					});
 			});
+
+			test.test('expand last row', function () {
+				return expand(4).then(function () {
+					testRowExists('4:0');
+					testRowExists('4:99', false);
+				});
+			});
+		});
+
+		test.suite('large family expansion', function () {
+
+			test.beforeEach(makeBeforeEach());
 
 			test.afterEach(destroyGrid);
 
