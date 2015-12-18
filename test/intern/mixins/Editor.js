@@ -19,7 +19,7 @@ define([
 		Grid, OnDemandGrid, Editor, createSyncStore, orderedData) {
 
 	var testOrderedData = orderedData.items,
-		EditorGrid = declare([Grid, Editor]),
+		EditorGrid = declare([ Grid, Editor ]),
 		grid;
 
 	test.suite('Editor mixin', function () {
@@ -326,7 +326,7 @@ define([
 				}
 			});
 
-			grid = new (declare([OnDemandGrid, Editor]))({
+			grid = new (declare([ OnDemandGrid, Editor ]))({
 				columns: {
 					order: 'step',
 					name: {
@@ -460,6 +460,34 @@ define([
 			testRow(0);
 
 			return dfd;
+		});
+
+		test.test('Maintain shared widgets on refresh in IE', function() {
+			grid = new (declare([ OnDemandGrid, Editor ]))({
+				columns: {
+					name: {
+						editor: TextBox,
+						editOn: 'click'
+					}
+				},
+				collection: createSyncStore({
+					data: testOrderedData,
+					idProperty: 'order'
+				})
+			});
+			document.body.appendChild(grid.domNode);
+			grid.startup();
+
+			var cell = grid.cell(1, 'name');
+			var cellContent;
+			return grid.edit(cell).then(function () {
+				cellContent = cell.element.innerHTML;
+				grid.refresh();
+				cell = grid.cell(1, 'name');
+				return grid.edit(cell);
+			}).then(function () {
+				assert.strictEqual(cell.element.innerHTML, cellContent, 'Widget should be identical to before refresh');
+			});
 		});
 	});
 });
