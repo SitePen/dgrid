@@ -1,7 +1,8 @@
 define([
+	'dojo/_base/kernel',
 	'dojo/has',
 	'put-selector/put'
-], function (has, put) {
+], function (kernel, has, put) {
 	// summary:
 	//		This module defines miscellaneous utility methods for purposes of
 	//		adding styles, and throttling/debouncing function calls.
@@ -125,6 +126,18 @@ define([
 					callback.call(context, arrayOrObject[i], i, arrayOrObject);
 				}
 			}
+		},
+
+		// DOM-related functions
+
+		contains: function (parent, node) {
+			// summary:
+			//		Checks if an element is contained within another element.
+			//		Deprecated in favor of Node#contains, which all browsers support.
+
+			kernel.deprecated('miscUtil.contains',
+				'Use Node#contains instead, which all browsers supported by dgrid already support.', '1.0');
+			return parent.contains(node);
 		},
 
 		// CSS-related functions
