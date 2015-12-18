@@ -14,9 +14,10 @@ define([
 	'dgrid/OnDemandGrid',
 	'dgrid/Editor',
 	'dgrid/test/data/createSyncStore',
-	'dgrid/test/data/orderedData'
+	'dgrid/test/data/orderedData',
+	'dstore/Memory'
 ], function (test, assert, declare, aspect, Deferred, on, all, query, when, registry, TextBox,
-		Grid, OnDemandGrid, Editor, createSyncStore, orderedData) {
+		Grid, OnDemandGrid, Editor, createSyncStore, orderedData, Memory) {
 
 	var testOrderedData = orderedData.items,
 		EditorGrid = declare([Grid, Editor]),
@@ -460,6 +461,41 @@ define([
 			testRow(0);
 
 			return dfd;
+		});
+
+		test.test('Maintain shared widgets on refresh in IE', function() {
+			var cell,
+				cellContent,
+				data = [],
+				i;
+
+			for (var i = 0; i < 10; i++) {
+				data.push({
+					id: i,
+					name: "Name " + i
+				});
+			}
+
+			grid = new (declare([OnDemandGrid, Editor]))({
+				columns: {
+					name: {
+						editor: TextBox,
+						editOn: 'click'
+					}
+				},
+				collection: new Memory({
+					data: data
+				})
+			});
+			document.body.appendChild(grid.domNode);
+			grid.startup();
+			cell = grid.cell(0, "name");
+			grid.edit(cell);
+			cellContent = cell.element.innerHTML;
+			grid.refresh();
+			cell = grid.cell(0, "name");
+			grid.edit(cell);
+			assert.isTrue(cell.element.innerHTML === cellContent, 'Content shouldn\'t have changed');
 		});
 	});
 });
