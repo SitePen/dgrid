@@ -60,8 +60,8 @@ define([
 				promise;
 
 			target = row.element;
-			target = target.className.indexOf('dgrid-expando-icon') > -1 ? target :
-				querySelector('.dgrid-expando-icon', target)[0];
+			target = target && (target.className.indexOf('dgrid-expando-icon') > -1 ? target :
+				querySelector('.dgrid-expando-icon', target)[0]);
 
 			noTransition = noTransition || !this.enableTreeTransitions;
 
@@ -323,10 +323,6 @@ define([
 
 			var grid = this,
 				colSelector = '.dgrid-content .dgrid-column-' + column.id;
-
-			if (!grid.collection) {
-				throw new Error('dgrid Tree mixin requires a collection to operate.');
-			}
 
 			if (typeof column.renderExpando !== 'function') {
 				column.renderExpando = this._defaultRenderExpando;
