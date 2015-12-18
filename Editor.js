@@ -42,6 +42,18 @@ define([
 			return rowElement;
 		},
 
+		refresh: function () {
+			for (var id in this._editorInstances) {
+				var editorInstanceDomNode = this._editorInstances[id].domNode;
+				if (editorInstanceDomNode && editorInstanceDomNode.parentNode) {
+					// Remove any editor widgets from the DOM before List destroys it, to avoid issues in IE (#1100)
+					editorInstanceDomNode.parentNode.removeChild(editorInstanceDomNode);
+				}
+			}
+
+			this.inherited(arguments);
+		},
+
 		removeRow: function (rowElement) {
 			var self = this;
 			var focusedCell = this._focusedEditorCell;
