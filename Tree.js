@@ -392,6 +392,13 @@ define([
 			});
 		},
 
+		_onNotification: function (rows, event) {
+			if (event.type === 'delete') {
+				delete this._expanded[event.id];
+			}
+			this.inherited(arguments);
+		},
+
 		_onTreeTransitionEnd: function (event) {
 			var container = this,
 				height = this.style.height;

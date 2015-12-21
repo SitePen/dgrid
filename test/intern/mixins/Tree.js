@@ -461,6 +461,18 @@ define([
 						'Expected first row to be the first row in the dom');
 				});
 			});
+
+			test.test('collapse items removed from store', function() {
+				return expand(0).then(function () {
+					assert.isTrue(domClass.contains(grid.row(0).element, 'dgrid-row-expanded'),
+						'Should have expanded class');
+					var item = grid.collection.getSync(0);
+					grid.collection.remove(0);
+					grid.collection.addSync(item);
+					assert.isFalse(domClass.contains(grid.row(0).element, 'dgrid-row-expanded'),
+						'Should not preserve expanded status after removing from store');
+				});
+			});
 		});
 
 		test.suite('Tree + Trackable + shouldTrackCollection: false', function () {
