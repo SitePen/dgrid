@@ -396,6 +396,19 @@ define([
 			});
 		},
 
+		_onNotification: function (rows, event) {
+			if (event.type === 'delete') {
+				var key;
+				for (key in this._expanded) {
+					var row = this.row(key);
+					if (!row || (!row.data && !row.element)) {
+						delete this._expanded[key];
+					}
+				}
+			}
+			this.inherited(arguments);
+		},
+
 		_onTreeTransitionEnd: function (event) {
 			var container = this,
 				height = this.style.height;
