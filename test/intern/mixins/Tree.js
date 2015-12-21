@@ -10,13 +10,14 @@ define([
 	'dojo/_base/lang',
 	'dojo/aspect',
 	'dojo/Deferred',
+	'dojo/dom-class',
 	'dojo/dom-style',
 	'dojo/on',
 	'dojo/query',
 	'put-selector/put',
 	'dgrid/test/data/createHierarchicalStore'
 ], function (test, assert, OnDemandGrid, Editor, Tree, has, miscUtil, declare, lang, aspect, Deferred,
-		domStyle, on, query, put, createHierarchicalStore) {
+		domClass, domStyle, on, query, put, createHierarchicalStore) {
 
 	var grid,
 		testDelay = 15,
@@ -454,6 +455,18 @@ define([
 					});
 					assert.strictEqual(grid.row('0').element, grid.domNode.querySelector('.dgrid-row'),
 						'Expected first row to be the first row in the dom');
+				});
+			});
+
+			test.test('collapse items removed from store', function() {
+				return expand(0).then(function () {
+					assert.isTrue(domClass.contains(grid.row(0).element, 'dgrid-row-expanded'),
+						'Should have expanded class');
+					var item = grid.collection.getSync(0);
+					grid.collection.remove(0);
+					grid.collection.addSync(item);
+					assert.isFalse(domClass.contains(grid.row(0).element, 'dgrid-row-expanded'),
+						'Should not preserve expanded status after removing from store');
 				});
 			});
 		});
