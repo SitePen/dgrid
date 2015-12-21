@@ -32,15 +32,6 @@ define([
 			});
 			this._listeners.push(this._editorFocusoutHandle);
 
-			aspect.before(this, 'refresh', function() {
-				var id;
-				for (id in this._editorInstances) {
-					var editorInstanceDomNode;
-					if ((editorInstanceDomNode = this._editorInstances[id].domNode) && editorInstanceDomNode.parentNode) {
-						editorInstanceDomNode.parentNode.removeChild(editorInstanceDomNode)
-					}
-				}
-			});
 		},
 
 		insertRow: function () {
@@ -52,6 +43,18 @@ define([
 				this.edit(this.cell(row, previouslyFocusedCell.column.id));
 			}
 			return rowElement;
+		},
+
+		refresh: function () {
+			var id;
+			for (id in this._editorInstances) {
+				var editorInstanceDomNode = this._editorInstances[ id ].domNode;
+				if (editorInstanceDomNode && editorInstanceDomNode.parentNode) {
+					editorInstanceDomNode.parentNode.removeChild(editorInstanceDomNode)
+				}
+			}
+
+			this.inherited(arguments);
 		},
 
 		removeRow: function (rowElement) {
