@@ -106,9 +106,8 @@ define([
 						//		Ensures the first element of a grid is always keyboard selectable after data has been
 						//		retrieved if there is not already a valid focused element.
 
-						var focusedNode = grid._focusedNode || initialNode;
-
 						// do not update the focused element if we already have a valid one
+						var focusedNode = grid._focusedNode || initialNode;
 						if (isFocusableClass.test(focusedNode.className) && areaNode.contains(focusedNode)) {
 							return rows;
 						}
@@ -119,12 +118,12 @@ define([
 						var elements = areaNode.getElementsByTagName('*');
 						for (var i = 0, element; (element = elements[i]); ++i) {
 							if (isFocusableClass.test(element.className)) {
-								focusedNode = grid._focusedNode = element;
+								element.tabIndex = grid.tabIndex;
+								grid._focusedNode = element;
 								break;
 							}
 						}
 
-						focusedNode.tabIndex = grid.tabIndex;
 						return rows;
 					});
 				}
