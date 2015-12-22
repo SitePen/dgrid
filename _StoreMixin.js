@@ -121,30 +121,32 @@ define([
 				});
 			}
 
-			if (collection) {
-				var renderedCollection = collection;
-				if (this.sort && this.sort.length > 0) {
-					renderedCollection = collection.sort(this.sort);
-				}
-
-				if (renderedCollection.track && this.shouldTrackCollection) {
-					renderedCollection = renderedCollection.track();
-					this._rows = [];
-
-					this._observerHandle = this._observeCollection(
-						renderedCollection,
-						this.contentNode,
-						{ rows: this._rows }
-					);
-				}
-
-				this._renderedCollection = renderedCollection;
-			}
-
 			this.collection = collection;
 
-			// Avoid unnecessary refresh if instance hasn't started yet (startup will refresh)
+			// Avoid unnecessary rendering and processing before the grid has started up
 			if (this._started) {
+				// Once startup is called, List.startup sets the sort property which calls _StoreMixin._applySort
+				// which sets the collection property again.  So _StoreMixin._applySort will be executed again
+				// after startup is called.
+				if (collection) {
+					var renderedCollection = collection;
+					if (this.sort && this.sort.length > 0) {
+						renderedCollection = collection.sort(this.sort);
+					}
+
+					if (renderedCollection.track && this.shouldTrackCollection) {
+						renderedCollection = renderedCollection.track();
+						this._rows = [];
+
+						this._observerHandle = this._observeCollection(
+							renderedCollection,
+							this.contentNode,
+							{ rows: this._rows }
+						);
+					}
+
+					this._renderedCollection = renderedCollection;
+				}
 				this.refresh();
 			}
 		},
