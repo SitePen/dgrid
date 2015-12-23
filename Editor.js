@@ -13,7 +13,10 @@ define([
 	return declare(null, {
 		constructor: function () {
 			this._editorInstances = {};
+			// Tracks shared editor dismissal listeners, and editor click/change listeners for old IE
 			this._editorColumnListeners = [];
+			// Tracks always-on editor listeners for old IE, or listeners for triggering shared editors
+			this._editorCellListeners = {};
 			this._editorsPendingStartup = [];
 		},
 
@@ -32,8 +35,19 @@ define([
 		},
 
 		insertRow: function () {
+			this._editorRowListeners = {};
 			var rowElement = this.inherited(arguments);
 			var row = this.row(rowElement);
+			var rowListeners = this._editorCellListeners[rowElement.id] =
+				this._editorCellListeners[rowElement.id] || {};
+
+			for (var key in this._editorRowListeners) {
+				rowListeners[key] = this._editorRowListeners[key];
+			}
+			// Null this out so that _createEditor can tell whether the editor being created is
+			// an individual cell editor at insertion time
+			this._editorRowListeners = null;
+
 			var previouslyFocusedCell = this._previouslyFocusedEditorCell;
 
 			if (previouslyFocusedCell && previouslyFocusedCell.row.id === row.id) {
@@ -71,6 +85,13 @@ define([
 					self._editorFocusoutHandle.resume();
 					self._previouslyFocusedEditorCell = null;
 				}, 0);
+			}
+
+			if (this._editorCellListeners[rowElement.id]) {
+				for (var columnId in this._editorCellListeners[rowElement.id]) {
+					this._editorCellListeners[rowElement.id][columnId].remove();
+				}
+				delete this._editorCellListeners[rowElement.id];
 			}
 
 			for (var i = this._alwaysOnWidgetColumns.length; i--;) {
@@ -129,6 +150,18 @@ define([
 			for (var i = listeners.length; i--;) {
 				listeners[i].remove();
 			}
+
+			for (var rowId in this._editorCellListeners) {
+				for (columnId in this._editorCellListeners[rowId]) {
+					this._editorCellListeners[rowId][columnId].remove();
+				}
+			}
+
+			for (i = 0; i < this._editorColumnListeners.length; i++) {
+				this._editorColumnListeners[i].remove();
+			}
+
+			this._editorCellListeners = {};
 			this._editorColumnListeners = [];
 			this._editorsPendingStartup = [];
 		},
@@ -170,12 +203,13 @@ define([
 				// which we already advocate in docs for optimal use)
 
 				if (!options || !options.alreadyHooked) {
-					self._editorColumnListeners.push(
-						on(cell, editOn, function () {
-							self._activeOptions = options;
-							self.edit(this);
-						})
-					);
+					var listener = on(cell, editOn, function () {
+						self._activeOptions = options;
+						self.edit(this);
+					});
+					if (self._editorRowListeners) {
+						self._editorRowListeners[column.id] = listener;
+					}
 				}
 
 				// initially render content in non-edit mode
@@ -424,16 +458,25 @@ define([
 				if (has('ie') < 9) {
 					// IE<9 doesn't fire change events for all the right things,
 					// and it doesn't bubble.
+					var listener;
 					if (editor === 'radio' || editor === 'checkbox') {
 						// listen for clicks since IE doesn't fire change events properly for checks/radios
-						this._editorColumnListeners.push(on(cmp, 'click', function (evt) {
+						listener = on(cmp, 'click', function (evt) {
 							self._handleEditorChange(evt, column);
-						}));
+						});
 					}
 					else {
-						this._editorColumnListeners.push(on(cmp, 'change', function (evt) {
+						listener = on(cmp, 'change', function (evt) {
 							self._handleEditorChange(evt, column);
-						}));
+						});
+					}
+
+					if (editOn) {
+						// Shared editor handlers are maintained in _editorColumnListeners, since they're not per-row
+						this._editorColumnListeners.push(listener);
+					}
+					else if (this._editorRowListeners) {
+						this._editorRowListeners[column.id] = listener;
 					}
 				}
 			}
