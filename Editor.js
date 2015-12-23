@@ -15,6 +15,7 @@ define([
 		constructor: function () {
 			this._editorInstances = {};
 			this._editorColumnListeners = [];
+			this._editorCellListeners = {};
 			this._editorsPendingStartup = [];
 		},
 
@@ -118,6 +119,14 @@ define([
 			for (var i = listeners.length; i--;) {
 				listeners[i].remove();
 			}
+			for (var columnId in this._editorCellListeners) {
+				for (var objectId in this._editorCellListeners[columnId]) {
+					for (i = 0; i < this._editorCellListeners[columnId][objectId].length; i++) {
+						this._editorCellListeners[columnId][objectId][i].remove();
+					}
+				}
+			}
+			this._editorCellListeners = {};
 			this._editorColumnListeners = [];
 			this._editorsPendingStartup = [];
 		},
@@ -159,12 +168,27 @@ define([
 				// which we already advocate in docs for optimal use)
 
 				if (!options || !options.alreadyHooked) {
-					self._editorColumnListeners.push(
-						on(cell, editOn, function () {
+					if (self.collection) {
+						var columnCellListeners = self._editorCellListeners[column.id] = self._editorCellListeners[column.id] || {};
+						var itemId = self.collection.getIdentity(object);
+						if (columnCellListeners[itemId] && columnCellListeners[itemId].length) {
+							var i;
+							for (i = 0; i < columnCellListeners[itemId].length; i++) {
+								columnCellListeners[itemId][i].remove();
+							}
+						}
+						columnCellListeners[itemId] = [ on(cell, editOn, function () {
 							self._activeOptions = options;
 							self.edit(this);
-						})
-					);
+						}) ];
+					} else {
+						self._editorColumnListeners.push(
+							on(cell, editOn, function () {
+								self._activeOptions = options;
+								self.edit(this);
+							})
+						);
+					}
 				}
 
 				// initially render content in non-edit mode
@@ -173,7 +197,7 @@ define([
 			} : function (object, value, cell, options) {
 				// always-on: create editor immediately upon rendering each cell
 				if (!column.canEdit || column.canEdit(object, value)) {
-					var cmp = self._createEditor(column);
+					var cmp = self._createEditor(column, self.collection ? self.collection.getIdentity(object) : null);
 					self._showEditor(cmp, column, cell, value);
 					// Maintain reference for later use.
 					cell[isWidget ? 'widget' : 'input'] = cmp;
@@ -357,7 +381,7 @@ define([
 			}
 		},
 
-		_createEditor: function (column) {
+		_createEditor: function (column, objectId) {
 			// Creates an editor instance based on column definition properties,
 			// and hooks up events.
 			var editor = column.editor,
@@ -417,16 +441,28 @@ define([
 				if (has('ie') < 9) {
 					// IE<9 doesn't fire change events for all the right things,
 					// and it doesn't bubble.
+					var handler;
 					if (editor === 'radio' || editor === 'checkbox') {
 						// listen for clicks since IE doesn't fire change events properly for checks/radios
-						this._editorColumnListeners.push(on(cmp, 'click', function (evt) {
+						handler = on(cmp, 'click', function (evt) {
 							self._handleEditorChange(evt, column);
-						}));
+						});
 					}
 					else {
-						this._editorColumnListeners.push(on(cmp, 'change', function (evt) {
+						handler = on(cmp, 'change', function (evt) {
 							self._handleEditorChange(evt, column);
-						}));
+						});
+					}
+					if (objectId) {
+						var columnCellListeners = self._editorCellListeners[column.id] = self._editorCellListeners[column.id] || {};
+						if (columnCellListeners[objectId] && columnCellListeners[objectId].length) {
+							for (var i = 0; i < columnCellListeners[objectId].length; i++) {
+								columnCellListeners[objectId][i].remove();
+							}
+						}
+						columnCellListeners[objectId] = [ handler ];
+					} else {
+						self._editorColumnListeners.push(handler);
 					}
 				}
 			}
