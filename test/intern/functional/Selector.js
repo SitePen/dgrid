@@ -201,27 +201,27 @@ define([
 			return this.remote
 				.findByCssSelector('#gridExtended-row-0 input')
 					.click()
-					.execute(getSelectionState, ['0'])
+					.execute(getSelectionState, [ '0' ])
 					.then(function (selectionState) {
 						assert.isTrue(selectionState, 'Clicked row should be selected');
 					})
 					.type(keys.ENTER)
-					.execute(getSelectionState, ['0'])
+					.execute(getSelectionState, [ '0' ])
 					.then(function (selectionState) {
 						assert.notOk(selectionState, 'Press Enter: row should not be selected');
 					})
 					.type(keys.ENTER)
-					.execute(getSelectionState, ['0'])
+					.execute(getSelectionState, [ '0' ])
 					.then(function (selectionState) {
 						assert.isTrue(selectionState, 'Press Enter: row should be selected');
 					})
 					.type(keys.SPACE)
-					.execute(getSelectionState, ['0'])
+					.execute(getSelectionState, [ '0' ])
 					.then(function (selectionState) {
 						assert.notOk(selectionState, 'Press Space: row should not be selected');
 					})
 					.type(keys.SPACE)
-					.execute(getSelectionState, ['0'])
+					.execute(getSelectionState, [ '0' ])
 					.then(function (selectionState) {
 						assert.isTrue(selectionState, 'Press Space: row should be selected');
 					})
