@@ -246,6 +246,9 @@ define([
 					this._waitForMouseUp = target;
 				}
 				else {
+					if (event.shiftKey) {
+						event.preventDefault();
+					}
 					this[this._selectionHandlerName](event, target);
 				}
 			}
