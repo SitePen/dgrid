@@ -1,5 +1,6 @@
 define([
 	'dojo/_base/declare',
+	'dojo/_base/array',
 	'dojo/on',
 	'dojo/query',
 	'dojo/_base/lang',
@@ -10,7 +11,7 @@ define([
 	'put-selector/put',
 	'dojo/_base/html',
 	'xstyle/css!../css/extensions/ColumnResizer.css'
-], function (declare, listen, query, lang, dom, geom, has, miscUtil, put) {
+], function (declare, arrayUtil, listen, query, lang, dom, geom, has, miscUtil, put) {
 
 	function addRowSpan(table, span, startRow, column, id) {
 		// loop through the rows of the table and add this column's id to
@@ -26,7 +27,9 @@ define([
 
 		var i = subRows.length,
 			l = i,
-			numCols = subRows[0].length,
+			numCols = arrayUtil.filter(subRows[0], function (column) {
+				return !column.hidden;
+			}).length,
 			table = new Array(i);
 
 		// create table-like structure in an array so it can be populated
