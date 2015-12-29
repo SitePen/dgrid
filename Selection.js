@@ -46,28 +46,10 @@ define([
 		downType = hasPointer ? hasPointer + (hasMSPointer ? 'Down' : 'down') : 'mousedown',
 		upType = hasPointer ? hasPointer + (hasMSPointer ? 'Up' : 'up') : 'mouseup';
 
-	function makeUnselectable(node, unselectable) {
-		// Utility function used in fallback path for recursively setting unselectable
-		var value = node.unselectable = unselectable ? 'on' : '',
-			elements = node.getElementsByTagName('*'),
-			i = elements.length;
-
-		while (--i) {
-			if (elements[i].tagName === 'INPUT' || elements[i].tagName === 'TEXTAREA') {
-				continue; // Don't prevent text selection in text input fields.
-			}
-			elements[i].unselectable = value;
-		}
-	}
-
 	function setSelectable(grid, selectable) {
 		// Alternative version of dojo/dom.setSelectable based on feature detection.
-
-		// For FF < 21, use -moz-none, which will respect -moz-user-select: text on
-		// child elements (e.g. form inputs).  In FF 21, none behaves the same.
-		// See https://developer.mozilla.org/en-US/docs/CSS/user-select
 		var node = grid.bodyNode,
-			value = selectable ? 'text' : has('ff') < 21 ? '-moz-none' : 'none';
+			value = selectable ? 'text' : 'none';
 
 		// In IE10+, -ms-user-select: none will block selection from starting within the
 		// element, but will not block an existing selection from entering the element.
@@ -99,21 +81,7 @@ define([
 			}
 		}
 		else {
-			// For browsers that don't support either user-select or selectstart (Opera),
-			// we need to resort to setting the unselectable attribute on all nodes
-			// involved.  Since this doesn't automatically apply to child nodes, we also
-			// need to re-apply it whenever rows are rendered.
-			makeUnselectable(node, !selectable);
-			if (!selectable && !grid._unselectableHandle) {
-				grid._unselectableHandle = aspect.after(grid, 'renderRow', function (row) {
-					makeUnselectable(row, true);
-					return row;
-				});
-			}
-			else if (selectable && grid._unselectableHandle) {
-				grid._unselectableHandle.remove();
-				delete grid._unselectableHandle;
-			}
+			throw new Error('Your browser dosen\'t support css user-select or selectstart event');
 		}
 	}
 
@@ -187,9 +155,6 @@ define([
 			// Remove any extra handles added by Selection.
 			if (this._selectstartHandle) {
 				this._selectstartHandle.remove();
-			}
-			if (this._unselectableHandle) {
-				this._unselectableHandle.remove();
 			}
 			if (this._removeDeselectSignals) {
 				this._removeDeselectSignals();

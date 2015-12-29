@@ -88,7 +88,7 @@ define([
 			// listen for keydown as well to get an event in firefox that we can properly retrieve
 			// the shiftKey property
 			if (event.type === 'click' || event.keyCode === 32 ||
-				(!has('opera') && event.keyCode === 13) || event.keyCode === 0) {
+				event.keyCode === 13 || event.keyCode === 0) {
 
 				this._selectionTriggerEvent = event;
 
