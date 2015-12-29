@@ -78,6 +78,10 @@ define([
 		},
 
 		_handleSelectorClick: function (event) {
+			if (event.target.nodeName === 'INPUT' && event.type === "keydown" && event.keyCode === 32) {
+				return;
+			}
+
 			var cell = this.cell(event);
 			var row = cell.row;
 
