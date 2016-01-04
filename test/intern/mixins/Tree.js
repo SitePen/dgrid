@@ -409,6 +409,34 @@ define([
 					}, null, 'Modification of child should not throw error');
 				});
 			});
+
+			test.test('child modification after parent when expanded', function() {
+				var dfd = this.async(10000);
+				expand(0).then(function() {
+					grid.collection.putSync({
+						id: '0',
+						value: 'Modified'
+					});
+					grid.collection.putSync({
+						id: '0:0',
+						value: 'Modified',
+						parent: '0'
+					});
+					setTimeout(dfd.callback(function() {
+						grid.collection.putSync({
+							id: '0',
+							value: 'Modified'
+						});
+						grid.collection.putSync({
+							id: '0:0',
+							value: 'Modified',
+							parent: '0'
+						});
+						assert.strictEqual(grid.row('0').element, grid.domNode.querySelector('.dgrid-row'),
+						'Expected first row to be the first row in the dom');
+					}), 100);
+				})
+			})
 		});
 
 		test.suite('Tree + Trackable + shouldTrackCollection: false', function () {
