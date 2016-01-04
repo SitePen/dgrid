@@ -1,6 +1,7 @@
 define([
 	'dojo/_base/declare',
 	'dojo/_base/lang',
+	'dojo/aspect',
 	'dojo/Deferred',
 	'dojo/dom-construct',
 	'dojo/dom-class',
@@ -9,7 +10,7 @@ define([
 	'dojo/query',
 	'./Grid',
 	'dojo/_base/sniff'
-], function (declare, lang, Deferred, domConstruct, domClass, on, has, query, Grid) {
+], function (declare, lang, aspect, Deferred, domConstruct, domClass, on, has, query, Grid) {
 
 	return declare(null, {
 		constructor: function () {
@@ -30,6 +31,7 @@ define([
 				self._focusedEditorCell = null;
 			});
 			this._listeners.push(this._editorFocusoutHandle);
+
 		},
 
 		insertRow: function () {
@@ -41,6 +43,18 @@ define([
 				this.edit(this.cell(row, previouslyFocusedCell.column.id));
 			}
 			return rowElement;
+		},
+
+		refresh: function () {
+			var id;
+			for (id in this._editorInstances) {
+				var editorInstanceDomNode = this._editorInstances[ id ].domNode;
+				if (editorInstanceDomNode && editorInstanceDomNode.parentNode) {
+					editorInstanceDomNode.parentNode.removeChild(editorInstanceDomNode)
+				}
+			}
+
+			this.inherited(arguments);
 		},
 
 		removeRow: function (rowElement) {
