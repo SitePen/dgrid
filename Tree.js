@@ -60,8 +60,8 @@ define([
 				promise;
 
 			target = row.element;
-			target = target && (target.className.indexOf('dgrid-expando-icon') > -1 ? target :
-				querySelector('.dgrid-expando-icon', target)[0]);
+			target = target.className.indexOf('dgrid-expando-icon') > -1 ? target :
+				querySelector('.dgrid-expando-icon', target)[0];
 
 			noTransition = noTransition || !this.enableTreeTransitions;
 

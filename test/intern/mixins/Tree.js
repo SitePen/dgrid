@@ -150,26 +150,6 @@ define([
 			};
 		}
 
-		test.suite('no store', function () {
-
-			test.afterEach(destroyGrid);
-
-			test.test('call expand', function () {
-				grid = new (declare([OnDemandGrid, Tree]))(
-					{
-						columns: [
-							{ renderExpando: true, label: 'id', field: 'id' },
-							{ label: 'value', field: 'value' }
-						]
-					}
-				);
-				document.body.appendChild(grid.domNode);
-				grid.startup();
-
-				grid.expand(0);
-			});
-		});
-
 		test.suite('configure store last', function () {
 
 			test.beforeEach(makeBeforeEach(true));
