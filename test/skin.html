@@ -89,7 +89,7 @@
 				byId('skin').innerHTML = skinUtil.skin;
 
 				// add links to test all skins, w/ dgrid.css loaded first/last
-				byId('skins').innerHTML = skinUtil.renderLinks(skins);
+				byId('skins').appendChild(skinUtil.renderLinks(skins, grid));
 
 				createGrid(true);
 			});

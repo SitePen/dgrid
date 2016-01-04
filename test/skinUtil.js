@@ -15,10 +15,17 @@ define([
 
 	return {
 		renderLinks: function (skins) {
-			return arrayUtil.map(skins, function (s) {
-				return s === skin ? s :
-					'<a href="skin.html?skin=' + s + (rtl ? '&dir=rtl' : '') + '">' + s + '</a>';
-			}).join(' / ');
+			var documentFragment = document.createDocumentFragment();
+			arrayUtil.forEach(skins, function (s) {
+					var button = document.createElement('button');
+					button.textContent = s;
+					button.onclick = function() {
+						document.body.className = button.textContent;
+						grid.resize();
+					};
+					documentFragment.appendChild(button);
+			});
+			return documentFragment;
 		},
 		rtl: rtl,
 		skin: skin
