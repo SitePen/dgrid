@@ -427,12 +427,33 @@ define([
 				return expand(0).then(function () {
 					testRowExists('0:0');
 					assert.doesNotThrow(function () {
-						grid.collection.put({
+						grid.collection.putSync({
 							id: '0:0',
 							value: 'Modified',
 							parent: '0'
 						});
 					}, null, 'Modification of child should not throw error');
+				});
+			});
+
+			test.test('child modification after parent when expanded', function () {
+				return expand(0).then(function () {
+					grid.collection.putSync({
+						id: '0',
+						value: 'Modified'
+					});
+					grid.collection.putSync({
+						id: '0:0',
+						value: 'Modified',
+						parent: '0',
+						hasChildren: false
+					});
+					grid.collection.putSync({
+						id: '0',
+						value: 'Modified'
+					});
+					assert.strictEqual(grid.row('0').element, grid.domNode.querySelector('.dgrid-row'),
+						'Expected first row to be the first row in the dom');
 				});
 			});
 		});
