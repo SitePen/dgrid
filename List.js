@@ -486,7 +486,7 @@ define([
 				if (row === beforeNode) {
 					beforeNode = (beforeNode.connected || beforeNode).nextSibling;
 				}
-				this.removeRow(row);
+				this.removeRow(row, false, options);
 			}
 			row = this.renderRow(object, options);
 			row.className = (row.className || '') + ' dgrid-row ' +
