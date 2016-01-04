@@ -398,13 +398,7 @@ define([
 
 		_onNotification: function (rows, event) {
 			if (event.type === 'delete') {
-				var key;
-				for (key in this._expanded) {
-					var row = this.row(key);
-					if (!row || (!row.data && !row.element)) {
-						delete this._expanded[key];
-					}
-				}
+				delete this._expanded[event.id];
 			}
 			this.inherited(arguments);
 		},

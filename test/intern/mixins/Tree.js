@@ -412,16 +412,12 @@ define([
 
 			test.test('collapse items removed from store', function() {
 				return expand(0).then(function() {
-					assert.isTrue(grid.row(0).element.classList.contains('dgrid-row-expanded'),
+					assert.isTrue(domClass.contains(grid.row(0).element, 'dgrid-row-expanded'),
 						'Should have expanded class');
 					var item = grid.collection.getSync(0);
-					grid.removeRow(grid.row(0));
-					grid.refresh();
-					assert.isTrue(grid.row(0).element.classList.contains('dgrid-row-expanded'),
-						'Should preserve expanded status after removing row');
 					grid.collection.remove(0);
 					grid.collection.add(item);
-					assert.isFalse(grid.row(0).element.classList.contains('dgrid-row-expanded'),
+					assert.isFalse(domClass.contains(grid.row(0).element, 'dgrid-row-expanded'),
 						'Should not preserve expanded status after removing from store');
 				});
 			});
