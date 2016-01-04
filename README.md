@@ -48,7 +48,7 @@ Alternatively, dgrid and its dependencies can be downloaded individually:
 * [xstyle](https://github.com/kriszyp/xstyle)
 * [put-selector](https://github.com/kriszyp/put-selector)
 * [dstore](https://github.com/SitePen/dstore) for store-backed grids
-* [The Dojo Toolkit](http://dojotoolkit.org) SDK version 1.8 or higher
+* [The Dojo Toolkit](http://dojotoolkit.org) SDK version 1.8.2 or higher
     * Out of the DTK components, Dojo core is the only hard dependency for dgrid;
       however, some of the test pages also use components from Dijit, and
       Dojox (namely grid for a comparison test, and mobile for a mobile page).
@@ -91,7 +91,7 @@ packages: [
 
 # Browser and Dojo Version Support
 
-dgrid 0.4 works with Dojo 1.8 or higher, and supports the following browsers:
+dgrid 0.4 works with Dojo 1.8.2 or higher, and supports the following browsers:
 
 * IE 8+
 * Firefox latest + ESR

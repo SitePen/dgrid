@@ -7,35 +7,15 @@ define([
 	'dojo/has!touch?./util/touch',
 	'put-selector/put',
 	'dojo/query',
-	'dojo/_base/sniff'
+	'dojo/_base/sniff',
+	'dojo/dom' // for has('css-user-select') in 1.8.2+
 ], function (declare, on, has, aspect, List, touchUtil, put) {
 
 	has.add('dom-comparedocumentposition', function (global, doc, element) {
 		return !!element.compareDocumentPosition;
 	});
 
-	// Add feature test for user-select CSS property for optionally disabling
-	// text selection.
-	// (Can't use dom.setSelectable prior to 1.8.2 because of bad sniffs, see #15990)
-	has.add('css-user-select', function (global, doc, element) {
-		var style = element.style,
-			prefixes = ['Khtml', 'O', 'ms', 'Moz', 'Webkit'],
-			i = prefixes.length,
-			name = 'userSelect';
-
-		// Iterate prefixes from most to least likely
-		do {
-			if (typeof style[name] !== 'undefined') {
-				// Supported; return property name
-				return name;
-			}
-		} while (i-- && (name = prefixes[i] + 'UserSelect'));
-
-		// Not supported if we didn't return before now
-		return false;
-	});
-
-	// Also add a feature test for the onselectstart event, which offers a more
+	// Add a feature test for the onselectstart event, which offers a more
 	// graceful fallback solution than node.unselectable.
 	has.add('dom-selectstart', typeof document.onselectstart !== 'undefined');
 
@@ -45,6 +25,11 @@ define([
 		hasMSPointer = hasPointer && hasPointer.slice(0, 2) === 'MS',
 		downType = hasPointer ? hasPointer + (hasMSPointer ? 'Down' : 'down') : 'mousedown',
 		upType = hasPointer ? hasPointer + (hasMSPointer ? 'Up' : 'up') : 'mouseup';
+
+	if (hasUserSelect === 'WebkitUserSelect' && typeof document.documentElement.style.msUserSelect !== 'undefined') {
+		// Edge defines both webkit and ms prefixes, rendering feature detects as brittle as UA sniffs...
+		hasUserSelect = false;
+	}
 
 	function makeUnselectable(node, unselectable) {
 		// Utility function used in fallback path for recursively setting unselectable
@@ -74,6 +59,7 @@ define([
 		// When using a modifier key, IE will select text inside of the element as well
 		// as outside of the element, because it thinks the selection started outside.
 		// Therefore, fall back to other means of blocking selection for IE10+.
+		// Newer versions of Dojo do not even report msUserSelect (see https://github.com/dojo/dojo/commit/7ae2a43).
 		if (hasUserSelect && hasUserSelect !== 'msUserSelect') {
 			node.style[hasUserSelect] = value;
 		}
