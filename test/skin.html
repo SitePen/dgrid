@@ -6,6 +6,13 @@
 		<meta name="viewport" content="width=570">
 		<link rel="stylesheet" href="../../dojo/resources/dojo.css">
 		<link rel="stylesheet" href="../css/dgrid.css">
+		<link rel="stylesheet" href="../css/skins/claro.css">
+		<link rel="stylesheet" href="../css/skins/tundra.css">
+		<link rel="stylesheet" href="../css/skins/nihilo.css">
+		<link rel="stylesheet" href="../css/skins/soria.css">
+		<link rel="stylesheet" href="../css/skins/slate.css">
+		<link rel="stylesheet" href="../css/skins/sage.css">
+		<link rel="stylesheet" href="../css/skins/cactus.css">
 		<style>
 			h2 {
 				font-weight: bold;
@@ -37,6 +44,7 @@
 		<script src="../../dojo/dojo.js" data-dojo-config="async: true"></script>
 		<script>
 			var toggleUiClasses; // Function, defined later
+			var skins = ['claro', 'tundra', 'nihilo', 'soria', 'slate', 'sage', 'cactus'];
 			require([ 'dojo/_base/declare', 'dojo/dom-construct',
 				'dgrid/Grid', 'dgrid/Selection', 'dgrid/Keyboard', 'dgrid/Editor', 'dgrid/extensions/Pagination',
 				'dgrid/test/data/testStore', 'dgrid/test/skinUtil', 'dojo/domReady!' ],
@@ -81,7 +89,7 @@
 				byId('skin').innerHTML = skinUtil.skin;
 
 				// add links to test all skins, w/ dgrid.css loaded first/last
-				byId('skins').innerHTML = skinUtil.renderLinks();
+				byId('skins').appendChild(skinUtil.renderLinks(skins, grid));
 
 				createGrid(true);
 			});
