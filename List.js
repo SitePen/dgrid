@@ -47,17 +47,15 @@ define([
 	});
 
 	has.add('dom-rtl-scrollbar-left', function (global, doc, element) {
-		var div = put('div'),
+		var div = put('div.dgrid-scrollbar-measure-child'),
 			isLeft;
 
 		put(document.body, element, '.dgrid-scrollbar-measure[dir=rtl]');
 		put(element, div);
 
-		// position: absolute makes IE always report child's offsetLeft as 0,
-		// but it conveniently makes other browsers reset to 0 as base, and all
-		// versions of IE are known to move the scrollbar to the left side for rtl
-		isLeft = !!has('ie') || !!has('trident') || div.offsetLeft >= has('dom-scrollbar-width');
-		cleanupTestElement(element);
+		// Calling has cleans up the element, and trying to clean up again
+		// causes an error in IE8
+		isLeft = div.offsetLeft >= has('dom-scrollbar-width');
 		put(div, '!');
 		element.removeAttribute('dir');
 		return isLeft;
