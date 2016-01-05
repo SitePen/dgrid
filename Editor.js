@@ -34,8 +34,21 @@ define([
 		},
 
 		insertRow: function () {
+			this._editorRowListeners = {};
 			var rowElement = this.inherited(arguments);
 			var row = this.row(rowElement);
+			var rowListeners = this._editorCellListeners[rowElement.id] = this._editorCellListeners[rowElement.id] || {};
+			for (var key in this._editorRowListeners) {
+				if (rowListeners[key]) {
+					rowListeners[key].push(this._editorRowListeners[key]);
+				} else {
+					rowListeners[key] = [ this._editorRowListeners[key] ];
+				}
+			}
+			// Null this out so that _createEditor can tell whether the editor being
+			// created is a shared column editor or an individual cell editor
+			this._editorRowListeners = null;
+
 			var previouslyFocusedCell = this._previouslyFocusedEditorCell;
 
 			if (previouslyFocusedCell && previouslyFocusedCell.row.id === row.id) {
@@ -63,6 +76,14 @@ define([
 				}, 0);
 			}
 
+			if (this._editorCellListeners[rowElement.id]) {
+				for (var key in this._editorCellListeners[rowElement.id]) {
+					for (var i = 0; i < this._editorCellListeners[rowElement.id][key].length; i++) {
+						this._editorCellListeners[rowElement.id][key][i].remove();
+					}
+				}
+				this._editorCellListeners[rowElement.id] = {};
+			}
 			for (var i = this._alwaysOnWidgetColumns.length; i--;) {
 				// Destroy always-on editor widgets during the row removal operation,
 				// but don't trip over loading nodes from incomplete requests
@@ -119,10 +140,10 @@ define([
 			for (var i = listeners.length; i--;) {
 				listeners[i].remove();
 			}
-			for (var columnId in this._editorCellListeners) {
-				for (var objectId in this._editorCellListeners[columnId]) {
-					for (i = 0; i < this._editorCellListeners[columnId][objectId].length; i++) {
-						this._editorCellListeners[columnId][objectId][i].remove();
+			for (var rowId in this._editorCellListeners) {
+				for (var columnId in this._editorCellListeners[rowId]) {
+					for (i = 0; i < this._editorCellListeners[rowId][columnId].length; i++) {
+						this._editorCellListeners[rowId][columnId][i].remove();
 					}
 				}
 			}
@@ -168,27 +189,10 @@ define([
 				// which we already advocate in docs for optimal use)
 
 				if (!options || !options.alreadyHooked) {
-					if (self.collection) {
-						var columnCellListeners = self._editorCellListeners[column.id] = self._editorCellListeners[column.id] || {};
-						var itemId = self.collection.getIdentity(object);
-						if (columnCellListeners[itemId] && columnCellListeners[itemId].length) {
-							var i;
-							for (i = 0; i < columnCellListeners[itemId].length; i++) {
-								columnCellListeners[itemId][i].remove();
-							}
-						}
-						columnCellListeners[itemId] = [ on(cell, editOn, function () {
-							self._activeOptions = options;
-							self.edit(this);
-						}) ];
-					} else {
-						self._editorColumnListeners.push(
-							on(cell, editOn, function () {
-								self._activeOptions = options;
-								self.edit(this);
-							})
-						);
-					}
+					this._editorRowListeners[column.id] = on(cell, editOn, function () {
+						self._activeOptions = options;
+						self.edit(this);
+					});
 				}
 
 				// initially render content in non-edit mode
@@ -197,7 +201,7 @@ define([
 			} : function (object, value, cell, options) {
 				// always-on: create editor immediately upon rendering each cell
 				if (!column.canEdit || column.canEdit(object, value)) {
-					var cmp = self._createEditor(column, self.collection ? self.collection.getIdentity(object) : null);
+					var cmp = self._createEditor(column);
 					self._showEditor(cmp, column, cell, value);
 					// Maintain reference for later use.
 					cell[isWidget ? 'widget' : 'input'] = cmp;
@@ -381,7 +385,7 @@ define([
 			}
 		},
 
-		_createEditor: function (column, objectId) {
+		_createEditor: function (column) {
 			// Creates an editor instance based on column definition properties,
 			// and hooks up events.
 			var editor = column.editor,
@@ -453,14 +457,8 @@ define([
 							self._handleEditorChange(evt, column);
 						});
 					}
-					if (objectId) {
-						var columnCellListeners = self._editorCellListeners[column.id] = self._editorCellListeners[column.id] || {};
-						if (columnCellListeners[objectId] && columnCellListeners[objectId].length) {
-							for (var i = 0; i < columnCellListeners[objectId].length; i++) {
-								columnCellListeners[objectId][i].remove();
-							}
-						}
-						columnCellListeners[objectId] = [ handler ];
+					if (this._editorRowListeners) {
+						this._editorRowListeners[column.id] = handler;
 					} else {
 						self._editorColumnListeners.push(handler);
 					}
