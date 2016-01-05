@@ -124,6 +124,10 @@ html.has-mozilla .dgrid-focus {
   position: absolute;
   top: -9999px;
 }
+.dgrid-scrollbar-measure-child {
+  width: 10px;
+  height: 10px;
+}
 .dgrid-autoheight {
   height: auto;
 }
