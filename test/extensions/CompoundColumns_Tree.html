@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Test Grid with Compound Columns, Column Sets, and Tree</title>
+		<meta name="viewport" content="width=570">
+		<style>
+			@import "../../../dojo/resources/dojo.css";
+			@import "../../css/dgrid.css";
+			@import "../../css/skins/claro.css";
+
+			.dgrid {
+				width: 750px;
+				margin: 10px;
+			}
+
+			.dgrid .dgrid-content .dgrid-cell {
+				height: 24px;
+			}
+		</style>
+		<script src="../../../dojo/dojo.js" data-dojo-config="async: true"></script>
+	</head>
+	<body class="claro">
+		<div id="grid"></div>
+
+		<script>
+			require([
+				'dgrid/Tree',
+				'dgrid/ColumnSet',
+				'dgrid/OnDemandGrid',
+				'dgrid/extensions/CompoundColumns',
+				'dgrid/test/data/createHierarchicalStore',
+				'dgrid/test/data/hierarchicalCountryData'
+			], function (Tree, ColumnSet, OnDemandGrid, CompoundColumns, createHierarchicalStore, data) {
+					var CompoundTree = OnDemandGrid.createSubclass([ Tree, CompoundColumns, ColumnSet ]);
+					var store = createHierarchicalStore({ data: data });
+
+					var columnSets = [
+						[
+							[
+								{
+									field: 'name',
+									label: 'Name',
+									renderExpando: true
+								}
+							]
+						],
+						[
+							[
+								{
+									label: 'Information',
+									children: [
+										{
+											field: 'type',
+											label: 'Type'
+										}, {
+											field: 'population',
+											label: 'Population'
+										}
+									]
+								}
+							]
+						]
+					];
+
+					window.grid = new CompoundTree({
+						columnSets: columnSets,
+						collection: store.getRootCollection()
+					}, 'grid');
+				});
+		</script>
+	</body>
+</html>
