@@ -18,5 +18,7 @@ define([
 	intern.maxConcurrency = 4;
 
 	intern.tunnel = 'SauceLabsTunnel';
+
+	return intern;
 });
 
