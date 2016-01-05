@@ -126,20 +126,67 @@ define([
 			});
 		});
 
-		test.test('set(\'collection\') before startup should not cause superfluous refresh',  function () {
-			var numCalls = 0;
 
-			grid = new OnDemandList();
+		test.suite('set collection before startup', function () {
+			test.test('should not cause superfluous refresh',  function () {
+				var numCalls = 0;
 
-			aspect.before(grid, 'refresh', function () {
-				numCalls++;
+				grid = new OnDemandList();
+
+				aspect.before(grid, 'refresh', function () {
+					numCalls++;
+				});
+
+				grid.set('collection', createSyncStore(genericData));
+				document.body.appendChild(grid.domNode);
+				grid.startup();
+
+				assert.strictEqual(numCalls, 1, 'refresh should only have been called once');
 			});
 
-			grid.set('collection', createSyncStore(genericData));
-			document.body.appendChild(grid.domNode);
-			grid.startup();
+			test.test('store changes before startup', function () {
+				var callCount = 0;
+				var store = createSyncStore({ data: genericData });
 
-			assert.strictEqual(numCalls, 1, 'refresh should only have been called once');
+				grid = new OnDemandList({
+					columns: {
+						col1: 'Column 1',
+						col2: 'Column 2'
+					}
+				});
+
+				var insertHandle = aspect.after(grid, 'insertRow', function (row) {
+					callCount++;
+					return row;
+				});
+
+				var removeHandle = aspect.after(grid, 'removeRow', function () {
+					callCount++;
+				});
+
+				var destroyHandle = aspect.after(grid, 'destroy', function () {
+					destroyHandle.remove();
+					insertHandle.remove();
+					removeHandle.remove();
+				});
+
+				document.body.appendChild(grid.domNode);
+
+				grid.set('collection', store);
+				// Make changes to the items in the store before the grid has started.
+				store.addSync({
+					col1: 'inserted value',
+					col2: true
+				});
+				var item = store.getSync(1);
+				item.col1 = 'this has changed';
+				store.putSync(item);
+				// The grid should not have reacted to the store changes.
+				assert.strictEqual(callCount, 0);
+				grid.startup();
+				// Once the grid has started, some rows should have been inserted.
+				assert.isTrue(callCount > 0);
+			});
 		});
 
 		test.test('_StoreMixin#_onNotification', function () {
