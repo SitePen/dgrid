@@ -19,16 +19,23 @@
 
 		<script>
 			var grid,
+				data = [
+					{ id: 0, name: '1', description: 'one' },
+					{ id: 1, name: '2', description: 'two' },
+					{ id: 2, name: '3', description: 'three' }
+				],
 				datachangeStack = [],
 				ready = false,
-				setEditorToTextBox;
+				setEditorToTextBox,
+				setEditorToValidationTextBox;
 
 			require([
 				'dojo/_base/declare',
 				'dgrid/Grid',
 				'dgrid/Editor',
-				'dijit/form/TextBox'
-			], function (declare, Grid, Editor, TextBox) {
+				'dijit/form/TextBox',
+				'dijit/form/ValidationTextBox'
+			], function (declare, Grid, Editor, TextBox, ValidationTextBox) {
 				function createColumnConfig(editorType) {
 					return {
 						id: 'ID',
@@ -48,11 +55,7 @@
 					columns: createColumnConfig('text')
 				}, 'grid');
 
-				grid.renderArray([
-					{ id: 0, name: '1', description: 'one' },
-					{ id: 1, name: '2', description: 'two' },
-					{ id: 2, name: '3', description: 'three' }
-				]);
+				grid.renderArray(data);
 
 				// Push values received by the "dgrid-datachange" event into a global stack.
 				// The functional test can read from this stack to verify the values it is
@@ -63,6 +66,15 @@
 
 				setEditorToTextBox = function () {
 					grid.set('columns', createColumnConfig(TextBox));
+				};
+
+				setEditorToValidationTextBox = function () {
+					var columns = createColumnConfig(ValidationTextBox);
+
+					columns.description.editorArgs = {
+						required: true
+					};
+					grid.set('columns', columns);
 				};
 
 				ready = true;

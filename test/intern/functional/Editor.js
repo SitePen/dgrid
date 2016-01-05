@@ -7,7 +7,7 @@ define([
 	'require'
 ], function (test, assert, util, pollUntil, keys, require) {
 	// Number of visible rows in the grid.
-	// Check the data loaded in test file (editor.html) and rows visible
+	// Check the data loaded in test file (Editor.html) and rows visible
 	// when the page is loaded to ensure this is correct.
 	var GRID_ROW_COUNT = 3;
 	var rowSelectorPrefix = '#grid-row-';
@@ -346,5 +346,34 @@ define([
 
 		test.test('autoSave: true', createAutosaveTest());
 		test.test('autoSave: true - TextBox', createAutosaveTest(setTextBox));
+
+		test.test('shared editor reset', function() {
+			return this.remote
+				.get(require.toUrl('./Editor.html'))
+				.then(pollUntil(function () {
+					return window.ready;
+				}, null, 5000))
+				.execute(function () {
+					/* global setEditorToValidationTextBox, data */
+					setEditorToValidationTextBox();
+					data[1].description = '';
+					data[2].description = '';
+					grid.refresh();
+					grid.renderArray(data);
+				})
+				.findByCssSelector('#grid-row-1 .field-description')
+					.click()
+					.end()
+				.findByCssSelector('#grid-row-2 .field-description')
+					.click()
+					.findByCssSelector('.dijitInputInner')
+						.getAttribute('aria-invalid')
+						.then(function (isInvalid) {
+							assert.notStrictEqual(isInvalid, 'true',
+								'Cell editor validation state should not carry over into newly active cell editor');
+							})
+						.end()
+					.end();
+		});
 	});
 });

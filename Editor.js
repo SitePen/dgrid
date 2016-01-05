@@ -305,6 +305,12 @@ define([
 
 			cellElement.innerHTML = '';
 			domClass.add(cellElement, 'dgrid-cell-editing');
+
+			// If a shared editor is being moved to a different cell reset it to clear validation state
+			if (cmp.domNode && cmp.domNode.parentNode !== cellElement) {
+				cmp.reset && cmp.reset();
+			}
+
 			cellElement.appendChild(cmp.domNode || cmp);
 
 			if (isWidget && !column.editOn) {
