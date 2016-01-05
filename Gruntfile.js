@@ -47,21 +47,34 @@ module.exports = function (grunt) {
 		intern: {
 			options: {
 				reporters: [ 'LcovHtml', 'Pretty' ],
-				runType: 'runner'
+				runType: 'runner',
+				config: 'test/intern/intern'
 			},
 			local: {
 				options: {
-					config: 'test/intern/intern.local'
+					config: 'test/intern/intern-local'
 				}
 			},
-			remote: {
+			browserstack: {},
+			saucelabs: {
 				options: {
-					config: 'test/intern/intern'
+					config: 'test/intern/intern-saucelabs'
 				}
-			}
+			},
+			remote: {}
 		}
 	});
 
 	grunt.registerTask('default', [ 'stylus', 'watch:stylus' ]);
-	grunt.registerTask('test', [ 'intern:local' ]);
+	grunt.registerTask('test', function () {
+		var flags = Object.keys(this.flags);
+
+		if (!flags.length) {
+			flags.push('remote');
+		}
+
+		flags.forEach(function (flag) {
+			grunt.task.run('intern:' + flag);
+		});
+	});
 };
