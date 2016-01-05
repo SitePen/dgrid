@@ -215,6 +215,12 @@
 		"parent": "extensions"
 	},
 	{
+		"name": "CompoundColumns_Tree.html",
+		"url": "extensions/CompoundColumns_Tree.html",
+		"title": "Test Grid with Compound Columns, Column Sets, and Tree",
+		"parent": "extensions"
+	},
+	{
 		"name": "DnD.html",
 		"url": "extensions/DnD.html",
 		"title": "Test Grid DnD",

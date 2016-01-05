@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Test Tree mixin with CompoundColumns extension</title>
+
+<style>
+	@import "../../../../dojo/resources/dojo.css";
+	@import "../../../css/dgrid.css";
+	@import "../../../css/skins/claro.css";
+
+	.dgrid {
+		width: 700px;
+		margin: 10px;
+	}
+
+	.dgrid .dgrid-content .dgrid-cell {
+		height: 24px;
+	}
+
+	#treeGrid .field-type {
+		width: 5em;
+	}
+</style>
+</head>
+
+<body class="claro">
+<div id="treeGrid"></div>
+
+<script src="../../../../dojo/dojo.js" data-dojo-config="async: true"></script>
+
+<script>
+var treeGrid;
+var ready;
+
+require([
+	'dgrid/OnDemandGrid',
+	'dgrid/Tree',
+	'dgrid/ColumnSet',
+	'dgrid/extensions/CompoundColumns',
+	'dgrid/test/data/createHierarchicalStore',
+	'dgrid/test/data/hierarchicalCountryData'
+], function (OnDemandGrid, Tree, ColumnSet, CompoundColumns,
+			 createHierarchicalStore, hierarchicalCountryData) {
+
+	var testCountryStore = createHierarchicalStore({data: hierarchicalCountryData});
+
+	treeGrid = new (OnDemandGrid.createSubclass([ Tree, CompoundColumns, ColumnSet ]))({
+		sort: 'id',
+		collection: testCountryStore,
+		columnSets: [
+			[
+				[
+					{
+						renderExpando: true,
+						label: 'Name',
+						field: 'name',
+						sortable: false
+					}
+				]
+			],
+			[
+				[
+					{
+						label: 'Info',
+						sortable: false,
+						children: [
+							{
+								label: 'Type',
+								field: 'type',
+								sortable: false
+							},
+							{
+								label: 'Population',
+								field: 'population'
+							},
+							{
+								label: 'Timezone',
+								field: 'timezone'
+							}
+						]
+					}
+				]
+			]
+		]
+	}, 'treeGrid');
+
+	ready = true;
+});
+</script>
+</body>
+</html>

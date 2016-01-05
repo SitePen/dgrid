@@ -288,34 +288,36 @@ define([
 			// summary:
 			//		Adds tree navigation capability to a column.
 
-			if (!column._isConfiguredTreeColumn) {
-				var originalRenderCell = column.renderCell || this._defaultRenderCell;
-				column._isConfiguredTreeColumn = true;
-				column.renderCell = function (object, value, td, options) {
-					// summary:
-					//		Renders a cell that can be expanded, creating more rows
-
-					var grid = column.grid,
-						level = Number(options && options.queryLevel) + 1,
-						mayHaveChildren = !grid.collection.mayHaveChildren || grid.collection.mayHaveChildren(object),
-						expando, node;
-
-					level = grid._currentLevel = isNaN(level) ? 0 : level;
-					expando = column.renderExpando(level, mayHaveChildren,
-						grid._expanded[grid.collection.getIdentity(object)], object);
-					expando.level = level;
-					expando.mayHaveChildren = mayHaveChildren;
-
-					node = originalRenderCell.call(column, object, value, td, options);
-					if (node && node.nodeType) {
-						put(td, expando);
-						put(td, node);
-					}
-					else {
-						td.insertBefore(expando, td.firstChild);
-					}
-				};
+			if (column._isConfiguredTreeColumn) {
+				return;
 			}
+
+			var originalRenderCell = column.renderCell || this._defaultRenderCell;
+			column._isConfiguredTreeColumn = true;
+			column.renderCell = function (object, value, td, options) {
+				// summary:
+				//		Renders a cell that can be expanded, creating more rows
+
+				var grid = column.grid,
+					level = Number(options && options.queryLevel) + 1,
+					mayHaveChildren = !grid.collection.mayHaveChildren || grid.collection.mayHaveChildren(object),
+					expando, node;
+
+				level = grid._currentLevel = isNaN(level) ? 0 : level;
+				expando = column.renderExpando(level, mayHaveChildren,
+					grid._expanded[grid.collection.getIdentity(object)], object);
+				expando.level = level;
+				expando.mayHaveChildren = mayHaveChildren;
+
+				node = originalRenderCell.call(column, object, value, td, options);
+				if (node && node.nodeType) {
+					put(td, expando);
+					put(td, node);
+				}
+				else {
+					td.insertBefore(expando, td.firstChild);
+				}
+			};
 
 			var clicked; // tracks row that was clicked (for expand dblclick event handling)
 
