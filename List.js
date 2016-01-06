@@ -62,10 +62,11 @@ define([
 		element.appendChild(div);
 		document.body.appendChild(element);
 
-		// position: absolute makes IE always report child's offsetLeft as 0,
-		// but it conveniently makes other browsers reset to 0 as base, and all
-		// versions of IE are known to move the scrollbar to the left side for rtl
-		isLeft = !!has('ie') || !!has('trident') || div.offsetLeft >= has('dom-scrollbar-width');
+		// position: absolute makes modern IE and Edge always report child's offsetLeft as 0,
+		// but other browsers factor in the position of the scrollbar if it is to the left.
+		// All versions of IE and Edge are known to move the scrollbar to the left side for rtl.
+		isLeft = !!has('ie') || !!has('trident') || /\bEdge\//.test(navigator.userAgent) ||
+			div.offsetLeft >= has('dom-scrollbar-width');
 		cleanupTestElement(element);
 		domConstruct.destroy(div);
 		element.removeAttribute('dir');
