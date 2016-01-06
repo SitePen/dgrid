@@ -225,6 +225,7 @@ define([
 		},
 
 		refreshCell: function (cell) {
+			this.inherited(arguments);
 			var row = cell.row;
 			var self = this;
 

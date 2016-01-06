@@ -39,11 +39,7 @@ define([
 			var row = this.row(rowElement);
 			var rowListeners = this._editorCellListeners[rowElement.id] = this._editorCellListeners[rowElement.id] || {};
 			for (var key in this._editorRowListeners) {
-				if (rowListeners[key]) {
-					rowListeners[key].push(this._editorRowListeners[key]);
-				} else {
-					rowListeners[key] = [ this._editorRowListeners[key] ];
-				}
+				rowListeners[key] = this._editorRowListeners[key];
 			}
 			// Null this out so that _createEditor can tell whether the editor being
 			// created is a shared column editor or an individual cell editor
@@ -76,14 +72,14 @@ define([
 				}, 0);
 			}
 
+			// Clear out cell listeners
 			if (this._editorCellListeners[rowElement.id]) {
-				for (var key in this._editorCellListeners[rowElement.id]) {
-					for (var i = 0; i < this._editorCellListeners[rowElement.id][key].length; i++) {
-						this._editorCellListeners[rowElement.id][key][i].remove();
-					}
+				for (var columnId in this._editorCellListeners[rowElement.id]) {
+					this._editorCellListeners[rowElement.id][columnId].remove();
 				}
 				delete this._editorCellListeners[rowElement.id];
 			}
+
 			for (var i = this._alwaysOnWidgetColumns.length; i--;) {
 				// Destroy always-on editor widgets during the row removal operation,
 				// but don't trip over loading nodes from incomplete requests
@@ -140,13 +136,19 @@ define([
 			for (var i = listeners.length; i--;) {
 				listeners[i].remove();
 			}
+
+			// Clear out most cell listeners
 			for (var rowId in this._editorCellListeners) {
 				for (var columnId in this._editorCellListeners[rowId]) {
-					for (i = 0; i < this._editorCellListeners[rowId][columnId].length; i++) {
-						this._editorCellListeners[rowId][columnId][i].remove();
-					}
+					this._editorCellListeners[rowId][columnId].remove();
 				}
 			}
+
+			// Clear out any shared editor listeners in older versions of IE
+			for (i = 0; i < this._editorColumnListeners.length; i++) {
+				this._editorColumnListeners[i].remove();
+			}
+
 			this._editorCellListeners = {};
 			this._editorColumnListeners = [];
 			this._editorsPendingStartup = [];
@@ -307,6 +309,17 @@ define([
 				}
 			}
 			return null;
+		},
+
+		refreshCell: function(cell) {
+			this.inherited(arguments);
+			var rowElementId = cell.row.element.id;
+			var columnId = cell.column.id;
+			if (this._editorCellListeners[rowElementId] && this._editorCellListeners[rowElementId][columnId]) {
+				this._editorCellListeners[rowElementId][columnId].remove();
+				this._editorCellListeners[rowElementId][columnId] = null;
+			}
+
 		},
 
 		_showEditor: function (cmp, column, cellElement, value) {
