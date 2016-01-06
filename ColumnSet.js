@@ -216,7 +216,7 @@ define([
 
 		columnSets: [],
 
-		createRowCells: function (tag, each, subRows, object) {
+		createRowCells: function (tag, each, subRows, object, options) {
 			var row = put('table.dgrid-row-table');
 			var tr = put(row, 'tbody tr');
 			for (var i = 0, l = this.columnSets.length; i < l; i++) {
@@ -224,7 +224,7 @@ define([
 				var cell = put(tr, tag + '.dgrid-column-set-cell.dgrid-column-set-' + i +
 					' div.dgrid-column-set[' + colsetidAttr + '=' + i + ']');
 				var subset = getColumnSetSubRows(subRows || this.subRows, i) || this.columnSets[i];
-				cell.appendChild(this.inherited(arguments, [tag, each, subset, object]));
+				cell.appendChild(this.inherited(arguments, [tag, each, subset, object, options]));
 			}
 			return row;
 		},
