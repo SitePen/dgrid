@@ -11,6 +11,10 @@ define([
 	'dijit/_WidgetBase',
 	'dijit/_TemplatedMixin',
 	'dijit/_WidgetsInTemplateMixin',
+	'dijit/form/TextBox',
+	'dijit/form/SimpleTextarea',
+	'dijit/form/CheckBox',
+	'dijit/form/RadioButton',
 	'dstore/Memory',
 	'dstore/Trackable',
 	'dstore/Tree',
@@ -27,10 +31,17 @@ define([
 	'dijit/layout/ContentPane',
 	'dijit/layout/TabContainer'
 ], function (require, arrayUtil, declare, lang, domClass, query, string, on, topic,
-		_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, Memory, Trackable, TreeStoreMixin,
-		aboutDialog, ColumnEditor, FeatureEditor, toJavaScript, config, i18n, template, codeTemplate) {
+		_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, TextBox, SimpleTextarea,
+		CheckBox, RadioButton, Memory, Trackable, TreeStoreMixin, aboutDialog, ColumnEditor,
+	 	FeatureEditor, toJavaScript, config, i18n, template, codeTemplate) {
 
 	var NUM_ITEMS = 50;
+	var dijitNameToConstructor = {
+		TextBox: TextBox,
+		SimpleTextarea: SimpleTextarea,
+		CheckBox: CheckBox,
+		RadioButton: RadioButton
+	};
 
 	return declare([ _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin ], {
 		templateString: template,
@@ -158,6 +169,13 @@ define([
 			var hasStore = this.featureEditor.isSelected('dgrid/OnDemandGrid') ||
 				this.featureEditor.isSelected('dgrid/extensions/Pagination');
 
+			arrayUtil.forEach(this.columnEditor.get('columns'), function (columnConfig) {
+				var formWidgetCallbackParam = toJavaScript.formatDijitFormWidget(columnConfig.editor);
+				if (formWidgetCallbackParam && callbackParams.indexOf(formWidgetCallbackParam) < 0) {
+					dependencies.push(columnConfig.editor);
+					callbackParams.push(formWidgetCallbackParam);
+				}
+			}, this);
 			// The expandoColumn for Tree is a special case:
 			// In the UI, it works better to present it in the grid feature config,
 			// although it's really a column config option. In order to add it to the appropriate column config
@@ -273,6 +291,7 @@ define([
 				gridModules.push(item.mid);
 			}, this);
 
+			this._fixDijitConstructors(gridOptions.columns);
 			require(gridModules, function () {
 				var storeModules;
 				var store;
@@ -406,6 +425,20 @@ define([
 			}
 
 			return mockData;
+		},
+
+		_fixDijitConstructors: function(obj) {
+			if (obj) {
+				for (var columnKey in obj) {
+					var column = obj[columnKey];
+					if (column && column.editor) {
+						var dijitConstructorName = toJavaScript.formatDijitFormWidget(column.editor);
+						if (dijitConstructorName) {
+							column.editor = dijitNameToConstructor[dijitConstructorName];
+						}
+					}
+				}
+			}
 		}
 	});
 });

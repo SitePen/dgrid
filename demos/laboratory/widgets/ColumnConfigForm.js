@@ -12,6 +12,7 @@ define([
 	'dijit/_TemplatedMixin',
 	'dijit/_WidgetsInTemplateMixin',
 	'dijit/form/_FormMixin',
+	'dijit/form/RadioButton',
 	'./_ResizeMixin',
 	'../data/config',
 	'dojo/i18n!../nls/laboratory',
@@ -19,11 +20,11 @@ define([
 	// for template
 	'dijit/form/Button',
 	'dijit/form/ComboBox',
+	'dijit/form/FilteringSelect',
 	'dijit/form/NumberTextBox',
-	'dijit/form/RadioButton',
 	'dijit/form/TextBox'
 ], function (arrayUtil, declare, lang, domClass, on, query, string, topic, registry, _WidgetBase, _TemplatedMixin,
-	_WidgetsInTemplateMixin, _FormMixin, _ResizeMixin, config, i18n, template) {
+	_WidgetsInTemplateMixin, _FormMixin, RadioButton, _ResizeMixin, config, i18n, template) {
 
 	var defaultColumnValues = {
 		// Standard column properties
@@ -94,6 +95,13 @@ define([
 				this.watch('value', function (propertyName, oldValue, newValue) {
 					// Let the ColumnGrid know the column config has changed so it an update the store
 					topic.publish('/column/changed', newValue);
+					if (newValue.editor !== oldValue.editor && newValue.editor) {
+						if (newValue.editor.toLowerCase().indexOf('textarea') >= 0) {
+							this.set('value', lang.mixin(newValue, { dismissOnEnter: 'false' }));
+						} else {
+							this.set('value', lang.mixin(newValue, { dismissOnEnter: 'true' }));
+						}
+					}
 				})
 			);
 		},
