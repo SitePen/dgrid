@@ -198,11 +198,13 @@ define([
 					if (self._editorRowListeners) {
 						self._editorRowListeners[column.id] = listener;
 					}
-					// We're in refresh cell since _editorRowListeners doesn't exist, so it's safe to assume
-					// that the row exists
+					// We're in refresh cell since _editorRowListeners doesn't exist, so the row
+					// should exist
 					else {
 						var row = self.row(object);
-						self._editorCellListeners[row.element.id][column.id] = listener;
+						if (row && row.element) {
+							self._editorCellListeners[row.element.id][column.id] = listener;
+						}
 					}
 				}
 
@@ -212,7 +214,7 @@ define([
 			} : function (object, value, cell, options) {
 				// always-on: create editor immediately upon rendering each cell
 				if (!column.canEdit || column.canEdit(object, value)) {
-					var cmp = self._createEditor(column);
+					var cmp = self._createEditor(column, object);
 					self._showEditor(cmp, column, cell, value);
 					// Maintain reference for later use.
 					cell[isWidget ? 'widget' : 'input'] = cmp;
@@ -406,7 +408,7 @@ define([
 			}
 		},
 
-		_createEditor: function (column) {
+		_createEditor: function (column, object) {
 			// Creates an editor instance based on column definition properties,
 			// and hooks up events.
 			var editor = column.editor,
@@ -480,7 +482,16 @@ define([
 					}
 					if (self._editorRowListeners) {
 						self._editorRowListeners[column.id] = listener;
-					} else {
+					}
+					// If object exists and editRowListeners doesn't, then we're here
+					// from refresh cell and we should be able to find the row
+					else if (object) {
+						var row = grid.row(object);
+						if (row && row.element) {
+							self._editorCellListeners[row.element.id][column.id] = listener;
+						}
+					}
+					else {
 						self._editorColumnListeners.push(listener);
 					}
 				}
