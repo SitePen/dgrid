@@ -4,7 +4,6 @@ define([
 	'dgrid/OnDemandGrid',
 	'dgrid/Editor',
 	'dgrid/Tree',
-	'dgrid/util/has-css3',
 	'dgrid/util/misc',
 	'dojo/_base/declare',
 	'dojo/_base/lang',
@@ -16,13 +15,13 @@ define([
 	'dojo/on',
 	'dojo/query',
 	'dgrid/test/data/createHierarchicalStore',
+	'../rowExpand',
 	'../addCss!'
-], function (test, assert, OnDemandGrid, Editor, Tree, has, miscUtil, declare, lang, aspect, Deferred,
-		domClass, domConstruct, domStyle, on, query, createHierarchicalStore) {
+], function (test, assert, OnDemandGrid, Editor, Tree, miscUtil, declare, lang, aspect, Deferred,
+		domClass, domConstruct, domStyle, on, query, createHierarchicalStore, rowExpand) {
 
 	var grid,
-		testDelay = 15,
-		hasTransitionEnd = has('transitionend');
+		testDelay = 15;
 
 	function createGrid(options, setStoreAfterStartup) {
 		var data = [],
@@ -106,25 +105,6 @@ define([
 		return dfd.promise;
 	}
 
-	// Define a function returning a promise resolving once children are expanded.
-	// On browsers which support CSS3 transitions, this occurs when transitionend fires;
-	// otherwise it occurs immediately.
-	var expand = hasTransitionEnd ? function (id) {
-		var dfd = new Deferred();
-
-		on.once(grid, hasTransitionEnd, function () {
-			dfd.resolve();
-		});
-
-		grid.expand(id);
-		return dfd.promise;
-	} : function (id) {
-		var dfd = new Deferred();
-		grid.expand(id);
-		dfd.resolve();
-		return dfd.promise;
-	};
-
 	function scrollToEnd() {
 		var dfd = new Deferred(),
 			handle;
@@ -157,7 +137,7 @@ define([
 			test.afterEach(destroyGrid);
 
 			test.test('expand first row', function () {
-				return expand(0)
+				return rowExpand(grid, 0)
 					.then(function () {
 						testRowExists('0:0');
 						testRowExists('0:99', false);
@@ -165,7 +145,7 @@ define([
 			});
 
 			test.test('expand last row', function () {
-				return expand(4).then(function () {
+				return rowExpand(grid, 4).then(function () {
 					testRowExists('4:0');
 					testRowExists('4:99', false);
 				});
@@ -179,7 +159,7 @@ define([
 			test.afterEach(destroyGrid);
 
 			test.test('expand first row', function () {
-				return expand(0)
+				return rowExpand(grid, 0)
 					.then(function () {
 						testRowExists('0:0');
 						testRowExists('0:99', false);
@@ -187,7 +167,7 @@ define([
 			});
 
 			test.test('expand first row + scroll to bottom', function () {
-				return expand(0)
+				return rowExpand(grid, 0)
 					.then(scrollToEnd)
 					.then(function () {
 						testRowExists('0:0');
@@ -196,14 +176,14 @@ define([
 			});
 
 			test.test('expand last row', function () {
-				return expand(4).then(function () {
+				return rowExpand(grid, 4).then(function () {
 					testRowExists('4:0');
 					testRowExists('4:99', false);
 				});
 			});
 
 			test.test('expand last row + scroll to bottom', function () {
-				return expand(4)
+				return rowExpand(grid, 4)
 					.then(scrollToEnd)
 					.then(function () {
 						testRowExists('4:0');
@@ -212,10 +192,10 @@ define([
 			});
 
 			test.test('expand first and last rows + scroll to bottom', function () {
-				return expand(0)
+				return rowExpand(grid, 0)
 					.then(scrollToEnd)
 					.then(function () {
-						return expand(4);
+						return rowExpand(grid, 4);
 					})
 					.then(scrollToEnd)
 					.then(function () {
@@ -401,7 +381,7 @@ define([
 
 				assert.strictEqual(countRowExpandos(), 1, 'Each parent row should have one expando icon');
 				grid.set('columns', grid.get('columns'));
-				assert.strictEqual(countRowExpandos(), 1,'Each parent row should still have only one expando icon');
+				assert.strictEqual(countRowExpandos(), 1, 'Each parent row should still have only one expando icon');
 			});
 		});
 
@@ -414,7 +394,7 @@ define([
 			test.afterEach(destroyGrid);
 
 			test.test('expand first row', function () {
-				return expand(0)
+				return rowExpand(grid, 0)
 					.then(function () {
 						testRowExists('0:0');
 						var row = grid.row('0:0').element;
@@ -429,7 +409,7 @@ define([
 			test.afterEach(destroyGrid);
 
 			test.test('child modification', function () {
-				return expand(0).then(function () {
+				return rowExpand(grid, 0).then(function () {
 					testRowExists('0:0');
 					assert.doesNotThrow(function () {
 						grid.collection.putSync({
@@ -442,7 +422,7 @@ define([
 			});
 
 			test.test('child modification after parent when expanded', function () {
-				return expand(0).then(function () {
+				return rowExpand(grid, 0).then(function () {
 					grid.collection.putSync({
 						id: '0',
 						value: 'Modified'
@@ -462,8 +442,8 @@ define([
 				});
 			});
 
-			test.test('collapse items removed from store', function() {
-				return expand(0).then(function () {
+			test.test('collapse items removed from store', function () {
+				return rowExpand(grid, 0).then(function () {
 					assert.isTrue(domClass.contains(grid.row(0).element, 'dgrid-row-expanded'),
 						'Should have expanded class');
 					var item = grid.collection.getSync(0);
@@ -495,7 +475,7 @@ define([
 			});
 
 			test.test('child add', function () {
-				return expand(0).then(function () {
+				return rowExpand(grid, 0).then(function () {
 					testRowExists('0:0');
 					grid.collection.add({
 						id: '0:0.5',
@@ -507,7 +487,7 @@ define([
 			});
 
 			test.test('child put', function () {
-				return expand(0).then(function () {
+				return rowExpand(grid, 0).then(function () {
 					var calls = 0;
 
 					handles.push(aspect.before(grid, 'removeRow', function () {
@@ -529,32 +509,10 @@ define([
 			});
 
 			test.test('child remove', function () {
-				return expand(0).then(function () {
+				return rowExpand(grid, 0).then(function () {
 					testRowExists('0:0');
 					grid.collection.remove('0:0');
 					testRowExists('0:0');
-				});
-			});
-		});
-
-		test.suite('treeIndentWidth', function () {
-			var treeIndentWidth = 20;
-			test.beforeEach(function () {
-				createGrid({
-					gridOptions: { treeIndentWidth: treeIndentWidth }
-				});
-				return wait();
-			});
-
-			test.afterEach(destroyGrid);
-
-			test.test('treeIndentWidth override', function () {
-				return expand(0).then(function () {
-					var row = grid.row('0:0');
-					assert.ok(row, 'Expected child row exists');
-					query('.dgrid-expando-icon', row.element).forEach(function (element) {
-						assert.strictEqual(element.style.marginLeft, treeIndentWidth + 'px');
-					});
 				});
 			});
 		});
