@@ -191,10 +191,19 @@ define([
 				// which we already advocate in docs for optimal use)
 
 				if (!options || !options.alreadyHooked) {
-					self._editorRowListeners[column.id] = on(cell, editOn, function () {
+					var listener = on(cell, editOn, function () {
 						self._activeOptions = options;
 						self.edit(this);
 					});
+					if (self._editorRowListeners) {
+						self._editorRowListeners[column.id] = listener;
+					}
+					// We're in refresh cell since _editorRowListeners doesn't exist, so it's safe to assume
+					// that the row exists
+					else {
+						var row = self.row(object);
+						self._editorCellListeners[row.element.id][column.id] = listener;
+					}
 				}
 
 				// initially render content in non-edit mode
@@ -312,14 +321,13 @@ define([
 		},
 
 		refreshCell: function(cell) {
-			this.inherited(arguments);
 			var rowElementId = cell.row.element.id;
 			var columnId = cell.column.id;
 			if (this._editorCellListeners[rowElementId] && this._editorCellListeners[rowElementId][columnId]) {
 				this._editorCellListeners[rowElementId][columnId].remove();
 				this._editorCellListeners[rowElementId][columnId] = null;
 			}
-
+			this.inherited(arguments);
 		},
 
 		_showEditor: function (cmp, column, cellElement, value) {
@@ -458,22 +466,22 @@ define([
 				if (has('ie') < 9) {
 					// IE<9 doesn't fire change events for all the right things,
 					// and it doesn't bubble.
-					var handler;
+					var listener;
 					if (editor === 'radio' || editor === 'checkbox') {
 						// listen for clicks since IE doesn't fire change events properly for checks/radios
-						handler = on(cmp, 'click', function (evt) {
+						listener = on(cmp, 'click', function (evt) {
 							self._handleEditorChange(evt, column);
 						});
 					}
 					else {
-						handler = on(cmp, 'change', function (evt) {
+						listener = on(cmp, 'change', function (evt) {
 							self._handleEditorChange(evt, column);
 						});
 					}
 					if (self._editorRowListeners) {
-						self._editorRowListeners[column.id] = handler;
+						self._editorRowListeners[column.id] = listener;
 					} else {
-						self._editorColumnListeners.push(handler);
+						self._editorColumnListeners.push(listener);
 					}
 				}
 			}
