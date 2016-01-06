@@ -189,7 +189,7 @@ define([
 				// which we already advocate in docs for optimal use)
 
 				if (!options || !options.alreadyHooked) {
-					this._editorRowListeners[column.id] = on(cell, editOn, function () {
+					self._editorRowListeners[column.id] = on(cell, editOn, function () {
 						self._activeOptions = options;
 						self.edit(this);
 					});
@@ -457,8 +457,8 @@ define([
 							self._handleEditorChange(evt, column);
 						});
 					}
-					if (this._editorRowListeners) {
-						this._editorRowListeners[column.id] = handler;
+					if (self._editorRowListeners) {
+						self._editorRowListeners[column.id] = handler;
 					} else {
 						self._editorColumnListeners.push(handler);
 					}
