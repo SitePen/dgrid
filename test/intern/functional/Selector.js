@@ -198,7 +198,7 @@ define([
 				return gridExtended.selection[id];
 			}
 
-			return this.remote
+			return this.get('remote')
 				.findByCssSelector('#gridExtended-row-0 input')
 					.click()
 					.execute(getSelectionState, [ '0' ])
