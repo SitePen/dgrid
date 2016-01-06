@@ -2,7 +2,7 @@ define([
 	'intern!tdd',
 	'intern/chai!assert',
 	'dojo/_base/declare',
-	'dojo/aspect',
+	'dojo/_base/lang',
 	'dojo/Deferred',
 	'dojo/on',
 	'dojo/promise/all',
@@ -13,10 +13,11 @@ define([
 	'dgrid/Grid',
 	'dgrid/OnDemandGrid',
 	'dgrid/Editor',
+	'dgrid/extensions/Pagination',
 	'dgrid/test/data/createSyncStore',
 	'dgrid/test/data/orderedData'
-], function (test, assert, declare, aspect, Deferred, on, all, query, when, registry, TextBox,
-		Grid, OnDemandGrid, Editor, createSyncStore, orderedData) {
+], function (test, assert, declare, lang, Deferred, on, all, query, when, registry, TextBox,
+		Grid, OnDemandGrid, Editor, Pagination, createSyncStore, orderedData) {
 
 	var testOrderedData = orderedData.items,
 		EditorGrid = declare([ Grid, Editor ]),
@@ -487,6 +488,97 @@ define([
 				return grid.edit(cell);
 			}).then(function () {
 				assert.strictEqual(cell.element.innerHTML, cellContent, 'Widget should be identical to before refresh');
+			});
+		});
+
+		test.suite('Listener cleanup', function () {
+			function testCellListeners(rowCount, editorColumnCount) {
+				var rowEntryCount = 0;
+				for (var rowKey in grid._editorCellListeners) {
+					rowEntryCount++;
+					var listenerCount = 0;
+					var rowCellListeners = grid._editorCellListeners[rowKey];
+
+					for (var cellKey in rowCellListeners) {
+						assert.ok(rowCellListeners[cellKey].remove, 'Object in hash should be a listener handle');
+						listenerCount++;
+					}
+
+					assert.strictEqual(listenerCount, editorColumnCount, 'Should have two listeners per row');
+				}
+				assert.strictEqual(rowEntryCount, rowCount, 'Should only have one entry for each row');
+			}
+
+			function buildPaginatedGrid (GridConstructor, rowsPerPage) {
+				var paginatedGrid = new GridConstructor({
+					rowsPerPage: rowsPerPage || 10,
+					columns: {
+						name: {
+							editor: 'text',
+							editOn: 'click'
+						},
+						description: {
+							editor: 'text',
+							editOn: 'click'
+						}
+					},
+					collection: createSyncStore({
+						data: testOrderedData,
+						idProperty: 'order'
+					})
+				});
+
+				document.body.appendChild(paginatedGrid.domNode);
+				paginatedGrid.startup();
+				return paginatedGrid;
+			}
+
+			test.test('clean up after row is rerendered', function () {
+				grid = buildPaginatedGrid(declare([Grid, Pagination, Editor]));
+				for (var i = 0; i < 9; i++) {
+					grid.collection.put(
+						lang.mixin(lang.clone(orderedData.items[i]), {description: 'modified'})
+					);
+				}
+				testCellListeners(9, 2);
+			});
+
+			test.test('clean up when switching pages', function () {
+				grid = buildPaginatedGrid(declare([Grid, Pagination, Editor]), 5);
+				testCellListeners(5, 2);
+				grid.gotoPage(2);
+				testCellListeners(4, 2);
+			});
+
+			test.test('clean up when scrolling', function () {
+				var data = [];
+				for (var i = 0; i < 1000; i++) {
+					data[i] = {
+						id: i,
+						name: 'Name ' + i
+					};
+				}
+				grid = new (declare([OnDemandGrid, Editor]))({
+					columns: {
+						name: {
+							editor: 'text',
+							editOn: 'click'
+						}
+					},
+					minRowsPerPage: 250,
+					collection: createSyncStore({
+						data: data
+					})
+				});
+
+				document.body.appendChild(grid.domNode);
+				grid.startup();
+
+				testCellListeners(250, 1);
+				grid.bodyNode.scrollTop = '10000';
+				return when(grid._processScroll(), function () {
+					testCellListeners(250, 1);
+				});
 			});
 		});
 	});
