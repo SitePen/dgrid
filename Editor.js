@@ -15,6 +15,7 @@ define([
 		constructor: function () {
 			this._editorInstances = {};
 			this._editorColumnListeners = [];
+			this._editorCellListeners = {};
 			this._editorsPendingStartup = [];
 		},
 
@@ -33,8 +34,17 @@ define([
 		},
 
 		insertRow: function () {
+			this._editorRowListeners = {};
 			var rowElement = this.inherited(arguments);
 			var row = this.row(rowElement);
+			var rowListeners = this._editorCellListeners[rowElement.id] = this._editorCellListeners[rowElement.id] || {};
+			for (var key in this._editorRowListeners) {
+				rowListeners[key] = this._editorRowListeners[key];
+			}
+			// Null this out so that _createEditor can tell whether the editor being
+			// created is a shared column editor or an individual cell editor
+			this._editorRowListeners = null;
+
 			var previouslyFocusedCell = this._previouslyFocusedEditorCell;
 
 			if (previouslyFocusedCell && previouslyFocusedCell.row.id === row.id) {
@@ -72,6 +82,14 @@ define([
 					self._editorFocusoutHandle.resume();
 					self._previouslyFocusedEditorCell = null;
 				}, 0);
+			}
+
+			// Clear out cell listeners
+			if (this._editorCellListeners[rowElement.id]) {
+				for (var columnId in this._editorCellListeners[rowElement.id]) {
+					this._editorCellListeners[rowElement.id][columnId].remove();
+				}
+				delete this._editorCellListeners[rowElement.id];
 			}
 
 			for (var i = this._alwaysOnWidgetColumns.length; i--;) {
@@ -130,6 +148,20 @@ define([
 			for (var i = listeners.length; i--;) {
 				listeners[i].remove();
 			}
+
+			// Clear out most cell listeners
+			for (var rowId in this._editorCellListeners) {
+				for (var columnId in this._editorCellListeners[rowId]) {
+					this._editorCellListeners[rowId][columnId].remove();
+				}
+			}
+
+			// Clear out any shared editor listeners in older versions of IE
+			for (i = 0; i < this._editorColumnListeners.length; i++) {
+				this._editorColumnListeners[i].remove();
+			}
+
+			this._editorCellListeners = {};
 			this._editorColumnListeners = [];
 			this._editorsPendingStartup = [];
 		},
@@ -171,12 +203,21 @@ define([
 				// which we already advocate in docs for optimal use)
 
 				if (!options || !options.alreadyHooked) {
-					self._editorColumnListeners.push(
-						on(cell, editOn, function () {
-							self._activeOptions = options;
-							self.edit(this);
-						})
-					);
+					var listener = on(cell, editOn, function () {
+						self._activeOptions = options;
+						self.edit(this);
+					});
+					if (self._editorRowListeners) {
+						self._editorRowListeners[column.id] = listener;
+					}
+					// We're in refresh cell since _editorRowListeners doesn't exist, so the row
+					// should exist
+					else {
+						var row = self.row(object);
+						if (row && row.element) {
+							self._editorCellListeners[row.element.id][column.id] = listener;
+						}
+					}
 				}
 
 				// initially render content in non-edit mode
@@ -185,7 +226,7 @@ define([
 			} : function (object, value, cell, options) {
 				// always-on: create editor immediately upon rendering each cell
 				if (!column.canEdit || column.canEdit(object, value)) {
-					var cmp = self._createEditor(column);
+					var cmp = self._createEditor(column, object);
 					self._showEditor(cmp, column, cell, value);
 					// Maintain reference for later use.
 					cell[isWidget ? 'widget' : 'input'] = cmp;
@@ -293,6 +334,16 @@ define([
 			return null;
 		},
 
+		refreshCell: function(cell) {
+			var rowElementId = cell.row.element.id;
+			var columnId = cell.column.id;
+			if (this._editorCellListeners[rowElementId] && this._editorCellListeners[rowElementId][columnId]) {
+				this._editorCellListeners[rowElementId][columnId].remove();
+				this._editorCellListeners[rowElementId][columnId] = null;
+			}
+			this.inherited(arguments);
+		},
+
 		_showEditor: function (cmp, column, cellElement, value) {
 			// Places a shared editor into the newly-active cell in the column.
 			// Also called when rendering an editor in an "always-on" editor column.
@@ -376,7 +427,7 @@ define([
 			}
 		},
 
-		_createEditor: function (column) {
+		_createEditor: function (column, object) {
 			// Creates an editor instance based on column definition properties,
 			// and hooks up events.
 			var editor = column.editor,
@@ -436,16 +487,31 @@ define([
 				if (has('ie') < 9) {
 					// IE<9 doesn't fire change events for all the right things,
 					// and it doesn't bubble.
+					var listener;
 					if (editor === 'radio' || editor === 'checkbox') {
 						// listen for clicks since IE doesn't fire change events properly for checks/radios
-						this._editorColumnListeners.push(on(cmp, 'click', function (evt) {
+						listener = on(cmp, 'click', function (evt) {
 							self._handleEditorChange(evt, column);
-						}));
+						});
 					}
 					else {
-						this._editorColumnListeners.push(on(cmp, 'change', function (evt) {
+						listener = on(cmp, 'change', function (evt) {
 							self._handleEditorChange(evt, column);
-						}));
+						});
+					}
+					if (self._editorRowListeners) {
+						self._editorRowListeners[column.id] = listener;
+					}
+					// If object exists and editRowListeners doesn't, then we're here
+					// from refresh cell and we should be able to find the row
+					else if (object) {
+						var row = grid.row(object);
+						if (row && row.element) {
+							self._editorCellListeners[row.element.id][column.id] = listener;
+						}
+					}
+					else {
+						self._editorColumnListeners.push(listener);
 					}
 				}
 			}
