@@ -6,9 +6,8 @@ define([
 	'dojo/dom-construct',
 	'dojo/has',
 	'dojo/on',
-	'dojo/when',
-	'./Grid'
-], function (declare, lang, Deferred, aspect, domConstruct, has, on, when, Grid) {
+	'dojo/when'
+], function (declare, lang, Deferred, aspect, domConstruct, has, on, when) {
 	// This module isolates the base logic required by store-aware list/grid
 	// components, e.g. OnDemandList/Grid and the Pagination extension.
 

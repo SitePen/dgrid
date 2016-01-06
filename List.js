@@ -82,7 +82,6 @@ define([
 	// common functions for class and className setters/getters
 	// (these are run in instance context)
 	function setClass(cls) {
-		// TODO: unit test
 		domClass.replace(this.domNode, cls, this._class || '');
 
 		// Store for later retrieval/removal.
@@ -212,7 +211,7 @@ define([
 
 			domNode.setAttribute('role', 'grid');
 			domClass.add(domNode, 'dgrid dgrid-' + this.listType +
-				(addUiClasses ? ' ui-widget' : ''))
+				(addUiClasses ? ' ui-widget' : ''));
 
 			// Place header node (initially hidden if showHeader is false).
 			headerNode = this.headerNode = domConstruct.create('div', {

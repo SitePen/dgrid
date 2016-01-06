@@ -10,6 +10,7 @@ var miniExcludeMids = {
 	'dgrid/package': 1
 };
 
+// jshint unused: false
 var profile = {
 	resourceTags: {
 		copyOnly: function (filename, mid) {
