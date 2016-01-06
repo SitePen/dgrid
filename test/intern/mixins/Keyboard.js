@@ -612,13 +612,7 @@ define([
 
 	test.suite('Keyboard + List - tabIndex', function () {
 		test.beforeEach(function () {
-			grid = new (declare([List, Keyboard]))({
-				columns: {
-					col1: 'Column 1',
-					col2: 'Column 2'
-				},
-				tabableHeader: false
-			});
+			grid = new (declare([List, Keyboard]))();
 			document.body.appendChild(grid.domNode);
 			grid.startup();
 		});
