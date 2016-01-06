@@ -5,6 +5,9 @@ define([
 	// which is fine - they'll just get unnecessarily wrapped in quotes
 	var propertyNameRegex = /^[A-Za-z]+[A-Za-z0-9_]*$/;
 
+	// Check for dijit form widgets for editor property
+	var dijitFormWidgetRegex = /dijit\/form\/([A-Za-z]*)$/;
+
 	function tab(count) {
 		var tabString = '';
 
@@ -104,7 +107,9 @@ define([
 								javascript += obj[property];
 							}
 							else {
-								javascript += '\'' + escapeString(obj[property]) + '\'';
+								// Widget editors are received by module ID, so convert any of those to constructors
+								javascript += (property === 'editor' && formatDijitFormWidget(obj[property])) ||
+									'\'' + escapeString(obj[property]) + '\'';
 							}
 
 							break;
@@ -140,6 +145,12 @@ define([
 		return str.replace(/[\\']/g, '\\$&');
 	}
 
+	function formatDijitFormWidget(str) {
+		return typeof str === 'string' && dijitFormWidgetRegex.test(str) ?
+			str.replace(dijitFormWidgetRegex, '$1') :
+			'';
+	}
+
 	function formatPropertyName(str) {
 		if (!propertyNameRegex.test(str)) {
 			return '\'' + str + '\'';
@@ -150,6 +161,7 @@ define([
 	}
 
 	toJavaScript.escapeString = escapeString;
+	toJavaScript.formatDijitFormWidget = formatDijitFormWidget;
 	toJavaScript.formatPropertyName = formatPropertyName;
 
 	return toJavaScript;

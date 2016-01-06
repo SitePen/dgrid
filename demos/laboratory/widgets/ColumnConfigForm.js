@@ -19,6 +19,7 @@ define([
 	// for template
 	'dijit/form/Button',
 	'dijit/form/ComboBox',
+	'dijit/form/FilteringSelect',
 	'dijit/form/NumberTextBox',
 	'dijit/form/RadioButton',
 	'dijit/form/TextBox'
@@ -85,6 +86,10 @@ define([
 		},
 
 		postCreate: function () {
+			function shouldDismiss(editor) {
+				return editor ? editor.toLowerCase().indexOf('textarea') === -1 : true;
+			}
+
 			this.inherited(arguments);
 			this.own(
 				topic.subscribe('/feature/select', lang.hitch(this, '_onFeatureSelect')),
@@ -94,6 +99,14 @@ define([
 				this.watch('value', function (propertyName, oldValue, newValue) {
 					// Let the ColumnGrid know the column config has changed so it an update the store
 					topic.publish('/column/changed', newValue);
+					if (newValue.editor !== oldValue.editor) {
+						// Set a sane default for dismissOnEnter if switching to/from a textarea editor
+						var newDismiss = shouldDismiss(newValue.editor);
+						var oldDismiss = shouldDismiss(oldValue.editor);
+						if (newDismiss !== oldDismiss) {
+							this.set('value', lang.mixin(newValue, { dismissOnEnter: '' + newDismiss }));
+						}
+					}
 				})
 			);
 		},
