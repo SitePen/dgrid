@@ -171,7 +171,7 @@ define([
 
 			arrayUtil.forEach(this.columnEditor.get('columns'), function (columnConfig) {
 				var formWidgetCallbackParam = toJavaScript.formatDijitFormWidget(columnConfig.editor);
-				if (formWidgetCallbackParam) {
+				if (formWidgetCallbackParam && callbackParams.indexOf(formWidgetCallbackParam) < 0) {
 					dependencies.push(columnConfig.editor);
 					callbackParams.push(formWidgetCallbackParam);
 				}
@@ -431,10 +431,10 @@ define([
 			if (obj) {
 				for (var columnKey in obj) {
 					var column = obj[columnKey];
-					for (var key in column) {
-						var dijitConstructorName = toJavaScript.formatDijitFormWidget(column[key]);
+					if (column && column.editor) {
+						var dijitConstructorName = toJavaScript.formatDijitFormWidget(column.editor);
 						if (dijitConstructorName) {
-							column[key] = dijitNameToConstructor[dijitConstructorName];
+							column.editor = dijitNameToConstructor[dijitConstructorName];
 						}
 					}
 				}
