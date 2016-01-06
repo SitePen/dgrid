@@ -82,7 +82,7 @@ define([
 						this._editorCellListeners[rowElement.id][key][i].remove();
 					}
 				}
-				this._editorCellListeners[rowElement.id] = {};
+				delete this._editorCellListeners[rowElement.id];
 			}
 			for (var i = this._alwaysOnWidgetColumns.length; i--;) {
 				// Destroy always-on editor widgets during the row removal operation,
