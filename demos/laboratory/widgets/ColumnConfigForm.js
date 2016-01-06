@@ -97,27 +97,9 @@ define([
 					topic.publish('/column/changed', newValue);
 					if (newValue.editor !== oldValue.editor && newValue.editor) {
 						if (newValue.editor.toLowerCase().indexOf('textarea') >= 0) {
-							arrayUtil.forEach(registry.findWidgets(this.editorFields), function (widget) {
-								if (widget instanceof RadioButton && widget.get('name') === 'dismissOnEnter') {
-									if (widget.value === 'true') {
-										widget.set('checked', false);
-									}
-									else if (widget.value === 'false') {
-										widget.set('checked', true);
-									}
-								}
-							});
+							this.set('value', lang.mixin(newValue, { dismissOnEnter: 'false' }));
 						} else {
-							arrayUtil.forEach(registry.findWidgets(this.editorFields), function (widget) {
-								if (widget instanceof RadioButton && widget.get('name') === 'dismissOnEnter') {
-									if (widget.value === 'false') {
-										widget.set('checked', false);
-									}
-									else if (widget.value === 'true') {
-										widget.set('checked', true);
-									}
-								}
-							});
+							this.set('value', lang.mixin(newValue, { dismissOnEnter: 'true' }));
 						}
 					}
 				})
