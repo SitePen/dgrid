@@ -5,14 +5,13 @@ define([
 	'dgrid/OnDemandGrid',
 	'dgrid/Tree',
 	'dgrid/extensions/CompoundColumns',
-	'dgrid/util/has-css3',
 	'dojo/_base/declare',
 	'dojo/query',
 	'dgrid/test/data/createHierarchicalStore',
 	'dgrid/test/data/hierarchicalCountryData',
 	'../rowExpand',
 	'../addCss!'
-], function (test, assert, ColumnSet, OnDemandGrid, Tree, CompoundColumns, has, declare, query,
+], function (test, assert, ColumnSet, OnDemandGrid, Tree, CompoundColumns, declare, query,
 			 createHierarchicalStore, data, rowExpand) {
 
 	test.suite('tree indent', function () {
