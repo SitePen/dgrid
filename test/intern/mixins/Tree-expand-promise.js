@@ -72,7 +72,8 @@ define([
 				columns: [
 					{renderExpando: true, field: 'node', label: 'Node'},
 					{field: 'value', label: 'Value'}
-				]
+				],
+				enableTreeTransitions: false
 			});
 			document.body.appendChild(grid.domNode);
 			grid.startup();
@@ -85,7 +86,8 @@ define([
 				columns: [
 					{renderExpando: true, field: 'node', label: 'Node'},
 					{field: 'value', label: 'Value'}
-				]
+				],
+				enableTreeTransitions: false
 			});
 			document.body.appendChild(grid.domNode);
 			grid.startup();

@@ -88,7 +88,8 @@ define([
 				collection: store.filter({ type: 'basket' }),
 				columns: [
 					{renderExpando: true, label: 'Name', field: 'name', sortable: false}
-				]
+				],
+				enableTreeTransitions: false
 			});
 			document.body.appendChild(grid1.domNode);
 			grid1.startup();
@@ -97,7 +98,8 @@ define([
 				collection: noBlueStore.filter({ type: 'basket' }),
 				columns: [
 					{renderExpando: true, label: 'Name', field: 'name', sortable: false}
-				]
+				],
+				enableTreeTransitions: false
 			});
 			document.body.appendChild(grid2.domNode);
 			grid2.startup();
