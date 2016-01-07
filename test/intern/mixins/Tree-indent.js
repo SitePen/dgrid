@@ -9,10 +9,9 @@ define([
 	'dojo/query',
 	'dgrid/test/data/createHierarchicalStore',
 	'dgrid/test/data/hierarchicalCountryData',
-	'../rowExpand',
 	'../addCss!'
 ], function (test, assert, ColumnSet, OnDemandGrid, Tree, CompoundColumns, declare, query,
-			 createHierarchicalStore, data, rowExpand) {
+			 createHierarchicalStore, data) {
 
 	test.suite('tree indent', function () {
 
@@ -35,14 +34,14 @@ define([
 		}
 
 		function level1Test() {
-			return rowExpand(grid, 'AF').then(function () {
+			return grid.expand('AF').then(function () {
 				testIndentWidth('EG', 1);
 			});
 		}
 
 		function level2Test() {
-			return rowExpand(grid, 'AF').then(function () {
-				return rowExpand(grid, 'EG');
+			return grid.expand('AF').then(function () {
+				return grid.expand('EG');
 			}).then(function () {
 				testIndentWidth('Cairo', 2);
 			});
@@ -53,6 +52,7 @@ define([
 				grid = new (declare([ OnDemandGrid, Tree ]))({
 					collection: createHierarchicalStore({ data: data }),
 					treeIndentWidth: treeIndentWidth,
+					enableTreeTransitions: false,
 					columns: [
 						{
 							field: 'name',
@@ -81,6 +81,7 @@ define([
 				grid = new (declare([ OnDemandGrid, Tree, CompoundColumns, ColumnSet ]))({
 					collection: createHierarchicalStore({ data: data }),
 					treeIndentWidth: treeIndentWidth,
+					enableTreeTransitions: false,
 					columnSets: [
 						[
 							[
