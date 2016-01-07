@@ -9,7 +9,7 @@ define([
 		//		specified, to retrieve all relevant results at once.
 		//		Appropriate for grids using memory stores with small
 		//		result set sizes.
-		//		From http://dgrid.io/tutorials/0.4/single_query/
+		//		From http://dgrid.io/tutorials/1.0/single_query/
 
 		refresh: function () {
 			var self = this;

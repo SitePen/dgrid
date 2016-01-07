@@ -1,6 +1,6 @@
 # Customizing Skins
 
-The skins in dgrid 0.5 are implemented using [Stylus](http://learnboost.github.io/stylus/), and are designed to be
+The skins in dgrid 1.0 are implemented using [Stylus](http://stylus-lang.com/), and are designed to be
 easily extensible.  All skins consist primarily of a series of variable definitions, which are used by
 `skin.styl` to generate commonly-used styles.
 

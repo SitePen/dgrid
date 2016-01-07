@@ -153,7 +153,7 @@ define([
 
 		_setStore: function () {
 			if (!this.collection) {
-				console.debug('set(\'store\') call detected, but you probably meant set(\'collection\') for 0.4');
+				console.debug('set(\'store\') call detected, but you probably meant set(\'collection\')');
 			}
 		},
 
