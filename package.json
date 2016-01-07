@@ -3,19 +3,10 @@
 	"author": "Kris Zyp",
 	"version": "0.5.0-dev",
 	"description": "A lightweight, mobile-ready, data-driven, modular widget designed for lists and grids",
-	"licenses": [
-		{
-			"type": "AFLv2.1",
-			"url": "https://spdx.org/licenses/AFL-2.1"
-		},
-		{
-			"type": "BSD",
-			"url": "http://opensource.org/licenses/BSD-3-Clause"
-		}
-	],
+	"license": "BSD-3-Clause",
 	"repository": {
-		"type":"git",
-		"url":"http://github.com/SitePen/dgrid"
+		"type": "git",
+		"url": "http://github.com/SitePen/dgrid"
 	},
 	"devDependencies": {
 		"grunt": "0.4.5",

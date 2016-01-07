@@ -1,7 +1,7 @@
 The dgrid project provides widgets for lists of data, including simple sets of scrolling rows,
 grids of data, on-demand lazy-loaded data, and various mixins for additional functionality.
 
-dgrid is available under the same dual BSD/AFLv2 license as the Dojo Toolkit.
+dgrid is available under the ["New" BSD License](LICENSE).
 
 # Installation
 

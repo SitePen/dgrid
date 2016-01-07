@@ -24,6 +24,6 @@
 		".*",
 		"test"
 	],
-	"license": [ "AFL-2.1", "BSD-3-Clause" ],
+	"license": [ "BSD-3-Clause" ],
 	"moduleType": [ "amd" ]
 }
