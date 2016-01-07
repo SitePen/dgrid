@@ -15,10 +15,9 @@ define([
 	'dojo/on',
 	'dojo/query',
 	'dgrid/test/data/createHierarchicalStore',
-	'../rowExpand',
 	'../addCss!'
 ], function (test, assert, OnDemandGrid, Editor, Tree, miscUtil, declare, lang, aspect, Deferred,
-		domClass, domConstruct, domStyle, on, query, createHierarchicalStore, rowExpand) {
+		domClass, domConstruct, domStyle, on, query, createHierarchicalStore) {
 
 	var grid,
 		testDelay = 15;
@@ -73,7 +72,8 @@ define([
 			columns: [
 				treeColumnOptions,
 				{ label: 'value', field: 'value'}
-			]
+			],
+			enableTreeTransitions: false
 		}, options && options.gridOptions));
 		document.body.appendChild(grid.domNode);
 		grid.startup();
@@ -137,7 +137,7 @@ define([
 			test.afterEach(destroyGrid);
 
 			test.test('expand first row', function () {
-				return rowExpand(grid, 0)
+				return grid.expand(0)
 					.then(function () {
 						testRowExists('0:0');
 						testRowExists('0:99', false);
@@ -145,7 +145,7 @@ define([
 			});
 
 			test.test('expand last row', function () {
-				return rowExpand(grid, 4).then(function () {
+				return grid.expand(4).then(function () {
 					testRowExists('4:0');
 					testRowExists('4:99', false);
 				});
@@ -159,7 +159,7 @@ define([
 			test.afterEach(destroyGrid);
 
 			test.test('expand first row', function () {
-				return rowExpand(grid, 0)
+				return grid.expand(0)
 					.then(function () {
 						testRowExists('0:0');
 						testRowExists('0:99', false);
@@ -167,7 +167,7 @@ define([
 			});
 
 			test.test('expand first row + scroll to bottom', function () {
-				return rowExpand(grid, 0)
+				return grid.expand(0)
 					.then(scrollToEnd)
 					.then(function () {
 						testRowExists('0:0');
@@ -176,14 +176,14 @@ define([
 			});
 
 			test.test('expand last row', function () {
-				return rowExpand(grid, 4).then(function () {
+				return grid.expand(4).then(function () {
 					testRowExists('4:0');
 					testRowExists('4:99', false);
 				});
 			});
 
 			test.test('expand last row + scroll to bottom', function () {
-				return rowExpand(grid, 4)
+				return grid.expand(4)
 					.then(scrollToEnd)
 					.then(function () {
 						testRowExists('4:0');
@@ -192,10 +192,10 @@ define([
 			});
 
 			test.test('expand first and last rows + scroll to bottom', function () {
-				return rowExpand(grid, 0)
+				return grid.expand(0)
 					.then(scrollToEnd)
 					.then(function () {
-						return rowExpand(grid, 4);
+						return grid.expand(4);
 					})
 					.then(scrollToEnd)
 					.then(function () {
@@ -394,7 +394,7 @@ define([
 			test.afterEach(destroyGrid);
 
 			test.test('expand first row', function () {
-				return rowExpand(grid, 0)
+				return grid.expand(0)
 					.then(function () {
 						testRowExists('0:0');
 						var row = grid.row('0:0').element;
@@ -409,7 +409,7 @@ define([
 			test.afterEach(destroyGrid);
 
 			test.test('child modification', function () {
-				return rowExpand(grid, 0).then(function () {
+				return grid.expand(0).then(function () {
 					testRowExists('0:0');
 					assert.doesNotThrow(function () {
 						grid.collection.putSync({
@@ -422,7 +422,7 @@ define([
 			});
 
 			test.test('child modification after parent when expanded', function () {
-				return rowExpand(grid, 0).then(function () {
+				return grid.expand(0).then(function () {
 					grid.collection.putSync({
 						id: '0',
 						value: 'Modified'
@@ -443,7 +443,7 @@ define([
 			});
 
 			test.test('collapse items removed from store', function () {
-				return rowExpand(grid, 0).then(function () {
+				return grid.expand(0).then(function () {
 					assert.isTrue(domClass.contains(grid.row(0).element, 'dgrid-row-expanded'),
 						'Should have expanded class');
 					var item = grid.collection.getSync(0);
@@ -475,7 +475,7 @@ define([
 			});
 
 			test.test('child add', function () {
-				return rowExpand(grid, 0).then(function () {
+				return grid.expand(0).then(function () {
 					testRowExists('0:0');
 					grid.collection.add({
 						id: '0:0.5',
@@ -487,7 +487,7 @@ define([
 			});
 
 			test.test('child put', function () {
-				return rowExpand(grid, 0).then(function () {
+				return grid.expand(0).then(function () {
 					var calls = 0;
 
 					handles.push(aspect.before(grid, 'removeRow', function () {
@@ -509,7 +509,7 @@ define([
 			});
 
 			test.test('child remove', function () {
-				return rowExpand(grid, 0).then(function () {
+				return grid.expand(0).then(function () {
 					testRowExists('0:0');
 					grid.collection.remove('0:0');
 					testRowExists('0:0');
