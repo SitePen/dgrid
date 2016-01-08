@@ -10,7 +10,6 @@ module.exports = function (grunt) {
 	// so generate the desired destination/source configuration ahead of time
 	var stylusFiles = grunt.file.expand([
 		'css/dgrid.styl',
-		'css/TouchScroll.styl',
 		'css/skins/*.styl',
 		'!css/skins/skin.styl'
 	]);

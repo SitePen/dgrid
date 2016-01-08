@@ -385,7 +385,7 @@ define([
 
 			// make sure all the content has been removed so it can be recreated
 			this.contentNode.innerHTML = '';
-			// Ensure scroll position always resets (especially for TouchScroll).
+			// Ensure scroll position always resets
 			this.scrollTo({ x: 0, y: 0 });
 		},
 

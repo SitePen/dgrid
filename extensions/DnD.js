@@ -12,8 +12,7 @@ define([
 	'dojo/dnd/Manager',
 	'dojo/_base/NodeList',
 	'../Selection',
-	'dojo/has!touch?../util/touch',
-	'dojo/has!touch?./_DnD-touch-autoscroll'
+	'dojo/has!touch?../util/touch'
 ], function (declare, lang, arrayUtil, aspect, domClass, on, topic, has, when, DnDSource,
 		DnDManager, NodeList, Selection, touchUtil) {
 	// Requirements
@@ -164,11 +163,6 @@ define([
 
 			this.inherited(arguments); // DnDSource.prototype.onDndStart.apply(this, arguments);
 			if (source === this) {
-				// If TouchScroll is in use, cancel any pending scroll operation.
-				if (this.grid.cancelTouchScroll) {
-					this.grid.cancelTouchScroll();
-				}
-
 				// Set avatar width to half the grid's width.
 				// Kind of a naive default, but prevents ridiculously wide avatars.
 				DnDManager.manager().avatar.node.style.width =

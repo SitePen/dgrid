@@ -102,12 +102,6 @@
 		"parent": ""
 	},
 	{
-		"name": "TouchScroll.html",
-		"url": "TouchScroll.html",
-		"title": "Test TouchScroll Mixin",
-		"parent": ""
-	},
-	{
 		"name": "Tree.html",
 		"url": "Tree.html",
 		"title": "Test Tree Grid",

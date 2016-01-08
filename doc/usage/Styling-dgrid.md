@@ -11,10 +11,8 @@ The first thing to do when using dgrid components is to add `dgrid.css` to your 
 <link rel="stylesheet" href="dgrid/css/dgrid.css">
 ```
 
-You may also need to include the following stylesheets under specific circumstances:
-
-* `dojo/resources/dnd.css` (or equivalent custom styles), if you are using the `ColumnReorder` or `DnD` extensions
-* `dgrid/css/TouchScroll.css`, if you are using the `dgrid/TouchScroll` module
+You may also need to include `dojo/resources/dnd.css` (or equivalent custom styles)
+if you are using the `ColumnReorder` or `DnD` extensions.
 
 ### Notes on Structural Styles
 
