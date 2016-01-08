@@ -13,8 +13,6 @@ define([
 	'dijit/_WidgetsInTemplateMixin',
 	'dijit/form/TextBox',
 	'dijit/form/SimpleTextarea',
-	'dijit/form/CheckBox',
-	'dijit/form/RadioButton',
 	'dstore/Memory',
 	'dstore/Trackable',
 	'dstore/Tree',
@@ -32,15 +30,13 @@ define([
 	'dijit/layout/TabContainer'
 ], function (require, arrayUtil, declare, lang, domClass, query, string, on, topic,
 		_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, TextBox, SimpleTextarea,
-		CheckBox, RadioButton, Memory, Trackable, TreeStoreMixin, aboutDialog, ColumnEditor,
-	 	FeatureEditor, toJavaScript, config, i18n, template, codeTemplate) {
+		Memory, Trackable, TreeStoreMixin, aboutDialog, ColumnEditor, FeatureEditor,
+		toJavaScript, config, i18n, template, codeTemplate) {
 
 	var NUM_ITEMS = 50;
 	var dijitNameToConstructor = {
 		TextBox: TextBox,
-		SimpleTextarea: SimpleTextarea,
-		CheckBox: CheckBox,
-		RadioButton: RadioButton
+		SimpleTextarea: SimpleTextarea
 	};
 
 	return declare([ _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin ], {
