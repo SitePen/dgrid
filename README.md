@@ -150,7 +150,7 @@ for dgrid, as well as Dojo and a number of other JavaScript libraries.
 dgrid uses [Intern](http://theintern.io/) as its test runner. Tests can
 either be run using the browser, or using a cloud provider such as
 [Sauce Labs](https://saucelabs.com/). More information on writing your own tests
-with Intern can be found in the [Intern wiki](https://github.com/theintern/intern/wiki).
+with Intern can be found in the [Intern user guide](https://theintern.github.io/intern/).
 
 *Note that installing dgrid via bower will not include the test folder; if you
 wish to run dgrid's unit tests, download the package directly.*

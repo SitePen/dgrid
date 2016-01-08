@@ -18,7 +18,7 @@
 		"url":"http://github.com/SitePen/dgrid"
 	},
 	"devDependencies": {
-		"intern-geezer": "~2"
+		"intern-geezer": "~2.2"
 	},
 	"directories": {
 		"doc": "./doc",
