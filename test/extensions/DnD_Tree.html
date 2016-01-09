@@ -52,13 +52,7 @@
 						{label:"Population", field:"population"},
 						{label:"Timezone", field:"timezone"}
 					],
-					collection: createHierarchicalStore({ data: hierarchicalCountryData }, true),
-					dndParams: {
-						allowNested: true, // also pick up indirect children w/ dojoDndItem class
-						checkAcceptance: function(source, nodes) {
-							return source !== this; // Don't self-accept.
-						}
-					}
+					collection: createHierarchicalStore({ data: hierarchicalCountryData }, true)
 				}, "treegrid");
 				
 				// Create the target list.
@@ -75,8 +69,7 @@
 		</script>
 	</head>
 	<body class="tundra">
-		<p>This page includes a simple example demonstrating ability to drag both
-			tree parents and children.  Note that this requires Dojo 1.8 or higher.</p>
+		<p>This page includes a simple example demonstrating ability to drag both tree parents and children.</p>
 		<div id="treegrid"></div>
 		<div id="targetlist"></div>
 		
