@@ -187,14 +187,7 @@ define([
 							parentNode.insertBefore(noDataNode, self._getFirstRowSibling(parentNode));
 							noDataNode.innerHTML = self.noDataMessage;
 						}
-						var height = 0;
-						for (var i = 0; i < trCount; i++) {
-							height += self._calcRowHeight(trs[i]);
-						}
-						// only update rowHeight if we actually got results and are visible
-						if (trCount && height) {
-							self.rowHeight = height / trCount;
-						}
+						self._calcAverageRowHeight(trs);
 
 						total -= trCount;
 						preload.count = total;
@@ -275,6 +268,9 @@ define([
 
 		resize: function () {
 			this.inherited(arguments);
+			if (!this.rowHeight) {
+				this._calcAverageRowHeight(this.contentNode.getElementsByClassName('dgrid-row'));
+			}
 			this._processScroll();
 		},
 
@@ -329,6 +325,21 @@ define([
 			}
 
 			return rowElement.offsetHeight;
+		},
+
+		_calcAverageRowHeight: function (rowElements) {
+			// summary:
+			//		Sets this.rowHeight based on the average from heights of the provided row elements.
+
+			var count = rowElements.length;
+			var height = 0;
+			for (var i = 0; i < count; i++) {
+				height += this._calcRowHeight(rowElements[i]);
+			}
+			// only update rowHeight if elements were passed and are in flow
+			if (count && height) {
+				this.rowHeight = height / count;
+			}
 		},
 
 		lastScrollTop: 0,
