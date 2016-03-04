@@ -290,8 +290,9 @@ define([
 			// summary:
 			//		Adds tree navigation capability to a column.
 
-			var grid = this,
-				colSelector = '.dgrid-content .dgrid-column-' + column.id;
+			var grid = this;
+			var colSelector = '.dgrid-content .dgrid-column-' + column.id;
+			var clicked; // tracks row that was clicked (for expand dblclick event handling)
 
 			this._treeColumn = column;
 			if (!column._isConfiguredTreeColumn) {
@@ -321,8 +322,6 @@ define([
 						td.insertBefore(expando, td.firstChild);
 					}
 				};
-
-				var clicked; // tracks row that was clicked (for expand dblclick event handling)
 
 				if (typeof column.renderExpando !== 'function') {
 					column.renderExpando = this._defaultRenderExpando;
