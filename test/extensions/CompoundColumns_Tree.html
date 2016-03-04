@@ -22,6 +22,7 @@
 	</head>
 	<body class="claro">
 		<div id="grid"></div>
+		<button id="setColumnsButton">Set Columns</button>
 
 		<script>
 			require([
@@ -30,8 +31,9 @@
 				'dgrid/OnDemandGrid',
 				'dgrid/extensions/CompoundColumns',
 				'dgrid/test/data/createHierarchicalStore',
-				'dgrid/test/data/hierarchicalCountryData'
-			], function (Tree, ColumnSet, OnDemandGrid, CompoundColumns, createHierarchicalStore, data) {
+				'dgrid/test/data/hierarchicalCountryData',
+				'dojo/on'
+			], function (Tree, ColumnSet, OnDemandGrid, CompoundColumns, createHierarchicalStore, data, on) {
 					var CompoundTree = OnDemandGrid.createSubclass([ Tree, CompoundColumns, ColumnSet ]);
 					var store = createHierarchicalStore({ data: data });
 
@@ -63,10 +65,14 @@
 						]
 					];
 
-					window.grid = new CompoundTree({
+					var grid = new CompoundTree({
 						columnSets: columnSets,
 						collection: store.getRootCollection()
 					}, 'grid');
+
+					on(document.getElementById('setColumnsButton'), 'click', function () {
+						grid.set('columns', grid.get('columns'));
+					});
 				});
 		</script>
 	</body>
