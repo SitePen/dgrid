@@ -94,6 +94,33 @@ define([
 					}
 				}
 
+				function afterContentAdded() {
+					// Ensures the first element of a grid is always keyboard selectable after data has been
+					// retrieved if there is not already a valid focused element.
+
+					var focusedNode = grid._focusedNode || initialNode;
+
+					// do not update the focused element if we already have a valid one
+					if (isFocusableClass.test(focusedNode.className) && areaNode.contains(focusedNode)) {
+						return;
+					}
+
+					// ensure that the focused element is actually a grid cell, not a
+					// dgrid-preload or dgrid-content element, which should not be focusable,
+					// even when data is loaded asynchronously
+					var elements = areaNode.getElementsByTagName('*');
+					for (var i = 0, element; (element = elements[i]); ++i) {
+						if (isFocusableClass.test(element.className)) {
+							focusedNode = grid._focusedNode = element;
+							break;
+						}
+					}
+
+					initialNode.tabIndex = -1;
+					focusedNode.tabIndex = grid.tabIndex; // This is initialNode if nothing focusable was found
+					return;
+				}
+
 				if (isHeader) {
 					// Initialize header now (since it's already been rendered),
 					// and aspect after future renderHeader calls to reset focus.
@@ -101,32 +128,15 @@ define([
 					aspect.after(grid, 'renderHeader', initHeader, true);
 				}
 				else {
-					aspect.after(grid, 'renderArray', function (rows) {
-						// summary:
-						//		Ensures the first element of a grid is always keyboard selectable after data has been
-						//		retrieved if there is not already a valid focused element.
-
-						var focusedNode = grid._focusedNode || initialNode;
-
-						// do not update the focused element if we already have a valid one
-						if (isFocusableClass.test(focusedNode.className) && areaNode.contains(focusedNode)) {
-							return rows;
+					aspect.after(grid, 'renderArray', afterContentAdded, true);
+					aspect.after(grid, '_onNotification', function (rows, event) {
+						if (event.totalLength === 0) {
+							areaNode.tabIndex = 0;
 						}
-
-						// ensure that the focused element is actually a grid cell, not a
-						// dgrid-preload or dgrid-content element, which should not be focusable,
-						// even when data is loaded asynchronously
-						var elements = areaNode.getElementsByTagName('*');
-						for (var i = 0, element; (element = elements[i]); ++i) {
-							if (isFocusableClass.test(element.className)) {
-								focusedNode = grid._focusedNode = element;
-								break;
-							}
+						else if (event.totalLength === 1 && event.type === 'add') {
+							afterContentAdded();
 						}
-
-						focusedNode.tabIndex = grid.tabIndex;
-						return rows;
-					});
+					}, true);
 				}
 
 				grid._listeners.push(on(areaNode, 'mousedown', function (event) {

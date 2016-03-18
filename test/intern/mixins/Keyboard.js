@@ -8,12 +8,11 @@ define([
 	'dojo/_base/declare',
 	'dojo/on',
 	'dojo/query',
-	'dstore/Memory',
 	'put-selector/put',
 	'dgrid/test/data/createSyncStore',
 	'dgrid/test/data/genericData'
 ], function (test, assert, OnDemandList, OnDemandGrid, Keyboard, ColumnSet,
-		declare, on, query, Memory, put, createSyncStore, genericData) {
+		declare, on, query, put, createSyncStore, genericData) {
 	var handles = [],
 		columns = {
 			col1: 'Column 1',
@@ -281,7 +280,7 @@ define([
 		});
 
 		test.test('grid.focus - no args, empty store', function () {
-			grid.set('collection', new Memory({ data: [] }));
+			grid.set('collection', createSyncStore({ data: [] }));
 			assert.doesNotThrow(function () {
 				grid.focus();
 			}, null, 'grid.focus() on empty grid should not throw error');
@@ -500,5 +499,37 @@ define([
 		});
 
 		registerRowTests('list');
+	});
+
+	test.suite('Keyboard + initially-empty store', function () {
+		var store = createSyncStore({ data: [] });
+		test.beforeEach(function () {
+			grid = new (declare([ OnDemandGrid, Keyboard ]))({
+				collection: store,
+				columns: columns
+			});
+			document.body.appendChild(grid.domNode);
+			grid.startup();
+		});
+
+		test.afterEach(afterEach);
+		test.after(after);
+
+		test.test('Proper tabIndex initialization after item is added', function () {
+			assert.strictEqual(grid.contentNode.tabIndex, 0,
+				'contentNode should be focusable when grid is empty');
+
+			var item = store.addSync({});
+
+			assert.strictEqual(grid.contentNode.tabIndex, -1,
+				'contentNode should not be focusable once an item exists');
+			assert.strictEqual(query('.dgrid-cell', grid.contentNode)[0].tabIndex, 0,
+				'First cell should be focusable once an item exists');
+
+			store.removeSync(item.id);
+
+			assert.strictEqual(grid.contentNode.tabIndex, 0,
+				'contentNode should be focusable when grid is empty again');
+		});
 	});
 });
