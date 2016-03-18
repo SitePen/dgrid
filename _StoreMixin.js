@@ -226,28 +226,27 @@ define([
 		},
 
 		refreshCell: function (cell) {
-			this.inherited(arguments);
-			var row = cell.row;
-			var self = this;
-
 			if (!this.collection || !this._createBodyRowCell) {
 				throw new Error('refreshCell requires a Grid with a collection.');
 			}
 
-			return this.collection.get(row.id).then(function (item) {
-				var cellElement = cell.element;
-				if (cellElement.widget) {
-					cellElement.widget.destroyRecursive();
-				}
-				domConstruct.empty(cellElement);
+			this.inherited(arguments);
+			return this.collection.get(cell.row.id).then(lang.hitch(this, '_refreshCellFromItem', cell));
+		},
 
-				var dirtyItem = self.dirty && self.dirty[row.id];
-				if (dirtyItem) {
-					item = lang.delegate(item, dirtyItem);
-				}
+		_refreshCellFromItem: function (cell, item, options) {
+			var cellElement = cell.element;
+			if (cellElement.widget) {
+				cellElement.widget.destroyRecursive();
+			}
+			domConstruct.empty(cellElement);
 
-				self._createBodyRowCell(cellElement, cell.column, item);
-			});
+			var dirtyItem = this.dirty && this.dirty[cell.row.id];
+			if (dirtyItem) {
+				item = lang.delegate(item, dirtyItem);
+			}
+
+			this._createBodyRowCell(cellElement, cell.column, item, options);
 		},
 
 		renderArray: function () {
