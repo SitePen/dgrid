@@ -154,8 +154,7 @@ wish to run dgrid's unit tests, download the package directly.*
 **Note:** Commands listed in this section are all written assuming they are
 run inside the `dgrid` directory.
 
-Run `npm install` to install the latest *geezer* version of Intern 2,
-which supports IE 8 in addition to modern browsers:
+Run `npm install` to install Intern:
 
 ```
 npm install
