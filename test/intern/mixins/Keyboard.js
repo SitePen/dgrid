@@ -1,19 +1,22 @@
 define([
 	'intern!tdd',
 	'intern/chai!assert',
+	'dgrid/List',
+	'dgrid/Grid',
 	'dgrid/OnDemandList',
 	'dgrid/OnDemandGrid',
 	'dgrid/Keyboard',
 	'dgrid/ColumnSet',
 	'dojo/_base/declare',
+	'dojo/dom-class',
 	'dojo/dom-construct',
 	'dojo/on',
 	'dojo/query',
 	'dstore/Memory',
 	'dgrid/test/data/createSyncStore',
 	'dgrid/test/data/genericData'
-], function (test, assert, OnDemandList, OnDemandGrid, Keyboard, ColumnSet,
-		declare, domConstruct, on, query, Memory, createSyncStore, genericData) {
+], function (test, assert, List, Grid, OnDemandList, OnDemandGrid, Keyboard, ColumnSet,
+		declare, domClass, domConstruct, on, query, Memory, createSyncStore, genericData) {
 	var handles = [],
 		columns = {
 			col1: 'Column 1',
@@ -285,8 +288,8 @@ define([
 			assert.doesNotThrow(function () {
 				grid.focus();
 			}, null, 'grid.focus() on empty grid should not throw error');
-			assert.strictEqual(document.activeElement, grid.contentNode,
-				'grid.contentNode should be focused after grid.focus() on empty grid');
+			assert.strictEqual(document.activeElement, document.body,
+				'document.body should be focused after grid.focus() on empty grid');
 		});
 	});
 
@@ -502,5 +505,142 @@ define([
 		});
 
 		registerRowTests('list');
+	});
+
+	function findTabIndexes(rootElement) {
+		// Count elements with a tabIndex set to a value of 0 or higher.
+		var found = [];
+		var elements = rootElement.getElementsByTagName('*');
+		var element;
+		var i;
+		var l = elements.length;
+		var tabIndex;
+		for (i = 0; i < l; i++) {
+			element = elements[i];
+			tabIndex = element.getAttribute('tabIndex');
+			if (tabIndex && parseInt(tabIndex, 10) >= 0) {
+				found.push(element);
+			}
+		}
+		return found;
+	}
+
+	test.suite('Keyboard + Grid + no tabable header - tabIndex', function () {
+		test.beforeEach(function () {
+			grid = new (declare([Grid, Keyboard]))({
+				columns: {
+					col1: 'Column 1',
+					col2: 'Column 2'
+				},
+				tabableHeader: false
+			});
+			document.body.appendChild(grid.domNode);
+			grid.startup();
+		});
+
+		test.afterEach(function () {
+			grid.destroy();
+		});
+
+		test.test('do not call renderArray', function () {
+			// By default, the grid should have no tab stops.
+			assert.strictEqual(findTabIndexes(grid.domNode).length, 0);
+		});
+
+		test.test('render data', function () {
+			// When rendering data, the grid should have a tab stop in the first cell in the first row.
+			grid.renderArray([
+				{ col1: 'One', col2: 'Two' },
+				{ col1: 'Three', col2: 'Four' }
+			]);
+			var elements = findTabIndexes(grid.domNode);
+			assert.strictEqual(elements.length, 1);
+			assert.isTrue(domClass.contains(elements[0], 'dgrid-cell'));
+			assert.isTrue(domClass.contains(elements[0], 'field-col1'));
+		});
+
+		test.test('render empty array', function ()  {
+			grid.renderArray([]);
+			assert.strictEqual(findTabIndexes(grid.domNode).length, 0);
+		});
+	});
+
+	test.suite('Keyboard + Grid + tabable header - tabIndex', function () {
+		test.beforeEach(function () {
+			grid = new (declare([Grid, Keyboard]))({
+				columns: {
+					col1: 'Column 1',
+					col2: 'Column 2'
+				},
+				tabableHeader: true
+			});
+			document.body.appendChild(grid.domNode);
+			grid.startup();
+		});
+
+		test.afterEach(function () {
+			grid.destroy();
+		});
+
+		test.test('do not call renderArray', function () {
+			assert.strictEqual(findTabIndexes(grid.domNode).length, 1);
+		});
+
+		test.test('render data', function () {
+			grid.renderArray([
+				{ col1: 'One', col2: 'Two' },
+				{ col1: 'Three', col2: 'Four' }
+			]);
+			var elements = findTabIndexes(grid.domNode);
+			assert.strictEqual(elements.length, 2);
+
+			var cell = elements[0];
+			assert.isTrue(domClass.contains(cell, 'dgrid-cell'));
+			assert.isTrue(domClass.contains(cell, 'field-col1'));
+			assert.strictEqual(cell.getAttribute('role'), 'columnheader');
+			cell = elements[1];
+			assert.isTrue(domClass.contains(cell, 'dgrid-cell'));
+			assert.isTrue(domClass.contains(cell, 'field-col1'));
+			assert.strictEqual(cell.getAttribute('role'), 'gridcell');
+		});
+
+		test.test('render empty array', function ()  {
+			grid.renderArray([]);
+			assert.strictEqual(findTabIndexes(grid.domNode).length, 1);
+		});
+	});
+
+	test.suite('Keyboard + List - tabIndex', function () {
+		test.beforeEach(function () {
+			grid = new (declare([List, Keyboard]))();
+			document.body.appendChild(grid.domNode);
+			grid.startup();
+		});
+
+		test.afterEach(function () {
+			grid.destroy();
+		});
+
+		test.test('do not call renderArray', function () {
+			// By default, the grid should have no tab stops.
+			assert.strictEqual(findTabIndexes(grid.domNode).length, 0);
+		});
+
+		test.test('render data', function () {
+			// When rendering data, the grid should have a tab stop in the first cell in the first row.
+			grid.renderArray([
+				{ col1: 'One', col2: 'Two' },
+				{ col1: 'Three', col2: 'Four' }
+			]);
+			var elements = findTabIndexes(grid.domNode);
+			assert.strictEqual(elements.length, 1);
+			console.log(elements[0]);
+			assert.isTrue(domClass.contains(elements[0], 'dgrid-row'));
+		});
+
+		test.test('render empty array', function ()  {
+			grid.renderArray([]);
+			assert.strictEqual(findTabIndexes(grid.domNode).length, 0);
+		});
 	});
 });
