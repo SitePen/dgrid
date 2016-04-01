@@ -1,8 +1,9 @@
 define([
+	'dstore/Tree',
 	'./createSyncStore',
 	'./stateData',
 	'dojo/_base/array'
-], function (createSyncStore, stateData, arrayUtil) {
+], function (Tree, createSyncStore, stateData, arrayUtil) {
 
 	var nextId = 0;
 	var topHeavyData = arrayUtil.map(stateData.items, function (state) {
@@ -10,25 +11,22 @@ define([
 			id: nextId++,
 			abbreviation: state.abbreviation,
 			name: state.name,
-			children: [{
-				id: nextId++,
-				abbreviation: 'US',
-				name: 'United States of America'
-			}]
+			hasChildren: true,
+			parent: null
 		};
 	});
 
 	// Store with few children and many parents to exhibit any
 	// issues due to bugs related to total disregarding level
-	return createSyncStore({
-		data: topHeavyData,
-		getChildren: function (parent) {
-			return createSyncStore({
-				data: parent.children
-			});
-		},
-		mayHaveChildren: function (parent) {
-			return !!parent.children;
-		}
+	arrayUtil.forEach(topHeavyData, function (state) {
+		topHeavyData.push({
+			id: nextId++,
+			abbreviation: 'US',
+			name: 'United States of America',
+			hasChildren: false,
+			parent: state.id
+		});
 	});
+
+	return createSyncStore({ data: topHeavyData }, Tree).getRootCollection();
 });
