@@ -432,6 +432,9 @@ define([
 				this._focusOnNode(node, false);
 			}
 			else {
+				if (this._removedFocus) {
+					this._removedFocus.active = true;
+				}
 				this.contentNode.focus();
 			}
 		}

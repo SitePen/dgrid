@@ -52,13 +52,14 @@ define([
 			handles[i].remove && handles[i].remove();
 		}
 		handles = [];
+
+		// Restore item that was removed for focus retention test
+		testStore.put(item);
 	}
 
 	function after() {
 		// Destroy list or grid
 		grid.destroy();
-		// Restore item that was removed for focus retention test
-		testStore.put(item);
 	}
 
 	// Common test functions for grid w/ cellNavigation: false and list
@@ -452,7 +453,6 @@ define([
 			assert.ok(element && element.className && element.className.indexOf('dgrid-cell') > -1,
 				'focus(id) call focused a cell');
 
-			// Focus the button we added to move focus out of the grid
 			button.focus();
 
 			nextElement = grid.cell(2, 'col1').element;
@@ -464,6 +464,31 @@ define([
 				}, null, 'focus() after blur and item removal should not throw error');
 				assert.strictEqual(nextElement, document.activeElement,
 					'The next row is focused after calling focus()');
+			}), 0);
+
+			return dfd;
+		});
+
+		test.test('grid.focus called in same turn after item removal', function () {
+			var dfd = this.async(1000),
+				element,
+				nextElement;
+
+			grid.focus(grid.cell(1, 'col1'));
+
+			element = document.activeElement;
+			assert.ok(element && element.className && element.className.indexOf('dgrid-cell') > -1,
+				'focus(id) call focused a cell');
+
+			button.focus();
+
+			nextElement = grid.cell(2, 'col1').element;
+			grid.collection.remove(1);
+			grid.focus();
+
+			setTimeout(dfd.callback(function () {
+				assert.strictEqual(nextElement, document.activeElement,
+					'The next row is focused after removing the item and calling focus on the same turn');
 			}), 0);
 
 			return dfd;
