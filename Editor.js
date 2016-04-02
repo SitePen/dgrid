@@ -334,14 +334,18 @@ define([
 			return null;
 		},
 
-		refreshCell: function(cell) {
-			var rowElementId = cell.row.element.id;
-			var columnId = cell.column.id;
-			if (this._editorCellListeners[rowElementId] && this._editorCellListeners[rowElementId][columnId]) {
-				this._editorCellListeners[rowElementId][columnId].remove();
-				this._editorCellListeners[rowElementId][columnId] = null;
+		refreshCell: function (cell) {
+			var value = cell.column.get ? cell.column.get(cell.row.data) : cell.row.data[cell.column.field];
+			var editor = this._editorInstances[cell.column.id] || cell.element.widget;
+
+			if (editor) {
+				editor.set('value', value);
 			}
-			return this.inherited(arguments);
+			else {
+				this._updateInputValue(cell.element.input, value);
+			}
+
+			return (new Deferred()).resolve();
 		},
 
 		_showEditor: function (cmp, column, cellElement, value) {
