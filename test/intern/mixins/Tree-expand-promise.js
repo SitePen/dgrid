@@ -70,14 +70,15 @@ define([
 
 		function createGrid(store) {
 			grid = new (declare([ OnDemandGrid, Tree ]))({
-				collection: store.getRootCollection(),
 				columns: [
 					{renderExpando: true, field: 'node', label: 'Node'},
 					{field: 'value', label: 'Value'}
-				]
+				],
+				enableTreeTransitions: false
 			});
 			document.body.appendChild(grid.domNode);
 			grid.startup();
+			grid.set('collection', store.getRootCollection());
 		}
 
 		function createNoRenderQueryGrid(store) {
@@ -86,7 +87,8 @@ define([
 				columns: [
 					{renderExpando: true, field: 'node', label: 'Node'},
 					{field: 'value', label: 'Value'}
-				]
+				],
+				enableTreeTransitions: false
 			});
 			document.body.appendChild(grid.domNode);
 			grid.startup();

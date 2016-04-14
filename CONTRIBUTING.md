@@ -209,7 +209,7 @@ existing test cases and appropriate platforms prior to submitting your pull requ
 
 ## Licensing
 
-All of your submissions will be licensed under a dual "New" BSD / AFLv2 license.
+All of your submissions will be licensed under the "New" BSD license.
 
 ## Expect Discussion and Rework
 

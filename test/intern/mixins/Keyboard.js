@@ -9,11 +9,10 @@ define([
 	'dojo/dom-construct',
 	'dojo/on',
 	'dojo/query',
-	'dstore/Memory',
 	'dgrid/test/data/createSyncStore',
 	'dgrid/test/data/genericData'
 ], function (test, assert, OnDemandList, OnDemandGrid, Keyboard, ColumnSet,
-		declare, domConstruct, on, query, Memory, createSyncStore, genericData) {
+		declare, domConstruct, on, query, createSyncStore, genericData) {
 	var handles = [],
 		columns = {
 			col1: 'Column 1',
@@ -53,13 +52,14 @@ define([
 			handles[i].remove && handles[i].remove();
 		}
 		handles = [];
+
+		// Restore item that was removed for focus retention test
+		testStore.put(item);
 	}
 
 	function after() {
 		// Destroy list or grid
 		grid.destroy();
-		// Restore item that was removed for focus retention test
-		testStore.put(item);
 	}
 
 	// Common test functions for grid w/ cellNavigation: false and list
@@ -281,7 +281,7 @@ define([
 		});
 
 		test.test('grid.focus - no args, empty store', function () {
-			grid.set('collection', new Memory({ data: [] }));
+			grid.set('collection', createSyncStore({ data: [] }));
 			assert.doesNotThrow(function () {
 				grid.focus();
 			}, null, 'grid.focus() on empty grid should not throw error');
@@ -453,7 +453,6 @@ define([
 			assert.ok(element && element.className && element.className.indexOf('dgrid-cell') > -1,
 				'focus(id) call focused a cell');
 
-			// Focus the button we added to move focus out of the grid
 			button.focus();
 
 			nextElement = grid.cell(2, 'col1').element;
@@ -465,6 +464,31 @@ define([
 				}, null, 'focus() after blur and item removal should not throw error');
 				assert.strictEqual(nextElement, document.activeElement,
 					'The next row is focused after calling focus()');
+			}), 0);
+
+			return dfd;
+		});
+
+		test.test('grid.focus called in same turn after item removal', function () {
+			var dfd = this.async(1000),
+				element,
+				nextElement;
+
+			grid.focus(grid.cell(1, 'col1'));
+
+			element = document.activeElement;
+			assert.ok(element && element.className && element.className.indexOf('dgrid-cell') > -1,
+				'focus(id) call focused a cell');
+
+			button.focus();
+
+			nextElement = grid.cell(2, 'col1').element;
+			grid.collection.remove(1);
+			grid.focus();
+
+			setTimeout(dfd.callback(function () {
+				assert.strictEqual(nextElement, document.activeElement,
+					'The next row is focused after removing the item and calling focus on the same turn');
 			}), 0);
 
 			return dfd;
@@ -502,5 +526,37 @@ define([
 		});
 
 		registerRowTests('list');
+	});
+
+	test.suite('Keyboard + initially-empty store', function () {
+		var store = createSyncStore({ data: [] });
+		test.beforeEach(function () {
+			grid = new (declare([ OnDemandGrid, Keyboard ]))({
+				collection: store,
+				columns: columns
+			});
+			document.body.appendChild(grid.domNode);
+			grid.startup();
+		});
+
+		test.afterEach(afterEach);
+		test.after(after);
+
+		test.test('Proper tabIndex initialization after item is added', function () {
+			assert.strictEqual(grid.contentNode.tabIndex, 0,
+				'contentNode should be focusable when grid is empty');
+
+			var item = store.addSync({});
+
+			assert.strictEqual(grid.contentNode.tabIndex, -1,
+				'contentNode should not be focusable once an item exists');
+			assert.strictEqual(query('.dgrid-cell', grid.contentNode)[0].tabIndex, 0,
+				'First cell should be focusable once an item exists');
+
+			store.removeSync(item.id);
+
+			assert.strictEqual(grid.contentNode.tabIndex, 0,
+				'contentNode should be focusable when grid is empty again');
+		});
 	});
 });

@@ -1,8 +1,15 @@
 # Customizing Skins
 
-The skins in dgrid 0.5 are implemented using [Stylus](http://learnboost.github.io/stylus/), and are designed to be
+The skins in dgrid 1.0 are implemented using [Stylus](http://stylus-lang.com/), and are designed to be
 easily extensible.  All skins consist primarily of a series of variable definitions, which are used by
 `skin.styl` to generate commonly-used styles.
+
+In order to further customize dgrid skins externally to dgrid itself, you will need to either install Stylus and Nib
+globally (i.e. `npm i -g stylus nib`), or implement a workflow (e.g. via npm scripts or Grunt) which incorporates them
+as dependencies (see dgrid's `package.json` and `Gruntfile.js` for example).
+
+If running stylus from the command line, you will need to pass `-u nib` in order for requires/imports of nib components
+to work.
 
 The following is the general format for skins, and can be followed to create new skins as well:
 

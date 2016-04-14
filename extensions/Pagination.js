@@ -462,7 +462,7 @@ define([
 
 			if (needsRefresh) {
 				// Refresh the current page to maintain correct number of rows on page
-				this.gotoPage(Math.min(this._currentPage, Math.ceil(event.totalLength / this.rowsPerPage)));
+				this.gotoPage(Math.min(this._currentPage, Math.ceil(event.totalLength / this.rowsPerPage)) || 1);
 			}
 			// If we're not updating the whole page, check if we at least need to update status/navigation
 			else if (collection === this._renderedCollection && event.totalLength !== this._total) {

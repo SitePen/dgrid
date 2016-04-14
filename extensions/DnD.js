@@ -12,8 +12,7 @@ define([
 	'dojo/dnd/Manager',
 	'dojo/_base/NodeList',
 	'../Selection',
-	'dojo/has!touch?../util/touch',
-	'dojo/has!touch?./_DnD-touch-autoscroll'
+	'dojo/has!touch?../util/touch'
 ], function (declare, lang, arrayUtil, aspect, domClass, on, topic, has, when, DnDSource,
 		DnDManager, NodeList, Selection, touchUtil) {
 	// Requirements
@@ -164,11 +163,6 @@ define([
 
 			this.inherited(arguments); // DnDSource.prototype.onDndStart.apply(this, arguments);
 			if (source === this) {
-				// If TouchScroll is in use, cancel any pending scroll operation.
-				if (this.grid.cancelTouchScroll) {
-					this.grid.cancelTouchScroll();
-				}
-
 				// Set avatar width to half the grid's width.
 				// Kind of a naive default, but prevents ridiculously wide avatars.
 				DnDManager.manager().avatar.node.style.width =
@@ -249,14 +243,18 @@ define([
 
 			// Make the grid's content a DnD source/target.
 			var Source = this.dndConstructor || GridDnDSource;
-			this.dndSource = new Source(
-				this.bodyNode,
-				lang.mixin(this.dndParams, {
-					// add cross-reference to grid for potential use in inter-grid drop logic
-					grid: this,
-					dropParent: this.contentNode
-				})
-			);
+
+			var dndParams = lang.mixin(this.dndParams, {
+				// add cross-reference to grid for potential use in inter-grid drop logic
+				grid: this,
+				dropParent: this.contentNode
+			});
+			if (typeof this.expand === 'function') {
+				// If the Tree mixin is being used, allowNested needs to be set to true for DnD to work properly
+				// with the child rows.  Without it, child rows will always move to the last child position.
+				dndParams.allowNested = true;
+			}
+			this.dndSource = new Source(this.bodyNode, dndParams);
 
 			// Set up select/deselect handlers to maintain references, in case selected
 			// rows are scrolled out of view and unrendered, but then dragged.

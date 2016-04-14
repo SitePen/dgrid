@@ -18,12 +18,12 @@
 	},
 	"dependencies": {
 		"dojo": ">=1.8.9",
-		"dstore": "~1.0"
+		"dstore": "~1.0.3 || ~1.1.1"
 	},
 	"ignore": [
 		".*",
 		"test"
 	],
-	"license": [ "AFL-2.1", "BSD-3-Clause" ],
+	"license": [ "BSD-3-Clause" ],
 	"moduleType": [ "amd" ]
 }

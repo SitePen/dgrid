@@ -78,6 +78,11 @@ define([
 		},
 
 		_handleSelectorClick: function (event) {
+			// Avoid double-triggering code below due to space key on input automatically triggering click (#731)
+			if (event.target.nodeName === 'INPUT' && event.type === 'keydown' && event.keyCode === 32) {
+				return;
+			}
+
 			var cell = this.cell(event);
 			var row = cell.row;
 

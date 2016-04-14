@@ -5,6 +5,8 @@ define([
 	'dojo/_base/declare',
 	'dojo/aspect',
 	'dojo/Deferred',
+	'dijit/form/TextBox',
+	'dgrid/Editor',
 	'dgrid/OnDemandList',
 	// column.set can't be tested independently from a Grid,
 	// so we are testing through OnDemandGrid for now.
@@ -13,7 +15,7 @@ define([
 	'dgrid/test/data/createSyncStore',
 	'dgrid/test/data/genericData',
 	'dojo/domReady!'
-], function (test, assert, lang, declare, aspect, Deferred,
+], function (test, assert, lang, declare, aspect, Deferred, TextBox, Editor,
 		OnDemandList, OnDemandGrid, ColumnSet, createSyncStore, genericData) {
 
 	// Helper method used to set column set() methods for various grid compositions
@@ -124,20 +126,69 @@ define([
 			});
 		});
 
-		test.test('set(\'collection\') before startup should not cause superfluous refresh',  function () {
-			var numCalls = 0;
 
-			grid = new OnDemandList();
+		test.suite('set collection before startup', function () {
+			test.test('should not cause superfluous refresh',  function () {
+				var numCalls = 0;
 
-			aspect.before(grid, 'refresh', function () {
-				numCalls++;
+				grid = new OnDemandList();
+
+				aspect.before(grid, 'refresh', function () {
+					numCalls++;
+				});
+
+				grid.set('collection', createSyncStore(genericData));
+				document.body.appendChild(grid.domNode);
+				grid.startup();
+
+				assert.strictEqual(numCalls, 1, 'refresh should only have been called once');
 			});
 
-			grid.set('collection', createSyncStore(genericData));
-			document.body.appendChild(grid.domNode);
-			grid.startup();
+			test.test('store modifications before startup', function () {
+				var numCalls = 0;
+				var store = createSyncStore({ data: genericData });
 
-			assert.strictEqual(numCalls, 1, 'refresh should only have been called once');
+				grid = new OnDemandList({
+					columns: {
+						col1: 'Column 1',
+						col2: 'Column 2'
+					}
+				});
+
+				var insertHandle = aspect.after(grid, 'insertRow', function (row) {
+					numCalls++;
+					return row;
+				});
+
+				var removeHandle = aspect.after(grid, 'removeRow', function () {
+					numCalls++;
+				});
+
+				var destroyHandle = aspect.after(grid, 'destroy', function () {
+					destroyHandle.remove();
+					insertHandle.remove();
+					removeHandle.remove();
+				});
+
+				document.body.appendChild(grid.domNode);
+
+				grid.set('collection', store);
+				store.addSync({
+					col1: 'inserted value',
+					col2: true
+				});
+
+				var item = store.getSync(1);
+				item.col1 = 'this has changed';
+				store.putSync(item);
+
+				assert.strictEqual(numCalls, 0,
+					'Should not react to store item modifications');
+
+				grid.startup();
+				assert.isTrue(numCalls > 0,
+					'Rows should appear inserted after startup');
+			});
 		});
 
 		test.test('_StoreMixin#_onNotification', function () {
@@ -248,6 +299,75 @@ define([
 					}, 100);
 					return dfd.promise;
 				}).then(unexpectedSuccess, expectedError);
+			});
+		});
+
+		test.suite('_StoreMixin#refreshCell', function () {
+			var store;
+
+			test.beforeEach(function () {
+				store = createSyncStore({ data: genericData });
+				grid = new (declare([ OnDemandGrid, Editor ]))({
+					columns: {
+						col1: 'Column 1',
+						col3: {
+							label: 'Column 3',
+							editor: TextBox
+						}
+					},
+					collection: store,
+					shouldTrackCollection: false
+				});
+				document.body.appendChild(grid.domNode);
+				grid.startup();
+			});
+
+			test.test('no change', function () {
+				var cell = grid.cell('2', 'col1');
+				var oldValue = cell.element.innerHTML;
+
+				return grid.refreshCell(cell).then(function () {
+					assert.strictEqual(cell.element.innerHTML, oldValue, 'Displayed cell value should not change');
+				});
+			});
+
+			test.test('dirty change', function () {
+				var cell = grid.cell('2', 'col1');
+				var newValue = 'new value';
+
+				grid.updateDirty(2, 'col1', newValue);
+				return grid.refreshCell(cell).then(function () {
+					assert.strictEqual(cell.element.innerHTML, newValue, 'Displayed cell value should change');
+				});
+			});
+
+			test.test('store change', function () {
+				var cell = grid.cell('2', 'col1');
+				var oldValue = cell.element.innerHTML;
+				var newValue = 'new value';
+
+				var item = cell.row.data;
+				item.col1 = newValue;
+				grid.collection.putSync(item);
+				assert.strictEqual(cell.element.innerHTML, oldValue, 'Displayed cell value should not change');
+
+				return grid.refreshCell(cell).then(function () {
+					assert.strictEqual(cell.element.innerHTML, newValue, 'Displayed cell value should change');
+				});
+			});
+
+			test.test('widget destruction', function () {
+				var cell = grid.cell('2', 'col3');
+				var widget = cell.element.widget;
+				var wasDestroyed = false;
+
+				aspect.after(widget, 'destroy', function () {
+					wasDestroyed = true;
+				});
+
+				return grid.refreshCell(cell).then(function () {
+					assert.isTrue(wasDestroyed, 'Cell\'s editor widget should be destroyed when refreshCell runs');
+				});
 			});
 		});
 

@@ -8,6 +8,7 @@ define([
 	'intern/node_modules/dojo/has!host-browser?./core/OnDemandList',
 	'intern/node_modules/dojo/has!host-browser?./core/trackable',
 	'intern/node_modules/dojo/has!host-browser?./extensions/ColumnHider',
+	'intern/node_modules/dojo/has!host-browser?./extensions/ColumnResizer',
 	'intern/node_modules/dojo/has!host-browser?./extensions/CompoundColumns',
 	'intern/node_modules/dojo/has!host-browser?./extensions/DijitRegistry',
 	'intern/node_modules/dojo/has!host-browser?./extensions/Pagination',
@@ -19,5 +20,6 @@ define([
 	'intern/node_modules/dojo/has!host-browser?./mixins/Selector',
 	'intern/node_modules/dojo/has!host-browser?./mixins/Tree',
 	'intern/node_modules/dojo/has!host-browser?./mixins/Tree-expand-promise',
-	'intern/node_modules/dojo/has!host-browser?./mixins/Tree-additional-filter'
+	'intern/node_modules/dojo/has!host-browser?./mixins/Tree-additional-filter',
+	'intern/node_modules/dojo/has!host-browser?./mixins/Tree-indent'
 ], function () {});

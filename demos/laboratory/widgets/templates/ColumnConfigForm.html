@@ -48,10 +48,11 @@
 			editor
 		</div>
 		<div class="field">
-			<select data-dojo-type="dijit/form/ComboBox" name="editor">
-				<option>text</option>
-				<option>checkbox</option>
-				<option>radio</option>
+			<select data-dojo-type="dijit/form/FilteringSelect" required="false" name="editor">
+				<option value="text">text</option>
+				<option value="textarea">textarea</option>
+				<option value="dijit/form/TextBox">dijit/form/TextBox</option>
+				<option value="dijit/form/SimpleTextarea">dijit/form/SimpleTextarea</option>
 			</select>
 		</div>
 
@@ -59,9 +60,9 @@
 			editOn
 		</div>
 		<div class="field">
-			<select data-dojo-type="dijit/form/ComboBox" name="editOn">
-				<option>click</option>
-				<option>dblclick</option>
+			<select data-dojo-type="dijit/form/FilteringSelect" required="false" name="editOn">
+				<option value="click">click</option>
+				<option value="dblclick">dblclick</option>
 			</select>
 		</div>
 

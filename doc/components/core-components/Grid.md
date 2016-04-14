@@ -177,6 +177,13 @@ require([
 });
 ```
 
+#### Column and row spanning with sub-rows
+
+When defining column structures with multiple sub-rows (via `subRows` or the
+[`ColumnSet`](../mixins/ColumnSet.md) mixin), the `colSpan` and `rowSpan` properties (documented below)
+can be specified in column definitions.  See the
+[`complex_column.html`](../../../test/complex_column.html) test page for examples of these properties in action.
+
 ## Column Definition Properties
 
 In any of the above formats, each individual column definition object may have
@@ -185,12 +192,14 @@ the following properties (all are optional):
 Property | Description
 -------- | -------------
 `field` | The property from the object in the list to display in the body of the grid (unless otherwise overridden via the `get` function, explained below). In cases where `columns` is passed an object, the key of each property represents the field name, and thus this property is normally omitted.
+`id` | The id of the column; normally this is determined automatically from the keys or indices in the `columns` object or array.
 `label` | The label to show in the header of the grid. Defaults to the value of `field`.
 `className` | CSS class(es) to assign to the cells in the column.  The value of this property may be a string to apply equally to all cells in the column, or a function which is passed the item for each row (or `undefined` for the header row) and should return a string.  In either case, multiple classes may be specified space-delimited.  In addition, a class in the format `field-<field>` is added if the column has a `field` defined.
-`id` | The id of the column; normally this is determined automatically from the keys or indices in the `columns` object or array.
+`colSpan` | A number specifying how many columns the cell should span, when multiple sub-rows are defined.
+`rowSpan` | A number specifying how many rows the cell should span, when multiple sub-rows are defined.
 `sortable` | Indicates whether or not the grid should allow sorting by values in this field, by clicking on the column's header cell. Defaults to `true`. Note that it is always possible to programmatically sort a Grid by a given field by calling `set("sort", property, descending)` regardless of`sortable` status or even visible presence in the Grid altogether.
 `get(item)` | An optional function that, given a data item, will return the value to render in the cell.
 `set(item)` | An optional function that, given a modified data item, will return the value to set for the respective field on that item upon a call to `save()`. If no value is returned, the value as set in the passed item will be used.  (Modifying the passed item directly is thus also an option.)
 `formatter(value, object)` | An optional function that will return a string of HTML for rendering.  The function is passed the value that would normally be rendered, and the object from the collection.  If `formatterScope` is used, this can be a string instead of a function, in which case a function will be looked up on the `formatterScope` object using the given string. (Note: if a custom `renderCell` is specified, `formatter` will be ignored unless the custom `renderCell` accounts for it.)
-`renderCell(object, value, node, options)` | An optional function that will be called to render the value into the target cell. `object` refers to the record from the grid's collection for the row, and `value` refers to the specific value for the current cell (which may have been modified by the column definition's `get` function). `node` refers to the table cell that will be placed in the grid if nothing is returned by `renderCell`; if `renderCell` returns a node, that returned node will be placed inside the table cell. (Note: if a custom `renderCell` is specified, `formatter` will be ignored unless the custom `renderCell` accounts for it.)
+`renderCell(object, value, node)` | An optional function that will be called to render the value into the target cell. `object` refers to the record from the grid's collection for the row, and `value` refers to the specific value for the current cell (which may have been modified by the column definition's `get` function). `node` refers to the table cell that will be placed in the grid; if `renderCell` returns a node, that returned node will be placed inside the table cell. (Note: if a custom `renderCell` is specified, `formatter` will be ignored unless the custom `renderCell` accounts for it.)
 `renderHeaderCell(node)` | An optional function that will be called to render the column's header cell. Like `renderCell`, this may either operate on the node directly, or return a new node to be placed within it.

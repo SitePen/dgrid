@@ -215,7 +215,7 @@ define([
 
 		columnSets: [],
 
-		createRowCells: function (tag, each, subRows, object) {
+		createRowCells: function (tag, each, subRows, object, options) {
 			var row = domConstruct.create('table', { className: 'dgrid-row-table' });
 			var tbody = domConstruct.create('tbody', null, row);
 			var tr = domConstruct.create('tr', null, tbody);
@@ -229,7 +229,7 @@ define([
 				}, cell);
 				cell.setAttribute(colsetidAttr, i);
 				var subset = getColumnSetSubRows(subRows || this.subRows, i) || this.columnSets[i];
-				cell.appendChild(this.inherited(arguments, [tag, each, subset, object]));
+				cell.appendChild(this.inherited(arguments, [tag, each, subset, object, options]));
 			}
 			return row;
 		},
@@ -298,24 +298,6 @@ define([
 				' .dgrid-column-set-' + miscUtil.escapeCssIdentifier(colsetId, '-'), css);
 			this._positionScrollers();
 			return rule;
-		},
-
-		_destroyColumns: function () {
-			var columnSetsLength = this.columnSets.length,
-				i, j, k, subRowsLength, len, columnSet, subRow, column;
-			for (i = 0; i < columnSetsLength; i++) {
-				columnSet = this.columnSets[i];
-				for (j = 0, subRowsLength = columnSet.length; j < subRowsLength; j++) {
-					subRow = columnSet[j];
-					for (k = 0, len = subRow.length; k < len; k++) {
-						column = subRow[k];
-						if (typeof column.destroy === 'function') {
-							column.destroy();
-						}
-					}
-				}
-			}
-			this.inherited(arguments);
 		},
 
 		configStructure: function () {

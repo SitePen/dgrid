@@ -102,12 +102,6 @@
 		"parent": ""
 	},
 	{
-		"name": "TouchScroll.html",
-		"url": "TouchScroll.html",
-		"title": "Test TouchScroll Mixin",
-		"parent": ""
-	},
-	{
 		"name": "Tree.html",
 		"url": "Tree.html",
 		"title": "Test Tree Grid",
@@ -212,6 +206,12 @@
 		"name": "CompoundColumns.html",
 		"url": "extensions/CompoundColumns.html",
 		"title": "Test Grid Compound Columns",
+		"parent": "extensions"
+	},
+	{
+		"name": "CompoundColumns_Tree.html",
+		"url": "extensions/CompoundColumns_Tree.html",
+		"title": "Test Grid with Compound Columns, Column Sets, and Tree",
 		"parent": "extensions"
 	},
 	{

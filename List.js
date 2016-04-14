@@ -62,10 +62,11 @@ define([
 		element.appendChild(div);
 		document.body.appendChild(element);
 
-		// position: absolute makes IE always report child's offsetLeft as 0,
-		// but it conveniently makes other browsers reset to 0 as base, and all
-		// versions of IE are known to move the scrollbar to the left side for rtl
-		isLeft = !!has('ie') || !!has('trident') || div.offsetLeft >= has('dom-scrollbar-width');
+		// position: absolute makes modern IE and Edge always report child's offsetLeft as 0,
+		// but other browsers factor in the position of the scrollbar if it is to the left.
+		// All versions of IE and Edge are known to move the scrollbar to the left side for rtl.
+		isLeft = !!has('ie') || !!has('trident') || /\bEdge\//.test(navigator.userAgent) ||
+			div.offsetLeft >= has('dom-scrollbar-width');
 		cleanupTestElement(element);
 		domConstruct.destroy(div);
 		element.removeAttribute('dir');
@@ -81,7 +82,6 @@ define([
 	// common functions for class and className setters/getters
 	// (these are run in instance context)
 	function setClass(cls) {
-		// TODO: unit test
 		domClass.replace(this.domNode, cls, this._class || '');
 
 		// Store for later retrieval/removal.
@@ -211,7 +211,7 @@ define([
 
 			domNode.setAttribute('role', 'grid');
 			domClass.add(domNode, 'dgrid dgrid-' + this.listType +
-				(addUiClasses ? ' ui-widget' : ''))
+				(addUiClasses ? ' ui-widget' : ''));
 
 			// Place header node (initially hidden if showHeader is false).
 			headerNode = this.headerNode = domConstruct.create('div', {
@@ -385,7 +385,7 @@ define([
 
 			// make sure all the content has been removed so it can be recreated
 			this.contentNode.innerHTML = '';
-			// Ensure scroll position always resets (especially for TouchScroll).
+			// Ensure scroll position always resets
 			this.scrollTo({ x: 0, y: 0 });
 		},
 
@@ -486,7 +486,7 @@ define([
 				if (row === beforeNode) {
 					beforeNode = (beforeNode.connected || beforeNode).nextSibling;
 				}
-				this.removeRow(row);
+				this.removeRow(row, false, options);
 			}
 			row = this.renderRow(object, options);
 			row.className = (row.className || '') + ' dgrid-row ' +

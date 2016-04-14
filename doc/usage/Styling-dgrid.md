@@ -11,17 +11,15 @@ The first thing to do when using dgrid components is to add `dgrid.css` to your 
 <link rel="stylesheet" href="dgrid/css/dgrid.css">
 ```
 
-You may also need to include the following stylesheets under specific circumstances:
-
-* `dojo/resources/dnd.css` (or equivalent custom styles), if you are using the `ColumnReorder` or `DnD` extensions
-* `dgrid/css/TouchScroll.css`, if you are using the `dgrid/TouchScroll` module
+You may also need to include `dojo/resources/dnd.css` (or equivalent custom styles)
+if you are using the `ColumnReorder` or `DnD` extensions.
 
 ### Notes on Structural Styles
 
-As of dgrid 0.5, dgrid no longer uses xstyle to automatically load structural CSS on a per-module basis.
+As of dgrid 1.0, dgrid no longer uses xstyle to automatically load structural CSS on a per-module basis.
 `dgrid.css` now includes all structural styles, so that is the only stylesheet that needs to be referenced.
 
-The structural styles are now organized using [Stylus](http://learnboost.github.io/stylus/), to keep each component's
+The structural styles are now organized using [Stylus](http://stylus-lang.com/), to keep each component's
 structural styles separate while still generating a single CSS file.  If you are also using Stylus in your own
 project, it is feasible to directly reference the `styl` files for only the specific dgrid components you need,
 rather than all of the files referenced in `dgrid.styl`.  (You will always need `base.styl` at minimum.)
@@ -98,4 +96,4 @@ property to the instance.
 **Note:** Using the `dgrid-autoheight` class with `OnDemandList` is **not** recommended, as `OnDemandList` will
 end up ultimately rendering all of the grid's rows immediately, page by page.  `dgrid-autoheight` works well with
 `Pagination`.  If you are really interested in rendering all store data at once into an auto-height list or grid,
-have a look at our [tutorial](http://dgrid.io/tutorials/0.4/single_query) on the subject.
+have a look at our [tutorial](http://dgrid.io/tutorials/1.0/single_query) on the subject.

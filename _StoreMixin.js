@@ -121,37 +121,39 @@ define([
 				});
 			}
 
-			if (collection) {
-				var renderedCollection = collection;
-				if (this.sort && this.sort.length > 0) {
-					renderedCollection = collection.sort(this.sort);
-				}
-
-				if (renderedCollection.track && this.shouldTrackCollection) {
-					renderedCollection = renderedCollection.track();
-					this._rows = [];
-
-					this._observerHandle = this._observeCollection(
-						renderedCollection,
-						this.contentNode,
-						{ rows: this._rows }
-					);
-				}
-
-				this._renderedCollection = renderedCollection;
-			}
-
 			this.collection = collection;
 
-			// Avoid unnecessary refresh if instance hasn't started yet (startup will refresh)
+			// Avoid unnecessary rendering and processing before the grid has started up
 			if (this._started) {
+				// Once startup is called, List.startup sets the sort property which calls _StoreMixin._applySort
+				// which sets the collection property again.  So _StoreMixin._applySort will be executed again
+				// after startup is called.
+				if (collection) {
+					var renderedCollection = collection;
+					if (this.sort && this.sort.length > 0) {
+						renderedCollection = collection.sort(this.sort);
+					}
+
+					if (renderedCollection.track && this.shouldTrackCollection) {
+						renderedCollection = renderedCollection.track();
+						this._rows = [];
+
+						this._observerHandle = this._observeCollection(
+							renderedCollection,
+							this.contentNode,
+							{ rows: this._rows }
+						);
+					}
+
+					this._renderedCollection = renderedCollection;
+				}
 				this.refresh();
 			}
 		},
 
 		_setStore: function () {
 			if (!this.collection) {
-				console.debug('set(\'store\') call detected, but you probably meant set(\'collection\') for 0.4');
+				console.debug('set(\'store\') call detected, but you probably meant set(\'collection\')');
 			}
 		},
 
@@ -221,6 +223,31 @@ define([
 			}
 
 			return result;
+		},
+
+		refreshCell: function (cell) {
+			this.inherited(arguments);
+			var row = cell.row;
+			var self = this;
+
+			if (!this.collection || !this._createBodyRowCell) {
+				throw new Error('refreshCell requires a Grid with a collection.');
+			}
+
+			return this.collection.get(row.id).then(function (item) {
+				var cellElement = cell.element;
+				if (cellElement.widget) {
+					cellElement.widget.destroyRecursive();
+				}
+				domConstruct.empty(cellElement);
+
+				var dirtyItem = self.dirty && self.dirty[row.id];
+				if (dirtyItem) {
+					item = lang.delegate(item, dirtyItem);
+				}
+
+				self._createBodyRowCell(cellElement, cell.column, item);
+			});
 		},
 
 		renderArray: function () {
@@ -478,11 +505,6 @@ define([
 							// adjust the rowIndex so adjustRowIndices has the right starting point
 							rows[from] && rows[from].rowIndex--;
 						}
-
-						// the removal of rows could cause us to need to page in more items
-						if (self._processScroll) {
-							self._processScroll();
-						}
 					}
 					if (event.type === 'delete') {
 						// Reset row in case this is later followed by an add;
@@ -545,6 +567,11 @@ define([
 						to = (typeof event.index !== 'undefined') ? event.index : Infinity,
 						adjustAtIndex = Math.min(from, to);
 					from !== to && rows[adjustAtIndex] && self.adjustRowIndices(rows[adjustAtIndex]);
+
+					// the removal of rows could cause us to need to page in more items
+					if (from !== Infinity && self._processScroll && (rows[from] || rows[from - 1])) {
+						self._processScroll();
+					}
 
 					// Fire _onNotification, even for out-of-viewport notifications,
 					// since some things may still need to update (e.g. Pagination's status/navigation)

@@ -538,7 +538,7 @@ define([
 		test.test('clearSelection() within event handler', function () {
 			var dfd = this.async();
 			var numCalls = 0;
-			handles.push(grid.on('dgrid-select', dfd.rejectOnError(function (event) {
+			handles.push(grid.on('dgrid-select', dfd.rejectOnError(function () {
 				numCalls++;
 				assert.isTrue(numCalls < 2, 'dgrid-select handler should only fire once');
 				// clearSelection will cause selection events to be fired,

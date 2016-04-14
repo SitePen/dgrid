@@ -6,6 +6,13 @@
 		<meta name="viewport" content="width=570">
 		<link rel="stylesheet" href="../../dojo/resources/dojo.css">
 		<link rel="stylesheet" href="../css/dgrid.css">
+		<link rel="stylesheet" href="../css/skins/claro.css">
+		<link rel="stylesheet" href="../css/skins/tundra.css">
+		<link rel="stylesheet" href="../css/skins/nihilo.css">
+		<link rel="stylesheet" href="../css/skins/soria.css">
+		<link rel="stylesheet" href="../css/skins/slate.css">
+		<link rel="stylesheet" href="../css/skins/sage.css">
+		<link rel="stylesheet" href="../css/skins/cactus.css">
 		<style>
 			h2 {
 				font-weight: bold;
@@ -29,26 +36,43 @@
 		<h2 id="gridHeading">A basic grid using the <span id="skin"></span> skin</h2>
 		<div><button type="button" onclick="grid.save();">Save</button>
 			(for testing highlight color)</div>
-		<div><button id="toggleUi" type="button" onclick="toggleUiClasses();">
-			Render without ui- classes
-		</button></div>
+		<div><button id="toggleUi" type="button">Render without ui- classes</button></div>
 		<h2>Test more skins!</h2>
 		<p id="skins"></p>
 		<script src="../../dojo/dojo.js" data-dojo-config="async: true"></script>
 		<script>
-			var toggleUiClasses; // Function, defined later
-			require([ 'dojo/_base/declare', 'dojo/dom-construct',
-				'dgrid/Grid', 'dgrid/Selection', 'dgrid/Keyboard', 'dgrid/Editor', 'dgrid/extensions/Pagination',
-				'dgrid/test/data/testStore', 'dgrid/test/skinUtil', 'dojo/domReady!' ],
-			function (declare, domConstruct, Grid, Selection, Keyboard, Editor, Pagination, testStore, skinUtil) {
-				var grid,
-					columns = {
-						col1: 'Column 1',
-						col2: { label: 'Column 2', sortable: false, editor: 'checkbox' },
-						col3: 'Column 3',
-						col4: 'Column 4',
-						col5: 'Column 5'
-					};
+			require([
+				'dojo/_base/declare',
+				'dojo/_base/array',
+				'dojo/dom-construct',
+				'dojo/on',
+				'dgrid/Grid',
+				'dgrid/Selection',
+				'dgrid/Keyboard',
+				'dgrid/Editor',
+				'dgrid/extensions/Pagination',
+				'dgrid/test/data/testStore'
+			], function (declare, arrayUtil, domConstruct, on, Grid, Selection, Keyboard, Editor, Pagination,
+					testStore) {
+
+				if (location.search.indexOf('dir=rtl') > -1) {
+					document.body.dir = 'rtl';
+				}
+
+				var grid;
+				var columns = {
+					col1: 'Column 1',
+					col2: { label: 'Column 2', sortable: false, editor: 'checkbox' },
+					col3: 'Column 3',
+					col4: 'Column 4',
+					col5: 'Column 5'
+				};
+				var skins = arrayUtil.filter(document.getElementsByTagName('link'), function (link) {
+					return link.href.indexOf('/skins/') > -1;
+				});
+				skins = arrayUtil.map(skins, function (link) {
+					return link.href.slice(link.href.lastIndexOf('/') + 1, -4);
+				});
 
 				function byId(id) {
 					return document.getElementById(id);
@@ -73,17 +97,24 @@
 						(addUiClasses ? 'out' : '') + ' ui- classes';
 				}
 
-				toggleUiClasses = function () {
+				on(byId('toggleUi'), 'click', function () {
 					createGrid(!grid.addUiClasses);
-				};
+				});
 
-				// mention (in heading) which skin is being displayed
-				byId('skin').innerHTML = skinUtil.skin;
+				byId('skins').innerHTML = arrayUtil.map(skins, function (s) {
+					return '<a href="#' + s + '">' + s + '</a>';
+				}).join(' / ');
 
-				// add links to test all skins, w/ dgrid.css loaded first/last
-				byId('skins').innerHTML = skinUtil.renderLinks();
+				function updateSkin() {
+					var skin = location.hash.slice(1) || 'claro';
+					document.getElementById('skin').innerHTML = skin;
+					document.body.className = skin;
+					grid.resize();
+				}
 
 				createGrid(true);
+				updateSkin();
+				on(window, 'hashchange', updateSkin);
 			});
 		</script>
 	</body>

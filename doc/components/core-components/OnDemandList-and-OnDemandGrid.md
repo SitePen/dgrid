@@ -101,9 +101,10 @@ Method | Description
 ------ | -----------
 `set("collection", collection)` | Specifies a new collection for the list to reference.
 `set("sort", property, descending)` | \_StoreMixin's version of this defers sorting to the store.
-`updateDirty(id, field, value)` | Updates an entry in the component's dirty data hash, to be persisted to the store on the next call to `save()`.
-`save()` | Instructs the list to relay any dirty data back to the store. Returns a promise which resolves when all necessary put operations have completed successfully (even if the store operates synchronously).
+`refreshCell(cell)` | Refreshes the given cell (from `Grid#cell`) based on the store and any present dirty data.  This can be used with `shouldTrackCollection: false` to manually control specific cell updates rather than re-rendering entire rows.  (Only applicable when `Grid` is inherited.)
 `revert()` | Clears the dirty data hash without updating the store, and refreshes the component.
+`save()` | Relays any dirty data back to the store via `put` calls. Returns a promise which resolves when all `put` calls have completed successfully, or rejects if any of the `put` operations fail.  Upon settling, the grid's `dirty` hash will only contain items for which `put` failed (i.e. it will be empty if they all succeed).
+`updateDirty(id, field, value)` | Updates an entry in the component's dirty data hash, to be persisted to the store on the next call to `save()`.
 
 ## Events
 

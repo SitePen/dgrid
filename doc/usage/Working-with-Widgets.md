@@ -26,13 +26,14 @@ During initial rendering of an editor widget, a reference to the created widget
 is stored, which is then accessed and destroyed when `removeRow` is called:
 
 ```js
-// add advice for cleaning up widgets in this column
-aspect.before(grid, 'removeRow', function (rowElement) {
+removeRow: function (rowElement) {
     // destroy our widget during the row removal operation
     var cellElement = grid.cell(rowElement, column.id).element,
         widget = cellElement.widget;
     if (widget) {
         widget.destroyRecursive();
     }
-});
+
+    this.inherited(arguments);
+}
 ```

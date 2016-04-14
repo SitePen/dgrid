@@ -72,16 +72,6 @@
 					};
 				}
 
-				// Note: createOrderedStore hard-wires sorting anyway,
-				// so leaving sort disabled on columns in this grid.
-				var grid = window.grid = new DnDGrid(lang.mixin(getCommonProperties(), {
-					columns: [
-						{ label: "Name", field:"name", sortable: false }
-					],
-					touchesToScroll: 2,
-					dndSourceType: "grid-row"
-				}), "grid");
-
 				var gridWithHandles = window.gridWithHandles = new DnDGrid(lang.mixin(getCommonProperties(), {
 					columns: [
 						{
@@ -103,13 +93,8 @@
 		</script>
 	</head>
 	<body class="tundra">
-		<p>This page contains grids with DnD set up for touch devices.</p>
 		<div class="gridcontainer">
-			<h2>no handles, 2-finger scroll</h2>
-			<div id="grid"></div>
-		</div>
-		<div class="gridcontainer">
-			<h2>handles, 1-finger scroll elsewhere</h2>
+			<h2>Grid with handles (and touch scroll elsewhere)</h2>
 			<div id="gridWithHandles"></div>
 		</div>
 	</body>

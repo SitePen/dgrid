@@ -60,15 +60,10 @@ Property | Description
 The `dojo/dnd` package supports interaction via touch events.
 However, since touch events are also used to control scrolling of dgrid
 components on touch devices, a conflict ensues and touch scrolling wins by default.
-There are generally two ways to resolve this conflict:
+The typical way to resolve this is to set up DnD handles somewhere in the grid,
+and instruct the DnD source to only drag by handles by passing `withHandles: true` in `dndParams`.
 
-* Set up DnD handles somewhere in the grid, and instruct the DnD source to
-  only drag by handles by passing `withHandles: true` in `dndParams`.
-* Use `dgrid/TouchScroll` and increase `touchesToScroll` to 2 on the instance,
-  to require that two fingers be used to scroll it.
-
-Examples of both of these solutions can be found in
-`test/extensions/DnD_touch.html`.
+An example of this solution can be found in `test/extensions/DnD_touch.html`.
 
 ## Styling DnD Avatars
 

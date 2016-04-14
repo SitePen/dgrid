@@ -1,7 +1,7 @@
 The dgrid project provides widgets for lists of data, including simple sets of scrolling rows,
 grids of data, on-demand lazy-loaded data, and various mixins for additional functionality.
 
-dgrid is available under the same dual BSD/AFLv2 license as the Dojo Toolkit.
+dgrid is available under the ["New" BSD License](LICENSE).
 
 # Installation
 
@@ -45,8 +45,8 @@ bower install dijit#<target>
 
 Alternatively, dgrid and its dependencies can be downloaded individually:
 
-* [dstore](https://github.com/SitePen/dstore) for store-backed grids
-* [The Dojo Toolkit](http://dojotoolkit.org) SDK version 1.8 or higher
+* [dstore](https://github.com/SitePen/dstore) >= 1.0.3 or 1.1.1, for store-backed grids
+* [The Dojo Toolkit](http://dojotoolkit.org) SDK >= 1.8.2
     * Out of the DTK components, Dojo core is the only hard dependency for dgrid;
       however, some of the test pages also use components from Dijit, and
       Dojox (namely grid for a comparison test, and mobile for a mobile page).
@@ -66,32 +66,33 @@ directory structure like the following:
 [RawGit](http://rawgit.com/) now offers CDN hosting of raw tagged git URLs.
 It can serve any version of dgrid and dstore via MaxCDN.
 
-For example, here's a `packages` configuration for dgrid 0.4.0 and dstore 1.0.0:
+For example, here's a `packages` configuration for dgrid 1.0.0 and dstore 1.1.1:
 
 ```js
 packages: [
     {
         name: 'dgrid',
-        location: '//cdn.rawgit.com/SitePen/dgrid/v0.4.0'
+        location: '//cdn.rawgit.com/SitePen/dgrid/v1.0.0'
     },
     {
         name: 'dstore',
-        location: '//cdn.rawgit.com/SitePen/dstore/v1.0.0'
+        location: '//cdn.rawgit.com/SitePen/dstore/v1.1.1'
     }
 ]
 ```
 
 # Browser and Dojo Version Support
 
-dgrid 0.4 works with Dojo 1.8 or higher, and supports the following browsers:
+dgrid works with Dojo 1.8.2 or higher, and supports the following browsers:
 
-* IE 8+
+* IE 9+ (IE8 still unofficially supported, but no longer tested)
+* Edge latest
 * Firefox latest + ESR
 * Chrome latest (desktop and mobile)
 * Safari latest (desktop and mobile)
 * Opera latest
 
-dgrid 0.4 *does not* support quirks mode.  You are *heavily* encouraged to
+dgrid *does not* support quirks mode.  You are *heavily* encouraged to
 include the HTML5 DOCTYPE (`<!DOCTYPE html>`) at the beginning of your pages.
 
 # Documentation
@@ -141,8 +142,9 @@ for dgrid, as well as Dojo and a number of other JavaScript libraries.
 
 dgrid uses [Intern](http://theintern.io/) as its test runner. Tests can
 either be run using the browser, or using a cloud provider such as
-[Sauce Labs](https://saucelabs.com/). More information on writing your own tests
-with Intern can be found in the [Intern wiki](https://github.com/theintern/intern/wiki).
+[BrowserStack](https://www.browserstack.com/) or [Sauce Labs](https://saucelabs.com/).
+More information on writing your own tests with Intern can be found in the
+[Intern user guide](https://theintern.github.io/intern/).
 
 *Note that installing dgrid via bower will not include the test folder; if you
 wish to run dgrid's unit tests, download the package directly.*
@@ -152,8 +154,7 @@ wish to run dgrid's unit tests, download the package directly.*
 **Note:** Commands listed in this section are all written assuming they are
 run inside the `dgrid` directory.
 
-Run `npm install` to install the latest *geezer* version of Intern 2,
-which supports IE 8 in addition to modern browsers:
+Run `npm install` to install Intern:
 
 ```
 npm install
@@ -164,11 +165,16 @@ npm install
 1. Open a browser to http://hostname/path_to_dgrid/test/intern/runTests.html
 2. View the console
 
-## Running via Sauce Labs
+## Running via BrowserStack or Sauce Labs
 
-Make sure the proper Sauce Labs credentials are set in the environment:
+Make sure the proper credentials are set in the environment:
 
 ```
+# for BrowserStack:
+export BROWSERSTACK_USERNAME=<your_browserstack_username>
+export BROWSERSTACK_ACCESS_KEY=<your_browserstack_access_key>
+
+# for Sauce Labs:
 export SAUCE_USERNAME=<your_sauce_username>
 export SAUCE_ACCESS_KEY=<your_sauce_access_key>
 ```
@@ -176,7 +182,11 @@ export SAUCE_ACCESS_KEY=<your_sauce_access_key>
 Then kick off the runner with the following command:
 
 ```
-grunt intern:remote
+# for BrowserStack:
+grunt intern:browserstack
+
+# for Sauce Labs:
+grunt intern:saucelabs
 ```
 
 ## Running via local Selenium server
@@ -205,8 +215,8 @@ brew install selenium-server-standalone
 brew install chromedriver # for automating tests in Chrome
 ```
 
-Recent versions of `selenium-server-standalone` install a `selenium-server`
-script which can be used to start up the server.  For additional information
+`selenium-server-standalone` installs a `selenium-server` script
+which can be used to start up the server.  For additional information
 (e.g. how to start the server at login), see the output of
 `brew info selenium-server-standalone`.
 
@@ -218,6 +228,6 @@ Once the Selenium server is running, kick off the Intern test runner with the fo
 grunt test
 ```
 
-This runs the `intern:local` Grunt task, which uses the configuration in `intern.local.js`.
+This runs the `intern:local` Grunt task, which uses the configuration in `intern-local.js`.
 This configuration overrides `intern.js` to use `NullTunnel`, and to test in Chrome by default
 (this can be customized as desired according to the browsers you have installed).

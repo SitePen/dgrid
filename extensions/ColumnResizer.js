@@ -1,5 +1,6 @@
 define([
 	'dojo/_base/declare',
+	'dojo/_base/array',
 	'dojo/on',
 	'dojo/query',
 	'dojo/_base/lang',
@@ -9,7 +10,7 @@ define([
 	'dojo/has',
 	'../util/misc',
 	'dojo/_base/html'
-], function (declare, listen, query, lang, dom, domConstruct, geom, has, miscUtil) {
+], function (declare, arrayUtil, listen, query, lang, dom, domConstruct, geom, has, miscUtil) {
 
 	function addRowSpan(table, span, startRow, column, id) {
 		// loop through the rows of the table and add this column's id to
@@ -25,7 +26,9 @@ define([
 
 		var i = subRows.length,
 			l = i,
-			numCols = subRows[0].length,
+			numCols = arrayUtil.filter(subRows[0], function (column) {
+				return !column.hidden;
+			}).length,
 			table = new Array(i);
 
 		// create table-like structure in an array so it can be populated
@@ -138,27 +141,32 @@ define([
 	// Functions for shared resizer node
 
 	var resizerNode, // DOM node for resize indicator, reused between instances
+		resizerGuardNode, // DOM node to guard against clicks registering on header cells (and inducing sort)
 		resizableCount = 0; // Number of ColumnResizer-enabled grid instances
 	var resizer = {
 		// This object contains functions for manipulating the shared resizerNode
 		create: function () {
 			resizerNode = domConstruct.create('div', { className: 'dgrid-column-resizer' });
+			resizerGuardNode = domConstruct.create('div', { className: 'dgrid-resize-guard' });
 		},
 		destroy: function () {
 			domConstruct.destroy(resizerNode);
-			resizerNode = null;
+			domConstruct.destroy(resizerGuardNode);
+			resizerNode = resizerGuardNode = null;
 		},
 		show: function (grid) {
 			var pos = geom.position(grid.domNode, true);
 			resizerNode.style.top = pos.y + 'px';
 			resizerNode.style.height = pos.h + 'px';
 			document.body.appendChild(resizerNode);
+			grid.domNode.appendChild(resizerGuardNode);
 		},
 		move: function (x) {
 			resizerNode.style.left = x + 'px';
 		},
 		hide: function () {
 			resizerNode.parentNode.removeChild(resizerNode);
+			resizerGuardNode.parentNode.removeChild(resizerGuardNode);
 		}
 	};
 
@@ -337,6 +345,7 @@ define([
 			// in all but IE < 9.  setSelectable works for those.
 			e.preventDefault();
 			dom.setSelectable(this.domNode, false);
+
 			this._startX = this._getResizeMouseLocation(e); //position of the target
 
 			this._targetCell = query('.dgrid-column-' + miscUtil.escapeCssIdentifier(target.columnId, '-'),

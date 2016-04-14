@@ -42,6 +42,8 @@ available to further expand dgrid's functionality.
 ## Upgrading dgrid
 
 * [0.4 Migration Guide](migrating/0.4-Migration.md)
+* Migrating from 0.4 to 1.0 is generally straightforward;
+  see the [dgrid 1.0 Release Notes](https://github.com/SitePen/dgrid/releases/tag/v1.0.0).
 
 ## Migrating from dojox/grid
 

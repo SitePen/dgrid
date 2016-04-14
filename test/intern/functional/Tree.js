@@ -69,4 +69,40 @@ define([
 		test.test('expand/collapse: click on expando node', createExpandTest('.dgrid-expando-icon', 'click'));
 		test.test('expand/collapse: double-click on cell node', createExpandTest('.dgrid-column-0', 'doubleClick'));
 	});
+
+	test.suite('dgrid/Tree functional tests with CompoundColumns', function () {
+
+		test.before(function () {
+			var remote = this.remote;
+
+			return remote.get(require.toUrl('./TreeCompound.html'))
+				.then(pollUntil(function () {
+					return window.ready;
+				}, null, 5000));
+		});
+
+		test.test('expand/collapse: click on expando node', createExpandTest('.dgrid-expando-icon', 'click'));
+		test.test('expand/collapse: double-click on cell node', createExpandTest('.dgrid-column-set-0', 'doubleClick'));
+	});
+
+	test.suite('dgrid/Tree functional tests with CompoundColumns after column reset', function () {
+
+		test.before(function () {
+			var remote = this.remote;
+
+			return remote.get(require.toUrl('./TreeCompound.html'))
+				.then(pollUntil(function () {
+					return window.ready;
+				}, null, 5000))
+				.then(function () {
+					return remote.execute(function () {
+						/* global treeGrid */
+						treeGrid.set('columns', treeGrid.get('columns'));
+					});
+				});
+		});
+
+		test.test('expand/collapse: click on expando node', createExpandTest('.dgrid-expando-icon', 'click'));
+		test.test('expand/collapse: double-click on cell node', createExpandTest('.dgrid-column-set-0', 'doubleClick'));
+	});
 });
