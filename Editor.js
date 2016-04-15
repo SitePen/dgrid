@@ -335,17 +335,31 @@ define([
 		},
 
 		refreshCell: function (cell) {
-			var value = cell.column.get ? cell.column.get(cell.row.data) : cell.row.data[cell.column.field];
-			var editor = this._editorInstances[cell.column.id] || cell.element.widget;
+			var column = cell.column;
+			var value = column.get ? column.get(cell.row.data) : cell.row.data[column.field];
+
+			var editor;
+
+			if (column.editor) {
+				if (cell.column.editOn && this._activeCell === cell.element) {
+					editor = this._editorInstances[cell.column.id];
+				}
+				else if (!cell.column.editOn) {
+					editor = cell.element.widget || cell.element.input;
+				}
+			}
 
 			if (editor) {
-				editor.set('value', value);
-			}
-			else {
-				this._updateInputValue(cell.element.input, value);
+				if (editor.domNode) {
+					editor.set('value', value);
+				}
+				else {
+					this._updateInputValue(editor, value);
+				}
+				return (new Deferred()).resolve();
 			}
 
-			return (new Deferred()).resolve();
+			return this.inherited(arguments);
 		},
 
 		_showEditor: function (cmp, column, cellElement, value) {
