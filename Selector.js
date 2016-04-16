@@ -2,10 +2,11 @@ define([
 	'dojo/_base/declare',
 	'dojo/_base/lang',
 	'dojo/_base/sniff',
+	'dojo/Deferred',
 	'dojo/dom-construct',
 	'dojo/dom-class',
 	'./Selection'
-], function (declare, lang, has, domConstruct, domClass, Selection) {
+], function (declare, lang, has, Deferred, domConstruct, domClass, Selection) {
 
 	return declare(Selection, {
 		// summary:
@@ -31,6 +32,15 @@ define([
 			// Register listeners to the select and deselect events to change the input checked value
 			this.on('dgrid-select', lang.hitch(this, '_changeSelectorInput', true));
 			this.on('dgrid-deselect', lang.hitch(this, '_changeSelectorInput', false));
+		},
+
+		refreshCell: function (cell) {
+			// columns created by the Selector module should not be refreshed
+			if (cell.column.selector) {
+				return (new Deferred()).resolve();
+			} else {
+				return this.inherited(arguments);
+			}
 		},
 
 		_defaultRenderSelectorInput: function (column, selected, cell, object) {

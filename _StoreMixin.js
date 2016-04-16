@@ -230,11 +230,6 @@ define([
 				throw new Error('refreshCell requires a Grid with a collection.');
 			}
 
-			// columns created by the Selector module should not be refreshed
-			if (cell.column.selector) {
-				return (new Deferred()).resolve();
-			}
-
 			this.inherited(arguments);
 			return this.collection.get(cell.row.id).then(lang.hitch(this, '_refreshCellFromItem', cell));
 		},
