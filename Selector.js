@@ -37,7 +37,7 @@ define([
 			var grid = column.grid;
 
 			domClass.add(cell, 'dgrid-selector');
-			return cell.input || (cell.input = domConstruct.create('input', {
+			return (cell.input = domConstruct.create('input', {
 				'aria-checked': selected,
 				checked: selected,
 				disabled: !grid.allowSelect(grid.row(object)),
