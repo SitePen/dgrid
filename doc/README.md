@@ -25,6 +25,7 @@ available to further expand dgrid's functionality.
     * [ColumnHider](components/extensions/ColumnHider.md)
     * [CompoundColumns](components/extensions/CompoundColumns.md)
     * [Pagination](components/extensions/Pagination.md)
+    * [SingleQuery](components/extensions/SingleQuery.md)
     * [DijitRegistry](components/extensions/DijitRegistry.md)
     * [DnD](components/extensions/DnD.md)
 * Utilities

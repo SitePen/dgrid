@@ -438,16 +438,7 @@ define([
 
 			// Reset to first page and return promise from gotoPage
 			return this.gotoPage(page).then(function (results) {
-				// Emit on a separate turn to enable event to be used consistently for
-				// initial render, regardless of whether the backing store is async
-				setTimeout(function () {
-					on.emit(self.domNode, 'dgrid-refresh-complete', {
-						bubbles: true,
-						cancelable: false,
-						grid: self
-					});
-				}, 0);
-
+				self._emitRefreshComplete();
 				return results;
 			});
 		},
@@ -581,11 +572,7 @@ define([
 								domConstruct.destroy(grid.noDataNode);
 								delete grid.noDataNode;
 							}
-							// If there are no results, display the no data message.
-							grid.noDataNode = domConstruct.create('div', {
-								className: 'dgrid-no-data',
-								innerHTML: grid.noDataMessage
-							}, grid.contentNode);
+							grid._insertNoDataNode();
 						}
 
 						// Update status text based on now-current page and total.

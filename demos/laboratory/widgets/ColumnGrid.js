@@ -13,7 +13,7 @@ define([
 	'dgrid/Editor',
 	'dgrid/extensions/DijitRegistry',
 	'dgrid/extensions/DnD',
-	'../grid/SingleQuery',
+	'dgrid/extensions/SingleQuery',
 	'dstore/Memory',
 	'dstore/Trackable',
 	// Widgets in template:
