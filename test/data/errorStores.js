@@ -13,20 +13,20 @@ define([
 		asyncFetchTotalStore = new Memory(),
 		asyncPutStore = new Memory({ data: lang.clone(typesData) });
 
-	asyncFetchStore.fetchRange = function () {
+	asyncFetchStore.fetch = asyncFetchStore.fetchRange = function () {
 		var dfd = new Deferred();
 		setTimeout(function () { dfd.reject('Error on async query'); }, 200);
-		return new QueryResults(dfd);
+		return new QueryResults(dfd.promise);
 	};
 
-	asyncFetchTotalStore.fetchRange = function () {
+	asyncFetchTotalStore.fetch = asyncFetchTotalStore.fetchRange = function () {
 		// dstore/QueryResults doesn't ensure the results return a promise; we have to ourselves
 		var dfd = new Deferred();
 		dfd.resolve([]);
 		var total = new Deferred();
 		total.reject('Error getting the total');
 		return new QueryResults(dfd.promise, {
-			totalLength: total
+			totalLength: total.promise
 		});
 	};
 
