@@ -355,20 +355,6 @@ define([
 					assert.strictEqual(cell.element.innerHTML, newValue, 'Displayed cell value should change');
 				});
 			});
-
-			test.test('widget destruction', function () {
-				var cell = grid.cell('2', 'col3');
-				var widget = cell.element.widget;
-				var wasDestroyed = false;
-
-				aspect.after(widget, 'destroy', function () {
-					wasDestroyed = true;
-				});
-
-				return grid.refreshCell(cell).then(function () {
-					assert.isTrue(wasDestroyed, 'Cell\'s editor widget should be destroyed when refreshCell runs');
-				});
-			});
 		});
 
 		test.suite('_StoreMixin#save', function () {

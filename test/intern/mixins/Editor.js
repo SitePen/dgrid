@@ -601,5 +601,55 @@ define([
 				});
 			});
 		});
+
+		test.suite('Editor#refreshCell', function () {
+			test.beforeEach(function () {
+				grid = new EditorGrid({
+					columns: {
+						order: {
+							label: 'Order',
+							editor: 'text'
+						},
+						name: {
+							label: 'Name',
+							editor: TextBox
+						}
+					}
+				});
+
+				document.body.appendChild(grid.domNode);
+				grid.startup();
+				grid.renderArray(testOrderedData);
+			});
+
+			test.afterEach(function () {
+				if (grid) {
+					grid.destroy();
+					grid = null;
+				}
+			});
+
+			test.test('editor: HTML input', function () {
+				var cell = grid.cell('2', 'order');
+				var oldValue = cell.element.input.value;
+
+				cell.element.input.value = 'new value';
+
+				return grid.refreshCell(cell).then(function () {
+					assert.strictEqual(cell.element.input.value, oldValue, 'Displayed cell value should change');
+				})
+			});
+
+			test.test('editor: Dijit TextBox', function () {
+				var cell = grid.cell('2', 'name');
+				var oldValue = cell.element.widget.get('value');
+
+				cell.element.widget.set('value', 'new value');
+
+				return grid.refreshCell(cell).then(function () {
+					assert.strictEqual(cell.element.widget.get('value'), oldValue, 'Displayed cell value should change');
+				})
+			});
+		});
 	});
 });

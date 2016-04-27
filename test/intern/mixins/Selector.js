@@ -92,5 +92,17 @@ define([
 				}
 			}
 		});
+
+		test.test('Selector#refreshCell should have no effect', function () {
+			var cell = grid.cell(0, 'select');
+			var editorNode = cell.element.input;
+			var newValue = !editorNode.checked;
+
+			editorNode.checked = newValue;
+
+			return grid.refreshCell(cell).then(function () {
+				assert.strictEqual(cell.element.input.checked, newValue, 'Selector value should not change');
+			});
+		});
 	});
 });
