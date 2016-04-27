@@ -601,5 +601,80 @@ define([
 				});
 			});
 		});
+
+		test.suite('Editor#refreshCell', function () {
+			var store;
+
+			function createGrid(columnOptions) {
+				store = createSyncStore({
+					data: testOrderedData,
+					idProperty: 'order'
+				});
+
+				grid = new (declare([ OnDemandGrid, Editor ]))({
+					columns: {
+						name: lang.mixin({
+							label: 'Name'
+						}, columnOptions)
+					},
+					collection: store,
+					shouldTrackCollection: false // Disable normal row-based observation hooks to test refreshCell
+				});
+
+				document.body.appendChild(grid.domNode);
+				grid.startup();
+			}
+
+			function createTest(columnOptions) {
+				return function () {
+					createGrid(columnOptions);
+					var cell = grid.cell(1, 'name');
+					var originalElement;
+					var originalValue;
+
+					// Test refreshing an active cell before its value is committed (should revert value, keep focus)
+
+					return grid.edit(cell).then(function () {
+						originalElement = document.activeElement;
+						originalValue = originalElement.value;
+						originalElement.value = 'new name';
+
+						return grid.refreshCell(cell);
+					}).then(function () {
+						assert.strictEqual(document.activeElement, originalElement,
+							'The same editor should still be focused after refreshCell is called on the active cell');
+						assert.strictEqual(originalElement.value, originalValue,
+							'The editor should revert to its stored value upon refresh');
+
+						// Test refreshing a cell with changed data that is not the active cell
+
+						store.putSync(lang.mixin(store.getSync(2), { name: 'new name 2'}));
+
+						return grid.refreshCell(grid.cell(2, 'name'));
+					}).then(function () {
+						var cellElement = grid.cell(2, 'name').element;
+						var name = columnOptions.editOn ? cellElement.textContent :
+							cellElement.widget ? cellElement.widget.get('value') : cellElement.input.value;
+
+						assert.strictEqual(document.activeElement, originalElement,
+							'The same editor should still be focused after refreshCell is called on another cell');
+						assert.strictEqual(name, 'new name 2',
+							'Cell should contain expected new value after refresh');
+					});
+				};
+			}
+
+			test.afterEach(function () {
+				if (grid) {
+					grid.destroy();
+					grid = null;
+				}
+			});
+
+			test.test('HTML input, always-on', createTest({ editor: 'text' }));
+			test.test('HTML input, editOn', createTest({ editor: 'text', editOn: 'click' }));
+			test.test('Dijit TextBox, always-on', createTest({ editor: TextBox }));
+			test.test('Dijit TextBox, editOn', createTest({ editor: TextBox, editOn: 'click' }));
+		});
 	});
 });

@@ -236,9 +236,7 @@ define([
 
 		_refreshCellFromItem: function (cell, item, options) {
 			var cellElement = cell.element;
-			if (cellElement.widget) {
-				cellElement.widget.destroyRecursive();
-			}
+
 			domConstruct.empty(cellElement);
 
 			var dirtyItem = this.dirty && this.dirty[cell.row.id];
