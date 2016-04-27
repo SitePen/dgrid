@@ -74,6 +74,16 @@ define([
 
 			test.test('level 1', level1Test);
 			test.test('level 2', level2Test);
+
+			test.test('refreshCell', function () {
+				return grid.expand('AF').then(function () {
+					return grid.expand('EG');
+				}).then(function () {
+					var cell = grid.cell('Cairo', '0');
+
+					return grid.refreshCell(cell).then(level2Test);
+				});
+			});
 		});
 
 		test.suite('OnDemandGrid + tree + compound columns + column sets', function () {

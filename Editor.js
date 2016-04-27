@@ -334,13 +334,31 @@ define([
 			return null;
 		},
 
-		refreshCell: function(cell) {
-			var rowElementId = cell.row.element.id;
-			var columnId = cell.column.id;
-			if (this._editorCellListeners[rowElementId] && this._editorCellListeners[rowElementId][columnId]) {
-				this._editorCellListeners[rowElementId][columnId].remove();
-				this._editorCellListeners[rowElementId][columnId] = null;
+		refreshCell: function (cell) {
+			var column = cell.column;
+			var value = column.get ? column.get(cell.row.data) : cell.row.data[column.field];
+
+			var editor;
+
+			if (column.editor) {
+				if (cell.column.editOn && this._activeCell === cell.element) {
+					editor = this._editorInstances[cell.column.id];
+				}
+				else if (!cell.column.editOn) {
+					editor = cell.element.widget || cell.element.input;
+				}
 			}
+
+			if (editor) {
+				if (editor.domNode) {
+					editor.set('value', value);
+				}
+				else {
+					this._updateInputValue(editor, value);
+				}
+				return (new Deferred()).resolve();
+			}
+
 			return this.inherited(arguments);
 		},
 

@@ -257,6 +257,16 @@ define([
 			this.inherited(arguments);
 		},
 
+		_refreshCellFromItem: function (cell, item) {
+			if (!cell.column.renderExpando) {
+				return this.inherited(arguments);
+			}
+
+			this.inherited(arguments, [ cell, item, {
+				queryLevel: querySelector('.dgrid-expando-icon', cell.element)[0].level - 1
+			}]);
+		},
+
 		cleanup: function () {
 			this.inherited(arguments);
 
