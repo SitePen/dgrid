@@ -73,7 +73,7 @@ define([
 		testPerformanceStore.putSync(testPerformanceStore.getSync(0));
 		assert.strictEqual(numInserts, 0,
 			'Item from unrendered range should not be added to grid when updated');
-		testPerformanceStore.putSync(testPerformanceStore.getSync(visibleId || 19999));
+		testPerformanceStore.putSync(testPerformanceStore.getSync(visibleId || 14499));
 		assert.strictEqual(numInserts, 1,
 			'Item from rendered range should be re-added to grid when updated');
 	}

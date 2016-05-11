@@ -1,6 +1,7 @@
 define([ './createSyncStore' ], function (createSyncStore) {
 	var perfData = [], today = new Date().getTime();
-	for (var i = 0; i < 20000; i++) {
+	// With the size of these rows, 14500 falls slightly under the magical IE height limit.
+	for (var i = 0; i < 14500; i++) {
 		perfData.push({
 			id: i,
 			integer: Math.floor(Math.random() * 100),

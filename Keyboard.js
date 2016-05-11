@@ -512,7 +512,6 @@ define([
 		// summary:
 		//		Handles requests to scroll to the beginning or end of the grid.
 
-		// Assume scrolling to top unless event is specifically for End key
 		var cellNavigation = this.cellNavigation,
 			contentNode = this.contentNode,
 			contentPos = scrollToTop ? 0 : contentNode.scrollHeight,
@@ -520,8 +519,14 @@ define([
 			endChild = contentNode[scrollToTop ? 'firstChild' : 'lastChild'],
 			hasPreload = endChild.className.indexOf('dgrid-preload') > -1,
 			endTarget = hasPreload ? endChild[(scrollToTop ? 'next' : 'previous') + 'Sibling'] : endChild,
-			endPos = endTarget.offsetTop + (scrollToTop ? 0 : endTarget.offsetHeight),
 			handle;
+
+		// Scroll explicitly rather than relying on native browser scrolling
+		// (which might use smooth scrolling, which could incur extra renders for OnDemandList)
+		event.preventDefault();
+		this.scrollTo({
+			y: scrollPos
+		});
 
 		if (hasPreload) {
 			// Find the nearest dgrid-row to the relevant end of the grid
@@ -564,12 +569,6 @@ define([
 				handle.remove();
 				return rows;
 			});
-		}
-
-		if (scrollPos === endPos) {
-			// Grid body is already scrolled to end; prevent browser from scrolling
-			// entire page instead
-			event.preventDefault();
 		}
 	};
 
