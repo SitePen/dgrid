@@ -61,7 +61,7 @@ define([
 		};
 	}
 
-	function testHomeEndKeys(gridId, cellNavigation) {
+	function testHomeEndKeys(gridId, cellNavigation, rowCount) {
 		var rootQuery = '#' + gridId + ' #' + gridId + '-row-';
 		return function () {
 			return this.remote
@@ -70,8 +70,7 @@ define([
 					.type([keys.END])
 					.end()
 				.setFindTimeout(1000)
-				// Note that this assumes the list is always 100 items, 0-99
-				.findByCssSelector('#' + gridId + '-row-99' + (cellNavigation ? ' .dgrid-column-col1' : ''))
+				.findByCssSelector('#' + gridId + '-row-' + (rowCount ? rowCount : 99) + (cellNavigation ? ' .dgrid-column-col1' : ''))
 					.getAttribute('class')
 					.then(function (classNames) {
 						var arr = classNames.split(' '),
@@ -129,12 +128,15 @@ define([
 			testHomeEndKeys('list'));
 
 		test.test('on-demand grid (cellNavigation: true) -> home + end keys',
-			testHomeEndKeys('grid-ondemand', true, true));
+			testHomeEndKeys('grid-ondemand', true));
 
 		test.test('on-demand simple grid (cellNavigation: false) -> home + end keys',
-			testHomeEndKeys('rowGrid-ondemand', false, true));
+			testHomeEndKeys('rowGrid-ondemand', false));
 
 		test.test('on-demand simple list -> home + end keys',
-			testHomeEndKeys('list-ondemand', false, true));
+			testHomeEndKeys('list-ondemand', false));
+
+		test.test('on-demand grid with large data set -> home + end keys',
+			testHomeEndKeys('grid-large-data-set', true, 14499));
 	});
 });
