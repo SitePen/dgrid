@@ -70,7 +70,7 @@ directory structure like the following:
 [RawGit](http://rawgit.com/) now offers CDN hosting of raw tagged git URLs.
 It can serve any version of dgrid, xstyle, and put-selector via MaxCDN.
 
-For example, here's a `packages` configuration for dgrid 0.4.0, xstyle 0.2.1, and put-selector 0.3.5:
+For example, here's a `packages` configuration for dgrid 0.4.0, xstyle 0.3.2, and put-selector 0.3.6:
 
 ```js
 packages: [
@@ -80,11 +80,11 @@ packages: [
     },
     {
         name: 'xstyle',
-        location: '//cdn.rawgit.com/kriszyp/xstyle/v0.2.1'
+        location: '//cdn.rawgit.com/kriszyp/xstyle/v0.3.2'
     },
     {
         name: 'put-selector',
-        location: '//cdn.rawgit.com/kriszyp/put-selector/v0.3.5'
+        location: '//cdn.rawgit.com/kriszyp/put-selector/v0.3.6'
     }
 ]
 ```
