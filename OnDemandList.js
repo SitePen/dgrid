@@ -119,38 +119,18 @@ define([
 				}, container),
 				count: 0,
 				query: query,
-				next: preload
+				isTop: true
 			};
 			topPreload.node.rowIndex = 0;
+			insertPreload(topPreload)
 			preload.node = preloadNode = domConstruct.create('div', {
 				className: 'dgrid-preload'
 			}, container);
-			preload.previous = topPreload;
 
 			// this preload node is used to represent the area of the grid that hasn't been
 			// downloaded yet
 			preloadNode.rowIndex = this.minRowsPerPage;
-
-			if (priorPreload) {
-				// the preload nodes (if there are multiple) are represented as a linked list, need to insert it
-				if ((preload.next = priorPreload.next) &&
-						// is this preload node below the prior preload node?
-						preloadNode.offsetTop >= priorPreload.node.offsetTop) {
-					// the prior preload is above/before in the linked list
-					preload.previous = priorPreload;
-				}
-				else {
-					// the prior preload is below/after in the linked list
-					preload.next = priorPreload;
-					preload.previous = priorPreload.previous;
-				}
-				// adjust the previous and next links so the linked list is proper
-				preload.previous.next = preload;
-				preload.next.previous = preload;
-			}
-			else {
-				this.preload = preload;
-			}
+			insertPreload(preload)
 
 			var loadingNode = domConstruct.create('div', {
 					className: 'dgrid-loading'
@@ -233,6 +213,31 @@ define([
 					throw err;
 				});
 			});
+			function insertPreload(newPreload) {
+				var preload = self.preload
+				if (!preload) {
+					// first one
+					self.preload = newPreload;
+					return;
+				}
+				while (preload.node.compareDocumentPosition(newPreload.node) & Node.DOCUMENT_POSITION_PRECEDING) {
+					preload = preload.previous;
+				}
+				while (preload.node.compareDocumentPosition(newPreload.node) & Node.DOCUMENT_POSITION_FOLLOWING) {
+					if (!preload.next) {
+						// at the end
+						preload.next = newPreload;
+						newPreload.previous = preload;
+						return;
+					}
+					preload = preload.next;
+				}
+				// insert, newPreload coming before preload
+				preload.previous.next = newPreload;
+				newPreload.previous = preload.previous;
+				newPreload.next = preload;
+				preload.previous = newPreload;
+			}
 		},
 
 		refresh: function (options) {
@@ -525,7 +530,7 @@ define([
 					preload.count -= count;
 					var beforeNode = preloadNode,
 						keepScrollTo, queryRowsOverlap = grid.queryRowsOverlap,
-						below = (preloadNode.rowIndex > 0 || preloadNode.offsetTop > visibleTop) && preload;
+						below = !preload.isTop && preload;
 					if (below) {
 						// add new rows below
 						var previous = preload.previous;
