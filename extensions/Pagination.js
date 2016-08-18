@@ -294,7 +294,7 @@ define([
 				lastFocusablePageLink,
 				focusableNodes;
 
-			function _gotoPage (page) {
+			function _gotoPage(page) {
 				page = +page;
 				if (!isNaN(page) && page > 0 && page <= end) {
 					grid.gotoPage(page);
@@ -314,13 +314,13 @@ define([
 						type: 'text',
 						value: currentPage
 					}, linksNode);
-					grid._pagingTextBoxChangeHandle = on(link, 'change', function (evt) {
+					grid._pagingTextBoxChangeHandle = on(link, 'change', function () {
 						if (requirePageChange) {
 							_gotoPage(+this.value);
 						}
 						requirePageChange = true;
 					});
-					grid._pagingTextBoxKeyPressHandle = on(link, 'keypress', function(evt) {
+					grid._pagingTextBoxKeyPressHandle = on(link, 'keypress', function (evt) {
 						if (evt.keyCode === keys.ENTER) {
 							requirePageChange = false;
 							_gotoPage(+this.value);
