@@ -2,6 +2,7 @@ define([
 	'intern!tdd',
 	'intern/chai!assert',
 	'dojo/_base/declare',
+	'dojo/keys',
 	'dojo/on',
 	'dojo/query',
 	'dojo/string',
@@ -10,7 +11,7 @@ define([
 	'dgrid/test/data/createSyncStore',
 	'dgrid/test/data/genericData',
 	'dojo/domReady!'
-], function (test, assert, declare, on, query, string, Grid, Pagination, createSyncStore, genericData) {
+], function (test, assert, declare, keys, on, query, string, Grid, Pagination, createSyncStore, genericData) {
 	var grid,
 		PaginationGrid = declare([Grid, Pagination]);
 
@@ -254,6 +255,22 @@ define([
 			assert.strictEqual(+targetValue, grid.rowsPerPage,
 				'rowsPerPage should have numeric value equivalent to the selected value');
 			verifyOptions(selector.options, initialCount);
+		});
+
+		test.test('hitting "Enter" key in pagination page input changes page', function () {
+			grid = new PaginationGrid({
+				collection: createTestStore(),
+				columns: getColumns(),
+				pagingTextBox: true
+			});
+			document.body.appendChild(grid.domNode);
+			grid.startup();
+
+			var textbox = query('.dgrid-page-input', grid.paginationLinksNode)[0];
+			assert.strictEqual(grid._currentPage, 1, 'Initial page should be 1');
+			textbox.value = '2';
+			on.emit(textbox, 'keypress', { keyCode: keys.ENTER });
+			assert.strictEqual(grid._currentPage, 2, 'Grid should change to page 2');
 		});
 	});
 });
