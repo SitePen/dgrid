@@ -233,7 +233,8 @@ define([
 				innerHTML: this.noDataMessage
 			});
 
-			parentNode.insertBefore(noDataNode, this._getFirstRowSibling && this._getFirstRowSibling(parentNode));
+			// 2nd param is *required*, even if it is null
+			parentNode.insertBefore(noDataNode, this._getFirstRowSibling ? this._getFirstRowSibling(parentNode) : null);
 			return noDataNode;
 		},
 
