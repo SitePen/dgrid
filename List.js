@@ -263,7 +263,7 @@ define([
 
 			// add window resize handler, with reference for later removal if needed
 			this._listeners.push(this._resizeHandle = listen(window, 'resize',
-				miscUtil.throttleDelayed(winResizeHandler, this)));
+				miscUtil.debounce(winResizeHandler, this, 200)));
 		},
 
 		postCreate: function () {
