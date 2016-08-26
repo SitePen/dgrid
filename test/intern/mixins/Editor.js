@@ -594,10 +594,10 @@ define([
 				document.body.appendChild(grid.domNode);
 				grid.startup();
 
-				testCellListeners(250, 1);
+				testCellListeners(grid.contentNode.querySelectorAll('.dgrid-row').length, 1);
 				grid.bodyNode.scrollTop = '10000';
 				return when(grid._processScroll(), function () {
-					testCellListeners(250, 1);
+					testCellListeners(grid.contentNode.querySelectorAll('.dgrid-row').length, 1);
 				});
 			});
 		});

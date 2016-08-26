@@ -17,26 +17,28 @@ define([
 	'dgrid/test/data/createHierarchicalStore',
 	'../addCss!'
 ], function (test, assert, OnDemandGrid, Editor, Tree, miscUtil, declare, lang, aspect, Deferred,
-		domClass, domConstruct, domStyle, on, query, createHierarchicalStore) {
+			 domClass, domConstruct, domStyle, on, query, createHierarchicalStore) {
 
 	var grid,
+		store,
 		testDelay = 15;
 
 	function createGrid(options, setStoreAfterStartup) {
 		var data = [],
-			store,
 			treeColumnOptions,
 			i,
 			k,
-			GridConstructor;
+			GridConstructor,
+			parentRowCount = options.parentRowCount || 5,
+			childRowCount = options.childRowCount || 100;
 
-		for (i = 0; i < 5; i++) {
+		for (i = 0; i < parentRowCount; i++) {
 			var parentId = '' + i;
 			data.push({
 				id: parentId,
 				value: 'Root ' + i
 			});
-			for (k = 0; k < 100; k++) {
+			for (k = 0; k < childRowCount; k++) {
 				data.push({
 					id: i + ':' + k,
 					parent: parentId,
@@ -71,7 +73,7 @@ define([
 			collection: setStoreAfterStartup ? null : store,
 			columns: [
 				treeColumnOptions,
-				{ label: 'value', field: 'value'}
+				{ label: 'value', field: 'value' }
 			],
 			enableTreeTransitions: false
 		}, options && options.gridOptions));
@@ -93,7 +95,7 @@ define([
 		// if `exists` is false, tests for nonexistence instead
 		exists = exists !== false;
 		assert[exists ? 'isNotNull' : 'isNull'](document.getElementById(grid.id + '-row-' + dataItemId),
-				'A row for ' + dataItemId + ' should ' + (exists ? '' : 'not ') + 'exist in the grid.');
+			'A row for ' + dataItemId + ' should ' + (exists ? '' : 'not ') + 'exist in the grid.');
 	}
 
 	function wait(delay) {
@@ -114,6 +116,19 @@ define([
 		}));
 
 		grid.scrollTo({ y: grid.bodyNode.scrollHeight });
+
+		return dfd.promise;
+	}
+
+	function scrollToBegin() {
+		var dfd = new Deferred(),
+			handle;
+
+		handle = on.once(grid.bodyNode, 'scroll', miscUtil.debounce(function () {
+			dfd.resolve();
+		}));
+
+		grid.scrollTo({ y: 0 });
 
 		return dfd.promise;
 	}
@@ -243,7 +258,7 @@ define([
 						rowObject = grid.row(i + ':' + j);
 						expandoNode = query('.dgrid-expando-icon.ui-icon', rowObject.element)[0];
 						assert.isUndefined(expandoNode,
-								'Child node should not have an expando icon; node id = ' + i + ':' + j);
+							'Child node should not have an expando icon; node id = ' + i + ':' + j);
 					}
 
 					grid.expand(i, false, true);
@@ -303,7 +318,7 @@ define([
 					expandoNode = query('.dgrid-expando-icon.ui-icon', rowObject.element)[0];
 					assert.isDefined(expandoNode, 'Row ' + i + ' should have an expando icon');
 					assert.include(expandoNode.className, 'test-expando',
-							'Row ' + i + '\'s expando icon should have the class "test-expando"');
+						'Row ' + i + '\'s expando icon should have the class "test-expando"');
 				}
 			});
 
@@ -513,6 +528,93 @@ define([
 					testRowExists('0:0');
 					grid.collection.remove('0:0');
 					testRowExists('0:0');
+				});
+			});
+		});
+
+		test.suite('prune large family on scroll', function () {
+			var handles = [];
+
+			test.beforeEach(function () {
+				createGrid({
+					parentRowCount: 200,
+					childRowCount: 500
+				});
+			});
+
+			test.afterEach(function () {
+				for (var i = handles.length; i--;) {
+					handles[i].remove();
+				}
+				handles = [];
+				destroyGrid();
+			});
+
+			test.test('prune expanded top row', function () {
+				return grid.expand(0).then(function () {
+					testRowExists('0:0');
+					return scrollToEnd();
+				}).then(function () {
+					testRowExists('0:0', false);
+				});
+			});
+
+			test.test('prune expanded bottom row', function () {
+				return scrollToEnd().then(function () {
+					return grid.expand(99);
+				}).then(function () {
+					testRowExists('99:0');
+					return scrollToBegin();
+				}).then(function () {
+					testRowExists('99:0', false);
+				});
+			});
+
+			test.test('prune expanded bottom row at bottom', function () {
+				return scrollToEnd().then(function () {
+					return grid.expand(99);
+				}).then(scrollToEnd).then(function () {
+					testRowExists('99:99');
+					return scrollToBegin();
+				}).then(function () {
+					testRowExists('99:99', false);
+				});
+			});
+
+			test.test('expanded top row, scroll to bottom, verify release range', function () {
+				var releaseCount = 0;
+				var expectedCount;
+				return grid.expand(0).then(function (initialRows) {
+					testRowExists('0:0');
+					expectedCount = initialRows[0].parentNode.querySelectorAll('.dgrid-row').length;
+					handles.push(aspect.after(grid.preload.query.collection, 'releaseRange',
+						function (startIndex, endIndex) {
+							releaseCount = endIndex - startIndex;
+						}, true));
+					return scrollToEnd();
+				}).then(function () {
+					testRowExists('0:0', false);
+					assert.strictEqual(releaseCount, expectedCount, 'All first row children should have been released.');
+				});
+			});
+
+			test.test('expanded bottom row, scroll to top, verify release range', function () {
+				var releaseCount = 0;
+				var expectedCount;
+
+				return scrollToEnd().then(function () {
+					return grid.expand(99);
+				}).then(function (initialRows) {
+					testRowExists('99:0');
+					expectedCount = initialRows[0].parentNode.querySelectorAll('.dgrid-row').length;
+					handles.push(aspect.after(grid.preload.query.collection, 'releaseRange',
+						function (startIndex, endIndex) {
+							releaseCount = endIndex - startIndex;
+						}, true));
+					return scrollToBegin();
+				}).then(function () {
+					testRowExists('99:0', false);
+					assert.strictEqual(releaseCount, expectedCount, 'All first row children should have been released.');
 				});
 			});
 		});

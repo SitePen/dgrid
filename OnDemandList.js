@@ -6,10 +6,26 @@ define([
 	'dojo/dom-construct',
 	'dojo/on',
 	'dojo/when',
+	'dojo/query',
 	'./util/misc'
-], function (List, _StoreMixin, declare, lang, domConstruct, on, when, miscUtil) {
+], function (List, _StoreMixin, declare, lang, domConstruct, on, when, query, miscUtil) {
 
-	return declare([ List, _StoreMixin ], {
+	var preloadId = 0;
+
+	function nextPreloadId() {
+		return preloadId++;
+	}
+
+	function isRowNode(node) {
+		return node && (node.className.indexOf('dgrid-row') >= 0 ||
+			node.className.indexOf('dgrid-loading') >= 0);
+	}
+
+	function isPreloadNode(node) {
+		return node && node.className.indexOf('dgrid-preload') >= 0;
+	}
+
+	return declare([List, _StoreMixin], {
 		// summary:
 		//		Extends List to include virtual scrolling functionality, querying a
 		//		dojo/store instance for the appropriate range when the user scrolls.
@@ -73,6 +89,10 @@ define([
 		//		the first range of data.
 		rowHeight: 0,
 
+		// _deleteQueue: Array
+		// 		List of DOM nodes queued for deletion.
+		_deleteQueue: [],
+
 		postCreate: function () {
 			this.inherited(arguments);
 			var self = this;
@@ -97,12 +117,22 @@ define([
 
 			var self = this,
 				container = (options && options.container) || this.contentNode,
-				preload = {
-					query: query,
-					count: 0
-				},
-				preloadNode,
-				priorPreload = this.preload;
+				preload,
+				topPreloadNode, preloadNode,
+				queryLevel,
+				preloadLevel = 0,
+				start = (options && options.start) || 0;
+
+			if ('level' in query) {
+				preloadLevel = queryLevel = query.level;
+			}
+
+			preload = {
+				query: query,
+				count: 0,
+				level: preloadLevel,
+				top: false
+			};
 
 			// Initial query; set up top and bottom preload nodes
 			var topPreload = {
@@ -112,38 +142,30 @@ define([
 				}, container),
 				count: 0,
 				query: query,
-				next: preload
+				next: preload,
+				level: preloadLevel,
+				top: true
 			};
-			topPreload.node.rowIndex = 0;
-			preload.node = preloadNode = domConstruct.create('div', {
-				className: 'dgrid-preload'
-			}, container);
+			topPreloadNode = topPreload.node;
+			topPreloadNode.rowIndex = 0;
 			preload.previous = topPreload;
+
+			preloadNode = preload.node = domConstruct.create('div', {
+				className: 'dgrid-preload',
+				style: { height: '0' }
+			}, container);
+
+			// Add preload ids.
+			topPreload.id = nextPreloadId();
+			topPreloadNode.setAttribute('data-preloadid', topPreload.id);
+			preload.id = nextPreloadId();
+			preloadNode.setAttribute('data-preloadid', preload.id);
 
 			// this preload node is used to represent the area of the grid that hasn't been
 			// downloaded yet
 			preloadNode.rowIndex = this.minRowsPerPage;
 
-			if (priorPreload) {
-				// the preload nodes (if there are multiple) are represented as a linked list, need to insert it
-				if ((preload.next = priorPreload.next) &&
-						// is this preload node below the prior preload node?
-						preloadNode.offsetTop >= priorPreload.node.offsetTop) {
-					// the prior preload is above/before in the linked list
-					preload.previous = priorPreload;
-				}
-				else {
-					// the prior preload is below/after in the linked list
-					preload.next = priorPreload;
-					preload.previous = priorPreload.previous;
-				}
-				// adjust the previous and next links so the linked list is proper
-				preload.previous.next = preload;
-				preload.next.previous = preload;
-			}
-			else {
-				this.preload = preload;
-			}
+			self._insertPreload(topPreload);
 
 			var loadingNode = domConstruct.create('div', {
 					className: 'dgrid-loading'
@@ -153,9 +175,11 @@ define([
 				}, loadingNode);
 			innerNode.innerHTML = this.loadingMessage;
 
-			// Establish query options, mixing in our own.
-			options = lang.mixin({ start: 0, count: this.minRowsPerPage },
-				'level' in query ? { queryLevel: query.level } : null);
+			// Establish query options, mixing in our own
+			options = lang.mixin({ start: 0, count: this.minRowsPerPage }, options);
+			if (queryLevel != null) {
+				options.queryLevel = queryLevel;
+			}
 
 			// Protect the query within a _trackError call, but return the resulting collection
 			return this._trackError(function () {
@@ -167,7 +191,7 @@ define([
 						var trCount = trs.length;
 						var parentNode = preloadNode.parentNode;
 
-						if (self._rows) {
+						if (self._rows && !('queryLevel' in options)) {
 							self._rows.min = 0;
 							self._rows.max = trCount === total ? Infinity : trCount - 1;
 						}
@@ -185,14 +209,16 @@ define([
 						}
 						self._calcAverageRowHeight(trs);
 
-						total -= trCount;
-						preload.count = total;
-						preloadNode.rowIndex = trCount;
+						topPreload.count = start;
+						preload.count = total - trCount - start;
+						preloadNode.rowIndex = start + trCount;
+
 						if (total) {
-							preloadNode.style.height = Math.min(total * self.rowHeight, self.maxEmptySpace) + 'px';
-						}
-						else {
+							self._adjustPreloadHeight(topPreload);
+							self._adjustPreloadHeight(preload);
+						} else {
 							preloadNode.style.display = 'none';
+							topPreloadNode.style.display = 'none';
 						}
 
 						if (self._previousScrollPosition) {
@@ -213,6 +239,35 @@ define([
 					throw err;
 				});
 			});
+		},
+
+		_insertPreload: function (newTopPreload) {
+			var preload = this.preload;
+			if (!preload) {
+				// first one
+				this.preload = newTopPreload;
+				return;
+			}
+
+			while (preload.node.compareDocumentPosition(newTopPreload.node) & Node.DOCUMENT_POSITION_PRECEDING) {
+				preload = preload.previous;
+				if (preload == null) {
+					return;
+				}
+			}
+
+			while (preload.node.compareDocumentPosition(newTopPreload.node) & Node.DOCUMENT_POSITION_FOLLOWING) {
+				if (!preload.next) {
+					break;
+				}
+				preload = preload.next;
+			}
+			// insert, newPreload before preload
+			preload.previous.next = newTopPreload;
+			newTopPreload.previous = preload.previous;
+			var newBottomPreload = newTopPreload.next;
+			newBottomPreload.next = preload;
+			preload.previous = newBottomPreload;
 		},
 
 		refresh: function (options) {
@@ -268,7 +323,7 @@ define([
 
 		renderQueryResults: function (results) {
 			var rows = this.inherited(arguments);
-			var collection = this._renderedCollection;
+			var collection = this._getRenderedCollection(this.preload);
 
 			if (collection && collection.releaseRange) {
 				rows.then(function (resolvedRows) {
@@ -366,89 +421,139 @@ define([
 
 			grid.lastScrollTop = visibleTop;
 
-			function removeDistantNodes(preload, distanceOff, traversal, below) {
+			function calculateDistanceOffset(preload, removeBelow) {
+				if (removeBelow) {
+					return preload.node.offsetTop - visibleBottom;
+				} else {
+					return visibleTop - (preload.node.offsetTop + preload.node.offsetHeight);
+				}
+			}
+
+			function traverseToEndPreload(preload, removeBelow) {
+				var direction = removeBelow ? 'next' : 'previous';
+				var nextPreload;
+				while ((nextPreload = preload[direction])) {
+					preload = nextPreload;
+				}
+				return preload;
+			}
+
+			function removeDistantNodes(preload, removeBelow) {
 				// we check to see the the nodes are "far off"
-				var farOffRemoval = grid.farOffRemoval,
-					preloadNode = preload.node;
-				// by checking to see if it is the farOffRemoval distance away
+
+				var startingPreload = preload;
+				preload = traverseToEndPreload(preload, removeBelow);
+
+				var distanceOff = calculateDistanceOffset(preload, removeBelow);
+				var farOffRemoval = grid.farOffRemoval;
+				var preloadNode = preload.node;
+				var domTraversal = removeBelow ? 'previousSibling' : 'nextSibling';
+				var count = 0;
+				var reclaimedHeight = 0;
+				var firstRowIndex;
+				var lastRowIndex;
+
+				function findNextPreload() {
+					var topPreloadWanted = !removeBelow;
+					var newPreload = preload;
+					while ((newPreload = newPreload[removeBelow ? 'previous' : 'next'])) {
+						if (topPreloadWanted === newPreload.top) {
+							return newPreload;
+						}
+					}
+				}
+
+				function isEmpty(aPreload) {
+					return isPreloadNode(aPreload.top ? aPreload.node.nextSibling : aPreload.node.previousSibling);
+				}
+
+				function traversePreload() {
+					var newPreload = findNextPreload();
+					var node;
+
+					if (newPreload && startingPreload !== newPreload && !isEmpty(newPreload)) {
+						adjustPreloadStats();
+
+						preload = newPreload;
+						preloadNode = preload.node;
+						distanceOff = calculateDistanceOffset(preload, removeBelow);
+						node = traverseNode(preloadNode);
+						resetRowIndexes(node);
+
+						return node;
+					}
+				}
+
+				function traverseNode(referenceNode) {
+					// Preload node referenced was first moved to the appropriate end of the list and
+					// now we are moving toward the viewable area.
+					var refIsPreload = isPreloadNode(referenceNode);
+					var node = referenceNode[domTraversal];
+					var childNode;
+					if (node) {
+						if (!isRowNode(node)) {
+							if (refIsPreload && isPreloadNode(node)) {
+								node = null;
+							} else {
+								childNode = traversePreload();
+								if (childNode) {
+									node = childNode;
+								} else {
+									node = traverseNode(node);
+								}
+							}
+						}
+					}
+					return node;
+				}
+
+				function adjustPreloadStats() {
+					// adjust the preloadNode based on the reclaimed space
+					preload.count += count;
+					if (removeBelow) {
+						preloadNode.rowIndex -= count;
+					}
+					grid._adjustPreloadHeight(preload);
+					count = 0;
+
+					grid._releaseRange(preload, removeBelow, firstRowIndex, lastRowIndex);
+				}
+
+				function resetRowIndexes(row) {
+					firstRowIndex = row && row.rowIndex;
+					lastRowIndex = undefined;
+				}
+
 				if (distanceOff > 2 * farOffRemoval) {
 					// there is a preloadNode that is far off;
 					// remove rows until we get to in the current viewport
 					var row;
-					var nextRow = preloadNode[traversal];
-					var reclaimedHeight = 0;
-					var count = 0;
-					var toDelete = [];
-					var firstRowIndex = nextRow && nextRow.rowIndex;
-					var lastRowIndex;
+					var nextRow = traverseNode(preloadNode);
+					resetRowIndexes(nextRow);
 
-					while ((row = nextRow)) {
+					while ((row = nextRow) && startingPreload !== preload) {
 						var rowHeight = grid._calcRowHeight(row);
-						if (reclaimedHeight + rowHeight + farOffRemoval > distanceOff ||
-								(nextRow.className.indexOf('dgrid-row') < 0 &&
-									nextRow.className.indexOf('dgrid-loading') < 0)) {
+						if (reclaimedHeight + rowHeight + farOffRemoval > distanceOff || !isRowNode(row)) {
 							// we have reclaimed enough rows or we have gone beyond grid rows
-							break;
+							nextRow = traversePreload();
+							continue;
 						}
 
-						nextRow = row[traversal];
 						reclaimedHeight += rowHeight;
 						count += row.count || 1;
-						// Just do cleanup here, as we will do a more efficient node destruction in a setTimeout below
-						grid.removeRow(row, true);
-						toDelete.push(row);
+						grid._pruneRow(row, removeBelow);
 
 						if ('rowIndex' in row) {
-							lastRowIndex = row.rowIndex;
+							lastRowIndex = row.rowIndex;  // TODO: with child deletion, this needs work.
 						}
+						nextRow = traverseNode(row);
 					}
 
-					if (grid._renderedCollection.releaseRange &&
-							typeof firstRowIndex === 'number' && typeof lastRowIndex === 'number') {
-						// Note that currently child rows in Tree structures are never unrendered;
-						// this logic will need to be revisited when that is addressed.
-
-						// releaseRange is end-exclusive, and won't remove anything if start >= end.
-						if (below) {
-							grid._renderedCollection.releaseRange(lastRowIndex, firstRowIndex + 1);
-						}
-						else {
-							grid._renderedCollection.releaseRange(firstRowIndex, lastRowIndex + 1);
-						}
-
-						grid._rows[below ? 'max' : 'min'] = lastRowIndex;
-						if (grid._rows.max >= grid._total - 1) {
-							grid._rows.max = Infinity;
-						}
-					}
-					// now adjust the preloadNode based on the reclaimed space
-					preload.count += count;
-					if (below) {
-						preloadNode.rowIndex -= count;
-						adjustHeight(preload);
-					}
-					else {
-						// if it is above, we can calculate the change in exact row changes,
-						// which we must do to not mess with the scroll position
-						preloadNode.style.height = (preloadNode.offsetHeight + reclaimedHeight) + 'px';
-					}
-					// we remove the elements after expanding the preload node so that
-					// the contraction doesn't alter the scroll position
-					var trashBin = document.createElement('div');
-					for (var i = toDelete.length; i--;) {
-						trashBin.appendChild(toDelete[i]);
-					}
-					setTimeout(function () {
-						// we can defer the destruction until later
-						domConstruct.destroy(trashBin);
-					}, 1);
+					adjustPreloadStats();
+					grid._deleteNodeQueue();
 				}
 			}
 
-			function adjustHeight(preload, noMax) {
-				preload.node.style.height = Math.min(preload.count * grid.rowHeight,
-					noMax ? Infinity : grid.maxEmptySpace) + 'px';
-			}
 			function traversePreload(preload, moveNext) {
 				// Skip past preloads that are not currently connected
 				do {
@@ -456,6 +561,7 @@ define([
 				} while (preload && !preload.node.offsetWidth);
 				return preload;
 			}
+
 			while (preload && !preload.node.offsetWidth) {
 				// skip past preloads that are not currently connected
 				preload = preload.previous;
@@ -475,21 +581,21 @@ define([
 					preload = traversePreload(preload, (preloadSearchNext = false));
 				}
 				else if (visibleTop - mungeAmount - searchBuffer >
-						(preloadTop + (preloadHeight = preloadNode.offsetHeight))) {
+					(preloadTop + (preloadHeight = preloadNode.offsetHeight))) {
 					// the preload is above the line of sight
 					preload = traversePreload(preload, (preloadSearchNext = true));
 				}
 				else {
 					// the preload node is visible, or close to visible, better show it
-					var offset = ((preloadNode.rowIndex ? visibleTop - requestBuffer :
-						visibleBottom) - preloadTop) / grid.rowHeight;
+					var offset = ((preloadNode.top ? visibleTop - requestBuffer :
+							visibleBottom) - preloadTop) / grid.rowHeight;
 					var count = (visibleBottom - visibleTop + 2 * requestBuffer) / grid.rowHeight;
 					// utilize momentum for predictions
 					var momentum = Math.max(
 						Math.min((visibleTop - lastScrollTop) * grid.rowHeight, grid.maxRowsPerPage / 2),
 						grid.maxRowsPerPage / -2);
 					count += Math.min(Math.abs(momentum), 10);
-					if (preloadNode.rowIndex === 0) {
+					if (preloadNode.top) {
 						// at the top, adjust from bottom to top
 						offset -= count;
 					}
@@ -500,7 +606,7 @@ define([
 						offset = 0;
 					}
 					count = Math.min(Math.max(count, grid.minRowsPerPage),
-										grid.maxRowsPerPage, preload.count);
+						grid.maxRowsPerPage, preload.count);
 
 					if (count === 0) {
 						preload = traversePreload(preload, preloadSearchNext);
@@ -513,20 +619,19 @@ define([
 					var options = {};
 					preload.count -= count;
 					var beforeNode = preloadNode,
-						keepScrollTo, queryRowsOverlap = grid.queryRowsOverlap,
-						below = (preloadNode.rowIndex > 0 || preloadNode.offsetTop > visibleTop) && preload;
-					if (below) {
+						keepScrollTo,
+						queryRowsOverlap = grid.queryRowsOverlap,
+						bottomPreload = !preload.top && preload;
+					if (bottomPreload) {
 						// add new rows below
 						var previous = preload.previous;
 						if (previous) {
-							removeDistantNodes(previous,
-								visibleTop - (previous.node.offsetTop + previous.node.offsetHeight),
-								'nextSibling');
-							if (offset > 0 && previous.node === preloadNode.previousSibling) {
+							removeDistantNodes(preload);
+							if (offset > 0 && isPreloadNode(preloadNode.previousSibling)) {
 								// all of the nodes above were removed
 								offset = Math.min(preload.count, offset);
 								preload.previous.count += offset;
-								adjustHeight(preload.previous, true);
+								grid._adjustPreloadHeight(preload.previous, true);
 								preloadNode.rowIndex += offset;
 								queryRowsOverlap = 0;
 							}
@@ -543,30 +648,32 @@ define([
 						// add new rows above
 						if (preload.next) {
 							// remove out of sight nodes first
-							removeDistantNodes(preload.next, preload.next.node.offsetTop - visibleBottom,
-								'previousSibling', true);
 							beforeNode = preloadNode.nextSibling;
-							if (beforeNode === preload.next.node) {
+							removeDistantNodes(preload, true);
+							if (isPreloadNode(preloadNode.nextSibling)) {
 								// all of the nodes were removed, can position wherever we want
 								preload.next.count += preload.count - offset;
 								preload.next.node.rowIndex = offset + count;
-								adjustHeight(preload.next);
+								grid._adjustPreloadHeight(preload.next);
 								preload.count = offset;
 								queryRowsOverlap = 0;
+								beforeNode = preload.next.node;
 							}
 							else {
 								keepScrollTo = true;
 							}
-
 						}
 						options.start = preload.count;
 						options.count = Math.min(count + queryRowsOverlap, grid.maxRowsPerPage);
+						options.scrollingUp = true;
 					}
 					if (keepScrollTo && beforeNode && beforeNode.offsetWidth) {
+						// Before adjusting the size of the preload node for the new rows yet to be loaded, remember
+						// the current position of beforeNode so the scroll position can be adjusted after
+						// the new rows are added.
 						keepScrollTo = beforeNode.offsetTop;
 					}
-
-					adjustHeight(preload);
+					grid._adjustPreloadHeight(preload);
 
 					// use the query associated with the preload node to get the next "page"
 					if ('level' in preload.query) {
@@ -584,7 +691,7 @@ define([
 						style: { height: count * grid.rowHeight + 'px' }
 					}, beforeNode, 'before');
 					domConstruct.create('div', {
-						className: 'dgrid-' + (below ? 'below' : 'above'),
+						className: 'dgrid-' + (bottomPreload ? 'below' : 'above'),
 						innerHTML: grid.loadingMessage
 					}, loadingNode);
 					loadingNode.count = count;
@@ -651,7 +758,7 @@ define([
 										// recalculate the count
 										below.count = total - below.node.rowIndex;
 										// readjust the height
-										adjustHeight(below);
+										grid._adjustPreloadHeight(below);
 									}
 								});
 
@@ -662,7 +769,7 @@ define([
 								domConstruct.destroy(loadingNode);
 								throw e;
 							});
-						})(loadingNode, below, keepScrollTo);
+						})(loadingNode, bottomPreload, keepScrollTo);
 					});
 
 					preload = preload.previous;
@@ -672,7 +779,120 @@ define([
 
 			// return the promise from the last render
 			return lastRows;
+		},
+
+		_adjustPreloadHeight: function (preload, noMax) {
+			preload.node.style.height =  this._calculatePreloadHeight(preload, noMax) + 'px';
+		},
+
+		_calculatePreloadHeight: function (preload, noMax) {
+			return Math.min(preload.count * this.rowHeight,
+				noMax ? Infinity : this.maxEmptySpace);
+		},
+
+		_pruneRow: function (rowElement, removeBelow, options) {
+			// Calling _pruneRow indicates the row is not being deleted permanantly but could be restored
+			// as the grid scrolls.
+
+			// Just do cleanup here, as we will do a more efficient node destruction will be done later.
+			this.removeRow(rowElement, true, options);
+			this._queueNodeForDeletion(rowElement);
+		},
+
+		_queueNodeForDeletion: function (node) {
+			this._deleteQueue.push(node);
+		},
+
+		_deleteNodeQueue: function () {
+			var trashBin = document.createElement('div');
+			var toDelete = this._deleteQueue;
+			for (var i = toDelete.length; i--;) {
+				trashBin.appendChild(toDelete[i]);
+			}
+			this._deleteQueue = [];
+			setTimeout(function () {
+				// we can defer the destruction until later
+				domConstruct.destroy(trashBin);
+			}, 1);
+		},
+
+		_removePreloads: function (preloadNodes) {
+			// summary:
+			// 		Remove the preload objects from the linked list that correspond to the
+			// 		supplied DOM nodes.
+			if (!preloadNodes || !preloadNodes.length) {
+				return;
+			}
+
+			var grid = this;
+			var headPreload = this._getHeadPreload();
+			preloadNodes.forEach(function (preloadNode) {
+				var preload = grid._findPreload(preloadNode, headPreload);
+				if (preload) {
+					// Remove the found preload object from the linked list.
+					if (preload.previous) {
+						preload.previous.next = preload.next;
+					}
+					if (preload.next) {
+						preload.next.previous = preload.previous;
+					}
+				}
+			});
+		},
+
+		_getHeadPreload: function () {
+			var headPreload = this.preload;
+			if (headPreload) {
+				while (headPreload.previous) {
+					headPreload = headPreload.previous;
+				}
+			}
+			return headPreload;
+		},
+
+		_findPreload: function (preloadNode, startingPreload) {
+			if (!startingPreload) {
+				startingPreload = this._getHeadPreload();
+			}
+			var preload = startingPreload;
+			while (preload) {
+				if (preload.node === preloadNode) {
+					return preload;
+				}
+				preload = preload.next;
+			}
+		},
+
+		_getRenderedCollection: function (/* preload */) {
+			// This allows extensions to overload the collection retrieval mechanism.
+			return this._renderedCollection;
+		},
+
+		_releaseRange: function (preload, removeBelow, firstRowIndex, lastRowIndex) {
+			var level = preload.level;
+			var renderedCollection = this._getRenderedCollection(preload);
+			if (lastRowIndex != null) {
+				if (renderedCollection.releaseRange &&
+					typeof firstRowIndex === 'number' && typeof lastRowIndex === 'number') {
+					// Note that currently child rows in Tree structures are never unrendered;
+					// this logic will need to be revisited when that is addressed.
+
+					// releaseRange is end-exclusive, and won't remove anything if start >= end.
+					if (removeBelow) {
+						renderedCollection.releaseRange(lastRowIndex, firstRowIndex + 1);
+					}
+					else {
+						renderedCollection.releaseRange(firstRowIndex, lastRowIndex + 1);
+					}
+
+					if (this._rows && !level) {
+						this._rows[removeBelow ? 'max' : 'min'] = lastRowIndex;
+						if (this._rows.max >= this._total - 1) {
+							this._rows.max = Infinity;
+						}
+					}
+				}
+			}
 		}
 	});
-
 });

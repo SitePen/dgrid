@@ -40,7 +40,7 @@ define([
 			return previouslyExpanded;
 		},
 
-		expand: function (target, expand, noTransition) {
+		expand: function (target, expand, noTransition, lastRowsFirst) {
 			// summary:
 			//		Expands the row corresponding to the given target.
 			// target: Object
@@ -59,6 +59,12 @@ define([
 				hasTransitionend = has('transitionend'),
 				promise;
 
+			function processScroll() {
+				if (!expanded) {
+					grid._processScroll && grid._processScroll();
+				}
+			}
+
 			target = row.element;
 			target = target.className.indexOf('dgrid-expando-icon') > -1 ? target :
 				querySelector('.dgrid-expando-icon', target)[0];
@@ -68,6 +74,10 @@ define([
 			if (target && target.mayHaveChildren && (noTransition || expand !== isExpanded)) {
 				// toggle or set expand/collapsed state based on optional 2nd argument
 				var expanded = expand === undefined ? !this._expanded[row.id] : expand;
+
+				// Update _expanded map.
+				var pos = this.getScrollPosition();
+				this._resetExpanded(row.id, expanded);
 
 				// update the expando display
 				domClass.replace(target, 'ui-icon-triangle-1-' + (expanded ? 'se' : 'e'),
@@ -102,6 +112,7 @@ define([
 								grid._observeCollection(childCollection, container, options)
 							];
 						}
+						query.collection = childCollection;
 						if ('start' in options) {
 							var rangeArgs = {
 								start: options.start,
@@ -121,7 +132,21 @@ define([
 
 					// Add the query to the promise chain
 					if (this.renderQuery) {
-						promise = this.renderQuery(query, options);
+						if (lastRowsFirst) {
+							promise = grid._renderedCollection.getChildren(row.data)
+								.fetchRange({ start: 0, end: 1 }).totalLength.then(function (total) {
+									options.start = total - grid.minRowsPerPage;
+									options.end = total - 1;
+									options.count = grid.minRowsPerPage;
+
+									grid._previousScrollPosition = pos;
+
+									return grid.renderQuery(query, options);
+								});
+						} else {
+							promise = this.renderQuery(query, options);
+						}
+
 					}
 					else {
 						// If not using OnDemandList, we don't need preload nodes,
@@ -158,8 +183,10 @@ define([
 				if (!hasTransitionend || noTransition) {
 					containerStyle.display = expanded ? 'block' : 'none';
 					containerStyle.height = '';
+					processScroll();
 				}
 				else {
+					on.once(container, hasTransitionend, processScroll);
 					if (expanded) {
 						containerStyle.display = 'block';
 						scrollHeight = container.scrollHeight;
@@ -178,14 +205,6 @@ define([
 							expanded ? (scrollHeight ? scrollHeight + 'px' : 'auto') : '0px';
 					}, 0);
 				}
-
-				// Update _expanded map.
-				if (expanded) {
-					this._expanded[row.id] = true;
-				}
-				else {
-					delete this._expanded[row.id];
-				}
 			}
 
 			// Always return a promise
@@ -197,7 +216,7 @@ define([
 
 			// Set up hash to store IDs of expanded rows (here rather than in
 			// _configureTreeColumn so nothing breaks if no column has renderExpando)
-			this._expanded = {};
+			this._resetExpanded();
 
 			for (var i = 0, l = columnArray.length; i < l; i++) {
 				if (columnArray[i].renderExpando) {
@@ -210,6 +229,7 @@ define([
 
 		insertRow: function (object, container, beforeNode, i, options) {
 			options = options || {};
+			var grid = this;
 
 			var level = options.queryLevel = 'queryLevel' in options ? options.queryLevel :
 				'level' in container ? container.level : 0;
@@ -221,7 +241,7 @@ define([
 				expanded = this.shouldExpand(row, level, this._expanded[row.id]);
 
 			if (expanded) {
-				this.expand(rowElement, true, true);
+				this.expand(rowElement, true, true, options.scrollingUp);
 			}
 
 			if (expanded || (!this.collection.mayHaveChildren || this.collection.mayHaveChildren(object))) {
@@ -231,9 +251,47 @@ define([
 			return rowElement; // pass return value through
 		},
 
-		removeRow: function (rowElement, preserveDom) {
+		_queueNodeForDeletion: function (node) {
+			this.inherited(arguments);
+
+			var connected = node.connected;
+			if (connected) {
+				this._deleteQueue.push(connected);
+			}
+		},
+
+		_pruneRow: function (rowElement, removeBelow) {
+			var connected = rowElement.connected;
+			var preloadNode;
+			var preload;
+			if (connected) {
+				var rowId = this.row(rowElement).id;
+				if (this._expanded[rowId]) {
+					preloadNode = querySelector('>.dgrid-preload', connected)[removeBelow ? 1 : 0];
+					if (preloadNode) {
+						preload = this._findPreload(preloadNode);
+						preload = removeBelow ? preload.next : preload.previous;
+						if (!preload.expandedContent) {
+							preload.expandedContent = {};
+						}
+						preload.expandedContent[rowId] = connected.offsetHeight;
+					}
+				}
+			}
+
+			this.inherited(arguments, [rowElement, removeBelow, {
+				treePrune: true,
+				removeBelow: removeBelow
+			}]);
+		},
+
+		removeRow: function (rowElement, preserveDom, options) {
 			var connected = rowElement.connected,
-				childOptions = {};
+				childOptions = {},
+				childRows,
+				preloadNodes,
+				firstIndex,
+				lastIndex;
 			if (connected) {
 				if (connected._handles) {
 					arrayUtil.forEach(connected._handles, function (handle) {
@@ -246,16 +304,33 @@ define([
 					childOptions.rows = connected._rows;
 				}
 
-				querySelector('>.dgrid-row', connected).forEach(function (element) {
-					this.removeRow(element, true, childOptions);
-				}, this);
+				childRows = querySelector('>.dgrid-row', connected);
+				preloadNodes = querySelector('>.dgrid-preload', connected);
+				if (childRows && childRows.length) {
+					childRows.forEach(function (element) {
+						if (options && options.treePrune) {
+							this._pruneRow(element, options.removeBelow);
+						} else {
+							this.removeRow(element, true, childOptions);
+						}
+					}, this);
+
+					if (this._releaseRange) {
+						firstIndex = childRows[0].rowIndex;
+						lastIndex = childRows[childRows.length - 1].rowIndex;
+						this._releaseRange(this._findPreload(preloadNodes[0]), false, firstIndex, lastIndex);
+					}
+				}
+				this._removePreloads && this._removePreloads(preloadNodes);
 
 				if (connected._rows) {
 					connected._rows.length = 0;
 					delete connected._rows;
 				}
 
-				if (!preserveDom) {
+				if (preserveDom) {
+					this._queueNodeForDeletion(connected);
+				} else {
 					domConstruct.destroy(connected);
 				}
 			}
@@ -268,7 +343,7 @@ define([
 				return this.inherited(arguments);
 			}
 
-			this.inherited(arguments, [ cell, item, {
+			this.inherited(arguments, [cell, item, {
 				queryLevel: querySelector('.dgrid-expando-icon', cell.element)[0].level
 			}]);
 		},
@@ -279,7 +354,7 @@ define([
 			if (this.collapseOnRefresh) {
 				// Clear out the _expanded hash on each call to cleanup
 				// (which generally coincides with refreshes, as well as destroy)
-				this._expanded = {};
+				this._resetExpanded();
 			}
 		},
 
@@ -410,7 +485,7 @@ define([
 
 		_onNotification: function (rows, event) {
 			if (event.type === 'delete') {
-				delete this._expanded[event.id];
+				this._resetExpanded(event.id);
 			}
 			this.inherited(arguments);
 		},
@@ -438,6 +513,75 @@ define([
 			}
 			// Now set the height to auto
 			this.style.height = '';
+		},
+
+		_resetPlaceHolder: function (rowId) {
+			var headPreload = this._getHeadPreload && this._getHeadPreload();
+			var preload;
+			var grid = this;
+
+			if (!headPreload) {
+				return;
+			}
+
+			function remove(rowId) {
+				var preload = headPreload;
+				while (preload) {
+					var expandedContent = preload.expandedContent;
+					if (expandedContent && expandedContent[rowId]) {
+						delete expandedContent[rowId];
+						grid._adjustPreloadHeight(preload);
+						return;
+					}
+					preload = preload.next;
+				}
+			}
+
+			if (rowId != null) {
+				remove(rowId);
+			} else {
+				preload = headPreload;
+				while (preload) {
+					if (preload.expandedContent) {
+						delete preload.expandedContent;
+						grid._adjustPreloadHeight(preload);
+					}
+					preload = preload.next;
+				}
+			}
+		},
+
+		_resetExpanded: function (rowId, expanded) {
+			// Always remove the place holder(s).
+			this._resetPlaceHolder(rowId);
+			if (rowId == null) {
+				this._expanded = {};
+			} else {
+				if (expanded) {
+					this._expanded[rowId] = true;
+				} else {
+					delete this._expanded[rowId];
+				}
+			}
+		},
+
+		_calculatePreloadHeight: function (preload) {
+			var newHeight = this.inherited(arguments);
+			var expandedContent = preload.expandedContent;
+			if (expandedContent) {
+				Object.keys(expandedContent).forEach(function (key) {
+					newHeight += expandedContent[key];
+				});
+			}
+			return newHeight;
+		},
+
+		_getRenderedCollection: function (preload) {
+			if (preload.level) {
+				return preload.query.collection;
+			} else {
+				return this.inherited(arguments);
+			}
 		}
 	});
 });
