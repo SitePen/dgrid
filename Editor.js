@@ -66,7 +66,7 @@ define([
 				}
 			}
 
-			this.inherited(arguments);
+			return this.inherited(arguments);
 		},
 
 		removeRow: function (rowElement) {
