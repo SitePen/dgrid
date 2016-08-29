@@ -142,9 +142,11 @@
 
 				function gridContentHeight() {
 					var contentHeight = 0;
-					grid.contentNode.childNodes.forEach(function (node) {
-						contentHeight += node.offsetHeight;
-					});
+					var childNodes = grid.contentNode.childNodes;
+					var len = childNodes.length;
+					for (var i = 0; i < len; i++) {
+						contentHeight += childNodes[i].offsetHeight;
+					}
 					return contentHeight;
 				}
 
