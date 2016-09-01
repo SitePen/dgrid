@@ -307,6 +307,13 @@ define([
 				childRows = querySelector('>.dgrid-row', connected);
 				preloadNodes = querySelector('>.dgrid-preload', connected);
 				if (childRows && childRows.length) {
+
+					if (this._releaseRange) {
+						firstIndex = childRows[0].rowIndex;
+						lastIndex = childRows[childRows.length - 1].rowIndex;
+						this._releaseRange(this._findPreload(preloadNodes[0]), false, firstIndex, lastIndex);
+					}
+
 					childRows.forEach(function (element) {
 						if (options && options.treePrune) {
 							this._pruneRow(element, options.removeBelow);
@@ -314,12 +321,6 @@ define([
 							this.removeRow(element, true, childOptions);
 						}
 					}, this);
-
-					if (this._releaseRange) {
-						firstIndex = childRows[0].rowIndex;
-						lastIndex = childRows[childRows.length - 1].rowIndex;
-						this._releaseRange(this._findPreload(preloadNodes[0]), false, firstIndex, lastIndex);
-					}
 				}
 				this._removePreloads && this._removePreloads(preloadNodes);
 

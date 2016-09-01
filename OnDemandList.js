@@ -207,22 +207,21 @@ define([
 							}
 							self._insertNoDataNode(parentNode);
 						}
-						self._calcAverageRowHeight(trs);
 
 						topPreload.count = start;
 						preload.count = total - trCount - start;
 						preloadNode.rowIndex = start + trCount;
 
 						if (total) {
-							self._adjustPreloadHeight(topPreload);
-							self._adjustPreloadHeight(preload);
+							self._updatePreloadRowHeights(topPreload);
 						} else {
 							preloadNode.style.display = 'none';
 							topPreloadNode.style.display = 'none';
 						}
 
-						if (self._previousScrollPosition) {
-							// Restore position after a refresh operation w/ keepScrollPosition
+						if (self._previousScrollPosition && parentNode.offsetHeight) {
+							// Restore position after a refresh operation w/ keepScrollPosition but only
+							// if the rows have been inserted into the DOM.
 							self.scrollTo(self._previousScrollPosition);
 							delete self._previousScrollPosition;
 						}
@@ -310,9 +309,6 @@ define([
 
 		resize: function () {
 			this.inherited(arguments);
-			if (!this.rowHeight) {
-				this._calcAverageRowHeight(this.contentNode.getElementsByClassName('dgrid-row'));
-			}
 			this._processScroll();
 		},
 
@@ -380,17 +376,41 @@ define([
 			}
 			// only update rowHeight if elements were passed and are in flow
 			if (count && height) {
-				this.rowHeight = height / count;
+				return height / count;
+			} else {
+				return 0;
+			}
+		},
+
+		_updatePreloadRowHeights: function () {
+			var preload = this.preload;
+			if (!preload) {
+				return;
+			}
+			while (preload.previous) {
+				preload = preload.previous;
+			}
+			while (preload) {
+				if (!preload.rowHeight) {
+					preload.rowHeight = this.rowHeight ||
+						this._calcAverageRowHeight(preload.node.parentNode.getElementsByClassName('dgrid-row'));
+					this._adjustPreloadHeight(preload);
+				}
+				preload = preload.next;
 			}
 		},
 
 		lastScrollTop: 0,
 		_processScroll: function (evt) {
-			// summary:
+			// summary:x
 			//		Checks to make sure that everything in the viewable area has been
 			//		downloaded, and triggering a request for the necessary data when needed.
+			var preload = this.preload,
+				rowHeight;
 
-			if (!this.rowHeight) {
+			this._updatePreloadRowHeights();
+			rowHeight = preload && preload.rowHeight;
+			if (!rowHeight) {
 				return;
 			}
 
@@ -399,10 +419,10 @@ define([
 				// grab current visible top from event if provided, otherwise from node
 				visibleTop = (evt && evt.scrollTop) || this.getScrollPosition().y,
 				visibleBottom = scrollNode.offsetHeight + visibleTop,
-				priorPreload, preloadNode, preload = grid.preload,
+				priorPreload, preloadNode,
 				lastScrollTop = grid.lastScrollTop,
-				requestBuffer = grid.bufferRows * grid.rowHeight,
-				searchBuffer = requestBuffer - grid.rowHeight, // Avoid rounding causing multiple queries
+				requestBuffer = grid.bufferRows * rowHeight,
+				searchBuffer = requestBuffer - rowHeight, // Avoid rounding causing multiple queries
 				// References related to emitting dgrid-refresh-complete if applicable
 				lastRows,
 				preloadSearchNext = true;
@@ -532,19 +552,19 @@ define([
 					resetRowIndexes(nextRow);
 
 					while ((row = nextRow) && startingPreload !== preload) {
-						var rowHeight = grid._calcRowHeight(row);
-						if (reclaimedHeight + rowHeight + farOffRemoval > distanceOff || !isRowNode(row)) {
+						var currentRowHeight = grid._calcRowHeight(row);
+						if (reclaimedHeight + currentRowHeight + farOffRemoval > distanceOff || !isRowNode(row)) {
 							// we have reclaimed enough rows or we have gone beyond grid rows
 							nextRow = traversePreload();
 							continue;
 						}
 
-						reclaimedHeight += rowHeight;
+						reclaimedHeight += currentRowHeight;
 						count += row.count || 1;
 						grid._pruneRow(row, removeBelow);
 
 						if ('rowIndex' in row) {
-							lastRowIndex = row.rowIndex;  // TODO: with child deletion, this needs work.
+							lastRowIndex = row.rowIndex;
 						}
 						nextRow = traverseNode(row);
 					}
@@ -574,25 +594,23 @@ define([
 				grid.preload = preload;
 				preloadNode = preload.node;
 				var preloadTop = preloadNode.offsetTop;
-				var preloadHeight;
 
 				if (visibleBottom + mungeAmount + searchBuffer < preloadTop) {
 					// the preload is below the line of sight
 					preload = traversePreload(preload, (preloadSearchNext = false));
 				}
-				else if (visibleTop - mungeAmount - searchBuffer >
-					(preloadTop + (preloadHeight = preloadNode.offsetHeight))) {
+				else if (visibleTop - mungeAmount - searchBuffer > preloadTop + preloadNode.offsetHeight) {
 					// the preload is above the line of sight
 					preload = traversePreload(preload, (preloadSearchNext = true));
 				}
 				else {
 					// the preload node is visible, or close to visible, better show it
 					var offset = ((preloadNode.top ? visibleTop - requestBuffer :
-							visibleBottom) - preloadTop) / grid.rowHeight;
-					var count = (visibleBottom - visibleTop + 2 * requestBuffer) / grid.rowHeight;
+							visibleBottom) - preloadTop) / preload.rowHeight;
+					var count = (visibleBottom - visibleTop + 2 * requestBuffer) / preload.rowHeight;
 					// utilize momentum for predictions
 					var momentum = Math.max(
-						Math.min((visibleTop - lastScrollTop) * grid.rowHeight, grid.maxRowsPerPage / 2),
+						Math.min((visibleTop - lastScrollTop) * preload.rowHeight, grid.maxRowsPerPage / 2),
 						grid.maxRowsPerPage / -2);
 					count += Math.min(Math.abs(momentum), 10);
 					if (preloadNode.top) {
@@ -688,7 +706,7 @@ define([
 					// create a loading node as a placeholder while the data is loaded
 					var loadingNode = domConstruct.create('div', {
 						className: 'dgrid-loading',
-						style: { height: count * grid.rowHeight + 'px' }
+						style: { height: count * preload.rowHeight + 'px' }
 					}, beforeNode, 'before');
 					domConstruct.create('div', {
 						className: 'dgrid-' + (bottomPreload ? 'below' : 'above'),
@@ -782,11 +800,11 @@ define([
 		},
 
 		_adjustPreloadHeight: function (preload, noMax) {
-			preload.node.style.height =  this._calculatePreloadHeight(preload, noMax) + 'px';
+			preload.node.style.height = this._calculatePreloadHeight(preload, noMax) + 'px';
 		},
 
 		_calculatePreloadHeight: function (preload, noMax) {
-			return Math.min(preload.count * this.rowHeight,
+			return Math.min(preload.count * preload.rowHeight,
 				noMax ? Infinity : this.maxEmptySpace);
 		},
 
@@ -869,6 +887,9 @@ define([
 		},
 
 		_releaseRange: function (preload, removeBelow, firstRowIndex, lastRowIndex) {
+			if (!preload) {
+				return;
+			}
 			var level = preload.level;
 			var renderedCollection = this._getRenderedCollection(preload);
 			if (lastRowIndex != null) {
