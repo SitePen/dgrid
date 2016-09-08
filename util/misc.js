@@ -1,13 +1,7 @@
-define([
-	'dojo/has'
-], function (has) {
+define(function () {
 	// summary:
 	//		This module defines miscellaneous utility methods for purposes of
 	//		adding styles, and throttling/debouncing function calls.
-
-	has.add('dom-contains', function (global, doc, element) {
-		return !!element.contains; // not supported by FF < 9
-	});
 
 	// establish an extra stylesheet which addCssRule calls will use,
 	// plus an array to track actual indices in stylesheet for removal
