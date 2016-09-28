@@ -1,12 +1,13 @@
 define([
 	'dojo/_base/declare',
+	'dojo/_base/lang',
 	'dojo/dom-construct',
 	'dojo/dom-class',
 	'dojo/on',
 	'dojo/has',
 	'./util/misc',
 	'dojo/_base/sniff'
-], function (declare, domConstruct, domClass, listen, has, miscUtil) {
+], function (declare, lang, domConstruct, domClass, listen, has, miscUtil) {
 	// Add user agent/feature CSS classes needed for structural CSS
 	var featureClasses = [];
 	if (has('mozilla')) {
@@ -130,6 +131,21 @@ define([
 		//		highlighted after it has been updated.
 		highlightDuration: 250,
 
+		// resizeThrottleDelay: Integer
+		//		The delay (in milliseconds) passed to the resizeThrottleMethod.
+		//		A lower value will provide more responsive grid resizing. If there are a large number of grids on
+		//		the page, a higher value can improve performance (or specify 'debounce' for 'resizeThrottleMethod').
+		resizeThrottleDelay: miscUtil.defaultDelay,
+
+		// resizeThrottleMethod: String or Function
+		//		String: the name of a method from dgrid/util/misc ('debounce', 'throttle', 'throttleDelayed') to throttle or debounce the window resize handler.
+		//		Function: a function to throttle or debounce the window resize handler. The function will receive
+		//		two parameters:
+		//			callback (Function): the function to be throttled
+		//			delay (Integer): the value of the resizeThrottleDelay property
+		//		The function must return a function that executes the callback function.
+		resizeThrottleMethod: 'throttleDelayed',
+
 		postscript: function (params, srcNodeRef) {
 			// perform setup and invoke create in postScript to allow descendants to
 			// perform logic before create/postCreate happen (a la dijit/_WidgetBase)
@@ -199,7 +215,8 @@ define([
 				headerNode,
 				bodyNode,
 				footerNode,
-				isRTL;
+				isRTL,
+				throttledResizeHandler;
 
 			// Detect RTL on html/body nodes; taken from dojo/dom-geometry
 			isRTL = this.isRTL = (document.body.dir || document.documentElement.dir ||
@@ -261,9 +278,18 @@ define([
 				className: 'dgrid-content' + (addUiClasses ? ' ui-widget-content' : '')
 			}, this.bodyNode);
 
+			if (typeof this.resizeThrottleMethod === 'string' && miscUtil[this.resizeThrottleMethod]) {
+				throttledResizeHandler = miscUtil[this.resizeThrottleMethod](winResizeHandler, this, this.resizeThrottleDelay);
+			} else if (typeof this.resizeThrottleMethod === 'function') {
+				throttledResizeHandler = this.resizeThrottleMethod(lang.hitch(this, winResizeHandler), this.resizeThrottleDelay);
+			} else {
+				console.warn('Invalid value specified for resizeThrottleMethod:  ' + this.resizeThrottleMethod);
+				throttledResizeHandler = miscUtil.throttleDelayed(winResizeHandler, this, this.resizeThrottleDelay);
+			}
+
 			// add window resize handler, with reference for later removal if needed
-			this._listeners.push(this._resizeHandle = listen(window, 'resize',
-				miscUtil.throttleDelayed(winResizeHandler, this)));
+			this._resizeHandle = listen(window, 'resize', throttledResizeHandler);
+			this._listeners.push(this._resizeHandle);
 		},
 
 		postCreate: function () {

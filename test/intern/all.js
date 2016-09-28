@@ -3,6 +3,7 @@ define([
 	'intern/node_modules/dojo/has!host-browser?./core/addCssRule',
 	'intern/node_modules/dojo/has!host-browser?./core/setClass',
 	'intern/node_modules/dojo/has!host-browser?./core/columns',
+	'intern/node_modules/dojo/has!host-browser?./core/List',
 	'intern/node_modules/dojo/has!host-browser?./core/stores',
 	'intern/node_modules/dojo/has!host-browser?./core/_StoreMixin',
 	'intern/node_modules/dojo/has!host-browser?./core/OnDemandList',
