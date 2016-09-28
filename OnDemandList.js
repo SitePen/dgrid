@@ -755,9 +755,7 @@ define([
 										// Since we already had to query the scroll position,
 										// include x to avoid TouchScroll querying it again on its end.
 										x: pos.x,
-										y: pos.y + beforeNode.offsetTop - keepScrollTo,
-										// Don't kill momentum mid-scroll (for TouchScroll only).
-										preserveMomentum: true
+										y: pos.y + beforeNode.offsetTop - keepScrollTo
 									});
 								}
 
