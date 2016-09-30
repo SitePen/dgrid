@@ -29,8 +29,11 @@ define([
 	}
 	function cleanupLoading(grid) {
 		if (grid.loadingNode) {
-			domConstruct.destroy(grid.loadingNode);
-			delete grid.loadingNode;
+			grid._loadingCount--;
+			if (!grid._loadingCount) {
+				domConstruct.destroy(grid.loadingNode);
+				delete grid.loadingNode;
+			}
 		}
 		else if (grid._oldPageNodes) {
 			// If cleaning up after a load w/ showLoadingMessage: false,
@@ -83,6 +86,7 @@ define([
 
 		showFooter: true,
 		_currentPage: 1,
+		_loadingCount: 0,
 
 		buildRendering: function () {
 			this.inherited(arguments);
@@ -556,6 +560,7 @@ define([
 					len;
 
 				if (grid.showLoadingMessage) {
+					grid._loadingCount++;
 					cleanupContent(grid);
 					loadingNode = grid.loadingNode = domConstruct.create('div', {
 						className: 'dgrid-loading',
