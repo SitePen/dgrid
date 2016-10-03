@@ -30,8 +30,8 @@ define([
 			setTimeout(resolveTotal, this.delay * (this.randomizeDelay ? Math.random() + 0.5 : 1));
 			setTimeout(resolveResults, this.delay * (this.randomizeDelay ? Math.random() + 0.5 : 1));
 
-			return new QueryResults(resultsDeferred, {
-				totalLength: totalDeferred
+			return new QueryResults(resultsDeferred.promise, {
+				totalLength: totalDeferred.promise
 			});
 		},
 

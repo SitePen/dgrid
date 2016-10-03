@@ -2,8 +2,15 @@
 header('Content-Type: application/json');
 $total = 500;
 $id_prefix = '';
-if(isset($_GET['parent']) && is_numeric($_GET['parent'])){
-	$id_prefix = ($_GET['parent'] + 1) * 1000;
+if(isset($_GET['parent'])){
+	$parent = ($_GET['parent']);
+	if ($parent === "undefined") {
+		$id_prefix = "";
+	} else {
+		$id_prefix = ($_GET['parent'])."-";
+	}
+}else{
+	$id_prefix = 0;
 }
 usleep(rand(0,500000));
 $start = 0;
@@ -51,7 +58,7 @@ for ($i = $start; $i < $end; $i++) {
 	if($i != $start){
 		echo ',';
 	}
-    echo '{"id":'.($id_prefix+$i).',"name":"Item '.$i.'","comment":"hello"}';
+    echo '{"id":"'.$id_prefix.$i.'","name":"Item '.$i.'","comment":"hello"}';
 }
 echo ']';
 ?>

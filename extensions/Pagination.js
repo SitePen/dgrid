@@ -9,12 +9,13 @@ define([
 	'dojo/query',
 	'dojo/string',
 	'dojo/has',
+	'dojo/keys',
 	'dojo/when',
 	'../util/misc',
 	'dojo/i18n!./nls/pagination',
 	'dojo/_base/sniff'
-], function (_StoreMixin, declare, arrayUtil, lang, domConstruct, domClass, on, query, string, has, when,
-		miscUtil, i18n) {
+], function (_StoreMixin, declare, arrayUtil, lang, domConstruct, domClass, on, query, string, has, keys,
+	when, miscUtil, i18n) {
 	function cleanupContent(grid) {
 		// Remove any currently-rendered rows, or noDataMessage
 		if (grid.noDataNode) {
@@ -28,8 +29,11 @@ define([
 	}
 	function cleanupLoading(grid) {
 		if (grid.loadingNode) {
-			domConstruct.destroy(grid.loadingNode);
-			delete grid.loadingNode;
+			grid._loadingCount--;
+			if (!grid._loadingCount) {
+				domConstruct.destroy(grid.loadingNode);
+				delete grid.loadingNode;
+			}
 		}
 		else if (grid._oldPageNodes) {
 			// If cleaning up after a load w/ showLoadingMessage: false,
@@ -82,6 +86,7 @@ define([
 
 		showFooter: true,
 		_currentPage: 1,
+		_loadingCount: 0,
 
 		buildRendering: function () {
 			this.inherited(arguments);
@@ -189,8 +194,11 @@ define([
 
 		destroy: function () {
 			this.inherited(arguments);
-			if (this._pagingTextBoxHandle) {
-				this._pagingTextBoxHandle.remove();
+			if (this._pagingTextBoxChangeHandle) {
+				this._pagingTextBoxChangeHandle.remove();
+			}
+			if (this._pagingTextBoxKeyPressHandle) {
+				this._pagingTextBoxKeyPressHandle.remove();
 			}
 		},
 
@@ -283,15 +291,25 @@ define([
 				pagingLinks = this.pagingLinks,
 				paginationNavigationNode = this.paginationNavigationNode,
 				end = Math.ceil(total / this.rowsPerPage),
-				pagingTextBoxHandle = this._pagingTextBoxHandle,
+				pagingTextBoxKeyPressHandle = this._pagingTextBoxKeyPressHandle,
+				pagingTextBoxChangeHandle = this._pagingTextBoxChangeHandle,
 				focused = document.activeElement,
 				focusedPage,
 				lastFocusablePageLink,
 				focusableNodes;
 
+			function _gotoPage(page) {
+				page = +page;
+				if (!isNaN(page) && page > 0 && page <= end) {
+					grid.gotoPage(page);
+				}
+			}
+
 			function pageLink(page, addSpace) {
 				var link;
 				var disabled;
+				var requirePageChange = true;
+
 				if (grid.pagingTextBox && page === currentPage && end > 1) {
 					// use a paging text box if enabled instead of just a number
 					link = domConstruct.create('input', {
@@ -300,10 +318,16 @@ define([
 						type: 'text',
 						value: currentPage
 					}, linksNode);
-					grid._pagingTextBoxHandle = on(link, 'change', function () {
-						var value = +this.value;
-						if (!isNaN(value) && value > 0 && value <= end) {
-							grid.gotoPage(+this.value);
+					grid._pagingTextBoxChangeHandle = on(link, 'change', function () {
+						if (requirePageChange) {
+							_gotoPage(+this.value);
+						}
+						requirePageChange = true;
+					});
+					grid._pagingTextBoxKeyPressHandle = on(link, 'keypress', function (evt) {
+						if (evt.keyCode === keys.ENTER) {
+							requirePageChange = false;
+							_gotoPage(+this.value);
 						}
 					});
 					if (focused && focused.tagName === 'INPUT') {
@@ -361,9 +385,13 @@ define([
 				focusedPage = +focused.innerHTML;
 			}
 
-			if (pagingTextBoxHandle) {
-				pagingTextBoxHandle.remove();
+			if (pagingTextBoxKeyPressHandle) {
+				pagingTextBoxKeyPressHandle.remove();
 			}
+			if (pagingTextBoxChangeHandle) {
+				pagingTextBoxChangeHandle.remove();
+			}
+
 			linksNode.innerHTML = '';
 			query('.dgrid-first, .dgrid-previous', paginationNavigationNode).forEach(function (link) {
 				setDisabled(link, currentPage === 1);
@@ -438,16 +466,7 @@ define([
 
 			// Reset to first page and return promise from gotoPage
 			return this.gotoPage(page).then(function (results) {
-				// Emit on a separate turn to enable event to be used consistently for
-				// initial render, regardless of whether the backing store is async
-				setTimeout(function () {
-					on.emit(self.domNode, 'dgrid-refresh-complete', {
-						bubbles: true,
-						cancelable: false,
-						grid: self
-					});
-				}, 0);
-
+				self._emitRefreshComplete();
 				return results;
 			});
 		},
@@ -541,6 +560,7 @@ define([
 					len;
 
 				if (grid.showLoadingMessage) {
+					grid._loadingCount++;
 					cleanupContent(grid);
 					loadingNode = grid.loadingNode = domConstruct.create('div', {
 						className: 'dgrid-loading',
@@ -581,11 +601,7 @@ define([
 								domConstruct.destroy(grid.noDataNode);
 								delete grid.noDataNode;
 							}
-							// If there are no results, display the no data message.
-							grid.noDataNode = domConstruct.create('div', {
-								className: 'dgrid-no-data',
-								innerHTML: grid.noDataMessage
-							}, grid.contentNode);
+							grid._insertNoDataNode();
 						}
 
 						// Update status text based on now-current page and total.

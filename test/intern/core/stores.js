@@ -7,16 +7,19 @@ define([
 	'dgrid/Grid',
 	'dgrid/OnDemandGrid',
 	'dgrid/extensions/Pagination',
+	'dgrid/extensions/SingleQuery',
 	'dgrid/test/data/errorStores',
 	'dgrid/test/data/createSyncStore',
 	'dgrid/test/data/createAsyncStore',
 	'dgrid/test/data/genericData',
 	'dgrid/test/data/testPerformanceStore',
 	'../addCss!'
-], function (test, assert, declare, aspect, on, Grid, OnDemandGrid, Pagination,
+], function (test, assert, declare, aspect, on, Grid, OnDemandGrid, Pagination, SingleQuery,
 		errorStores, createSyncStore, createAsyncStore, genericData, testPerformanceStore) {
 
-	var PaginationGrid = declare([Grid, Pagination]);
+	var PaginationGrid = declare([ Grid, Pagination ]);
+	var SingleQueryGrid = declare([ Grid, SingleQuery ]);
+
 	var grid;
 	var handles = [];
 
@@ -74,7 +77,7 @@ define([
 		testPerformanceStore.putSync(testPerformanceStore.getSync(0));
 		assert.strictEqual(numInserts, 0,
 			'Item from unrendered range should not be added to grid when updated');
-		testPerformanceStore.putSync(testPerformanceStore.getSync(visibleId || 19999));
+		testPerformanceStore.putSync(testPerformanceStore.getSync(visibleId || 14499));
 		assert.strictEqual(numInserts, 1,
 			'Item from rendered range should be re-added to grid when updated');
 	}
@@ -140,6 +143,18 @@ define([
 			grid.gotoPage(2);
 			testReleaseRange(10);
 		});
+
+		test.test('SingleQueryGrid + sync store', function () {
+			storeTest(SingleQueryGrid, store, true, this.async());
+		});
+
+		test.test('SingleQueryGrid + async store', function () {
+			storeTest(SingleQueryGrid, asyncStore, true, this.async());
+		});
+
+		test.test('SingleQueryGrid + async store w/ error', function () {
+			storeTest(SingleQueryGrid, errorStores.asyncFetch, false, this.async());
+		});
 	});
 
 	test.suite('Async empty stores', function () {
@@ -176,5 +191,8 @@ define([
 
 		test.test('Pagination consecutive refresh with async empty store',
 			createTest(PaginationGrid));
+
+		test.test('SingleQuery consecutive refresh with async empty store',
+			createTest(SingleQueryGrid));
 	});
 });

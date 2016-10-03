@@ -173,6 +173,14 @@ define([
 			this._debouncedEnsureScroll = miscUtil.debounce(this._ensureScroll, this);
 		},
 
+		_pruneRow: function () {
+			// If rows are being pruned for scrolling, then don't try to restore focus.
+			var savedFocusedNode = this._focusedNode;
+			this._focusedNode = null;
+			this.inherited(arguments);
+			this._focusedNode = savedFocusedNode;
+		},
+
 		removeRow: function (rowElement) {
 			if (!this._focusedNode) {
 				// Nothing special to do if we have no record of anything focused
@@ -189,12 +197,12 @@ define([
 			// If removed row previously had focus, temporarily store information
 			// to be handled in an immediately-following insertRow call, or next turn
 			if (rowElement === focusedRow.element) {
-				sibling = this.down(focusedRow, true);
+				sibling = this.down(focusedRow, 1, true);
 
 				// Check whether down call returned the same row, or failed to return
 				// any (e.g. during a partial unrendering)
 				if (!sibling || sibling.element === rowElement) {
-					sibling = this.up(focusedRow, true);
+					sibling = this.up(focusedRow, 1, true);
 				}
 
 				this._removedFocus = {
@@ -234,7 +242,6 @@ define([
 			// summary:
 			//		Restores focus to the newly inserted row if it matches the
 			//		previously removed row, or to the nearest sibling otherwise.
-
 			var focusInfo = this._removedFocus,
 				newTarget,
 				cell;
@@ -513,7 +520,6 @@ define([
 		// summary:
 		//		Handles requests to scroll to the beginning or end of the grid.
 
-		// Assume scrolling to top unless event is specifically for End key
 		var cellNavigation = this.cellNavigation,
 			contentNode = this.contentNode,
 			contentPos = scrollToTop ? 0 : contentNode.scrollHeight,
@@ -521,8 +527,14 @@ define([
 			endChild = contentNode[scrollToTop ? 'firstChild' : 'lastChild'],
 			hasPreload = endChild.className.indexOf('dgrid-preload') > -1,
 			endTarget = hasPreload ? endChild[(scrollToTop ? 'next' : 'previous') + 'Sibling'] : endChild,
-			endPos = endTarget.offsetTop + (scrollToTop ? 0 : endTarget.offsetHeight),
 			handle;
+
+		// Scroll explicitly rather than relying on native browser scrolling
+		// (which might use smooth scrolling, which could incur extra renders for OnDemandList)
+		event.preventDefault();
+		this.scrollTo({
+			y: scrollPos
+		});
 
 		if (hasPreload) {
 			// Find the nearest dgrid-row to the relevant end of the grid
@@ -565,12 +577,6 @@ define([
 				handle.remove();
 				return rows;
 			});
-		}
-
-		if (scrollPos === endPos) {
-			// Grid body is already scrolled to end; prevent browser from scrolling
-			// entire page instead
-			event.preventDefault();
 		}
 	};
 

@@ -95,6 +95,9 @@ define([
 			if (this._renderedCollection) {
 				this._cleanupCollection();
 			}
+			if (this._refreshTimeout) {
+				clearTimeout(this._refreshTimeout);
+			}
 		},
 
 		_configColumn: function (column) {
@@ -203,6 +206,38 @@ define([
 			}
 		},
 
+		_emitRefreshComplete: function () {
+			// summary:
+			//		Handles emitting the dgrid-refresh-complete event on a separate turn,
+			//		to enable event to be used consistently regardless of whether the backing store is async.
+
+			var self = this;
+
+			this._refreshTimeout = setTimeout(function () {
+				on.emit(self.domNode, 'dgrid-refresh-complete', {
+					bubbles: true,
+					cancelable: false,
+					grid: self
+				});
+				self._refreshTimeout = null;
+			}, 0);
+		},
+
+		_insertNoDataNode: function (parentNode) {
+			// summary:
+			//		Creates a node displaying noDataMessage.
+
+			parentNode = parentNode || this.contentNode;
+			var noDataNode = this.noDataNode = domConstruct.create('div', {
+				className: 'dgrid-no-data',
+				innerHTML: this.noDataMessage
+			});
+
+			// 2nd param is *required*, even if it is null
+			parentNode.insertBefore(noDataNode, this._getFirstRowSibling ? this._getFirstRowSibling(parentNode) : null);
+			return noDataNode;
+		},
+
 		row: function () {
 			// Extend List#row with more appropriate lookup-by-id logic
 			var row = this.inherited(arguments);
@@ -216,38 +251,32 @@ define([
 			var result = this.inherited(arguments);
 
 			if (!this.collection) {
-				this.noDataNode = domConstruct.create('div', {
-					className: 'dgrid-no-data',
-					innerHTML: this.noDataMessage
-				}, this.contentNode);
+				this._insertNoDataNode();
 			}
 
 			return result;
 		},
 
 		refreshCell: function (cell) {
-			this.inherited(arguments);
-			var row = cell.row;
-			var self = this;
-
 			if (!this.collection || !this._createBodyRowCell) {
 				throw new Error('refreshCell requires a Grid with a collection.');
 			}
 
-			return this.collection.get(row.id).then(function (item) {
-				var cellElement = cell.element;
-				if (cellElement.widget) {
-					cellElement.widget.destroyRecursive();
-				}
-				domConstruct.empty(cellElement);
+			this.inherited(arguments);
+			return this.collection.get(cell.row.id).then(lang.hitch(this, '_refreshCellFromItem', cell));
+		},
 
-				var dirtyItem = self.dirty && self.dirty[row.id];
-				if (dirtyItem) {
-					item = lang.delegate(item, dirtyItem);
-				}
+		_refreshCellFromItem: function (cell, item, options) {
+			var cellElement = cell.element;
 
-				self._createBodyRowCell(cellElement, cell.column, item);
-			});
+			domConstruct.empty(cellElement);
+
+			var dirtyItem = this.dirty && this.dirty[cell.row.id];
+			if (dirtyItem) {
+				item = lang.delegate(item, dirtyItem);
+			}
+
+			this._createBodyRowCell(cellElement, cell.column, item, options);
 		},
 
 		renderArray: function () {
@@ -432,14 +461,9 @@ define([
 		removeRow: function (rowElement, preserveDom, options) {
 			var row = {element: rowElement};
 			// Check to see if we are now empty...
-			if (!preserveDom && this.noDataMessage &&
-					(this.up(row).element === rowElement) &&
-					(this.down(row).element === rowElement)) {
+			if (!preserveDom && (this.up(row).element === rowElement) && (this.down(row).element === rowElement)) {
 				// ...we are empty, so show the no data message.
-				this.noDataNode = domConstruct.create('div', {
-					className: 'dgrid-no-data',
-					innerHTML: this.noDataMessage
-				}, this.contentNode);
+				this._insertNoDataNode();
 			}
 
 			var rows = (options && options.rows) || this._rows;

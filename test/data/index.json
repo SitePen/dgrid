@@ -257,6 +257,12 @@
 		"parent": "extensions"
 	},
 	{
+		"name": "SingleQuery.html",
+		"url": "extensions/SingleQuery.html",
+		"title": "Test SingleQuery Extension",
+		"parent": "extensions"
+	},
+	{
 		"name": "has-css3.html",
 		"url": "has-css3.html",
 		"title": "has-css3 tests",

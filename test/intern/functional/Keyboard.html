@@ -13,6 +13,7 @@
 		<div id="list-ondemand"></div>
 		<div id="grid-ondemand"></div>
 		<div id="rowGrid-ondemand"></div>
+		<div id="grid-large-data-set"></div>
 		<script src="../../../../dojo/dojo.js"></script>
 		<script>
 			var grid, list, rowGrid, ready;
@@ -26,8 +27,11 @@
 				'dojo/on',
 				'dojo/query',
 				'dgrid/test/data/createSyncStore',
-				'dgrid/test/data/genericData'
-			], function(OnDemandList, List, OnDemandGrid, Grid, Keyboard, declare, on, query, createSyncStore, genericData){
+				'dgrid/test/data/genericData',
+				'dgrid/test/data/testPerformanceStore'
+			], function(OnDemandList, List, OnDemandGrid, Grid, Keyboard, declare, on, query, createSyncStore,
+					genericData, largeDataSetStore){
+
 				var columns = {
 						col1: 'Column 1',
 						col2: 'Column 2',
@@ -74,6 +78,21 @@
 					columns: columns,
 					cellNavigation: false
 				}, 'rowGrid-ondemand');
+				largeDataSetGrid = new KeyboardOnDemandGrid({
+					collection: largeDataSetStore,
+					columns: {
+						col1: { label: 'Column 0', field: 'id', width: '10%' },
+						col2: { label: 'Column 1', field: 'integer', width: '10%' },
+						col3: { label: 'Column 2', field: 'floatNum', width: '10%' },
+						col4: { label: 'Column 3', field: 'date', width: '10%' },
+						col5: { label: 'Column 4', field: 'date2', width: '10%' },
+						col6: { label: 'Column 5', field: 'text', width: '10%' },
+						col7: { label: 'Column 6', field: 'bool', width: '10%' },
+						col8: { label: 'Column 7', field: 'bool2', width: '10%' },
+						col9: { label: 'Column 8', field: 'price', width: '10%' },
+						col10: { label: 'Column 9', field: 'today', width: '10%' }
+					}
+				}, 'grid-large-data-set');
 				ready = true;
 			});
 		</script>

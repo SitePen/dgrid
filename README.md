@@ -5,15 +5,15 @@ dgrid is available under the ["New" BSD License](LICENSE).
 
 # Installation
 
-## Installing with bower
+## Bower
 
-dgrid and its dependencies can be installed via [bower](http://bower.io/) using the following command:
+dgrid and its dependencies can be installed via [Bower](http://bower.io/) using the following command:
 
 ```
 bower install dgrid
 ```
 
-Note that by default, bower installs to a `bower_components` subdirectory.  If you'd
+Note that by default, Bower installs to a `bower_components` subdirectory.  If you'd
 like to install to the current directory instead (which tends to be more appropriate
 for AMD projects), add a `.bowerrc` with the following:
 
@@ -23,9 +23,9 @@ for AMD projects), add a `.bowerrc` with the following:
 }
 ```
 
-By default, bower will automatically find the highest tagged version of dgrid and
+By default, Bower will automatically find the highest tagged version of dgrid and
 install it along with its dependencies.  Alternatively, the latest development version of dgrid can be
-installed by instructing bower to install from the master branch:
+installed by instructing Bower to install from the master branch:
 
 ```
 bower install dgrid#master
@@ -61,18 +61,23 @@ directory structure like the following:
 * `dstore`
 * `util` (optional, e.g. if pursuing a custom build)
 
+## npm
+
+As of version 1.1.0, dgrid can also be [retrieved via npm](doc/usage/npm.md),
+but using Bower is recommended as it is more straightforward.
+
 ## CDN
 
 [RawGit](http://rawgit.com/) now offers CDN hosting of raw tagged git URLs.
 It can serve any version of dgrid and dstore via MaxCDN.
 
-For example, here's a `packages` configuration for dgrid 1.0.0 and dstore 1.1.1:
+For example, here's a `packages` configuration for dgrid 1.1.0 and dstore 1.1.1:
 
 ```js
 packages: [
     {
         name: 'dgrid',
-        location: '//cdn.rawgit.com/SitePen/dgrid/v1.0.0'
+        location: '//cdn.rawgit.com/SitePen/dgrid/v1.1.0'
     },
     {
         name: 'dstore',
@@ -146,7 +151,7 @@ either be run using the browser, or using a cloud provider such as
 More information on writing your own tests with Intern can be found in the
 [Intern user guide](https://theintern.github.io/intern/).
 
-*Note that installing dgrid via bower will not include the test folder; if you
+*Note that installing dgrid via Bower will not include the test folder; if you
 wish to run dgrid's unit tests, download the package directly.*
 
 ## Setting up

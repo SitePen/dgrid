@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Test SingleQuery Extension</title>
+		<meta name="viewport" content="width=570">
+		<style>
+			@import "../../../dojo/resources/dojo.css";
+			@import "../../css/dgrid.css";
+			@import "../../css/skins/claro.css";
+
+			.heading {
+				font-weight: bold;
+				padding-bottom: 0.25em;
+			}
+
+			.dgrid {
+				margin: 10px;
+			}
+
+			.dgrid-loading,
+			.dgrid-no-data {
+				padding: 1em;
+			}
+		</style>
+	</head>
+	<body class="claro">
+		<h2>A basic grid with the SingleQuery extension and auto-height</h2>
+
+		<div>Buttons to test changing column structure:
+			<button onclick="grid.set('columns', getColumns2());">New Structure</button>
+			<button onclick="grid.set('columns', getColumns());">Original Structure</button>
+		</div>
+		<div>Buttons to test different stores:
+			<button onclick="grid.set('collection', testAsyncStore);">Set to async store</button>
+			<button onclick="grid.set('collection', testStore);">Set to sync store</button>
+			<button onclick="grid.set('collection', emptyAsyncStore);">Set to empty store</button>
+			<button onclick="grid.set('collection', errorStores.asyncFetch);">Set to error store</button>
+		</div>
+
+		<div id="grid"></div>
+
+		<script src="../../../dojo/dojo.js" data-dojo-config="async: true"></script>
+		<script>
+			require([
+				'dojo/_base/lang', 'dojo/_base/declare', 'dojo/on', 'dojo/dom-construct',
+				'dgrid/Grid', 'dgrid/extensions/SingleQuery', 'dgrid/Selection', 'dgrid/Keyboard',
+				'dgrid/test/data/errorStores', 'dgrid/test/data/testStore',
+				'dgrid/test/data/createAsyncStore', 'dgrid/test/data/genericData'
+			], function(
+				lang, declare, on, domConstruct, Grid, SingleQuery, Selection, Keyboard,
+				errorStores, testStore, createAsyncStore, genericData
+			) {
+				window.errorStores = errorStores; // for easy access by button handlers
+				window.testStore = testStore;
+				window.testAsyncStore = createAsyncStore({ data: genericData });
+				window.emptyAsyncStore = createAsyncStore();
+
+				window.getColumns = function () {
+					return {
+						id: 'ID',
+						col1: 'Column 1',
+						col2: { label: 'Column2', sortable: false },
+						col3: 'Column 3',
+						col4: 'Column 4',
+						col5: 'Column 5'
+					};
+				};
+				window.getColumns2 = function () {
+					return {
+						col2: 'Col2',
+						col4: { label: 'Col4', sortable: false },
+						col1: 'Col1',
+						col5: 'Column 5'
+					};
+				};
+
+				var CustomGrid = declare([ Grid, SingleQuery, Keyboard, Selection ]);
+				var grid = window.grid = new CustomGrid({
+					className: 'dgrid-autoheight',
+					collection: testAsyncStore,
+					columns: getColumns(),
+					noDataMessage: "No results.",
+					loadingMessage: "Loading..."
+				}, 'grid');
+
+				grid.on('dgrid-error', function(evt){
+					console.warn('error on grid: ', evt.grid.id, evt.error);
+				});
+			});
+		</script>
+	</body>
+</html>

@@ -15,7 +15,7 @@ define([
 	'dgrid/Grid',
 	'dgrid/Editor',
 	'dgrid/extensions/DijitRegistry',
-	'../grid/SingleQuery',
+	'dgrid/extensions/SingleQuery',
 	'dojo/i18n!../nls/laboratory',
 	'dojo/text!./templates/FeatureGrid.html',
 	// Widgets in template

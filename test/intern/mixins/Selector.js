@@ -92,5 +92,17 @@ define([
 				}
 			}
 		});
+
+		test.test('Selector#refreshCell', function () {
+			grid.select(0);
+			var cell = grid.cell(0, 'select');
+
+			return grid.refreshCell(cell).then(function () {
+				assert.strictEqual(cell.element.input, query('.field-select input', grid.domNode)[0],
+					'Cell element\'s input property should reference re-rendered checkbox');
+				assert.strictEqual(cell.element.input.checked, true,
+					'Checkbox should be in correct state');
+			});
+		});
 	});
 });
