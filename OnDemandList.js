@@ -301,8 +301,9 @@ define([
 						start: queryOptions.start,
 						end: queryOptions.start + queryOptions.count
 					});
-				}).then(function () {
+				}).then(function (rows) {
 					self._emitRefreshComplete();
+					return rows;
 				});
 			}
 		},
