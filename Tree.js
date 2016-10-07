@@ -229,7 +229,6 @@ define([
 
 		insertRow: function (object, container, beforeNode, i, options) {
 			options = options || {};
-			var grid = this;
 
 			var level = options.queryLevel = 'queryLevel' in options ? options.queryLevel :
 				'level' in container ? container.level : 0;
@@ -241,7 +240,7 @@ define([
 				expanded = this.shouldExpand(row, level, this._expanded[row.id]);
 
 			if (expanded) {
-				this.expand(rowElement, true, true, options.scrollingUp);
+				this._expandWhenInDom(rowElement, options);
 			}
 
 			if (expanded || (!this.collection.mayHaveChildren || this.collection.mayHaveChildren(object))) {
@@ -249,6 +248,17 @@ define([
 			}
 
 			return rowElement; // pass return value through
+		},
+
+		_expandWhenInDom: function (rowElement, options) {
+			// Expand a row after it has been inserted into the DOM.  This is necessary because
+			// the OnDemandList code that manages the preload nodes needs the nodes to be in the DOM
+			// to create a correctly ordered linked list.
+			if (rowElement.offsetHeight) {
+				this.expand(rowElement, true, true, options.scrollingUp);
+			} else {
+				setTimeout(this._expandWhenInDom.bind(this, rowElement, options), 0);
+			}
 		},
 
 		_queueNodeForDeletion: function (node) {
