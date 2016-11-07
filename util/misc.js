@@ -89,6 +89,7 @@ define(function () {
 				var a = arguments;
 				timer = setTimeout(function () {
 					cb.apply(context, a);
+					timer = null;
 				}, delay);
 			};
 		},
