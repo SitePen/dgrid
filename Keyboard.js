@@ -8,6 +8,10 @@ define([
 	'./util/misc',
 	'dojo/_base/sniff'
 ], function (declare, aspect, domClass, on, lang, has, miscUtil) {
+	
+	var hasPointer = has("pointer"),
+            hasMSPointer = hasPointer && hasPointer.slice(0, 2) === "MS",
+            downType = hasPointer ? hasPointer + (hasMSPointer ? "Down" : "down") : "mousedown";
 
 	var delegatingInputTypes = {
 			checkbox: 1,
@@ -139,7 +143,7 @@ define([
 					}, true);
 				}
 
-				grid._listeners.push(on(areaNode, 'mousedown', function (event) {
+				grid._listeners.push(on(areaNode, downType, function (event) {
 					if (!handledEvent(event)) {
 						grid._focusOnNode(event.target, isHeader, event);
 					}
