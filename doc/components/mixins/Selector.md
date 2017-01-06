@@ -22,6 +22,9 @@ require([
 });
 ```
 
+The selector column does not read from or write to the data store, so the name of the field associated with a
+selector column can be chosen without regard to which fields are actually present in the data.
+
 A selector column can be used to allow selection even in a grid where `selectionMode` is set to `none`, in which case
 the controls in the selector column will be the only means by which a user may select or deselect rows.
 

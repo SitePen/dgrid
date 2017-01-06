@@ -36,6 +36,11 @@ require([
 });
 ```
 
+## Selection State Data
+
+The grid keeps track of which rows are selected in the object stored in the `selection` property. The grid neither loads
+from nor persists this information to any underlying data store.
+
 ## APIs
 
 The Selection mixin supports the following additional instance properties and methods.
