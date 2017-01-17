@@ -393,7 +393,7 @@ define([
 			while (preload) {
 				if (!preload.rowHeight) {
 					preload.rowHeight = this.rowHeight ||
-						this._calcAverageRowHeight(preload.node.parentNode.getElementsByClassName('dgrid-row'));
+						this._calcAverageRowHeight(preload.node.parentNode.querySelectorAll('dgrid-row'));
 					this._adjustPreloadHeight(preload);
 				}
 				preload = preload.next;
