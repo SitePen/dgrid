@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>dMarket Demo</title>
+		<link rel="stylesheet" href="../../../dojo/resources/dojo.css">
+		<link rel="stylesheet" href="../../../dijit/themes/claro/claro.css">
+		<link rel="stylesheet" href="../../css/skins/slate.css">
+		<link rel="stylesheet" href="resources/dMarket.css">
+	</head>
+	<body class="slate claro">
+		<div style="height:40px; width:1000px;">
+			<div class="marketHeading">dMarket - Demo for the Web-5 Conference</div>
+			<div id="shopping"></div>
+		</div>
+		<div class="marketContainer">
+			<div id="market" class="gallery"></div>
+			<div id="descContainer" class="desc"></div>
+			<div id="shoppingCart">
+				<div id="purchases"></div>
+				<div id="deleteBtn"></div>
+				<span id="total">Total: </span>
+			</div>
+		</div>
+		<script src="../../../dojo/dojo.js" data-dojo-config="async:1"></script>
+		<script>
+require(["dgrid/OnDemandList", "dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Keyboard",
+	"dgrid/editor", "dgrid/selector",
+	"dgrid/extensions/ColumnResizer", "dgrid/extensions/ColumnHider", "dgrid/extensions/DnD",
+	"dojo/_base/lang", "dojo/_base/declare", "dojo/on", "dojo/aspect", "dojo/dom",
+	"dojo/store/Memory", "dojo/store/Observable", "put-selector/put",
+	"dijit/form/Button", "dijit/form/NumberSpinner", "dojo/domReady!"],
+function(List, Grid, Selection, Keyboard, editor, selector, ColumnResizer, ColumnHider, DnD,
+		lang, declare, on, aspect, dom, Memory, Observable, put, Button, NumberSpinner){
+	
+	var descContainer = dom.byId("descContainer"),
+		shoppingCart = dom.byId("shoppingCart"),
+		totalNode = dom.byId("total"),
+		button, marketList, purchasesGrid;
+	
+	var cartStore = Observable(new Memory({data: []}));
+	var marketStore = new Memory({ data: [
+		{ id: "aic", artist: "Alice in Chains", icon: "aic", album: "Alice in Chains",
+			summary: "In many ways, Alice in Chains was the definitive heavy metal band of the early '90s. Drawing equally from the heavy riffing of post-Van Halen metal and the gloomy strains of post-punk, the band developed a bleak, nihilistic sound that balanced grinding hard rock with subtly textured acoustic numbers. They were hard enough for metal fans, yet their dark subject matter and punky attack placed them among the front ranks of the Seattle-based grunge bands. While this dichotomy helped the group soar to multi-platinum status with their second album, 1992's Dirt, it also divided them. ",
+			genre: "Alternative", price: 2.74
+		},{ id: "jof", artist: "Alice in Chains", icon: "jof", album: "Jar of Flies",
+			summary: "Written and recorded in about a week, Jar of Flies solidified Alice in Chains' somewhat bizarre pattern of alternating full-length hard rock albums with mostly acoustic, ballad-oriented EPs. That quirk aside, Jar of Flies is a low-key stunner, achingly gorgeous and harrowingly sorrowful all at once. In a way, it's a logical sequel to Dirt -- despite the veneer of calm, the songs' voices still blame only themselves. But where Dirt found catharsis in its unrelenting darkness and depravity, Jar of Flies is about living with the consequences, full of deeply felt reflections on loneliness, self-imposed isolation, and lost human connections.",
+			genre: "Alternative", price: 1.54
+		},{
+			id: "ava", artist: "Avalanches", icon: "avalanches", album: "Since I Left You",
+			summary: "Like recklessly riding your BMX or skipping rope after downing a sugar-laced pitcher of lemonade, the un-mawkish Since I Left You thrives on making you feel youthful and mighty. Its Utopian grove stand bric-a-brac of grooves, beats, flutters, whistles, oohs-and-yeahs, and sundry animal noises can alternately sound familiar and fresh. Some origins can be immediately placed, and those that can't trigger an impulse that you've heard it somewhere before. You're at least familiar with the tone as it relates to a long-lost feeling of childhood bliss -- whether it's staring at a clear blue sky from a fresh-cut lawn or the first time you heard 'Rock the Bells.' If you want stifling touchstones, they're there.",
+			genre: "Electro-pop", price: 6.51
+		}, {
+			id: "beck", artist: "Beck", icon: "guero", album: "Guero",
+			summary: "Ever since his thrilling 1994 debut with Mellow Gold, each new Beck album was a genuine pop cultural event, since it was never clear which direction he would follow. Kicking off his career as equal parts noise-prankster, indie folkster, alt-rocker, and ironic rapper, he's gone to extremes, veering between garishly ironic party music to brooding heartbroken Baroque pop, and this unpredictability is a large part of his charm, since each album was distinct from the one before. That remains true with Guero, his eighth album (sixth if you don't count 1994's Stereopathetic Soul Manure and One Foot in the Grave, which some don't), but the surprising thing here is that it sounds for all the world like a good, straight-ahead, garden-variety Beck album, which is something he'd never delivered prior to this 2005 release.",
+			genre: "Alternative", price: 1.90
+		}, {
+			id: "lmfao", artist: "LMFAO", icon: "lmfao", album: "Party Rock",
+			summary: "Sky Blu and Redfoo of LMFAO may actually be having as much fun as they describe in their music, but there's still little doubt they're a comedy act. (The liner notes for Party Rock do indeed include dancefloor polaroids of beautiful babes, but also plenty of shiny robots smiling for the camera.) For their full-length debut, Party Rock, the dance hit \"I'm in Miami Bitch\" is firmly in place, and still sounding pretty hilarious as a satirical expos of the hedonistic Winter Music Conference held every year. Sky Blu and Redfoo have almost as many laugh lines in their lyrics as the Lonely Island, even if their production aesthetic shows more than a little knowledge of Spank Rock",
+			genre: "Pop", price: 0.54
+		}, {
+			id: "ma", artist: "Massive Attack", icon: "bluelines", album: "Blue Lines",
+			summary: "The first masterpiece of what was only termed trip-hop much later, Blue Lines filtered American hip-hop through the lens of British club culture, a stylish, nocturnal sense of scene that encompassed music from rare groove to dub to dance. The album balances dark, diva-led club jams along the lines of Soul II Soul with some of the best British rap (vocals and production) heard up to that point, occasionally on the same track. The opener 'Safe From Harm' is the best example, with diva vocalist Shara Nelson trading off lines with the group's own monotone (yet effective) rapping. Even more than hip-hop or dance, however, dub is the big touchstone on Blue Lines.",
+			genre: "Downtempo", price: 11.52
+		}, {
+			id: "no", artist: "No Doubt", icon: "rocksteady", album: "Rock Steady",
+			summary: "Five years separated Tragic Kingdom and its 2000 follow-up, Return of Saturn. About 15 months separated Saturn and its sequel, Rock Steady -- a clear sign that No Doubt was getting back to business, but it's really a more accurate reflection of Gwen Stefani's stature in 2001. Once Saturn started slipping down the charts -- apparently, the kids weren't ready to hear a post-new wave album about facing your thirties with your biological clock ticking.",
+			genre: "Pop", price: 1.22
+		}, {
+			id: "pf", artist: "Pink Floyd", icon: "the_wall", album: "The Wall",
+			summary: "Although the sonic and conceptual complexities define Pink Floyd's monumental 1979 release, it's earned an enduring audience though its sharp contrasts; the isolated torment of the message and the grandiose scale of the sound are as sharply defined as the bricks on its cover. The Experience Edition couples a 2011 remaster with behind-the-scenes demos of the record in formative and nearly-finished stages.",
+			genre: "Classic Rock", price: 3.34
+		}, {
+			id: "sp", artist: "Smashing Pumpkins", icon: "pumpkins", album: "Mellon Collie and the Infinite Sadness",
+			summary: "The Smashing Pumpkins didn't shy away from making the follow-up to the grand, intricate Siamese Dream. With Mellon Collie and the Infinite Sadness, the band turns in one of the most ambitious and indulgent albums in rock history. Lasting over two hours and featuring 28 songs, the album is certainly a challenging listen. To Billy Corgan's credit, it's a rewarding and compelling one as well. Although the artistic scope of the album is immense, the Smashing Pumpkins flourish in such an overblown setting. Corgan's songwriting has never been limited by conventional notions of what a rock band can do, even if it is clear that he draws inspiration from scores of '70s heavy metal and art rock bands.",
+			genre: "Alternative", price: 7.55
+		}
+	] });
+	
+	button = new Button({
+    label: "Shopping Cart",
+		style: "float:right; padding: 10px;",
+		onClick: function(){
+			descContainer.style.display = "none";
+			shoppingCart.style.display = "block";
+			purchasesGrid.refresh();
+		}
+  }, "shopping");
+	
+	button = new Button({
+    label: "Delete",
+		"class": "delete",
+		onClick: function(){
+			for (var id in purchasesGrid.get("selection")) {
+				cartStore.remove(id);
+			}
+		}
+	}, "deleteBtn");
+	
+	var galleryRender = function(obj, options){
+		// function used for renderRow for gallery view (large tiled thumbnails)
+		var div = put("div");
+		div.innerHTML = '<div class="galleryCell">' +
+				'<div class="icon" style="background-image:url(resources/' + obj.icon + '_128.png);">&nbsp;</div>' +
+				'<div class="info">' +
+					'<div class="album">'+obj.album+'</div>' +
+					'<div class="name">' + obj.artist + '</div>' +
+					'<div class="genre">'+obj.genre+'</div>' +
+					'<div class="price">$'+obj.price+'</div>' +
+			'</div></div>';
+		return div;
+	};
+	
+	var MarketList = declare([List, Selection, Keyboard/*, DnD*/]);
+	var CartGrid = declare([Grid,Selection, Keyboard, ColumnResizer, ColumnHider/*, DnD*/]);
+	marketList = new MarketList({
+		store: marketStore,
+		renderRow: galleryRender,
+		selectionMode: "single"/*,
+		dndSourceType: "marketItem",
+		dndParams: { copyOnly: true, selfAccept: false }*/
+	}, "market");
+	
+	purchasesGrid = new CartGrid({
+		columns: {
+			selector: selector({ label: " ", unhidable: true }),
+			artist: "Artist",
+			album: "Album",
+			quantity: editor({
+				label: "#",
+				autoSave: true,
+				editor: NumberSpinner,
+				editOn: "dgrid-cellfocusin",
+				editorArgs: {
+					constraints: { min: 1, max: 10, places: 0}
+				}
+			}),
+			price: { label: "Price", formatter: function(price){ return "$" + price; } }
+		},
+		store: cartStore,
+		selectionMode: "none"/*,
+		dndSourceType: "marketItem",
+		dndParams: { isSource: false }*/
+	}, "purchases");
+	
+	marketList.on(".dgrid-row:click", function(e){
+		var item = marketList.row(e).data;
+		var html = '<div class="albumDesc"><div class="albumLarge">' + item.album + '</div><div class="artist">' + item.artist + '</div>' +
+			'<div class="summary">'+item.summary+'</div><div class="price">$' + item.price +'</div><div class="buyBtn" id="buy">Buy</div></div>';
+		shoppingCart.style.display = "none";
+		descContainer.innerHTML = html;
+		descContainer.style.display = "block";
+	});
+	
+	aspect.before(cartStore, "put", function(item, options){
+		var cartItem = cartStore.get(item.id);
+		if(cartItem){
+			// Item already exists in cart; reuse it, but only increment quantity
+			// if this was a drop / add from the market, not an in-cart edit!
+			if(cartItem !== item){ cartItem.quantity++; }
+			return [cartItem, options];
+		}
+		// Otherwise, create object to store in cart, with initial quantity set.
+		cartItem = lang.clone(item);
+		cartItem.quantity = 1;
+		return [cartItem, options];
+	});
+	
+	cartStore.query({}).observe(function(object, from, to){
+		// re-tally prices of all items in store after any add/remove/edit
+		var total = 0,
+			items = cartStore.query({});
+		
+		items.forEach(function(item){
+			total += item.price * item.quantity;
+		});
+		
+		// temper floating-point insanity
+		total *= 100;
+		total = Math.round(total);
+		total /= 100;
+		
+		totalNode.innerHTML="Total: $" + total;
+	}, true);
+	
+	// hook up "buy" click handler
+	on(descContainer, ".buyBtn:click", function() {
+		var selection = marketList.get("selection"), id, item;
+		for (id in selection) {
+			cartStore.put(marketStore.get(id));
+		}
+		descContainer.style.display = "none";
+		shoppingCart.style.display = "block";
+		purchasesGrid.refresh();
+	});
+});
+		</script>
+	</body>
+</html>

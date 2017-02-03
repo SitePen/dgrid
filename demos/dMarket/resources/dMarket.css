@@ -1,0 +1,148 @@
+body {
+	font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+	font-weight: 300;
+}
+.marketHeading {
+	float:left;
+	padding: 10px;
+	font-size: 3em;
+	color: #555;
+}
+.marketContainer {
+	width: 1000px;
+	height: 700px;
+}
+#market {
+	width: 550px;
+	margin: 20px;
+	height: 660px; /* tall enough for 3 rows in gallery view */
+	float:left;
+}
+#market .dgrid-scroller {
+	position: relative;
+	overflow-y: hidden;
+}
+#market .dgrid-header-scroll {
+	display: none;
+}
+#market .dgrid-header {
+	right: 0;
+}
+
+/* styles for item thumbnails in gallery layout */
+.icon {
+	font-size: 0;
+	background-repeat: no-repeat;
+}
+
+.name {
+	color: #8e8e8e;
+	font-size: 10px;
+	line-height: 1;
+	overflow: hidden;
+	text-transform: uppercase;
+}
+.album {
+	color: #414242;
+	font-weight: bold;
+}
+.genre {
+	color: #8e8e8e;
+	margin-left: 0;
+	text-transform: none;
+}
+.galleryCell {
+	width: 180px;
+	height: 195px;
+	margin: auto;
+}
+.galleryCell .icon
+{
+	margin-left:26px;
+	width: 128px;
+	height:128px;
+}
+.galleryCell .info {
+	position: relative;
+	margin-left:26px;
+	padding: 5px;
+}
+
+/* styles for gallery layout */
+.gallery .dgrid-row {
+	width: 33%;
+	float: left;
+	text-align: left;
+	padding: 1em 0;
+}
+
+/*styles for purchase grid*/
+#purchases {
+	width: 400px;
+	height: 200px;
+	float:right;
+}
+
+/* styles for desc container */
+#descContainer {
+	width: 400px;
+	margin-top: 20px;
+	height: 460px;
+	float:right;
+}
+.buyBtn {
+	background-color: #555;
+	border: 1px solid #fff;
+	display: block;
+	padding: 3px 7px;
+	color: #fff;
+	cursor: pointer;
+	font-size: 11px;
+	line-height: 1em;
+	text-transform: uppercase;
+	width:40px;
+}
+.buyBtn:hover {
+	background-color: #CCC;
+}
+.summary {
+	line-height: 1.5em;
+	font-size: 1em;
+	color: #555;
+	padding-bottom: 10px;
+}
+.albumLarge {
+	font-size: 2em;
+	font-weight: bold;
+	padding-bottom: 5px;
+}
+.artist {
+	font-size: 1.5em;
+	padding-bottom: 10px;
+}
+
+/* styles for the shopping cart area */
+#shoppingCart {
+	width: 402px;
+	margin-top: 20px;
+	height: 460px;
+	float:right;
+	display:none;
+}
+.dgrid-column-selector {
+	width: 2em;
+}
+.field-quantity {
+	width: 5em;
+}
+.field-quantity .dijitTextBox {
+	width: 100%;
+}
+#total {
+	float: right;
+	padding-top: 10px;
+}
+.delete {
+	float:left;
+	padding-top: 10px;
+}
