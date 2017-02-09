@@ -11,11 +11,30 @@ define([
 		extraSheet,
 		removeMethod,
 		rulesProperty,
-		invalidCssChars = /([^A-Za-z0-9_\u00A0-\uFFFF-])/g;
+		invalidCssChars = /([^A-Za-z0-9_\u00A0-\uFFFF-])/g,
+		delayCallback = setTimeout,
+		cancelDelay = clearTimeout;
 
 	has.add('requestidlecallback', function (global) {
 		return typeof global.requestIdleCallback === 'function';
 	});
+
+	// The presence of the 'requestIdleCallback' method indicates a browser that might
+	// performance optimize code by delaying execution of the callback passed to
+	// 'setTimeout', so use 'requestIdleCallback' to improve the likelihood of the
+	// callback being executed in a timely manner.
+	// This is not a perfect solution, but has worked well in testing.
+	// requestIdleCallback is designed to be called successively, performing progressive chunks
+	// of computation each time until the task is complete.
+	// setTimeout executes its callback when delay has transpired, *or later*
+	// requestIdleCallback executes its callback when delay has transpired, *or sooner*
+	// Fixes https://github.com/SitePen/dgrid/issues/1351
+	if (has('requestidlecallback')) {
+		delayCallback = function (callback, delay) {
+			return requestIdleCallback(callback, { timeout: delay });
+		};
+		cancelDelay = cancelIdleCallback;
+	}
 
 	function removeRule(index) {
 		// Function called by the remove method on objects returned by addCssRule.
@@ -46,26 +65,7 @@ define([
 		// Throttle/debounce functions
 
 		defaultDelay: 15,
-		// The presence of the 'requestIdleCallback' method indicates a browser that might
-		// performance optimize code by delaying execution of the callback passed to
-		// 'setTimeout', so use 'requestIdleCallback' to improve the likelihood of the
-		// callback being executed in a timely manner. Alternate implementations of each of
-		// the debounce and throttle methods are provided that use this function.
-		throttle: has('requestidlecallback') ? function (cb, context, delay) {
-			var ran = false;
-			delay = delay || util.defaultDelay;
-			return function () {
-				if (ran) {
-					return;
-				}
-				ran = true;
-				cb.apply(context, arguments);
-				requestIdleCallback(function () {
-					ran = false;
-				}, { timeout: delay });
-			};
-		}
-		: function (cb, context, delay) {
+		throttle: function (cb, context, delay) {
 			// summary:
 			//		Returns a function which calls the given callback at most once per
 			//		delay milliseconds.  (Inspired by plugd)
@@ -77,27 +77,12 @@ define([
 				}
 				ran = true;
 				cb.apply(context, arguments);
-				setTimeout(function () {
+				delayCallback(function () {
 					ran = false;
 				}, delay);
 			};
 		},
-		throttleDelayed: has('requestidlecallback') ? function (cb, context, delay) {
-			var ran = false;
-			delay = delay || util.defaultDelay;
-			return function () {
-				if (ran) {
-					return;
-				}
-				ran = true;
-				var a = arguments;
-				requestIdleCallback(function () {
-					ran = false;
-					cb.apply(context, a);
-				}, {timeout: delay });
-			};
-		}
-		: function (cb, context, delay) {
+		throttleDelayed: function (cb, context, delay) {
 			// summary:
 			//		Like throttle, except that the callback runs after the delay,
 			//		rather than before it.
@@ -109,28 +94,13 @@ define([
 				}
 				ran = true;
 				var a = arguments;
-				setTimeout(function () {
+				delayCallback(function () {
 					ran = false;
 					cb.apply(context, a);
 				}, delay);
 			};
 		},
-		debounce: has('requestidlecallback') ? function (cb, context, delay) {
-			var timer;
-			delay = delay || util.defaultDelay;
-			return function () {
-				if (timer) {
-					cancelIdleCallback(timer);
-					timer = null;
-				}
-				var a = arguments;
-				timer = requestIdleCallback(function () {
-					timer = null;
-					cb.apply(context, a);
-				}, { timeout: delay });
-			};
-		}
-		: function (cb, context, delay) {
+		debounce: function (cb, context, delay) {
 			// summary:
 			//		Returns a function which calls the given callback only after a
 			//		certain time has passed without successive calls.  (Inspired by plugd)
@@ -138,11 +108,12 @@ define([
 			delay = delay || util.defaultDelay;
 			return function () {
 				if (timer) {
-					clearTimeout(timer);
+					cancelDelay(timer);
 					timer = null;
 				}
 				var a = arguments;
-				timer = setTimeout(function () {
+				timer = delayCallback(function () {
+					timer = null;
 					cb.apply(context, a);
 				}, delay);
 			};
