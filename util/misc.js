@@ -126,7 +126,7 @@ define([
 			delay = delay || util.defaultDelay;
 			return function () {
 				if (timer) {
-					clearTimeout(timer);
+					cancelIdleCallback(timer);
 					timer = null;
 				}
 				var a = arguments;
