@@ -131,6 +131,7 @@ define([
 				}
 				var a = arguments;
 				timer = requestIdleCallback(function () {
+					timer = null;
 					cb.apply(context, a);
 				}, { timeout: delay });
 			};
