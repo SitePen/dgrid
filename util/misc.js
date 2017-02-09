@@ -1,4 +1,6 @@
-define(function () {
+define([
+	'dojo/has'
+], function (has) {
 	// summary:
 	//		This module defines miscellaneous utility methods for purposes of
 	//		adding styles, and throttling/debouncing function calls.
@@ -10,6 +12,10 @@ define(function () {
 		removeMethod,
 		rulesProperty,
 		invalidCssChars = /([^A-Za-z0-9_\u00A0-\uFFFF-])/g;
+
+	has.add('requestidlecallback', function (global) {
+		return typeof global.requestIdleCallback === 'function';
+	});
 
 	function removeRule(index) {
 		// Function called by the remove method on objects returned by addCssRule.
@@ -40,7 +46,26 @@ define(function () {
 		// Throttle/debounce functions
 
 		defaultDelay: 15,
-		throttle: function (cb, context, delay) {
+		// The presence of the 'requestIdleCallback' method indicates a browser that might
+		// performance optimize code by delaying execution of the callback passed to
+		// 'setTimeout', so use 'requestIdleCallback' to improve the likelihood of the
+		// callback being executed in a timely manner. Alternate implementations of each of
+		// the debounce and throttle methods are provided that use this function.
+		throttle: has('requestidlecallback') ? function (cb, context, delay) {
+			var ran = false;
+			delay = delay || util.defaultDelay;
+			return function () {
+				if (ran) {
+					return;
+				}
+				ran = true;
+				cb.apply(context, arguments);
+				requestIdleCallback(function () {
+					ran = false;
+				}, { timeout: delay });
+			};
+		}
+		: function (cb, context, delay) {
 			// summary:
 			//		Returns a function which calls the given callback at most once per
 			//		delay milliseconds.  (Inspired by plugd)
@@ -57,7 +82,22 @@ define(function () {
 				}, delay);
 			};
 		},
-		throttleDelayed: function (cb, context, delay) {
+		throttleDelayed: has('requestidlecallback') ? function (cb, context, delay) {
+			var ran = false;
+			delay = delay || util.defaultDelay;
+			return function () {
+				if (ran) {
+					return;
+				}
+				ran = true;
+				var a = arguments;
+				requestIdleCallback(function () {
+					ran = false;
+					cb.apply(context, a);
+				}, {timeout: delay });
+			};
+		}
+		: function (cb, context, delay) {
 			// summary:
 			//		Like throttle, except that the callback runs after the delay,
 			//		rather than before it.
@@ -75,7 +115,21 @@ define(function () {
 				}, delay);
 			};
 		},
-		debounce: function (cb, context, delay) {
+		debounce: has('requestidlecallback') ? function (cb, context, delay) {
+			var timer;
+			delay = delay || util.defaultDelay;
+			return function () {
+				if (timer) {
+					clearTimeout(timer);
+					timer = null;
+				}
+				var a = arguments;
+				timer = requestIdleCallback(function () {
+					cb.apply(context, a);
+				}, { timeout: delay });
+			};
+		}
+		: function (cb, context, delay) {
 			// summary:
 			//		Returns a function which calls the given callback only after a
 			//		certain time has passed without successive calls.  (Inspired by plugd)
