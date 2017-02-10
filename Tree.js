@@ -325,7 +325,7 @@ define([
 			} else {
 				refreshResult = this.inherited(arguments);
 			}
-			return refreshResult.then(function () {
+			return when(refreshResult).then(function () {
 				var promises = this._expandPromises;
 				delete this._expandPromises;
 				return all(promises);
