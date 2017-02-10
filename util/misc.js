@@ -1,4 +1,6 @@
-define(function () {
+define([
+	'dojo/has'
+], function (has) {
 	// summary:
 	//		This module defines miscellaneous utility methods for purposes of
 	//		adding styles, and throttling/debouncing function calls.
@@ -9,7 +11,30 @@ define(function () {
 		extraSheet,
 		removeMethod,
 		rulesProperty,
-		invalidCssChars = /([^A-Za-z0-9_\u00A0-\uFFFF-])/g;
+		invalidCssChars = /([^A-Za-z0-9_\u00A0-\uFFFF-])/g,
+		delayCallback = setTimeout,
+		cancelDelay = clearTimeout;
+
+	has.add('requestidlecallback', function (global) {
+		return typeof global.requestIdleCallback === 'function';
+	});
+
+	// The presence of the 'requestIdleCallback' method indicates a browser that might
+	// performance optimize code by delaying execution of the callback passed to
+	// 'setTimeout', so use 'requestIdleCallback' to improve the likelihood of the
+	// callback being executed in a timely manner.
+	// This is not a perfect solution, but has worked well in testing.
+	// requestIdleCallback is designed to be called successively, performing progressive chunks
+	// of computation each time until the task is complete.
+	// setTimeout executes its callback when delay has transpired, *or later*
+	// requestIdleCallback executes its callback when delay has transpired, *or sooner*
+	// Fixes https://github.com/SitePen/dgrid/issues/1351
+	if (has('requestidlecallback')) {
+		delayCallback = function (callback, delay) {
+			return requestIdleCallback(callback, { timeout: delay });
+		};
+		cancelDelay = cancelIdleCallback;
+	}
 
 	function removeRule(index) {
 		// Function called by the remove method on objects returned by addCssRule.
@@ -52,7 +77,7 @@ define(function () {
 				}
 				ran = true;
 				cb.apply(context, arguments);
-				setTimeout(function () {
+				delayCallback(function () {
 					ran = false;
 				}, delay);
 			};
@@ -69,7 +94,7 @@ define(function () {
 				}
 				ran = true;
 				var a = arguments;
-				setTimeout(function () {
+				delayCallback(function () {
 					ran = false;
 					cb.apply(context, a);
 				}, delay);
@@ -83,11 +108,12 @@ define(function () {
 			delay = delay || util.defaultDelay;
 			return function () {
 				if (timer) {
-					clearTimeout(timer);
+					cancelDelay(timer);
 					timer = null;
 				}
 				var a = arguments;
-				timer = setTimeout(function () {
+				timer = delayCallback(function () {
+					timer = null;
 					cb.apply(context, a);
 				}, delay);
 			};
