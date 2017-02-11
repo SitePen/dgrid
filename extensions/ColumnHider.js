@@ -132,7 +132,10 @@ define([
 			var grid = this,
 				hiderMenuNode = this.hiderMenuNode,
 				hiderToggleNode = this.hiderToggleNode,
-				id;
+				id,
+				scrollbarWidth,
+				hiderNodeScale,
+				hiderNodeTranslate;
 
 			function stopPropagation(event) {
 				event.stopPropagation();
@@ -149,6 +152,17 @@ define([
 					className: 'ui-icon dgrid-hider-toggle',
 					type: 'button'
 				}, this.domNode);
+
+				// The ColumnHider icon is 16 x 16 pixels. Presumably, when it was created that size worked in all
+				// browsers. Hopefully any browsers (or updates) introduced since then that reduce the scrollbar width
+				// also include support for scaling with CSS transforms.
+				scrollbarWidth = this.bodyNode.offsetWidth - this.bodyNode.clientWidth;
+				if (scrollbarWidth < 16) {
+					hiderNodeScale = scrollbarWidth / 16;
+					hiderNodeTranslate = (16 - scrollbarWidth) / 2;
+					hiderToggleNode.style.transform = 'scale(' + (hiderNodeScale) + ') translate(' +
+						hiderNodeTranslate + 'px)';
+				}
 
 				this._listeners.push(listen(hiderToggleNode, 'click', function (e) {
 					grid._toggleColumnHiderMenu(e);
