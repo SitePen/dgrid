@@ -295,11 +295,25 @@ define([
 				data: object,
 				type: type instanceof Array ? type : [type]
 			});
+
+			if (this.selection) {
+				var objectId = this.collection.getIdentity(object);
+				if (objectId in this.selection) {
+					this.dndSource._selectedNodes[objectId] = row;
+				}
+			}
+
 			return row;
 		},
 
 		removeRow: function (rowElement) {
-			this.dndSource.delItem(this.row(rowElement));
+			var row = this.row(rowElement);
+
+			if (this.selection && (row.id in this.selection)) {
+				delete this.dndSource._selectedNodes[row.id];
+			}
+
+			this.dndSource.delItem(row.element.id);
 			this.inherited(arguments);
 		}
 	});
