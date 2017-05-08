@@ -141,7 +141,6 @@ html.has-mozilla .dgrid-focus {
   overflow: hidden;
   width: 100%;
   position: relative;
-  height: 100%;
   -ms-touch-action: pan-y;
   touch-action: pan-y;
 }
