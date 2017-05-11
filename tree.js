@@ -305,7 +305,7 @@ function tree(column){
 		
 		var grid = column.grid,
 			level = Number(options && options.queryLevel) + 1,
-			mayHaveChildren = !grid.store.mayHaveChildren || grid.store.mayHaveChildren(object),
+			mayHaveChildren = !grid.store.mayHaveChildren || grid.store.mayHaveChildren(object, options),
 			parentId = options.parentId,
 			expando, node;
 		
