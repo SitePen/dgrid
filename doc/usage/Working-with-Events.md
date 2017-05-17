@@ -44,14 +44,14 @@ of `cell`, a second argument indicating column ID would also be passed.
 Expanding upon the examples above...
 
 ```js
-grid.on('.dgrid-content .dgrid-row:contextmenu', function (event) {
+grid.on('.dgrid-content .dgrid-row:contextmenu', function (evt) {
     var row = grid.row(evt);
     // row.element == the element with the dgrid-row class
     // row.id == the identity of the item represented by the row
     // row.data == the item represented by the row
 });
 
-grid.on('.dgrid-header .dgrid-cell:click', function (event) {
+grid.on('.dgrid-header .dgrid-cell:click', function (evt) {
     var cell = grid.cell(evt);
     // cell.element == the element with the dgrid-cell class
     // cell.column == the column definition object for the column the cell is within
