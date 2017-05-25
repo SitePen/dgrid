@@ -147,7 +147,7 @@ define([
 				// First run
 				// Assume that if this plugin is used, then columns are hidable.
 				// Create the toggle node.
-				hiderToggleNode = this.hiderToggleNode = domConstruct.create('button', {
+				hiderToggleNode = this.hiderToggleNode = domConstruct.create('div', {
 					'aria-label': this.i18nColumnHider.popupTriggerLabel,
 					className: 'ui-icon dgrid-hider-toggle',
 					type: 'button'
@@ -157,7 +157,7 @@ define([
 				// browsers. Hopefully any browsers (or updates) introduced since then that reduce the scrollbar width
 				// also include support for scaling with CSS transforms.
 				scrollbarWidth = this.bodyNode.offsetWidth - this.bodyNode.clientWidth;
-				if (scrollbarWidth < 16) {
+				if (scrollbarWidth < 16 && scrollbarWidth > 0) {
 					hiderNodeScale = scrollbarWidth / 16;
 					hiderNodeTranslate = (16 - scrollbarWidth) / 2;
 					hiderToggleNode.style.transform = 'scale(' + (hiderNodeScale) + ') translate(' +
