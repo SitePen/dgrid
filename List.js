@@ -94,7 +94,7 @@ define([
 
 	// window resize event handler, run in context of List instance
 	var winResizeHandler = function () {
-		if (this._started) {
+		if (this._started && this.domNode.offsetParent) {
 			this.resize();
 		}
 	};
