@@ -227,6 +227,9 @@ define([
 			// summary:
 			//		Creates a node displaying noDataMessage.
 
+			// Remove the current no data node if it exists.
+			this._removeNoDataNode();
+
 			parentNode = parentNode || this.contentNode;
 			var noDataNode = this.noDataNode = domConstruct.create('div', {
 				className: 'dgrid-no-data',
@@ -236,6 +239,19 @@ define([
 			// 2nd param is *required*, even if it is null
 			parentNode.insertBefore(noDataNode, this._getFirstRowSibling ? this._getFirstRowSibling(parentNode) : null);
 			return noDataNode;
+		},
+
+		_removeNoDataNode: function () {
+			// summary:
+			//		Removes the noDataNode from the grid if it exists.
+			//		Returns true if a noDataNode existed previously.
+			//		Returns false if no noDataNode existed previously.
+			if (this.noDataNode) {
+				domConstruct.destroy(this.noDataNode);
+				delete this.noDataNode;
+				return true; // Indicate that a noDataNode was removed.
+			}
+			return false;  // Indicate there was no noDataNode.
 		},
 
 		row: function () {

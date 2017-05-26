@@ -18,11 +18,7 @@ define([
 	when, miscUtil, i18n) {
 	function cleanupContent(grid) {
 		// Remove any currently-rendered rows, or noDataMessage
-		if (grid.noDataNode) {
-			domConstruct.destroy(grid.noDataNode);
-			delete grid.noDataNode;
-		}
-		else {
+		if (!grid._removeNoDataNode()) {
 			grid.cleanup();
 		}
 		grid.contentNode.innerHTML = '';
@@ -597,10 +593,6 @@ define([
 
 					results.totalLength.then(function (total) {
 						if (!total) {
-							if (grid.noDataNode) {
-								domConstruct.destroy(grid.noDataNode);
-								delete grid.noDataNode;
-							}
 							grid._insertNoDataNode();
 						}
 
