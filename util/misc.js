@@ -115,6 +115,7 @@ define([
 				timer = delayCallback(function () {
 					timer = null;
 					cb.apply(context, a);
+					timer = null;
 				}, delay);
 			};
 		},
