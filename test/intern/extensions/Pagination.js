@@ -7,11 +7,13 @@ define([
 	'dojo/query',
 	'dojo/string',
 	'dgrid/Grid',
+	'dgrid/OnDemandList',
 	'dgrid/extensions/Pagination',
 	'dgrid/test/data/createSyncStore',
 	'dgrid/test/data/genericData',
 	'dojo/domReady!'
-], function (test, assert, declare, keys, on, query, string, Grid, Pagination, createSyncStore, genericData) {
+], function (test, assert, declare, keys, on, query, string, Grid, OnDemandList, Pagination, createSyncStore,
+			 genericData) {
 	var grid,
 		PaginationGrid = declare([Grid, Pagination]);
 
@@ -271,6 +273,44 @@ define([
 			textbox.value = '2';
 			on.emit(textbox, 'keypress', { keyCode: keys.ENTER });
 			assert.strictEqual(grid._currentPage, 2, 'Grid should change to page 2');
+		});
+	});
+
+	test.suite('Pagination with OnDemandGrid', function () {
+		var badList;
+		var builtInWarn;
+
+		test.afterEach(function () {
+			if (badList) {
+				badList.destroy();
+				badList = undefined;
+			}
+			if (builtInWarn) {
+				console.warn = builtInWarn;
+				builtInWarn = undefined;
+			}
+		});
+
+		test.test('Invalid list+pagination combination', function () {
+			// When the Pagination extension is used with OnDemandList, a warning should appear in the console
+			// telling the dev that they have constructed an invalid class combination.
+			var warnCalled = true;
+			builtInWarn = console.warn;
+			console.warn = function (message) {
+				warnCalled = true;
+				assert.strictEqual('The Pagination extension is not compatible with dgrid/OnDemandList and ' +
+					'dgrid/OnDemandGrid. Please use dgrid/List or dgrid/Grid as a base class.', message);
+			};
+
+			var BadList = declare([OnDemandList, Pagination]);
+			var list = new BadList({});
+			document.body.appendChild(grid.domNode);
+			list.startup();
+
+			// Make sure OnDemandList implements the method the Pagination extension is looking for.  If
+			// the method is missing, the warning will not be generated.
+			assert.isTrue(list._processScroll != null);
+			assert.isTrue(warnCalled);
 		});
 	});
 });
