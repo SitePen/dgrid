@@ -84,7 +84,7 @@ define([
 		_currentPage: 1,
 		_loadingCount: 0,
 
-		postMixInProperties: function () {
+		constructor: function () {
 			// Warn the user of an invalid class + mixin combination when they mix OnDemandList and this extension.
 			if (this._processScroll) {
 				console.warn('The Pagination extension is not compatible with dgrid/OnDemandList and dgrid/OnDemandGrid. ' +
