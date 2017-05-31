@@ -233,6 +233,12 @@
 		"parent": "extensions"
 	},
 	{
+		"name": "DnD_Tree_children.html",
+		"url": "extensions/DnD_Tree_children.html",
+		"title": "Test dragging parent and child rows",
+		"parent": "extensions"
+	},
+	{
 		"name": "DnD_error.html",
 		"url": "extensions/DnD_error.html",
 		"title": "Test Grid DnD on stores returning rejected promises",
