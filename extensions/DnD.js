@@ -105,9 +105,15 @@ define([
 					// otherwise settle for put anyway.
 					// (put will relocate an existing item with the same id, i.e. move).
 					grid._trackError(function () {
-						return store[copy && store.copy ? 'copy' : 'put'](object, {
-							beforeId: targetItem ? store.getIdentity(targetItem) : null
-						}).then(function () {
+						// Do no store operation if the object being moved is targetItem.  This can happen when
+						// multiple, non-adjacent rows are being dragged.
+						var objectId = store.getIdentity(object);
+						var targetId = targetItem ? store.getIdentity(targetItem) : null;
+						var promise = objectId === targetId ? when(true) :
+							store[copy && store.copy ? 'copy' : 'put'](object, {
+								beforeId: targetId
+							});
+						return promise.then(function () {
 							// Self-drops won't cause the dgrid-select handler to re-fire,
 							// so update the cached node manually
 							if (targetSource._selectedNodes[id]) {
