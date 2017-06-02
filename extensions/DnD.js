@@ -135,7 +135,7 @@ define([
 				if (row.element) {
 					row = grid.down(row);
 					if (row.element) {
-						return grid.collection.get(row.id);
+						return when(row.data);
 					}
 				}
 			}
