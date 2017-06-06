@@ -330,16 +330,20 @@ define([
 			}
 		},
 
-		_ensureScroll: function (cell, isHeader) {
+		_ensureScroll: function (rowOrCell, isHeader) {
 			// summary:
 			//		Corrects scroll based on the position of the newly-focused row/cell
 			//		as necessary based on grid configuration and dimensions.
+			var isRow = !rowOrCell.column && !rowOrCell.row && rowOrCell.data && rowOrCell.element;
 
+			if(isRow) {
+				this._ensureRowScroll(rowOrCell.element);
+			}
 			if(this.cellNavigation && (this.columnSets || this.subRows.length > 1) && !isHeader){
-				this._ensureRowScroll(cell.row.element);
+				this._ensureRowScroll(rowOrCell.row.element);
 			}
 			if(this.bodyNode.clientWidth < this.contentNode.offsetWidth){
-				this._ensureColumnScroll(cell.element);
+				this._ensureColumnScroll(rowOrCell.element);
 			}
 		},
 
