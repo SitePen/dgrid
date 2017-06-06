@@ -109,7 +109,10 @@ define([
 						// multiple, non-adjacent rows are being dragged.
 						var objectId = store.getIdentity(object);
 						var targetId = targetItem ? store.getIdentity(targetItem) : null;
-						var promise = objectId === targetId ? when(true) :
+						var promise = objectId === targetId ? targetSource._getNextItem(targetItem)
+							.then(function (nextItem) {
+								targetItem = nextItem;
+							}) :
 							store[copy && store.copy ? 'copy' : 'put'](object, {
 								beforeId: targetId
 							});
@@ -124,6 +127,21 @@ define([
 				});
 			});
 		},
+
+		_getNextItem: function (item) {
+			var grid = this.grid;
+			if (item) {
+				var row = grid.row(item);
+				if (row.element) {
+					row = grid.down(row);
+					if (row.element) {
+						return when(row.data);
+					}
+				}
+			}
+			return when(null);
+		},
+
 		onDropExternal: function (sourceSource, nodes, copy, targetItem) {
 			// Note: this default implementation expects that two grids do not
 			// share the same store.  There may be more ideal implementations in the
