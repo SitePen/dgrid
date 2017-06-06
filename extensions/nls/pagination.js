@@ -7,7 +7,8 @@ define({
 		gotoLast: 'Go to last page',
 		gotoPage: 'Go to page',
 		jumpPage: 'Jump to page',
-		rowsPerPage: 'Number of rows per page'
+		rowsPerPage: 'Number of rows per page',
+		notCompatibleWithOnDemand: 'Pagination is not compatible with OnDemandList'
 	},
 	ar: true,
 	de: true,

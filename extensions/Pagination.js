@@ -106,6 +106,11 @@ define([
 				navigationNode,
 				node;
 
+			if (typeof this._processScroll === 'function') {
+				this.bodyNode.innerHTML = i18n.notCompatibleWithOnDemand;
+				console.warn(i18n.notCompatibleWithOnDemand);
+			}
+
 			statusNode.tabIndex = 0;
 
 			// Initialize UI based on pageSizeOptions and rowsPerPage
