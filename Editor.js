@@ -204,9 +204,9 @@ define([
 				// which we already advocate in docs for optimal use)
 
 				if (!options || !options.alreadyHooked) {
-					var listener = on(cell, editOn, function () {
+					var listener = on(cell, editOn, function (event) {
 						self._activeOptions = options;
-						self.edit(this);
+						self.edit(event.currentTarget);
 					});
 					if (self._editorRowListeners) {
 						self._editorRowListeners[column.id] = listener;
