@@ -339,11 +339,13 @@ define([
 			if(isRow) {
 				this._ensureRowScroll(rowOrCell.element);
 			}
-			if(this.cellNavigation && (this.columnSets || this.subRows.length > 1) && !isHeader){
-				this._ensureRowScroll(rowOrCell.row.element);
-			}
-			if(this.bodyNode.clientWidth < this.contentNode.offsetWidth){
-				this._ensureColumnScroll(rowOrCell.element);
+			else {
+				if(this.cellNavigation && (this.columnSets || this.subRows.length > 1) && !isHeader){
+					this._ensureRowScroll(rowOrCell.row.element);
+				}
+				if(this.bodyNode.clientWidth < this.contentNode.offsetWidth){
+					this._ensureColumnScroll(rowOrCell.element);
+				}
 			}
 		},
 
