@@ -1,6 +1,4 @@
-define([
-	'dojo/has'
-], function (has) {
+define(function () {
 	// summary:
 	//		This module defines miscellaneous utility methods for purposes of
 	//		adding styles, and throttling/debouncing function calls.
