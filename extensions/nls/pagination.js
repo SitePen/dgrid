@@ -7,7 +7,9 @@ define({
 		gotoLast: 'Go to last page',
 		gotoPage: 'Go to page',
 		jumpPage: 'Jump to page',
-		rowsPerPage: 'Number of rows per page'
+		rowsPerPage: 'Number of rows per page',
+		notCompatibleWithOnDemand: 'The Pagination extension is not compatible with dgrid/OnDemandList ' +
+			'and dgrid/OnDemandGrid. Please use dgrid/List or dgrid/Grid as a base class.'
 	},
 	ar: true,
 	de: true,

@@ -84,15 +84,6 @@ define([
 		_currentPage: 1,
 		_loadingCount: 0,
 
-		constructor: function () {
-			// Warn the user of an invalid class + mixin combination when they mix OnDemandList and this extension.
-			if (this._processScroll) {
-				console.warn('The Pagination extension is not compatible with dgrid/OnDemandList and dgrid/OnDemandGrid. ' +
-					'Please use dgrid/List or dgrid/Grid as a base class.'
-				);
-			}
-		},
-
 		buildRendering: function () {
 			this.inherited(arguments);
 
@@ -105,6 +96,12 @@ define([
 				i18n = this.i18nPagination,
 				navigationNode,
 				node;
+
+			if (typeof this._processScroll === 'function') {
+				// Warn the user of an invalid class + mixin combination when they mix OnDemandList and this extension.
+				this.bodyNode.innerHTML = i18n.notCompatibleWithOnDemand;
+				console.warn(i18n.notCompatibleWithOnDemand);
+			}
 
 			statusNode.tabIndex = 0;
 

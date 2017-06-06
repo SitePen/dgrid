@@ -5,16 +5,17 @@ define([
 	'dojo/query',
 	'dstore/Memory',
 	'dstore/Trackable',
+	'dgrid/Grid',
 	'dgrid/OnDemandGrid',
 	'dgrid/extensions/Pagination',
 	'dgrid/extensions/SingleQuery'
-], function (test, assert, declare, query, Memory, Trackable, OnDemandGrid, Pagination, SingleQuery) {
+], function (test, assert, declare, query, Memory, Trackable, Grid, OnDemandGrid, Pagination, SingleQuery) {
 
 	var grid;
 
-	var PaginationGrid = declare([OnDemandGrid, Pagination]);
+	var PaginationGrid = declare([Grid, Pagination]);
 	var SingleQueryGrid = declare([OnDemandGrid, SingleQuery]);
-	var PaginationSingleQueryGrid = declare([OnDemandGrid, Pagination, SingleQuery]);
+	var PaginationSingleQueryGrid = declare([Grid, Pagination, SingleQuery]);
 	var TrackableStore = declare([Memory, Trackable]);
 
 	function createGrid(Grid, options) {
