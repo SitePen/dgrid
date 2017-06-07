@@ -182,6 +182,8 @@ define([
 		//		browser would otherwise stretch all columns to span the grid.
 		adjustLastColumn: true,
 
+		_isResizingColumn: false, // flag indicating whether a column is currently being resized
+
 		_resizedColumns: false, // flag indicating if resizer has converted column widths to px
 
 		buildRendering: function () {
@@ -305,10 +307,16 @@ define([
 
 			if (!grid.mouseMoveListen) {
 				// establish listeners for initiating, dragging, and finishing resize
+				listen(grid.headerNode, 'dgrid-sort', function (event) {
+					if (grid._isResizingColumn) {
+						event.preventDefault();
+					}
+				});
 				listen(grid.headerNode,
 					'.dgrid-resize-handle:mousedown' +
 						(has('touch') ? ',.dgrid-resize-handle:touchstart' : ''),
 					function (e) {
+						grid._isResizingColumn = true;
 						grid._resizeMouseDown(e, this);
 						grid.mouseMoveListen.resume();
 						grid.mouseUpListen.resume();
@@ -324,6 +332,7 @@ define([
 				grid._listeners.push(grid.mouseUpListen = listen.pausable(document,
 					'mouseup' + (has('touch') ? ',touchend' : ''),
 					function (e) {
+						grid._isResizingColumn = false;
 						grid._resizeMouseUp(e);
 						grid.mouseMoveListen.pause();
 						grid.mouseUpListen.pause();

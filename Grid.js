@@ -276,9 +276,9 @@ define([
 			if (this._sortListener) {
 				this._sortListener.remove();
 			}
-			this._sortListener = listen(row, 'click,keydown', function (event) {
+			this._sortListener = listen(row, 'mouseup,keydown', function (event) {
 				// respond to click, space keypress, or enter keypress
-				if (event.type === 'click' || event.keyCode === 32 ||
+				if (event.type === 'mouseup' || event.keyCode === 32 ||
 						(!has('opera') && event.keyCode === 13)) {
 					var target = event.target;
 					var field;
