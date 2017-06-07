@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset='utf-8'>
+	<title>Test Tree Grid</title>
+	<meta name='viewport' content='width=570'>
+	<style>
+		@import '../../dojo/resources/dojo.css';
+		@import '../css/dgrid.css';
+		@import '../css/skins/claro.css';
+
+		#grid, #treeGrid{
+			height: 200px;
+		}
+	</style>
+	<script src='../../dojo/dojo.js'
+			data-dojo-config='async: true'></script>
+</head>
+<body class='claro'>
+<h2>Flat grid</h2>
+<div id='grid'>
+</div>
+<button id='btn1'>Refresh</button>
+<h2>Tree grid</h2>
+<div id='treeGrid'>
+</div>
+<button id='btn2'>Refresh</button>
+
+<script>
+	require(['dojo/_base/declare', 'dojo/_base/lang', 'dojo/on',
+		'dgrid/Tree', 'dgrid/OnDemandGrid', 'dstore/Memory'
+	], function (declare, lang, on, Tree, OnDemandGrid, Memory) {
+
+		function prepareExampleData() {
+
+			const top = 1;
+			const children = 5000;
+
+			var data = [];
+			for (var i = 0; i < top; i++) {
+				var parent = {
+					id: '' + i
+				};
+				data.push(parent);
+				for (j = 0; j < children; j++) {
+					var obj = {
+						id: i + '.' + j,
+						parent: '' + i
+					};
+					data.push(obj);
+				}
+			}
+			return data;
+		}
+
+		var GridCls = declare([OnDemandGrid]);
+		var TreeGridCls = declare([OnDemandGrid, Tree]);
+
+		var data = prepareExampleData();
+		var store1 = new Memory({
+			data: data
+		});
+		var store2 = new Memory({
+			data: lang.clone(data),
+
+			getChildren: function (parent) {
+				return store2.filter({ parent: parent.id });
+			},
+
+			mayHaveChildren: function (parent) {
+				return parent.parent === undefined;
+			}
+		});
+
+		var grid = new GridCls({
+			columns: [{
+				field: 'id',
+				label: 'ID'
+			}],
+			collection: store1
+		}, 'grid');
+		grid.startup();
+
+		var treeGrid = window.treeGrid = new TreeGridCls({
+			columns: [{
+				field: 'id',
+				label: 'ID',
+				renderExpando: true
+			}],
+			collection: store2.filter({ parent: undefined }),
+			shouldExpand: function (row, level, previouslyExpanded) {
+				return true;
+			},
+
+			logPreload: function () {
+				var line = '';
+				for (var i = 0; i < 160; i++) {
+					line += '\u2500';
+				}
+				console.log(line);
+				var preload = this.preload;
+				if (preload) {
+					while (preload.previous) {
+						preload = preload.previous;
+					}
+					var preloads = [];
+					var preloadNodes = [];
+					var height = 0;
+					var totalPossibleRows = 0;
+					while (preload) {
+						preloads.push(preload);
+						var node = preload.node;
+						height += node.offsetHeight;
+						totalPossibleRows += preload.count;
+						preloadNodes.push({
+							preloadId: node.getAttribute('data-preloadid'),
+							rowIndex: node.rowIndex,
+							height: node.style.height,
+							offsetTop: node.offsetTop,
+							offsetHeight: node.offsetHeight
+						});
+						preload = preload.next;
+					}
+					console.table(preloads);
+					console.table(preloadNodes);
+				}
+			}
+		}, 'treeGrid');
+		treeGrid.startup();
+
+
+		function doRefresh() {
+			var d = new Date();
+			this.refresh({ keepScrollPosition: true });
+			console.log('Refresh time: ' + ((new Date() - d) / 1000) + 's');
+			console.log('Rendered row count: ', this.contentNode.querySelectorAll('.dgrid-row').length);
+		}
+
+		on(document.getElementById('btn1'), 'click', doRefresh.bind(grid));
+		on(document.getElementById('btn2'), 'click', doRefresh.bind(treeGrid));
+	});
+</script>
+</body>
+</html>

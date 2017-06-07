@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Test Grid DnD</title>
+		<meta name="viewport" content="width=570">
+		<style>
+			@import "../../../dojo/resources/dojo.css";
+			@import "../../../dojo/resources/dnd.css";
+			@import "../../css/dgrid.css";
+			/* need a theme for some dnd styles (e.g. before/after indicators).
+			   Using tundra because claro has a silly dojoDndItemBefore/After bug
+			*/
+			@import "../../../dijit/themes/tundra/tundra.css";
+			@import "../../css/skins/tundra.css";
+
+			.dgrid {
+				margin: 10px;
+			}
+		</style>
+		<script src="../../../dojo/dojo.js"
+				data-dojo-config="async: true"></script>
+	</head>
+	<body class="tundra">
+		<div id="gridcontainer"></div>
+
+		<script>
+			require([
+				'dgrid/extensions/DnD',
+				'dgrid/OnDemandGrid',
+				'dojo/_base/declare',
+				'dgrid/extensions/DnDMemoryStore',
+				'dstore/Trackable',
+				'dojo/domReady!'
+			], function (DnD, Grid, declare, Memory, Trackable) {
+				var data = [];
+				for (var i = 1; i <= 10; i++) {
+					data.push({
+						id: i,
+						name: 'Name ' + i
+					});
+				}
+				var store = new (declare([Memory, Trackable]))({
+					data: data
+				});
+				var options = {
+					columns: [{
+						field: 'id',
+						label: 'ID'
+					}, {
+						field: 'name',
+						label: 'Name'
+					}],
+					collection: store
+				};
+
+				new (declare([Grid, DnD]))(options, 'gridcontainer');
+			});
+		</script>
+	</body>
+</html>
