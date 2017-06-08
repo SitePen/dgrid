@@ -30,14 +30,24 @@ define([
 		return createSyncStore({ data: genericData });
 	}
 
+	function createGrid(factoryFn) {
+		// Make sure there is only one grid on the page at a time.
+		if (grid) {
+			grid.destroy();
+		}
+		grid = factoryFn();
+		document.body.appendChild(grid.domNode);
+		grid.startup();
+	}
+
 	test.suite('Pagination', function () {
 		test.beforeEach(function () {
-			grid = new PaginationGrid({
-				collection: createTestStore(),
-				columns: getColumns()
+			createGrid(function () {
+				return new PaginationGrid({
+					collection: createTestStore(),
+					columns: getColumns()
+				});
 			});
-			document.body.appendChild(grid.domNode);
-			grid.startup();
 		});
 
 		test.afterEach(function () {
@@ -120,16 +130,16 @@ define([
 		});
 
 		test.test('pageSizeOptions + unique rowsPerPage during creation', function () {
-			grid = new PaginationGrid({
-				collection: createTestStore(),
-				columns: getColumns(),
-				// Purposely set pageSizeOptions out of order to test setter
-				pageSizeOptions: [25, 15, 5],
-				// Purposely set rowsPerPage to a value not in pageSizeOptions
-				rowsPerPage: 10
+			createGrid(function () {
+				return new PaginationGrid({
+					collection: createTestStore(),
+					columns: getColumns(),
+					// Purposely set pageSizeOptions out of order to test setter
+					pageSizeOptions: [25, 15, 5],
+					// Purposely set rowsPerPage to a value not in pageSizeOptions
+					rowsPerPage: 10
+				});
 			});
-			document.body.appendChild(grid.domNode);
-			grid.startup();
 
 			assert.strictEqual(grid.paginationSizeSelect.tagName, 'SELECT',
 				'paginationSizeSelect should reference a SELECT element');
@@ -147,13 +157,13 @@ define([
 		});
 
 		test.test('pageSizeOptions added after creation', function () {
-			grid = new PaginationGrid({
-				collection: createTestStore(),
-				columns: getColumns(),
-				rowsPerPage: 10
+			createGrid(function () {
+				return new PaginationGrid({
+					collection: createTestStore(),
+					columns: getColumns(),
+					rowsPerPage: 10
+				});
 			});
-			document.body.appendChild(grid.domNode);
-			grid.startup();
 
 			assert.isUndefined(grid.paginationSizeSelect,
 				'paginationSizeSelect should not exist yet (no options)');
@@ -169,20 +179,39 @@ define([
 			assert.strictEqual(grid.pageSizeOptions[0], 5,
 				'pageSizeOptions should be sorted ascending');
 		});
+
+		test.test('hitting "Enter" key in pagination page input changes page', function () {
+			createGrid(function () {
+				return new PaginationGrid({
+					collection: createTestStore(),
+					columns: getColumns(),
+					pagingTextBox: true
+				});
+			});
+
+			var textbox = query('.dgrid-page-input', grid.paginationLinksNode)[0];
+			assert.strictEqual(grid._currentPage, 1, 'Initial page should be 1');
+			textbox.value = '2';
+			on.emit(textbox, 'keypress', { keyCode: keys.ENTER });
+			assert.strictEqual(grid._currentPage, 2, 'Grid should change to page 2');
+		});
 	});
 
 	test.suite('Pagination size selector', function () {
 		test.before(function () {
-			grid = new PaginationGrid({
-				collection: createTestStore(),
-				columns: getColumns(),
-				pageSizeOptions: [5, 10, 15]
+			createGrid(function () {
+				return new PaginationGrid({
+					collection: createTestStore(),
+					columns: getColumns(),
+					pageSizeOptions: [5, 10, 15]
+				});
 			});
-			document.body.appendChild(grid.domNode);
-			grid.startup();
 		});
 		test.after(function () {
-			grid.destroy();
+			if (grid) {
+				grid.destroy();
+				grid = undefined;
+			}
 		});
 
 		function verifyOptions(options, expectedCount) {
@@ -258,22 +287,6 @@ define([
 				'rowsPerPage should have numeric value equivalent to the selected value');
 			verifyOptions(selector.options, initialCount);
 		});
-
-		test.test('hitting "Enter" key in pagination page input changes page', function () {
-			grid = new PaginationGrid({
-				collection: createTestStore(),
-				columns: getColumns(),
-				pagingTextBox: true
-			});
-			document.body.appendChild(grid.domNode);
-			grid.startup();
-
-			var textbox = query('.dgrid-page-input', grid.paginationLinksNode)[0];
-			assert.strictEqual(grid._currentPage, 1, 'Initial page should be 1');
-			textbox.value = '2';
-			on.emit(textbox, 'keypress', { keyCode: keys.ENTER });
-			assert.strictEqual(grid._currentPage, 2, 'Grid should change to page 2');
-		});
 	});
 
 	test.suite('Pagination with OnDemandGrid', function () {
@@ -303,13 +316,13 @@ define([
 			};
 
 			var BadList = declare([OnDemandList, Pagination]);
-			var list = new BadList({});
-			document.body.appendChild(grid.domNode);
-			list.startup();
+			badList = new BadList({});
+			document.body.appendChild(badList.domNode);
+			badList.startup();
 
 			// Make sure OnDemandList implements the method the Pagination extension is looking for.  If
 			// the method is missing, the warning will not be generated.
-			assert.isTrue(list._processScroll != null);
+			assert.isTrue(badList._processScroll != null);
 			assert.isTrue(warnCalled);
 		});
 	});
