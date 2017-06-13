@@ -201,7 +201,7 @@ define([
 				collection: this.store.filter({ featureType: this.featureType }),
 				gridTypeForm: this.gridTypeForm
 			}, this.gridNode);
-			this._startupWidgets.push(this.grid);
+			this._startupWidgets ? this._startupWidgets.push(this.grid) : this._startupWidgets = [this.grid];
 		},
 
 		postCreate: function () {
