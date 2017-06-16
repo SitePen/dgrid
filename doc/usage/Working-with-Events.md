@@ -45,17 +45,17 @@ Expanding upon the examples above...
 
 ```js
 grid.on('.dgrid-content .dgrid-row:contextmenu', function (event) {
-    var row = grid.row(evt);
+    var row = grid.row(event);
     // row.element == the element with the dgrid-row class
     // row.id == the identity of the item represented by the row
     // row.data == the item represented by the row
 });
 
 grid.on('.dgrid-header .dgrid-cell:click', function (event) {
-    var cell = grid.cell(evt);
+    var cell = grid.cell(event);
     // cell.element == the element with the dgrid-cell class
     // cell.column == the column definition object for the column the cell is within
-    // cell.row == the same object obtained from grid.row(evt)
+    // cell.row == the same object obtained from grid.row(event)
 });
 ```
 
