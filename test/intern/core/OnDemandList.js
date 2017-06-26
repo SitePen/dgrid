@@ -45,4 +45,31 @@ define([
 			assert.strictEqual(query('.dgrid-row', list.contentNode).length, list.minRowsPerPage);
 		});
 	});
+
+	test.suite('OnDemandList', function () {
+		var list;
+		var store = createSyncStore({ data: genericData });
+
+		test.beforeEach(function () {
+			list = new OnDemandList({
+				collection: store,
+				renderRow: function () {
+					var node = document.createElement('div');
+					node.innerHTML = 'Test';
+					node.style.height = '16px';
+					return node;
+				}
+			});
+			document.body.appendChild(list.domNode);
+			list.startup();
+		});
+
+		test.afterEach(function () {
+			list.destroy();
+		});
+
+		test.test('calculated row height', function () {
+			assert.strictEqual(16, list.preload.rowHeight);
+		});
+	});
 });
