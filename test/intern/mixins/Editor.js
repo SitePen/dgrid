@@ -497,7 +497,8 @@ define([
 			var cellContent;
 			return addDelay(grid.edit(cell)).then(function () {
 				cellContent = cell.element.innerHTML;
-				grid.refresh();
+				return addDelay(grid.refresh());
+			}).then(function () {
 				cell = grid.cell(1, 'name');
 				return addDelay(grid.edit(cell));
 			}).then(function () {
