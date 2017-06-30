@@ -34,12 +34,12 @@ define([
 	// setTimeout executes its callback when delay has transpired, *or later*
 	// requestIdleCallback executes its callback when delay has transpired, *or sooner*
 	// Fixes https://github.com/SitePen/dgrid/issues/1351
-	if (has('requestidlecallback')) {
-		delayCallback = function (callback, delay) {
-			return requestIdleCallback(callback, { timeout: delay });
-		};
-		cancelDelay = cancelIdleCallback;
-	}
+	// if (has('requestidlecallback')) {
+	// 	delayCallback = function (callback, delay) {
+	// 		return requestIdleCallback(callback, { timeout: delay });
+	// 	};
+	// 	cancelDelay = cancelIdleCallback;
+	// }
 
 	function removeRule(index) {
 		// Function called by the remove method on objects returned by addCssRule.
