@@ -269,7 +269,7 @@ define([
 		resize: function () {
 			this.inherited(arguments);
 			if (!this.rowHeight) {
-				this._calcAverageRowHeight(this.contentNode.querySelectorAll('dgrid-row'));
+				this._calcAverageRowHeight(this.contentNode.querySelectorAll('.dgrid-row'));
 			}
 			this._processScroll();
 		},
