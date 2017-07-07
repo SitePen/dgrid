@@ -436,20 +436,14 @@ define([
 		},
 
 		adjustRowIndices: function (firstRow) {
-			// this traverses through rows to maintain odd/even classes on the rows when indexes shift;
+			// Traverse through rows to update indexes on shift, i.e. for the odd/even classes.
 			var next = firstRow;
 			var rowIndex = next.rowIndex;
 			if (rowIndex > -1) { // make sure we have a real number in case this is called on a non-row
 				do {
 					// Skip non-numeric, non-rows
 					if (next.rowIndex > -1) {
-						if (this.maintainOddEven) {
-							if (domClass.contains(next, 'dgrid-row')) {
-								domClass.replace(next, (rowIndex % 2 === 1 ? oddClass : evenClass),
-									(rowIndex % 2 === 0 ? oddClass : evenClass));
-							}
-						}
-						next.rowIndex = rowIndex++;
+						this.setRowIndex(next, rowIndex++, next.rowIndex);
 					}
 				} while ((next = next.nextSibling) && next.rowIndex !== rowIndex);
 			}
@@ -493,6 +487,20 @@ define([
 		renderHeader: function () {
 			// no-op in a plain list
 		},
+		setRowIndex: function(row, rowIndex, oldRowIndex) {
+			// Update row for changes to the visual row index.
+			row.rowIndex = rowIndex;
+			if (this.maintainOddEven) {
+				var newClass = (rowIndex % 2 === 1 ? oddClass : evenClass)
+				if (oldRowIndex !== undefined) {
+					var oldClass = (oldRowIndex % 2 === 1 ? oddClass : evenClass);
+					if (oldClass !== newClass)
+						domClass.replace(row, oldClass, newClass);
+				} else {
+					domClass.add(row, newClass);
+				}
+			}
+		},
 
 		_autoRowId: 0,
 		insertRow: function (object, parent, beforeNode, i, options) {
@@ -516,13 +524,12 @@ define([
 			}
 			row = this.renderRow(object, options);
 			row.className = (row.className || '') + ' dgrid-row ' +
-				(i % 2 === 1 ? oddClass : evenClass) +
 				(this.addUiClasses ? ' ui-state-default' : '');
 			// Get the row id for easy retrieval
 			this._rowIdToObject[row.id = id] = object;
 			parent.insertBefore(row, beforeNode || null);
+			this.setRowIndex(row, i);
 
-			row.rowIndex = i;
 			if (previousRow && previousRow.rowIndex !== (row.rowIndex - 1)) {
 				// In this case, we are pulling the row from another location in the grid,
 				// and we need to readjust the rowIndices from the point it was removed
