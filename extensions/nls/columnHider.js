@@ -5,5 +5,6 @@ define({
 	},
 	es: true,
 	ro: true,
+	ru: true,
 	sl: true
 });

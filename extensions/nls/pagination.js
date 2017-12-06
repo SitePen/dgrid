@@ -18,6 +18,7 @@ define({
 	ja: true,
 	pt: true,
 	ro: true,
+	ru: true,
 	sk: true,
 	sl: true,
 	th: true,
