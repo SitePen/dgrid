@@ -14,12 +14,16 @@ define([
 	'../addCss!'
 ], function (test, assert, OnDemandList, OnDemandGrid, Keyboard, ColumnSet,
 		declare, domConstruct, on, query, createSyncStore, genericData) {
-	var handles = [],
-		columns = {
+
+	function getColumns() {
+		return {
 			col1: 'Column 1',
 			col3: 'Column 3',
 			col5: 'Column 5'
-		},
+		};
+	}
+
+	var handles = [],
 		testStore = createSyncStore({ data: genericData }),
 		item = testStore.getSync(1),
 		grid,
@@ -180,7 +184,7 @@ define([
 	test.suite('Keyboard (Grid + cellNavigation:true)', function () {
 		test.before(function () {
 			grid = new (declare([OnDemandGrid, Keyboard]))({
-				columns: columns,
+				columns: getColumns(),
 				sort: 'id',
 				collection: testStore
 			});
@@ -329,7 +333,7 @@ define([
 	test.suite('Keyboard focus preservation', function () {
 		test.before(function () {
 			grid = new (declare([OnDemandGrid, Keyboard]))({
-				columns: columns,
+				columns: getColumns(),
 				sort: 'id',
 				collection: testStore
 			});
@@ -410,7 +414,7 @@ define([
 
 		test.before(function () {
 			grid = new (declare([OnDemandGrid, Keyboard]))({
-				columns: columns,
+				columns: getColumns(),
 				sort: 'id',
 				collection: testStore
 			});
@@ -503,7 +507,7 @@ define([
 		test.before(function () {
 			grid = new (declare([OnDemandGrid, Keyboard]))({
 				cellNavigation: false,
-				columns: columns,
+				columns: getColumns(),
 				sort: 'id',
 				collection: testStore
 			});
@@ -537,7 +541,7 @@ define([
 		test.beforeEach(function () {
 			grid = new (declare([ OnDemandGrid, Keyboard ]))({
 				collection: store,
-				columns: columns
+				columns: getColumns()
 			});
 			document.body.appendChild(grid.domNode);
 			grid.startup();
@@ -573,7 +577,7 @@ define([
 			var store = createSyncStore({ data: genericData });
 			grid = new (declare([ OnDemandGrid, Keyboard ]))({
 				collection: store,
-				columns: columns
+				columns: getColumns()
 			});
 			document.body.appendChild(grid.domNode);
 			grid.startup();
