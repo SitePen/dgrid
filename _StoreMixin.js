@@ -178,10 +178,6 @@ define([
 
 			options = options || {};
 
-			if (this._renderedCollection.tracking) {
-				this._renderedCollection.tracking.remove();
-			}
-
 			// Remove observer and existing rows so any sub-row observers will be cleaned up
 			if (this._observerHandle) {
 				this._observerHandle.remove();
