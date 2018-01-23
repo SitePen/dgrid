@@ -31,40 +31,42 @@
 				padding: 1px;
 			}
 		</style>
-		<script src="../../dojo/dojo.js" 
+		<script src="../../dojo/dojo.js"
 			data-dojo-config="async: true"></script>
 		<script>
 			require(['dojo/_base/declare', 'dojo/_base/lang', 'dgrid/OnDemandGrid', 'dgrid/test/data/testPerformanceStore', 'dojo/domReady!'],
 				function(declare, lang, OnDemandGrid, testPerformanceStore){
-					var columns = [
-						{ name: 'Column 0', field: 'id', width: '10%' },
-						{ name: 'Column 1', field: 'integer', width: '10%' },
-						{ name: 'Column 2', field: 'floatNum', width: '10%' },
-						{ name: 'Column 3', field: 'date', width: '10%' },
-						{ name: 'Column 4', field: 'date2', width: '10%' },
-						{ name: 'Column 5', field: 'text', width: '10%' },
-						{ name: 'Column 6', field: 'bool', width: '10%' },
-						{ name: 'Column 7', field: 'bool2', width: '10%' },
-						{ name: 'Column 8', field: 'price', width: '10%' },
-						{ name: 'Column 9', field: 'today', width: '10%' }
-					];
+					function getColumns() {
+						return [
+							{ name: 'Column 0', field: 'id', width: '10%' },
+							{ name: 'Column 1', field: 'integer', width: '10%' },
+							{ name: 'Column 2', field: 'floatNum', width: '10%' },
+							{ name: 'Column 3', field: 'date', width: '10%' },
+							{ name: 'Column 4', field: 'date2', width: '10%' },
+							{ name: 'Column 5', field: 'text', width: '10%' },
+							{ name: 'Column 6', field: 'bool', width: '10%' },
+							{ name: 'Column 7', field: 'bool2', width: '10%' },
+							{ name: 'Column 8', field: 'price', width: '10%' },
+							{ name: 'Column 9', field: 'today', width: '10%' }
+						];
+					}
 					new OnDemandGrid({
 						collection: testPerformanceStore,
-						columns: lang.mixin({}, columns),
+						columns: lang.mixin({}, getColumns()),
 						pagingMethod: 'throttle'
 					}, 'gridThrottle');
 					new OnDemandGrid({
 						collection: testPerformanceStore,
-						columns: lang.mixin({}, columns),
+						columns: lang.mixin({}, getColumns()),
 						pagingMethod: 'throttleDelayed'
 					}, 'gridThrottleDelayed');
 					new OnDemandGrid({
 						collection: testPerformanceStore,
-						columns: lang.mixin({}, columns),
+						columns: lang.mixin({}, getColumns()),
 						pagingMethod: 'debounce'
 					}, 'gridDebounce');
 				});
-				
+
 		</script>
 	</head>
 	<body class="tundra">

@@ -43,24 +43,27 @@
 				{order: 8, name:"remove", description:"Using a spatula, lift cookies off onto wax paper or a cooling rack"},
 				{order: 9, name:"eat", description:"Eat and enjoy!"}
 			];
-			var columns1 = {
-				order: "step", // give column a custom name
-				name: {},
-				description: { label: "what to do", sortable: false }
-			};
-			// columns2 tests using an array of columns with explicit IDs
-			var columns2 = [
-				{ id: "name", field: "name", label: "name" },
-				{ id: "description", field: "description", label: "what to do", sortable: false }
-			];
-
+			function getColumns1() {
+				return {
+					order: "step", // give column a custom name
+					name: {},
+					description: { label: "what to do", sortable: false }
+				};
+			}
+			function getColumns2() {
+				// columns2 tests using an array of columns with explicit IDs
+				return [
+					{ id: "name", field: "name", label: "name" },
+					{ id: "description", field: "description", label: "what to do", sortable: false }
+				];
+			}
 			var prevent;
 
 			require(["dgrid/Grid", "dgrid/extensions/ColumnReorder", "dgrid/extensions/ColumnResizer",
 					"dojo/_base/declare", "dojo/domReady!"],
 				function(Grid, ColumnReorder, ColumnResizer, declare){
 					window.grid = new (declare([Grid, ColumnReorder]))({
-						columns: columns1
+						columns: getColumns1()
 					}, "grid");
 					grid.renderArray(data);
 
@@ -80,7 +83,7 @@
 					});
 
                     window.gridDash1 = new (declare([Grid, ColumnReorder]))({
-                        columns: columns1
+                        columns: getColumns1()
                     }, "grid-99");
                     gridDash1.renderArray(data);
 				});
@@ -91,8 +94,8 @@
 		<h2>A basic grid with column re-ordering</h2>
 		<div id="grid"></div>
 		<div>Buttons to test resetting columns:
-			<button onclick="grid.set('columns', columns1);">order, name, description</button>
-			<button onclick="grid.set('columns', columns2);">name, description</button>
+			<button onclick="grid.set('columns', getColumns1());">order, name, description</button>
+			<button onclick="grid.set('columns', getColumns2());">name, description</button>
 		</div>
 		<div>Button to test canceling dgrid-columnreorder events:
 			<button onclick="prevent = !prevent;">toggle canceling</button>
