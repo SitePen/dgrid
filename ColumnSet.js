@@ -114,7 +114,7 @@ define([
 					}
 				}),
 				on(target, getTouchEventName('move'), function (event) {
-					if (grid._currentlyTouchedColumnSet === null) {
+					if (grid._currentlyTouchedColumnSet == null) {
 						return;
 					}
 					var node = findParentColumnSet(event.target);
