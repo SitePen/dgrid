@@ -203,3 +203,56 @@ Property | Description
 `formatter(value, object)` | An optional function that will return a string of HTML for rendering.  The function is passed the value that would normally be rendered, and the object from the collection.  If `formatterScope` is used, this can be a string instead of a function, in which case a function will be looked up on the `formatterScope` object using the given string. (Note: if a custom `renderCell` is specified, `formatter` will be ignored unless the custom `renderCell` accounts for it.)
 `renderCell(object, value, node)` | An optional function that will be called to render the value into the target cell. `object` refers to the record from the grid's collection for the row, and `value` refers to the specific value for the current cell (which may have been modified by the column definition's `get` function). `node` refers to the table cell that will be placed in the grid; if `renderCell` returns a node, that returned node will be placed inside the table cell. (Note: if a custom `renderCell` is specified, `formatter` will be ignored unless the custom `renderCell` accounts for it.)
 `renderHeaderCell(node)` | An optional function that will be called to render the column's header cell. Like `renderCell`, this may either operate on the node directly, or return a new node to be placed within it.
+
+## Column Definition Limitations
+
+### Reuse of Column Definitions
+
+Reusing a single column definition object between multiple grids is *not* supported, and will not function properly.
+
+```js
+var cols = {...};
+var gridA = new Grid({ columns: cols });
+var gridB = new Grid({ columns: cols });  // Not supported
+
+var MyGrid = Grid.createSubclass(Grid, {
+	// Setting the columns definition in the Grid prototype will cause the
+	// columns object to be shared between all instances the grid.
+	columns: {...}
+});
+var gridC = new MyGrid();
+var gridD = new MyGrid();  // gridC and gridD now share the same columns object.
+```
+Always create a fresh `columns` object for every grid you instantiate.
+
+If multiple grids in a single page are likely to use the same column structure,
+in order to avoid code repetition, you can create a function which returns
+the structure, but creates it every time it is called.  For example:
+
+```js
+function getColumns () {
+    return {
+        col1: { label: 'Column 1', editor: 'text', editOn: 'dblclick' },
+        col2: { label: 'Column 2', sortable: false },
+        // ...
+    };
+}
+
+var grid = new Grid({
+    columns: getColumns(),
+    // ...
+}, 'grid');
+var secondGrid = new Grid({
+    columns: getColumns(),
+    // ...
+}, 'secondGrid');
+```
+
+### Column Definitions: Coexistence of formatter and renderCell
+
+The default `renderCell` logic is specifically written in such a way as to honor any
+`formatter` that is defined on the column definition.
+
+If a custom `renderCell` function is specified, however, it will override the
+default logic which is responsible for honoring `formatter`, and thus the custom
+`renderCell` logic will take precedence.
