@@ -125,18 +125,20 @@ define([
 					// Initialize header now (since it's already been rendered),
 					// and aspect after future renderHeader calls to reset focus.
 					initHeader();
-					aspect.after(grid, 'renderHeader', initHeader, true);
+					grid._listeners.push(aspect.after(grid, 'renderHeader', initHeader, true));
 				}
 				else {
-					aspect.after(grid, 'renderArray', afterContentAdded, true);
-					aspect.after(grid, '_onNotification', function (rows, event) {
-						if (event.totalLength === 0) {
-							areaNode.tabIndex = 0;
-						}
-						else if (event.totalLength === 1 && event.type === 'add') {
-							afterContentAdded();
-						}
-					}, true);
+					grid._listeners.push(
+						aspect.after(grid, 'renderArray', afterContentAdded, true),
+						aspect.after(grid, '_onNotification', function (rows, event) {
+							if (event.totalLength === 0) {
+								areaNode.tabIndex = 0;
+							}
+							else if (event.totalLength === 1 && event.type === 'add') {
+								afterContentAdded();
+							}
+						}, true)
+					);
 				}
 
 				grid._listeners.push(on(areaNode, 'mousedown', function (event) {
@@ -295,8 +297,10 @@ define([
 
 			// Aspects may be about 10% slower than using an array-based appraoch,
 			// but there is significantly less code involved (here and above).
-			return aspect.after( // Handle
+			var handle = aspect.after( // Handle
 				this[isHeader ? 'headerKeyMap' : 'keyMap'], key, callback, true);
+			this._listeners.push(handle);
+			return handle;
 		},
 
 		_ensureRowScroll: function (rowElement) {
@@ -583,6 +587,7 @@ define([
 				handle.remove();
 				return rows;
 			});
+			this._listeners.push(handle);
 		}
 	};
 

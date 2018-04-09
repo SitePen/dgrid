@@ -55,6 +55,10 @@ define([
 		//		The observer handle for the current collection, if trackable.
 		_observerHandle: null,
 
+		// _structureHandle: Object
+		//		The observer handle for the configStructure aspect event.
+		_structureHandle: null,
+
 		// shouldTrackCollection: Boolean
 		//		Whether this instance should track any trackable collection it is passed.
 		shouldTrackCollection: true,
@@ -84,7 +88,7 @@ define([
 			this._columnsWithSet = {};
 
 			// Reset _columnsWithSet whenever column configuration is reset
-			aspect.before(this, 'configStructure', lang.hitch(this, function () {
+			this._structureHandle = aspect.before(this, 'configStructure', lang.hitch(this, function () {
 				this._columnsWithSet = {};
 			}));
 		},
@@ -92,6 +96,9 @@ define([
 		destroy: function () {
 			this.inherited(arguments);
 
+			if (this._structureHandle) {
+				this._structureHandle.remove();
+			}
 			if (this._renderedCollection) {
 				this._cleanupCollection();
 			}
