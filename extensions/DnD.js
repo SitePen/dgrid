@@ -301,11 +301,13 @@ define([
 				arrayUtil.forEach(event.rows, deselectRow);
 			});
 
-			aspect.after(this, 'destroy', function () {
-				delete this.dndSource._selectedNodes;
-				selectedNodes = null;
-				this.dndSource.destroy();
-			}, true);
+			this._listeners.push(
+				aspect.after(this, 'destroy', function () {
+					delete this.dndSource._selectedNodes;
+					selectedNodes = null;
+					this.dndSource.destroy();
+				}, true)
+			);
 		},
 
 		insertRow: function (object) {
