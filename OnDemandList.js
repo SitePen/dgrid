@@ -219,7 +219,7 @@ define([
 							topPreloadNode.style.display = 'none';
 						}
 
-						if (self._previousScrollPosition && parentNode.offsetHeight) {
+						if (self._previousScrollPosition && parentNode && parentNode.offsetHeight) {
 							// Restore position after a refresh operation w/ keepScrollPosition but only
 							// if the rows have been inserted into the DOM.
 							self.scrollTo(self._previousScrollPosition);
