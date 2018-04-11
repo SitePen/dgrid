@@ -49,7 +49,7 @@ define([
 			//		if unspecified, toggles the current state.
 
 			if (!this._treeColumn) {
-				return;
+				return when();
 			}
 
 			var grid = this,
