@@ -5,41 +5,41 @@ return declare([List, _StoreMixin], {
 	// summary:
 	//		Extends List to include virtual scrolling functionality, querying a
 	//		dojo/store instance for the appropriate range when the user scrolls.
-	
+
 	// minRowsPerPage: Integer
 	//		The minimum number of rows to request at one time.
 	minRowsPerPage: 25,
-	
+
 	// maxRowsPerPage: Integer
 	//		The maximum number of rows to request at one time.
 	maxRowsPerPage: 250,
-	
+
 	// maxEmptySpace: Integer
 	//		Defines the maximum size (in pixels) of unrendered space below the
 	//		currently-rendered rows. Setting this to less than Infinity can be useful if you
 	//		wish to limit the initial vertical scrolling of the grid so that the scrolling is
 	// 		not excessively sensitive. With very large grids of data this may make scrolling
 	//		easier to use, albiet it can limit the ability to instantly scroll to the end.
-	maxEmptySpace: Infinity,	
-	
+	maxEmptySpace: Infinity,
+
 	// bufferRows: Integer
 	//	  The number of rows to keep ready on each side of the viewport area so that the user can
 	//	  perform local scrolling without seeing the grid being built. Increasing this number can
 	//	  improve perceived performance when the data is being retrieved over a slow network.
 	bufferRows: 10,
-	
+
 	// farOffRemoval: Integer
 	//		Defines the minimum distance (in pixels) from the visible viewport area
 	//		rows must be in order to be removed.  Setting to Infinity causes rows
 	//		to never be removed.
 	farOffRemoval: 2000,
-	
+
 	// queryRowsOverlap: Integer
 	//		Indicates the number of rows to overlap queries. This helps keep
 	//		continuous data when underlying data changes (and thus pages don't
 	//		exactly align)
 	queryRowsOverlap: 0,
-	
+
 	// pagingMethod: String
 	//		Method (from dgrid/util/misc) to use to either throttle or debounce
 	//		requests.  Default is "debounce" which will cause the grid to wait until
@@ -47,21 +47,21 @@ return declare([List, _StoreMixin], {
 	//		"throttleDelayed" instead to progressively request as the user scrolls,
 	//		which generally incurs more overhead but might appear more responsive.
 	pagingMethod: "debounce",
-	
+
 	// pagingDelay: Integer
 	//		Indicates the delay (in milliseconds) imposed upon pagingMethod, to wait
 	//		before paging in more data on scroll events. This can be increased to
 	//		reduce client-side overhead or the number of requests sent to a server.
 	pagingDelay: miscUtil.defaultDelay,
-	
+
 	// keepScrollPosition: Boolean
 	//		When refreshing the list, controls whether the scroll position is
 	//		preserved, or reset to the top.  This can also be overridden for
 	//		specific calls to refresh.
 	keepScrollPosition: false,
-	
+
 	rowHeight: 22,
-	
+
 	postCreate: function(){
 		this.inherited(arguments);
 		var self = this;
@@ -70,14 +70,14 @@ return declare([List, _StoreMixin], {
 			miscUtil[this.pagingMethod](function(event){ self._processScroll(event); },
 				null, this.pagingDelay));
 	},
-	
+
 	destroy: function(){
 		this.inherited(arguments);
 		if (this._refreshTimeout) {
 			clearTimeout(this._refreshTimeout);
 		}
 	},
-	
+
 	renderQuery: function(query, options){
 		// summary:
 		//		Creates a preload node for rendering a query into, and executes the query
@@ -93,7 +93,7 @@ return declare([List, _StoreMixin], {
 			preloadNode,
 			priorPreload = this.preload,
 			results;
-		
+
 		// Initial query; set up top and bottom preload nodes
 		var topPreload = {
 			node: put(container, "div.dgrid-preload", {
@@ -107,14 +107,14 @@ return declare([List, _StoreMixin], {
 		topPreload.node.style.height = "0";
 		preload.node = preloadNode = put(container, "div.dgrid-preload");
 		preload.previous = topPreload;
-		
+
 		// this preload node is used to represent the area of the grid that hasn't been
 		// downloaded yet
 		preloadNode.rowIndex = this.minRowsPerPage;
 
 		if(priorPreload){
 			// the preload nodes (if there are multiple) are represented as a linked list, need to insert it
-			if((preload.next = priorPreload.next) && 
+			if((preload.next = priorPreload.next) &&
 					// is this preload node below the prior preload node?
 					preloadNode.offsetTop >= priorPreload.node.offsetTop){
 				// the prior preload is above/before in the linked list
@@ -126,11 +126,11 @@ return declare([List, _StoreMixin], {
 			}
 			// adjust the previous and next links so the linked list is proper
 			preload.previous.next = preload;
-			preload.next.previous = preload; 
+			preload.next.previous = preload;
 		}else{
 			this.preload = preload;
 		}
-		
+
 		var loadingNode = put(preloadNode, "-div.dgrid-loading"),
 			innerNode = put(loadingNode, "div.dgrid-below");
 		innerNode.innerHTML = this.loadingMessage;
@@ -139,7 +139,7 @@ return declare([List, _StoreMixin], {
 			// Used as errback for when calls;
 			// remove the loadingNode and re-throw if an error was passed
 			put(loadingNode, "!");
-			
+
 			if(err){
 				if(self._refreshDeferred){
 					self._refreshDeferred.reject(err);
@@ -151,19 +151,19 @@ return declare([List, _StoreMixin], {
 
 		// Establish query options, mixing in our own.
 		// (The getter returns a delegated object, so simply using mixin is safe.)
-		options = lang.mixin(this.get("queryOptions"), options, 
+		options = lang.mixin(this.get("queryOptions"), options,
 			{ start: 0, count: this.minRowsPerPage },
 			"level" in query ? { queryLevel: query.level } : null);
-		
+
 		// Protect the query within a _trackError call, but return the QueryResults
 		this._trackError(function(){ return results = query(options); });
-		
+
 		if(typeof results === "undefined"){
 			// Synchronous error occurred (but was caught by _trackError)
 			errback();
 			return;
 		}
-		
+
 		// Render the result set
 		Deferred.when(self.renderArray(results, preloadNode, options), function(trs){
 			var total = typeof results.total === "undefined" ?
@@ -172,7 +172,7 @@ return declare([List, _StoreMixin], {
 				var trCount = trs.length,
 					parentNode = preloadNode.parentNode,
 					noDataNode = self.noDataNode;
-				
+
 				put(loadingNode, "!");
 				if(!("queryLevel" in options)){
 					self._total = total;
@@ -193,7 +193,7 @@ return declare([List, _StoreMixin], {
 				}
 				// only update rowHeight if we actually got results and are visible
 				if(trCount && height){ self.rowHeight = height / trCount; }
-				
+
 				total -= trCount;
 				preload.count = total;
 				preloadNode.rowIndex = trCount;
@@ -206,17 +206,17 @@ return declare([List, _StoreMixin], {
 					// last page, like is done in the processScroll function
 					options.count++;
 				}
-				
-				if (self._previousScrollPosition) {
+
+				if (self._previousScrollPosition && parentNode && parentNode.offsetHeight) {
 					// Restore position after a refresh operation w/ keepScrollPosition
 					self.scrollTo(self._previousScrollPosition);
 					delete self._previousScrollPosition;
 				}
-				
+
 				// Redo scroll processing in case the query didn't fill the screen,
 				// or in case scroll position was restored
 				self._processScroll();
-				
+
 				// If _refreshDeferred is still defined after calling _processScroll,
 				// resolve it now (_processScroll will remove it and resolve it itself
 				// otherwise)
@@ -224,14 +224,14 @@ return declare([List, _StoreMixin], {
 					self._refreshDeferred.resolve(results);
 					delete self._refreshDeferred;
 				}
-				
+
 				return trs;
 			}, errback);
 		}, errback);
-		
+
 		return results;
 	},
-	
+
 	refresh: function(options){
 		// summary:
 		//		Refreshes the contents of the grid.
@@ -240,22 +240,22 @@ return declare([List, _StoreMixin], {
 		//		* keepScrollPosition: like the keepScrollPosition instance property;
 		//			specifying it in the options here will override the instance
 		//			property's value for this specific refresh call only.
-		
+
 		var self = this,
 			keep = (options && options.keepScrollPosition),
 			dfd, results;
-		
+
 		// Fall back to instance property if option is not defined
 		if(typeof keep === "undefined"){ keep = this.keepScrollPosition; }
-		
+
 		// Store scroll position to be restored after new total is received
 		if(keep){ this._previousScrollPosition = this.getScrollPosition(); }
-		
+
 		this.inherited(arguments);
 		if(this.store){
 			// render the query
 			dfd = this._refreshDeferred = new Deferred();
-			
+
 			// renderQuery calls _trackError internally
 			results = self.renderQuery(function(queryOptions){
 				return self.store.query(self.query, queryOptions);
@@ -264,7 +264,7 @@ return declare([List, _StoreMixin], {
 				// Synchronous error occurred; reject the refresh promise.
 				dfd.reject();
 			}
-			
+
 			// Internally, _refreshDeferred will always be resolved with an object
 			// containing `results` (QueryResults) and `rows` (the rendered rows);
 			// externally the promise will resolve simply with the QueryResults, but
@@ -281,10 +281,10 @@ return declare([List, _StoreMixin], {
 					});
 					self._refreshTimeout = null;
 				}, 0);
-				
+
 				// Delete the Deferred immediately so nothing tries to re-resolve
 				delete self._refreshDeferred;
-				
+
 				// Resolve externally with just the QueryResults
 				return results;
 			}, function(err){
@@ -293,7 +293,7 @@ return declare([List, _StoreMixin], {
 			});
 		}
 	},
-	
+
 	resize: function(){
 		this.inherited(arguments);
 		this._processScroll();
@@ -307,14 +307,14 @@ return declare([List, _StoreMixin], {
 		//		of the container (which will be a trailing preload node).
 		return container.lastChild;
 	},
-	
+
 	_calcRowHeight: function(rowElement){
 		// summary:
 		//		Calculate the height of a row. This is a method so it can be overriden for
 		//		plugins that add connected elements to a row, like the tree
-		
+
 		var sibling = rowElement.nextSibling;
-		
+
 		// If a next row exists, compare the top of this row with the
 		// next one (in case "rows" are actually rendering side-by-side).
 		// If no next row exists, this is either the last or only row,
@@ -322,10 +322,10 @@ return declare([List, _StoreMixin], {
 		if(sibling && !/\bdgrid-preload\b/.test(sibling.className)){
 			return sibling.offsetTop - rowElement.offsetTop;
 		}
-		
+
 		return rowElement.offsetHeight;
 	},
-	
+
 	lastScrollTop: 0,
 	_processScroll: function(evt){
 		// summary:
@@ -345,7 +345,7 @@ return declare([List, _StoreMixin], {
 			lastResults,
 			lastRows,
 			preloadSearchNext = true;
-		
+
 		// XXX: I do not know why this happens.
 		// munging the actual location of the viewport relative to the preload node by a few pixels in either
 		// direction is necessary because at least WebKit on Windows seems to have an error that causes it to
@@ -357,7 +357,7 @@ return declare([List, _StoreMixin], {
 		// wondering if it has to do with border-box or something, but changing the border widths does not
 		// seem to make it break more or less, so I do not know…
 		var mungeAmount = 1;
-		
+
 		grid.lastScrollTop = visibleTop;
 
 		function removeDistantNodes(preload, distanceOff, traversal, below){
@@ -401,7 +401,7 @@ return declare([List, _StoreMixin], {
 				},1);
 			}
 		}
-		
+
 		function adjustHeight(preload, noMax){
 			preload.node.style.height = Math.min(preload.count * grid.rowHeight, noMax ? Infinity : grid.maxEmptySpace) + "px";
 		}
@@ -424,7 +424,7 @@ return declare([List, _StoreMixin], {
 			preloadNode = preload.node;
 			var preloadTop = preloadNode.offsetTop;
 			var preloadHeight;
-			
+
 			if(visibleBottom + mungeAmount + searchBuffer < preloadTop){
 				// the preload is below the line of sight
 				preload = traversePreload(preload, (preloadSearchNext = false));
@@ -450,12 +450,12 @@ return declare([List, _StoreMixin], {
 				}
 				count = Math.min(Math.max(count, grid.minRowsPerPage),
 									grid.maxRowsPerPage, preload.count);
-				
+
 				if(count == 0){
 					preload = traversePreload(preload, preloadSearchNext);
 					continue;
 				}
-				
+
 				count = Math.ceil(count);
 				offset = Math.min(Math.floor(offset), preload.count - count);
 				var options = lang.mixin(grid.get("queryOptions"), preload.options);
@@ -499,7 +499,7 @@ return declare([List, _StoreMixin], {
 						}else{
 							keepScrollTo = true;
 						}
-						
+
 					}
 					options.start = preload.count;
 					options.count = Math.min(count + queryRowsOverlap, grid.maxRowsPerPage);
@@ -509,29 +509,29 @@ return declare([List, _StoreMixin], {
 				}
 
 				adjustHeight(preload);
-				
+
 				// use the query associated with the preload node to get the next "page"
 				if("level" in preload.query){
 					options.queryLevel = preload.query.level;
 				}
-				
+
 				// Avoid spurious queries (ideally this should be unnecessary...)
 				if(!("queryLevel" in options) && (options.start > grid._total || options.count < 0)){
 					continue;
 				}
-				
+
 				// create a loading node as a placeholder while the data is loaded
 				var loadingNode = put(beforeNode, "-div.dgrid-loading[style=height:" + count * grid.rowHeight + "px]"),
 					innerNode = put(loadingNode, "div.dgrid-" + (below ? "below" : "above"));
 				innerNode.innerHTML = grid.loadingMessage;
 				loadingNode.count = count;
-				
+
 				// Query now to fill in these rows.
 				// Keep _trackError-wrapped results separate, since if results is a
 				// promise, it will lose QueryResults functions when chained by `when`
 				var results = preload.query(options),
 					trackedResults = grid._trackError(function(){ return results; });
-				
+
 				if(trackedResults === undefined){
 					// Sync query failed
 					put(loadingNode, "!");
@@ -543,11 +543,11 @@ return declare([List, _StoreMixin], {
 				(function(loadingNode, below, keepScrollTo, results){
 					lastRows = Deferred.when(grid.renderArray(results, loadingNode, options), function(rows){
 						lastResults = results;
-						
+
 						// can remove the loading node now
 						beforeNode = loadingNode.nextSibling;
 						put(loadingNode, "!");
-						if(keepScrollTo && beforeNode && beforeNode.offsetWidth){ // beforeNode may have been removed if the query results loading node was a removed as a distant node before rendering 
+						if(keepScrollTo && beforeNode && beforeNode.offsetWidth){ // beforeNode may have been removed if the query results loading node was a removed as a distant node before rendering
 							// if the preload area above the nodes is approximated based on average
 							// row height, we may need to adjust the scroll once they are filled in
 							// so we don't "jump" in the scrolling position
@@ -561,7 +561,7 @@ return declare([List, _StoreMixin], {
 								preserveMomentum: true
 							});
 						}
-						
+
 						Deferred.when(results.total || results.length, function(total){
 							if(!("queryLevel" in options)){
 								grid._total = total;
@@ -570,7 +570,7 @@ return declare([List, _StoreMixin], {
 								// if it is below, we will use the total from the results to update
 								// the count of the last preload in case the total changes as later pages are retrieved
 								// (not uncommon when total counts are estimated for db perf reasons)
-								
+
 								// recalculate the count
 								below.count = total - below.node.rowIndex;
 								// check to see if we are on the last page
@@ -584,7 +584,7 @@ return declare([List, _StoreMixin], {
 								adjustHeight(below);
 							}
 						});
-						
+
 						// make sure we have covered the visible area
 						grid._processScroll();
 						return rows;
@@ -596,7 +596,7 @@ return declare([List, _StoreMixin], {
 				preload = preload.previous;
 			}
 		}
-		
+
 		// After iterating, if additional requests have been made mid-refresh,
 		// resolve the refresh promise based on the latest results obtained
 		if (lastRows && (refreshDfd = this._refreshDeferred)) {
