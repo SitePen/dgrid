@@ -384,6 +384,7 @@ define([
 
 		_updatePreloadRowHeights: function () {
 			var preload = this.preload;
+			var rowHeight = 0;
 			if (!preload) {
 				return;
 			}
@@ -392,12 +393,14 @@ define([
 			}
 			while (preload) {
 				if (!preload.rowHeight) {
-					preload.rowHeight = this.rowHeight ||
+					preload.rowHeight = 
 						this._calcAverageRowHeight(preload.node.parentNode.querySelectorAll('.dgrid-row'));
 					this._adjustPreloadHeight(preload);
 				}
+				rowHeight = preload ? preload.rowHeight : rowHeight;
 				preload = preload.next;
 			}
+			this.rowHeight = rowHeight;
 		},
 
 		lastScrollTop: 0,

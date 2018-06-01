@@ -70,6 +70,7 @@ define([
 
 		test.test('calculated row height', function () {
 			assert.strictEqual(16, list.preload.rowHeight);
+			assert.strictEqual(16, list.rowHeight);
 		});
 	});
 });
