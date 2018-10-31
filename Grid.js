@@ -400,7 +400,9 @@ define([
 			// Clean up UI from any previous sort
 			if (this._lastSortedArrow) {
 				// Remove the sort classes from the parent node
-				domClass.remove(this._lastSortedArrow.parentNode, 'dgrid-sort-up dgrid-sort-down');
+				if (this._lastSortedArrow.parentNode) {
+					domClass.remove(this._lastSortedArrow.parentNode, 'dgrid-sort-up dgrid-sort-down');
+				}
 				// Destroy the lastSortedArrow node
 				domConstruct.destroy(this._lastSortedArrow);
 				delete this._lastSortedArrow;
