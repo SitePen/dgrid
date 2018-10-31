@@ -476,7 +476,14 @@ define([
 				}
 
 				// add grid reference to each column object for potential use by plugins
-				column.grid = this;
+				if (!column.grid) {
+					column.grid = this;
+				} else {
+					if (column.grid !== this) {
+						console.warn('Sharing column definition objects with multiple grids is not supported.',
+							column.grid, this);
+					}
+				}
 				subRow.push(column); // make sure it can be iterated on
 			}
 

@@ -474,7 +474,7 @@ define([
 				// the latter is delayed by setTimeouts in Dijit and will fire too late.
 				cmp.on(editOn ? 'blur' : 'change', function () {
 					if (!cmp._dgridIgnoreChange) {
-						self._updatePropertyFromEditor(column, this, {type: 'widget'});
+						self._updatePropertyFromEditor(column, cmp, {type: 'widget'});
 					}
 				});
 			}

@@ -63,6 +63,84 @@ define([
 			grid.renderArray(orderedData.items);
 			runClassNameTests();
 		});
+
+		test.suite('sharing column definitions', function () {
+			var warnCalled = false;
+			var warnMessage;
+			var systemWarn;
+			var grids;
+			var expectedWarnMessage = 'Sharing column definition objects with multiple grids is not supported.';
+
+			test.beforeEach(function () {
+				grids = [];
+				systemWarn = console.warn;
+				warnCalled = false;
+				warnMessage = null;
+				console.warn = function (message) {
+					warnMessage = message;
+					warnCalled = true;
+				};
+			});
+
+			test.afterEach(function () {
+				console.warn = systemWarn;
+				for (var i = 0, l = grids.length; i < l; i++) {
+					grids[i].destroy();
+				}
+			});
+
+			test.test('detect warning during construction', function () {
+				var columns = {
+					col1: 'Column 1',
+					col3: 'Column 3',
+					col5: 'Column 5'
+				};
+				grids.push(new Grid({
+					columns: columns
+				}));
+				grids.push(new Grid({
+					columns: columns
+				}));
+				assert.isTrue(warnCalled);
+				assert.strictEqual(warnMessage, expectedWarnMessage);
+			});
+
+			test.test('detect warning during column setting', function () {
+				var columns1 = {
+					col1: 'Column 1',
+					col3: 'Column 3',
+					col5: 'Column 5'
+				};
+				var columns2 = {
+					col1: 'Column 1',
+					col3: 'Column 3',
+					col5: 'Column 5'
+				};
+				grids.push(new Grid({
+					columns: columns1
+				}));
+				grids.push(new Grid({
+					columns: columns2
+				}));
+				assert.isFalse(warnCalled);
+				grids[1].set('columns', columns1);
+				assert.isTrue(warnCalled);
+				assert.strictEqual(warnMessage, expectedWarnMessage);
+			});
+
+			test.test('no warning when same columns set again', function () {
+				var columns = {
+					col1: 'Column 1',
+					col3: 'Column 3',
+					col5: 'Column 5'
+				};
+				grids.push(new Grid({
+					columns: columns
+				}));
+				grids[0].set('columns', columns);
+				assert.isFalse(warnCalled);
+			});
+		});
 	});
 
 	test.suite('columnSets', function () {

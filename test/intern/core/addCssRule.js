@@ -9,13 +9,21 @@ define([
 	'dgrid/ColumnSet',
 	'dgrid/extensions/ColumnHider',
 	'dgrid/extensions/ColumnResizer',
-	'dgrid/util/misc'
+	'dgrid/util/misc',
+	'../addCss!'
 ], function (test, assert, declare, domStyle, domConstruct, query,
 		Grid, ColumnSet, ColumnHider, ColumnResizer, miscUtil) {
 
+	var grid;
+	function gridDestroy() {
+		if (grid) {
+			grid.destroy();
+			grid = undefined;
+		}
+	}
+
 	test.suite('addCssRule', function () {
 		var testDiv;
-		var grid;
 
 		// Setup / teardown
 		test.before(function () {
@@ -26,11 +34,7 @@ define([
 			domConstruct.destroy(testDiv);
 		});
 
-		test.afterEach(function () {
-			if (grid) {
-				grid.destroy();
-			}
-		});
+		test.afterEach(gridDestroy);
 
 		// Tests
 		test.test('addCssRule + remove', function () {
@@ -164,7 +168,7 @@ define([
 			addRules();
 			checkRules(values);
 			// Destroy the grid, which should remove the style rules
-			grid.destroy();
+			gridDestroy();
 
 			// Create grid for the second time, with cleanAddedRules: false
 			createGrid(false);
@@ -175,7 +179,7 @@ define([
 			this.rules = addRules();
 			checkRules(values);
 			// Destroy the grid, which should *not* remove the style rules
-			grid.destroy();
+			gridDestroy();
 
 			// Create grid for the third time
 			createGrid(true);
@@ -183,7 +187,8 @@ define([
 			checkRules(values);
 			// Destroy the grid (which won't remove the styles from last time,
 			// since no handles were added to this exact instance)
-			grid.destroy();
+			gridDestroy();
+
 			// Clean up rule litter from cleanAddedRules: false test
 			var i;
 			for (i in this.rules) {
@@ -211,8 +216,6 @@ define([
 
 	test.suite('CSS escaping of column IDs via dgrid APIs', function () {
 
-		var grid;
-
 		test.suite('Grid columns and columnsets', function () {
 			function makeTest(func, id) {
 				return function () {
@@ -235,9 +238,7 @@ define([
 				grid.startup();
 			});
 
-			test.afterEach(function () {
-				grid.destroy();
-			});
+			test.afterEach(gridDestroy);
 
 			test.test('styleColumn', makeTest('styleColumn', 'col:umn'));
 
@@ -249,9 +250,7 @@ define([
 		test.suite('ColumnHider', function () {
 			var ColumnHiderGrid = declare([Grid, ColumnHider]);
 
-			test.afterEach(function () {
-				grid.destroy();
-			});
+			test.afterEach(gridDestroy);
 
 			test.test('Hiding column after construction', function () {
 				assert.doesNotThrow(function () {
@@ -291,9 +290,7 @@ define([
 		test.suite('ColumnResizer', function () {
 			var ColumnResizerGrid = declare([Grid, ColumnResizer]);
 
-			test.afterEach(function () {
-				grid.destroy();
-			});
+			test.afterEach(gridDestroy);
 
 			test.test('Resizing column after construction', function () {
 				assert.doesNotThrow(function () {

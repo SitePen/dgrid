@@ -53,7 +53,7 @@ define([
 			//		if unspecified, toggles the current state.
 
 			if (!this._treeColumn) {
-				return;
+				return when();
 			}
 
 			var grid = this,
@@ -325,7 +325,7 @@ define([
 			} else {
 				refreshResult = this.inherited(arguments);
 			}
-			return refreshResult.then(function () {
+			return when(refreshResult).then(function () {
 				var promises = this._expandPromises;
 				delete this._expandPromises;
 				return all(promises);

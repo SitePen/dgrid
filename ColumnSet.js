@@ -114,7 +114,7 @@ define([
 					}
 				}),
 				on(target, getTouchEventName('move'), function (event) {
-					if (grid._currentlyTouchedColumnSet === null) {
+					if (grid._currentlyTouchedColumnSet == null) {
 						return;
 					}
 					var node = findParentColumnSet(event.target);
@@ -199,17 +199,19 @@ define([
 			});
 
 			if (typeof this.expand === 'function') {
-				aspect.after(this, 'expand', function (promise, args) {
-					promise.then(function () {
-						var row = self.row(args[0]);
-						if (self._expanded[row.id]) {
-							// scrollLeft changes can't take effect on collapsed child rows;
-							// ensure they are properly updated once re-expanded.
-							adjustScrollLeft(self, row.element.connected);
-						}
-					});
-					return promise;
-				});
+				this._listeners.push(
+					aspect.after(this, 'expand', function (promise, args) {
+						promise.then(function () {
+							var row = self.row(args[0]);
+							if (self._expanded[row.id]) {
+								// scrollLeft changes can't take effect on collapsed child rows;
+								// ensure they are properly updated once re-expanded.
+								adjustScrollLeft(self, row.element.connected);
+							}
+						});
+						return promise;
+					})
+				);
 			}
 		},
 
@@ -273,8 +275,10 @@ define([
 				}
 			} else {
 				// first-time-only operations: hook up event/aspected handlers
-				aspect.after(this, 'resize', reposition, true);
-				aspect.after(this, 'styleColumn', reposition, true);
+				this._listeners.push(
+					aspect.after(this, 'resize', reposition, true),
+					aspect.after(this, 'styleColumn', reposition, true)
+				);
 				this._columnSetScrollerNode = domConstruct.create('div', {
 					className: 'dgrid-column-set-scroller-container'
 				}, this.footerNode, 'after');
