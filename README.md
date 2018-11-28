@@ -68,7 +68,7 @@ but using Bower is recommended as it is more straightforward.
 
 ## CDN
 
-[unokg](https://unpkg.com/) offers CDN hosting of raw tagged git URLs.
+[unpkg](https://unpkg.com/) offers CDN hosting of raw tagged git URLs.
 It can serve any version of dgrid and dstore.
 
 For example, here's a `packages` configuration for dgrid 1.1.0 and dstore 1.1.1:
