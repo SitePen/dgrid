@@ -68,8 +68,8 @@ but using Bower is recommended as it is more straightforward.
 
 ## CDN
 
-[RawGit](http://rawgit.com/) now offers CDN hosting of raw tagged git URLs.
-It can serve any version of dgrid and dstore via MaxCDN.
+[unpkg](https://unpkg.com/) offers CDN hosting of raw tagged git URLs.
+It can serve any version of dgrid and dstore.
 
 For example, here's a `packages` configuration for dgrid 1.1.0 and dstore 1.1.1:
 
@@ -77,11 +77,11 @@ For example, here's a `packages` configuration for dgrid 1.1.0 and dstore 1.1.1:
 packages: [
     {
         name: 'dgrid',
-        location: '//cdn.rawgit.com/SitePen/dgrid/v1.1.0'
+        location: '//unpkg.com/dgrid@1.1.0/'
     },
     {
         name: 'dstore',
-        location: '//cdn.rawgit.com/SitePen/dstore/v1.1.1'
+        location: '//unpkg.com/dojo-dstore@1.1.1/'
     }
 ]
 ```
