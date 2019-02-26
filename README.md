@@ -5,41 +5,24 @@ dgrid is available under the ["New" BSD License](LICENSE).
 
 # Installation
 
-## Bower
+## Install from npm
 
-dgrid and its dependencies can be installed via [Bower](http://bower.io/) using the following command:
-
-```
-bower install dgrid
-```
-
-Note that by default, Bower installs to a `bower_components` subdirectory.  If you'd
-like to install to the current directory instead (which tends to be more appropriate
-for AMD projects), add a `.bowerrc` with the following:
-
-```json
-{
-    "directory": "."
-}
-```
-
-By default, Bower will automatically find the highest tagged version of dgrid and
-install it along with its dependencies.  Alternatively, the latest development version of dgrid can be
-installed by instructing Bower to install from the master branch:
+dgrid and its dependencies can be installed via [npm](https://www.npmjs.com/) using the following command:
 
 ```
-bower install dgrid#master
+npm install dgrid dojo-dstore
 ```
 
-Note that while dgrid lists the `dojo` package as a dependency, it will not automatically
-install `dijit`, as it is not a hard requirement.  Dijit can be additionally installed by
-running:
+Note that by default, npm installs to a `node_modules` subdirectory.
+
+If you are using Dojo widgets, you may want to include `dijit` and `dojox`:
 
 ```
-bower install dijit#<target>
+npm install dgrid dojo-dstore dijit dojox
 ```
 
-...where `<target>` corresponds to the version of Dojo you have installed.
+By default, npm will automatically find the highest tagged version of each component and
+install it along with its dependencies.
 
 ## Manual Download
 
@@ -60,11 +43,6 @@ directory structure like the following:
 * `dojox` (optional, dependency of some dgrid tests)
 * `dstore`
 * `util` (optional, e.g. if pursuing a custom build)
-
-## npm
-
-As of version 1.1.0, dgrid can also be [retrieved via npm](doc/usage/npm.md),
-but using Bower is recommended as it is more straightforward.
 
 ## CDN
 
@@ -151,7 +129,7 @@ either be run using the browser, or using a cloud provider such as
 More information on writing your own tests with Intern can be found in the
 [Intern user guide](https://theintern.github.io/intern/).
 
-*Note that installing dgrid via Bower will not include the test folder; if you
+*Note that installing dgrid via npm will not include the test folder; if you
 wish to run dgrid's unit tests, download the package directly.*
 
 ## Setting up
