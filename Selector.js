@@ -40,7 +40,7 @@ define([
 			return (cell.input = domConstruct.create('input', {
 				'aria-checked': selected,
 				checked: selected,
-				disabled: !grid.allowSelect(grid.row(object)),
+				readonly: !grid.allowSelect(grid.row(object)),
 				tabIndex: isNaN(column.tabIndex) ? -1 : column.tabIndex,
 				type: column.selector
 			}, cell));
@@ -155,8 +155,8 @@ define([
 						continue;
 					}
 					element = (element.contents || element).input;
-					if (element && !element.disabled) {
-						// Only change the value if it is not disabled
+					if (element && !element.readonly) {
+						// Only change the value if it is not read-only
 						element.checked = value;
 						element.setAttribute('aria-checked', value);
 					}
