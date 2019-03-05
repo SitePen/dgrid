@@ -45,21 +45,23 @@ define([
 
 		test.test('Grids + initially-defined classes', function () {
 			// Build three grids
-			var columns = {
+			function getColumns() {
+				return {
 					order: 'step', // give column a custom name
 					name: {},
 					description: { label: 'what to do', sortable: false }
-				},
-				gridC = window.gridC = new Grid({
+				};
+			}
+			var gridC = window.gridC = new Grid({
 					'class': 'c',
-					columns: columns
+					columns: getColumns()
 				}),
 				gridCN = window.gridCN = new Grid({
 					'class': 'cn',
-					columns: columns
+					columns: getColumns()
 				}),
 				gridDOM = window.gridDOM = new Grid({
-					columns: columns
+					columns: getColumns()
 				}, domConstruct.create('div', { 'class': 'dom' }));
 
 			// Check the classes on each List.domNode

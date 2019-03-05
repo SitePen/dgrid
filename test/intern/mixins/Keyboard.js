@@ -10,15 +10,20 @@ define([
 	'dojo/on',
 	'dojo/query',
 	'dgrid/test/data/createSyncStore',
-	'dgrid/test/data/genericData'
+	'dgrid/test/data/genericData',
+	'../addCss!'
 ], function (test, assert, OnDemandList, OnDemandGrid, Keyboard, ColumnSet,
 		declare, domConstruct, on, query, createSyncStore, genericData) {
-	var handles = [],
-		columns = {
+
+	function getColumns() {
+		return {
 			col1: 'Column 1',
 			col3: 'Column 3',
 			col5: 'Column 5'
-		},
+		};
+	}
+
+	var handles = [],
 		testStore = createSyncStore({ data: genericData }),
 		item = testStore.getSync(1),
 		grid,
@@ -59,7 +64,10 @@ define([
 
 	function after() {
 		// Destroy list or grid
-		grid.destroy();
+		if (grid) {
+			grid.destroy();
+			grid = undefined;
+		}
 	}
 
 	// Common test functions for grid w/ cellNavigation: false and list
@@ -176,7 +184,7 @@ define([
 	test.suite('Keyboard (Grid + cellNavigation:true)', function () {
 		test.before(function () {
 			grid = new (declare([OnDemandGrid, Keyboard]))({
-				columns: columns,
+				columns: getColumns(),
 				sort: 'id',
 				collection: testStore
 			});
@@ -325,7 +333,7 @@ define([
 	test.suite('Keyboard focus preservation', function () {
 		test.before(function () {
 			grid = new (declare([OnDemandGrid, Keyboard]))({
-				columns: columns,
+				columns: getColumns(),
 				sort: 'id',
 				collection: testStore
 			});
@@ -406,7 +414,7 @@ define([
 
 		test.before(function () {
 			grid = new (declare([OnDemandGrid, Keyboard]))({
-				columns: columns,
+				columns: getColumns(),
 				sort: 'id',
 				collection: testStore
 			});
@@ -499,7 +507,7 @@ define([
 		test.before(function () {
 			grid = new (declare([OnDemandGrid, Keyboard]))({
 				cellNavigation: false,
-				columns: columns,
+				columns: getColumns(),
 				sort: 'id',
 				collection: testStore
 			});
@@ -533,7 +541,7 @@ define([
 		test.beforeEach(function () {
 			grid = new (declare([ OnDemandGrid, Keyboard ]))({
 				collection: store,
-				columns: columns
+				columns: getColumns()
 			});
 			document.body.appendChild(grid.domNode);
 			grid.startup();
@@ -557,6 +565,39 @@ define([
 
 			assert.strictEqual(grid.contentNode.tabIndex, 0,
 				'contentNode should be focusable when grid is empty again');
+		});
+	});
+
+	test.suite('Keyboard _ensureScroll', function () {
+		function isRowVisible(row) {
+			return row.element.offsetTop < grid.bodyNode.scrollTop + grid.bodyNode.offsetHeight;
+		}
+
+		test.beforeEach(function () {
+			var store = createSyncStore({ data: genericData });
+			grid = new (declare([ OnDemandGrid, Keyboard ]))({
+				collection: store,
+				columns: getColumns()
+			});
+			document.body.appendChild(grid.domNode);
+			grid.startup();
+		});
+
+		test.afterEach(after);
+
+		test.test('scroll to row', function () {
+			var row40 = grid.row(40);
+			assert.isTrue(!isRowVisible(row40), 'Row 40 is visible.');
+			grid._ensureScroll(row40);
+			assert.isTrue(isRowVisible(row40), 'Row 40 is not visible.');
+		});
+
+		test.test('scroll to cell', function () {
+			var cell40col3 = grid.cell(40, 'col3');
+			assert.isTrue(!isRowVisible(cell40col3.row), 'Row 40 is visible.');
+			grid._ensureScroll(cell40col3);
+			// This is how the code works when there are no column sets and only one subrow.
+			assert.isTrue(!isRowVisible(cell40col3.row), 'Row 40 is visible.');
 		});
 	});
 });

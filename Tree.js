@@ -3,15 +3,18 @@ define([
 	'dojo/_base/lang',
 	'dojo/_base/array',
 	'dojo/aspect',
+	'dojo/Deferred',
 	'dojo/dom-construct',
 	'dojo/dom-class',
 	'dojo/on',
+	'dojo/promise/all',
 	'dojo/query',
 	'dojo/when',
 	'./util/has-css3',
 	'./Grid',
 	'dojo/has!touch?./util/touch'
-], function (declare, lang, arrayUtil, aspect, domConstruct, domClass, on, querySelector, when, has, Grid, touchUtil) {
+], function (declare, lang, arrayUtil, aspect, Deferred, domConstruct, domClass, on, all, querySelector, when, has,
+			 Grid, touchUtil) {
 
 	return declare(null, {
 		// collapseOnRefresh: Boolean
@@ -50,7 +53,7 @@ define([
 			//		if unspecified, toggles the current state.
 
 			if (!this._treeColumn) {
-				return;
+				return when();
 			}
 
 			var grid = this,
@@ -229,7 +232,6 @@ define([
 
 		insertRow: function (object, container, beforeNode, i, options) {
 			options = options || {};
-			var grid = this;
 
 			var level = options.queryLevel = 'queryLevel' in options ? options.queryLevel :
 				'level' in container ? container.level : 0;
@@ -241,7 +243,7 @@ define([
 				expanded = this.shouldExpand(row, level, this._expanded[row.id]);
 
 			if (expanded) {
-				this.expand(rowElement, true, true, options.scrollingUp);
+				this._expandWhenInDom(rowElement, options);
 			}
 
 			if (expanded || (!this.collection.mayHaveChildren || this.collection.mayHaveChildren(object))) {
@@ -249,6 +251,30 @@ define([
 			}
 
 			return rowElement; // pass return value through
+		},
+
+		_expandWhenInDom: function (rowElement, options, dfd) {
+			// Expand a row after it has been inserted into the DOM.  This is necessary because
+			// the OnDemandList code that manages the preload nodes needs the nodes to be in the DOM
+			// to create a correctly ordered linked list.;
+
+			if (rowElement.offsetHeight) {
+				var expandPromise = this.expand(rowElement, true, true, options.scrollingUp);
+				if (dfd) {
+					expandPromise.then(function () {
+						dfd.resolve();
+					});
+				}
+			} else {
+				if (rowElement.parentNode && this.domNode.offsetHeight) {
+					if (this._expandPromises && !dfd) {
+						dfd = new Deferred();
+						this._expandPromises.push(dfd.promise);
+					}
+					// Continue to try to expand the row only while it is inserted into a document fragment.
+					setTimeout(this._expandWhenInDom.bind(this, rowElement, options, dfd), 0);
+				}
+			}
 		},
 
 		_queueNodeForDeletion: function (node) {
@@ -283,6 +309,27 @@ define([
 				treePrune: true,
 				removeBelow: removeBelow
 			}]);
+		},
+
+		refresh: function (options) {
+			// Restoring the previous scroll position with OnDemandList is not possible in some cases with
+			// nested expanded nodes.  In those cases, restoring the position would require scrolling and
+			// loading rows incrementally to make sure the expanded rows are loaded and expanded.  dgrid is not
+			// currently written to do that.  If there are expanded rows, then do not allow the position to be
+			// restored.
+			var refreshResult;
+			this._expandPromises = [];
+			var keepScrollPosition = this.keepScrollPosition || (options && options.keepScrollPosition);
+			if (keepScrollPosition && Object.keys(this._expanded).length) {
+				refreshResult = this.inherited(arguments, lang.mixin(options || {}, { keepScrollPosition: false }));
+			} else {
+				refreshResult = this.inherited(arguments);
+			}
+			return when(refreshResult).then(function () {
+				var promises = this._expandPromises;
+				delete this._expandPromises;
+				return all(promises);
+			}.bind(this));
 		},
 
 		removeRow: function (rowElement, preserveDom, options) {

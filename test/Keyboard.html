@@ -36,12 +36,14 @@
 
 			require(["dgrid/OnDemandList", "dgrid/OnDemandGrid", "dgrid/Keyboard", "dojo/_base/declare", "dojo/on", "dojo/query", "dgrid/test/data/testStore", "dojo/domReady!"],
 			function(OnDemandList, OnDemandGrid, Keyboard, declare, on, query, testStore){
-				var columns = {
+				function getColumns() {
+					return {
 						col1: "Column 1",
 						col3: "Column 3",
 						col5: "Column 5"
-					},
-					KeyboardList = declare([OnDemandList, Keyboard]),
+					};
+				}
+				var KeyboardList = declare([OnDemandList, Keyboard]),
 					KeyboardGrid = declare([OnDemandGrid, Keyboard]),
 					list = window.list = new KeyboardList({
 						collection: testStore,
@@ -53,11 +55,11 @@
 					}, "list"),
 					grid = window.grid = new KeyboardGrid({
 						collection: testStore,
-						columns: columns
+						columns: getColumns()
 					}, "grid"),
 					rowGrid = window.rowGrid = new KeyboardGrid({
 						collection: testStore,
-						columns: columns,
+						columns: getColumns(),
 						cellNavigation: false
 					}, "rowGrid");
 

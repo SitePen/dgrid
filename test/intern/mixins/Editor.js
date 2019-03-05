@@ -24,11 +24,23 @@ define([
 		EditorGrid = declare([ Grid, Editor ]),
 		grid;
 
+	function addDelay(result) {
+		var delay = new Deferred();
+		when(result).then(function () {
+			var args = arguments;
+			setTimeout(function () {
+				delay.resolve.apply(delay, args);
+			}, 300);
+		});
+		return delay;
+	}
+
 	test.suite('Editor mixin', function () {
 
 		test.afterEach(function () {
 			if (grid) {
 				grid.destroy();
+				grid = undefined;
 			}
 		});
 
@@ -165,7 +177,7 @@ define([
 
 			function testRow(rowIndex) {
 				cell = grid.cell(rowIndex, 'name');
-				when(grid.edit(cell)).then(dfd.rejectOnError(function () {
+				addDelay(grid.edit(cell)).then(dfd.rejectOnError(function () {
 					matchedNodes = query('input', cell.element);
 					if (canEdit(cell.row.data)) {
 						assert.strictEqual(1, matchedNodes.length,
@@ -223,15 +235,16 @@ define([
 
 			function testRow(rowIndex) {
 				cell = grid.cell(rowIndex, 'description');
-				when(grid.edit(cell)).then(dfd.rejectOnError(function () {
+				// Waiting for the promise to resolve is not enough time for IE9 to render the input.
+				addDelay(grid.edit(cell)).then(dfd.rejectOnError(function () {
 					matchedNodes = query('input', cell.element);
 					if (canEdit(cell.row.data)) {
 						assert.strictEqual(1, matchedNodes.length,
-							'Cell with canEdit=>true should have an editor element');
+							'Cell with canEdit=>true should have an editor element: rowIndex = ' + rowIndex);
 					}
 					else {
 						assert.strictEqual(0, matchedNodes.length,
-							'Cell with canEdit=>false should not have an editor element');
+							'Cell with canEdit=>false should not have an editor element: rowIndex = ' + rowIndex);
 					}
 					rowIndex++;
 					if (rowIndex < rowCount) {
@@ -387,7 +400,7 @@ define([
 			function testRow(rowIndex) {
 				// Test calling 'grid.edit()' in an always-on cell
 				cell = grid.cell(rowIndex, 'name');
-				grid.edit(cell).then(dfd.rejectOnError(function (node) {
+				addDelay(grid.edit(cell)).then(dfd.rejectOnError(function (node) {
 					cellEditor = query('input', cell.element)[0];
 					assert.strictEqual(cellEditor, node,
 						'edit method\'s promise should return the active editor');
@@ -446,7 +459,7 @@ define([
 					dfdEvent.resolve();
 				}));
 				// Don't move on to the next row until the editor has received focus and the show event has fired.
-				all([grid.edit(cell), dfdEvent]).then(dfd.rejectOnError(function () {
+				all([addDelay(grid.edit(cell)), dfdEvent]).then(dfd.rejectOnError(function () {
 					cellEditor = query('input', cell.element)[0];
 					assert.strictEqual(cellEditor, document.activeElement,
 						'Editing a cell should make the cell\'s editor active');
@@ -482,11 +495,12 @@ define([
 
 			var cell = grid.cell(1, 'name');
 			var cellContent;
-			return grid.edit(cell).then(function () {
+			return addDelay(grid.edit(cell)).then(function () {
 				cellContent = cell.element.innerHTML;
-				grid.refresh();
+				return addDelay(grid.refresh());
+			}).then(function () {
 				cell = grid.cell(1, 'name');
-				return grid.edit(cell);
+				return addDelay(grid.edit(cell));
 			}).then(function () {
 				assert.strictEqual(cell.element.innerHTML, cellContent, 'Widget should be identical to before refresh');
 			});
@@ -634,7 +648,7 @@ define([
 
 					// Test refreshing an active cell before its value is committed (should revert value, keep focus)
 
-					return grid.edit(cell).then(function () {
+					return addDelay(grid.edit(cell)).then(function () {
 						originalElement = document.activeElement;
 						originalValue = originalElement.value;
 						originalElement.value = 'new name';

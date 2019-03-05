@@ -72,6 +72,12 @@
 		"parent": ""
 	},
 	{
+		"name": "OnDemand_pagingMethod.html",
+		"url": "OnDemand_pagingMethod.html",
+		"title": "Test OnDemandGrids different pagingMethod values",
+		"parent": ""
+	},
+	{
 		"name": "OnDemand_promises.html",
 		"url": "OnDemand_promises.html",
 		"title": "Test OnDemandGrids with promise-based stores",

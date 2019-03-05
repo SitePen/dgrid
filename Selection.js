@@ -362,9 +362,11 @@ define([
 
 			// Update aspects if there is a collection change
 			if (this._setCollection) {
-				aspect.before(this, '_setCollection', function (collection) {
-					grid._updateDeselectionAspect(collection);
-				});
+				this._listeners.push(
+					aspect.before(this, '_setCollection', function (collection) {
+						grid._updateDeselectionAspect(collection);
+					})
+				);
 			}
 			this._updateDeselectionAspect();
 		},

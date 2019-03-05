@@ -400,7 +400,9 @@ define([
 			// Clean up UI from any previous sort
 			if (this._lastSortedArrow) {
 				// Remove the sort classes from the parent node
-				domClass.remove(this._lastSortedArrow.parentNode, 'dgrid-sort-up dgrid-sort-down');
+				if (this._lastSortedArrow.parentNode) {
+					domClass.remove(this._lastSortedArrow.parentNode, 'dgrid-sort-up dgrid-sort-down');
+				}
 				// Destroy the lastSortedArrow node
 				domConstruct.destroy(this._lastSortedArrow);
 				delete this._lastSortedArrow;
@@ -476,7 +478,14 @@ define([
 				}
 
 				// add grid reference to each column object for potential use by plugins
-				column.grid = this;
+				if (!column.grid) {
+					column.grid = this;
+				} else {
+					if (column.grid !== this) {
+						console.warn('Sharing column definition objects with multiple grids is not supported.',
+							column.grid, this);
+					}
+				}
 				subRow.push(column); // make sure it can be iterated on
 			}
 

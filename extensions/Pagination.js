@@ -18,11 +18,7 @@ define([
 	when, miscUtil, i18n) {
 	function cleanupContent(grid) {
 		// Remove any currently-rendered rows, or noDataMessage
-		if (grid.noDataNode) {
-			domConstruct.destroy(grid.noDataNode);
-			delete grid.noDataNode;
-		}
-		else {
+		if (!grid._removeNoDataNode()) {
 			grid.cleanup();
 		}
 		grid.contentNode.innerHTML = '';
@@ -100,6 +96,12 @@ define([
 				i18n = this.i18nPagination,
 				navigationNode,
 				node;
+
+			if (typeof this._processScroll === 'function') {
+				// Warn the user of an invalid class + mixin combination when they mix OnDemandList and this extension.
+				this.bodyNode.innerHTML = i18n.notCompatibleWithOnDemand;
+				console.warn(i18n.notCompatibleWithOnDemand);
+			}
 
 			statusNode.tabIndex = 0;
 
@@ -597,10 +599,6 @@ define([
 
 					results.totalLength.then(function (total) {
 						if (!total) {
-							if (grid.noDataNode) {
-								domConstruct.destroy(grid.noDataNode);
-								delete grid.noDataNode;
-							}
 							grid._insertNoDataNode();
 						}
 

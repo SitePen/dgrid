@@ -105,9 +105,18 @@ define([
 					// otherwise settle for put anyway.
 					// (put will relocate an existing item with the same id, i.e. move).
 					grid._trackError(function () {
-						return store[copy && store.copy ? 'copy' : 'put'](object, {
-							beforeId: targetItem ? store.getIdentity(targetItem) : null
-						}).then(function () {
+						// Do no store operation if the object being moved is targetItem.  This can happen when
+						// multiple, non-adjacent rows are being dragged.
+						var objectId = store.getIdentity(object);
+						var targetId = targetItem ? store.getIdentity(targetItem) : null;
+						var promise = objectId === targetId ? targetSource._getNextItem(targetItem)
+							.then(function (nextItem) {
+								targetItem = nextItem;
+							}) :
+							store[copy && store.copy ? 'copy' : 'put'](object, {
+								beforeId: targetId
+							});
+						return promise.then(function () {
 							// Self-drops won't cause the dgrid-select handler to re-fire,
 							// so update the cached node manually
 							if (targetSource._selectedNodes[id]) {
@@ -118,6 +127,21 @@ define([
 				});
 			});
 		},
+
+		_getNextItem: function (item) {
+			var grid = this.grid;
+			if (item) {
+				var row = grid.row(item);
+				if (row.element) {
+					row = grid.down(row);
+					if (row.element) {
+						return when(row.data);
+					}
+				}
+			}
+			return when(null);
+		},
+
 		onDropExternal: function (sourceSource, nodes, copy, targetItem) {
 			// Note: this default implementation expects that two grids do not
 			// share the same store.  There may be more ideal implementations in the
@@ -277,11 +301,13 @@ define([
 				arrayUtil.forEach(event.rows, deselectRow);
 			});
 
-			aspect.after(this, 'destroy', function () {
-				delete this.dndSource._selectedNodes;
-				selectedNodes = null;
-				this.dndSource.destroy();
-			}, true);
+			this._listeners.push(
+				aspect.after(this, 'destroy', function () {
+					delete this.dndSource._selectedNodes;
+					selectedNodes = null;
+					this.dndSource.destroy();
+				}, true)
+			);
 		},
 
 		insertRow: function (object) {
@@ -295,11 +321,25 @@ define([
 				data: object,
 				type: type instanceof Array ? type : [type]
 			});
+
+			if (this.selection) {
+				var objectId = this.collection.getIdentity(object);
+				if (objectId in this.selection) {
+					this.dndSource._selectedNodes[objectId] = row;
+				}
+			}
+
 			return row;
 		},
 
 		removeRow: function (rowElement) {
-			this.dndSource.delItem(this.row(rowElement));
+			var row = this.row(rowElement);
+
+			if (this.selection && (row.id in this.selection)) {
+				delete this.dndSource._selectedNodes[row.id];
+			}
+
+			this.dndSource.delItem(row.element.id);
 			this.inherited(arguments);
 		}
 	});

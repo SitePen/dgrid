@@ -1,7 +1,7 @@
 define([
 	'dojo/_base/declare',
 	'dojo/dom-construct',
-	'dgrid/_StoreMixin'
+	'../_StoreMixin'
 ], function (declare, domConstruct, _StoreMixin) {
 	return declare(_StoreMixin, {
 		// summary:
