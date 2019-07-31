@@ -1,7 +1,7 @@
 # AddRowDelRow
-The AddRowDelRow component adds two new related funcionalities:
-A ➕ button on the header to create a new, empty row at the end of the table.
-A ❌ button on each body row to remove that row.
+The AddRowDelRow component adds two new related funcionalities:  
+ - A ➕ button on the header to create a new, empty row at the end of the table.
+ - A ❌ button on each body row to remove that row.
 
 ## How to use
 This is a simple mixin with no required setup or dependencies.
