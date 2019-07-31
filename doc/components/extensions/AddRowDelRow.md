@@ -24,17 +24,25 @@ require([
   var store = new Memory();
   var grid = new (declare([OnDemandGrid, Selection, Editor, AddRowDelRow]))({
       collection: store,
-      columns: {
-          name: {
-              editor: 'text'
-          },
-          bool: {
-              editor: 'checkbox'
-          }
-      }
+        columns: {
+            col1: {
+                editor: 'text'
+            },
+            col2: {
+                editor: 'checkbox'
+            }
+        }
   }, 'grid');
 
   grid.startup();
-  grid.addRow({name: "name1"});
-  grid.addRow({name: "name2"});
+  grid.addRow({col1: "value1a", col2: false});
+  grid.addRow({col1: "value1b", col2: true});
+  grid.addRow({col1: "value1c", col2: false});
 ```
+## Result
+
+| col1 | col2 | ➕ |  
+| --- | --- | --- |  
+| value1a | ☐ | ❌ |  
+| value1b | ☑ | ❌ |  
+| value1c | ☐ | ❌ |  
