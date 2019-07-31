@@ -28,6 +28,7 @@ available to further expand dgrid's functionality.
     * [SingleQuery](components/extensions/SingleQuery.md)
     * [DijitRegistry](components/extensions/DijitRegistry.md)
     * [DnD](components/extensions/DnD.md)
+    * [AddRowDelRow](components/extensions/AddRowDelRow.md)
 * Utilities
     * [touch](components/utilities/touch.md)
     * [misc](components/utilities/misc.md)
