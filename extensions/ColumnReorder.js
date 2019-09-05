@@ -9,18 +9,18 @@ define([
 	"xstyle/css!../css/extensions/ColumnReorder.css"
 ], function(lang, declare, arrayUtil, on, query, DndSource, put){
 	var dndTypeRx = /(\d+)(?:-(\d+))?$/; // used to determine subrow from dndType
-	
+
 	// The following 2 functions are used by onDropInternal logic for
 	// retrieving/modifying a given subRow.  The `match` variable in each is
 	// expected to be the result of executing dndTypeRx on a subRow ID.
-	
+
 	function getMatchingSubRow(grid, match) {
 		var hasColumnSets = match[2],
 			rowOrSet = grid[hasColumnSets ? "columnSets" : "subRows"][match[1]];
-		
+
 		return hasColumnSets ? rowOrSet[match[2]] : rowOrSet;
 	}
-	
+
 	function setMatchingSubRow(grid, match, subRow) {
 		if(match[2]){
 			grid.columnSets[match[1]][match[2]] = subRow;
@@ -40,36 +40,36 @@ define([
 	function stripIdPrefix(gridId, dndtype) {
 		return dndtype.slice(makeDndTypePrefix(gridId).length);
 	}
-	
+
 	var ColumnDndSource = declare(DndSource, {
 		// summary:
 		//		Custom dojo/dnd source extension configured specifically for
 		//		dgrid column reordering.
-		
+
 		copyState: function(){ return false; }, // never copy
-		
+
 		checkAcceptance: function(source, nodes){
 			return source == this; // self-accept only
 		},
-		
+
 		_legalMouseDown: function(evt){
 			// Overridden to prevent blocking ColumnResizer resize handles.
 			return evt.target.className.indexOf("dgrid-resize-handle") > -1 ? false :
 				this.inherited(arguments);
 		},
-		
+
 		onDropInternal: function(nodes){
 			var grid = this.grid,
 				match = dndTypeRx.exec(stripIdPrefix(grid.id, nodes[0].getAttribute("dndType"))),
 				structureProperty = match[2] ? "columnSets" : "subRows",
 				oldSubRow = getMatchingSubRow(grid, match),
 				columns = grid.columns;
-			
+
 			// First, allow original DnD logic to place node in new location.
 			this.inherited(arguments);
-			
+
 			if(!match){ return; }
-			
+
 			// Then, iterate through the header cells in their new order,
 			// to populate a new row array to assign as a new sub-row to the grid.
 			// (Wait until the next turn to avoid errors in Opera.)
@@ -78,9 +78,9 @@ define([
 						return columns[col.columnId];
 					}),
 					eventObject;
-				
+
 				setMatchingSubRow(grid, match, newSubRow);
-				
+
 				eventObject = {
 					grid: grid,
 					subRow: newSubRow,
@@ -92,7 +92,7 @@ define([
 				};
 				// Set columnSets or subRows depending on which the grid is using.
 				eventObject[structureProperty] = grid[structureProperty];
-				
+
 				// Emit a custom event which passes the new structure.
 				// Allow calling preventDefault() to cancel the reorder operation.
 				if(on.emit(grid.domNode, "dgrid-columnreorder", eventObject)){
@@ -111,38 +111,38 @@ define([
 			}, 0);
 		}
 	});
-	
+
 	var ColumnReorder = declare(null, {
 		// summary:
 		//		Extension allowing reordering of columns in a grid via drag'n'drop.
 		//		Reordering of columns within the same subrow or columnset is also
 		//		supported; between different ones is not.
-		
+
 		// columnDndConstructor: Function
 		//		Constructor to call for instantiating DnD sources within the grid's
 		//		header.
 		columnDndConstructor: ColumnDndSource,
-		
+
 		_initSubRowDnd: function(subRow, dndType){
 			// summary:
 			//		Initializes a dojo/dnd source for one subrow of a grid;
 			//		this could be its only subrow, one of several, or a subrow within a
 			//		columnset.
-			
+
 			var dndParent, c, len, col, th;
-			
+
 			for(c = 0, len = subRow.length; c < len; c++){
 				col = subRow[c];
 				if(col.reorderable === false){ continue; }
-				
+
 				th = col.headerNode;
 				if(th.tagName != "TH"){ th = th.parentNode; } // from IE < 8 padding
 				// Add dojoDndItem class, and a dndType unique to this subrow.
 				put(th, ".dojoDndItem[dndType=" + dndType + "]");
-				
+
 				if(!dndParent){ dndParent = th.parentNode; }
 			}
-			
+
 			if(dndParent){ // (if dndParent wasn't set, no columns are draggable!)
 				this._columnDndSources.push(new this.columnDndConstructor(dndParent, {
 					horizontal: true,
@@ -150,17 +150,23 @@ define([
 				}));
 			}
 		},
-		
+
 		renderHeader: function(){
 			var dndTypePrefix = makeDndTypePrefix(this.id),
 				csLength, cs;
-			
+
 			this.inherited(arguments);
-			
+
 			// After header is rendered, set up a dnd source on each of its subrows.
-			
+
+			if (this._columnDndSources) {
+				// Destroy old dnd sources.
+				arrayUtil.forEach(this._columnDndSources, function (source) {
+					source.destroy();
+				});
+			}
 			this._columnDndSources = [];
-			
+
 			if(this.columnSets){
 				// Iterate columnsets->subrows->columns.
 				for(cs = 0, csLength = this.columnSets.length; cs < csLength; cs++){
@@ -175,7 +181,7 @@ define([
 				}, this);
 			}
 		},
-		
+
 		_destroyColumns: function(){
 			if(this._columnDndSources){
 				// Destroy old dnd sources.
@@ -183,11 +189,11 @@ define([
 					source.destroy();
 				});
 			}
-			
+
 			this.inherited(arguments);
 		}
 	});
-	
+
 	ColumnReorder.ColumnDndSource = ColumnDndSource;
 	return ColumnReorder;
 });
