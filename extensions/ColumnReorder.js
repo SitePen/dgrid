@@ -169,6 +169,12 @@ define([
 
 			// After header is rendered, set up a dnd source on each of its subrows.
 
+			if (this._columnDndSources) {
+				// Destroy old dnd sources.
+				arrayUtil.forEach(this._columnDndSources, function (source) {
+					source.destroy();
+				});
+			}
 			this._columnDndSources = [];
 
 			if (this.columnSets) {
