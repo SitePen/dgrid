@@ -442,6 +442,9 @@ define([
 	// Common functions used in default keyMap (called in instance context)
 
 	var moveFocusVertical = Keyboard.moveFocusVertical = function (event, steps) {
+		// if there is no _focusNode (for example, when the grid doesn't have data) don't try to find the next focus row/cell
+		if (!this._focusedNode) { return; }
+
 		var cellNavigation = this.cellNavigation,
 			target = this[cellNavigation ? 'cell' : 'row'](event),
 			columnId = cellNavigation && target.column.id,
