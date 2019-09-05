@@ -21,26 +21,26 @@ var delegatingInputTypes = {
 var Keyboard = declare(null, {
 	// summary:
 	//		Adds keyboard navigation capability to a list or grid.
-	
+
 	// pageSkip: Number
 	//		Number of rows to jump by when page up or page down is pressed.
 	pageSkip: 10,
-	
+
 	tabIndex: 0,
-	
+
 	// keyMap: Object
 	//		Hash which maps key codes to functions to be executed (in the context
 	//		of the instance) for key events within the grid's body.
 	keyMap: null,
-	
+
 	// headerKeyMap: Object
 	//		Hash which maps key codes to functions to be executed (in the context
 	//		of the instance) for key events within the grid's header row.
 	headerKeyMap: null,
-	
+
 	postMixInProperties: function(){
 		this.inherited(arguments);
-		
+
 		if(!this.keyMap){
 			this.keyMap = lang.mixin({}, Keyboard.defaultKeyMap);
 		}
@@ -48,23 +48,23 @@ var Keyboard = declare(null, {
 			this.headerKeyMap = lang.mixin({}, Keyboard.defaultHeaderKeyMap);
 		}
 	},
-	
+
 	postCreate: function(){
 		this.inherited(arguments);
 		var grid = this;
-		
+
 		function handledEvent(event){
 			// text boxes and other inputs that can use direction keys should be ignored and not affect cell/row navigation
 			var target = event.target;
 			return target.type && (!delegatingInputTypes[target.type] || event.keyCode == 32);
 		}
-		
+
 		function enableNavigation(areaNode){
 			var cellNavigation = grid.cellNavigation,
 				isFocusableClass = cellNavigation ? hasGridCellClass : hasGridRowClass,
 				isHeader = areaNode === grid.headerNode,
 				initialNode = areaNode;
-			
+
 			function initHeader(){
 				if(grid._focusedHeaderNode){
 					// Remove the tab index for the node that previously had it.
@@ -92,7 +92,7 @@ var Keyboard = declare(null, {
 					}
 				}
 			}
-			
+
 			if(isHeader){
 				// Initialize header now (since it's already been rendered),
 				// and aspect after future renderHeader calls to reset focus.
@@ -103,15 +103,15 @@ var Keyboard = declare(null, {
 					// summary:
 					//		Ensures the first element of a grid is always keyboard selectable after data has been
 					//		retrieved if there is not already a valid focused element.
-					
+
 					return Deferred.when(ret, function(ret){
 						var focusedNode = grid._focusedNode || initialNode;
-						
+
 						// do not update the focused element if we already have a valid one
 						if(isFocusableClass.test(focusedNode.className) && miscUtil.contains(areaNode, focusedNode)){
 							return ret;
 						}
-						
+
 						// ensure that the focused element is actually a grid cell, not a
 						// dgrid-preload or dgrid-content element, which should not be focusable,
 						// even when data is loaded asynchronously
@@ -121,35 +121,35 @@ var Keyboard = declare(null, {
 								break;
 							}
 						}
-						
+
 						focusedNode.tabIndex = grid.tabIndex;
 						return ret;
 					});
 				});
 			}
-			
+
 			grid._listeners.push(on(areaNode, "mousedown", function(event){
 				if(!handledEvent(event)){
 					grid._focusOnNode(event.target, isHeader, event);
 				}
 			}));
-			
+
 			grid._listeners.push(on(areaNode, "keydown", function(event){
 				// For now, don't squash browser-specific functionalities by letting
 				// ALT and META function as they would natively
 				if(event.metaKey || event.altKey) {
 					return;
 				}
-				
+
 				var handler = grid[isHeader ? "headerKeyMap" : "keyMap"][event.keyCode];
-				
+
 				// Text boxes and other inputs that can use direction keys should be ignored and not affect cell/row navigation
 				if(handler && !handledEvent(event)){
 					handler.call(grid, event);
 				}
 			}));
 		}
-		
+
 		if(this.tabableHeader){
 			enableNavigation(this.headerNode);
 			on(this.headerNode, "dgrid-cellfocusin", function(){
@@ -157,41 +157,41 @@ var Keyboard = declare(null, {
 			});
 		}
 		enableNavigation(this.contentNode);
-		
+
 		this._debouncedEnsureScroll = miscUtil.debounce(this._ensureScroll, this);
 	},
-	
+
 	removeRow: function(rowElement){
 		if(!this._focusedNode){
 			// Nothing special to do if we have no record of anything focused
 			return this.inherited(arguments);
 		}
-		
+
 		var self = this,
 			isActive = document.activeElement === this._focusedNode,
 			focusedTarget = this[this.cellNavigation ? "cell" : "row"](this._focusedNode),
 			focusedRow = focusedTarget.row || focusedTarget,
 			sibling;
 		rowElement = rowElement.element || rowElement;
-		
+
 		// If removed row previously had focus, temporarily store information
 		// to be handled in an immediately-following insertRow call, or next turn
 		if(rowElement === focusedRow.element){
 			sibling = this.down(focusedRow, true);
-			
+
 			// Check whether down call returned the same row, or failed to return
 			// any (e.g. during a partial unrendering)
 			if (!sibling || sibling.element === rowElement) {
 				sibling = this.up(focusedRow, true);
 			}
-			
+
 			this._removedFocus = {
 				active: isActive,
 				rowId: focusedRow.id,
 				columnId: focusedTarget.column && focusedTarget.column.id,
 				siblingId: !sibling || sibling.element === rowElement ? undefined : sibling.id
 			};
-			
+
 			// Call _restoreFocus on next turn, to restore focus to sibling
 			// if no replacement row was immediately inserted.
 			// Pass original row's id in case it was re-inserted in a renderArray
@@ -201,15 +201,15 @@ var Keyboard = declare(null, {
 					self._restoreFocus(focusedRow.id);
 				}
 			}, 0);
-			
+
 			// Clear _focusedNode until _restoreFocus is called, to avoid
 			// needlessly re-running this logic
 			this._focusedNode = null;
 		}
-		
+
 		this.inherited(arguments);
 	},
-	
+
 	insertRow: function(object){
 		var rowElement = this.inherited(arguments);
 		if(this._removedFocus && !this._removedFocus.wait){
@@ -217,20 +217,20 @@ var Keyboard = declare(null, {
 		}
 		return rowElement;
 	},
-	
+
 	_restoreFocus: function(row) {
 		// summary:
 		//		Restores focus to the newly inserted row if it matches the
 		//		previously removed row, or to the nearest sibling otherwise.
-		
+
 		var focusInfo = this._removedFocus,
 			newTarget,
 			cell;
-		
+
 		row = row && this.row(row);
 		newTarget = row && row.element && row.id === focusInfo.rowId ? row :
 			typeof focusInfo.siblingId !== "undefined" && this.row(focusInfo.siblingId);
-		
+
 		if(newTarget && newTarget.element){
 			if(!newTarget.element.parentNode.parentNode){
 				// This was called from renderArray, so the row hasn't
@@ -257,10 +257,10 @@ var Keyboard = declare(null, {
 				this._focusedNode = newTarget.element;
 			}
 		}
-		
+
 		delete this._removedFocus;
 	},
-	
+
 	addKeyHandler: function(key, callback, isHeader){
 		// summary:
 		//		Adds a handler to the keyMap on the instance.
@@ -272,13 +272,13 @@ var Keyboard = declare(null, {
 		// isHeader: Boolean
 		//		Whether the handler is to be added for the grid body (false, default)
 		//		or the header (true).
-		
+
 		// Aspects may be about 10% slower than using an array-based appraoch,
 		// but there is significantly less code involved (here and above).
 		return aspect.after( // Handle
 			this[isHeader ? "headerKeyMap" : "keyMap"], key, callback, true);
 	},
-	
+
 	_ensureRowScroll: function(rowElement){
 		// summary:
 		//		Ensures that the entire row is visible within the viewport.
@@ -299,7 +299,7 @@ var Keyboard = declare(null, {
 		// summary:
 		//		Ensures that the entire cell is visible in the viewport.
 		//		Called in cases where the grid can scroll horizontally.
-		
+
 		var scrollX = this.getScrollPosition().x;
 		var cellLeft = cellElement.offsetLeft;
 		if (scrollX > cellLeft) {
@@ -316,12 +316,12 @@ var Keyboard = declare(null, {
 			}
 		}
 	},
-	
+
 	_ensureScroll: function (cell, isHeader) {
 		// summary:
 		//		Corrects scroll based on the position of the newly-focused row/cell
 		//		as necessary based on grid configuration and dimensions.
-		
+
 		if(this.cellNavigation && (this.columnSets || this.subRows.length > 1) && !isHeader){
 			this._ensureRowScroll(cell.row.element);
 		}
@@ -329,7 +329,7 @@ var Keyboard = declare(null, {
 			this._ensureColumnScroll(cell.element);
 		}
 	},
-	
+
 	_focusOnNode: function(element, isHeader, event){
 		var focusedNodeProperty = "_focused" + (isHeader ? "Header" : "") + "Node",
 			focusedNode = this[focusedNodeProperty],
@@ -340,10 +340,10 @@ var Keyboard = declare(null, {
 			numInputs,
 			inputFocused,
 			i;
-		
+
 		element = cell && cell.element;
 		if(!element){ return; }
-		
+
 		if(this.cellNavigation){
 			inputs = element.getElementsByTagName("input");
 			for(i = 0, numInputs = inputs.length; i < numInputs; i++){
@@ -358,7 +358,7 @@ var Keyboard = declare(null, {
 				}
 			}
 		}
-		
+
 		// Set up event information for dgrid-cellfocusout/in events.
 		// Note that these events are not fired for _restoreFocus.
 		if(event !== null){
@@ -372,7 +372,7 @@ var Keyboard = declare(null, {
 				event.bubbles = true;
 			}
 		}
-		
+
 		if(focusedNode){
 			// Clean up previously-focused element
 			// Remove the class name and the tabIndex attribute
@@ -381,7 +381,7 @@ var Keyboard = declare(null, {
 				// Clean up after workaround below (for non-input cases)
 				focusedNode.style.position = "";
 			}
-			
+
 			// Expose object representing focused cell or row losing focus, via
 			// event.cell or event.row; which is set depends on cellNavigation.
 			if(event){
@@ -390,7 +390,7 @@ var Keyboard = declare(null, {
 			}
 		}
 		focusedNode = this[focusedNodeProperty] = element;
-		
+
 		if(event){
 			// Expose object representing focused cell or row gaining focus, via
 			// event.cell or event.row; which is set depends on cellNavigation.
@@ -398,7 +398,7 @@ var Keyboard = declare(null, {
 			// performs a shallow copy of properties into a new event object.
 			event[cellOrRowType] = cell;
 		}
-		
+
 		var isFocusableClass = this.cellNavigation ? hasGridCellClass : hasGridRowClass;
 		if(!inputFocused && isFocusableClass.test(element.className)){
 			if(has("ie") < 8){
@@ -411,18 +411,18 @@ var Keyboard = declare(null, {
 			element.focus();
 		}
 		put(element, ".dgrid-focus");
-		
+
 		if(event){
 			on.emit(focusedNode, "dgrid-cellfocusin", event);
 		}
-		
+
 		this._debouncedEnsureScroll(cell, isHeader);
 	},
-	
+
 	focusHeader: function(element){
 		this._focusOnNode(element || this._focusedHeaderNode, true);
 	},
-	
+
 	focus: function(element){
 		var node = element || this._focusedNode;
 		if(node){
@@ -436,15 +436,18 @@ var Keyboard = declare(null, {
 // Common functions used in default keyMap (called in instance context)
 
 var moveFocusVertical = Keyboard.moveFocusVertical = function(event, steps){
+	// if there is no _focusNode (for example, when the grid doesn't have data) don't try to find the next focus row/cell
+	if (!this._focusOnNode) { return; }
+
 	var cellNavigation = this.cellNavigation,
 		target = this[cellNavigation ? "cell" : "row"](event),
 		columnId = cellNavigation && target.column.id,
 		next = this.down(this._focusedNode, steps, true);
-	
+
 	// Navigate within same column if cell navigation is enabled
 	if(cellNavigation){ next = this.cell(next, columnId); }
 	this._focusOnNode(next, false, event);
-	
+
 	event.preventDefault();
 };
 
@@ -468,7 +471,7 @@ var moveFocusHorizontal = Keyboard.moveFocusHorizontal = function(event, steps){
 	if(!this.cellNavigation){ return; }
 	var isHeader = !this.row(event), // header reports row as undefined
 		currentNode = this["_focused" + (isHeader ? "Header" : "") + "Node"];
-	
+
 	this._focusOnNode(this.right(currentNode, steps), isHeader, event);
 	event.preventDefault();
 };
@@ -489,7 +492,7 @@ var moveHeaderFocusEnd = Keyboard.moveHeaderFocusEnd = function(event, scrollToB
 		this._focusOnNode(nodes[scrollToBeginning ? 0 : nodes.length - 1], true, event);
 	}
 	// In row-navigation mode, there's nothing to do - only one row in header
-	
+
 	// Prevent browser from scrolling entire page
 	event.preventDefault();
 };
@@ -501,7 +504,7 @@ var moveHeaderFocusHome = Keyboard.moveHeaderFocusHome = function(event){
 var moveFocusEnd = Keyboard.moveFocusEnd = function(event, scrollToTop){
 	// summary:
 	//		Handles requests to scroll to the beginning or end of the grid.
-	
+
 	// Assume scrolling to top unless event is specifically for End key
 	var self = this,
 		cellNavigation = this.cellNavigation,
@@ -513,7 +516,7 @@ var moveFocusEnd = Keyboard.moveFocusEnd = function(event, scrollToTop){
 		endTarget = hasPreload ? endChild[(scrollToTop ? "next" : "previous") + "Sibling"] : endChild,
 		endPos = endTarget.offsetTop + (scrollToTop ? 0 : endTarget.offsetHeight),
 		handle;
-	
+
 	if(hasPreload){
 		// Find the nearest dgrid-row to the relevant end of the grid
 		while(endTarget && endTarget.className.indexOf("dgrid-row") < 0){
@@ -522,7 +525,7 @@ var moveFocusEnd = Keyboard.moveFocusEnd = function(event, scrollToTop){
 		// If none is found, there are no rows, and nothing to navigate
 		if(!endTarget){ return; }
 	}
-	
+
 	// Grid content may be lazy-loaded, so check if content needs to be
 	// loaded first
 	if(!hasPreload || endChild.offsetHeight < 1){
@@ -538,7 +541,7 @@ var moveFocusEnd = Keyboard.moveFocusEnd = function(event, scrollToTop){
 		if(!has("dom-addeventlistener")){
 			event = lang.mixin({}, event);
 		}
-		
+
 		// If the topmost/bottommost row rendered doesn't reach the top/bottom of
 		// the contentNode, we are using OnDemandList and need to wait for more
 		// data to render, then focus the first/last row in the new content.
@@ -554,7 +557,7 @@ var moveFocusEnd = Keyboard.moveFocusEnd = function(event, scrollToTop){
 			});
 		});
 	}
-	
+
 	if(scrollPos === endPos){
 		// Grid body is already scrolled to end; prevent browser from scrolling
 		// entire page instead
