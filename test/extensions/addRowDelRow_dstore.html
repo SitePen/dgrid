@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Test Add Row Del Row</title>
+    <meta name="viewport" content="width=570">
+    <style>
+      /*
+      @import "/siteassets/dojo/resources/dojo.css";
+      @import "/siteassets/dgrid/css/dgrid.css";
+      @import "/siteassets/dgrid/css/skins/claro.css";
+      */
+      @import "../../dojo/resources/dojo.css";
+      @import "../css/dgrid.css";
+      @import "../css/skins/claro.css";
+
+      .heading {
+        font-weight: bold;
+        padding-bottom: 0.25em;
+      }
+      .dgrid {
+        margin: 10px;
+      }
+      /* add styles to size this grid appropriately */
+      #grid {
+        height: 20em;
+      }
+      #grid .field-order {
+        width: 7%;
+      }
+      #grid .field-name {
+        width: 18%;
+      }
+    </style>
+    <!--
+    <script src="/siteassets/init.js" data-dojo-config="async: true"></script>
+    -->
+    <script src="../../dojo/dojo.js" data-dojo-config="async: true"></script>
+    <script>
+      var columns = {
+        order: "step", // give column a custom name
+        name: {},
+        description: {label: "what to do", sortable: false}
+      };
+      var columns2 = {
+        name: {},
+        description: {label: "what to do", sortable: false}
+      };
+      //require(['dojo/_base/declare',"dgrid/Grid", 'dgrid/OnDemandList', 'dstore/Memory', '../siteassets/AddRowDelRow.js', "dojo/domReady!"], function(declare, Grid, OnDemandList, dstoreMemory, AddRowDelRow){
+      require(['dojo/_base/declare',"dgrid/Grid", 'dgrid/OnDemandList', 'dstore/Memory', 'dstore/extensions/AddRowDelRow', "dojo/domReady!"], function(declare, Grid, OnDemandList, dstoreMemory, AddRowDelRow){
+        var data = [
+          {id: 1, order: 1, name:"preheat", description:"Preheat your oven to 350F"},
+          {id: 2, order: 2, name:"mix dry", description:"In a medium bowl, combine flour, salt, and baking soda"},
+          {id: 3, order: 3, name:"mix butter", description:"In a large bowl, beat butter, then add the brown sugar and white sugar then mix"},
+          {id: 4, order: 4, name:"mix together", description:"Slowly add the dry ingredients from the medium bowl to the wet ingredients in the large bowl, mixing until the dry ingredients are totally combined"},
+          {id: 5, order: 5, name:"chocolate chips", description:"Add chocolate chips"},
+          {id: 6, order: 6, name:"make balls", description:"Scoop up a golf ball size amount of dough with a spoon and drop in onto a cookie sheet"},
+          {id: 7, order: 7, name:"bake", description:"Put the cookies in the oven and bake for about 10-14 minutes"},
+          {id: 8, order: 8, name:"remove", description:"Using a spatula, lift cookies off onto wax paper or a cooling rack"},
+          {id: 9, order: 9, name:"eat", description:"Eat and enjoy!"}
+        ];
+        var grid = new declare([Grid, OnDemandList, AddRowDelRow])({
+          collection: new dstoreMemory({data: data}),
+          columns: columns
+        }, "grid");
+        // grid.renderArray(data);
+        grid.startup();
+      });
+    </script>
+  </head>
+  <body class="claro">
+    <h2>A basic grid rendered from an array</h2>
+    <div id="grid"></div>
+    <div>Buttons to test resetting columns:
+      <button onclick="grid.set('columns', columns);">order, name, description</button>
+      <button onclick="grid.set('columns', columns2);">name, description</button>
+    </div>
+    <div>Buttons to test programmatic sort (on order field):
+      <button onclick="grid.set('sort', 'order');">Sort Asc</button>
+      <button onclick="grid.set('sort', 'order', true);">Sort Desc</button>
+    </div>
+  </body>
+</html>
