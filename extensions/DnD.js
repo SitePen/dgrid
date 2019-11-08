@@ -4,8 +4,8 @@ define([
 	'dojo/_base/array',
 	'dojo/aspect',
 	'dojo/dom-class',
-	'dojo/on',
 	'dojo/topic',
+	'dojo/touch',
 	'dojo/has',
 	'dojo/when',
 	'dojo/dnd/Source',
@@ -13,7 +13,7 @@ define([
 	'dojo/_base/NodeList',
 	'../Selection',
 	'dojo/has!touch?../util/touch'
-], function (declare, lang, arrayUtil, aspect, domClass, on, topic, has, when, DnDSource,
+], function (declare, lang, arrayUtil, aspect, domClass, topic, touch, has, when, DnDSource,
 		DnDManager, NodeList, Selection, touchUtil) {
 	// Requirements
 	// * requires a store (sounds obvious, but not all Lists/Grids have stores...)
@@ -260,6 +260,15 @@ define([
 			this.inherited(arguments);
 			// ensure dndParams is initialized
 			this.dndParams = lang.mixin({ accept: [this.dndSourceType] }, this.dndParams);
+
+			// The DnD extension adds a touch.press listener (via dojo/dnd/Source). In browsers
+			// that support pointer events the presence of this listener prevents dgrid/Keyboard's
+			// 'mousedown' listener from being called. To ensure dgrid/Keyboard works in conjunction
+			// with DnD the mouse down event type for dgrid/Keyboard is changed to touch.press.
+			// Note: this is set in postMixInProperties to ensure it overrides the value in Keyboard
+			// regardless of which module is mixed in first. This means that if you want to override
+			// the value set in DnD you need to do so in the postMixInProperties lifecycle method.
+			this.mouseDownEventType = touch.press;
 		},
 
 		postCreate: function () {
