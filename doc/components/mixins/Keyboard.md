@@ -34,6 +34,7 @@ Property | Description
 `pageSkip` | Number indicating how many rows to navigate when page up or page down is pressed.  Defaults to `10`.
 `keyMap` | Object hash mapping key codes to callbacks to be executed when the respective keys are pressed within the body of the grid.  This is typically augmented by calling `addKeyHandler`, but it can also be completely overridden by passing an object hash to the constructor (or otherwise creating one before `Keyboard#postMixInProperties` executes).  The default `keyMap` is exposed via `Keyboard.defaultKeyMap`.
 `headerKeyMap` | Object hash mapping key codes to callbacks to be executed when the respective keys are pressed within the header of the grid.  This is typically augmented by calling `addKeyHandler`, but it can also be completely overridden by passing an object hash to the constructor (or otherwise creating one before `Keyboard#postMixInProperties` executes).  The default `headerKeyMap` is exposed via `Keyboard.defaultHeaderKeyMap`.
+`mouseDownEventType` | `dojo/on` compatible event type. Defaults to `'mousedown'`. Can be overridden to use a different event type to register the mouse down event handler that sets focus. Overridden by `dgrid/extensions/DnD` to `touch.press` (from `dojo/touch`) for compatibility with `dojo/dnd/Source`, which is used by `dgrid/extensions/DnD`.
 
 ### Method Summary
 
