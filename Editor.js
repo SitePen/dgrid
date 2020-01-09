@@ -448,10 +448,6 @@ define([
 		_createEditor: function (column, object) {
 			// Creates an editor instance based on column definition properties,
 			// and hooks up events.
-            //
-            // object is undefined when creating a shared editor.  For
-            // an always-on editor, object is the row data. If
-            // editorArgs is a function, object will be passed to this function
 			var editor = column.editor,
 				editOn = column.editOn,
 				self = this,
@@ -464,6 +460,8 @@ define([
 
 			args = column.editorArgs || {};
 			if (typeof args === 'function') {
+				// `object` is undefined for shared editors, but for always-on
+				// editors it will be the row data.
 				args = args.call(this, column, object);
 			}
 
