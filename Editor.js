@@ -460,7 +460,9 @@ define([
 
 			args = column.editorArgs || {};
 			if (typeof args === 'function') {
-				args = args.call(this, column);
+				// `object` is undefined for shared editors, but for always-on
+				// editors it will be the row data.
+				args = args.call(this, column, object);
 			}
 
 			if (Widget) {
