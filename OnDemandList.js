@@ -229,7 +229,8 @@ define([
 			//			property's value for this specific refresh call only.
 
 			var self = this,
-				keep = (options && options.keepScrollPosition);
+				keep = (options && options.keepScrollPosition),
+				fetchResults;
 
 			// Fall back to instance property if option is not defined
 			if (typeof keep === 'undefined') {
@@ -244,13 +245,21 @@ define([
 			this.inherited(arguments);
 			if (this._renderedCollection) {
 				// render the query
-
 				// renderQuery calls _trackError internally
 				return this.renderQuery(function (queryOptions) {
-					return self._renderedCollection.fetchRange({
+					var queryResults = self._renderedCollection.fetchRange({
 						start: queryOptions.start,
 						end: queryOptions.start + queryOptions.count
 					});
+
+					queryResults.then(function (results) {
+						fetchResults = results;
+					});
+
+					// It is important to return the original QueryResults object, which is a special promise
+					// with 'totalLength' and 'forEach' properties on it. Returning a chained promise would
+					// lose these properties.
+					return queryResults;
 				}).then(function () {
 					// Emit on a separate turn to enable event to be used consistently for
 					// initial render, regardless of whether the backing store is async
@@ -262,6 +271,8 @@ define([
 						});
 						self._refreshTimeout = null;
 					}, 0);
+
+					return fetchResults;
 				});
 			}
 		},
