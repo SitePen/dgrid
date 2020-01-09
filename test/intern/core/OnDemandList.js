@@ -44,5 +44,14 @@ define([
 			// This tests GitHub issue #965.
 			assert.strictEqual(query('.dgrid-row', list.contentNode).length, list.minRowsPerPage);
 		});
+
+		test.test('refresh should return a QueryResults object', function () {
+			var dfd = this.async();
+
+			list.refresh().then(dfd.callback(function (results) {
+				assert.property(results, 'forEach');
+				assert.property(results, 'totalLength');
+			}));
+		});
 	});
 });

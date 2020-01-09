@@ -109,6 +109,15 @@ define([
 			store.putSync({ id: 2 });
 			assert.strictEqual(pageNumber, 1, 'Should have refreshed page 1 after adding the first item');
 		});
+
+		test.test('refresh should return a QueryResults object', function () {
+			var dfd = this.async();
+
+			grid.refresh().then(dfd.callback(function (results) {
+				assert.property(results, 'forEach');
+				assert.property(results, 'totalLength');
+			}));
+		});
 	});
 
 	test.suite('Pagination size selector initialization tests', function () {
