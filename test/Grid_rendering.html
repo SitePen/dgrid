@@ -43,8 +43,9 @@
 			}
 
 			function testFormatter(item){
-				return "<h3>Step " + item.order + ": " + item.name + "</h3><p>" +
-					item.description + "</p>";
+				return {
+					html: '<h3>Step ' + item.order + ': ' + item.name + '</h3><p>' + item.description + '</p>'
+				};
 			}
 
 			function testGet(item){
@@ -67,10 +68,12 @@
 
 			var testFormatterScope = {
 				foo: function(item){
-					return "<h3>" + this.word + " " + item.order + ": " + item.name + "</h3><p>" +
-						item.description + "</p>";
+					return {
+						html: '<h3>' + this.word + item.order + ': ' + item.name + '</h3>' +
+							'<p>' + item.description + '</p>'
+					};
 				},
-				word: "Step" // for testing proper execution context
+				word: 'Step ' // for testing proper execution context
 			};
 
 			var columnsLegacyFormatter = [

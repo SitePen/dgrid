@@ -141,6 +141,42 @@ define([
 				assert.isFalse(warnCalled);
 			});
 		});
+
+		test.test('column formatter', function () {
+			var nameCells;
+			var orderCells;
+			var gridFormatter = {
+				formatName: function (value) {
+					return {
+						html: '<' + this.tagName + '>' + value + '</' + this.tagName + '>'
+					};
+				},
+				tagName: 'b'
+			};
+
+			grid = new Grid({
+				columns: {
+					order: {
+						label: 'Order',
+						formatter: function (value) {
+							return '<b>' + value + '</b>';
+						}
+					},
+					name: {
+						label: 'Name',
+						formatter: 'formatName'
+					}
+				},
+				formatterScope: gridFormatter
+			});
+			grid.startup();
+			grid.renderArray(orderedData.items);
+
+			orderCells = query('td.dgrid-cell.field-order', grid.domNode);
+			assert.strictEqual(orderCells[0].innerHTML, '&lt;b&gt;1&lt;/b&gt;');
+			nameCells = query('td.dgrid-cell.field-name', grid.domNode);
+			assert.strictEqual(nameCells[0].innerHTML, '<b>preheat</b>');
+		});
 	});
 
 	test.suite('columnSets', function () {
