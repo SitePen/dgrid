@@ -111,7 +111,9 @@
 								label: "Name",
 								field: "name",
 								formatter: function(value){
-									return "<strong>" + value + "</strong>";
+									return {
+										html: '<strong>' + value + '</strong>'
+									};
 								},
 								sortable: false
 							},

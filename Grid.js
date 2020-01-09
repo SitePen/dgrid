@@ -233,8 +233,13 @@ define([
 				// Support formatter, with or without formatterScope
 				var formatter = this.formatter,
 					formatterScope = this.grid.formatterScope;
-				td.innerHTML = typeof formatter === 'string' && formatterScope ?
+				var formattedValue = typeof formatter === 'string' && formatterScope ?
 					formatterScope[formatter](value, object) : this.formatter(value, object);
+				if (formattedValue != null && formattedValue.hasOwnProperty('html')) {
+					td.innerHTML = formattedValue.html;
+				} else if (formattedValue != null) {
+					td.appendChild(document.createTextNode(formattedValue));
+				}
 			}
 			else if (value != null) {
 				td.appendChild(document.createTextNode(value));
