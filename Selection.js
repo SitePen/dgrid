@@ -285,6 +285,12 @@ define([
 			//		except that clicks/keystrokes without modifier keys will clear
 			//		the previous selection.
 
+			// If the target is already selected, and is the sole selection, ignore a user action
+			// that would simply select the target (causing unnecessary deselect/select).
+			if (!event[ctrlEquiv] && this.isSelected(target) && this.getSelectedCount() === 1) {
+				return;
+			}
+
 			// Clear selection first for right-clicks outside selection and non-ctrl-clicks;
 			// otherwise, extended mode logic is identical to multiple mode
 			if (event.button === 2 ? !this.isSelected(target) :
@@ -641,6 +647,18 @@ define([
 				this._select(row.id, null, true);
 			}
 			this._fireSelectionEvents();
+		},
+
+		getSelectedCount: function () {
+			var count = 0;
+
+			for (var id in this.selection) {
+				if (id) {
+					count += 1;
+				}
+			}
+
+			return count;
 		},
 
 		isSelected: function (object) {

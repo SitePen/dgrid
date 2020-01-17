@@ -65,6 +65,7 @@ Method | Description
 `selectAll()`| Programmatically selects all rows in the component. Note that only rows that have actually been loaded will be represented in the `selection` object.
 `clearSelection()`| Programmatically deselects all rows in the component.
 `isSelected(row)`| Returns `true` if the given row is selected.
+`getSelectedCount()` | Returns the number of selected rows/cells.
 
 **Note:** The `select`, `deselect`, and `isSelected` methods can be passed any
 type of argument acceptable to List's `row` method; see the [List](../core-components/List.md) APIs for
