@@ -28,7 +28,7 @@ var profile = {
 		},
 
 		amd: function (filename) {
-			return (/\.js$/).test(filename);
+			return (/\.js$/).test(filename) && !(/(html-report|nodes)\//).test(filename);
 		}
 	}
 };
