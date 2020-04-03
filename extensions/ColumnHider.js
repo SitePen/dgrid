@@ -150,7 +150,8 @@ define([
 				hiderToggleNode = this.hiderToggleNode = domConstruct.create('div', {
 					'aria-label': this.i18nColumnHider.popupTriggerLabel,
 					className: 'ui-icon dgrid-hider-toggle',
-					type: 'button'
+					role: 'button',
+					tabindex: 0
 				}, this.domNode);
 
 				// The ColumnHider icon is 16 x 16 pixels. Presumably, when it was created that size worked in all
@@ -166,6 +167,13 @@ define([
 
 				this._listeners.push(listen(hiderToggleNode, 'click', function (e) {
 					grid._toggleColumnHiderMenu(e);
+				}));
+
+				this._listeners.push(listen(hiderToggleNode, 'keydown', function (event) {
+					var charOrCode = event.charCode || event.keyCode;
+					if (charOrCode === /*ENTER*/ 13 || charOrCode === /*SPACE*/ 32) {
+						grid._toggleColumnHiderMenu(event);
+					}
 				}));
 
 				// Create the column list, with checkboxes.
