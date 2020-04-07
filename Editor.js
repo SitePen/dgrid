@@ -52,6 +52,7 @@ define([
 
 			if (previouslyFocusedCell && previouslyFocusedCell.row.id === row.id) {
 				this.edit(this.cell(row, previouslyFocusedCell.column.id));
+				this._previouslyFocusedEditorCell = null;
 			}
 			return rowElement;
 		},
@@ -280,6 +281,7 @@ define([
 				return null;
 			}
 
+			this._previouslyFocusedEditorCell = cell;
 			column = cell.column;
 			field = column.field;
 			cellElement = cell.element.contents || cell.element;
