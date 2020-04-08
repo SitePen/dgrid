@@ -56,3 +56,7 @@ The ColumnSet mixin supports the following additional instance methods.
 Method | Description
 ------ | -----------
 `styleColumnSet(columnsetId, css)` | Programmatically adds styles to a columnset, by injecting a rule into a stylesheet in the document.  Returns a handle with a `remove` function, which can be called to later remove the added style rule.  Styles added via this method will be removed when the instance is destroyed if `cleanAddedRules` is set to `true`.
+
+## Mixin Order
+
+`ColumnSet` must be mixed in **before** `Editor` when both are used together.
