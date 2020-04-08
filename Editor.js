@@ -104,6 +104,7 @@ define([
 				if (widget) {
 					this._editorFocusoutHandle.pause();
 					widget.destroyRecursive();
+					this._editorFocusoutHandle.resume();
 				}
 			}
 
