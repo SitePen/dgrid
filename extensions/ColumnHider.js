@@ -1,12 +1,12 @@
 define([
+	'dojo/_base/array',
 	'dojo/_base/declare',
-    'dojo/_base/array',
 	'dojo/dom-construct',
 	'dojo/has',
 	'dojo/on',
 	'../util/misc',
 	'dojo/i18n!./nls/columnHider'
-], function (declare, array, domConstruct, has, listen, miscUtil, i18n) {
+], function (arrayUtil, declare, domConstruct, has, listen, miscUtil, i18n) {
 /*
  *	Column Hider plugin for dgrid
  *	Originally contributed by TRT 2011-09-28
@@ -65,42 +65,37 @@ define([
 			// summary:
 			//		Iterates over subRows or columnSets for the sake of adding items to the
 			//		column hider menu.
-            
-            if (this.subRows && this.subRows.length) {
-                var subRows = this.subRows,
-                    first = true,
-                    srLength, cLength, sr, c;
 
-                delete this._columnHiderFirstCheckbox;
+			if (this.subRows && this.subRows.length) {
+				var subRows = this.subRows,
+					first = true,
+					srLength, cLength, sr, c;
 
-                for (sr = 0, srLength = subRows.length; sr < srLength; sr++) {
-                    for (c = 0, cLength = subRows[sr].length; c < cLength; c++) {
-                        this._renderHiderMenuEntry(subRows[sr][c]);
-                        if (first) {
-                            first = false;
-                            this._columnHiderFirstCheckbox =
-                                this._columnHiderCheckboxes[subRows[sr][c].id];
-                        }
-                    }
-                }
-            }
-            else if (this.columnSets && this.columnSets.length) {
-                // Loop through each this.columnSets
-                array.forEach(this.columnSets, function (columnSet) {
-                    // Loop through each columnSet
-                    array.forEach(columnSet, function (columnSetColumns) {
-                        // Loop through each columnSetColumns
-                        array.forEach(columnSetColumns, function (column) {
-                            // Render a checkbox for each column
-                            this._renderHiderMenuEntry(column);
-                            // Keep track of the first checkbox
-                            this._columnHiderFirstCheckbox =
-                                this._columnHiderFirstCheckbox ||
-                                this._columnHiderCheckboxes[column.id];
-                        }, this);
-                    }, this);
-                }, this);
-            }
+				delete this._columnHiderFirstCheckbox;
+
+				for (sr = 0, srLength = subRows.length; sr < srLength; sr++) {
+					for (c = 0, cLength = subRows[sr].length; c < cLength; c++) {
+						this._renderHiderMenuEntry(subRows[sr][c]);
+						if (first) {
+							first = false;
+							this._columnHiderFirstCheckbox =
+								this._columnHiderCheckboxes[subRows[sr][c].id];
+						}
+					}
+				}
+			}
+			else if (this.columnSets && this.columnSets.length) {
+				arrayUtil.forEach(this.columnSets, function (columnSet) {
+					arrayUtil.forEach(columnSet, function (columnSetColumns) {
+						arrayUtil.forEach(columnSetColumns, function (column) {
+							this._renderHiderMenuEntry(column);
+							this._columnHiderFirstCheckbox =
+								this._columnHiderFirstCheckbox ||
+								this._columnHiderCheckboxes[column.id];
+						}, this);
+					}, this);
+				}, this);
+			}
 		},
 
 		_renderHiderMenuEntry: function (col) {

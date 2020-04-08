@@ -35,11 +35,11 @@
 			// Functions defined within require callback
 			var getColumns, getAltColumns, createGrid, destroyGrid;
 
-			require(["dojo/_base/lang", "dojo/_base/declare", "dojo/dom-construct",
+			require(["dojo/_base/lang", "dojo/_base/declare", "dojo/dom-construct", "dgrid/ColumnSet",
 				"dgrid/OnDemandGrid", "dgrid/Keyboard", "dgrid/Selection",
 				"dgrid/extensions/ColumnHider", "dgrid/extensions/ColumnResizer", "dgrid/extensions/ColumnReorder",
 				"dgrid/test/data/testStore", "dojo/domReady!"],
-			function(lang, declare, domConstruct, Grid, Keyboard, Selection, ColumnHider, ColumnResizer, ColumnReorder, testStore){
+			function(lang, declare, domConstruct, ColumnSet, Grid, Keyboard, Selection, ColumnHider, ColumnResizer, ColumnReorder, testStore){
 				var columns = {
 						col1: "Column 1Column1Column 1 Column 1",
 						col2: { label: "Column2 (unhidable)", sortable: false, unhidable: true },
@@ -106,6 +106,30 @@
 					collection: testStore,
 					columns: lang.clone(columns)
 				}, "gridreorder");
+
+				window.gridColumnSet = new (declare([Grid, Selection, ColumnHider, ColumnSet]))({
+					collection: testStore,
+					columnSets: [
+						[
+							[
+								{ field: "col1", label: "Column 1" },
+								{ field: "col2", label: "Column 2" }
+							],
+							[
+								{ field: "col3", label: "Column 3", colSpan: 2 }
+							]
+						],
+						[
+							[
+								{ field: "col1", label: "Column 1", rowSpan: 2 },
+								{ field: "col4", label: "Column 4" }
+							],
+							[
+								{ field: "col5", label: "Column 5" }
+							]
+						]
+					]
+				}, "gridColumnSet");
 			});
 		</script>
 	</head>
@@ -121,5 +145,8 @@
 		<div id="gridresize"></div>
 		<h2>Another grid w/ ColumnHider and ColumnReorder</h2>
 		<div id="gridreorder"></div>
+
+		<h2>Grid with ColumnHider and ColumnSet</h2>
+		<div id="gridColumnSet"></div>
 	</body>
 </html>
