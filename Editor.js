@@ -166,9 +166,13 @@ define([
 			this._editorsPendingStartup = [];
 		},
 
+		configStructure: function () {
+			this._alwaysOnWidgetColumns = [];
+			this.inherited(arguments);
+		},
+
 		_configColumns: function () {
 			var columnArray = this.inherited(arguments);
-			this._alwaysOnWidgetColumns = [];
 			for (var i = 0, l = columnArray.length; i < l; i++) {
 				if (columnArray[i].editor) {
 					this._configureEditorColumn(columnArray[i]);

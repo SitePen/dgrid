@@ -186,6 +186,12 @@ define([
 		//		columns from each other. This mainly serves the purpose of allowing for
 		//		column locking.
 
+		constructor: function () {
+			if ('_editorInstances' in this) {
+				throw new Error('When used with Editor ColumnSet must be mixed in before Editor.');
+			}
+		},
+
 		postCreate: function () {
 			var self = this;
 			this.inherited(arguments);
