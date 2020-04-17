@@ -47,7 +47,7 @@ function makeUnselectable(node, unselectable){
 	var value = node.unselectable = unselectable ? "on" : "",
 		elements = node.getElementsByTagName("*"),
 		i = elements.length;
-	
+
 	while(--i){
 		if(elements[i].tagName === "INPUT" || elements[i].tagName === "TEXTAREA"){
 			continue; // Don't prevent text selection in text input fields.
@@ -58,13 +58,13 @@ function makeUnselectable(node, unselectable){
 
 function setSelectable(grid, selectable){
 	// Alternative version of dojo/dom.setSelectable based on feature detection.
-	
+
 	// For FF < 21, use -moz-none, which will respect -moz-user-select: text on
 	// child elements (e.g. form inputs).  In FF 21, none behaves the same.
 	// See https://developer.mozilla.org/en-US/docs/CSS/user-select
 	var node = grid.bodyNode,
 		value = selectable ? "text" : has("ff") < 21 ? "-moz-none" : "none";
-	
+
 	// In IE10+, -ms-user-select: none will block selection from starting within the
 	// element, but will not block an existing selection from entering the element.
 	// When using a modifier key, IE will select text inside of the element as well
@@ -81,7 +81,7 @@ function setSelectable(grid, selectable){
 		if(!selectable && !grid._selectstartHandle){
 			grid._selectstartHandle = on(node, "selectstart", function(evt){
 				var tag = evt.target && evt.target.tagName;
-				
+
 				// Prevent selection except where a text input field is involved.
 				if(tag !== "INPUT" && tag !== "TEXTAREA"){
 					evt.preventDefault();
@@ -113,89 +113,89 @@ return declare(null, {
 	// summary:
 	//		Add selection capabilities to a grid. The grid will have a selection property and
 	//		fire "dgrid-select" and "dgrid-deselect" events.
-	
+
 	// selectionDelegate: String
 	//		Selector to delegate to as target of selection events.
 	selectionDelegate: ".dgrid-row",
-	
+
 	// selectionEvents: String|Function
 	//		Event (or comma-delimited events, or extension event) to listen on
 	//		to trigger select logic.
 	selectionEvents: downType + "," + upType + ",dgrid-cellfocusin",
-	
+
 	// selectionTouchEvents: String|Function
 	//		Event (or comma-delimited events, or extension event) to listen on
 	//		in addition to selectionEvents for touch devices.
 	selectionTouchEvents: has("touch") ? touchUtil.tap : null,
-	
+
 	// deselectOnRefresh: Boolean
 	//		If true, the selection object will be cleared when refresh is called.
 	deselectOnRefresh: true,
-	
+
 	// allowSelectAll: Boolean
 	//		If true, allow ctrl/cmd+A to select all rows.
 	//		Also consulted by the selector plugin for showing select-all checkbox.
 	allowSelectAll: false,
-	
+
 	// selection:
-	//		An object where the property names correspond to 
+	//		An object where the property names correspond to
 	//		object ids and values are true or false depending on whether an item is selected
 	selection: {},
-	
+
 	// selectionMode: String
 	//		The selection mode to use, can be "none", "multiple", "single", or "extended".
 	selectionMode: "extended",
-	
+
 	// allowTextSelection: Boolean
 	//		Whether to still allow text within cells to be selected.  The default
 	//		behavior is to allow text selection only when selectionMode is none;
 	//		setting this property to either true or false will explicitly set the
 	//		behavior regardless of selectionMode.
 	allowTextSelection: undefined,
-	
+
 	// _selectionTargetType: String
 	//		Indicates the property added to emitted events for selected targets;
 	//		overridden in CellSelection
 	_selectionTargetType: "rows",
-	
+
 	create: function(){
 		this.selection = {};
 		return this.inherited(arguments);
 	},
 	postCreate: function(){
 		this.inherited(arguments);
-		
+
 		this._initSelectionEvents();
-		
+
 		// Force selectionMode setter to run
 		var selectionMode = this.selectionMode;
 		this.selectionMode = "";
 		this._setSelectionMode(selectionMode);
 	},
-	
+
 	destroy: function(){
 		this.inherited(arguments);
-		
+
 		// Remove any extra handles added by Selection.
 		if(this._selectstartHandle){ this._selectstartHandle.remove(); }
 		if(this._unselectableHandle){ this._unselectableHandle.remove(); }
 		if(this._removeDeselectSignals){ this._removeDeselectSignals(); }
 	},
-	
+
 	_setSelectionMode: function(mode){
 		// summary:
 		//		Updates selectionMode, resetting necessary variables.
 		if(mode == this.selectionMode){ return; } // prevent unnecessary spinning
-		
+
 		// Start selection fresh when switching mode.
 		this.clearSelection();
-		
+
 		this.selectionMode = mode;
-		
+
 		// Compute name of selection handler for this mode once
 		// (in the form of _fooSelectionHandler)
 		this._selectionHandlerName = "_" + mode + "SelectionHandler";
-		
+
 		// Also re-run allowTextSelection setter in case it is in automatic mode.
 		this._setAllowTextSelection(this.allowTextSelection);
 	},
@@ -203,7 +203,7 @@ return declare(null, {
 		kernel.deprecated("setSelectionMode(...)", 'use set("selectionMode", ...) instead', "dgrid 0.4");
 		this.set("selectionMode", mode);
 	},
-	
+
 	_setAllowTextSelection: function(allow){
 		if(typeof allow !== "undefined"){
 			setSelectable(this, allow);
@@ -212,7 +212,7 @@ return declare(null, {
 		}
 		this.allowTextSelection = allow;
 	},
-	
+
 	_handleSelect: function(event, target){
 		// Don't run if selection mode doesn't have a handler (incl. "none"), target can't be selected,
 		// or if coming from a dgrid-cellfocusin from a mousedown
@@ -223,7 +223,7 @@ return declare(null, {
 		}
 		this._waitForMouseUp = null;
 		this._selectionTriggerEvent = event;
-		
+
 		// Don't call select handler for ctrl+navigation
 		if(!event.keyCode || !event.ctrlKey || event.keyCode == 32){
 			// If clicking a selected item, wait for mouseup so that drag n' drop
@@ -236,12 +236,12 @@ return declare(null, {
 		}
 		this._selectionTriggerEvent = null;
 	},
-	
+
 	_singleSelectionHandler: function(event, target){
 		// summary:
 		//		Selection handler for "single" mode, where only one target may be
 		//		selected at a time.
-		
+
 		var ctrlKey = event.keyCode ? event.ctrlKey : event[ctrlEquiv];
 		if(this._lastSelected === target){
 			// Allow ctrl to toggle selection, even within single select mode.
@@ -252,17 +252,17 @@ return declare(null, {
 			this._lastSelected = target;
 		}
 	},
-	
+
 	_multipleSelectionHandler: function(event, target){
 		// summary:
 		//		Selection handler for "multiple" mode, where shift can be held to
 		//		select ranges, ctrl/cmd can be held to toggle, and clicks/keystrokes
 		//		without modifier keys will add to the current selection.
-		
+
 		var lastRow = this._lastSelected,
 			ctrlKey = event.keyCode ? event.ctrlKey : event[ctrlEquiv],
 			value;
-		
+
 		if(!event.shiftKey){
 			// Toggle if ctrl is held; otherwise select
 			value = ctrlKey ? null : true;
@@ -276,13 +276,19 @@ return declare(null, {
 			this._lastSelected = target;
 		}
 	},
-	
+
 	_extendedSelectionHandler: function(event, target){
 		// summary:
 		//		Selection handler for "extended" mode, which is like multiple mode
 		//		except that clicks/keystrokes without modifier keys will clear
 		//		the previous selection.
-		
+
+		// If the target is already selected, and is the sole selection, ignore a user action
+		// that would simply select the target (causing unnecessary deselect/select).
+		if (!event[ctrlEquiv] && this.isSelected(target) && this.getSelectedCount() === 1) {
+			return;
+		}
+
 		// Clear selection first for right-clicks outside selection and non-ctrl-clicks;
 		// otherwise, extended mode logic is identical to multiple mode
 		if(event.button === 2 ? !this.isSelected(target) :
@@ -291,12 +297,12 @@ return declare(null, {
 		}
 		this._multipleSelectionHandler(event, target);
 	},
-	
+
 	_toggleSelectionHandler: function(event, target){
 		// summary:
 		//		Selection handler for "toggle" mode which simply toggles the selection
 		//		of the given target.  Primarily useful for touch input.
-		
+
 		this.select(target, null, null);
 	},
 
@@ -304,16 +310,16 @@ return declare(null, {
 		// summary:
 		//		Performs first-time hookup of event handlers containing logic
 		//		required for selection to operate.
-		
+
 		var grid = this,
 			contentNode = this.contentNode,
 			selector = this.selectionDelegate;
-		
+
 		this._selectionEventQueues = {
 			deselect: [],
 			select: []
 		};
-		
+
 		if(has("touch") && !has("pointer") && this.selectionTouchEvents){
 			// Listen for taps, and also for mouse/keyboard, making sure not
 			// to trigger both for the same interaction
@@ -334,14 +340,14 @@ return declare(null, {
 				grid._handleSelect(event, this);
 			});
 		}
-		
+
 		// Also hook up spacebar (for ctrl+space)
 		if(this.addKeyHandler){
 			this.addKeyHandler(32, function(event){
 				grid._handleSelect(event, event.target);
 			});
 		}
-		
+
 		// If allowSelectAll is true, bind ctrl/cmd+A to (de)select all rows,
 		// unless the event was received from an editor component.
 		// (Handler further checks against _allowSelectAll, which may be updated
@@ -355,7 +361,7 @@ return declare(null, {
 				}
 			});
 		}
-		
+
 		// Update aspects if there is a store change
 		if(this._setStore){
 			aspect.after(this, "_setStore", function(){
@@ -364,13 +370,13 @@ return declare(null, {
 		}
 		this._updateDeselectionAspect();
 	},
-	
+
 	_updateDeselectionAspect: function(){
 		// summary:
 		//		Hooks up logic to handle deselection of removed items.
 		//		Aspects to an observable store's notify method if applicable,
 		//		or to the list/grid's removeRow method otherwise.
-		
+
 		var self = this,
 			store = this.store,
 			beforeSignal,
@@ -388,7 +394,7 @@ return declare(null, {
 				}
 			}
 		}
-		
+
 		// Remove anything previously configured
 		if(this._removeDeselectSignals){
 			this._removeDeselectSignals();
@@ -409,7 +415,7 @@ return declare(null, {
 				// element's CSS is updated.  If the object was removed then the aspect-before has already deselected it.
 				ifSelected(object, idToUpdate, "select");
 			}, true);
-			
+
 			this._removeDeselectSignals = function(){
 				beforeSignal.remove();
 				afterSignal.remove();
@@ -430,23 +436,23 @@ return declare(null, {
 			};
 		}
 	},
-	
+
 	allowSelect: function(row){
 		// summary:
-		//		A method that can be overriden to determine whether or not a row (or 
+		//		A method that can be overriden to determine whether or not a row (or
 		//		cell) can be selected. By default, all rows (or cells) are selectable.
 		return true;
 	},
-	
+
 	_fireSelectionEvent: function(type){
 		// summary:
 		//		Fires an event for the accumulated rows once a selection
 		//		operation is finished (whether singular or for a range)
-		
+
 		var queue = this._selectionEventQueues[type],
 			triggerEvent = this._selectionTriggerEvent,
 			eventObject;
-		
+
 		eventObject = {
 			bubbles: true,
 			grid: this
@@ -455,44 +461,44 @@ return declare(null, {
 			eventObject.parentType = triggerEvent.type;
 		}
 		eventObject[this._selectionTargetType] = queue;
-		
+
 		// Clear the queue so that the next round of (de)selections starts anew
 		this._selectionEventQueues[type] = [];
-		
+
 		on.emit(this.contentNode, "dgrid-" + type, eventObject);
 	},
-	
+
 	_fireSelectionEvents: function(){
 		var queues = this._selectionEventQueues,
 			type;
-		
+
 		for(type in queues){
 			if(queues[type].length){
 				this._fireSelectionEvent(type);
 			}
 		}
 	},
-	
+
 	_select: function(row, toRow, value){
 		// summary:
 		//		Contains logic for determining whether to select targets, but
 		//		does not emit events.  Called from select, deselect, selectAll,
 		//		and clearSelection.
-		
+
 		var selection,
 			previousValue,
 			element,
 			toElement,
 			direction;
-		
+
 		if(typeof value === "undefined"){
 			// default to true
 			value = true;
-		} 
+		}
 		if(!row.element){
 			row = this.row(row);
 		}
-		
+
 		// Check whether we're allowed to select the given row before proceeding.
 		// If a deselect operation is being performed, this check is skipped,
 		// to avoid errors when changing column definitions, and since disabled
@@ -523,12 +529,12 @@ return declare(null, {
 				// add to the queue of row events
 				this._selectionEventQueues[(value ? "" : "de") + "select"].push(row);
 			}
-			
+
 			if(toRow){
 				if(!toRow.element){
 					toRow = this.row(toRow);
 				}
-				
+
 				if(!toRow){
 					this._lastSelected = element;
 					console.warn("The selection range has been reset because the " +
@@ -538,7 +544,7 @@ return declare(null, {
 						"in the DOM may impact performance.");
 					return;
 				}
-				
+
 				toElement = toRow.element;
 				if(toElement){
 					direction = this._determineSelectionDirection(element, toElement);
@@ -554,7 +560,7 @@ return declare(null, {
 			}
 		}
 	},
-	
+
 	// Implement _determineSelectionDirection differently based on whether the
 	// browser supports element.compareDocumentPosition; use sourceIndex for IE<9
 	_determineSelectionDirection: has("dom-comparedocumentposition") ? function (from, to) {
@@ -569,7 +575,7 @@ return declare(null, {
 		}
 		return to.sourceIndex > from.sourceIndex ? "down" : "up";
 	},
-	
+
 	select: function(row, toRow, value){
 		// summary:
 		//		Selects or deselects the given row or range of rows.
@@ -581,7 +587,7 @@ return declare(null, {
 		// value: Boolean|Null
 		//		Whether to select (true/default), deselect (false), or toggle
 		//		(null) the row
-		
+
 		this._select(row, toRow, value);
 		this._fireSelectionEvents();
 	},
@@ -593,16 +599,16 @@ return declare(null, {
 		// toRow: Mixed
 		//		If specified, the inclusive range between row and toRow will
 		//		be deselected
-		
+
 		this.select(row, toRow, false);
 	},
-	
+
 	clearSelection: function(exceptId, dontResetLastSelected){
 		// summary:
 		//		Deselects any currently-selected items.
 		// exceptId: Mixed?
 		//		If specified, the given id will not be deselected.
-		
+
 		this.allSelected = false;
 		for(var id in this.selection){
 			if(exceptId !== id){
@@ -623,25 +629,35 @@ return declare(null, {
 		}
 		this._fireSelectionEvents();
 	},
-	
+
+	getSelectedCount: function(){
+		var count = 0;
+		for(var id in this.selection){
+			if(id){
+				count += 1;
+			}
+		}
+		return count;
+	},
+
 	isSelected: function(object){
 		// summary:
 		//		Returns true if the indicated row is selected.
-		
+
 		if(typeof object === "undefined" || object === null){
 			return false;
 		}
 		if(!object.element){
 			object = this.row(object);
 		}
-		
+
 		// First check whether the given row is indicated in the selection hash;
 		// failing that, check if allSelected is true (testing against the
 		// allowSelect method if possible)
 		return (object.id in this.selection) ? !!this.selection[object.id] :
 			this.allSelected && (!object.data || this.allowSelect(object));
 	},
-	
+
 	refresh: function(){
 		if(this.deselectOnRefresh){
 			this.clearSelection();
@@ -649,11 +665,11 @@ return declare(null, {
 		this._lastSelected = null;
 		return this.inherited(arguments);
 	},
-	
+
 	renderArray: function(){
 		var grid = this,
 			rows = this.inherited(arguments);
-		
+
 		Deferred.when(rows, function(rows){
 			var selection = grid.selection,
 				i, row, selected;
