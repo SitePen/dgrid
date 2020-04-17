@@ -561,6 +561,7 @@ return function(column, editor, editOn){
 				if(widget){
 					grid._editorFocusoutHandle.pause();
 					widget.destroyRecursive();
+					grid._editorFocusoutHandle.resume();
 				}
 			}));
 		}
