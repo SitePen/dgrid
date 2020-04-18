@@ -199,7 +199,7 @@ define([
 							preloadNode.style.display = 'none';
 						}
 
-						if (self._previousScrollPosition) {
+						if (self._previousScrollPosition && parentNode && parentNode.offsetHeight) {
 							// Restore position after a refresh operation w/ keepScrollPosition
 							self.scrollTo(self._previousScrollPosition);
 							delete self._previousScrollPosition;
