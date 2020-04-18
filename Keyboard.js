@@ -164,9 +164,11 @@ define([
 
 			if (this.tabableHeader) {
 				enableNavigation(this.headerNode);
-				on(this.headerNode, 'dgrid-cellfocusin', function () {
-					grid.scrollTo({ x: this.scrollLeft });
-				});
+				this._listeners.push(
+					on(this.headerNode, 'dgrid-cellfocusin', function () {
+						grid.scrollTo({ x: this.scrollLeft });
+					})
+				);
 			}
 			enableNavigation(this.contentNode);
 

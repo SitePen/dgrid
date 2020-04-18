@@ -371,7 +371,9 @@ define([
 					'.dgrid-column-set-scroller.dgrid-column-set-scroller-' + i +
 					'[' + colsetidAttr + '=' + i +']');
 			this._columnSetScrollerContents[i] = put(scroller, 'div.dgrid-column-set-scroller-content');
-			on(scroller, 'scroll', lang.hitch(this, '_onColumnSetScroll'));
+			this._listeners.push(
+				on(scroller, 'scroll', lang.hitch(this, '_onColumnSetScroll'))
+			);
 		},
 
 		_onColumnSetScroll: function (evt) {
