@@ -5,11 +5,10 @@ define([
 	'dojo/dom-construct',
 	'dojo/dom-class',
 	'dojo/on',
-	'dojo/has',
 	'dojo/query',
-	'./Grid',
-	'dojo/_base/sniff'
-], function (declare, lang, Deferred, domConstruct, domClass, on, has, query, Grid) {
+	'dojo/sniff',
+	'./Grid'
+], function (declare, lang, Deferred, domConstruct, domClass, on, query, has, Grid) {
 
 	return declare(null, {
 		constructor: function () {
@@ -361,7 +360,7 @@ define([
 					editor.set('value', value);
 				}
 				else {
-					this._updateInputValue(editor, value);
+					this._updateInputValue(this._getEditorInputNode(editor), value);
 				}
 				return (new Deferred()).resolve();
 			}
@@ -376,7 +375,7 @@ define([
 			var isWidget = cmp.domNode;
 			// for regular inputs, we can update the value before even showing it
 			if (!isWidget) {
-				this._updateInputValue(cmp, value);
+				this._updateInputValue(this._getEditorInputNode(cmp), value);
 			}
 
 			cellElement.innerHTML = '';
@@ -403,6 +402,8 @@ define([
 			// summary:
 			//		Handles editor widget startup logic and updates the editor's value.
 
+			var inputNode = this._getEditorInputNode(cmp);
+
 			if (cmp.domNode) {
 				// For widgets, ensure startup is called before setting value, to maximize compatibility
 				// with flaky widgets like dijit/form/Select.
@@ -420,7 +421,7 @@ define([
 			}
 
 			// track previous value for short-circuiting or in case we need to revert
-			cmp._dgridLastValue = value;
+			inputNode._dgridLastValue = value;
 			// if this is an editor with editOn, also update _activeValue
 			// (_activeOptions will have been updated previously)
 			if (this._activeCell) {
@@ -430,7 +431,7 @@ define([
 					grid: this,
 					cell: this.cell(cellElement),
 					column: column,
-					editor: cmp,
+					editor: inputNode,
 					bubbles: true,
 					cancelable: false
 				});
@@ -450,6 +451,18 @@ define([
 			if ('_dgridLastValue' in target && target.className.indexOf('dgrid-input') > -1) {
 				this._updatePropertyFromEditor(column || this.cell(target).column, target, evt);
 			}
+		},
+
+		// summary:
+		//		Get the input node of a non-widget editor component
+		// cmp:
+		//		non-widget editor component which can be:
+		//		1. an HTMLInputElement
+		//		2. an HTMLDivElement that wraps an HTMLInputElement
+		//	returns:
+		//		HTMLInputElement
+		_getEditorInputNode: function (cmp) {
+			return cmp._inputNode || cmp;
 		},
 
 		_createEditor: function (column, object) {
@@ -511,6 +524,29 @@ define([
 					tabIndex: isNaN(column.tabIndex) ? -1 : column.tabIndex
 				}, args));
 
+				// In OS X form controls are not considered focusable elements. Some browsers (Safari, Firefox)
+				// adopt this decision:
+				// https://github.com/whatwg/html/issues/4356
+				// https://bugzilla.mozilla.org/show_bug.cgi?id=1524863
+				// https://bugs.webkit.org/show_bug.cgi?id=22261
+				// The resulting implementation is broken - you can call `focus()` on a checkbox and it
+				// will be focused, but clicking on a checkbox does not focus it. Further, clicking on a focused
+				// checkbox blurs it. To overcome these challenges checkboxes and radios are wrapped in a div
+				// that can receive focus (and blur) in a consistent manner.
+				// This complicates handling of editor components (cmp) as they can be any of:
+				// 1. A Dijit widget
+				// 2. A plain HTML element (HTMLInputElement)
+				// 3. A wrapped input (HTMLDivElement wrapping an HTMLInputElement)
+				if (has('mac') && column.editOn && /checkbox|radio/i.test(editor)) {
+					cmp = domConstruct.create('div', {
+						tabIndex: node.tabIndex
+					});
+					node.tabIndex = 0;
+					node.removeAttribute('tabindex');
+					cmp.appendChild(node);
+					cmp._inputNode = node;
+				}
+
 				if (has('ie') < 9) {
 					// IE<9 doesn't fire change events for all the right things,
 					// and it doesn't bubble.
@@ -567,12 +603,13 @@ define([
 				isWidget = cmp.domNode,
 				node = cmp.domNode || cmp,
 				focusNode = cmp.focusNode || node,
+				inputNode = this._getEditorInputNode(cmp),
 				reset = isWidget ?
 					function () {
 						cmp.set('value', cmp._dgridLastValue);
 					} :
 					function () {
-						self._updateInputValue(cmp, cmp._dgridLastValue);
+						self._updateInputValue(inputNode, inputNode._dgridLastValue);
 						// Update property again in case we need to revert a previous change
 						self._updatePropertyFromEditor(column, cmp);
 					};
@@ -592,7 +629,15 @@ define([
 				}
 			}
 
-			function onblur() {
+			function onblur(event) {
+				// Some browsers on OS X emit a blur event when a focused checkbox is clicked
+				// (see notes above in _createEditor where the wrapper node is created)
+				var isInvalidBlur = event && event.target === cmp && event.relatedTarget === cmp._inputNode;
+				if (isInvalidBlur) {
+					cmp.focus();
+					return;
+				}
+
 				var parentNode = node.parentNode,
 					options = { alreadyHooked: true },
 					cell = self.cell(node);
@@ -602,7 +647,7 @@ define([
 					grid: self,
 					cell: cell,
 					column: column,
-					editor: cmp,
+					editor: self._getEditorInputNode(cmp),
 					bubbles: true,
 					cancelable: false
 				});
@@ -633,7 +678,7 @@ define([
 				if (key === 27) {
 					// Escape: revert + dismiss
 					reset();
-					self._activeValue = cmp._dgridLastValue;
+					self._activeValue = self._getEditorInputNode(cmp)._dgridLastValue;
 					blur();
 				}
 				else if (key === 13 && column.dismissOnEnter !== false) {
@@ -655,11 +700,14 @@ define([
 		_updatePropertyFromEditor: function (column, cmp, triggerEvent) {
 			var value,
 				id,
-				editedRow;
+				editedRow,
+				inputNode;
 
 			if (!cmp.isValid || cmp.isValid()) {
+				inputNode = this._getEditorInputNode(cmp);
+
 				value = this._updateProperty((cmp.domNode || cmp).parentNode,
-					this._activeCell ? this._activeValue : cmp._dgridLastValue,
+					this._activeCell ? this._activeValue : inputNode._dgridLastValue,
 					this._retrieveEditorValue(column, cmp), triggerEvent);
 
 				if (this._activeCell) { // for editors with editOn defined
@@ -669,15 +717,15 @@ define([
 					cmp._dgridLastValue = value;
 				}
 
-				if (cmp.type === 'radio' && cmp.name && !column.editOn && column.field) {
+				if (inputNode.type === 'radio' && inputNode.name && !column.editOn && column.field) {
 					editedRow = this.row(cmp);
 
 					// Update all other rendered radio buttons in the group
-					query('input[type=radio][name=' + cmp.name + ']', this.contentNode).forEach(function (radioBtn) {
+					query('input[type=radio][name=' + inputNode.name + ']', this.contentNode).forEach(function (radioBtn) {
 						var row = this.row(radioBtn);
 						// Only update _dgridLastValue and the dirty data if it exists
 						// and is not already false
-						if (radioBtn !== cmp && radioBtn._dgridLastValue) {
+						if (radioBtn !== inputNode && radioBtn._dgridLastValue) {
 							radioBtn._dgridLastValue = false;
 							if (this.updateDirty) {
 								this.updateDirty(row.id, column.field, false);
@@ -756,7 +804,7 @@ define([
 							}, 0);
 						}
 						else if ((cmp = cellElement.input)) {
-							this._updateInputValue(cmp, oldValue);
+							this._updateInputValue(this._getEditorInputNode(cmp), oldValue);
 						}
 
 						return oldValue;
@@ -782,12 +830,14 @@ define([
 			//		Intermediary between _convertEditorValue and
 			//		_updatePropertyFromEditor.
 
+			var inputNode = this._getEditorInputNode(cmp);
+
 			if (typeof cmp.get === 'function') { // widget
 				return this._convertEditorValue(cmp.get('value'));
 			}
 			else { // HTML input
 				return this._convertEditorValue(
-					cmp[cmp.type === 'checkbox' || cmp.type === 'radio' ? 'checked' : 'value']);
+					inputNode[inputNode.type === 'checkbox' || inputNode.type === 'radio' ? 'checked' : 'value']);
 			}
 		},
 
