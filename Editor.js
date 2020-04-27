@@ -508,13 +508,12 @@ define([
 		//
 		// summary:
 		//		Create a focus wrapper for an editor component
-		// cmp:
-		//		editor component which can be:
-		//		1. an HTMLInputElement
-		//		2. a Dijit widget instance
-		//		3. an HTMLDivElement that wraps a #1 or #2
+		// node:
+		//		the node to wrap, either a plain HTMLInputElement or the root node of a widget (widget.domNode)
+		// tabIndex:
+		//		[optional] tabIndex value to set on the wrapper node, defaults to the node's tabIndex or -1
 		//	returns:
-		//		HTMLInputElement or Dijit widget instance
+		//		HTMLDivElement that has `node` as its only child
 		_createEditorFocusWrapper: function (node, tabIndex) {
 			if (isNaN(tabIndex)) {
 				if (isNaN(node.tabIndex)) {
@@ -704,7 +703,7 @@ define([
 
 					// Some browsers on OS X emit a blur event when a focused checkbox is clicked
 					// Revert the erroneous blur by refocusing the wrapper and exit
-					// (see notes above in _createEditor where the wrapper node is created)
+					// (see notes above on the _createEditorFocusWrapper method)
 					if (wrapperNode && event.relatedTarget === (cmp.focusNode || cmp)) {
 						wrapperNode.focus();
 						return;
