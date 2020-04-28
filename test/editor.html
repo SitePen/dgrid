@@ -17,7 +17,7 @@
 				height: 15em;
 				width: 500px;
 			}
-			
+
 			.outer {
 				border: 1px solid #333;
 				padding: 0 4px;
@@ -34,7 +34,7 @@
 		<script>
 			var grid, // stores global reference to grid instance
 				editFirst; // function defined within require callback
-			
+
 			require(["dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Keyboard", "dgrid/editor", "put-selector/put",
 					"dojo/_base/lang", "dojo/_base/declare", "dojo/on", "dojo/dom-construct",
 					"dojo/store/Memory", "dojo/store/Observable", "dojo/data/ObjectStore",
@@ -94,6 +94,13 @@
 										// convert to boolean for save
 										return !!item.editor;
 									}
+								}
+							},
+							{
+								label: "dijit/form/RadioButton",
+								generate: generateBool,
+								column: {
+									editorArgs: { value: "true" }
 								}
 							},
 							{
@@ -161,7 +168,7 @@
 						],
 						optStr = "",
 						i;
-					
+
 					// data generation functions used for populating store data,
 					// used by different componentTypes
 					function generateText() {
@@ -195,7 +202,7 @@
 							lastName: ["Doe", "Smith"][Math.floor(Math.random() * 2)]
 						};
 					}
-					
+
 					function getSelected(select){
 						var options = select.options,
 							i;
@@ -203,19 +210,19 @@
 							if(options[i].selected){ return options[i].value; }
 						}
 					}
-					
+
 					function customRenderCell(object, data) {
 						var container = domConstruct.create("div", { "class": "outer" });
 						domConstruct.place('<span class="rendercell">' +
 							("" + data).replace(/</g, "&lt;") + "</span>", container);
 						return container;
 					}
-					
+
 					function customFormatter(data) {
 						return '<div class="outer"><span class="formatter">' +
 							("" + data).replace(/</g, "&lt;") + "</span></div>";
 					}
-					
+
 					var cancelDataChange = false;
 					form.onsubmit = function(){
 						var
@@ -228,36 +235,36 @@
 							async = form.elements.async.checked,
 							store,
 							i;
-						
+
 						for (i = 0; i < 200; i++){
 							data.push(lang.mixin(options.generate(i), { id: i }));
 						}
-						
+
 						store = new TestStore({ data: data });
 						if(async){
 							store = new DeferredWrapper(store, 100);
 						}
 						store = Observable(store);
-						
+
 						require(deps, function(ctor){
 							var columnArgs = {
 								autoSave: form.elements.autoSave.checked,
 								editor: ctor || editorType
 							};
-							
+
 							if(editOn){ columnArgs.editOn = editOn; }
-							
+
 							if(form.elements.customRenderCell.checked){
 								columnArgs.renderCell = customRenderCell;
 							}else if(options.renderCell){
 								columnArgs.renderCell = options.renderCell;
 							}
-							
+
 							if(form.elements.customFormatter.checked){
 								columnArgs.formatter = customFormatter;
 							}
 							cancelDataChange = form.elements.cancelDataChange.checked;
-							
+
 							if(!grid){
 								grid = new CustomGrid({
 									sort: "id",
@@ -276,16 +283,16 @@
 								grid.set("store", store);
 							}
 						});
-						
+
 						return false;
 					};
-					
+
 					// generate radios in editorComponentTypes div
 					for(i in componentTypes){
 						optStr += '<option value="' + i + '">' + componentTypes[i].label + "</option>";
 					}
 					domConstruct.place('<select name="editor">' + optStr + "</select>", typesArea);
-					
+
 					on(document.body, "dgrid-datachange", function(evt){
 						console.log(evt.grid.id + " row " + evt.cell.row.id + " data changed" +
 						(evt.parentType ? " (via " + evt.parentType + "): " : ": "),
@@ -295,14 +302,14 @@
 							evt.preventDefault();
 						}
 					});
-					
+
 					on(document.body, "dgrid-editor-show", function(evt){
 						console.log("show editOn editor: ", evt);
 					});
 					on(document.body, "dgrid-editor-hide", function(evt){
 						console.log("hide editOn editor: ", evt);
 					});
-					
+
 					editFirst = function() {
 						var grid = window.grid;
 						window.grid.edit(window.grid.cell(0, "editor"));

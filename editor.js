@@ -3,6 +3,7 @@ define([
 	"dojo/_base/lang",
 	"dojo/_base/array",
 	"dojo/_base/Deferred",
+	"dojo/dom-class",
 	"dojo/on",
 	"dojo/aspect",
 	"dojo/has",
@@ -11,7 +12,7 @@ define([
 	"./Grid",
 	"put-selector/put",
 	"dojo/_base/sniff"
-], function(kernel, lang, arrayUtil, Deferred, on, aspect, has, query, when, Grid, put){
+], function(kernel, lang, arrayUtil, Deferred, domClass, on, aspect, has, query, when, Grid, put){
 
 function updateInputValue(input, value){
 	// common code for updating value of a standard input
@@ -153,6 +154,82 @@ function setPropertyFromEditor(grid, cmp, triggerEvent) {
 
 // editor creation/hookup/placement logic
 
+// summary:
+//		Get the focus node of an editor component. For a wrapped node, the focus node will be the wrapper.
+//		For a non-wrapped widget, the focus node will be widget.focusNode OR widget.domNode.
+//		For a non-wrapped input element, the focus node will be the input element
+// cmp:
+//		editor component which can be:
+//		1. an HTMLInputElement
+//		2. a Dijit widget instance
+//	returns:
+//		HTMLElement
+function getEditorFocusNode (cmp) {
+	var focusNode = cmp.parentNode || (cmp.domNode && cmp.domNode.parentNode);
+
+	if (!focusNode || !domClass.contains(focusNode, editorFocusWrapperClassName)) {
+		focusNode = cmp.focusNode || cmp.domNode || cmp;
+	}
+
+	return focusNode;
+}
+
+// summary:
+//		Get the editor component's root node, which may be the wrapper node
+// cmp:
+//		editor component which can be:
+//		1. an HTMLInputElement
+//		2. a Dijit widget instance
+//	returns:
+//		Wrapper node OR widget.domNode OR HTMLInputElement
+function getEditorRootNode(cmp) {
+	if (!cmp) {
+		return;
+	}
+
+	var rootNode = cmp.parentNode || (cmp.domNode && cmp.domNode.parentNode);
+
+	if (!rootNode || !domClass.contains(rootNode, editorFocusWrapperClassName)) {
+		rootNode = cmp.domNode || cmp;
+	}
+
+	return rootNode;
+}
+
+// In OS X form controls are not considered focusable elements. Some browsers (Safari, Firefox)
+// adopt this decision:
+// https://github.com/whatwg/html/issues/4356
+// https://bugzilla.mozilla.org/show_bug.cgi?id=1524863
+// https://bugs.webkit.org/show_bug.cgi?id=22261
+// The resulting implementation is broken - you can call `focus()` on a checkbox and it
+// will be focused, but clicking on a checkbox does not focus it. Further, clicking on a focused
+// checkbox blurs it. To overcome these challenges checkboxes and radios are wrapped in a div
+// that can receive focus (and blur) in a consistent manner.
+//
+// summary:
+//		Create a focus wrapper for an editor component
+// node:
+//		the node to wrap, either a plain HTMLInputElement or the root node of a widget (widget.domNode)
+// tabIndex:
+//		[optional] tabIndex value to set on the wrapper node, defaults to the node's tabIndex or -1
+//	returns:
+//		HTMLDivElement that has `node` as its only child
+function createEditorFocusWrapper(node, tabIndex) {
+	if (isNaN(tabIndex)) {
+		if (isNaN(node.tabIndex)) {
+			tabIndex = -1;
+		}
+		else {
+			tabIndex = node.tabIndex;
+		}
+	}
+
+	return put('div', {
+		className: editorFocusWrapperClassName,
+		tabIndex: tabIndex
+	}, node);
+}
+
 function createEditor(column){
 	// Creates an editor instance based on column definition properties,
 	// and hooks up events.
@@ -160,7 +237,7 @@ function createEditor(column){
 		editOn = column.editOn,
 		grid = column.grid,
 		isWidget = typeof editor != "string", // string == standard HTML input
-		args, cmp, node, putstr, handleChange;
+		args, cmp, node, putstr, handleChange, wrapperNode;
 
 	args = column.editorArgs || {};
 	if(typeof args == "function"){ args = args.call(grid, column); }
@@ -172,13 +249,23 @@ function createEditor(column){
 		// Add dgrid-input to className to make consistent with HTML inputs.
 		node.className += " dgrid-input";
 
-		// For editOn editors, connect to onBlur rather than onChange, since
-		// the latter is delayed by setTimeouts in Dijit and will fire too late.
-		cmp.connect(cmp, editOn ? "onBlur" : "onChange", function(){
-			if(!cmp._dgridIgnoreChange){
-				setPropertyFromEditor(grid, cmp, {type: "widget"});
-			}
-		});
+		if(has("mac") && editOn && /checkbox|radio/i.test(node.type)){
+			wrapperNode = createEditorFocusWrapper(cmp.domNode, column.tabIndex);
+			on(wrapperNode, "blur", function(){
+				if(!cmp._dgridIgnoreChange){
+					setPropertyFromEditor(grid, cmp, {type: "widget"});
+				}
+			});
+		}
+		else{
+			// For editOn editors, connect to onBlur rather than onChange, since
+			// the latter is delayed by setTimeouts in Dijit and will fire too late.
+			cmp.connect(cmp, editOn ? "onBlur" : "onChange", function(){
+				if(!cmp._dgridIgnoreChange){
+					setPropertyFromEditor(grid, cmp, {type: "widget"});
+				}
+			});
+		}
 	}else{
 		handleChange = function(evt){
 			var target = evt.target;
@@ -202,6 +289,12 @@ function createEditor(column){
 			tabIndex: isNaN(column.tabIndex) ? -1 : column.tabIndex
 		}, args));
 
+		if(has("mac") && editOn && /checkbox|radio/i.test(editor)){
+			wrapperNode = createEditorFocusWrapper(cmp);
+			cmp.tabIndex = 0;
+			cmp.removeAttribute("tabindex");
+		}
+
 		if(has("ie") < 9 || (has("ie") && has("quirks"))){
 			// IE<9 / quirks doesn't fire change events for all the right things,
 			// and it doesn't bubble.
@@ -224,8 +317,8 @@ function createSharedEditor(column, originalRenderCell){
 	var cmp = createEditor(column),
 		grid = column.grid,
 		isWidget = cmp.domNode,
-		node = cmp.domNode || cmp,
-		focusNode = cmp.focusNode || node,
+		rootNode = getEditorRootNode(cmp),
+		focusNode = getEditorFocusNode(cmp),
 		reset = isWidget ?
 			function(){ cmp.set("value", cmp._dgridLastValue); } :
 			function(){
@@ -250,11 +343,25 @@ function createSharedEditor(column, originalRenderCell){
 		}
 	}
 
-	function onblur(){
-		var parentNode = node.parentNode,
+	function onblur(event){
+		var wrapperNode;
+		if(event && event.target){
+			wrapperNode = event.target;
+			wrapperNode = domClass.contains(wrapperNode, editorFocusWrapperClassName) && wrapperNode;
+
+			// Some browsers on OS X emit a blur event when a focused checkbox is clicked
+			// Revert the erroneous blur by refocusing the wrapper and exit
+			// (see notes above on the createEditorFocusWrapper method)
+			if (wrapperNode && event.relatedTarget === (cmp.focusNode || cmp)) {
+				wrapperNode.focus();
+				return;
+			}
+		}
+
+		var parentNode = rootNode.parentNode,
 			i = parentNode.children.length - 1,
 			options = { alreadyHooked: true },
-			cell = grid.cell(node);
+			cell = grid.cell(rootNode);
 
 		// emit an event immediately prior to removing an editOn editor
 		on.emit(cell.element, "dgrid-editor-hide", {
@@ -267,7 +374,7 @@ function createSharedEditor(column, originalRenderCell){
 		});
 		column._editorBlurHandle.pause();
 		// Remove the editor from the cell, to be reused later.
-		parentNode.removeChild(node);
+		parentNode.removeChild(rootNode);
 
 		if(cell.row){
 			// If the row is still present (i.e. we didn't blur due to removal),
@@ -304,7 +411,7 @@ function createSharedEditor(column, originalRenderCell){
 	keyHandle = on(focusNode, "keydown", dismissOnKey);
 
 	// hook up blur handler, but don't activate until widget is activated
-	(column._editorBlurHandle = on.pausable(cmp, "blur", onblur)).pause();
+	(column._editorBlurHandle = on.pausable(getEditorFocusNode(cmp), "blur", onblur)).pause();
 
 	return cmp;
 }
@@ -322,7 +429,7 @@ function showEditor(cmp, column, cellElement, value){
 
 	cellElement.innerHTML = "";
 	put(cellElement, ".dgrid-cell-editing");
-	put(cellElement, cmp.domNode || cmp);
+	put(cellElement, getEditorRootNode(cmp));
 
 	if(isWidget && !column.editOn){
 		// Queue arguments to be run once editor is in DOM
@@ -386,7 +493,7 @@ function edit(cell) {
 	//		input/widget when the cell editor is focused.
 	//		If the cell is not editable, returns null.
 
-	var row, column, cellElement, dirty, field, value, cmp, dfd, node,
+	var row, column, cellElement, dirty, field, value, cmp, dfd, node, focusNode,
 		self = this;
 
 	function show(dfd){
@@ -396,8 +503,9 @@ function edit(cell) {
 		// focus / blur-handler-resume logic is surrounded in a setTimeout
 		// to play nice with Keyboard's dgrid-cellfocusin as an editOn event
 		column._editTimer = setTimeout(function(){
+			var focusNode = getEditorFocusNode(cmp);
 			// focus the newly-placed control (supported by form widgets and HTML inputs)
-			if(cmp.focus){ cmp.focus(); }
+			if(focusNode.focus){ focusNode.focus(); }
 			// resume blur handler once editor is focused
 			if(column._editorBlurHandle){ column._editorBlurHandle.resume(); }
 			column._editTimer = null;
@@ -426,10 +534,10 @@ function edit(cell) {
 				// In some browsers, moving a DOM node causes a blur event to fire which is not
 				// the best time for the blur handler to fire.  Force the issue by blurring the
 				// editor now.
-				node = cmp.domNode || cmp;
-				if(node.offsetWidth){
+				focusNode = getEditorFocusNode(cmp);
+				if(focusNode.offsetWidth){
 					// The editor is visible.  Blur it.
-					node.blur();
+					focusNode.blur();
 					// In IE, the blur does not complete immediately.
 					// Push showing of the editor to the next turn.
 					setTimeout(function () {
@@ -453,6 +561,8 @@ function edit(cell) {
 	}
 	return null;
 }
+
+var editorFocusWrapperClassName = 'dgrid-editor-focus-wrapper';
 
 // editor column plugin function
 
