@@ -216,6 +216,9 @@ define([
 				gridConfig.dataCreation += '\n\t\t\t\titem.hasChildren = false;';
 				gridConfig.dataCreation += '\n\t\t\t\titem.parent = i % 2;';
 				gridConfig.dataCreation += '\n\t\t\t}';
+				gridConfig.dataCreation += '\n\t\t\telse {';
+				gridConfig.dataCreation += '\n\t\t\t\titem.parent = null;';
+				gridConfig.dataCreation += '\n\t\t\t}';
 			}
 
 			gridConfig.dataCreation += '\n\t\t\tdata.push(item);' +
@@ -234,7 +237,6 @@ define([
 
 				gridConfig.storeDeclaration = '\n\tvar store = new (declare([ Memory, Trackable ]))({\n' +
 					'\t\tdata: data\n\t});\n';
-				gridConfig.storeAssignment = '\n\tgrid.set(\'collection\', store);';
 			}
 			else {
 				gridConfig.gridRender = '\n\tgrid.renderArray(data);';
@@ -256,7 +258,11 @@ define([
 			}, this);
 
 			if (hasStore) {
-				gridConfig.gridOptions += '\t\tcollection: store,\n';
+				gridConfig.gridOptions += '\t\tcollection: store';
+				if (treeExpandoColumn) {
+					gridConfig.gridOptions += '.getRootCollection()';
+				}
+				gridConfig.gridOptions += ',\n';
 			}
 
 			gridConfig.gridOptions += toJavaScript(gridOptions, { indent: 1, inline: true } );
