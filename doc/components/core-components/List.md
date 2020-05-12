@@ -89,3 +89,14 @@ When a dgrid instance is created with no ID specified (via the `id` property in 
 
 As of dgrid 0.4.1, the `dgrid_` prefix for auto-generated IDs is exposed via `List.autoIdPrefix` (a property on the
 constructor, not the prototype) and can be overridden if desired.
+
+## Right-to-left (RTL) support
+
+dgrid is designed to support RTL rendering. dgrid detects any of the following standard ways of setting a document's rendering direction:
+
+* `<html dir="rtl">`
+* `<body dir="rtl">`
+* `<body style="direction: rtl">`
+  * Note: using a CSS rule or class to apply `direction` to the `body` will not work, it must be set directly on the `style` attribute.
+
+Tests and examples can be seen in [`test/rtl.html`](../../../test/rtl.html).
