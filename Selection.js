@@ -1,15 +1,14 @@
 define([
 	'dojo/_base/declare',
-	'dojo/dom-class',
-	'dojo/on',
-	'dojo/has',
 	'dojo/aspect',
-	'./List',
+	'dojo/dom-class',
+	'dojo/mouse',
+	'dojo/on',
+	'dojo/sniff',
 	'dojo/has!touch?./util/touch',
-	'dojo/query',
-	'dojo/_base/sniff',
+	'dojo/query', // for on.selector
 	'dojo/dom' // for has('css-user-select') in 1.8.2+
-], function (declare, domClass, on, has, aspect, List, touchUtil) {
+], function (declare, aspect, domClass, mouse, on, has, touchUtil) {
 
 	has.add('dom-comparedocumentposition', function (global, doc, element) {
 		return !!element.compareDocumentPosition;
@@ -214,6 +213,10 @@ define([
 		},
 
 		_handleSelect: function (event, target) {
+			if (mouse.isRight(event)) {
+				return;
+			}
+
 			// Don't run if selection mode doesn't have a handler (incl. "none"), target can't be selected,
 			// or if coming from a dgrid-cellfocusin from a mousedown
 			if (!this[this._selectionHandlerName] || !this.allowSelect(this.row(target)) ||
