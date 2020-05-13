@@ -1,13 +1,13 @@
 define([
 	'dojo/_base/declare',
 	'dojo/_base/lang',
-	'dojo/dom-construct',
 	'dojo/dom-class',
+	'dojo/dom-construct',
 	'dojo/on',
-	'dojo/has',
-	'./util/misc',
-	'dojo/_base/sniff'
-], function (declare, lang, domConstruct, domClass, listen, has, miscUtil) {
+	'dojo/query',
+	'dojo/sniff',
+	'./util/misc'
+], function (declare, lang, domClass, domConstruct, listen, query, has, miscUtil) {
 	// Add user agent/feature CSS classes needed for structural CSS
 	var featureClasses = [];
 	if (has('mozilla')) {
@@ -28,8 +28,10 @@ define([
 		evenClass = 'dgrid-row-even',
 		scrollbarWidth, scrollbarHeight;
 
-	function byId(id) {
-		return document.getElementById(id);
+	function byId(id, context) {
+		// document.getElementById only works for elements in the document
+		// dojo/query with the context parameter works for descendants of 'context' even when it is not in the document
+		return query('#' + id, context)[0];
 	}
 
 	function cleanupTestElement(element) {
@@ -378,7 +380,7 @@ define([
 			var i;
 			for (i in this._rowIdToObject) {
 				if (this._rowIdToObject[i] !== this.columns) {
-					var rowElement = byId(i);
+					var rowElement = byId(i, this.domNode);
 					if (rowElement) {
 						this.removeRow(rowElement, true);
 					}
@@ -512,7 +514,7 @@ define([
 			// multiple parents.)
 			var id = this.id + '-row-' + ((this.collection && this.collection.getIdentity) ?
 					this.collection.getIdentity(object) : this._autoRowId++),
-				row = byId(id),
+				row = byId(id, this.domNode),
 				previousRow = row && row.previousSibling;
 
 			if (row) {
@@ -605,7 +607,7 @@ define([
 				id = target;
 				target = this._rowIdToObject[this.id + '-row-' + id];
 			}
-			return new this._Row(id, target, byId(this.id + '-row-' + id));
+			return new this._Row(id, target, byId(this.id + '-row-' + id, this.domNode));
 		},
 		cell: function (target) {
 			// this doesn't do much in a plain list
