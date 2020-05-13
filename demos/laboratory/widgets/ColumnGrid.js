@@ -54,8 +54,10 @@ define([
 					config: {
 						label: '',
 						formatter: function () {
-							return '<i class="icon-times" title="' + i18n['delete'] + '"></i>' +
-								'<i class="icon-gear" title="' + i18n.edit + '"></i> ';
+							return {
+								html: '<i class="icon-times" title="' + i18n['delete'] + '"></i>' +
+									'<i class="icon-gear" title="' + i18n.edit + '"></i> '
+							};
 						},
 						sortable: false
 					}

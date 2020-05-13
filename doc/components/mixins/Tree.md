@@ -4,14 +4,16 @@ The Tree mixin enables expansion of rows to display children.
 
 ```js
 require([
-    'dojo/_base/declare',
     'dgrid/OnDemandGrid',
-    'dgrid/Keyboard',
-    'dgrid/Selection',
-    'dgrid/Tree'
-], function (declare, OnDemandGrid, Keyboard, Selection, Tree) {
-    var treeGrid = new (declare([ OnDemandGrid, Keyboard, Selection, Tree ]))({
-        collection: myStore,
+    'dgrid/Tree',
+    'dstore/Memory',
+    'dstore/Tree'
+], function (OnDemandGrid, Tree, MemoryStore, TreeStoreMixin) {
+    var treeStore = new (MemoryStore.createSubclass([ TreeStoreMixin ]))({
+        data: [ /* ... */ ]
+    });
+    var treeGrid = new (OnDemandGrid.createSubclass([ Tree ]))({
+        collection: treeStore.getRootCollection(),
         columns: {
             // Render expando icon and trigger expansion from first column
             name: { label: 'Name', renderExpando: true },
@@ -38,8 +40,14 @@ The store may also (optionally) provide a `mayHaveChildren(object)` method which
 returns a boolean indicating whether or not the row can be expanded. If this
 is not provided, all items will be rendered with expand icons.
 
-The [`dstore/Tree`](https://github.com/SitePen/dstore/blob/master/docs/Stores.md#tree)
-module provides a reference implementation of these functions.
+The [`dstore/Tree`](https://github.com/SitePen/dstore/blob/master/docs/Stores.md#tree) module provides a reference
+implementation of these functions suitable for use with `dstore/Memory` and appropriately formatted data. `dstore/Tree`
+provides a convenience method `getRootCollection()` which simply filters the collection to only return the root nodes.
+It is necessary to pass a collection filtered to root nodes to the grid's `collection` option. To work correctly with
+`dstore/Tree` the data must include the following properties:
+
+* `hasChildren`: must be `false` for all leaf nodes, can be omitted for parent nodes in which case it defaults to `true`
+* `parent`: must be exactly `null` for root nodes, for nodes with parents it must specify the parent node's id
 
 ## Additional Column Definition Properties
 
