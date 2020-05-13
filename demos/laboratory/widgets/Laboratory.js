@@ -234,9 +234,6 @@ define([
 					dependencies.push('dstore/Tree');
 					callbackParams.push('TreeStoreMixin');
 				}
-
-				gridConfig.storeDeclaration = '\n\tvar store = new (declare([ Memory, Trackable ]))({\n' +
-					'\t\tdata: data\n\t});\n';
 			}
 			else {
 				gridConfig.gridRender = '\n\tgrid.renderArray(data);';
@@ -312,7 +309,7 @@ define([
 						data: data
 					});
 
-					gridOptions.collection = isTree ? store.filter('mayHaveChildren') : store;
+					gridOptions.collection = isTree ? store.getRootCollection() : store;
 				}
 
 				self.demoGrid = new (declare(Array.prototype.slice.apply(arguments)))(gridOptions);
@@ -419,6 +416,9 @@ define([
 					if (i > 1) {
 						mockData[i].hasChildren = false;
 						mockData[i].parent = i % 2;
+					}
+					else {
+						mockData[i].parent = null;
 					}
 
 					arrayUtil.forEach(fieldNames, function (fieldName) {
