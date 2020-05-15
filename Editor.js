@@ -30,7 +30,12 @@ define([
 			this.on('.dgrid-input:focusin', function () {
 				self._focusedEditorCell = self.cell(this);
 			});
-			this._editorFocusoutHandle = on.pausable(this.domNode, '.dgrid-input:focusout', function () {
+			this._editorFocusoutHandle = on.pausable(this.domNode, '.dgrid-input:focusout', function (event) {
+				// Widgets can trigger a 'focusout' event when clicking within the widget, since the widget
+				// is still focused the 'focusout' event should be ignored
+				if (self._focusedEditorCell && self._focusedEditorCell.element.contains(event.target)) {
+					return;
+				}
 				self._focusedEditorCell = null;
 			});
 			this._listeners.push(this._editorFocusoutHandle);
@@ -573,10 +578,10 @@ define([
 						})
 					);
 				}
-				else {
-					// For editOn editors, connect to onBlur rather than onChange, since
-					// the latter is delayed by setTimeouts in Dijit and will fire too late.
-					cmp.on(editOn ? 'blur' : 'change', function () {
+				else if (!editOn) {
+					// For editOn editors the update is handled in the shared editor's blur handler since
+					// the 'change' event is delayed by setTimeouts in Dijit and will fire too late.
+					cmp.on('change', function () {
 						if (!cmp._dgridIgnoreChange) {
 							self._updatePropertyFromEditor(column, cmp, {type: 'widget'});
 						}
@@ -715,6 +720,8 @@ define([
 						return;
 					}
 				}
+
+				self._updatePropertyFromEditor(column, cmp, {type: 'widget'});
 
 				var parentNode = rootNode.parentNode,
 					options = { alreadyHooked: true },
