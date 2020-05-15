@@ -31,7 +31,7 @@ define([
 	function byId(id, context) {
 		// document.getElementById only works for elements in the document
 		// dojo/query with the context parameter works for descendants of 'context' even when it is not in the document
-		return query('#' + id, context)[0];
+		return query('#' + miscUtil.escapeCssIdentifier(id), context)[0];
 	}
 
 	function cleanupTestElement(element) {
