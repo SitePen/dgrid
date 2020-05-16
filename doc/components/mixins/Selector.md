@@ -28,6 +28,15 @@ selector column can be chosen without regard to which fields are actually presen
 A selector column can be used to allow selection even in a grid where `selectionMode` is set to `none`, in which case
 the controls in the selector column will be the only means by which a user may select or deselect rows.
 
+## Selecting all rows
+
+Selecting rows is a UI action, not a data action. When rows are selected dgrid maintains a list of selected rows in the
+[`selection` property](Selection.md#property-summary). [`Selection#selectAll`](Selection.md#method-summary) is
+invoked, and it _only_ acts on currently rendered rows. Selection does not modify the underlying data at all. This means
+that with pagination only rows in the current page will be selected, and with virtual scrolling
+(`OnDemandList/OnDemandGrid`) only a subset of the rows will be selected. The grid's `selectAll` method can be extended
+to implement custom behavior in response to a `selectAll` action.
+
 ## Additional Column Definition Properties
 
 Property | Description
