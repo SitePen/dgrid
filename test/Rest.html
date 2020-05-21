@@ -22,25 +22,39 @@
 				margin: 10px;
 			}
 		</style>
-		<script src="../../dojo/dojo.js"
-				data-dojo-config="async: true"></script>
+		<script>
+			var dojoConfig = {
+				async: true,
+				requestProvider: 'dojo/request/registry'
+			};
+		</script>
+		<script src="../../dojo/dojo.js"></script>
 		<script>
 			require([
+				"dojo/_base/declare",
 				"dojo/_base/lang",
+				"dojo/Deferred",
+				"dojo/query",
+				"dojo/request/registry",
 				"dgrid/List",
 				"dgrid/OnDemandGrid",
 				"dgrid/Selection",
 				"dgrid/Editor",
 				"dgrid/Keyboard",
 				"dgrid/Tree",
-				"dojo/_base/declare",
-				"dojo/query",
+				"dgrid/test/data/restMock",
 				"dstore/Rest",
 				"dstore/Trackable",
 				"dstore/Cache",
 				"dstore/Tree",
 				"dojo/domReady!"
-			], function (lang, List, Grid, Selection, Editor, Keyboard, Tree, declare, query, Rest, Trackable, Cache, TreeStore) {
+			], function (declare, lang, Deferred, query, requestRegistry, List, Grid, Selection,
+				Editor, Keyboard, Tree, restMock, Rest, Trackable, Cache, TreeStore) {
+
+				//var TARGET_URL = "./data/rest.php"; // PHP server
+				var TARGET_URL = window.location.origin + ":8040/data/rest"; // Node.js server
+				// comment out the line below to disable client-side request mocking and send requests to the server
+				requestRegistry.register(/data\/rest/, restMock);
 
 				var CustomGrid = declare([Grid, Selection, Keyboard, Editor, Tree], {
 					insertRow: function () {
@@ -99,9 +113,11 @@
 
 				function createStore(config) {
 					var store = new declare([Rest, Trackable, Cache, TreeStore])(lang.mixin({
-						target: "./data/rest.php",
+						target: TARGET_URL,
 						put: function (object) {
-							return object;
+							var dfd = new Deferred();
+							dfd.resolve(object);
+							return dfd.promise;
 						}
 					}, config));
 

@@ -25,15 +25,37 @@
 				white-space: nowrap;
 			}
 		</style>
-		<script src="../../../dojo/dojo.js"
-			data-dojo-config="async: true"></script>
 		<script>
-			require(["dgrid/Grid", "dgrid/extensions/Pagination", "dgrid/Selection", "dgrid/Tree",
-					"dojo/_base/lang", "dojo/_base/declare", "dojo/dom-construct", "dojo/dom-form",
-					"dstore/Rest", "dstore/Cache", "dstore/Trackable", "dstore/Tree", "dojo/domReady!"],
-				function(Grid, Pagination, Selection, Tree,
-						lang, declare, domConstruct, domForm,
-						Rest, Cache, Trackable, TreeStore){
+			var dojoConfig = {
+				async: true,
+				requestProvider: 'dojo/request/registry'
+			};
+		</script>
+		<script src="../../../dojo/dojo.js"></script>
+		<script>
+			require([
+				"dojo/_base/declare",
+				"dojo/_base/lang",
+				"dojo/dom-construct",
+				"dojo/dom-form",
+				"dojo/request/registry",
+				"dgrid/Grid",
+				"dgrid/extensions/Pagination",
+				"dgrid/Selection",
+				"dgrid/Tree",
+				"dgrid/test/data/restMock",
+				"dstore/Rest",
+				"dstore/Cache",
+				"dstore/Trackable",
+				"dstore/Tree",
+				"dojo/domReady!"
+			], function(declare, lang, domConstruct, domForm, requestRegistry, Grid, Pagination, Selection,
+				Tree, restMock, Rest, Cache, Trackable, TreeStore){
+
+				//var TARGET_URL = "./data/rest.php"; // PHP server
+				var TARGET_URL = window.location.origin + ":8040/data/rest"; // Node.js server
+				// comment out the line below to disable client-side request mocking and send requests to the server
+				requestRegistry.register(/data\/rest/, restMock);
 
 					var CustomGrid = declare([Grid, Selection, Pagination, Tree]);
 					var testStore;
