@@ -8,6 +8,7 @@ See: https://github.com/SitePen/dstore/blob/master/docs/Stores.md#request
 Launch command: node rest-node.js
 Stop server with Ctrl+C
 */
+
 var http = require('http');
 var process = require('process');
 var url = require('url');

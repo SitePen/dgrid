@@ -52,7 +52,7 @@
 			], function(declare, lang, domConstruct, domForm, requestRegistry, Grid, Pagination, Selection,
 				Tree, restMock, Rest, Cache, Trackable, TreeStore){
 
-				//var TARGET_URL = "./data/rest.php"; // PHP server
+				//var TARGET_URL = "../data/rest.php"; // PHP server
 				var TARGET_URL = window.location.origin + ":8040/data/rest"; // Node.js server
 				// comment out the line below to disable client-side request mocking and send requests to the server
 				requestRegistry.register(/data\/rest/, restMock);
@@ -62,7 +62,7 @@
 
 					function createStore(config){
 						testStore = new declare([ Rest, Cache, Trackable, TreeStore ])(lang.mixin({
-							target:"../data/rest.php"
+							target: TARGET_URL
 						}, config));
 					}
 					createStore();
