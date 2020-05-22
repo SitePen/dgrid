@@ -27,7 +27,7 @@ define([
 			searchParams.parent === 'undefined' ? '' : (searchParams.parent + '-') : '';
 		var data = [];
 		var responseDelay = RESPONSE_DELAY_MAX ?
-			Math.floor(Math.random() * ((RESPONSE_DELAY_MAX - RESPONSE_DELAY_MIN) + 1)) + 50 :
+			Math.floor(Math.random() * ((RESPONSE_DELAY_MAX - RESPONSE_DELAY_MIN) + 1)) + RESPONSE_DELAY_MIN :
 			0;
 		var i;
 
