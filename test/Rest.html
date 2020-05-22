@@ -107,8 +107,8 @@
 									});
 									preload = preload.next;
 								}
-								console.table(preloads);
-								console.table(preloadNodes);
+								console.table && console.table(preloads);
+								console.table && console.table(preloadNodes);
 								var realRowCount = query('.dgrid-row', grid.contentNode).length;
 								height += 24 * realRowCount;
 								totalPossibleRows += realRowCount;

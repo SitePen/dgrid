@@ -51,7 +51,7 @@ var server = http.createServer(function (request, response) {
 		});
 	}
 
-	response.setHeader('Access-Control-Allow-Headers', '*');
+	response.setHeader('Access-Control-Allow-Headers', '*, Range, X-Range, X-Requested-With');
 	response.setHeader('Access-Control-Allow-Origin', '*');
 	response.setHeader('Access-Control-Expose-Headers', 'Content-Range');
 	response.setHeader('Content-Type', 'application/json');

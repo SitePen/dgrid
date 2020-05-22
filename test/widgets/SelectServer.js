@@ -39,7 +39,7 @@ define([
 			var value = searchParams.server;
 
 			if (value) {
-				this.form.serverType.value = value;
+				this.set('value', value);
 			}
 			else {
 				value = 'mock';
@@ -86,7 +86,29 @@ define([
 		},
 
 		_getValueAttr: function () {
-			return this.form.serverType.value;
+			var value = '';
+			var radioInput;
+			var i;
+
+			for (i = 0; i < this.form.serverType.length; i++) {
+				radioInput = this.form.serverType[i];
+				if (radioInput.checked) {
+					value = radioInput.value;
+					break;
+				}
+			}
+
+			return value;
+		},
+
+		_setValueAttr: function (newValue) {
+			var radioInput;
+			var i;
+
+			for (i = 0; i < this.form.serverType.length; i++) {
+				radioInput = this.form.serverType[i];
+				radioInput.checked = (radioInput.value === newValue);
+			}
 		}
 	});
 });
