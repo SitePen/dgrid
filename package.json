@@ -22,5 +22,8 @@
 	},
 	"main": "./OnDemandGrid",
 	"icon": "http://packages.dojofoundation.org/images/dgrid.png",
+	"scripts": {
+		"test-server": "node ./test/data/rest-node.js"
+	},
 	"dojoBuild": "package.js"
 }

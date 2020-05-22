@@ -1,0 +1,11 @@
+<div>
+	<h2>Choose a server for the <code>dstore/Rest</code> store:</h2>
+	<form data-dojo-attach-point="form">
+		<div><label><input name="serverType" type="radio" value="mock" checked> Client-side request mock (<code>dgrid/test/data/restMock.js</code>)</label></div>
+		<div><label><input name="serverType" type="radio" value="nodejs"> Node.js server (<code>dgrid/test/data/rest-node.js</code>)</label></div>
+		<div><label><input name="serverType" type="radio" value="php"> PHP server (<code>dgrid/test/data/rest.php</code>)</label></div>
+	</form>
+
+	<div data-dojo-attach-point="messageNode"
+		style="background: #ffd3d3; border: 2px solid red; display: none; padding: 8px"></div>
+</div>

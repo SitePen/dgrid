@@ -8,6 +8,11 @@
 			@import "../../../dojo/resources/dojo.css";
 			@import "../../css/dgrid.css";
 			@import "../../css/skins/claro.css";
+
+			body {
+				padding-left: 2rem;
+			}
+
 			.heading {
 				font-weight: bold;
 				padding-bottom: 0.25em;
@@ -25,73 +30,11 @@
 				white-space: nowrap;
 			}
 		</style>
-		<script src="../../../dojo/dojo.js"
-			data-dojo-config="async: true"></script>
-		<script>
-			require(["dgrid/Grid", "dgrid/extensions/Pagination", "dgrid/Selection", "dgrid/Tree",
-					"dojo/_base/lang", "dojo/_base/declare", "dojo/dom-construct", "dojo/dom-form",
-					"dstore/Rest", "dstore/Cache", "dstore/Trackable", "dstore/Tree", "dojo/domReady!"],
-				function(Grid, Pagination, Selection, Tree,
-						lang, declare, domConstruct, domForm,
-						Rest, Cache, Trackable, TreeStore){
-
-					var CustomGrid = declare([Grid, Selection, Pagination, Tree]);
-					var testStore;
-
-					function createStore(config){
-						testStore = new declare([ Rest, Cache, Trackable, TreeStore ])(lang.mixin({
-							target:"../data/rest.php"
-						}, config));
-					}
-					createStore();
-
-					function getColumns(){
-						return [
-							{label:'Name', field:'name', sortable: false, renderExpando: true},
-							{label:'Id', field:'id', sortable: true},
-							{label:'Comment', field:'comment', sortable: false}
-						];
-					}
-
-					window.grid2 = new CustomGrid({
-						className: "dgrid-autoheight",
-						collection: testStore,
-						columns: getColumns(),
-						pagingLinks: false,
-						pagingTextBox: true,
-						firstLastArrows: true,
-						pageSizeOptions: [10, 15, 25]
-					}, "grid2");
-
-					function createGrid(args){
-						window.grid = new CustomGrid(lang.mixin({
-									collection: testStore,
-									columns: getColumns()
-								}, args),
-							"grid");
-					}
-					createGrid();
-
-					var form = document.getElementById("configForm");
-					form.onsubmit = function() {
-						var args = domForm.toObject(form);
-						args.pagingLinks = +args.pagingLinks;
-						if (!args.previousNextArrows) { args.previousNextArrows = false; }
-						if (!args.showLoadingMessage) { args.showLoadingMessage = false; }
-
-						// recreate grid using args from form
-						window.grid.destroy();
-						domConstruct.create("div", { id: "grid" }, form, "after");
-						createStore({ useRangeHeaders: args.useRangeHeaders});
-						args.useRangeHeaders = undefined;
-						createGrid(args);
-
-						return false;
-					};
-				});
-		</script>
 	</head>
+
 	<body class="claro">
+		<div id="selectServerForm"></div>
+
 		<h2>A basic grid with the Pagination extension with tree plugin</h2>
 		<h3>Configuration</h3>
 		<form id="configForm">
@@ -116,5 +59,90 @@
 		<h2>An autoheight grid with the Pagination extension,
 			with a rows-per-page drop-down</h2>
 		<div id="grid2"></div>
+
+		<script>
+			var dojoConfig = {
+				async: true,
+				requestProvider: 'dojo/request/registry'
+			};
+		</script>
+		<script src="../../../dojo/dojo.js"></script>
+		<script>
+			require([
+				'dojo/_base/lang',
+				'dojo/dom-construct',
+				'dojo/dom-form',
+				'dgrid/Grid',
+				'dgrid/extensions/Pagination',
+				'dgrid/Selection',
+				'dgrid/Tree',
+				'dgrid/test/widgets/SelectServer',
+				'dstore/Rest',
+				'dstore/Cache',
+				'dstore/Trackable',
+				'dstore/Tree'
+			], function(lang, domConstruct, domForm, Grid, Pagination, Selection,
+				Tree, SelectServer, Rest, Cache, Trackable, TreeStore){
+
+				var CustomGrid = Grid.createSubclass([ Selection, Pagination, Tree ]);
+				var selectServer = new SelectServer({}, document.getElementById('selectServerForm'));
+
+				selectServer.startup();
+				selectServer.startupPromise.then(function () {
+					var testStore;
+
+					function createStore(config){
+						testStore = new (Rest.createSubclass([ Cache, Trackable, TreeStore ]))(lang.mixin({
+							target: selectServer.get('targetUrl')
+						}, config));
+					}
+					createStore();
+
+					function getColumns(){
+						return [
+							{label:'Name', field:'name', sortable: false, renderExpando: true},
+							{label:'Id', field:'id', sortable: true},
+							{label:'Comment', field:'comment', sortable: false}
+						];
+					}
+
+					window.grid2 = new CustomGrid({
+						className: 'dgrid-autoheight',
+						collection: testStore,
+						columns: getColumns(),
+						pagingLinks: false,
+						pagingTextBox: true,
+						firstLastArrows: true,
+						pageSizeOptions: [10, 15, 25]
+					}, 'grid2');
+
+					function createGrid(args){
+						window.grid = new CustomGrid(lang.mixin({
+									collection: testStore,
+									columns: getColumns()
+								}, args),
+							'grid');
+					}
+					createGrid();
+
+					var form = document.getElementById('configForm');
+					form.onsubmit = function() {
+						var args = domForm.toObject(form);
+						args.pagingLinks = +args.pagingLinks;
+						if (!args.previousNextArrows) { args.previousNextArrows = false; }
+						if (!args.showLoadingMessage) { args.showLoadingMessage = false; }
+
+						// recreate grid using args from form
+						window.grid.destroy();
+						domConstruct.create('div', { id: 'grid' }, form, 'after');
+						createStore({ useRangeHeaders: args.useRangeHeaders});
+						args.useRangeHeaders = undefined;
+						createGrid(args);
+
+						return false;
+					};
+				});
+			});
+		</script>
 	</body>
 </html>
