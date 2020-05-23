@@ -63,6 +63,7 @@
 			], function (lang, Deferred, query, List, Grid, Selection, Editor, Keyboard, Tree,
 				SelectServer, Rest, Trackable, Cache, TreeStore) {
 
+				var ENABLE_DEBUG_LOG = false; // set to true to enable logging preload info
 				var selectServer = new SelectServer({}, document.getElementById('selectServerForm'));
 
 				selectServer.startup();
@@ -80,7 +81,7 @@
 
 						logPreload: function () {
 							var line = '';
-							for (var i = 0; i < 160; i++) {
+							for (var i = 0; i < 100; i++) {
 								line += '\u2500';
 							}
 							console.log(line);
@@ -107,14 +108,12 @@
 									});
 									preload = preload.next;
 								}
-								console.table && console.table(preloads);
-								console.table && console.table(preloadNodes);
+								console.table(preloads);
+								console.table(preloadNodes);
 								var realRowCount = query('.dgrid-row', grid.contentNode).length;
 								height += 24 * realRowCount;
 								totalPossibleRows += realRowCount;
 								console.log('Height calculated from preloads = ', height);
-
-
 								console.log('Actual grid content height = ', gridContentHeight());
 								console.log('Total possible rows = ', totalPossibleRows);
 								console.log('Current row count = ', realRowCount);
@@ -158,14 +157,17 @@
 
 					var refreshed = false;
 					var prevContentHeight = 0;
-					setInterval(function () {
-						var contentHeight = gridContentHeight();
-						if (refreshed || prevContentHeight != contentHeight) {
-							prevContentHeight = contentHeight;
-							refreshed = false;
-							grid.logPreload();
-						}
-					}, 1500);
+
+					if (ENABLE_DEBUG_LOG) {
+						setInterval(function () {
+							var contentHeight = gridContentHeight();
+							if (refreshed || prevContentHeight != contentHeight) {
+								prevContentHeight = contentHeight;
+								refreshed = false;
+								grid.logPreload();
+							}
+						}, 1500);
+					}
 
 					function gridContentHeight() {
 						var contentHeight = 0;
