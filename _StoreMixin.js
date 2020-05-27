@@ -532,6 +532,12 @@ define([
 							rows.max--;
 						}
 
+						// max should never be less than zero; if it is the logic in the 'add, update' handler
+						// below will prevent insertion of rows (https://github.com/SitePen/dgrid/issues/1305)
+						if (rows.max < 0) {
+							rows.max = 0;
+						}
+
 						row = rows[from];
 
 						// check to make the sure the node is still there before we try to remove it
