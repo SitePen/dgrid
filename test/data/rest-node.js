@@ -26,13 +26,15 @@ var server = http.createServer(function (request, response) {
 	});
 	var responseData = restHelpers.getResponseData(searchParams, request.headers);
 	var responseDelay = restHelpers.getDelay(RESPONSE_DELAY_MIN, RESPONSE_DELAY_MAX);
+	var responseJson = JSON.stringify(responseData.items);
 
 	response.setHeader('Access-Control-Allow-Headers', '*, Range, X-Range, X-Requested-With');
 	response.setHeader('Access-Control-Allow-Origin', '*');
 	response.setHeader('Access-Control-Expose-Headers', 'Content-Range');
+	response.setHeader('Content-Length', Buffer.byteLength(responseJson));
 	response.setHeader('Content-Type', 'application/json');
 	response.setHeader('Content-Range', responseData.contentRange);
-	response.write(JSON.stringify(responseData.items));
+	response.write(responseJson);
 
 	if (responseDelay) {
 		setTimeout(function () {
