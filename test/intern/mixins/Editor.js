@@ -1,6 +1,4 @@
 define([
-	'intern!tdd',
-	'intern/chai!assert',
 	'dojo/_base/declare',
 	'dojo/_base/lang',
 	'dojo/Deferred',
@@ -17,12 +15,14 @@ define([
 	'dgrid/test/data/createSyncStore',
 	'dgrid/test/data/orderedData',
 	'../addCss!'
-], function (test, assert, declare, lang, Deferred, on, all, query, when, registry, TextBox,
-		Grid, OnDemandGrid, Editor, Pagination, createSyncStore, orderedData) {
+], function (declare, lang, Deferred, on, all, query, when, registry, TextBox, Grid, OnDemandGrid,
+	Editor, Pagination, createSyncStore, orderedData) {
 
-	var testOrderedData = orderedData.items,
-		EditorGrid = declare([ Grid, Editor ]),
-		grid;
+	var test = intern.getInterface('tdd');
+	var assert = intern.getPlugin('chai').assert;
+	var testOrderedData = orderedData.items;
+	var EditorGrid = declare([ Grid, Editor ]);
+	var grid;
 
 	function addDelay(result) {
 		var delay = new Deferred();

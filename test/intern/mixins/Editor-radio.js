@@ -1,14 +1,13 @@
 define([
-	'intern!tdd',
-	'intern/chai!assert',
 	'dojo/_base/declare',
 	'dojo/query',
 	'dgrid/Grid',
 	'dgrid/Editor',
 	'dgrid/OnDemandGrid',
 	'dstore/Memory'
-], function (test, assert, declare, query, Grid, Editor, OnDemandGrid, Memory) {
-
+], function (declare, query, Grid, Editor, OnDemandGrid, Memory) {
+	var test = intern.getInterface('tdd');
+	var assert = intern.getPlugin('chai').assert;
 	var PlainEditorGrid = declare([ Grid, Editor ]);
 	var OnDemandEditorGrid = declare([ OnDemandGrid, Editor ]);
 	var grid;

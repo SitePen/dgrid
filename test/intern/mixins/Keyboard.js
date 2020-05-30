@@ -1,19 +1,44 @@
 define([
-	'intern!tdd',
-	'intern/chai!assert',
-	'dgrid/OnDemandList',
-	'dgrid/OnDemandGrid',
-	'dgrid/Keyboard',
-	'dgrid/ColumnSet',
 	'dojo/_base/declare',
 	'dojo/dom-construct',
 	'dojo/on',
 	'dojo/query',
+	'dgrid/OnDemandList',
+	'dgrid/OnDemandGrid',
+	'dgrid/Keyboard',
+	'dgrid/ColumnSet',
 	'dgrid/test/data/createSyncStore',
 	'dgrid/test/data/genericData',
 	'../addCss!'
-], function (test, assert, OnDemandList, OnDemandGrid, Keyboard, ColumnSet,
-		declare, domConstruct, on, query, createSyncStore, genericData) {
+], function (declare, domConstruct, on, query, OnDemandList, OnDemandGrid, Keyboard,
+	ColumnSet, createSyncStore, genericData) {
+
+	var test = intern.getInterface('tdd');
+	var assert = intern.getPlugin('chai').assert;
+	var handles = [];
+	var testStore = createSyncStore({ data: genericData });
+	var item = testStore.getSync(1);
+	var grid;
+	var columnSet = [
+		[
+			[
+				{ label: 'Column 1', field: 'col1' },
+				{ label: 'Column 2', field: 'col2', sortable: false }
+			],
+			[
+				{ label: 'Column 3', field: 'col3', colSpan: 2 }
+			]
+		],
+		[
+			[
+				{ label: 'Column 1', field: 'col1', rowSpan: 2 },
+				{ label: 'Column 4', field: 'col4' }
+			],
+			[
+				{ label: 'Column 5', field: 'col5' }
+			]
+		]
+	];
 
 	function getColumns() {
 		return {
@@ -22,33 +47,6 @@ define([
 			col5: 'Column 5'
 		};
 	}
-
-	var handles = [],
-		testStore = createSyncStore({ data: genericData }),
-		item = testStore.getSync(1),
-		grid,
-		columnSet = [
-			[
-				[
-					{ label: 'Column 1', field: 'col1' },
-					{ label: 'Column 2', field: 'col2', sortable: false }
-				],
-				[
-					{ label: 'Column 3', field: 'col3', colSpan: 2 }
-				]
-			],
-			[
-				[
-					{ label: 'Column 1', field: 'col1', rowSpan: 2 },
-					{ label: 'Column 4', field: 'col4' }
-				],
-				[
-					{ label: 'Column 5', field: 'col5' }
-				]
-			]
-		];
-
-	// Common functions run after each test and suite
 
 	function afterEach() {
 		grid.domNode.style.display = '';

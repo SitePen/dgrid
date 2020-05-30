@@ -1,6 +1,4 @@
 define([
-	'intern!tdd',
-	'intern/chai!assert',
 	'dojo/_base/lang',
 	'dojo/_base/declare',
 	'dojo/aspect',
@@ -15,8 +13,11 @@ define([
 	'dgrid/test/data/createSyncStore',
 	'dgrid/test/data/genericData',
 	'dojo/domReady!'
-], function (test, assert, lang, declare, aspect, Deferred, TextBox, Editor,
-		OnDemandList, OnDemandGrid, ColumnSet, createSyncStore, genericData) {
+], function (lang, declare, aspect, Deferred, TextBox, Editor, OnDemandList, OnDemandGrid,
+	ColumnSet, createSyncStore, genericData) {
+
+	var test = intern.getInterface('tdd');
+	var assert = intern.getPlugin('chai').assert;
 
 	// Helper method used to set column set() methods for various grid compositions
 	function testSetMethod(grid, dfd) {

@@ -1,13 +1,12 @@
 define([
-	'intern!tdd',
-	'intern/chai!assert',
 	'dojo/_base/declare',
 	'dojo/query',
 	'dgrid/Grid',
 	'dgrid/ColumnSet',
 	'dgrid/test/data/orderedData'
-], function (test, assert, declare, query, Grid, ColumnSet, orderedData) {
-
+], function (declare, query, Grid, ColumnSet, orderedData) {
+	var test = intern.getInterface('tdd');
+	var assert = intern.getPlugin('chai').assert;
 	var grid;
 
 	function runClassNameTests() {

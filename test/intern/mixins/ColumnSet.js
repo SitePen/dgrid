@@ -1,6 +1,4 @@
 define([
-	'intern!tdd',
-	'intern/chai!assert',
 	'dojo/_base/declare',
 	'dojo/aspect',
 	'dojo/Deferred',
@@ -12,9 +10,11 @@ define([
 	'dgrid/Keyboard',
 	'dgrid/Tree',
 	'../addCss!'
-], function (test, assert, declare, aspect, Deferred, query, createSyncStore, createHierarchicalStore,
-		OnDemandGrid, ColumnSet, Keyboard, Tree) {
+], function (declare, aspect, Deferred, query, createSyncStore, createHierarchicalStore,
+	OnDemandGrid, ColumnSet, Keyboard, Tree) {
 
+	var test = intern.getInterface('tdd');
+	var assert = intern.getPlugin('chai').assert;
 	var grid;
 	var handles;
 

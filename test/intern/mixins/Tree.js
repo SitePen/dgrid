@@ -1,10 +1,4 @@
 define([
-	'intern!tdd',
-	'intern/chai!assert',
-	'dgrid/OnDemandGrid',
-	'dgrid/Editor',
-	'dgrid/Tree',
-	'dgrid/util/misc',
 	'dojo/_base/declare',
 	'dojo/_base/lang',
 	'dojo/aspect',
@@ -15,14 +9,20 @@ define([
 	'dojo/on',
 	'dojo/query',
 	'dojo/string',
+	'dgrid/OnDemandGrid',
+	'dgrid/Editor',
+	'dgrid/Tree',
+	'dgrid/util/misc',
 	'dgrid/test/data/createHierarchicalStore',
 	'../addCss!'
-], function (test, assert, OnDemandGrid, Editor, Tree, miscUtil, declare, lang, aspect, Deferred,
-			 domClass, domConstruct, domStyle, on, query, string, createHierarchicalStore) {
+], function (declare, lang, aspect, Deferred, domClass, domConstruct, domStyle, on, query, string,
+	OnDemandGrid, Editor, Tree, miscUtil, createHierarchicalStore) {
 
-	var grid,
-		store,
-		testDelay = 15;
+	var test = intern.getInterface('tdd');
+	var assert = intern.getPlugin('chai').assert;
+	var grid;
+	var store;
+	var testDelay = 15;
 
 	function makeId(num) {
 		return string.pad(num, 3);

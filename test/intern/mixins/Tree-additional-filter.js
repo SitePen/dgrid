@@ -1,14 +1,14 @@
 define([
-	'intern!tdd',
-	'intern/chai!assert',
-	'dgrid/OnDemandGrid',
-	'dgrid/Tree',
 	'dojo/_base/declare',
 	'dojo/_base/lang',
 	'dojo/query',
+	'dgrid/OnDemandGrid',
+	'dgrid/Tree',
 	'dstore/Memory',
 	'../addCss!'
-], function (test, assert, OnDemandGrid, Tree, declare, lang, query, Memory) {
+], function (declare, lang, query, OnDemandGrid, Tree, Memory) {
+	var test = intern.getInterface('tdd');
+	var assert = intern.getPlugin('chai').assert;
 
 	function formatName(name) {
 		return name.charAt(0).toUpperCase() + name.slice(1);

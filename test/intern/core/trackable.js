@@ -1,16 +1,14 @@
 define([
-	'intern!tdd',
-	'intern/chai!assert',
-	'dojo/_base/declare',
 	'dojo/aspect',
 	'dojo/dom-class',
 	'dojo/query',
 	'../../data/createSyncStore',
 	'dgrid/OnDemandList'
-], function (test, assert, declare, aspect, domClass, query, createSyncStore, OnDemandList) {
-
-	var widget,
-		storeCounter = 0;
+], function (aspect, domClass, query, createSyncStore, OnDemandList) {
+	var test = intern.getInterface('tdd');
+	var assert = intern.getPlugin('chai').assert;
+	var widget;
+	var storeCounter = 0;
 
 	function destroyWidget() {
 		if (widget) {

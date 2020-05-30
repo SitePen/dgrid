@@ -13,7 +13,7 @@
 		"grunt-contrib-clean": "~1.0.0",
 		"grunt-contrib-stylus": "~1.2.0",
 		"grunt-contrib-watch": "~1.1.0",
-		"intern": "~3.0.6",
+		"intern": "~4.8.5",
 		"nib": "~1.1.2"
 	},
 	"directories": {

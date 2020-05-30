@@ -1,11 +1,11 @@
 define([
-	'intern!tdd',
-	'intern/chai!assert',
 	'dojo/_base/declare',
 	'dgrid/Grid',
 	'dgrid/extensions/ColumnHider',
 	'dgrid/extensions/ColumnResizer'
-], function (test, assert, declare, Grid, ColumnHider, ColumnResizer) {
+], function (declare, Grid, ColumnHider, ColumnResizer) {
+	var test = intern.getInterface('tdd');
+	var assert = intern.getPlugin('chai').assert;
 
 	test.suite('ColumnResizer', function () {
 		var grid;

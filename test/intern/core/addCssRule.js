@@ -1,6 +1,4 @@
 define([
-	'intern!tdd',
-	'intern/chai!assert',
 	'dojo/_base/declare',
 	'dojo/dom-style',
 	'dojo/dom-construct',
@@ -11,10 +9,11 @@ define([
 	'dgrid/extensions/ColumnResizer',
 	'dgrid/util/misc',
 	'../addCss!'
-], function (test, assert, declare, domStyle, domConstruct, query,
-		Grid, ColumnSet, ColumnHider, ColumnResizer, miscUtil) {
-
+], function (declare, domStyle, domConstruct, query, Grid, ColumnSet, ColumnHider, ColumnResizer, miscUtil) {
+	var test = intern.getInterface('tdd');
+	var assert = intern.getPlugin('chai').assert;
 	var grid;
+
 	function gridDestroy() {
 		if (grid) {
 			grid.destroy();

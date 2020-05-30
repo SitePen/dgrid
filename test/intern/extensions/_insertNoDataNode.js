@@ -1,6 +1,4 @@
 define([
-	'intern!tdd',
-	'intern/chai!assert',
 	'dojo/_base/declare',
 	'dojo/query',
 	'dstore/Memory',
@@ -9,10 +7,10 @@ define([
 	'dgrid/OnDemandGrid',
 	'dgrid/extensions/Pagination',
 	'dgrid/extensions/SingleQuery'
-], function (test, assert, declare, query, Memory, Trackable, Grid, OnDemandGrid, Pagination, SingleQuery) {
-
+], function (declare, query, Memory, Trackable, Grid, OnDemandGrid, Pagination, SingleQuery) {
+	var test = intern.getInterface('tdd');
+	var assert = intern.getPlugin('chai').assert;
 	var grid;
-
 	var PaginationGrid = declare([Grid, Pagination]);
 	var SingleQueryGrid = declare([OnDemandGrid, SingleQuery]);
 	var PaginationSingleQueryGrid = declare([Grid, Pagination, SingleQuery]);

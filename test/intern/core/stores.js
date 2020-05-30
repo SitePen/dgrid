@@ -1,6 +1,4 @@
 define([
-	'intern!tdd',
-	'intern/chai!assert',
 	'dojo/_base/declare',
 	'dojo/aspect',
 	'dojo/on',
@@ -14,12 +12,13 @@ define([
 	'dgrid/test/data/genericData',
 	'dgrid/test/data/testPerformanceStore',
 	'../addCss!'
-], function (test, assert, declare, aspect, on, Grid, OnDemandGrid, Pagination, SingleQuery,
-		errorStores, createSyncStore, createAsyncStore, genericData, testPerformanceStore) {
+], function (declare, aspect, on, Grid, OnDemandGrid, Pagination, SingleQuery, errorStores, createSyncStore,
+	createAsyncStore, genericData, testPerformanceStore) {
 
+	var test = intern.getInterface('tdd');
+	var assert = intern.getPlugin('chai').assert;
 	var PaginationGrid = declare([ Grid, Pagination ]);
 	var SingleQueryGrid = declare([ Grid, SingleQuery ]);
-
 	var grid;
 	var handles = [];
 

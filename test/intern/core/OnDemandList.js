@@ -1,11 +1,12 @@
 define([
-	'intern!tdd',
-	'intern/chai!assert',
 	'dojo/query',
 	'dgrid/OnDemandList',
 	'dgrid/test/data/createSyncStore',
 	'dgrid/test/data/genericData'
-], function (test, assert, query, OnDemandList, createSyncStore, genericData) {
+], function (query, OnDemandList, createSyncStore, genericData) {
+	var test = intern.getInterface('tdd');
+	var assert = intern.getPlugin('chai').assert;
+
 	test.suite('OnDemandList with zero rowHeight', function () {
 		var list;
 		var store = createSyncStore({ data: genericData });

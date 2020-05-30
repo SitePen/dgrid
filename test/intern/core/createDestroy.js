@@ -1,12 +1,13 @@
 define([
-	'intern!tdd',
-	'intern/chai!assert',
 	'dojo/_base/declare',
 	'dojo/on',
 	'dgrid/List',
 	'dgrid/OnDemandList',
 	'dstore/Memory'
-], function (test, assert, declare, on, List, OnDemandList, Memory) {
+], function (declare, on, List, OnDemandList, Memory) {
+	var test = intern.getInterface('tdd');
+	var assert = intern.getPlugin('chai').assert;
+
 	test.suite('createDestroy', function () {
 		test.test('no params list', function () {
 			var list = new List();

@@ -1,6 +1,4 @@
 define([
-	'intern!tdd',
-	'intern/chai!assert',
 	'dojo/_base/array',
 	'dojo/_base/declare',
 	'dojo/aspect',
@@ -11,11 +9,13 @@ define([
 	'dgrid/List',
 	'dgrid/extensions/DijitRegistry',
 	'dojo/domReady!'
-], function (test, assert, arrayUtil, declare, aspect, domConstruct,
-		registry, BorderContainer, StackContainer, List, DijitRegistry) {
+], function (arrayUtil, declare, aspect, domConstruct, registry, BorderContainer,
+	StackContainer, List, DijitRegistry) {
 
-	var list,
-		DijitList = declare([ List, DijitRegistry ]);
+	var test = intern.getInterface('tdd');
+	var assert = intern.getPlugin('chai').assert;
+	var DijitList = declare([ List, DijitRegistry ]);
+	var list;
 
 	test.suite('DijitRegistry', function () {
 		test.afterEach(function () {

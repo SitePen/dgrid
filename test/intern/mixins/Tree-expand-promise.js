@@ -1,22 +1,19 @@
 define([
-	'intern!tdd',
-	'intern/chai!assert',
+	'dojo/_base/declare',
+	'dojo/Deferred',
+	'dojo/on',
+	'dojo/query',
 	'dgrid/Grid',
 	'dgrid/OnDemandGrid',
 	'dgrid/_StoreMixin',
 	'dgrid/Tree',
-	'dojo/_base/declare',
-	'dojo/_base/lang',
-	'dojo/_base/array',
-	'dojo/Deferred',
-	'dojo/on',
 	'dstore/Memory',
 	'dstore/Tree',
 	'dstore/QueryResults',
-	'dojo/query',
 	'../addCss!'
-], function (test, assert, Grid, OnDemandGrid, _StoreMixin, Tree, declare, lang, arrayUtil, Deferred, on,
-		Memory, TreeStore, QueryResults, query) {
+], function (declare, Deferred, on, query, Grid, OnDemandGrid, _StoreMixin, Tree, Memory, TreeStore, QueryResults) {
+	var test = intern.getInterface('tdd');
+	var assert = intern.getPlugin('chai').assert;
 
 	test.suite('tree (expand + promise)', function () {
 		var grid,
@@ -303,12 +300,6 @@ define([
 				createNoRenderQueryGrid(syncStore);
 			});
 			test.afterEach(destroyGrid);
-
-			test.test('expand + callback', function () {
-				assert.strictEqual(2, query('.dgrid-row', grid.domNode).length, 'Grid should have 2 rows');
-				grid.expand(1);
-				assert.strictEqual(3, query('.dgrid-row', grid.domNode).length, 'Grid should have 3 rows');
-			});
 
 			test.test('expand + callback', function () {
 				assert.strictEqual(2, query('.dgrid-row', grid.domNode).length, 'Grid should have 2 rows');

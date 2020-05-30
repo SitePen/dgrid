@@ -1,13 +1,14 @@
 define([
-	'intern!tdd',
-	'intern/chai!assert',
 	'dojo/_base/declare',
 	'dojo/query',
 	'dgrid/OnDemandGrid',
 	'dgrid/Selection',
 	'dgrid/Selector',
 	'dgrid/test/data/testStore'
-], function (test, assert, declare, query, OnDemandGrid, Selection, Selector, testStore) {
+], function (declare, query, OnDemandGrid, Selection, Selector, testStore) {
+	var test = intern.getInterface('tdd');
+	var assert = intern.getPlugin('chai').assert;
+
 	test.suite('selector column plugin', function () {
 		var grid;
 

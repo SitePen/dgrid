@@ -1,15 +1,14 @@
 define([
-	'intern!tdd',
-	'intern/chai!assert',
 	'dgrid/List',
 	'dgrid/Grid',
 	'dgrid/GridFromHtml',
-	'dojo/_base/array',
 	'dojo/parser',
 	'dojo/dom-class',
 	'dojo/dom-construct',
 	'dojo/text!../resources/setClass.html'
-], function (test, assert, List, Grid, GridFromHtml, arrayUtil, parser, domClass, domConstruct, gridTemplate) {
+], function (List, Grid, GridFromHtml, parser, domClass, domConstruct, gridTemplate) {
+	var test = intern.getInterface('tdd');
+	var assert = intern.getPlugin('chai').assert;
 
 	test.suite('setClass', function () {
 		// Tests

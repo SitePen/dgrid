@@ -1,10 +1,11 @@
 define([
-	'intern!tdd',
-	'intern/chai!assert',
 	'dojo/on',
 	'dgrid/List',
 	'dgrid/util/misc'
-], function (test, assert, on, List, miscUtil) {
+], function (on, List, miscUtil) {
+	var test = intern.getInterface('tdd');
+	var assert = intern.getPlugin('chai').assert;
+
 	test.suite('List', function() {
 		test.suite('resize', function() {
 			var list;

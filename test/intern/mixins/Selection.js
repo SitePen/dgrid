@@ -1,9 +1,6 @@
 define([
-	'intern!tdd',
-	'intern/chai!assert',
 	'dojo/_base/declare',
 	'dojo/_base/array',
-	'dojo/_base/lang',
 	'dojo/json',
 	'dojo/dom-class',
 	'dstore/Memory',
@@ -13,16 +10,18 @@ define([
 	'dgrid/Selection',
 	'dgrid/CellSelection',
 	'dgrid/extensions/Pagination'
-], function (test, assert, declare, arrayUtil, lang, JSON, domClass, Memory, Trackable,
-		Grid, OnDemandGrid, Selection, CellSelection, Pagination) {
+], function (declare, arrayUtil, JSON, domClass, Memory, Trackable, Grid, OnDemandGrid,
+	Selection, CellSelection, Pagination) {
 
+	var test = intern.getInterface('tdd');
+	var assert = intern.getPlugin('chai').assert;
+	var TrackableMemory = declare([ Memory, Trackable ]);
 	var mixins = {
-			Selection: Selection,
-			CellSelection: CellSelection
-		},
-		notificationTests = {},
-		grid,
-		TrackableMemory = declare([ Memory, Trackable ]);
+		Selection: Selection,
+		CellSelection: CellSelection
+	};
+	var notificationTests = {};
+	var grid;
 
 	function _createTestData(size) {
 		var data = [],

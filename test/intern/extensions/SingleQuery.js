@@ -1,15 +1,15 @@
 define([
-	'intern!tdd',
-	'intern/chai!assert',
 	'dojo/_base/declare',
 	'dgrid/Grid',
 	'dgrid/extensions/SingleQuery',
 	'dgrid/test/data/createSyncStore',
 	'dgrid/test/data/genericData',
 	'dojo/domReady!'
-], function (test, assert, declare, Grid, SingleQuery, createSyncStore, genericData) {
-	var grid;
+], function (declare, Grid, SingleQuery, createSyncStore, genericData) {
+	var test = intern.getInterface('tdd');
+	var assert = intern.getPlugin('chai').assert;
 	var SingleQueryGrid = declare([ Grid, SingleQuery ]);
+	var grid;
 
 	function getColumns() {
 		return {

@@ -1,13 +1,13 @@
 define([
-	'intern!tdd',
-	'intern/chai!assert',
 	'dojo/_base/declare',
 	'dgrid/Grid',
 	'dgrid/extensions/CompoundColumns'
-], function (test, assert, declare, Grid, CompoundColumns) {
-	var CompoundColumnGrid = declare([Grid, CompoundColumns]),
-		data = [],
-		grid;
+], function (declare, Grid, CompoundColumns) {
+	var test = intern.getInterface('tdd');
+	var assert = intern.getPlugin('chai').assert;
+	var CompoundColumnGrid = declare([Grid, CompoundColumns]);
+	var data = [];
+	var grid;
 
 	// Generate data to be used for all tests
 	for (var itemIndex = 0; itemIndex < 12; itemIndex++) {

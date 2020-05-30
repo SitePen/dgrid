@@ -1,19 +1,20 @@
 define([
-	'intern!tdd',
-	'intern/chai!assert',
+	'dojo/_base/declare',
+	'dojo/query',
 	'dgrid/Grid',
 	'dgrid/ColumnSet',
 	'dgrid/OnDemandGrid',
 	'dgrid/Tree',
 	'dgrid/extensions/CompoundColumns',
 	'dgrid/extensions/SingleQuery',
-	'dojo/_base/declare',
-	'dojo/query',
 	'dgrid/test/data/createHierarchicalStore',
 	'dgrid/test/data/hierarchicalCountryData',
 	'../addCss!'
-], function (test, assert, Grid, ColumnSet, OnDemandGrid, Tree, CompoundColumns, SingleQuery, declare, query,
-		createHierarchicalStore, data) {
+], function (declare, query, Grid, ColumnSet, OnDemandGrid, Tree, CompoundColumns, SingleQuery,
+	createHierarchicalStore, data) {
+
+	var test = intern.getInterface('tdd');
+	var assert = intern.getPlugin('chai').assert;
 
 	test.suite('tree indent', function () {
 		var grid;

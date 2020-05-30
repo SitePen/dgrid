@@ -1,6 +1,4 @@
 define([
-	'intern!tdd',
-	'intern/chai!assert',
 	'dojo/_base/declare',
 	'dojo/keys',
 	'dojo/on',
@@ -12,10 +10,11 @@ define([
 	'dgrid/test/data/createSyncStore',
 	'dgrid/test/data/genericData',
 	'dojo/domReady!'
-], function (test, assert, declare, keys, on, query, string, Grid, OnDemandList, Pagination, createSyncStore,
-			 genericData) {
-	var grid,
-		PaginationGrid = declare([Grid, Pagination]);
+], function (declare, keys, on, query, string, Grid, OnDemandList, Pagination, createSyncStore, genericData) {
+	var test = intern.getInterface('tdd');
+	var assert = intern.getPlugin('chai').assert;
+	var PaginationGrid = declare([Grid, Pagination]);
+	var grid;
 
 	function getColumns() {
 		return {
