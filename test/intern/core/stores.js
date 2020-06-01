@@ -15,7 +15,7 @@ define([
 ], function (declare, aspect, on, Grid, OnDemandGrid, Pagination, SingleQuery, errorStores, createSyncStore,
 	createAsyncStore, genericData, testPerformanceStore) {
 
-	var test = intern.getInterface('tdd');
+	var test = intern.getPlugin('interface.tdd');
 	var assert = intern.getPlugin('chai').assert;
 	var PaginationGrid = declare([ Grid, Pagination ]);
 	var SingleQueryGrid = declare([ Grid, SingleQuery ]);

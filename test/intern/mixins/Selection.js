@@ -13,7 +13,7 @@ define([
 ], function (declare, arrayUtil, JSON, domClass, Memory, Trackable, Grid, OnDemandGrid,
 	Selection, CellSelection, Pagination) {
 
-	var test = intern.getInterface('tdd');
+	var test = intern.getPlugin('interface.tdd');
 	var assert = intern.getPlugin('chai').assert;
 	var TrackableMemory = declare([ Memory, Trackable ]);
 	var mixins = {

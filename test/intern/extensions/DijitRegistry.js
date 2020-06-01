@@ -12,7 +12,7 @@ define([
 ], function (arrayUtil, declare, aspect, domConstruct, registry, BorderContainer,
 	StackContainer, List, DijitRegistry) {
 
-	var test = intern.getInterface('tdd');
+	var test = intern.getPlugin('interface.tdd');
 	var assert = intern.getPlugin('chai').assert;
 	var DijitList = declare([ List, DijitRegistry ]);
 	var list;

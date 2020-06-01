@@ -7,7 +7,7 @@ define([
 	'dojo/dom-construct',
 	'dojo/text!../resources/setClass.html'
 ], function (List, Grid, GridFromHtml, parser, domClass, domConstruct, gridTemplate) {
-	var test = intern.getInterface('tdd');
+	var test = intern.getPlugin('interface.tdd');
 	var assert = intern.getPlugin('chai').assert;
 
 	test.suite('setClass', function () {

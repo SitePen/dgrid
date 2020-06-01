@@ -7,7 +7,7 @@ define([
 	'dstore/Memory',
 	'../addCss!'
 ], function (declare, lang, query, OnDemandGrid, Tree, Memory) {
-	var test = intern.getInterface('tdd');
+	var test = intern.getPlugin('interface.tdd');
 	var assert = intern.getPlugin('chai').assert;
 
 	function formatName(name) {

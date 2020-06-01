@@ -3,7 +3,7 @@ define([
 	'dgrid/Grid',
 	'dgrid/extensions/CompoundColumns'
 ], function (declare, Grid, CompoundColumns) {
-	var test = intern.getInterface('tdd');
+	var test = intern.getPlugin('interface.tdd');
 	var assert = intern.getPlugin('chai').assert;
 	var CompoundColumnGrid = declare([Grid, CompoundColumns]);
 	var data = [];

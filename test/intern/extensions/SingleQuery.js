@@ -6,7 +6,7 @@ define([
 	'dgrid/test/data/genericData',
 	'dojo/domReady!'
 ], function (declare, Grid, SingleQuery, createSyncStore, genericData) {
-	var test = intern.getInterface('tdd');
+	var test = intern.getPlugin('interface.tdd');
 	var assert = intern.getPlugin('chai').assert;
 	var SingleQueryGrid = declare([ Grid, SingleQuery ]);
 	var grid;

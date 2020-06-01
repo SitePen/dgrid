@@ -6,7 +6,7 @@ define([
 	'dgrid/Selector',
 	'dgrid/test/data/testStore'
 ], function (declare, query, OnDemandGrid, Selection, Selector, testStore) {
-	var test = intern.getInterface('tdd');
+	var test = intern.getPlugin('interface.tdd');
 	var assert = intern.getPlugin('chai').assert;
 
 	test.suite('selector column plugin', function () {

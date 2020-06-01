@@ -5,7 +5,7 @@ define([
 	'dgrid/OnDemandList',
 	'dstore/Memory'
 ], function (declare, on, List, OnDemandList, Memory) {
-	var test = intern.getInterface('tdd');
+	var test = intern.getPlugin('interface.tdd');
 	var assert = intern.getPlugin('chai').assert;
 
 	test.suite('createDestroy', function () {

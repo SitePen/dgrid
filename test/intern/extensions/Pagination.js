@@ -11,7 +11,7 @@ define([
 	'dgrid/test/data/genericData',
 	'dojo/domReady!'
 ], function (declare, keys, on, query, string, Grid, OnDemandList, Pagination, createSyncStore, genericData) {
-	var test = intern.getInterface('tdd');
+	var test = intern.getPlugin('interface.tdd');
 	var assert = intern.getPlugin('chai').assert;
 	var PaginationGrid = declare([Grid, Pagination]);
 	var grid;

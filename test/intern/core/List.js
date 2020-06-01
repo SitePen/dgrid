@@ -3,7 +3,7 @@ define([
 	'dgrid/List',
 	'dgrid/util/misc'
 ], function (on, List, miscUtil) {
-	var test = intern.getInterface('tdd');
+	var test = intern.getPlugin('interface.tdd');
 	var assert = intern.getPlugin('chai').assert;
 
 	test.suite('List', function() {

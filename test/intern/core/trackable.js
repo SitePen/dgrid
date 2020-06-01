@@ -5,7 +5,7 @@ define([
 	'../../data/createSyncStore',
 	'dgrid/OnDemandList'
 ], function (aspect, domClass, query, createSyncStore, OnDemandList) {
-	var test = intern.getInterface('tdd');
+	var test = intern.getPlugin('interface.tdd');
 	var assert = intern.getPlugin('chai').assert;
 	var widget;
 	var storeCounter = 0;

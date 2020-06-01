@@ -18,7 +18,7 @@ define([
 ], function (declare, lang, Deferred, on, all, query, when, registry, TextBox, Grid, OnDemandGrid,
 	Editor, Pagination, createSyncStore, orderedData) {
 
-	var test = intern.getInterface('tdd');
+	var test = intern.getPlugin('interface.tdd');
 	var assert = intern.getPlugin('chai').assert;
 	var testOrderedData = orderedData.items;
 	var EditorGrid = declare([ Grid, Editor ]);

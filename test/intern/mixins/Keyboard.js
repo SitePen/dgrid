@@ -13,7 +13,7 @@ define([
 ], function (declare, domConstruct, on, query, OnDemandList, OnDemandGrid, Keyboard,
 	ColumnSet, createSyncStore, genericData) {
 
-	var test = intern.getInterface('tdd');
+	var test = intern.getPlugin('interface.tdd');
 	var assert = intern.getPlugin('chai').assert;
 	var handles = [];
 	var testStore = createSyncStore({ data: genericData });

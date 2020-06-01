@@ -12,7 +12,7 @@ define([
 	'dstore/QueryResults',
 	'../addCss!'
 ], function (declare, Deferred, on, query, Grid, OnDemandGrid, _StoreMixin, Tree, Memory, TreeStore, QueryResults) {
-	var test = intern.getInterface('tdd');
+	var test = intern.getPlugin('interface.tdd');
 	var assert = intern.getPlugin('chai').assert;
 
 	test.suite('tree (expand + promise)', function () {

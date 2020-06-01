@@ -5,7 +5,7 @@ define([
 	'dgrid/ColumnSet',
 	'dgrid/test/data/orderedData'
 ], function (declare, query, Grid, ColumnSet, orderedData) {
-	var test = intern.getInterface('tdd');
+	var test = intern.getPlugin('interface.tdd');
 	var assert = intern.getPlugin('chai').assert;
 	var grid;
 

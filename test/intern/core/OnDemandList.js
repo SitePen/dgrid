@@ -4,7 +4,7 @@ define([
 	'dgrid/test/data/createSyncStore',
 	'dgrid/test/data/genericData'
 ], function (query, OnDemandList, createSyncStore, genericData) {
-	var test = intern.getInterface('tdd');
+	var test = intern.getPlugin('interface.tdd');
 	var assert = intern.getPlugin('chai').assert;
 
 	test.suite('OnDemandList with zero rowHeight', function () {

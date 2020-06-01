@@ -18,7 +18,7 @@ define([
 ], function (declare, lang, aspect, Deferred, domClass, domConstruct, domStyle, on, query, string,
 	OnDemandGrid, Editor, Tree, miscUtil, createHierarchicalStore) {
 
-	var test = intern.getInterface('tdd');
+	var test = intern.getPlugin('interface.tdd');
 	var assert = intern.getPlugin('chai').assert;
 	var grid;
 	var store;

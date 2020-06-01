@@ -13,7 +13,7 @@ define([
 ], function (declare, query, Grid, ColumnSet, OnDemandGrid, Tree, CompoundColumns, SingleQuery,
 	createHierarchicalStore, data) {
 
-	var test = intern.getInterface('tdd');
+	var test = intern.getPlugin('interface.tdd');
 	var assert = intern.getPlugin('chai').assert;
 
 	test.suite('tree indent', function () {

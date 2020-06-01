@@ -6,7 +6,7 @@ define([
 	'dgrid/OnDemandGrid',
 	'dstore/Memory'
 ], function (declare, query, Grid, Editor, OnDemandGrid, Memory) {
-	var test = intern.getInterface('tdd');
+	var test = intern.getPlugin('interface.tdd');
 	var assert = intern.getPlugin('chai').assert;
 	var PlainEditorGrid = declare([ Grid, Editor ]);
 	var OnDemandEditorGrid = declare([ OnDemandGrid, Editor ]);

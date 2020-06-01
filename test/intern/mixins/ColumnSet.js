@@ -13,7 +13,7 @@ define([
 ], function (declare, aspect, Deferred, query, createSyncStore, createHierarchicalStore,
 	OnDemandGrid, ColumnSet, Keyboard, Tree) {
 
-	var test = intern.getInterface('tdd');
+	var test = intern.getPlugin('interface.tdd');
 	var assert = intern.getPlugin('chai').assert;
 	var grid;
 	var handles;

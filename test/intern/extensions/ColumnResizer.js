@@ -4,7 +4,7 @@ define([
 	'dgrid/extensions/ColumnHider',
 	'dgrid/extensions/ColumnResizer'
 ], function (declare, Grid, ColumnHider, ColumnResizer) {
-	var test = intern.getInterface('tdd');
+	var test = intern.getPlugin('interface.tdd');
 	var assert = intern.getPlugin('chai').assert;
 
 	test.suite('ColumnResizer', function () {

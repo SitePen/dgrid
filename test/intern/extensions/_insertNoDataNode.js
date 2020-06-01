@@ -8,7 +8,7 @@ define([
 	'dgrid/extensions/Pagination',
 	'dgrid/extensions/SingleQuery'
 ], function (declare, query, Memory, Trackable, Grid, OnDemandGrid, Pagination, SingleQuery) {
-	var test = intern.getInterface('tdd');
+	var test = intern.getPlugin('interface.tdd');
 	var assert = intern.getPlugin('chai').assert;
 	var grid;
 	var PaginationGrid = declare([Grid, Pagination]);

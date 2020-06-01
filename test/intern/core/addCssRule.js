@@ -10,7 +10,7 @@ define([
 	'dgrid/util/misc',
 	'../addCss!'
 ], function (declare, domStyle, domConstruct, query, Grid, ColumnSet, ColumnHider, ColumnResizer, miscUtil) {
-	var test = intern.getInterface('tdd');
+	var test = intern.getPlugin('interface.tdd');
 	var assert = intern.getPlugin('chai').assert;
 	var grid;
 

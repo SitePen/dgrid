@@ -16,7 +16,7 @@ define([
 ], function (lang, declare, aspect, Deferred, TextBox, Editor, OnDemandList, OnDemandGrid,
 	ColumnSet, createSyncStore, genericData) {
 
-	var test = intern.getInterface('tdd');
+	var test = intern.getPlugin('interface.tdd');
 	var assert = intern.getPlugin('chai').assert;
 
 	// Helper method used to set column set() methods for various grid compositions
