@@ -1,7 +1,7 @@
 define([
-	'./functional/Keyboard',
-	'./functional/KeyboardTab',
-	'./functional/Selector',
-	'./functional/Editor',
-	'./functional/Tree'
+	'./functional/Keyboard'
+	// './functional/KeyboardTab',
+	// './functional/Selector',
+	// './functional/Editor'
+	// './functional/Tree'
 ], function () {});

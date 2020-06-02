@@ -1,18 +1,19 @@
 {
-	"basePath": "./",
+	"$schema": "./node_modules/intern/schemas/config.json",
+
+	"basePath": "../",
 
 	"environments": [
 		{ "browserName": "chrome" }
 	],
 
 	"suites": [ "dgrid/test/intern/all" ],
-	"functionalSuites": [ "dgrid/test/intern/functional" ],
+	"functionalSuites": [ "dgrid/test/intern/functional/Editor" ],
 
 	"maxConcurrency": 2,
-	"proxy": "http://localhost:9000/",
 
 	"tunnelComment": "Username and key should be set in the BROWSERSTACK_USERNAME and BROWSERSTACK_ACCESS_KEY environment variables",
-	"tunnel": "browserstack",
+	"tunnel": "null",
 
 	"capabilitiesComment": "See https://www.browserstack.com/automate/capabilities for capabilities and environments",
 	"capabilities": {
@@ -22,12 +23,12 @@
 	"loader": {
 		"script": "dojo",
 		"options": {
-			"internLoaderPath": "../dojo/dojo.js",
+			"internLoaderPath": "dojo/dojo.js",
 			"packages": [
-				{ "name": "dojo", "location": "../dojo" },
-				{ "name": "dijit", "location": "../dijit" },
-				{ "name": "dgrid", "location": "../dgrid" },
-				{ "name": "dstore", "location": "../dstore" }
+				{ "name": "dojo", "location": "dojo" },
+				{ "name": "dijit", "location": "dijit" },
+				{ "name": "dgrid", "location": "dgrid" },
+				{ "name": "dstore", "location": "dstore" }
 			]
 		}
 	}

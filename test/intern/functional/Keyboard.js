@@ -1,14 +1,18 @@
 define([
-	'intern!tdd',
-	'intern/chai!assert',
-	'intern/dojo/node!leadfoot/helpers/pollUntil',
-	'intern/dojo/node!leadfoot/keys',
-	'require'
-], function (test, assert, pollUntil, keys, require) {
+	'dojo/node!@theintern/leadfoot/helpers/pollUntil',
+	'dojo/node!@theintern/leadfoot/keys'
+], function (pollUntilModule, keysModule) {
+	var test = intern.getPlugin('interface.tdd');
+	var assert = intern.getPlugin('chai').assert;
+	/* jshint -W024 */
+	var pollUntil = pollUntilModule.default;
+	var keys = keysModule.default;
+	/* jshint +W024 */
+
 	function testUpDownKeys(gridId, cellNavigation) {
 		var rootQuery = '#' + gridId + ' #' + gridId + '-row-';
-		return function () {
-			return this.remote
+		return function (suite) {
+			return suite.remote
 				.findByCssSelector(rootQuery + '0' + (cellNavigation ? ' .dgrid-column-col1' : ''))
 					.click()
 					.type([keys.ARROW_DOWN])
@@ -18,7 +22,7 @@ define([
 					.then(function (classNames) {
 						var arr = classNames.split(' '),
 							containsClass = (arr.indexOf('dgrid-focus') !== -1);
-						assert.ok(containsClass, 'the down arrow key should move focus one element down');
+						assert(containsClass, 'the down arrow key should move focus one element down');
 					})
 					.type([keys.ARROW_UP])
 					.end()
@@ -27,7 +31,7 @@ define([
 					.then(function (classNames) {
 						var arr = classNames.split(' '),
 							containsClass = (arr.indexOf('dgrid-focus') !== -1);
-						assert.ok(containsClass, 'the up arrow key should move focus one element up');
+						assert(containsClass, 'the up arrow key should move focus one element up');
 					})
 					.end();
 		};
@@ -35,8 +39,8 @@ define([
 
 	function testLeftRightKeys(gridId, header) {
 		var rootQuery = header ? ('#' + gridId + ' .dgrid-header') : ('#' + gridId + ' #' + gridId + '-row-0');
-		return function () {
-			return this.remote
+		return function (suite) {
+			return suite.remote
 				.findByCssSelector(rootQuery + ' .dgrid-column-col1')
 					.click()
 					.type([keys.ARROW_RIGHT])
@@ -46,7 +50,7 @@ define([
 					.then(function (classNames) {
 						var arr = classNames.split(' '),
 							containsClass = (arr.indexOf('dgrid-focus') !== -1);
-						assert.ok(containsClass, 'the right arrow key should move focus one element right');
+						assert(containsClass, 'the right arrow key should move focus one element right');
 					})
 					.type([keys.ARROW_LEFT])
 					.end()
@@ -55,7 +59,7 @@ define([
 					.then(function (classNames) {
 						var arr = classNames.split(' '),
 							containsClass = (arr.indexOf('dgrid-focus') !== -1);
-						assert.ok(containsClass, 'the left arrow key should move focus one element left');
+						assert(containsClass, 'the left arrow key should move focus one element left');
 					})
 					.end();
 		};
@@ -65,8 +69,8 @@ define([
 		var rootQuery = '#' + gridId + ' #' + gridId + '-row-';
 		lastId = lastId || 99;
 
-		return function () {
-			return this.remote
+		return function (suite) {
+			return suite.remote
 				.findByCssSelector(rootQuery + '0' + (cellNavigation ? ' .dgrid-column-col1' : ''))
 					.click()
 					.type([keys.END])
@@ -77,7 +81,7 @@ define([
 					.then(function (classNames) {
 						var arr = classNames.split(' '),
 						containsClass = arr.indexOf('dgrid-focus') !== -1;
-						assert.ok(containsClass, 'the end key should move focus to the last element in the list');
+						assert(containsClass, 'the end key should move focus to the last element in the list');
 					})
 					.type([keys.HOME])
 					.end()
@@ -86,20 +90,20 @@ define([
 					.then(function (classNames) {
 						var arr = classNames.split(' '),
 							containsClass = (arr.indexOf('dgrid-focus') !== -1);
-						assert.ok(containsClass, 'the home key should move focus to the first element in the list');
+						assert(containsClass, 'the home key should move focus to the first element in the list');
 					})
 					.end();
 		};
 	}
 
 	test.suite('Keyboard functional tests', function () {
-		test.before(function () {
+		test.before(function (suite) {
 			// Get our html page. This page should load all necessary scripts
 			// since this functional test module runs on the server and can't load
 			// such scripts. Further, in the html page, set a global "ready" var
 			// to true to tell the runner to continue.
-			return this.remote
-				.get(require.toUrl('./Keyboard.html'))
+			return suite.remote
+				.get('dgrid/test/intern/functional/Keyboard.html')
 				.then(pollUntil(function () {
 					return window.ready;
 				}, null, 5000));

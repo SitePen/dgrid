@@ -1,11 +1,11 @@
 define([
-	'intern!tdd',
-	'intern/chai!assert',
 	'./util',
-	'intern/dojo/node!leadfoot/helpers/pollUntil',
-	'intern/dojo/node!leadfoot/keys',
-	'require'
-], function (test, assert, util, pollUntil, keys, require) {
+	'dojo/node!@theintern/leadfoot/helpers/pollUntil',
+	'dojo/node!@theintern/leadfoot/keys'
+], function (util, pollUntil, keys) {
+	var test = intern.getPlugin('interface.tdd');
+	var assert = intern.getPlugin('chai').assert;
+
 	// Number of visible rows in the grid.
 	// Check the data loaded in test file (Editor.html) and rows visible
 	// when the page is loaded to ensure this is correct.
@@ -104,11 +104,11 @@ define([
 
 		function createDatachangeTest(testFunc, dismissFunc, initFunction) {
 			// Generates test functions for enter/blur value registration tests
-			return function () {
-				this.async(60000);
-				var command = new EditorCommand(this.remote);
+			return function (suite) {
+				suite.async(60000);
+				var command = new EditorCommand(suite.remote);
 
-				command = command.get(require.toUrl('./Editor.html'))
+				command = command.get('dgrid/test/intern/functional/Editor.html')
 					.then(pollUntil(function () {
 						return window.ready;
 					}, null, 5000));
@@ -127,8 +127,8 @@ define([
 
 		function createFocusTest(selector, initFunction) {
 			// Generates test functions for focus preservation tests
-			return function () {
-				var command = new EditorCommand(this.remote),
+			return function (suite) {
+				var command = new EditorCommand(suite.remote),
 					rowIndex;
 
 				function each(rowIndex) {
@@ -162,7 +162,7 @@ define([
 							.end();
 				}
 
-				command = command.get(require.toUrl('./Editor-OnDemand.html'))
+				command = command.get('dgrid/test/intern/functional/Editor-OnDemand.html')
 					.then(pollUntil(function () {
 						return window.ready;
 					}, null, 5000));
@@ -180,8 +180,8 @@ define([
 		}
 
 		function createEscapeRevertTest(initFunction) {
-			return function () {
-				var command = new EditorCommand(this.remote),
+			return function (suite) {
+				var command = new EditorCommand(suite.remote),
 					rowIndex;
 
 				function each(rowIndex) {
@@ -218,7 +218,7 @@ define([
 							.end();
 				}
 
-				command = command.get(require.toUrl('./Editor.html'))
+				command = command.get(('dgrid/test/intern/functional/Editor.html')
 					.then(pollUntil(function () {
 						return window.ready;
 					}, null, 5000));
@@ -236,8 +236,8 @@ define([
 		}
 
 		function createAutosaveTest(initFunction) {
-			return function () {
-				var command = new EditorCommand(this.remote),
+			return function (suite) {
+				var command = new EditorCommand(suite.remote),
 					appendValue = 'abc',
 					rowIndex;
 
@@ -272,7 +272,7 @@ define([
 						});
 				}
 
-				command = command.get(require.toUrl('./Editor-OnDemand.html'))
+				command = command.get('dgrid/test/intern/functional/Editor-OnDemand.html')
 					.then(pollUntil(function () {
 						return window.ready;
 					}, null, 5000));
@@ -297,11 +297,11 @@ define([
 			setEditorToTextBox();
 		}
 
-		test.before(function () {
+		test.before(function (suite) {
 			// In order to function properly on all platforms, we need to know
 			// what the proper character sequence is to go to the end of a text field.
 			// End key works generally everywhere except Mac OS X.
-			return util.isInputHomeEndSupported(this.remote).then(function (isSupported) {
+			return util.isInputHomeEndSupported(suite.remote).then(function (isSupported) {
 				gotoEnd = isSupported ? function (command) {
 					return command.type(keys.END);
 				} : function (command) {
@@ -347,9 +347,9 @@ define([
 		test.test('autoSave: true', createAutosaveTest());
 		test.test('autoSave: true - TextBox', createAutosaveTest(setTextBox));
 
-		test.test('shared editor reset', function () {
-			return this.remote
-				.get(require.toUrl('./Editor.html'))
+		test.test('shared editor reset', function (suite) {
+			return suite.remote
+				.get('dgrid/test/intern/functional/Editor.html')
 				.then(pollUntil(function () {
 					return window.ready;
 				}, null, 5000))

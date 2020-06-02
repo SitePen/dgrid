@@ -1,7 +1,7 @@
 define([
-	'intern/dojo/node!leadfoot/helpers/pollUntil',
-	'intern/dojo/node!leadfoot/keys',
-	'intern/dojo/node!leadfoot/Command'
+	'dojo/node!@theintern/leadfoot/helpers/pollUntil',
+	'dojo/node!@theintern/leadfoot/keys',
+	'dojo/node!@theintern/leadfoot/Command'
 ], function (pollUntil, keys, Command) {
 	return {
 		isShiftClickSupported: function (remote) {
