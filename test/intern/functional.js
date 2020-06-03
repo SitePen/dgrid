@@ -1,7 +1,5 @@
-define([
-	'./functional/Keyboard'
-	// './functional/KeyboardTab',
-	// './functional/Selector',
-	// './functional/Editor'
-	// './functional/Tree'
-], function () {});
+require('./functional/Editor');
+require('./functional/Keyboard');
+//require('./functional/KeyboardTab');
+//require('./functional/Selector');
+//require('./functional/Tree);

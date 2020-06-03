@@ -4,32 +4,63 @@
 	"basePath": "../",
 
 	"environments": [
-		{ "browserName": "chrome" }
+		{
+			"browserName": "chrome"
+		}
 	],
 
-	"suites": [ "dgrid/test/intern/all" ],
-	"functionalSuites": [ "dgrid/test/intern/functional/Editor" ],
+	"zfunctionalSuites": [
+		"./test/intern/functional/Keyboard.js",
+		"!dgrid/test/intern/functional/util.js"
+	],
+	"functionalSuites": [ "./test/intern/functional" ],
+
+	"coverage": [
+		"./extensions/*.js",
+		"./_StoreMixin.js",
+		"./CellSelection.js",
+		"./ColumnSet.js",
+		"./Editor.js",
+		"./Grid.js",
+		"./GridFromHtml.js",
+		"./GridWithColumnSetsFromHtml.js",
+		"./Keyboard.js",
+		"./List.js",
+		"./OnDemandGrid.js",
+		"./OnDemandList.js",
+		"./Selection.js",
+		"./Selector.js",
+		"./Tree.js"
+	],
 
 	"maxConcurrency": 2,
 
 	"tunnelComment": "Username and key should be set in the BROWSERSTACK_USERNAME and BROWSERSTACK_ACCESS_KEY environment variables",
 	"tunnel": "null",
 
-	"capabilitiesComment": "See https://www.browserstack.com/automate/capabilities for capabilities and environments",
-	"capabilities": {
-		"name": "dgrid"
+	"browser": {
+		"suites": [
+			"dgrid/test/intern/browserSuites"
+		],
+
+		"loader": {
+			"script": "dojo",
+			"options": {
+				"internLoaderPath": "dojo/dojo.js",
+				"packages": [
+					{ "name": "dojo", "location": "dojo" },
+					{ "name": "dijit", "location": "dijit" },
+					{ "name": "dgrid", "location": "dgrid" },
+					{ "name": "dstore", "location": "dstore" }
+				]
+			}
+		}
 	},
 
-	"loader": {
-		"script": "dojo",
-		"options": {
-			"internLoaderPath": "dojo/dojo.js",
-			"packages": [
-				{ "name": "dojo", "location": "dojo" },
-				{ "name": "dijit", "location": "dijit" },
-				{ "name": "dgrid", "location": "dgrid" },
-				{ "name": "dstore", "location": "dstore" }
-			]
-		}
+	"node": {
+		"reporters": [
+			"htmlcoverage",
+			"pretty"
+		]
 	}
 }
