@@ -1,4 +1,5 @@
 define([
+	'dojo/_base/array',
 	'dojo/_base/declare',
 	'dojo/_base/lang',
 	'dojo/Deferred',
@@ -8,7 +9,7 @@ define([
 	'dojo/query',
 	'dojo/sniff',
 	'./Grid'
-], function (declare, lang, Deferred, domConstruct, domClass, on, query, has, Grid) {
+], function (arrayUtil, declare, lang, Deferred, domConstruct, domClass, on, query, has, Grid) {
 
 	return declare(null, {
 		editorFocusWrapperClassName: 'dgrid-editor-focus-wrapper',
@@ -68,6 +69,7 @@ define([
 			for (var id in this._editorInstances) {
 				var editorInstanceDomNode = this._getEditorRootNode(this._editorInstances[id].domNode);
 				if (editorInstanceDomNode && editorInstanceDomNode.parentNode) {
+					this._removeEditorBlurHandles();
 					// Remove any editor widgets from the DOM before List destroys it, to avoid issues in IE (#1100)
 					editorInstanceDomNode.parentNode.removeChild(editorInstanceDomNode);
 				}
@@ -938,6 +940,24 @@ define([
 				value = isNaN(asDate.getTime()) ? value : asDate;
 			}
 			return value;
+		},
+
+		_removeEditorBlurHandles: function () {
+			// summary:
+			//		The blur handler created in _createSharedEditor will remove the editor node from the DOM.
+			//		If other code needs to remove an editor node from the DOM it must first remove the editor's
+			//		blur handle to avoid making a duplicate call to remove the node from the DOM which will
+			//		throw an error.
+			arrayUtil.forEach(this.subRows, function (subRow) {
+				if (subRow instanceof Array) {
+					arrayUtil.forEach(subRow, function (column) {
+						column._editorBlurHandle && column._editorBlurHandle.remove();
+					});
+				}
+				else {
+					subRow._editorBlurHandle && subRow._editorBlurHandle.remove();
+				}
+			});
 		}
 	});
 });
