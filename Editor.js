@@ -376,6 +376,12 @@ define([
 				return (new Deferred()).resolve();
 			}
 
+			if (column._editorBlurHandle) {
+				// _StoreMixin#refreshCell will empty the cell, causing the blur handler to be triggered
+				// Remove the blur handler to avoid having it called unnecessarily (and throwing an error)
+				column._editorBlurHandle.remove();
+			}
+
 			return this.inherited(arguments);
 		},
 
