@@ -74,7 +74,8 @@ define([
 
 			function assertScroll(messageSuffix) {
 				var element = query('.dgrid-column-set-1 [data-dgrid-column-set-id="1"]', grid.row(1).element)[0];
-				assert.strictEqual(element.scrollLeft, scrollAmount,
+				// use Math.ceil() to account for sub-pixel values on scaled displays
+				assert.strictEqual(Math.ceil(element.scrollLeft), scrollAmount,
 					'Column Set scrollLeft should equal ' + scrollAmount + messageSuffix);
 			}
 
@@ -164,7 +165,8 @@ define([
 				var element = query('.dgrid-column-set-0 [data-dgrid-column-set-id="0"]',
 					grid.row('0:0').element)[0];
 
-				assert.strictEqual(element.scrollLeft, scrollAmount,
+				// use Math.ceil() to account for sub-pixel values on scaled displays
+				assert.strictEqual(Math.ceil(element.scrollLeft), scrollAmount,
 					'Column Set should have expected scroll position for re-expanded rows');
 			});
 		});
