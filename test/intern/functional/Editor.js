@@ -29,7 +29,7 @@ var EditorCommand = util.createCommandConstructor({
 	}
 });
 
-test.suite('dgrid/editor functional tests', function () {
+test.suite('Editor functional tests', function () {
 	var gotoEnd; // Function defined when `before` logic runs
 
 	// Functions performing operations to test the editor columns in the grid,

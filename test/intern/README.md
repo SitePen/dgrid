@@ -11,6 +11,9 @@ chromedriver --port=4444 --url-base=wd/hub
 npx intern leaveRemoteOpen
 ```
 
+The `pretty` reporter erases errors that are output to the console. Delete the value in `intern.json` or change
+it to `runner` while debugging.
+
 ### Loader errors
 
 Loader errors may produce confusing output that does not facilitate debugging. If you encounter a loader error

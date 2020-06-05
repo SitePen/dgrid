@@ -1,108 +1,107 @@
-define([
-	'intern!tdd',
-	'intern/chai!assert',
-	'intern/dojo/node!leadfoot/helpers/pollUntil',
-	'require'
-], function (test, assert, pollUntil, require) {
-	// dgrid.css defines a 300ms transition duration for .dgrid-tree-container
-	// Add 20% for good measure
-	var TRANSITION_DELAY = 360;
+/* jshint -W024 */
+var pollUntil = require('@theintern/leadfoot/helpers/pollUntil').default;
+/* jshint +W024 */
+var test = intern.getPlugin('interface.tdd');
+var assert = intern.getPlugin('chai').assert;
 
-	function createExpandTest(clickTarget, clickMethod) {
-		return function () {
-			var xOffset = 0;
-			// Nudge the y-offset of the cursor down a bit for good measure (default seems to be 0,0 in the target
-			// element; in Firefox the click has been known to hit just above the target element)
-			var remote = this.remote;
+// dgrid.css defines a 300ms transition duration for .dgrid-tree-container
+// Add 20% for good measure
+var TRANSITION_DELAY = 360;
 
-			if (remote.environmentType.browserName === 'safari') {
-				console.warn('Warning: skipping a tree functional test because ' +
-					'the safari web driver does not support mouseMoveTo.');
-				return;
-			}
+function createExpandTest(clickTarget, clickMethod) {
+	return function (suite) {
+		var xOffset = 0;
+		// Nudge the y-offset of the cursor down a bit for good measure (default seems to be 0,0 in the target
+		// element; in Firefox the click has been known to hit just above the target element)
+		var remote = suite.remote;
 
-			// With the cell selector used in the double-click test the cursor will be positioned at the start of the
-			// cell, right over the expando
-			// Move the cursor a bit to the right so it's not on the expando
-			if (clickMethod === 'doubleClick') {
-				xOffset = 30;
-			}
+		if (remote.environmentType.browserName === 'safari') {
+			console.warn('Warning: skipping a tree functional test because ' +
+				'the safari web driver does not support mouseMoveTo.');
+			return;
+		}
 
-			// Turn off whitespace check because it doesn't like [clickMethod]() on its own line
-			/* jshint white: false */
-			return remote.findByCssSelector('#treeGrid-row-AF ' + clickTarget)
-				.moveMouseTo(xOffset, 8)
-				[clickMethod]()
-				.sleep(TRANSITION_DELAY)
-				.end()
-				.findByCssSelector('#treeGrid-row-SD')
-				.isDisplayed()
-				.then(function (isDisplayed) {
-					assert.ok(isDisplayed, 'Expanded rows should be visible');
-				})
-				.end()
-				.findByCssSelector('#treeGrid-row-AF ' + clickTarget)
-				.moveMouseTo(xOffset, 8)
-				[clickMethod]()
-				.sleep(TRANSITION_DELAY)
-				.end()
-				.findByCssSelector('#treeGrid-row-SD')
-				.isDisplayed()
-				.then(function (isDisplayed) {
-					assert.ok(!isDisplayed, 'Collapsed rows should not be visible');
-				})
-				.end();
-		};
-	}
+		// With the cell selector used in the double-click test the cursor will be positioned at the start of the
+		// cell, right over the expando
+		// Move the cursor a bit to the right so it's not on the expando
+		if (clickMethod === 'doubleClick') {
+			xOffset = 30;
+		}
 
-	test.suite('dgrid/tree functional tests', function () {
+		// Turn off whitespace check because it doesn't like [clickMethod]() on its own line
+		/* jshint white: false */
+		return remote.findByCssSelector('#treeGrid-row-AF ' + clickTarget)
+			.moveMouseTo(xOffset, 8)
+			[clickMethod]()
+			.sleep(TRANSITION_DELAY)
+			.end()
+			.findByCssSelector('#treeGrid-row-SD')
+			.isDisplayed()
+			.then(function (isDisplayed) {
+				assert.ok(isDisplayed, 'Expanded rows should be visible');
+			})
+			.end()
+			.findByCssSelector('#treeGrid-row-AF ' + clickTarget)
+			.moveMouseTo(xOffset, 8)
+			[clickMethod]()
+			.sleep(TRANSITION_DELAY)
+			.end()
+			.findByCssSelector('#treeGrid-row-SD')
+			.isDisplayed()
+			.then(function (isDisplayed) {
+				assert.ok(!isDisplayed, 'Collapsed rows should not be visible');
+			})
+			.end();
+	};
+}
 
-		test.before(function () {
-			var remote = this.remote;
+test.suite('Tree functional tests', function () {
 
-			return remote.get(require.toUrl('./Tree.html'))
-				.then(pollUntil(function () {
-					return window.ready;
-				}, null, 5000));
-		});
+	test.before(function (suite) {
+		var remote = suite.remote;
 
-		test.test('expand/collapse: click on expando node', createExpandTest('.dgrid-expando-icon', 'click'));
-		test.test('expand/collapse: double-click on cell node', createExpandTest('.dgrid-column-0', 'doubleClick'));
+		return remote.get('dgrid/test/intern/functional/Tree.html')
+			.then(pollUntil(function () {
+				return window.ready;
+			}, null, 5000));
 	});
 
-	test.suite('dgrid/Tree functional tests with CompoundColumns', function () {
+	test.test('expand/collapse: click on expando node', createExpandTest('.dgrid-expando-icon', 'click'));
+	test.test('expand/collapse: double-click on cell node', createExpandTest('.dgrid-column-0', 'doubleClick'));
+});
 
-		test.before(function () {
-			var remote = this.remote;
+test.suite('Tree functional tests with CompoundColumns', function () {
 
-			return remote.get(require.toUrl('./TreeCompound.html'))
-				.then(pollUntil(function () {
-					return window.ready;
-				}, null, 5000));
-		});
+	test.before(function (suite) {
+		var remote = suite.remote;
 
-		test.test('expand/collapse: click on expando node', createExpandTest('.dgrid-expando-icon', 'click'));
-		test.test('expand/collapse: double-click on cell node', createExpandTest('.dgrid-column-set-0', 'doubleClick'));
+		return remote.get('dgrid/test/intern/functional/TreeCompound.html')
+			.then(pollUntil(function () {
+				return window.ready;
+			}, null, 5000));
 	});
 
-	test.suite('dgrid/Tree functional tests with CompoundColumns after column reset', function () {
+	test.test('expand/collapse: click on expando node', createExpandTest('.dgrid-expando-icon', 'click'));
+	test.test('expand/collapse: double-click on cell node', createExpandTest('.dgrid-column-set-0', 'doubleClick'));
+});
 
-		test.before(function () {
-			var remote = this.remote;
+test.suite('Tree functional tests with CompoundColumns after column reset', function () {
 
-			return remote.get(require.toUrl('./TreeCompound.html'))
-				.then(pollUntil(function () {
-					return window.ready;
-				}, null, 5000))
-				.then(function () {
-					return remote.execute(function () {
-						/* global treeGrid */
-						treeGrid.set('columns', treeGrid.get('columns'));
-					});
+	test.before(function (suite) {
+		var remote = suite.remote;
+
+		return remote.get('dgrid/test/intern/functional/TreeCompound.html')
+			.then(pollUntil(function () {
+				return window.ready;
+			}, null, 5000))
+			.then(function () {
+				return remote.execute(function () {
+					/* global treeGrid */
+					treeGrid.set('columns', treeGrid.get('columns'));
 				});
-		});
-
-		test.test('expand/collapse: click on expando node', createExpandTest('.dgrid-expando-icon', 'click'));
-		test.test('expand/collapse: double-click on cell node', createExpandTest('.dgrid-column-set-0', 'doubleClick'));
+			});
 	});
+
+	test.test('expand/collapse: click on expando node', createExpandTest('.dgrid-expando-icon', 'click'));
+	test.test('expand/collapse: double-click on cell node', createExpandTest('.dgrid-column-set-0', 'doubleClick'));
 });

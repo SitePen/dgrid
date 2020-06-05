@@ -9,11 +9,10 @@
 		}
 	],
 
-	"zfunctionalSuites": [
-		"./test/intern/functional/Keyboard.js",
+	"functionalSuites": [
+		"./test/intern/functional/*.js",
 		"!dgrid/test/intern/functional/util.js"
 	],
-	"functionalSuites": [ "./test/intern/functional" ],
 
 	"coverage": [
 		"./extensions/*.js",
