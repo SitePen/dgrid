@@ -14,11 +14,16 @@
 				overflow: hidden;
 			}
 			body {
+				background-color: hsl(0, 0%, 64%);
 				font-family: Calibri, Verdana, Arial, Helvetica, sans-serif;
 			}
 			.toc {
 				border: none;
+				border-left: 1px solid hsl(0, 0%, 80%);
 				height: 100%;
+				max-width: 50em;
+				margin-left: auto;
+				margin-right: auto;
 			}
 			.toc .header-title {
 				padding: 7px 20px;
@@ -28,16 +33,15 @@
 				border: none;
 			}
 			.toc .dgrid-row {
-				background-color: #fff;
-				border-bottom: 1px solid #ccc;
+				border-bottom: 1px solid hsl(0, 0%, 80%);
 				cursor: pointer;
 			}
 			.toc .dgrid-row:hover {
-				background-color: #def;
+				background-color: hsl(210, 100%, 93%);
 			}
 			.toc a {
 				/* Subdue default link styles, since entire row is clickable */
-				color: #000;
+				color: black;
 				text-decoration: none;
 			}
 
@@ -85,7 +89,7 @@
 						json.parse(persistedInfo) : { expanded: {} };
 
 					function shouldExpand(row, level, previouslyExpanded) {
-						return previouslyExpanded || !!persistedInfo.expanded[row.id];
+						return previouslyExpanded || Boolean(persistedInfo.expanded[row.id]);
 					}
 
 					function renderLinkCell(object, value){
@@ -129,12 +133,14 @@
 
 					grid.on(".dgrid-row:click", function(evt){
 						var item = grid.row(evt).data;
+
+						// Persist state of expansion and scroll
+						cookie(cookieName, json.stringify({
+							expanded: grid._expanded,
+							scroll: grid.getScrollPosition().y
+						}));
+
 						if(item.title){
-							// Persist state of expansion and scroll
-							cookie(cookieName, json.stringify({
-								expanded: grid._expanded,
-								scroll: grid.getScrollPosition().y
-							}));
 							// Navigate to test page, unless a link was clicked
 							// (in which case navigation will occur anyway)
 							if(evt.target.tagName !== "A"){

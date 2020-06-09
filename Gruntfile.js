@@ -4,7 +4,6 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-stylus');
 	grunt.loadNpmTasks('grunt-contrib-watch');
-	grunt.loadNpmTasks('intern');
 
 	// grunt-contrib-stylus does not appear to support globbed destination filenames,
 	// so generate the desired destination/source configuration ahead of time
@@ -41,41 +40,8 @@ module.exports = function (grunt) {
 				files: [ 'css/**/*.styl' ],
 				tasks: [ 'stylus' ]
 			}
-		},
-
-		intern: {
-			options: {
-				reporters: [ 'LcovHtml', 'Pretty' ],
-				runType: 'runner',
-				config: 'test/intern/intern'
-			},
-
-			local: {
-				options: {
-					config: 'test/intern/intern-local'
-				}
-			},
-
-			browserstack: {},
-
-			saucelabs: {
-				options: {
-					config: 'test/intern/intern-saucelabs'
-				}
-			}
 		}
 	});
 
 	grunt.registerTask('default', [ 'stylus', 'watch:stylus' ]);
-	grunt.registerTask('test', function () {
-		var flags = Object.keys(this.flags);
-
-		if (!flags.length) {
-			flags.push('local');
-		}
-
-		flags.forEach(function (flag) {
-			grunt.task.run('intern:' + flag);
-		});
-	});
 };

@@ -13,7 +13,7 @@
 		"grunt-contrib-clean": "~1.0.0",
 		"grunt-contrib-stylus": "~1.2.0",
 		"grunt-contrib-watch": "~1.1.0",
-		"intern": "~4.8.5",
+		"intern": "~4.8.7",
 		"nib": "~1.1.2"
 	},
 	"directories": {
@@ -23,7 +23,8 @@
 	"main": "./OnDemandGrid",
 	"icon": "http://packages.dojofoundation.org/images/dgrid.png",
 	"scripts": {
-		"test-server": "node ./test/data/rest-node.js"
+		"serve": "npx http-serve ../",
+		"serve-rest": "node ./test/data/rest-node.js"
 	},
 	"dojoBuild": "package.js"
 }

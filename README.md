@@ -68,7 +68,7 @@ packages: [
 
 dgrid works with Dojo 1.8.2 or higher, and supports the following browsers:
 
-* IE 9+ (IE8 still unofficially supported, but no longer tested)
+* IE 11 (IE8+ still unofficially supported, but no longer tested)
 * Edge latest
 * Firefox latest + ESR
 * Chrome latest (desktop and mobile)
@@ -123,94 +123,4 @@ for dgrid, as well as Dojo and a number of other JavaScript libraries.
 
 # Testing
 
-dgrid uses [Intern](http://theintern.io/) as its test runner. Tests can
-either be run using the browser, or using a cloud provider such as
-[BrowserStack](https://www.browserstack.com/) or [Sauce Labs](https://saucelabs.com/).
-More information on writing your own tests with Intern can be found in the
-[Intern user guide](https://theintern.github.io/intern/).
-
-*Note that installing dgrid via npm will not include the test folder; if you
-wish to run dgrid's unit tests, download the package directly.*
-
-## Setting up
-
-**Note:** Commands listed in this section are all written assuming they are
-run inside the `dgrid` directory.
-
-Run `npm install` to install Intern:
-
-```
-npm install
-```
-
-## Running via the browser
-
-1. Open a browser to http://hostname/path_to_dgrid/test/intern/runTests.html
-2. View the console
-
-## Running via BrowserStack or Sauce Labs
-
-Make sure the proper credentials are set in the environment:
-
-```
-# for BrowserStack:
-export BROWSERSTACK_USERNAME=<your_browserstack_username>
-export BROWSERSTACK_ACCESS_KEY=<your_browserstack_access_key>
-
-# for Sauce Labs:
-export SAUCE_USERNAME=<your_sauce_username>
-export SAUCE_ACCESS_KEY=<your_sauce_access_key>
-```
-
-Then kick off the runner with the following command:
-
-```
-# for BrowserStack:
-grunt intern:browserstack
-
-# for Sauce Labs:
-grunt intern:saucelabs
-```
-
-## Running via local Selenium server
-
-### Windows
-
-Obtain the latest version of the Selenium server and the IE driver server from
-[Selenium's Download page](http://docs.seleniumhq.org/download/).  (The IE driver server needs to be
-placed in a folder on your PATH.)
-
-The Selenium server can be started by executing:
-
-```
-java -jar path\to\selenium-server-standalone-<version>.jar
-```
-
-### Mac OS X
-
-The easiest way to obtain the Selenium standalone server for Mac OS X is by
-using [Homebrew](http://brew.sh/).  Once Homebrew is installed, run the following
-commands:
-
-```sh
-brew update # ensure you have the latest formulae
-brew install selenium-server-standalone
-brew install chromedriver # for automating tests in Chrome
-```
-
-`selenium-server-standalone` installs a `selenium-server` script
-which can be used to start up the server.  For additional information
-(e.g. how to start the server at login), see the output of
-`brew info selenium-server-standalone`.
-
-### Running the tests
-
-Once the Selenium server is running, kick off the Intern test runner with the following command:
-
-```
-grunt test
-```
-
-This runs the `intern:local` Grunt task, which uses the configuration in `intern-local.js`.
-This configuration overrides `intern.js` to use `NullTunnel`, and to test in Chrome by default
-(this can be customized as desired according to the browsers you have installed).
+See [test/README.md](test/README.md).

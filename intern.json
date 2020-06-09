@@ -43,19 +43,11 @@
 		},
 
 		"chrome": {
-			"environments": "chrome",
-			"tunnelOptions": {
-				"port": "9515",
-				"pathname": "/"
-			}
+			"environments": "chrome"
 		},
 
 		"firefox": {
-			"environments": "firefox",
-			"tunnelOptions": {
-				"port": "4444",
-				"pathname": "/"
-			}
+			"environments": "firefox"
 		},
 
 		"safari": {
@@ -67,11 +59,7 @@
 		},
 
 		"ie": {
-			"environments": "internet explorer",
-			"tunnelOptions": {
-				"port": "5555",
-				"pathname": "/"
-			}
+			"environments": "internet explorer"
 		}
 	},
 
@@ -106,6 +94,14 @@
 		]
 	},
 
+	"tunnel": "selenium",
+
+	"functionalTimeouts": {
+		"executeAsync": 10000,
+		"find": 10000,
+		"pageLoad": 10000
+	},
+
 	"coverage": [
 		"./extensions/*.js",
 		"./_StoreMixin.js",
@@ -122,7 +118,5 @@
 		"./Selection.js",
 		"./Selector.js",
 		"./Tree.js"
-	],
-
-	"tunnel": "null"
+	]
 }
