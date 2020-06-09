@@ -13,13 +13,13 @@ define([
 ], function (declare, aspect, Deferred, query, createSyncStore, createHierarchicalStore,
 	OnDemandGrid, ColumnSet, Keyboard, Tree) {
 
-	var test = intern.getPlugin('interface.tdd');
+	var tdd = intern.getPlugin('interface.tdd');
 	var assert = intern.getPlugin('chai').assert;
 	var grid;
 	var handles;
 
-	test.suite('ColumnSet mixin', function () {
-		test.before(function () {
+	tdd.suite('ColumnSet mixin', function () {
+		tdd.before(function () {
 			var ColumnSetGrid = declare([ OnDemandGrid, Keyboard, ColumnSet ]);
 			grid = new ColumnSetGrid({
 				columnSets: [
@@ -47,7 +47,7 @@ define([
 			grid.startup();
 		});
 
-		test.beforeEach(function () {
+		tdd.beforeEach(function () {
 			var data = [];
 			handles = [];
 
@@ -58,17 +58,17 @@ define([
 			grid.set('collection', createSyncStore({ data: data }));
 		});
 
-		test.afterEach(function () {
+		tdd.afterEach(function () {
 			for (var i = handles.length; i--;) {
 				handles[i].remove();
 			}
 		});
 
-		test.after(function () {
+		tdd.after(function () {
 			grid.destroy();
 		});
 
-		test.test('Re-inserted rows should maintain previous column set scroll positions', function () {
+		tdd.test('Re-inserted rows should maintain previous column set scroll positions', function () {
 			var dfd = this.async(1000);
 			var scrollAmount = 250;
 
@@ -88,7 +88,7 @@ define([
 			grid._scrollColumnSet('1', scrollAmount);
 		});
 
-		test.test('Horizontal scroll caused by cell focus should remain synchronized', function () {
+		tdd.test('Horizontal scroll caused by cell focus should remain synchronized', function () {
 			var dfd = this.async(1000);
 
 			handles.push(aspect.after(grid, '_onColumnSetScroll', dfd.callback(function () {
@@ -101,8 +101,8 @@ define([
 		});
 	});
 
-	test.suite('ColumnSet + Tree mixins', function () {
-		test.beforeEach(function () {
+	tdd.suite('ColumnSet + Tree mixins', function () {
+		tdd.beforeEach(function () {
 			var TreeColumnSetGrid = declare([ OnDemandGrid, ColumnSet, Tree ]);
 			var data = [];
 
@@ -138,14 +138,14 @@ define([
 			grid.startup();
 		});
 
-		test.afterEach(function () {
+		tdd.afterEach(function () {
 			for (var i = handles.length; i--;) {
 				handles[i].remove();
 			}
 			grid.destroy();
 		});
 
-		test.test('re-expand after horizontal scroll should restore correct scrollLeft', function () {
+		tdd.test('re-expand after horizontal scroll should restore correct scrollLeft', function () {
 			var scrollAmount = 250;
 			grid.styleColumn('0-0-0', 'width: 10000px;');
 

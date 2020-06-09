@@ -7,14 +7,14 @@ define([
 	'dstore/Memory',
 	'../addCss!'
 ], function (declare, lang, query, OnDemandGrid, Tree, Memory) {
-	var test = intern.getPlugin('interface.tdd');
+	var tdd = intern.getPlugin('interface.tdd');
 	var assert = intern.getPlugin('chai').assert;
 
 	function formatName(name) {
 		return name.charAt(0).toUpperCase() + name.slice(1);
 	}
 
-	test.suite('tree + additional filters', function () {
+	tdd.suite('tree + additional filters', function () {
 		var grid1;
 		var grid2;
 		var store;
@@ -42,7 +42,7 @@ define([
 			}
 		}
 
-		test.before(function () {
+		tdd.before(function () {
 			var id = 0;
 			var iItemType, lItem;
 			var iColor, lColor;
@@ -84,7 +84,7 @@ define([
 			});
 		});
 
-		test.beforeEach(function () {
+		tdd.beforeEach(function () {
 			grid1 = new TreeGrid({
 				collection: store.filter({ type: 'basket' }),
 				columns: [
@@ -106,26 +106,26 @@ define([
 			grid2.startup();
 		});
 
-		test.afterEach(function () {
+		tdd.afterEach(function () {
 			destroyGrid(grid1);
 			destroyGrid(grid2);
 		});
 
 		//  Note:  since the following tests are using a Memory store which is synchronous, there is no
 		//  need to wait for the expand's promise to resolve.
-		test.test('expand tree with original store', function () {
+		tdd.test('expand tree with original store', function () {
 			assert.strictEqual(4, query('.dgrid-row', grid1.domNode).length, 'Grid should have 4 rows');
 			grid1.expand(1);
 			assert.strictEqual(8, query('.dgrid-row', grid1.domNode).length, 'Grid should have 8 rows');
 		});
 
-		test.test('expand tree with no-blue store', function () {
+		tdd.test('expand tree with no-blue store', function () {
 			assert.strictEqual(4, query('.dgrid-row', grid2.domNode).length, 'Grid should have 4 rows');
 			grid2.expand(3);
 			assert.strictEqual(7, query('.dgrid-row', grid2.domNode).length, 'Grid should have 7 rows');
 		});
 
-		test.test('expand both trees', function () {
+		tdd.test('expand both trees', function () {
 			assert.strictEqual(4, query('.dgrid-row', grid1.domNode).length, 'Grid should have 4 rows');
 			assert.strictEqual(4, query('.dgrid-row', grid2.domNode).length, 'Grid should have 4 rows');
 

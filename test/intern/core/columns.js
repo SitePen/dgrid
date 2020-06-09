@@ -5,7 +5,7 @@ define([
 	'dgrid/ColumnSet',
 	'dgrid/test/data/orderedData'
 ], function (declare, query, Grid, ColumnSet, orderedData) {
-	var test = intern.getPlugin('interface.tdd');
+	var tdd = intern.getPlugin('interface.tdd');
 	var assert = intern.getPlugin('chai').assert;
 	var grid;
 
@@ -34,12 +34,12 @@ define([
 			'Each body row\'s description cell has two desc-* classes (one being desc-row)');
 	}
 
-	test.suite('columns', function () {
-		test.afterEach(function () {
+	tdd.suite('columns', function () {
+		tdd.afterEach(function () {
 			grid.destroy();
 		});
 
-		test.test('className property', function () {
+		tdd.test('className property', function () {
 			grid = new Grid({
 				columns: {
 					order: 'Order',
@@ -63,14 +63,14 @@ define([
 			runClassNameTests();
 		});
 
-		test.suite('sharing column definitions', function () {
+		tdd.suite('sharing column definitions', function () {
 			var warnCalled = false;
 			var warnMessage;
 			var systemWarn;
 			var grids;
 			var expectedWarnMessage = 'Sharing column definition objects with multiple grids is not supported.';
 
-			test.beforeEach(function () {
+			tdd.beforeEach(function () {
 				grids = [];
 				systemWarn = console.warn;
 				warnCalled = false;
@@ -81,14 +81,14 @@ define([
 				};
 			});
 
-			test.afterEach(function () {
+			tdd.afterEach(function () {
 				console.warn = systemWarn;
 				for (var i = 0, l = grids.length; i < l; i++) {
 					grids[i].destroy();
 				}
 			});
 
-			test.test('detect warning during construction', function () {
+			tdd.test('detect warning during construction', function () {
 				var columns = {
 					col1: 'Column 1',
 					col3: 'Column 3',
@@ -104,7 +104,7 @@ define([
 				assert.strictEqual(warnMessage, expectedWarnMessage);
 			});
 
-			test.test('detect warning during column setting', function () {
+			tdd.test('detect warning during column setting', function () {
 				var columns1 = {
 					col1: 'Column 1',
 					col3: 'Column 3',
@@ -127,7 +127,7 @@ define([
 				assert.strictEqual(warnMessage, expectedWarnMessage);
 			});
 
-			test.test('no warning when same columns set again', function () {
+			tdd.test('no warning when same columns set again', function () {
 				var columns = {
 					col1: 'Column 1',
 					col3: 'Column 3',
@@ -141,7 +141,7 @@ define([
 			});
 		});
 
-		test.test('column formatter', function () {
+		tdd.test('column formatter', function () {
 			var nameCells;
 			var orderCells;
 			var gridFormatter = {
@@ -178,12 +178,12 @@ define([
 		});
 	});
 
-	test.suite('columnSets', function () {
-		test.afterEach(function () {
+	tdd.suite('columnSets', function () {
+		tdd.afterEach(function () {
 			grid.destroy();
 		});
 
-		test.test('className property', function () {
+		tdd.test('className property', function () {
 			grid = new (declare([Grid, ColumnSet]))({
 				columnSets: [
 					[[

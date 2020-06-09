@@ -2,7 +2,7 @@
 var keys = require('@theintern/leadfoot/keys').default;
 var pollUntil = require('@theintern/leadfoot/helpers/pollUntil').default;
 /* jshint +W024 */
-var test = intern.getPlugin('interface.tdd');
+var tdd = intern.getPlugin('interface.tdd');
 var assert = intern.getPlugin('chai').assert;
 
 function testUpDownKeys(gridId, cellNavigation) {
@@ -92,8 +92,8 @@ function testHomeEndKeys(gridId, cellNavigation, lastId) {
 	};
 }
 
-test.suite('Keyboard functional tests', function () {
-	test.before(function (suite) {
+tdd.suite('Keyboard functional tests', function () {
+	tdd.before(function (suite) {
 		// Get our html page. This page should load all necessary scripts
 		// since this functional test module runs on the server and can't load
 		// such scripts. Further, in the html page, set a global "ready" var
@@ -105,39 +105,39 @@ test.suite('Keyboard functional tests', function () {
 			}, null, 5000));
 	});
 
-	test.test('grid (cellNavigation: true) -> up + down arrow keys',
+	tdd.test('grid (cellNavigation: true) -> up + down arrow keys',
 		testUpDownKeys('grid', true));
 
-	test.test('grid (cellNavigation: false) -> up + down arrow keys',
+	tdd.test('grid (cellNavigation: false) -> up + down arrow keys',
 		testUpDownKeys('rowGrid'));
 
-	test.test('list -> up + down arrow keys',
+	tdd.test('list -> up + down arrow keys',
 		testUpDownKeys('list'));
 
-	test.test('grid row -> left + right arrow keys',
+	tdd.test('grid row -> left + right arrow keys',
 		testLeftRightKeys('grid'));
 
-	test.test('grid header -> left + right arrow keys',
+	tdd.test('grid header -> left + right arrow keys',
 		testUpDownKeys('grid', true));
 
-	test.test('simple grid (cellNavigation: true) -> home + end keys',
+	tdd.test('simple grid (cellNavigation: true) -> home + end keys',
 		testHomeEndKeys('grid', true));
 
-	test.test('simple grid (cellNavigation: false) -> home + end keys',
+	tdd.test('simple grid (cellNavigation: false) -> home + end keys',
 		testHomeEndKeys('rowGrid'));
 
-	test.test('simple list -> home + end keys',
+	tdd.test('simple list -> home + end keys',
 		testHomeEndKeys('list'));
 
-	test.test('on-demand grid (cellNavigation: true) -> home + end keys',
+	tdd.test('on-demand grid (cellNavigation: true) -> home + end keys',
 		testHomeEndKeys('grid-ondemand', true));
 
-	test.test('on-demand simple grid (cellNavigation: false) -> home + end keys',
+	tdd.test('on-demand simple grid (cellNavigation: false) -> home + end keys',
 		testHomeEndKeys('rowGrid-ondemand', false));
 
-	test.test('on-demand simple list -> home + end keys',
+	tdd.test('on-demand simple list -> home + end keys',
 		testHomeEndKeys('list-ondemand', false));
 
-	test.test('on-demand grid with large data set -> home + end keys',
+	tdd.test('on-demand grid with large data set -> home + end keys',
 		testHomeEndKeys('grid-large-data-set', true, 14499));
 });

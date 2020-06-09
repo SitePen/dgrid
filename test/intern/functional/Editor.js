@@ -3,7 +3,7 @@ var keys = require('@theintern/leadfoot/keys').default;
 var pollUntil = require('@theintern/leadfoot/helpers/pollUntil').default;
 /* jshint +W024 */
 var util = require('./util');
-var test = intern.getPlugin('interface.tdd');
+var tdd = intern.getPlugin('interface.tdd');
 var assert = intern.getPlugin('chai').assert;
 
 // Number of visible rows in the grid.
@@ -29,7 +29,7 @@ var EditorCommand = util.createCommandConstructor({
 	}
 });
 
-test.suite('Editor functional tests', function () {
+tdd.suite('Editor functional tests', function () {
 	var gotoEnd; // Function defined when `before` logic runs
 
 	// Functions performing operations to test the editor columns in the grid,
@@ -297,7 +297,7 @@ test.suite('Editor functional tests', function () {
 		setEditorToTextBox();
 	}
 
-	test.before(function (suite) {
+	tdd.before(function (suite) {
 		// In order to function properly on all platforms, we need to know
 		// what the proper character sequence is to go to the end of a text field.
 		// End key works generally everywhere except Mac OS X.
@@ -310,44 +310,44 @@ test.suite('Editor functional tests', function () {
 		});
 	});
 
-	test.test('escape reverts edited value', createEscapeRevertTest());
-	test.test('escape reverts edited value - TextBox', createEscapeRevertTest(setTextBox));
+	tdd.test('escape reverts edited value', createEscapeRevertTest());
+	tdd.test('escape reverts edited value - TextBox', createEscapeRevertTest(setTextBox));
 
 	// This combination works, though it's debatable whether it even should
-	test.test('enter registers edited value for always-on editor',
+	tdd.test('enter registers edited value for always-on editor',
 		createDatachangeTest(testAlwaysOnEditor, 'dismissViaEnter'));
 
-	test.test('enter registers edited value for editOn editor',
+	tdd.test('enter registers edited value for editOn editor',
 		createDatachangeTest(testEditOnEditor, 'dismissViaEnter'));
 
-	test.test('blur registers edited value for always-on editor',
+	tdd.test('blur registers edited value for always-on editor',
 		createDatachangeTest(testAlwaysOnEditor, 'dismissViaBlur'));
 
-	test.test('blur registers edited value for always-on editor - TextBox',
+	tdd.test('blur registers edited value for always-on editor - TextBox',
 		createDatachangeTest(testAlwaysOnEditor, 'dismissViaBlur', setTextBox));
 
-	test.test('blur registers edited value for editOn editor',
+	tdd.test('blur registers edited value for editOn editor',
 		createDatachangeTest(testEditOnEditor, 'dismissViaBlur'));
 
-	test.test('blur registers edited value for editOn editor - TextBox',
+	tdd.test('blur registers edited value for editOn editor - TextBox',
 		createDatachangeTest(testEditOnEditor, 'dismissViaBlur', setTextBox));
 
-	test.test('maintain focus on update for always-on editor',
+	tdd.test('maintain focus on update for always-on editor',
 		createFocusTest('.field-name input'));
 
-	test.test('maintain focus on update for always-on editor - TextBox',
+	tdd.test('maintain focus on update for always-on editor - TextBox',
 		createFocusTest('.field-name input', setTextBox));
 
-	test.test('maintain focus on update for editOn editor',
+	tdd.test('maintain focus on update for editOn editor',
 		createFocusTest('.field-description'));
 
-	test.test('maintain focus on update for editOn editor - TextBox',
+	tdd.test('maintain focus on update for editOn editor - TextBox',
 		createFocusTest('.field-description', setTextBox));
 
-	test.test('autoSave: true', createAutosaveTest());
-	test.test('autoSave: true - TextBox', createAutosaveTest(setTextBox));
+	tdd.test('autoSave: true', createAutosaveTest());
+	tdd.test('autoSave: true - TextBox', createAutosaveTest(setTextBox));
 
-	test.test('shared editor reset', function (suite) {
+	tdd.test('shared editor reset', function (suite) {
 		return suite.remote
 			.get('dgrid/test/intern/functional/Editor.html')
 			.then(pollUntil(function () {

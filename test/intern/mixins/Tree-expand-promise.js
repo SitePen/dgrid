@@ -12,10 +12,10 @@ define([
 	'dstore/QueryResults',
 	'../addCss!'
 ], function (declare, Deferred, on, query, Grid, OnDemandGrid, _StoreMixin, Tree, Memory, TreeStore, QueryResults) {
-	var test = intern.getPlugin('interface.tdd');
+	var tdd = intern.getPlugin('interface.tdd');
 	var assert = intern.getPlugin('chai').assert;
 
-	test.suite('tree (expand + promise)', function () {
+	tdd.suite('tree (expand + promise)', function () {
 		var grid,
 			SyncTreeStore = declare([ Memory, TreeStore ], {
 				mayHaveChildren: function () {
@@ -118,27 +118,27 @@ define([
 			}, 10);
 		}
 
-		test.suite('tree + sync store', function () {
-			test.beforeEach(function () {
+		tdd.suite('tree + sync store', function () {
+			tdd.beforeEach(function () {
 				createGrid(syncStore);
 			});
-			test.afterEach(destroyGrid);
+			tdd.afterEach(destroyGrid);
 
 			// Tests
-			test.test('expand + no callback', function () {
+			tdd.test('expand + no callback', function () {
 				assert.strictEqual(2, query('.dgrid-row', grid.domNode).length, 'Grid should have 2 rows');
 				grid.expand(1);
 				assert.strictEqual(3, query('.dgrid-row', grid.domNode).length, 'Grid should have 3 rows');
 			});
 
-			test.test('expand + callback', function () {
+			tdd.test('expand + callback', function () {
 				assert.strictEqual(2, query('.dgrid-row', grid.domNode).length, 'Grid should have 2 rows');
 				return grid.expand(1).then(function () {
 					assert.strictEqual(3, query('.dgrid-row', grid.domNode).length, 'Grid should have 3 rows');
 				});
 			});
 
-			test.test('expand + multiple callback', function () {
+			tdd.test('expand + multiple callback', function () {
 				assert.strictEqual(2, query('.dgrid-row', grid.domNode).length, 'Grid should have 2 rows');
 				return grid.expand(1).then(function () {
 					assert.strictEqual(3, query('.dgrid-row', grid.domNode).length, 'Grid should have 3 rows');
@@ -151,7 +151,7 @@ define([
 				});
 			});
 
-			test.test('duplicate expand + callback', function () {
+			tdd.test('duplicate expand + callback', function () {
 				assert.strictEqual(2, query('.dgrid-row', grid.domNode).length, 'Grid should have 2 rows');
 				return grid.expand(1).then(function () {
 					assert.strictEqual(3, query('.dgrid-row', grid.domNode).length, 'Grid should have 3 rows');
@@ -163,13 +163,13 @@ define([
 			});
 		});
 
-		test.suite('tree + async store', function () {
-			test.beforeEach(function () {
+		tdd.suite('tree + async store', function () {
+			tdd.beforeEach(function () {
 				createGrid(asyncStore);
 			});
-			test.afterEach(destroyGrid);
+			tdd.afterEach(destroyGrid);
 
-			test.test('expand + callback', function () {
+			tdd.test('expand + callback', function () {
 				var promise = createOnPromise(grid, 'dgrid-refresh-complete').then(function () {
 					// Start testing when the grid is ready.
 					assert.strictEqual(2, query('.dgrid-row', grid.domNode).length,
@@ -193,7 +193,7 @@ define([
 				return promise;
 			});
 
-			test.test('expand + multiple callback', function () {
+			tdd.test('expand + multiple callback', function () {
 				var promise = createOnPromise(grid, 'dgrid-refresh-complete').then(function () {
 					// Start testing when the grid is ready.
 					assert.strictEqual(2, query('.dgrid-row', grid.domNode).length,
@@ -233,7 +233,7 @@ define([
 				return promise;
 			});
 
-			test.test('duplicate expand + callback', function () {
+			tdd.test('duplicate expand + callback', function () {
 				var promise = createOnPromise(grid, 'dgrid-refresh-complete').then(function () {
 					// Start testing when the grid is ready.
 					assert.strictEqual(2, query('.dgrid-row', grid.domNode).length,
@@ -257,7 +257,7 @@ define([
 				return promise;
 			});
 
-			test.test('expand + callback, rejecting', function () {
+			tdd.test('expand + callback, rejecting', function () {
 				var errorCount = 0;
 
 				grid.on('dgrid-error', function (event) {
@@ -295,20 +295,20 @@ define([
 			});
 		});
 
-		test.suite('tree + no renderQuery + sync store', function () {
-			test.beforeEach(function () {
+		tdd.suite('tree + no renderQuery + sync store', function () {
+			tdd.beforeEach(function () {
 				createNoRenderQueryGrid(syncStore);
 			});
-			test.afterEach(destroyGrid);
+			tdd.afterEach(destroyGrid);
 
-			test.test('expand + callback', function () {
+			tdd.test('expand + callback', function () {
 				assert.strictEqual(2, query('.dgrid-row', grid.domNode).length, 'Grid should have 2 rows');
 				return grid.expand(1).then(function () {
 					assert.strictEqual(3, query('.dgrid-row', grid.domNode).length, 'Grid should have 3 rows');
 				});
 			});
 
-			test.test('expand + multiple callback', function () {
+			tdd.test('expand + multiple callback', function () {
 				assert.strictEqual(2, query('.dgrid-row', grid.domNode).length, 'Grid should have 2 rows');
 				return grid.expand(1).then(function () {
 					assert.strictEqual(3, query('.dgrid-row', grid.domNode).length, 'Grid should have 3 rows');
@@ -321,7 +321,7 @@ define([
 				});
 			});
 
-			test.test('duplicate expand + callback', function () {
+			tdd.test('duplicate expand + callback', function () {
 				assert.strictEqual(2, query('.dgrid-row', grid.domNode).length, 'Grid should have 2 rows');
 				return grid.expand(1).then(function () {
 					assert.strictEqual(3, query('.dgrid-row', grid.domNode).length, 'Grid should have 3 rows');
@@ -333,14 +333,14 @@ define([
 			});
 		});
 
-		test.suite('tree + no renderQuery + async store', function () {
-			test.beforeEach(function () {
+		tdd.suite('tree + no renderQuery + async store', function () {
+			tdd.beforeEach(function () {
 				createNoRenderQueryGrid(asyncStore);
 			});
 
-			test.afterEach(destroyGrid);
+			tdd.afterEach(destroyGrid);
 
-			test.test('expand + callback', function () {
+			tdd.test('expand + callback', function () {
 				var promise = grid.collection.dfd.then(function () {
 					// Start testing when the initial query is done is ready.
 					assert.strictEqual(2, query('.dgrid-row', grid.domNode).length,
@@ -364,7 +364,7 @@ define([
 				return promise;
 			});
 
-			test.test('expand + multiple callback', function () {
+			tdd.test('expand + multiple callback', function () {
 				var promise = grid.collection.dfd.then(function () {
 					// Start testing when the initial query is done is ready.
 					assert.strictEqual(2, query('.dgrid-row', grid.domNode).length,
@@ -404,7 +404,7 @@ define([
 				return promise;
 			});
 
-			test.test('duplicate expand + callback', function () {
+			tdd.test('duplicate expand + callback', function () {
 				var promise = grid.collection.dfd.then(function () {
 					// Start testing when the initial query is done is ready.
 					assert.strictEqual(2, query('.dgrid-row', grid.domNode).length,
@@ -428,7 +428,7 @@ define([
 				return promise;
 			});
 
-			test.test('expand + callback, rejecting', function () {
+			tdd.test('expand + callback, rejecting', function () {
 				var promise = grid.collection.dfd.then(function () {
 					// Start testing when the initial query is done is ready.
 					assert.strictEqual(2, query('.dgrid-row', grid.domNode).length,

@@ -2,12 +2,12 @@
 var keys = require('@theintern/leadfoot/keys').default;
 var pollUntil = require('@theintern/leadfoot/helpers/pollUntil').default;
 /* jshint +W024 */
-var test = intern.getPlugin('interface.tdd');
+var tdd = intern.getPlugin('interface.tdd');
 var assert = intern.getPlugin('chai').assert;
 var tabKey = keys.TAB;
 
-test.suite('Keyboard tab key functional tests', function () {
-	test.before(function (suite) {
+tdd.suite('Keyboard tab key functional tests', function () {
+	tdd.before(function (suite) {
 		// Get our html page. This page should load all necessary scripts
 		// since this functional test module runs on the server and can't load
 		// such scripts. Further, in the html page, set a global "ready" var
@@ -19,7 +19,7 @@ test.suite('Keyboard tab key functional tests', function () {
 			}, null, 5000));
 	});
 
-	test.test('grids with and without headers -> tab key', function (suite) {
+	tdd.test('grids with and without headers -> tab key', function (suite) {
 		return suite.remote
 			.getActiveElement()
 				.getAttribute('id')

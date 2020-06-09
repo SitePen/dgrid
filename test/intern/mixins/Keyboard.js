@@ -13,7 +13,7 @@ define([
 ], function (declare, domConstruct, on, query, OnDemandList, OnDemandGrid, Keyboard,
 	ColumnSet, createSyncStore, genericData) {
 
-	var test = intern.getPlugin('interface.tdd');
+	var tdd = intern.getPlugin('interface.tdd');
 	var assert = intern.getPlugin('chai').assert;
 	var handles = [];
 	var testStore = createSyncStore({ data: genericData });
@@ -169,18 +169,18 @@ define([
 	}
 
 	function registerRowTests(name) {
-		test.afterEach(afterEach);
-		test.after(after);
+		tdd.afterEach(afterEach);
+		tdd.after(after);
 
-		test.test(name + '.focus + no args', testRowFocus);
-		test.test(name + '.focus + args', testRowFocusArgs);
-		test.test('dgrid-cellfocusout event', testRowBlur);
-		test.test(name + '.focus + item update', testRowUpdate);
-		test.test(name + '.focus + item removal', testRowRemove);
+		tdd.test(name + '.focus + no args', testRowFocus);
+		tdd.test(name + '.focus + args', testRowFocusArgs);
+		tdd.test('dgrid-cellfocusout event', testRowBlur);
+		tdd.test(name + '.focus + item update', testRowUpdate);
+		tdd.test(name + '.focus + item removal', testRowRemove);
 	}
 
-	test.suite('Keyboard (Grid + cellNavigation:true)', function () {
-		test.before(function () {
+	tdd.suite('Keyboard (Grid + cellNavigation:true)', function () {
+		tdd.before(function () {
 			grid = new (declare([OnDemandGrid, Keyboard]))({
 				columns: getColumns(),
 				sort: 'id',
@@ -190,10 +190,10 @@ define([
 			grid.startup();
 		});
 
-		test.afterEach(afterEach);
-		test.after(after);
+		tdd.afterEach(afterEach);
+		tdd.after(after);
 
-		test.test('grid.focus + no args', function () {
+		tdd.test('grid.focus + no args', function () {
 			var colId;
 			// listen for a dgrid-cellfocusin event
 			handles.push(on(document.body, 'dgrid-cellfocusin', function (e) {
@@ -208,7 +208,7 @@ define([
 				'dgrid-cellfocusin event triggered on first cell on focus() call');
 		});
 
-		test.test('grid.focusHeader + no args', function () {
+		tdd.test('grid.focusHeader + no args', function () {
 			var colId;
 			// listen for a dgrid-cellfocusin event (header triggers same event)
 			handles.push(on(document.body, 'dgrid-cellfocusin', function (e) {
@@ -224,7 +224,7 @@ define([
 				'dgrid-cellfocusin event triggered on first cell on focusHeader() call');
 		});
 
-		test.test('grid.focus + args', function () {
+		tdd.test('grid.focus + args', function () {
 			var focusedCell, target;
 			// listen for a dgrid-cellfocusin event
 			handles.push(on(document.body, 'dgrid-cellfocusin', function (e) {
@@ -243,7 +243,7 @@ define([
 				'dgrid-cellfocusin event triggered on second cell on focus(...) call');
 		});
 
-		test.test('grid.focusHeader + args', function () {
+		tdd.test('grid.focusHeader + args', function () {
 			var colId, target;
 			// listen for a dgrid-cellfocusin event (header triggers same event)
 			handles.push(on(document.body, 'dgrid-cellfocusin', function (e) {
@@ -259,7 +259,7 @@ define([
 			assert.strictEqual(colId, 'col3', 'dgrid-cellfocusin event triggered on expected header cell');
 		});
 
-		test.test('dgrid-cellfocusout event', function () {
+		tdd.test('dgrid-cellfocusout event', function () {
 			var blurredCell,
 				blurredElementRowId,
 				targets = query('.dgrid-cell', grid.contentNode);
@@ -286,7 +286,7 @@ define([
 				'dgrid-cellfocusout event.cell contains expected column');
 		});
 
-		test.test('grid.focus - no args, empty store', function () {
+		tdd.test('grid.focus - no args, empty store', function () {
 			grid.set('collection', createSyncStore({ data: [] }));
 			assert.doesNotThrow(function () {
 				grid.focus();
@@ -296,8 +296,8 @@ define([
 		});
 	});
 
-	test.suite('Keyboard (Grid + cellNavigation:true + ColumnSet)', function () {
-		test.before(function () {
+	tdd.suite('Keyboard (Grid + cellNavigation:true + ColumnSet)', function () {
+		tdd.before(function () {
 			grid = new (declare([OnDemandGrid, ColumnSet, Keyboard]))({
 				columnSets: columnSet,
 				sort: 'id',
@@ -307,10 +307,10 @@ define([
 			grid.startup();
 		});
 
-		test.afterEach(afterEach);
-		test.after(after);
+		tdd.afterEach(afterEach);
+		tdd.after(after);
 
-		test.test('grid.focusHeader + ColumnSet', function () {
+		tdd.test('grid.focusHeader + ColumnSet', function () {
 			var colSetId;
 
 			handles.push(on(document.body, 'dgrid-cellfocusin', function (e) {
@@ -328,8 +328,8 @@ define([
 		});
 	});
 
-	test.suite('Keyboard focus preservation', function () {
-		test.before(function () {
+	tdd.suite('Keyboard focus preservation', function () {
+		tdd.before(function () {
 			grid = new (declare([OnDemandGrid, Keyboard]))({
 				columns: getColumns(),
 				sort: 'id',
@@ -339,10 +339,10 @@ define([
 			grid.startup();
 		});
 
-		test.afterEach(afterEach);
-		test.after(after);
+		tdd.afterEach(afterEach);
+		tdd.after(after);
 
-		test.test('grid.focus + item update', function () {
+		tdd.test('grid.focus + item update', function () {
 			var element;
 			// Focus a row based on a store ID + column ID,
 			// then issue an update and make sure the same id is still focused
@@ -359,7 +359,7 @@ define([
 				'The item\'s new cell is focused after updating the item');
 		});
 
-		test.test('grid.focus + item update on hidden grid', function () {
+		tdd.test('grid.focus + item update on hidden grid', function () {
 			var element;
 			// Focus a row based on a store ID + column ID,
 			// then issue an update and make sure the same id is still focused
@@ -378,7 +378,7 @@ define([
 				'A different or no DOM element is focused after updating the item');
 		});
 
-		test.test('grid.focus + item removal', function () {
+		tdd.test('grid.focus + item removal', function () {
 			var dfd = this.async(1000),
 				element,
 				nextElement;
@@ -407,10 +407,10 @@ define([
 		});
 	});
 
-	test.suite('Keyboard focused node preservation after blur', function () {
+	tdd.suite('Keyboard focused node preservation after blur', function () {
 		var button;
 
-		test.before(function () {
+		tdd.before(function () {
 			grid = new (declare([OnDemandGrid, Keyboard]))({
 				columns: getColumns(),
 				sort: 'id',
@@ -423,13 +423,13 @@ define([
 			button = domConstruct.create('button', null, document.body);
 		});
 
-		test.afterEach(afterEach);
-		test.after(function () {
+		tdd.afterEach(afterEach);
+		tdd.after(function () {
 			after();
 			domConstruct.destroy(button);
 		});
 
-		test.test('grid.focus + item update', function () {
+		tdd.test('grid.focus + item update', function () {
 			var element;
 			grid.focus(grid.cell(1, 'col1'));
 
@@ -448,7 +448,7 @@ define([
 				'The item\'s new cell is focused after updating the item');
 		});
 
-		test.test('grid.focus + item removal', function () {
+		tdd.test('grid.focus + item removal', function () {
 			var dfd = this.async(1000),
 				element,
 				nextElement;
@@ -475,7 +475,7 @@ define([
 			return dfd;
 		});
 
-		test.test('grid.focus called in same turn after item removal', function () {
+		tdd.test('grid.focus called in same turn after item removal', function () {
 			var dfd = this.async(1000),
 				element,
 				nextElement;
@@ -501,8 +501,8 @@ define([
 		});
 	});
 
-	test.suite('Keyboard (Grid + cellNavigation:false)', function () {
-		test.before(function () {
+	tdd.suite('Keyboard (Grid + cellNavigation:false)', function () {
+		tdd.before(function () {
 			grid = new (declare([OnDemandGrid, Keyboard]))({
 				cellNavigation: false,
 				columns: getColumns(),
@@ -516,8 +516,8 @@ define([
 		registerRowTests('grid');
 	});
 
-	test.suite('Keyboard (List)', function () {
-		test.before(function () {
+	tdd.suite('Keyboard (List)', function () {
+		tdd.before(function () {
 			grid = new (declare([OnDemandList, Keyboard]))({
 				sort: 'id',
 				collection: testStore,
@@ -534,9 +534,9 @@ define([
 		registerRowTests('list');
 	});
 
-	test.suite('Keyboard + initially-empty store', function () {
+	tdd.suite('Keyboard + initially-empty store', function () {
 		var store = createSyncStore({ data: [] });
-		test.beforeEach(function () {
+		tdd.beforeEach(function () {
 			grid = new (declare([ OnDemandGrid, Keyboard ]))({
 				collection: store,
 				columns: getColumns()
@@ -545,10 +545,10 @@ define([
 			grid.startup();
 		});
 
-		test.afterEach(afterEach);
-		test.after(after);
+		tdd.afterEach(afterEach);
+		tdd.after(after);
 
-		test.test('Proper tabIndex initialization after item is added', function () {
+		tdd.test('Proper tabIndex initialization after item is added', function () {
 			assert.strictEqual(grid.contentNode.tabIndex, 0,
 				'contentNode should be focusable when grid is empty');
 
@@ -566,12 +566,12 @@ define([
 		});
 	});
 
-	test.suite('Keyboard _ensureScroll', function () {
+	tdd.suite('Keyboard _ensureScroll', function () {
 		function isRowVisible(row) {
 			return row.element.offsetTop < grid.bodyNode.scrollTop + grid.bodyNode.offsetHeight;
 		}
 
-		test.beforeEach(function () {
+		tdd.beforeEach(function () {
 			var store = createSyncStore({ data: genericData });
 			grid = new (declare([ OnDemandGrid, Keyboard ]))({
 				collection: store,
@@ -581,16 +581,16 @@ define([
 			grid.startup();
 		});
 
-		test.afterEach(after);
+		tdd.afterEach(after);
 
-		test.test('scroll to row', function () {
+		tdd.test('scroll to row', function () {
 			var row40 = grid.row(40);
 			assert.isTrue(!isRowVisible(row40), 'Row 40 is visible.');
 			grid._ensureScroll(row40);
 			assert.isTrue(isRowVisible(row40), 'Row 40 is not visible.');
 		});
 
-		test.test('scroll to cell', function () {
+		tdd.test('scroll to cell', function () {
 			var cell40col3 = grid.cell(40, 'col3');
 			assert.isTrue(!isRowVisible(cell40col3.row), 'Row 40 is visible.');
 			grid._ensureScroll(cell40col3);

@@ -18,7 +18,7 @@ define([
 ], function (declare, lang, Deferred, on, all, query, when, registry, TextBox, Grid, OnDemandGrid,
 	Editor, Pagination, createSyncStore, orderedData) {
 
-	var test = intern.getPlugin('interface.tdd');
+	var tdd = intern.getPlugin('interface.tdd');
 	var assert = intern.getPlugin('chai').assert;
 	var testOrderedData = orderedData.items;
 	var EditorGrid = declare([ Grid, Editor ]);
@@ -35,16 +35,16 @@ define([
 		return delay;
 	}
 
-	test.suite('Editor mixin', function () {
+	tdd.suite('Editor mixin', function () {
 
-		test.afterEach(function () {
+		tdd.afterEach(function () {
 			if (grid) {
 				grid.destroy();
 				grid = undefined;
 			}
 		});
 
-		test.test('canEdit - always-on (instance-per-row) editor', function () {
+		tdd.test('canEdit - always-on (instance-per-row) editor', function () {
 			var results = {};
 			var data = [
 				{id: 1, data1: 'Data 1.a', data2: 'Data 2.a'},
@@ -79,7 +79,7 @@ define([
 				'canEdit should have been called (item 3)');
 		});
 
-		test.test('canEdit - editOn (shared) editor', function () {
+		tdd.test('canEdit - editOn (shared) editor', function () {
 			var results = {};
 			var data = [
 				{id: 1, data1: 'Data 1.a', data2: 'Data 2.a'},
@@ -143,7 +143,7 @@ define([
 				'canEdit should have been called for editOn editor (item 3)');
 		});
 
-		test.test('canEdit always-on editor - suppress on false', function () {
+		tdd.test('canEdit always-on editor - suppress on false', function () {
 			var rowCount,
 				cell,
 				matchedNodes,
@@ -201,7 +201,7 @@ define([
 			return dfd;
 		});
 
-		test.test('canEdit edit-on click editor - suppress on false', function () {
+		tdd.test('canEdit edit-on click editor - suppress on false', function () {
 			var rowCount,
 				cell,
 				matchedNodes,
@@ -260,7 +260,7 @@ define([
 			return dfd;
 		});
 
-		test.test('destroy editor widgets - native', function () {
+		tdd.test('destroy editor widgets - native', function () {
 			var matchedNodes;
 
 			matchedNodes = query('input');
@@ -296,7 +296,7 @@ define([
 				'After grid is destroyed there should be 0 input elements on the page');
 		});
 
-		test.test('destroy editor widgets - Dijit', function () {
+		tdd.test('destroy editor widgets - Dijit', function () {
 			assert.strictEqual(0, registry.length,
 				'Before grid is created there should be 0 widgets on the page');
 
@@ -328,7 +328,7 @@ define([
 				'After grid is destroyed there should be 0 widgets on the page');
 		});
 
-		test.test('editor widget startup called at appropriate time', function () {
+		tdd.test('editor widget startup called at appropriate time', function () {
 			var assertionMessage;
 			var AssertionTextBox = declare(TextBox, {
 				startup: function () {
@@ -372,7 +372,7 @@ define([
 			grid.collection.put(grid.collection.getSync(2));
 		});
 
-		test.test('editor focus with always-on editor', function () {
+		tdd.test('editor focus with always-on editor', function () {
 			var rowCount,
 				cell,
 				cellEditor,
@@ -420,7 +420,7 @@ define([
 			return dfd;
 		});
 
-		test.test('editor focus and show event with edit-on click editor', function () {
+		tdd.test('editor focus and show event with edit-on click editor', function () {
 			var rowCount,
 				cell,
 				cellEditor,
@@ -477,7 +477,7 @@ define([
 			return dfd;
 		});
 
-		test.test('Maintain shared widgets on refresh in IE', function() {
+		tdd.test('Maintain shared widgets on refresh in IE', function() {
 			grid = new (declare([ OnDemandGrid, Editor ]))({
 				columns: {
 					name: {
@@ -506,7 +506,7 @@ define([
 			});
 		});
 
-		test.suite('Listener cleanup', function () {
+		tdd.suite('Listener cleanup', function () {
 			function testCellListeners(rowCount, editorColumnCount) {
 				var rowEntryCount = 0;
 				for (var rowKey in grid._editorCellListeners) {
@@ -548,7 +548,7 @@ define([
 				return paginatedGrid;
 			}
 
-			test.test('clean up after refresh cell', function () {
+			tdd.test('clean up after refresh cell', function () {
 				// Test with Pagination mixed in first
 				grid = buildPaginatedGrid(declare([ Grid, Pagination, Editor ]));
 				for (var i = 1; i < 10;i ++) {
@@ -567,7 +567,7 @@ define([
 				testCellListeners(9, 2);
 			});
 
-			test.test('clean up after row is rerendered', function () {
+			tdd.test('clean up after row is rerendered', function () {
 				grid = buildPaginatedGrid(declare([Grid, Pagination, Editor]));
 				for (var i = 0; i < 9; i++) {
 					grid.collection.put(
@@ -577,14 +577,14 @@ define([
 				testCellListeners(9, 2);
 			});
 
-			test.test('clean up when switching pages', function () {
+			tdd.test('clean up when switching pages', function () {
 				grid = buildPaginatedGrid(declare([Grid, Pagination, Editor]), 5);
 				testCellListeners(5, 2);
 				grid.gotoPage(2);
 				testCellListeners(4, 2);
 			});
 
-			test.test('clean up when scrolling', function () {
+			tdd.test('clean up when scrolling', function () {
 				var data = [];
 				for (var i = 0; i < 1000; i++) {
 					data[i] = {
@@ -616,7 +616,7 @@ define([
 			});
 		});
 
-		test.suite('Editor#refreshCell', function () {
+		tdd.suite('Editor#refreshCell', function () {
 			var store;
 
 			function createGrid(columnOptions) {
@@ -678,17 +678,17 @@ define([
 				};
 			}
 
-			test.afterEach(function () {
+			tdd.afterEach(function () {
 				if (grid) {
 					grid.destroy();
 					grid = null;
 				}
 			});
 
-			test.test('HTML input, always-on', createTest({ editor: 'text' }));
-			test.test('HTML input, editOn', createTest({ editor: 'text', editOn: 'click' }));
-			test.test('Dijit TextBox, always-on', createTest({ editor: TextBox }));
-			test.test('Dijit TextBox, editOn', createTest({ editor: TextBox, editOn: 'click' }));
+			tdd.test('HTML input, always-on', createTest({ editor: 'text' }));
+			tdd.test('HTML input, editOn', createTest({ editor: 'text', editOn: 'click' }));
+			tdd.test('Dijit TextBox, always-on', createTest({ editor: TextBox }));
+			tdd.test('Dijit TextBox, editOn', createTest({ editor: TextBox, editOn: 'click' }));
 		});
 	});
 });

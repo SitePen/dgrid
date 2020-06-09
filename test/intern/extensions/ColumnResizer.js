@@ -4,19 +4,19 @@ define([
 	'dgrid/extensions/ColumnHider',
 	'dgrid/extensions/ColumnResizer'
 ], function (declare, Grid, ColumnHider, ColumnResizer) {
-	var test = intern.getPlugin('interface.tdd');
+	var tdd = intern.getPlugin('interface.tdd');
 	var assert = intern.getPlugin('chai').assert;
 
-	test.suite('ColumnResizer', function () {
+	tdd.suite('ColumnResizer', function () {
 		var grid;
 
-		test.afterEach(function () {
+		tdd.afterEach(function () {
 			if (grid) {
 				grid.destroy();
 			}
 		});
 
-		test.test('subrows with hidden columns', function() {
+		tdd.test('subrows with hidden columns', function() {
 			var subRows = [ [
 				{ field: 'Id', label: 'ID' },
 				{ field: 'name', label: 'Name' },

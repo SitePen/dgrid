@@ -1,7 +1,7 @@
 /* jshint -W024 */
 var pollUntil = require('@theintern/leadfoot/helpers/pollUntil').default;
 /* jshint +W024 */
-var test = intern.getPlugin('interface.tdd');
+var tdd = intern.getPlugin('interface.tdd');
 var assert = intern.getPlugin('chai').assert;
 
 // dgrid.css defines a 300ms transition duration for .dgrid-tree-container
@@ -55,9 +55,9 @@ function createExpandTest(clickTarget, clickMethod) {
 	};
 }
 
-test.suite('Tree functional tests', function () {
+tdd.suite('Tree functional tests', function () {
 
-	test.before(function (suite) {
+	tdd.before(function (suite) {
 		var remote = suite.remote;
 
 		return remote.get('dgrid/test/intern/functional/Tree.html')
@@ -66,13 +66,13 @@ test.suite('Tree functional tests', function () {
 			}, null, 5000));
 	});
 
-	test.test('expand/collapse: click on expando node', createExpandTest('.dgrid-expando-icon', 'click'));
-	test.test('expand/collapse: double-click on cell node', createExpandTest('.dgrid-column-0', 'doubleClick'));
+	tdd.test('expand/collapse: click on expando node', createExpandTest('.dgrid-expando-icon', 'click'));
+	tdd.test('expand/collapse: double-click on cell node', createExpandTest('.dgrid-column-0', 'doubleClick'));
 });
 
-test.suite('Tree functional tests with CompoundColumns', function () {
+tdd.suite('Tree functional tests with CompoundColumns', function () {
 
-	test.before(function (suite) {
+	tdd.before(function (suite) {
 		var remote = suite.remote;
 
 		return remote.get('dgrid/test/intern/functional/TreeCompound.html')
@@ -81,13 +81,13 @@ test.suite('Tree functional tests with CompoundColumns', function () {
 			}, null, 5000));
 	});
 
-	test.test('expand/collapse: click on expando node', createExpandTest('.dgrid-expando-icon', 'click'));
-	test.test('expand/collapse: double-click on cell node', createExpandTest('.dgrid-column-set-0', 'doubleClick'));
+	tdd.test('expand/collapse: click on expando node', createExpandTest('.dgrid-expando-icon', 'click'));
+	tdd.test('expand/collapse: double-click on cell node', createExpandTest('.dgrid-column-set-0', 'doubleClick'));
 });
 
-test.suite('Tree functional tests with CompoundColumns after column reset', function () {
+tdd.suite('Tree functional tests with CompoundColumns after column reset', function () {
 
-	test.before(function (suite) {
+	tdd.before(function (suite) {
 		var remote = suite.remote;
 
 		return remote.get('dgrid/test/intern/functional/TreeCompound.html')
@@ -102,6 +102,6 @@ test.suite('Tree functional tests with CompoundColumns after column reset', func
 			});
 	});
 
-	test.test('expand/collapse: click on expando node', createExpandTest('.dgrid-expando-icon', 'click'));
-	test.test('expand/collapse: double-click on cell node', createExpandTest('.dgrid-column-set-0', 'doubleClick'));
+	tdd.test('expand/collapse: click on expando node', createExpandTest('.dgrid-expando-icon', 'click'));
+	tdd.test('expand/collapse: double-click on cell node', createExpandTest('.dgrid-column-set-0', 'doubleClick'));
 });

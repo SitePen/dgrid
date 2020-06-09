@@ -3,7 +3,7 @@ var keys = require('@theintern/leadfoot/keys').default;
 var pollUntil = require('@theintern/leadfoot/helpers/pollUntil').default;
 /* jshint +W024 */
 var util = require('./util');
-var test = intern.getPlugin('interface.tdd');
+var tdd = intern.getPlugin('interface.tdd');
 var assert = intern.getPlugin('chai').assert;
 
 // The number of visible rows in each grid (clickable without scrolling)
@@ -22,7 +22,7 @@ expectedSelectState.gridMultiple = expectedSelectState.gridExtended;
 expectedSelectState.gridToggle = expectedSelectState.gridExtended;
 expectedSelectState.gridNone = expectedSelectState.gridExtended;
 
-test.suite('Selector functional tests', function () {
+tdd.suite('Selector functional tests', function () {
 
 	var isShiftClickSupported;
 
@@ -133,7 +133,7 @@ test.suite('Selector functional tests', function () {
 		};
 	}
 
-	test.before(function (suite) {
+	tdd.before(function (suite) {
 		var remote = suite.remote;
 		return remote.get('dgrid/test/intern/functional/Selector.html')
 			.then(pollUntil(function () {
@@ -150,7 +150,7 @@ test.suite('Selector functional tests', function () {
 			});
 	});
 
-	test.beforeEach(function (suite) {
+	tdd.beforeEach(function (suite) {
 		// Clear selections from previous tests
 		return suite.remote.execute(function () {
 			/* global gridExtended, gridMultiple, gridSingle, gridToggle, gridNone */
@@ -162,38 +162,38 @@ test.suite('Selector functional tests', function () {
 		});
 	});
 
-	test.test('selectionMode: extended',
+	tdd.test('selectionMode: extended',
 		createRowSelectionTest('gridExtended', true, clickAndTestEachRow));
-	test.test('selectionMode: multiple',
+	tdd.test('selectionMode: multiple',
 		createRowSelectionTest('gridMultiple', true, clickAndTestEachRow));
-	test.test('selectionMode: single',
+	tdd.test('selectionMode: single',
 		createRowSelectionTest('gridSingle', false, clickAndTestEachRow));
-	test.test('selectionMode: toggle',
+	tdd.test('selectionMode: toggle',
 		createRowSelectionTest('gridToggle', true, clickAndTestEachRow));
-	test.test('selectionMode: none',
+	tdd.test('selectionMode: none',
 		createRowSelectionTest('gridNone', true, clickAndTestEachRow));
 
-	test.test('multiple selection with shift+click; selectionMode: extended',
+	tdd.test('multiple selection with shift+click; selectionMode: extended',
 		createRowSelectionTest('gridExtended', true, shiftClickAndTestRows));
-	test.test('multiple selection with shift+click; selectionMode: multiple',
+	tdd.test('multiple selection with shift+click; selectionMode: multiple',
 		createRowSelectionTest('gridMultiple', true, shiftClickAndTestRows));
-	test.test('multiple selection with shift+click; selectionMode: single',
+	tdd.test('multiple selection with shift+click; selectionMode: single',
 		createRowSelectionTest('gridSingle', false, shiftClickAndTestRows));
-	test.test('multiple selection with shift+click; selectionMode: toggle',
+	tdd.test('multiple selection with shift+click; selectionMode: toggle',
 			createRowSelectionTest('gridToggle', true, shiftClickAndTestRows));
-	test.test('multiple selection with shift+click; selectionMode: none',
+	tdd.test('multiple selection with shift+click; selectionMode: none',
 			createRowSelectionTest('gridNone', true, shiftClickAndTestRows));
 
-	test.test('select all; selectionMode: extended',
+	tdd.test('select all; selectionMode: extended',
 		createRowSelectionTest('gridExtended', true, selectAll));
-	test.test('select all; selectionMode: multiple',
+	tdd.test('select all; selectionMode: multiple',
 		createRowSelectionTest('gridMultiple', true, selectAll));
-	test.test('select all; selectionMode: toggle',
+	tdd.test('select all; selectionMode: toggle',
 		createRowSelectionTest('gridToggle', true, selectAll));
-	test.test('select all; selectionMode: none',
+	tdd.test('select all; selectionMode: none',
 		createRowSelectionTest('gridNone', true, selectAll));
 
-	test.test('keyboard selection on input element', function (suite) {
+	tdd.test('keyboard selection on input element', function (suite) {
 		function getSelectionState (id) {
 			return gridExtended.selection[id];
 		}

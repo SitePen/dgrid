@@ -6,15 +6,15 @@ define([
 	'dgrid/OnDemandGrid',
 	'dstore/Memory'
 ], function (declare, query, Grid, Editor, OnDemandGrid, Memory) {
-	var test = intern.getPlugin('interface.tdd');
+	var tdd = intern.getPlugin('interface.tdd');
 	var assert = intern.getPlugin('chai').assert;
 	var PlainEditorGrid = declare([ Grid, Editor ]);
 	var OnDemandEditorGrid = declare([ OnDemandGrid, Editor ]);
 	var grid;
 
-	test.suite('Grids with Editor mixin - radio editor', function () {
+	tdd.suite('Grids with Editor mixin - radio editor', function () {
 
-		test.afterEach(function () {
+		tdd.afterEach(function () {
 			if (grid) {
 				grid.destroy();
 			}
@@ -51,7 +51,7 @@ define([
 			});
 		}
 
-		test.test('Grid', function () {
+		tdd.test('Grid', function () {
 			createGrid(PlainEditorGrid, {
 				columns: [
 					{
@@ -79,7 +79,7 @@ define([
 			assert.isTrue(grid.row(2).data.data2);
 		});
 
-		test.test('OnDemandGrid - autoSave', function () {
+		tdd.test('OnDemandGrid - autoSave', function () {
 			var dfd = this.async(1000);
 			var store = new Memory({ data: createData() });
 			createGrid(OnDemandEditorGrid, {
@@ -114,7 +114,7 @@ define([
 			}), 0);
 		});
 
-		test.test('OnDemandGrid - no autoSave', function () {
+		tdd.test('OnDemandGrid - no autoSave', function () {
 			var dfd = this.async(1000);
 			var store = new Memory({ data: createData() });
 			createGrid(OnDemandEditorGrid, {

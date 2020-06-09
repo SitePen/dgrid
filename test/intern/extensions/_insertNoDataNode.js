@@ -8,7 +8,7 @@ define([
 	'dgrid/extensions/Pagination',
 	'dgrid/extensions/SingleQuery'
 ], function (declare, query, Memory, Trackable, Grid, OnDemandGrid, Pagination, SingleQuery) {
-	var test = intern.getPlugin('interface.tdd');
+	var tdd = intern.getPlugin('interface.tdd');
 	var assert = intern.getPlugin('chai').assert;
 	var grid;
 	var PaginationGrid = declare([Grid, Pagination]);
@@ -26,18 +26,18 @@ define([
 		assert.strictEqual(query('.dgrid-no-data', grid.domNode).length, exists ? 1 : 0);
 	}
 
-	test.suite('_insertNoDataNode', function () {
+	tdd.suite('_insertNoDataNode', function () {
 
-		test.afterEach(function () {
+		tdd.afterEach(function () {
 			if (grid) {
 				grid.destroy();
 				grid = undefined;
 			}
 		});
 
-		test.suite('Pagination', function () {
+		tdd.suite('Pagination', function () {
 
-			test.test('empty store with refresh', function () {
+			tdd.test('empty store with refresh', function () {
 				createGrid(PaginationGrid, {
 					collection: new TrackableStore({}),
 					noDataMessage: 'No data'
@@ -48,8 +48,8 @@ define([
 			});
 		});
 
-		test.suite('SingleQuery', function () {
-			test.test('empty store with refresh', function () {
+		tdd.suite('SingleQuery', function () {
+			tdd.test('empty store with refresh', function () {
 				createGrid(SingleQueryGrid, {
 					collection: new TrackableStore({}),
 					noDataMessage: 'No data'
@@ -59,7 +59,7 @@ define([
 				testNoDataNodeExists(true);
 			});
 
-			test.test('empty store add and remove', function () {
+			tdd.test('empty store add and remove', function () {
 				var store = new TrackableStore();
 				createGrid(SingleQueryGrid, {
 					collection: store,
@@ -80,9 +80,9 @@ define([
 			});
 		});
 
-		test.suite('PaginationSingleQuery', function () {
+		tdd.suite('PaginationSingleQuery', function () {
 
-			test.test('empty store with refresh', function () {
+			tdd.test('empty store with refresh', function () {
 				createGrid(PaginationSingleQueryGrid, {
 					collection: new TrackableStore({}),
 					noDataMessage: 'No data'

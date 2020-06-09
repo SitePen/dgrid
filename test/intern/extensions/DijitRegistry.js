@@ -12,60 +12,60 @@ define([
 ], function (arrayUtil, declare, aspect, domConstruct, registry, BorderContainer,
 	StackContainer, List, DijitRegistry) {
 
-	var test = intern.getPlugin('interface.tdd');
+	var tdd = intern.getPlugin('interface.tdd');
 	var assert = intern.getPlugin('chai').assert;
 	var DijitList = declare([ List, DijitRegistry ]);
 	var list;
 
-	test.suite('DijitRegistry', function () {
-		test.afterEach(function () {
+	tdd.suite('DijitRegistry', function () {
+		tdd.afterEach(function () {
 			list.destroy();
 		});
 
-		test.test('Dijit registry population', function () {
+		tdd.test('Dijit registry population', function () {
 			var id = 'myId';
 			list = new DijitList({ id: id });
 			assert.strictEqual(registry.byId(id), list,
 				'dgrid instances with DijitRegistry mixin should appear in dijit/registry');
 		});
 
-		test.suite('#placeAt', function () {
-			test.beforeEach(function () {
+		tdd.suite('#placeAt', function () {
+			tdd.beforeEach(function () {
 				list = new DijitList();
 			});
 
-			test.suite('DOM', function () {
+			tdd.suite('DOM', function () {
 				var referenceNode;
-				test.before(function () {
+				tdd.before(function () {
 					referenceNode = domConstruct.create('div', null, document.body);
 				});
 
-				test.afterEach(function () {
+				tdd.afterEach(function () {
 					domConstruct.empty(referenceNode);
 				});
 
-				test.after(function () {
+				tdd.after(function () {
 					domConstruct.destroy(referenceNode);
 				});
 
-				test.test('default placement (last child)', function () {
+				tdd.test('default placement (last child)', function () {
 					domConstruct.create('div', null, referenceNode);
 					list.placeAt(referenceNode);
 					assert.strictEqual(referenceNode.lastChild, list.domNode,
 						'placeAt with domNode should place dgrid instance as the last child by default');
 				});
 
-				test.test('specified placement', function () {
+				tdd.test('specified placement', function () {
 					list.placeAt(referenceNode, 'after');
 					assert.strictEqual(referenceNode.nextSibling, list.domNode,
 						'placeAt with domNode and placement argument should operate like domConstruct.place');
 				});
 			});
 
-			test.suite('Dijit (also tests startup/destroy)', function () {
+			tdd.suite('Dijit (also tests startup/destroy)', function () {
 				var containerWidget;
 
-				test.afterEach(function () {
+				tdd.afterEach(function () {
 					containerWidget.destroyRecursive();
 				});
 
@@ -97,8 +97,8 @@ define([
 					};
 				}
 
-				test.test('BorderContainer', createContainerTest(BorderContainer));
-				test.test('StackContainer', createContainerTest(StackContainer));
+				tdd.test('BorderContainer', createContainerTest(BorderContainer));
+				tdd.test('StackContainer', createContainerTest(StackContainer));
 			});
 		});
 	});

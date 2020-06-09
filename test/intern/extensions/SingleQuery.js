@@ -6,7 +6,7 @@ define([
 	'dgrid/test/data/genericData',
 	'dojo/domReady!'
 ], function (declare, Grid, SingleQuery, createSyncStore, genericData) {
-	var test = intern.getPlugin('interface.tdd');
+	var tdd = intern.getPlugin('interface.tdd');
 	var assert = intern.getPlugin('chai').assert;
 	var SingleQueryGrid = declare([ Grid, SingleQuery ]);
 	var grid;
@@ -18,11 +18,11 @@ define([
 		};
 	}
 
-	test.suite('SingleQuery', function () {
+	tdd.suite('SingleQuery', function () {
 		var store = createSyncStore({ data: genericData });
 		var numItems = store.storage.fullData.length;
 
-		test.beforeEach(function () {
+		tdd.beforeEach(function () {
 			grid = new SingleQueryGrid({
 				collection: store,
 				columns: getColumns()
@@ -31,16 +31,16 @@ define([
 			grid.startup();
 		});
 
-		test.afterEach(function () {
+		tdd.afterEach(function () {
 			grid.destroy();
 		});
 
-		test.test('Should render all results at once', function () {
+		tdd.test('Should render all results at once', function () {
 			assert.strictEqual(grid.contentNode.children.length, numItems,
 				'A grid row should exist for every item in the collection');
 		});
 
-		test.test('Should expose total via get(\'total\')', function () {
+		tdd.test('Should expose total via get(\'total\')', function () {
 			assert.strictEqual(grid.get('total'), numItems,
 				'grid.get(\'total\') should return total number of items');
 		});
