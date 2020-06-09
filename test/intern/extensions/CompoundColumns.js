@@ -1,13 +1,13 @@
 define([
-	'intern!tdd',
-	'intern/chai!assert',
 	'dojo/_base/declare',
 	'dgrid/Grid',
 	'dgrid/extensions/CompoundColumns'
-], function (test, assert, declare, Grid, CompoundColumns) {
-	var CompoundColumnGrid = declare([Grid, CompoundColumns]),
-		data = [],
-		grid;
+], function (declare, Grid, CompoundColumns) {
+	var tdd = intern.getPlugin('interface.tdd');
+	var assert = intern.getPlugin('chai').assert;
+	var CompoundColumnGrid = declare([Grid, CompoundColumns]);
+	var data = [];
+	var grid;
 
 	// Generate data to be used for all tests
 	for (var itemIndex = 0; itemIndex < 12; itemIndex++) {
@@ -28,13 +28,13 @@ define([
 		grid.renderArray(data);
 	}
 
-	test.suite('CompoundColumns', function () {
-		test.suite('cell method', function () {
-			test.afterEach(function () {
+	tdd.suite('CompoundColumns', function () {
+		tdd.suite('cell method', function () {
+			tdd.afterEach(function () {
 				grid.destroy();
 			});
 
-			test.test('simple grid', function () {
+			tdd.test('simple grid', function () {
 				createGrid({
 					data0: 'Data 0',
 					data1: 'Data 1',
@@ -51,7 +51,7 @@ define([
 				assert.isUndefined(grid.cell(12, 0).element);
 			});
 
-			test.test('simple grid with column ids', function () {
+			tdd.test('simple grid with column ids', function () {
 				createGrid({
 					data0: { label: 'Data 0', id: 'myData0' },
 					data1: { label: 'Data 1', id: 'myData1' },
@@ -70,7 +70,7 @@ define([
 				assert.isUndefined(grid.cell(0, 0).element);
 			});
 
-			test.test('grid with children', function () {
+			tdd.test('grid with children', function () {
 				createGrid([
 					{ field: 'data0', label: 'Data 0' },
 					{
@@ -103,7 +103,7 @@ define([
 				assert.isUndefined(grid.cell(12, 0).element);
 			});
 
-			test.test('grid with children and children ids', function () {
+			tdd.test('grid with children and children ids', function () {
 				createGrid([
 					{ field: 'data0', label: 'Data 0' },
 					{
@@ -149,7 +149,7 @@ define([
 				assert.strictEqual(grid.cell(11, '4-myData5').element.innerHTML, 'Value 11:5');
 			});
 
-			test.test('grid with children and ids', function () {
+			tdd.test('grid with children and ids', function () {
 				createGrid([
 					{ field: 'data0', label: 'Data 0' },
 					{
@@ -190,7 +190,7 @@ define([
 				assert.strictEqual(grid.cell(11, 'compound2-myData5').element.innerHTML, 'Value 11:5');
 			});
 
-			test.test('grid with nested children and ids', function () {
+			tdd.test('grid with nested children and ids', function () {
 				createGrid([
 					{ field: 'data0', label: 'Data 0' },
 					{
@@ -258,7 +258,7 @@ define([
 				assert.strictEqual(grid.cell(11, 'compound2-nested2-myData8').element.innerHTML, 'Value 11:8');
 			});
 
-			test.test('grid with nested children and ids hiding all headers', function () {
+			tdd.test('grid with nested children and ids hiding all headers', function () {
 				createGrid([
 					{ field: 'data0', label: 'Data 0' },
 					{
@@ -326,7 +326,7 @@ define([
 				assert.strictEqual(grid.cell(11, 'compound2-nested2-myData8').element.innerHTML, 'Value 11:8');
 			});
 
-			test.test('grid with nested children and ids hiding child headers', function () {
+			tdd.test('grid with nested children and ids hiding child headers', function () {
 				createGrid([
 					{ field: 'data0', label: 'Data 0' },
 					{
@@ -397,12 +397,12 @@ define([
 			});
 		});
 
-		test.suite('column method', function () {
-			test.afterEach(function () {
+		tdd.suite('column method', function () {
+			tdd.afterEach(function () {
 				grid.destroy();
 			});
 
-			test.test('simple grid', function () {
+			tdd.test('simple grid', function () {
 				createGrid({
 					data0: 'Data 0',
 					data1: 'Data 1',
@@ -416,7 +416,7 @@ define([
 				assert.isUndefined(grid.column(5));
 			});
 
-			test.test('simple grid with column ids', function () {
+			tdd.test('simple grid with column ids', function () {
 				createGrid({
 					data0: { label: 'Data 0', id: 'myData0' },
 					data1: { label: 'Data 1', id: 'myData1' },
@@ -431,7 +431,7 @@ define([
 				assert.isUndefined(grid.column(0));
 			});
 
-			test.test('grid with children', function () {
+			tdd.test('grid with children', function () {
 				createGrid([
 					{ field: 'data0', label: 'Data 0' },
 					{
@@ -458,7 +458,7 @@ define([
 				assert.isUndefined(grid.column(6));
 			});
 
-			test.test('grid with children and children ids', function () {
+			tdd.test('grid with children and children ids', function () {
 				createGrid([
 					{ field: 'data0', label: 'Data 0' },
 					{
@@ -493,7 +493,7 @@ define([
 				assert.strictEqual(grid.column('4-myData5').label, 'Data 5');
 			});
 
-			test.test('grid with children and ids', function () {
+			tdd.test('grid with children and ids', function () {
 				createGrid([
 					{ field: 'data0', label: 'Data 0' },
 					{
@@ -526,7 +526,7 @@ define([
 				assert.strictEqual(grid.column('compound2-myData5').label, 'Data 5');
 			});
 
-			test.test('grid with nested children and ids', function () {
+			tdd.test('grid with nested children and ids', function () {
 				createGrid([
 					{ field: 'data0', label: 'Data 0' },
 					{
@@ -580,7 +580,7 @@ define([
 				assert.strictEqual(grid.column('compound2-nested2-myData8').label, 'Data 8');
 			});
 
-			test.test('grid with nested children and ids hiding all headers', function () {
+			tdd.test('grid with nested children and ids hiding all headers', function () {
 				createGrid([
 					{ field: 'data0', label: 'Data 0' },
 					{
@@ -634,7 +634,7 @@ define([
 				assert.strictEqual(grid.column('compound2-nested2-myData8').label, 'Data 8');
 			});
 
-			test.test('grid with nested children and ids hiding child headers', function () {
+			tdd.test('grid with nested children and ids hiding child headers', function () {
 				createGrid([
 					{ field: 'data0', label: 'Data 0' },
 					{
@@ -691,12 +691,12 @@ define([
 			});
 		});
 
-		test.suite('sort method', function () {
-			test.afterEach(function () {
+		tdd.suite('sort method', function () {
+			tdd.afterEach(function () {
 				grid.destroy();
 			});
 
-			test.test('sort grid programmatically by field present in header', function () {
+			tdd.test('sort grid programmatically by field present in header', function () {
 				createGrid({
 					data0: 'Data 0',
 					data1: 'Data 1',

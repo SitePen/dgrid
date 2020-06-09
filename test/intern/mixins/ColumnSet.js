@@ -1,6 +1,4 @@
 define([
-	'intern!tdd',
-	'intern/chai!assert',
 	'dojo/_base/declare',
 	'dojo/aspect',
 	'dojo/Deferred',
@@ -12,14 +10,16 @@ define([
 	'dgrid/Keyboard',
 	'dgrid/Tree',
 	'../addCss!'
-], function (test, assert, declare, aspect, Deferred, query, createSyncStore, createHierarchicalStore,
-		OnDemandGrid, ColumnSet, Keyboard, Tree) {
+], function (declare, aspect, Deferred, query, createSyncStore, createHierarchicalStore,
+	OnDemandGrid, ColumnSet, Keyboard, Tree) {
 
+	var tdd = intern.getPlugin('interface.tdd');
+	var assert = intern.getPlugin('chai').assert;
 	var grid;
 	var handles;
 
-	test.suite('ColumnSet mixin', function () {
-		test.before(function () {
+	tdd.suite('ColumnSet mixin', function () {
+		tdd.before(function () {
 			var ColumnSetGrid = declare([ OnDemandGrid, Keyboard, ColumnSet ]);
 			grid = new ColumnSetGrid({
 				columnSets: [
@@ -47,7 +47,7 @@ define([
 			grid.startup();
 		});
 
-		test.beforeEach(function () {
+		tdd.beforeEach(function () {
 			var data = [];
 			handles = [];
 
@@ -58,23 +58,24 @@ define([
 			grid.set('collection', createSyncStore({ data: data }));
 		});
 
-		test.afterEach(function () {
+		tdd.afterEach(function () {
 			for (var i = handles.length; i--;) {
 				handles[i].remove();
 			}
 		});
 
-		test.after(function () {
+		tdd.after(function () {
 			grid.destroy();
 		});
 
-		test.test('Re-inserted rows should maintain previous column set scroll positions', function () {
+		tdd.test('Re-inserted rows should maintain previous column set scroll positions', function () {
 			var dfd = this.async(1000);
 			var scrollAmount = 250;
 
 			function assertScroll(messageSuffix) {
 				var element = query('.dgrid-column-set-1 [data-dgrid-column-set-id="1"]', grid.row(1).element)[0];
-				assert.strictEqual(element.scrollLeft, scrollAmount,
+				// use Math.ceil() to account for sub-pixel values on scaled displays
+				assert.strictEqual(Math.ceil(element.scrollLeft), scrollAmount,
 					'Column Set scrollLeft should equal ' + scrollAmount + messageSuffix);
 			}
 
@@ -87,7 +88,7 @@ define([
 			grid._scrollColumnSet('1', scrollAmount);
 		});
 
-		test.test('Horizontal scroll caused by cell focus should remain synchronized', function () {
+		tdd.test('Horizontal scroll caused by cell focus should remain synchronized', function () {
 			var dfd = this.async(1000);
 
 			handles.push(aspect.after(grid, '_onColumnSetScroll', dfd.callback(function () {
@@ -100,8 +101,8 @@ define([
 		});
 	});
 
-	test.suite('ColumnSet + Tree mixins', function () {
-		test.beforeEach(function () {
+	tdd.suite('ColumnSet + Tree mixins', function () {
+		tdd.beforeEach(function () {
 			var TreeColumnSetGrid = declare([ OnDemandGrid, ColumnSet, Tree ]);
 			var data = [];
 
@@ -137,14 +138,14 @@ define([
 			grid.startup();
 		});
 
-		test.afterEach(function () {
+		tdd.afterEach(function () {
 			for (var i = handles.length; i--;) {
 				handles[i].remove();
 			}
 			grid.destroy();
 		});
 
-		test.test('re-expand after horizontal scroll should restore correct scrollLeft', function () {
+		tdd.test('re-expand after horizontal scroll should restore correct scrollLeft', function () {
 			var scrollAmount = 250;
 			grid.styleColumn('0-0-0', 'width: 10000px;');
 
@@ -164,7 +165,8 @@ define([
 				var element = query('.dgrid-column-set-0 [data-dgrid-column-set-id="0"]',
 					grid.row('0:0').element)[0];
 
-				assert.strictEqual(element.scrollLeft, scrollAmount,
+				// use Math.ceil() to account for sub-pixel values on scaled displays
+				assert.strictEqual(Math.ceil(element.scrollLeft), scrollAmount,
 					'Column Set should have expected scroll position for re-expanded rows');
 			});
 		});

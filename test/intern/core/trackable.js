@@ -1,16 +1,14 @@
 define([
-	'intern!tdd',
-	'intern/chai!assert',
-	'dojo/_base/declare',
 	'dojo/aspect',
 	'dojo/dom-class',
 	'dojo/query',
 	'../../data/createSyncStore',
 	'dgrid/OnDemandList'
-], function (test, assert, declare, aspect, domClass, query, createSyncStore, OnDemandList) {
-
-	var widget,
-		storeCounter = 0;
+], function (aspect, domClass, query, createSyncStore, OnDemandList) {
+	var tdd = intern.getPlugin('interface.tdd');
+	var assert = intern.getPlugin('chai').assert;
+	var widget;
+	var storeCounter = 0;
 
 	function destroyWidget() {
 		if (widget) {
@@ -70,7 +68,7 @@ define([
 
 		numToModify = numToModify || 1;
 
-		test.test(description, function () {
+		tdd.test(description, function () {
 			var i,
 				cnt,
 				step = function () {
@@ -126,13 +124,13 @@ define([
 		// a given amount of overlap.
 		var index, numToModify;
 
-		test.suite(widgetClassName + ' with ' + overlap + ' overlap', function () {
+		tdd.suite(widgetClassName + ' with ' + overlap + ' overlap', function () {
 
-			test.beforeEach(function () {
+			tdd.beforeEach(function () {
 				createList(storeSize, itemsPerQuery, overlap);
 			});
 
-			test.afterEach(destroyWidget);
+			tdd.afterEach(destroyWidget);
 
 			// Modify items counting up.
 			for (numToModify = 1; numToModify <= config.itemsModifiedMax; numToModify++) {
@@ -162,7 +160,7 @@ define([
 		// with the correct widget on the page.
 		config.itemAction = itemAction;
 
-		test.suite(description, function () {
+		tdd.suite(description, function () {
 			// Test widgets with only one query: total item count equals item count per query.
 			itemTestSuite('OnDemandList one query', config.itemsPerQuery, config.itemsPerQuery, 0, config);
 
@@ -183,7 +181,7 @@ define([
 			assert.isTrue(domClass.contains(rowNode, cssClass), rowNode.outerHTML + ' should have ' + cssClass);
 		}
 
-		test.test('Add ' + itemsToAddCount + ' items with ' + overlap + ' overlap', function () {
+		tdd.test('Add ' + itemsToAddCount + ' items with ' + overlap + ' overlap', function () {
 			createList(0, itemsPerQuery, overlap);
 			var store = widget.collection;
 			for (i = 0; i < itemsToAddCount; i++) {
@@ -211,9 +209,9 @@ define([
 	}
 
 	function itemAddEmptyStoreTestSuite(config) {
-		test.suite('Add items to empty store', function () {
+		tdd.suite('Add items to empty store', function () {
 
-			test.afterEach(destroyWidget);
+			tdd.afterEach(destroyWidget);
 
 			itemAddEmptyStoreTest(1, config.itemsPerQuery, 0);
 
@@ -224,7 +222,7 @@ define([
 		});
 	}
 
-	test.suite('Trackable lists', function () {
+	tdd.suite('Trackable lists', function () {
 		// Creates test suites that execute the following actions on OnDemandLists with varying amount of
 		// overlap and modifying varying number of items:
 		// - modify existing items
@@ -297,10 +295,10 @@ define([
 		itemAddEmptyStoreTestSuite(config);
 	});
 
-	test.suite('Multiple updates to trackable list', function () {
-		test.afterEach(destroyWidget);
+	tdd.suite('Multiple updates to trackable list', function () {
+		tdd.afterEach(destroyWidget);
 
-		test.test('Multiple puts', function () {
+		tdd.test('Multiple puts', function () {
 			var i;
 			var data = [];
 			for (i = 0; i < 10; i++) {
@@ -327,41 +325,41 @@ define([
 		});
 	});
 
-	test.suite('shouldTrackCollection = false + store modifications', function () {
+	tdd.suite('shouldTrackCollection = false + store modifications', function () {
 		var numItems = 3;
 		var store;
 		var handles = [];
 
-		test.before(function () {
+		tdd.before(function () {
 			createList(numItems, 25, 0, false);
 		});
 
-		test.beforeEach(function () {
+		tdd.beforeEach(function () {
 			store = createStore(numItems);
 			widget.set('collection', store);
 		});
 
-		test.afterEach(function () {
+		tdd.afterEach(function () {
 			for (var i = handles.length; i--;) {
 				handles[i].remove();
 			}
 			handles = [];
 		});
 
-		test.after(destroyWidget);
+		tdd.after(destroyWidget);
 
 		function countRows() {
 			var count = query('.dgrid-row', widget.contentNode).length;
 			return count;
 		}
 
-		test.test('shouldTrackCollection = false + add', function () {
+		tdd.test('shouldTrackCollection = false + add', function () {
 			var numRows = countRows();
 			store.addSync(createItem(3));
 			assert.strictEqual(countRows(), numRows);
 		});
 
-		test.test('shouldTrackCollection = false + put', function () {
+		tdd.test('shouldTrackCollection = false + put', function () {
 			var calls = 0;
 
 			handles.push(aspect.before(widget, 'removeRow', function () {
@@ -377,7 +375,7 @@ define([
 			assert.strictEqual(calls, 0, 'insertRow and removeRow should never be called');
 		});
 
-		test.test('shouldTrackCollection = false + remove', function () {
+		tdd.test('shouldTrackCollection = false + remove', function () {
 			var numRows = countRows();
 			for (var i = 0; i < numItems; i++) {
 				store.removeSync(indexToId(i));

@@ -1,17 +1,18 @@
 define([
-	'intern!tdd',
-	'intern/chai!assert',
 	'dojo/_base/declare',
 	'dojo/query',
 	'dgrid/OnDemandGrid',
 	'dgrid/Selection',
 	'dgrid/Selector',
 	'dgrid/test/data/testStore'
-], function (test, assert, declare, query, OnDemandGrid, Selection, Selector, testStore) {
-	test.suite('selector column plugin', function () {
+], function (declare, query, OnDemandGrid, Selection, Selector, testStore) {
+	var tdd = intern.getPlugin('interface.tdd');
+	var assert = intern.getPlugin('chai').assert;
+
+	tdd.suite('selector column plugin', function () {
 		var grid;
 
-		test.beforeEach(function () {
+		tdd.beforeEach(function () {
 			grid = new (declare([OnDemandGrid, Selection, Selector]))({
 				collection: testStore,
 				columns: {
@@ -25,11 +26,11 @@ define([
 			grid.startup();
 		});
 
-		test.afterEach(function () {
+		tdd.afterEach(function () {
 			grid.destroy();
 		});
 
-		test.test('programmatic row selection', function () {
+		tdd.test('programmatic row selection', function () {
 			var rowNode,
 				checkboxNode,
 				rowCount = testStore.data.length,
@@ -93,7 +94,7 @@ define([
 			}
 		});
 
-		test.test('Selector#refreshCell', function () {
+		tdd.test('Selector#refreshCell', function () {
 			grid.select(0);
 			var cell = grid.cell(0, 'select');
 

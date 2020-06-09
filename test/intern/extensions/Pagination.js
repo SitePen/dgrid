@@ -1,6 +1,4 @@
 define([
-	'intern!tdd',
-	'intern/chai!assert',
 	'dojo/_base/declare',
 	'dojo/keys',
 	'dojo/on',
@@ -12,10 +10,11 @@ define([
 	'dgrid/test/data/createSyncStore',
 	'dgrid/test/data/genericData',
 	'dojo/domReady!'
-], function (test, assert, declare, keys, on, query, string, Grid, OnDemandList, Pagination, createSyncStore,
-			 genericData) {
-	var grid,
-		PaginationGrid = declare([Grid, Pagination]);
+], function (declare, keys, on, query, string, Grid, OnDemandList, Pagination, createSyncStore, genericData) {
+	var tdd = intern.getPlugin('interface.tdd');
+	var assert = intern.getPlugin('chai').assert;
+	var PaginationGrid = declare([Grid, Pagination]);
+	var grid;
 
 	function getColumns() {
 		return {
@@ -40,8 +39,8 @@ define([
 		grid.startup();
 	}
 
-	test.suite('Pagination', function () {
-		test.beforeEach(function () {
+	tdd.suite('Pagination', function () {
+		tdd.beforeEach(function () {
 			createGrid(function () {
 				return new PaginationGrid({
 					collection: createTestStore(),
@@ -50,11 +49,11 @@ define([
 			});
 		});
 
-		test.afterEach(function () {
+		tdd.afterEach(function () {
 			grid.destroy();
 		});
 
-		test.test('Pagination info updates on page switch', function () {
+		tdd.test('Pagination info updates on page switch', function () {
 			// switch pages and ensure that the status message and links are
 			// updated
 			var disabledLinks = query('span.dgrid-page-disabled', grid.paginationLinksNode),
@@ -83,7 +82,7 @@ define([
 			testAssertions('2');
 		});
 
-		test.test('Pagination info updates when an item is added/removed', function () {
+		tdd.test('Pagination info updates when an item is added/removed', function () {
 			function testAssertions(expectedTotal, expectedLastPage) {
 				assert.strictEqual(grid.paginationStatusNode.innerHTML,
 					string.substitute(grid.i18nPagination.status, {
@@ -106,7 +105,7 @@ define([
 			testAssertions(100, 10);
 		});
 
-		test.test('Should not pass 0 to gotoPage when removing last item (#1192)', function() {
+		tdd.test('Should not pass 0 to gotoPage when removing last item (#1192)', function() {
 			var store = createSyncStore({ data: [ { id: 1 } ] });
 			grid.set('collection', store);
 
@@ -122,7 +121,7 @@ define([
 			assert.strictEqual(pageNumber, 1, 'Should have refreshed page 1 after adding the first item');
 		});
 
-		test.test('refresh should return a QueryResults object', function () {
+		tdd.test('refresh should return a QueryResults object', function () {
 			var dfd = this.async();
 
 			grid.refresh().then(dfd.callback(function (results) {
@@ -132,13 +131,13 @@ define([
 		});
 	});
 
-	test.suite('Pagination size selector initialization tests', function () {
+	tdd.suite('Pagination size selector initialization tests', function () {
 		// Each test in this suite is responsible for instantiating the grid
-		test.afterEach(function () {
+		tdd.afterEach(function () {
 			grid.destroy();
 		});
 
-		test.test('pageSizeOptions + unique rowsPerPage during creation', function () {
+		tdd.test('pageSizeOptions + unique rowsPerPage during creation', function () {
 			createGrid(function () {
 				return new PaginationGrid({
 					collection: createTestStore(),
@@ -165,7 +164,7 @@ define([
 				'paginationSizeSelect node should have been destroyed');
 		});
 
-		test.test('pageSizeOptions added after creation', function () {
+		tdd.test('pageSizeOptions added after creation', function () {
 			createGrid(function () {
 				return new PaginationGrid({
 					collection: createTestStore(),
@@ -189,7 +188,7 @@ define([
 				'pageSizeOptions should be sorted ascending');
 		});
 
-		test.test('hitting "Enter" key in pagination page input changes page', function () {
+		tdd.test('hitting "Enter" key in pagination page input changes page', function () {
 			createGrid(function () {
 				return new PaginationGrid({
 					collection: createTestStore(),
@@ -206,8 +205,8 @@ define([
 		});
 	});
 
-	test.suite('Pagination size selector', function () {
-		test.before(function () {
+	tdd.suite('Pagination size selector', function () {
+		tdd.before(function () {
 			createGrid(function () {
 				return new PaginationGrid({
 					collection: createTestStore(),
@@ -216,7 +215,7 @@ define([
 				});
 			});
 		});
-		test.after(function () {
+		tdd.after(function () {
 			if (grid) {
 				grid.destroy();
 				grid = undefined;
@@ -259,19 +258,19 @@ define([
 			}
 		}
 
-		test.test('setting rowsPerPage to a low value properly updates select', function () {
+		tdd.test('setting rowsPerPage to a low value properly updates select', function () {
 			rowsPerPageTest(2);
 		});
 
-		test.test('setting rowsPerPage properly updates select', function () {
+		tdd.test('setting rowsPerPage properly updates select', function () {
 			rowsPerPageTest(7);
 		});
 
-		test.test('setting rowsPerPage to a high value properly updates select', function () {
+		tdd.test('setting rowsPerPage to a high value properly updates select', function () {
 			rowsPerPageTest(20);
 		});
 
-		test.test('setting rowsPerPage to an existing value doesn\'t add a value', function () {
+		tdd.test('setting rowsPerPage to an existing value doesn\'t add a value', function () {
 			var selector = grid.paginationSizeSelect,
 				initialCount = selector.options.length,
 				value = getNonSelectedValue(selector.options);
@@ -281,7 +280,7 @@ define([
 			verifyOptions(selector.options, initialCount);
 		});
 
-		test.test('selecting a value from the selector doesn\'t change the selector options', function () {
+		tdd.test('selecting a value from the selector doesn\'t change the selector options', function () {
 			var selector = grid.paginationSizeSelect,
 				initialCount = selector.options.length,
 				targetValue = getNonSelectedValue(selector.options);
@@ -298,11 +297,11 @@ define([
 		});
 	});
 
-	test.suite('Pagination with OnDemandGrid', function () {
+	tdd.suite('Pagination with OnDemandGrid', function () {
 		var badList;
 		var builtInWarn;
 
-		test.afterEach(function () {
+		tdd.afterEach(function () {
 			if (badList) {
 				badList.destroy();
 				badList = undefined;
@@ -313,7 +312,7 @@ define([
 			}
 		});
 
-		test.test('Invalid list+pagination combination', function () {
+		tdd.test('Invalid list+pagination combination', function () {
 			// When the Pagination extension is used with OnDemandList, a warning should appear in the console
 			// telling the dev that they have constructed an invalid class combination.
 			var warnCalled = true;

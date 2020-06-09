@@ -1,10 +1,4 @@
 define([
-	'intern!tdd',
-	'intern/chai!assert',
-	'dgrid/OnDemandGrid',
-	'dgrid/Editor',
-	'dgrid/Tree',
-	'dgrid/util/misc',
 	'dojo/_base/declare',
 	'dojo/_base/lang',
 	'dojo/aspect',
@@ -15,14 +9,20 @@ define([
 	'dojo/on',
 	'dojo/query',
 	'dojo/string',
+	'dgrid/OnDemandGrid',
+	'dgrid/Editor',
+	'dgrid/Tree',
+	'dgrid/util/misc',
 	'dgrid/test/data/createHierarchicalStore',
 	'../addCss!'
-], function (test, assert, OnDemandGrid, Editor, Tree, miscUtil, declare, lang, aspect, Deferred,
-			 domClass, domConstruct, domStyle, on, query, string, createHierarchicalStore) {
+], function (declare, lang, aspect, Deferred, domClass, domConstruct, domStyle, on, query, string,
+	OnDemandGrid, Editor, Tree, miscUtil, createHierarchicalStore) {
 
-	var grid,
-		store,
-		testDelay = 15;
+	var tdd = intern.getPlugin('interface.tdd');
+	var assert = intern.getPlugin('chai').assert;
+	var grid;
+	var store;
+	var testDelay = 15;
 
 	function makeId(num) {
 		return string.pad(num, 3);
@@ -138,7 +138,7 @@ define([
 		return dfd.promise;
 	}
 
-	test.suite('Tree', function () {
+	tdd.suite('Tree', function () {
 
 		function makeBeforeEach(setStoreAfterStartup) {
 			return function () {
@@ -150,13 +150,13 @@ define([
 			};
 		}
 
-		test.suite('configure store last', function () {
+		tdd.suite('configure store last', function () {
 
-			test.beforeEach(makeBeforeEach(true));
+			tdd.beforeEach(makeBeforeEach(true));
 
-			test.afterEach(destroyGrid);
+			tdd.afterEach(destroyGrid);
 
-			test.test('expand first row', function () {
+			tdd.test('expand first row', function () {
 				return grid.expand('000')
 					.then(function () {
 						testRowExists('000:000');
@@ -164,7 +164,7 @@ define([
 					});
 			});
 
-			test.test('expand last row', function () {
+			tdd.test('expand last row', function () {
 				return grid.expand('004').then(function () {
 					testRowExists('004:000');
 					testRowExists('004:499', false);
@@ -172,13 +172,13 @@ define([
 			});
 		});
 
-		test.suite('large family expansion', function () {
+		tdd.suite('large family expansion', function () {
 
-			test.beforeEach(makeBeforeEach());
+			tdd.beforeEach(makeBeforeEach());
 
-			test.afterEach(destroyGrid);
+			tdd.afterEach(destroyGrid);
 
-			test.test('expand first row', function () {
+			tdd.test('expand first row', function () {
 				return grid.expand('000')
 					.then(function () {
 						testRowExists('000:000');
@@ -186,7 +186,7 @@ define([
 					});
 			});
 
-			test.test('expand first row + scroll to bottom', function () {
+			tdd.test('expand first row + scroll to bottom', function () {
 				return grid.expand('000')
 					.then(scrollToEnd)
 					.then(function () {
@@ -195,14 +195,14 @@ define([
 					});
 			});
 
-			test.test('expand last row', function () {
+			tdd.test('expand last row', function () {
 				return grid.expand('004').then(function () {
 					testRowExists('004:000');
 					testRowExists('004:499', false);
 				});
 			});
 
-			test.test('expand last row + scroll to bottom', function () {
+			tdd.test('expand last row + scroll to bottom', function () {
 				return grid.expand('004')
 					.then(function () {
 						testRowExists('004:000');
@@ -213,7 +213,7 @@ define([
 					});
 			});
 
-			test.test('expand first and last rows + scroll to bottom', function () {
+			tdd.test('expand first and last rows + scroll to bottom', function () {
 				return grid.expand('000')
 					.then(function () {
 						testRowExists('000');
@@ -231,7 +231,7 @@ define([
 					});
 			});
 
-			test.test('expand hidden', function () {
+			tdd.test('expand hidden', function () {
 				var dfd = this.async(1000);
 
 				grid.domNode.style.display = 'none';
@@ -253,7 +253,7 @@ define([
 			// * The store created in "createGrid" has a "mayHaveChildren" that returns true for nodes with no parentId
 			// * The expando icon (.dgrid-expando-icon) is always rendered, it is not visible if it lacks the class
 			//   ".ui-icon"
-			test.test('mayHaveChildren', function () {
+			tdd.test('mayHaveChildren', function () {
 				var rowObject;
 				var expandoNode;
 				var i;
@@ -281,7 +281,7 @@ define([
 
 			// Test goal: ensure that rows are correctly expanded/collapsed on grid render in accordance with the
 			// grid's "shouldExpand" method
-			test.test('shouldExpand', function () {
+			tdd.test('shouldExpand', function () {
 				var shouldExpand;
 				var i;
 
@@ -308,7 +308,7 @@ define([
 			});
 
 			// Test goal: ensure that a custom "renderExpando" column method produces the expected DOM structure
-			test.test('renderExpando', function () {
+			tdd.test('renderExpando', function () {
 				var columns;
 				var rowObject;
 				var expandoNode;
@@ -338,7 +338,7 @@ define([
 			});
 
 			// Test goal: ensure the expando node is still rendered when the column has a custom "renderCell" method
-			test.test('renderCell', function () {
+			tdd.test('renderCell', function () {
 				var rowObject;
 				var expandoNode;
 				var i;
@@ -381,7 +381,7 @@ define([
 
 			// Test goal: ensure the expando node is still rendered with the editor plugin
 			// Note: ordering is important: tree(editor()), not editor(tree())
-			test.test('renderCell with editor', function () {
+			tdd.test('renderCell with editor', function () {
 				var rowObject;
 				var expandoNode;
 				var inputNode;
@@ -404,7 +404,7 @@ define([
 
 			// Test goal: ensure renderCell does not get re-wrapped over itself if the same column definition object
 			// is received during a column reset (e.g. via ColumnReorder).  See #1157
-			test.test('renderCell after same structure is recomputed', function () {
+			tdd.test('renderCell after same structure is recomputed', function () {
 				function countRowExpandos() {
 					return grid.row('000').element.querySelectorAll('.dgrid-expando-icon').length;
 				}
@@ -415,15 +415,15 @@ define([
 			});
 		});
 
-		test.suite('large family expansion without sort', function () {
-			test.beforeEach(function () {
+		tdd.suite('large family expansion without sort', function () {
+			tdd.beforeEach(function () {
 				createGrid({ gridOptions: { sort: null } });
 				return wait();
 			});
 
-			test.afterEach(destroyGrid);
+			tdd.afterEach(destroyGrid);
 
-			test.test('expand first row', function () {
+			tdd.test('expand first row', function () {
 				return grid.expand('000')
 					.then(function () {
 						testRowExists('000:000');
@@ -434,11 +434,11 @@ define([
 			});
 		});
 
-		test.suite('Tree + Trackable', function () {
-			test.beforeEach(createGrid);
-			test.afterEach(destroyGrid);
+		tdd.suite('Tree + Trackable', function () {
+			tdd.beforeEach(createGrid);
+			tdd.afterEach(destroyGrid);
 
-			test.test('child modification', function () {
+			tdd.test('child modification', function () {
 				return grid.expand('000').then(function () {
 					testRowExists('000:000');
 					assert.doesNotThrow(function () {
@@ -451,7 +451,7 @@ define([
 				});
 			});
 
-			test.test('child modification after parent when expanded', function () {
+			tdd.test('child modification after parent when expanded', function () {
 				return grid.expand('000').then(function () {
 					grid.collection.putSync({
 						id: '000',
@@ -472,7 +472,7 @@ define([
 				});
 			});
 
-			test.test('collapse items removed from store', function () {
+			tdd.test('collapse items removed from store', function () {
 				return grid.expand('000').then(function () {
 					assert.isTrue(domClass.contains(grid.row('000').element, 'dgrid-row-expanded'),
 						'Should have expanded class');
@@ -485,10 +485,10 @@ define([
 			});
 		});
 
-		test.suite('Tree + Trackable + shouldTrackCollection: false', function () {
+		tdd.suite('Tree + Trackable + shouldTrackCollection: false', function () {
 			var handles = [];
 
-			test.beforeEach(function () {
+			tdd.beforeEach(function () {
 				createGrid({
 					gridOptions: {
 						shouldTrackCollection: false
@@ -496,7 +496,7 @@ define([
 				});
 			});
 
-			test.afterEach(function () {
+			tdd.afterEach(function () {
 				for (var i = handles.length; i--;) {
 					handles[i].remove();
 				}
@@ -504,7 +504,7 @@ define([
 				destroyGrid();
 			});
 
-			test.test('child add', function () {
+			tdd.test('child add', function () {
 				return grid.expand('000').then(function () {
 					testRowExists('000:000');
 					grid.collection.add({
@@ -516,7 +516,7 @@ define([
 				});
 			});
 
-			test.test('child put', function () {
+			tdd.test('child put', function () {
 				return grid.expand('000').then(function () {
 					var calls = 0;
 
@@ -538,7 +538,7 @@ define([
 				});
 			});
 
-			test.test('child remove', function () {
+			tdd.test('child remove', function () {
 				return grid.expand('000').then(function () {
 					testRowExists('000:000');
 					grid.collection.remove('000:000');
@@ -547,17 +547,17 @@ define([
 			});
 		});
 
-		test.suite('prune large family on scroll', function () {
+		tdd.suite('prune large family on scroll', function () {
 			var handles = [];
 
-			test.beforeEach(function () {
+			tdd.beforeEach(function () {
 				createGrid({
 					parentRowCount: 500,
 					childRowCount: 500
 				});
 			});
 
-			test.afterEach(function () {
+			tdd.afterEach(function () {
 				for (var i = handles.length; i--;) {
 					handles[i].remove();
 				}
@@ -565,7 +565,7 @@ define([
 				destroyGrid();
 			});
 
-			test.test('prune expanded top row', function () {
+			tdd.test('prune expanded top row', function () {
 				return grid.expand('000').then(function () {
 					testRowExists('000:000');
 					return scrollToEnd();
@@ -574,7 +574,7 @@ define([
 				});
 			});
 
-			test.test('prune expanded bottom row', function () {
+			tdd.test('prune expanded bottom row', function () {
 				return scrollToEnd().then(function () {
 					return grid.expand('499');
 				}).then(function () {
@@ -585,7 +585,7 @@ define([
 				});
 			});
 
-			test.test('prune expanded bottom row at bottom', function () {
+			tdd.test('prune expanded bottom row at bottom', function () {
 				return scrollToEnd().then(function () {
 					return grid.expand('499');
 				}).then(scrollToEnd).then(function () {
@@ -596,7 +596,7 @@ define([
 				});
 			});
 
-			test.test('expanded top row, scroll to bottom, verify release range', function () {
+			tdd.test('expanded top row, scroll to bottom, verify release range', function () {
 				var releaseCount = 0;
 				var expectedCount;
 				return grid.expand('000').then(function (initialRows) {
@@ -613,7 +613,7 @@ define([
 				});
 			});
 
-			test.test('expanded bottom row, scroll to top, verify release range', function () {
+			tdd.test('expanded bottom row, scroll to top, verify release range', function () {
 				var releaseCount = 0;
 				var expectedCount;
 

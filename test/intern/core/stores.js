@@ -1,6 +1,4 @@
 define([
-	'intern!tdd',
-	'intern/chai!assert',
 	'dojo/_base/declare',
 	'dojo/aspect',
 	'dojo/on',
@@ -14,12 +12,13 @@ define([
 	'dgrid/test/data/genericData',
 	'dgrid/test/data/testPerformanceStore',
 	'../addCss!'
-], function (test, assert, declare, aspect, on, Grid, OnDemandGrid, Pagination, SingleQuery,
-		errorStores, createSyncStore, createAsyncStore, genericData, testPerformanceStore) {
+], function (declare, aspect, on, Grid, OnDemandGrid, Pagination, SingleQuery, errorStores, createSyncStore,
+	createAsyncStore, genericData, testPerformanceStore) {
 
+	var tdd = intern.getPlugin('interface.tdd');
+	var assert = intern.getPlugin('chai').assert;
 	var PaginationGrid = declare([ Grid, Pagination ]);
 	var SingleQueryGrid = declare([ Grid, SingleQuery ]);
-
 	var grid;
 	var handles = [];
 
@@ -82,9 +81,9 @@ define([
 			'Item from rendered range should be re-added to grid when updated');
 	}
 
-	test.suite('stores', function () {
+	tdd.suite('stores', function () {
 		// Setup / teardown
-		test.afterEach(function () {
+		tdd.afterEach(function () {
 			for (var i = handles.length; i--;) {
 				handles[i].remove();
 			}
@@ -95,23 +94,23 @@ define([
 		var store = createSyncStore({ data: genericData }),
 			asyncStore = createAsyncStore({ data: genericData });
 
-		test.test('OnDemandGrid + sync store', function () {
+		tdd.test('OnDemandGrid + sync store', function () {
 			storeTest(OnDemandGrid, store, true, this.async());
 		});
 
-		test.test('OnDemandGrid + async store', function () {
+		tdd.test('OnDemandGrid + async store', function () {
 			storeTest(OnDemandGrid, asyncStore, true, this.async());
 		});
 
-		test.test('OnDemandGrid + async store w/ error', function () {
+		tdd.test('OnDemandGrid + async store w/ error', function () {
 			storeTest(OnDemandGrid, errorStores.asyncFetch, false, this.async());
 		});
 
-		test.test('OnDemandGrid + async store w/ total error', function () {
+		tdd.test('OnDemandGrid + async store w/ total error', function () {
 			storeTest(OnDemandGrid, errorStores.asyncFetchTotal, false, this.async());
 		});
 
-		test.test('OnDemandGrid observes/releases ranges appropriately', function () {
+		tdd.test('OnDemandGrid observes/releases ranges appropriately', function () {
 			var dfd = this.async();
 			createReleaseRangeGrid(OnDemandGrid);
 
@@ -126,39 +125,39 @@ define([
 			return dfd;
 		});
 
-		test.test('PaginationGrid + sync store', function () {
+		tdd.test('PaginationGrid + sync store', function () {
 			storeTest(PaginationGrid, store, true, this.async());
 		});
 
-		test.test('PaginationGrid + async store', function () {
+		tdd.test('PaginationGrid + async store', function () {
 			storeTest(PaginationGrid, asyncStore, true, this.async());
 		});
 
-		test.test('PaginationGrid + async store w/ error', function () {
+		tdd.test('PaginationGrid + async store w/ error', function () {
 			storeTest(PaginationGrid, errorStores.asyncFetch, false, this.async());
 		});
 
-		test.test('Pagination observes/releases ranges appropriately', function () {
+		tdd.test('Pagination observes/releases ranges appropriately', function () {
 			createReleaseRangeGrid(PaginationGrid);
 			grid.gotoPage(2);
 			testReleaseRange(10);
 		});
 
-		test.test('SingleQueryGrid + sync store', function () {
+		tdd.test('SingleQueryGrid + sync store', function () {
 			storeTest(SingleQueryGrid, store, true, this.async());
 		});
 
-		test.test('SingleQueryGrid + async store', function () {
+		tdd.test('SingleQueryGrid + async store', function () {
 			storeTest(SingleQueryGrid, asyncStore, true, this.async());
 		});
 
-		test.test('SingleQueryGrid + async store w/ error', function () {
+		tdd.test('SingleQueryGrid + async store w/ error', function () {
 			storeTest(SingleQueryGrid, errorStores.asyncFetch, false, this.async());
 		});
 	});
 
-	test.suite('Async empty stores', function () {
-		test.afterEach(function () {
+	tdd.suite('Async empty stores', function () {
+		tdd.afterEach(function () {
 			grid.destroy();
 		});
 
@@ -186,13 +185,13 @@ define([
 			};
 		}
 
-		test.test('OnDemandGrid consecutive refresh with async empty store (#1065)',
+		tdd.test('OnDemandGrid consecutive refresh with async empty store (#1065)',
 			createTest(OnDemandGrid));
 
-		test.test('Pagination consecutive refresh with async empty store',
+		tdd.test('Pagination consecutive refresh with async empty store',
 			createTest(PaginationGrid));
 
-		test.test('SingleQuery consecutive refresh with async empty store',
+		tdd.test('SingleQuery consecutive refresh with async empty store',
 			createTest(SingleQueryGrid));
 	});
 });

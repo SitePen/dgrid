@@ -1,19 +1,18 @@
 define([
-	'intern!tdd',
-	'intern/chai!assert',
 	'dgrid/List',
 	'dgrid/Grid',
 	'dgrid/GridFromHtml',
-	'dojo/_base/array',
 	'dojo/parser',
 	'dojo/dom-class',
 	'dojo/dom-construct',
 	'dojo/text!../resources/setClass.html'
-], function (test, assert, List, Grid, GridFromHtml, arrayUtil, parser, domClass, domConstruct, gridTemplate) {
+], function (List, Grid, GridFromHtml, parser, domClass, domConstruct, gridTemplate) {
+	var tdd = intern.getPlugin('interface.tdd');
+	var assert = intern.getPlugin('chai').assert;
 
-	test.suite('setClass', function () {
+	tdd.suite('setClass', function () {
 		// Tests
-		test.test('Lists + initially-defined classes', function () {
+		tdd.test('Lists + initially-defined classes', function () {
 			function renderRow(item) {
 				var div = document.createElement('div');
 				div.appendChild(document.createTextNode(item.name));
@@ -43,7 +42,7 @@ define([
 			listDOM.destroy();
 		});
 
-		test.test('Grids + initially-defined classes', function () {
+		tdd.test('Grids + initially-defined classes', function () {
 			// Build three grids
 			function getColumns() {
 				return {
@@ -75,7 +74,7 @@ define([
 			gridDOM.destroy();
 		});
 
-		test.test('Declarative Grid + initially-defined class', function () {
+		tdd.test('Declarative Grid + initially-defined class', function () {
 			/* global gridDecl */
 
 			// Create markup for a grid to be declaratively parsed

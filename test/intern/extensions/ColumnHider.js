@@ -1,15 +1,15 @@
 define([
-	'intern!tdd',
-	'intern/chai!assert',
 	'dojo/_base/declare',
 	'dgrid/Grid',
 	'dgrid/extensions/ColumnHider'
-], function (test, assert, declare, Grid, ColumnHider) {
+], function (declare, Grid, ColumnHider) {
+	var tdd = intern.getPlugin('interface.tdd');
+	var assert = intern.getPlugin('chai').assert;
 	var ColumnHiderGrid = declare([ Grid, ColumnHider ]);
 	var grid;
 
-	test.suite('ColumnHider', function () {
-		test.beforeEach(function () {
+	tdd.suite('ColumnHider', function () {
+		tdd.beforeEach(function () {
 			grid = new ColumnHiderGrid({
 				columns: {
 					col1: 'Column 1',
@@ -24,12 +24,12 @@ define([
 			grid.renderArray([]);
 		});
 
-		test.afterEach(function () {
+		tdd.afterEach(function () {
 			grid.destroy();
 		});
 
-		test.suite('#toggleColumnHiddenState', function () {
-			test.test('unhidable column', function () {
+		tdd.suite('#toggleColumnHiddenState', function () {
+			tdd.test('unhidable column', function () {
 				assert.doesNotThrow(function () {
 					grid.toggleColumnHiddenState('col2');
 				});

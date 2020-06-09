@@ -1,9 +1,6 @@
 define([
-	'intern!tdd',
-	'intern/chai!assert',
 	'dojo/_base/declare',
 	'dojo/_base/array',
-	'dojo/_base/lang',
 	'dojo/json',
 	'dojo/dom-class',
 	'dstore/Memory',
@@ -13,16 +10,18 @@ define([
 	'dgrid/Selection',
 	'dgrid/CellSelection',
 	'dgrid/extensions/Pagination'
-], function (test, assert, declare, arrayUtil, lang, JSON, domClass, Memory, Trackable,
-		Grid, OnDemandGrid, Selection, CellSelection, Pagination) {
+], function (declare, arrayUtil, JSON, domClass, Memory, Trackable, Grid, OnDemandGrid,
+	Selection, CellSelection, Pagination) {
 
+	var tdd = intern.getPlugin('interface.tdd');
+	var assert = intern.getPlugin('chai').assert;
+	var TrackableMemory = declare([ Memory, Trackable ]);
 	var mixins = {
-			Selection: Selection,
-			CellSelection: CellSelection
-		},
-		notificationTests = {},
-		grid,
-		TrackableMemory = declare([ Memory, Trackable ]);
+		Selection: Selection,
+		CellSelection: CellSelection
+	};
+	var notificationTests = {};
+	var grid;
 
 	function _createTestData(size) {
 		var data = [],
@@ -463,23 +462,23 @@ define([
 		};
 	});
 
-	test.suite('Selection update handling', function () {
-		test.afterEach(function () {
+	tdd.suite('Selection update handling', function () {
+		tdd.afterEach(function () {
 			grid.destroy();
 		});
 
 		for (var name in notificationTests) {
-			test.test(name, notificationTests[name]);
+			tdd.test(name, notificationTests[name]);
 		}
 	});
 
-	test.suite('Selection events', function () {
+	tdd.suite('Selection events', function () {
 		var store = new TrackableMemory({
 			data: _createTestData()
 		});
 		var handles = [];
 
-		test.beforeEach(function () {
+		tdd.beforeEach(function () {
 			grid = new (declare([OnDemandGrid, Selection]))({
 				columns: getColumns(),
 				sort: 'id',
@@ -489,7 +488,7 @@ define([
 			grid.startup();
 		});
 
-		test.afterEach(function () {
+		tdd.afterEach(function () {
 			grid.destroy();
 			for (var i = handles.length; i--;) {
 				handles[i].remove();
@@ -497,7 +496,7 @@ define([
 			handles = [];
 		});
 
-		test.test('programmatic row deselection event', function () {
+		tdd.test('programmatic row deselection event', function () {
 			var lastEventType,
 				expectedEventType = 'dgrid-deselect',
 				eventCount = 0;
@@ -518,7 +517,7 @@ define([
 			assert.equal(expectedEventType, lastEventType);
 		});
 
-		test.test('programmatic row selection event', function () {
+		tdd.test('programmatic row selection event', function () {
 			var lastEventType,
 				expectedEventType = 'dgrid-select',
 				eventCount = 0;
@@ -535,7 +534,7 @@ define([
 			assert.equal(expectedEventType, lastEventType);
 		});
 
-		test.test('clearSelection() within event handler', function () {
+		tdd.test('clearSelection() within event handler', function () {
 			var dfd = this.async();
 			var numCalls = 0;
 			handles.push(grid.on('dgrid-select', dfd.rejectOnError(function () {

@@ -1,6 +1,4 @@
 define([
-	'intern!tdd',
-	'intern/chai!assert',
 	'dojo/_base/lang',
 	'dojo/_base/declare',
 	'dojo/aspect',
@@ -15,8 +13,11 @@ define([
 	'dgrid/test/data/createSyncStore',
 	'dgrid/test/data/genericData',
 	'dojo/domReady!'
-], function (test, assert, lang, declare, aspect, Deferred, TextBox, Editor,
-		OnDemandList, OnDemandGrid, ColumnSet, createSyncStore, genericData) {
+], function (lang, declare, aspect, Deferred, TextBox, Editor, OnDemandList, OnDemandGrid,
+	ColumnSet, createSyncStore, genericData) {
+
+	var tdd = intern.getPlugin('interface.tdd');
+	var assert = intern.getPlugin('chai').assert;
 
 	// Helper method used to set column set() methods for various grid compositions
 	function testSetMethod(grid, dfd) {
@@ -73,17 +74,17 @@ define([
 		return item[this.field].toUpperCase();
 	}
 
-	test.suite('_StoreMixin', function () {
+	tdd.suite('_StoreMixin', function () {
 		var grid; // Reused for each test and common afterEach logic
 
-		test.afterEach(function () {
+		tdd.afterEach(function () {
 			grid.destroy();
 		});
 
-		test.suite('_StoreMixin#_setCollection', function () {
+		tdd.suite('_StoreMixin#_setCollection', function () {
 			var store;
 
-			test.beforeEach(function () {
+			tdd.beforeEach(function () {
 				store = createSyncStore({ data: genericData });
 				grid = new OnDemandList({
 					collection: store
@@ -92,7 +93,7 @@ define([
 				grid.startup();
 			});
 
-			test.test('null', function () {
+			tdd.test('null', function () {
 				assert.isDefined(grid._renderedCollection,
 					'grid._renderedCollection should be defined');
 				assert.notStrictEqual(grid.contentNode.children.length, 0,
@@ -113,7 +114,7 @@ define([
 					'grid.contentNode should contain children when refreshing with a store');
 			});
 
-			test.test('dirty data preservation/cleanup', function () {
+			tdd.test('dirty data preservation/cleanup', function () {
 				grid.updateDirty(0, 'col1', 'modified');
 				assert.isDefined(grid.dirty[0], 'Dirty hash should contain entry for item 0 after updateDirty');
 				grid.set('sort', 'col3');
@@ -127,8 +128,8 @@ define([
 		});
 
 
-		test.suite('set collection before startup', function () {
-			test.test('should not cause superfluous refresh',  function () {
+		tdd.suite('set collection before startup', function () {
+			tdd.test('should not cause superfluous refresh',  function () {
 				var numCalls = 0;
 
 				grid = new OnDemandList();
@@ -144,7 +145,7 @@ define([
 				assert.strictEqual(numCalls, 1, 'refresh should only have been called once');
 			});
 
-			test.test('store modifications before startup', function () {
+			tdd.test('store modifications before startup', function () {
 				var numCalls = 0;
 				var store = createSyncStore({ data: genericData });
 
@@ -191,7 +192,7 @@ define([
 			});
 		});
 
-		test.test('_StoreMixin#_onNotification', function () {
+		tdd.test('_StoreMixin#_onNotification', function () {
 			var store = createSyncStore({ data: genericData }),
 				notificationCount = 0,
 				lastNotificationEvent = null;
@@ -229,7 +230,7 @@ define([
 			assert.equal(lastNotificationEvent.target, item);
 		});
 
-		test.suite('_StoreMixin#_trackError', function () {
+		tdd.suite('_StoreMixin#_trackError', function () {
 			var emittedErrorCount,
 				lastEmittedError,
 				expectedValue;
@@ -252,7 +253,7 @@ define([
 				throw new Error('Unexpected resolution');
 			}
 
-			test.beforeEach(function () {
+			tdd.beforeEach(function () {
 				grid = new OnDemandList();
 
 				grid.on('dgrid-error', function (event) {
@@ -264,14 +265,14 @@ define([
 				lastEmittedError = null;
 			});
 
-			test.test('_StoreMixin#_trackError - sync value', function () {
+			tdd.test('_StoreMixin#_trackError - sync value', function () {
 				expectedValue = 'expected';
 				return grid._trackError(function () {
 					return expectedValue;
 				}).then(expectedSuccess);
 			});
 
-			test.test('_StoreMixin#_trackError - async value', function () {
+			tdd.test('_StoreMixin#_trackError - async value', function () {
 				expectedValue = 'expected-async';
 				return grid._trackError(function () {
 					var dfd = new Deferred();
@@ -282,14 +283,14 @@ define([
 				}).then(expectedSuccess);
 			});
 
-			test.test('_StoreMixin#_trackError - sync error', function () {
+			tdd.test('_StoreMixin#_trackError - sync error', function () {
 				expectedValue = 'expected-error';
 				return grid._trackError(function () {
 					throw new Error(expectedValue);
 				}).then(unexpectedSuccess, expectedError);
 			});
 
-			test.test('_StoreMixin#_trackError - async error', function () {
+			tdd.test('_StoreMixin#_trackError - async error', function () {
 				// async error
 				expectedValue = 'expected-async-error';
 				return grid._trackError(function () {
@@ -302,10 +303,10 @@ define([
 			});
 		});
 
-		test.suite('_StoreMixin#refreshCell', function () {
+		tdd.suite('_StoreMixin#refreshCell', function () {
 			var store;
 
-			test.beforeEach(function () {
+			tdd.beforeEach(function () {
 				store = createSyncStore({ data: genericData });
 				grid = new (declare([ OnDemandGrid, Editor ]))({
 					columns: {
@@ -322,7 +323,7 @@ define([
 				grid.startup();
 			});
 
-			test.test('no change', function () {
+			tdd.test('no change', function () {
 				var cell = grid.cell('2', 'col1');
 				var oldValue = cell.element.innerHTML;
 
@@ -331,7 +332,7 @@ define([
 				});
 			});
 
-			test.test('dirty change', function () {
+			tdd.test('dirty change', function () {
 				var cell = grid.cell('2', 'col1');
 				var newValue = 'new value';
 
@@ -341,7 +342,7 @@ define([
 				});
 			});
 
-			test.test('store change', function () {
+			tdd.test('store change', function () {
 				var cell = grid.cell('2', 'col1');
 				var oldValue = cell.element.innerHTML;
 				var newValue = 'new value';
@@ -357,10 +358,10 @@ define([
 			});
 		});
 
-		test.suite('_StoreMixin#save', function () {
+		tdd.suite('_StoreMixin#save', function () {
 			var store;
 
-			test.beforeEach(function () {
+			tdd.beforeEach(function () {
 				store = createSyncStore({ data: genericData });
 				grid = new OnDemandList({
 					collection: store
@@ -369,7 +370,7 @@ define([
 				grid.startup();
 			});
 
-			test.test('API', function () {
+			tdd.test('API', function () {
 				this.async(1000);
 				grid.updateDirty(0, 'col1', 'important');
 				grid.updateDirty(1, 'col1', 'normal');
@@ -383,7 +384,7 @@ define([
 				});
 			});
 
-			test.test('Should return promise even if nothing needs to be put', function () {
+			tdd.test('Should return promise even if nothing needs to be put', function () {
 				this.async(1000);
 				var promise = grid.save();
 				assert.isDefined(promise.then, 'grid.save() should return a promise');
@@ -399,8 +400,8 @@ define([
 			});
 		});
 
-		test.suite('_StoreMixin#save / column.set tests', function () {
-			test.test('column.set in subRows', function () {
+		tdd.suite('_StoreMixin#save / column.set tests', function () {
+			tdd.test('column.set in subRows', function () {
 				grid = new OnDemandGrid({
 					subRows: [
 						[
@@ -418,7 +419,7 @@ define([
 				testSetMethod(grid, this.async(1000));
 			});
 
-			test.test('column.set in columnSets', function () {
+			tdd.test('column.set in columnSets', function () {
 				grid = new (declare([OnDemandGrid, ColumnSet]))({
 					columnSets: [
 						[

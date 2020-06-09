@@ -1,21 +1,22 @@
 define([
-	'intern!tdd',
-	'intern/chai!assert',
 	'dojo/on',
 	'dgrid/List',
 	'dgrid/util/misc'
-], function (test, assert, on, List, miscUtil) {
-	test.suite('List', function() {
-		test.suite('resize', function() {
+], function (on, List, miscUtil) {
+	var tdd = intern.getPlugin('interface.tdd');
+	var assert = intern.getPlugin('chai').assert;
+
+	tdd.suite('List', function() {
+		tdd.suite('resize', function() {
 			var list;
 
-			test.afterEach(function() {
+			tdd.afterEach(function() {
 				if (list && list._started) {
 					list.destroy();
 				}
 			});
 
-			test.test('default throttle', function() {
+			tdd.test('default throttle', function() {
 				var originalThrottleDelayed = miscUtil.throttleDelayed;
 				var throttleCalled = false;
 
@@ -40,7 +41,7 @@ define([
 				}
 			});
 
-			test.test('custom throttle: string', function() {
+			tdd.test('custom throttle: string', function() {
 				var originalDebounce = miscUtil.debounce;
 				var throttleCalled = false;
 
@@ -66,7 +67,7 @@ define([
 				}
 			});
 
-			test.test('custom throttle: invalid string', function() {
+			tdd.test('custom throttle: invalid string', function() {
 				var originalThrottleDelayed = miscUtil.throttleDelayed;
 				var throttleCalled = false;
 
@@ -92,7 +93,7 @@ define([
 				}
 			});
 
-			test.test('custom throttle: function', function() {
+			tdd.test('custom throttle: function', function() {
 				var throttleCalled = false;
 				var throttleDelay;
 

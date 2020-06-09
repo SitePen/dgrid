@@ -1,25 +1,26 @@
 define([
-	'intern!tdd',
-	'intern/chai!assert',
+	'dojo/_base/declare',
+	'dojo/query',
 	'dgrid/Grid',
 	'dgrid/ColumnSet',
 	'dgrid/OnDemandGrid',
 	'dgrid/Tree',
 	'dgrid/extensions/CompoundColumns',
 	'dgrid/extensions/SingleQuery',
-	'dojo/_base/declare',
-	'dojo/query',
 	'dgrid/test/data/createHierarchicalStore',
 	'dgrid/test/data/hierarchicalCountryData',
 	'../addCss!'
-], function (test, assert, Grid, ColumnSet, OnDemandGrid, Tree, CompoundColumns, SingleQuery, declare, query,
-		createHierarchicalStore, data) {
+], function (declare, query, Grid, ColumnSet, OnDemandGrid, Tree, CompoundColumns, SingleQuery,
+	createHierarchicalStore, data) {
 
-	test.suite('tree indent', function () {
+	var tdd = intern.getPlugin('interface.tdd');
+	var assert = intern.getPlugin('chai').assert;
+
+	tdd.suite('tree indent', function () {
 		var grid;
 		var treeIndentWidth = 20;
 
-		test.afterEach(function () {
+		tdd.afterEach(function () {
 			if (grid) {
 				grid.destroy();
 				grid = null;
@@ -49,8 +50,8 @@ define([
 			});
 		}
 
-		test.suite('OnDemandGrid + tree', function () {
-			test.beforeEach(function () {
+		tdd.suite('OnDemandGrid + tree', function () {
+			tdd.beforeEach(function () {
 				grid = new (declare([ OnDemandGrid, Tree ]))({
 					collection: createHierarchicalStore({ data: data }),
 					treeIndentWidth: treeIndentWidth,
@@ -74,10 +75,10 @@ define([
 				grid.startup();
 			});
 
-			test.test('level 1', level1Test);
-			test.test('level 2', level2Test);
+			tdd.test('level 1', level1Test);
+			tdd.test('level 2', level2Test);
 
-			test.test('refreshCell', function () {
+			tdd.test('refreshCell', function () {
 				return grid.expand('AF').then(function () {
 					return grid.expand('EG');
 				}).then(function () {
@@ -88,8 +89,8 @@ define([
 			});
 		});
 
-		test.suite('OnDemandGrid + tree + compound columns + column sets', function () {
-			test.beforeEach(function () {
+		tdd.suite('OnDemandGrid + tree + compound columns + column sets', function () {
+			tdd.beforeEach(function () {
 				grid = new (declare([ OnDemandGrid, Tree, CompoundColumns, ColumnSet ]))({
 					collection: createHierarchicalStore({ data: data }),
 					treeIndentWidth: treeIndentWidth,
@@ -126,14 +127,14 @@ define([
 				grid.startup();
 			});
 
-			test.test('level 1', level1Test);
-			test.test('level 2', level2Test);
+			tdd.test('level 1', level1Test);
+			tdd.test('level 2', level2Test);
 		});
 
-		test.suite('SingleQuery + Tree', function () {
+		tdd.suite('SingleQuery + Tree', function () {
 			var store;
 
-			test.beforeEach(function () {
+			tdd.beforeEach(function () {
 				store = createHierarchicalStore({ data: [ { id: 1 } ] });
 				grid = new (declare([ Grid, SingleQuery, Tree ]))({
 					collection: store,
@@ -149,7 +150,7 @@ define([
 				grid.startup();
 			});
 
-			test.test('Child indentation, both when parent is collapsed and expanded', function () {
+			tdd.test('Child indentation, both when parent is collapsed and expanded', function () {
 				store.addSync({ id: 2, parent: 1 });
 				return grid.expand(1).then(function () {
 					testIndentWidth(2, 1);
@@ -158,7 +159,7 @@ define([
 				});
 			});
 
-			test.test('refreshCell on parent after a child is rendered', function () {
+			tdd.test('refreshCell on parent after a child is rendered', function () {
 				store.addSync({ id: 2, parent: 1 });
 				return grid.expand(1).then(function () {
 					grid.refreshCell(grid.cell(1, 'id'));

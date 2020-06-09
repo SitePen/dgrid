@@ -1,16 +1,17 @@
 define([
-	'intern!tdd',
-	'intern/chai!assert',
 	'dojo/query',
 	'dgrid/OnDemandList',
 	'dgrid/test/data/createSyncStore',
 	'dgrid/test/data/genericData'
-], function (test, assert, query, OnDemandList, createSyncStore, genericData) {
-	test.suite('OnDemandList with zero rowHeight', function () {
+], function (query, OnDemandList, createSyncStore, genericData) {
+	var tdd = intern.getPlugin('interface.tdd');
+	var assert = intern.getPlugin('chai').assert;
+
+	tdd.suite('OnDemandList with zero rowHeight', function () {
 		var list;
 		var store = createSyncStore({ data: genericData });
 
-		test.beforeEach(function () {
+		tdd.beforeEach(function () {
 			list = new OnDemandList({
 				collection: store,
 				renderRow: function () {
@@ -21,11 +22,11 @@ define([
 			list.startup();
 		});
 
-		test.afterEach(function () {
+		tdd.afterEach(function () {
 			list.destroy();
 		});
 
-		test.test('_processScroll should bail out if rowHeight is 0', function () {
+		tdd.test('_processScroll should bail out if rowHeight is 0', function () {
 			// Bailing out with rowHeight === 0 is important because otherwise
 			// _processScroll has the potential to loop infinitely.
 
@@ -40,12 +41,12 @@ define([
 			list._processScroll();
 		});
 
-		test.test('refresh with zero rowHeight should only render minRowsPerPage rows', function () {
+		tdd.test('refresh with zero rowHeight should only render minRowsPerPage rows', function () {
 			// This tests GitHub issue #965.
 			assert.strictEqual(query('.dgrid-row', list.contentNode).length, list.minRowsPerPage);
 		});
 
-		test.test('refresh should return a QueryResults object', function () {
+		tdd.test('refresh should return a QueryResults object', function () {
 			var dfd = this.async();
 
 			list.refresh().then(dfd.callback(function (results) {
@@ -55,11 +56,11 @@ define([
 		});
 	});
 
-	test.suite('OnDemandList', function () {
+	tdd.suite('OnDemandList', function () {
 		var list;
 		var store = createSyncStore({ data: genericData });
 
-		test.beforeEach(function () {
+		tdd.beforeEach(function () {
 			list = new OnDemandList({
 				collection: store,
 				renderRow: function () {
@@ -73,11 +74,11 @@ define([
 			list.startup();
 		});
 
-		test.afterEach(function () {
+		tdd.afterEach(function () {
 			list.destroy();
 		});
 
-		test.test('calculated row height', function () {
+		tdd.test('calculated row height', function () {
 			assert.strictEqual(16, list.preload.rowHeight);
 			assert.strictEqual(16, list.rowHeight);
 		});

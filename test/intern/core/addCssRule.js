@@ -1,6 +1,4 @@
 define([
-	'intern!tdd',
-	'intern/chai!assert',
 	'dojo/_base/declare',
 	'dojo/dom-style',
 	'dojo/dom-construct',
@@ -11,10 +9,11 @@ define([
 	'dgrid/extensions/ColumnResizer',
 	'dgrid/util/misc',
 	'../addCss!'
-], function (test, assert, declare, domStyle, domConstruct, query,
-		Grid, ColumnSet, ColumnHider, ColumnResizer, miscUtil) {
-
+], function (declare, domStyle, domConstruct, query, Grid, ColumnSet, ColumnHider, ColumnResizer, miscUtil) {
+	var tdd = intern.getPlugin('interface.tdd');
+	var assert = intern.getPlugin('chai').assert;
 	var grid;
+
 	function gridDestroy() {
 		if (grid) {
 			grid.destroy();
@@ -22,22 +21,22 @@ define([
 		}
 	}
 
-	test.suite('addCssRule', function () {
+	tdd.suite('addCssRule', function () {
 		var testDiv;
 
 		// Setup / teardown
-		test.before(function () {
+		tdd.before(function () {
 			testDiv = domConstruct.create('div', null, document.body);
 		});
 
-		test.after(function () {
+		tdd.after(function () {
 			domConstruct.destroy(testDiv);
 		});
 
-		test.afterEach(gridDestroy);
+		tdd.afterEach(gridDestroy);
 
 		// Tests
-		test.test('addCssRule + remove', function () {
+		tdd.test('addCssRule + remove', function () {
 			testDiv.className = 'foo';
 			// cache original style and update .foo
 			var origStyle = domStyle.getComputedStyle(testDiv).fontSize,
@@ -52,7 +51,7 @@ define([
 			testDiv.className = '';
 		});
 
-		test.test('addCssRule get/set/remove', function () {
+		tdd.test('addCssRule get/set/remove', function () {
 			testDiv.className = 'bar';
 			// cache original style and update .foo
 			var origStyle = domStyle.getComputedStyle(testDiv).fontSize,
@@ -75,7 +74,7 @@ define([
 			testDiv.className = '';
 		});
 
-		test.test('add/remove multiple rules in mixed order', function () {
+		tdd.test('add/remove multiple rules in mixed order', function () {
 			var origStyle = domStyle.getComputedStyle(testDiv).fontSize,
 				rules = [],
 				expected = { // hash containing test classes / values
@@ -118,7 +117,7 @@ define([
 			check();
 		});
 
-		test.test('addCssRule via dgrid APIs', function () {
+		tdd.test('addCssRule via dgrid APIs', function () {
 			var values = ['7px', '8px'],
 				origValues;
 
@@ -196,7 +195,7 @@ define([
 			}
 		});
 
-		test.test('Grid columns as array (numeric IDs)', function () {
+		tdd.test('Grid columns as array (numeric IDs)', function () {
 			grid = new Grid({
 				columns: [
 					{ field: 'name' },
@@ -214,9 +213,9 @@ define([
 		});
 	});
 
-	test.suite('CSS escaping of column IDs via dgrid APIs', function () {
+	tdd.suite('CSS escaping of column IDs via dgrid APIs', function () {
 
-		test.suite('Grid columns and columnsets', function () {
+		tdd.suite('Grid columns and columnsets', function () {
 			function makeTest(func, id) {
 				return function () {
 					assert.doesNotThrow(function () {
@@ -227,7 +226,7 @@ define([
 				};
 			}
 
-			test.beforeEach(function () {
+			tdd.beforeEach(function () {
 				grid = new (declare([Grid, ColumnSet]))({
 					id: 'i:d',
 					columnSets: [[[
@@ -238,21 +237,21 @@ define([
 				grid.startup();
 			});
 
-			test.afterEach(gridDestroy);
+			tdd.afterEach(gridDestroy);
 
-			test.test('styleColumn', makeTest('styleColumn', 'col:umn'));
+			tdd.test('styleColumn', makeTest('styleColumn', 'col:umn'));
 
 			// Currently ColumnSet IDs can't be customized so that isn't really an issue,
 			// but this still tests escaping the grid ID
-			test.test('styleColumnSet', makeTest('styleColumnSet', '0'));
+			tdd.test('styleColumnSet', makeTest('styleColumnSet', '0'));
 		});
 
-		test.suite('ColumnHider', function () {
+		tdd.suite('ColumnHider', function () {
 			var ColumnHiderGrid = declare([Grid, ColumnHider]);
 
-			test.afterEach(gridDestroy);
+			tdd.afterEach(gridDestroy);
 
-			test.test('Hiding column after construction', function () {
+			tdd.test('Hiding column after construction', function () {
 				assert.doesNotThrow(function () {
 					grid = new ColumnHiderGrid({
 						id: 'i:d',
@@ -271,7 +270,7 @@ define([
 					'Column should be hidden');
 			});
 
-			test.test('Hiding column during construction', function () {
+			tdd.test('Hiding column during construction', function () {
 				assert.doesNotThrow(function () {
 					grid = new ColumnHiderGrid({
 						id: 'i:d',
@@ -287,12 +286,12 @@ define([
 			});
 		});
 
-		test.suite('ColumnResizer', function () {
+		tdd.suite('ColumnResizer', function () {
 			var ColumnResizerGrid = declare([Grid, ColumnResizer]);
 
-			test.afterEach(gridDestroy);
+			tdd.afterEach(gridDestroy);
 
-			test.test('Resizing column after construction', function () {
+			tdd.test('Resizing column after construction', function () {
 				assert.doesNotThrow(function () {
 					grid = new ColumnResizerGrid({
 						id: 'i:d',
@@ -312,7 +311,7 @@ define([
 					'Column should be the expected width');
 			});
 
-			test.test('Resizing column during construction', function () {
+			tdd.test('Resizing column during construction', function () {
 				assert.doesNotThrow(function () {
 					grid = new ColumnResizerGrid({
 						id: 'i:d',

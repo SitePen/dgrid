@@ -1,14 +1,15 @@
 define([
-	'intern!tdd',
-	'intern/chai!assert',
 	'dojo/_base/declare',
 	'dojo/on',
 	'dgrid/List',
 	'dgrid/OnDemandList',
 	'dstore/Memory'
-], function (test, assert, declare, on, List, OnDemandList, Memory) {
-	test.suite('createDestroy', function () {
-		test.test('no params list', function () {
+], function (declare, on, List, OnDemandList, Memory) {
+	var tdd = intern.getPlugin('interface.tdd');
+	var assert = intern.getPlugin('chai').assert;
+
+	tdd.suite('createDestroy', function () {
+		tdd.test('no params list', function () {
 			var list = new List();
 			document.body.appendChild(list.domNode);
 			list.startup();
@@ -23,7 +24,7 @@ define([
 		});
 
 		// Test for issue #1030
-		test.test('OnDemandList#refresh should not throw error if domNode is nullified when destroyed', function () {
+		tdd.test('OnDemandList#refresh should not throw error if domNode is nullified when destroyed', function () {
 			var CustomList = declare(OnDemandList, {
 				destroy: function () {
 					this.inherited(arguments);
