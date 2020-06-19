@@ -611,7 +611,7 @@ return function(column, editor, editOn){
 			listeners.push(aspect.before(grid, 'removeRow', function (row) {
 				var focusedCell = grid._focusedEditorCell;
 				row = grid.row(row);
-				if (focusedCell && focusedCell.row.id === row.id) {
+				if (focusedCell && row && focusedCell.row.id === row.id) {
 					previouslyFocusedCell = focusedCell;
 
 					// Pause the focusout handler until after this row has had
