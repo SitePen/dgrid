@@ -1,5 +1,5 @@
-define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/dom", "dojo/on", "dojo/has", "./util/misc", "dojo/has!touch?./TouchScroll", "xstyle/has-class", "put-selector/put", "dojo/_base/sniff", "xstyle/css!./css/dgrid.css"],
-function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put){
+define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/dom", "dojo/on", "dojo/query", "dojo/has", "./util/misc", "dojo/has!touch?./TouchScroll", "xstyle/has-class", "put-selector/put", "dojo/_base/sniff", "xstyle/css!./css/dgrid.css"],
+function(kernel, declare, dom, listen, query, has, miscUtil, TouchScroll, hasClass, put){
 	// Add user agent/feature CSS classes
 	hasClass("mozilla", "opera", "webkit", "ie", "ie-6", "ie-6-7", "quirks", "no-quirks", "touch");
 
@@ -7,8 +7,10 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 		evenClass = "dgrid-row-even",
 		scrollbarWidth, scrollbarHeight;
 
-	function byId(id){
-		return document.getElementById(id);
+	function byId(id, context){
+		// document.getElementById only works for elements in the document
+		// dojo/query with the context parameter works for descendants of 'context' even when it is not in the document
+		return query('#' + miscUtil.escapeCssIdentifier(id), context)[0];
 	}
 
 	function cleanupTestElement(element){
@@ -411,7 +413,7 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 				i;
 			for(i in this._rowIdToObject){
 				if(this._rowIdToObject[i] != this.columns){
-					var rowElement = byId(i);
+					var rowElement = byId(i, this.domNode);
 					if(rowElement){
 						this.removeRow(rowElement, true);
 					}
@@ -740,7 +742,7 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 				id = this.id + "-row-" + (parentId ? parentId + "-" : "") +
 					((this.store && this.store.getIdentity) ?
 						this.store.getIdentity(object) : this._autoId++),
-				row = byId(id),
+				row = byId(id, this.domNode),
 				previousRow = row && row.previousSibling;
 
 			if(row){// if it existed elsewhere in the DOM, we will remove it, so we can recreate it
@@ -817,7 +819,7 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 				id = target;
 				target = this._rowIdToObject[this.id + "-row-" + id];
 			}
-			return new this._Row(id, target, byId(this.id + "-row-" + id));
+			return new this._Row(id, target, byId(this.id + "-row-" + id, this.domNode));
 		},
 		cell: function(target){
 			// this doesn't do much in a plain list
