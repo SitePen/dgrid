@@ -3,19 +3,10 @@
 	"author": "Kris Zyp",
 	"version": "0.4.6-pre",
 	"description": "A lightweight, mobile-ready, data-driven, modular widget designed for lists and grids",
-	"licenses": [
-		{
-			"type": "AFLv2.1",
-			"url": "https://spdx.org/licenses/AFL-2.1"
-		},
-		{
-			"type": "BSD",
-			"url": "http://opensource.org/licenses/BSD-3-Clause"
-		}
-	],
+	"license": "BSD-3-Clause OR AFL-2.1",
 	"repository": {
 		"type":"git",
-		"url":"http://github.com/SitePen/dgrid"
+		"url":"https://github.com/SitePen/dgrid"
 	},
 	"devDependencies": {
 		"intern-geezer": "~2.2"
@@ -25,6 +16,6 @@
 		"lib": "."
 	},
 	"main": "./OnDemandGrid",
-	"icon": "http://packages.dojofoundation.org/images/dgrid.png",
+	"icon": "https://dojotoolkit.org/images/projects/dgrid.svg",
 	"dojoBuild": "package.js"
 }
