@@ -257,10 +257,10 @@ function createEditor(column){
 				}
 			});
 		}
-		else{
-			// For editOn editors, connect to onBlur rather than onChange, since
-			// the latter is delayed by setTimeouts in Dijit and will fire too late.
-			cmp.connect(cmp, editOn ? "onBlur" : "onChange", function(){
+		else if (!editOn){
+			// For editOn editors the update is handled in the shared editor's blur handler since
+			// the 'change' event is delayed by setTimeouts in Dijit and will fire too late.
+			cmp.connect(cmp, "onChange", function(){
 				if(!cmp._dgridIgnoreChange){
 					setPropertyFromEditor(grid, cmp, {type: "widget"});
 				}
@@ -364,6 +364,8 @@ function createSharedEditor(column, originalRenderCell){
 				return;
 			}
 		}
+
+		setPropertyFromEditor(grid, cmp, {type: 'widget'});
 
 		var parentNode = rootNode.parentNode,
 			i = parentNode.children.length - 1,
@@ -596,7 +598,12 @@ return function(column, editor, editOn){
 				grid._focusedEditorCell = grid.cell(this);
 			}));
 			focusoutHandle = grid._editorFocusoutHandle =
-				on.pausable(grid.domNode, '.dgrid-input:focusout', function () {
+				on.pausable(grid.domNode, '.dgrid-input:focusout', function (event) {
+					// Widgets can trigger a 'focusout' event when clicking within the widget, since the widget
+					// is still focused the 'focusout' event should be ignored
+					if (grid._focusedEditorCell && grid._focusedEditorCell.element.contains(event.target)) {
+						return;
+					}
 					grid._focusedEditorCell = null;
 				});
 			listeners.push(focusoutHandle);
