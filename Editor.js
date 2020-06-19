@@ -79,8 +79,9 @@ define([
 		removeRow: function (rowElement) {
 			var self = this;
 			var focusedCell = this._focusedEditorCell;
+			var row = this.row(rowElement);
 
-			if (focusedCell && focusedCell.row.id === this.row(rowElement).id) {
+			if (focusedCell && row && focusedCell.row.id === row.id) {
 				this._previouslyFocusedEditorCell = focusedCell;
 				// Pause the focusout handler until after this row has had
 				// time to re-render, if this removal is part of an update.
