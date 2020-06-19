@@ -445,12 +445,20 @@ define([
 
 	var moveFocusVertical = Keyboard.moveFocusVertical = function (event, steps) {
 		// if there is no _focusNode (for example, when the grid doesn't have data) don't try to find the next focus row/cell
-		if (!this._focusedNode) { return; }
+		if (!this._focusedNode) {
+			return;
+		}
 
-		var cellNavigation = this.cellNavigation,
-			target = this[cellNavigation ? 'cell' : 'row'](event),
-			columnId = cellNavigation && target.column.id,
-			next = this.down(this._focusedNode, steps, true);
+		// don't attempt navigation if a cell or row is not currently focused
+		// this can happen if empty space within the grid has been clicked
+		if (event.target === this.contentNode) {
+			return;
+		}
+
+		var cellNavigation = this.cellNavigation;
+		var target = this[cellNavigation ? 'cell' : 'row'](event);
+		var columnId = cellNavigation && target.column.id;
+		var next = this.down(this._focusedNode, steps, true);
 
 		// Navigate within same column if cell navigation is enabled
 		if (cellNavigation) {
@@ -481,8 +489,15 @@ define([
 		if (!this.cellNavigation) {
 			return;
 		}
-		var isHeader = !this.row(event), // header reports row as undefined
-			currentNode = this['_focused' + (isHeader ? 'Header' : '') + 'Node'];
+
+		// don't attempt navigation if a cell or row is not currently focused
+		// this can happen if empty space within the grid has been clicked
+		if (event.target === this.contentNode) {
+			return;
+		}
+
+		var isHeader = !this.row(event); // header reports row as undefined
+		var currentNode = this['_focused' + (isHeader ? 'Header' : '') + 'Node'];
 
 		this._focusOnNode(this.right(currentNode, steps), isHeader, event);
 		event.preventDefault();
