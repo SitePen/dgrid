@@ -12,20 +12,21 @@
 				font-weight: bold;
 				padding-bottom: 0.25em;
 			}
-			#grid .field-date, #grid .field-date2 {
+			#grid .field-date,
+			#grid .field-date2 {
 				width: 16em;
 			}
 			#grid .field-integer {
 				width: 6em;
 			}
 			#grid .field-bool {
-				width: 6em;
+				width: 7em;
 			}
 			.dgrid {
 				margin: 10px;
 			}
 		</style>
-		<script src="../../dojo/dojo.js" 
+		<script src="../../dojo/dojo.js"
 			data-dojo-config="async: true"></script>
 		<script>
 			require(["dgrid/List", "dgrid/OnDemandGrid", "dgrid/Selection", "dgrid/Keyboard", "dgrid/editor", "dijit/form/CheckBox", "dijit/form/TimeTextBox",  "dijit/form/Select","dojo/data/ObjectStore", "dijit/form/FilteringSelect", "dojo/_base/declare", "dgrid/test/data/base", "dojo/domReady!"],
@@ -81,7 +82,7 @@
 						columns: columns,
 						selectionMode: "none"
 					}, "grid");
-					
+
 					grid.on("dgrid-datachange", function(evt){
 						console.log("data changed: ", evt.oldValue, " -> ", evt.value);
 						console.log("cell: ", evt.cell, evt.cell.row.id);
@@ -93,7 +94,7 @@
 						console.log("hide editOn editor: ", evt);
 					});
 				});
-				
+
 		</script>
 	</head>
 	<body class="claro">
