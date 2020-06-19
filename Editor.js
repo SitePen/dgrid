@@ -643,6 +643,12 @@ define([
 			function onblur(event) {
 				var wrapperNode;
 
+				// a blur caused by clicking within an editor widget's dropDown (e.g. dijit/form/Select) should be
+				// ignored, otherwise the cell reverts to the read state when the user opens the dropdown
+				if (cmp.dropDown && cmp.dropDown.domNode.contains(event.relatedTarget || document.activeElement)) {
+					return;
+				}
+
 				if (event && event.target) {
 					wrapperNode = event.target;
 					wrapperNode = domClass.contains(wrapperNode, self.editorFocusWrapperClassName) && wrapperNode;
