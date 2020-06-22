@@ -1,7 +1,7 @@
 {
   "name": "dgrid",
   "author": "Kris Zyp",
-  "version": "0.3.21-pre",
+  "version": "0.3.21",
   "description": "A lightweight, mobile-ready, data-driven, modular widget designed for lists and grids",
   "license": "BSD-3-Clause OR AFL-2.1",
   "repository": {
