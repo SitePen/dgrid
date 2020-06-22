@@ -1,7 +1,7 @@
 {
 	"name": "dgrid",
 	"author": "Kris Zyp",
-	"version": "1.3.2-pre",
+	"version": "1.3.2",
 	"description": "A lightweight, mobile-ready, data-driven, modular widget designed for lists and grids",
 	"license": "BSD-3-Clause",
 	"repository": {
@@ -21,7 +21,7 @@
 		"lib": "."
 	},
 	"main": "./OnDemandGrid",
-	"icon": "http://packages.dojofoundation.org/images/dgrid.png",
+	"icon": "https://dojotoolkit.org/images/projects/dgrid.svg",
 	"scripts": {
 		"serve": "npx http-serve ../",
 		"serve-rest": "node ./test/data/rest-node.js"
