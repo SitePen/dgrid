@@ -1,2 +1,4 @@
+# IMPORTANT: be sure to copy an relevant updates to .npmignore
+
 coverage
 node_modules
