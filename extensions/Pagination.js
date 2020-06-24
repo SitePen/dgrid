@@ -537,6 +537,23 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 				// A synchronous error occurred; reject the promise.
 				dfd.reject();
 			}
+
+			var self = this;
+			dfd.promise.then(function (results) {
+				// Emit on a separate turn to enable event to be used consistently for
+				// initial render, regardless of whether the backing store is async
+				setTimeout(function () {
+					on.emit(self.domNode, "dgrid-page-complete", {
+						bubbles: true,
+						cancelable: false,
+						grid: self,
+						page: page,
+						results: results // QueryResults object (may be a wrapped promise)
+					});
+				}, 0);
+
+				return results;
+			});
 			return dfd.promise;
 		}
 	});
