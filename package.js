@@ -39,7 +39,7 @@ var profile = (function () {
 		},
 
 		trees: [
-			[ '.', '.', /(?:\/\.)|(?:~$)|(?:(?:html-report|node_modules|nib|nodes)\/)/ ]
+			[ '.', '.', /(?:\/\.)|(?:~$)|(?:(?:coverage|node_modules|nib|nodes)\/)/ ]
 		]
 	};
 })();

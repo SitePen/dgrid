@@ -1,4 +1,4 @@
-# IMPORTANT: be sure to copy an relevant updates to .npmignore
+# IMPORTANT: be sure to copy any relevant updates to .npmignore
 
 coverage
 node_modules
