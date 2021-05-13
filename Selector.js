@@ -27,7 +27,15 @@ define([
 			this.inherited(arguments);
 
 			// Register one listener at the top level that receives events delegated
-			this.on('.dgrid-selector:click,.dgrid-selector:keydown', lang.hitch(this, '_handleSelectorClick'));
+			var handleSelectorClick = lang.hitch(this, '_handleSelectorClick');
+			// Some mobile browsers do not like the checkbox element to be modified when responding to a "click"
+			// event.  Responding to the "change" event works better.
+			this.on('.dgrid-selector:change', handleSelectorClick);
+			this.on('.dgrid-selector:click,.dgrid-selector:keydown', function (event) {
+				if (event.target.nodeName !== 'INPUT') {
+					handleSelectorClick(event);
+				}
+			});
 			// Register listeners to the select and deselect events to change the input checked value
 			this.on('dgrid-select', lang.hitch(this, '_changeSelectorInput', true));
 			this.on('dgrid-deselect', lang.hitch(this, '_changeSelectorInput', false));
@@ -90,7 +98,7 @@ define([
 			// trigger a click, but the click event doesn't provide access to the shift key in firefox, so
 			// listen for keydown as well to get an event in firefox that we can properly retrieve
 			// the shiftKey property
-			if (event.type === 'click' || event.keyCode === 32 ||
+			if (event.type === 'change' || event.type === 'click' || event.keyCode === 32 ||
 				(!has('opera') && event.keyCode === 13) || event.keyCode === 0) {
 
 				this._selectionTriggerEvent = event;
