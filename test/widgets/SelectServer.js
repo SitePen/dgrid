@@ -8,7 +8,7 @@ define([
 	'../data/restMock',
 	'dojo/text!./SelectServer.html'
 ], function (Deferred, ioQuery, on, requestRegistry, _WidgetBase, _TemplatedMixin, restMock, template) {
-	var NODEJS_TARGET_URL = window.location.origin + ':8040/data/rest';
+	var NODEJS_TARGET_URL = 'http://' + window.location.hostname + ':8040/data/rest';
 	var PHP_TARGET_URL = '../data/rest.php';
 	var TIMEOUT = 1500; // milliseconds; timeout for server up status check
 
