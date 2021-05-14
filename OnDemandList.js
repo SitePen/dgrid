@@ -735,65 +735,67 @@ define([
 						(function (loadingNode, below, keepScrollTo) {
 							/* jshint maxlen: 122 */
 							var rangeResults = preload.query(options);
-							lastRows = grid.renderQueryResults(rangeResults, loadingNode, options).then(function (rows) {
-								var gridRows = grid._rows;
-								if (gridRows && !('queryLevel' in options) && rows.length) {
-									// Update relevant observed range for top-level items
-									if (below) {
-										if (gridRows.max <= gridRows.min) {
-											// All rows were removed; update start of rendered range as well
-											gridRows.min = rows[0].rowIndex;
-										}
-										gridRows.max = rows[rows.length - 1].rowIndex;
-									}
-									else {
-										if (gridRows.max <= gridRows.min) {
-											// All rows were removed; update end of rendered range as well
+							lastRows = grid._trackError(function () {
+								return grid.renderQueryResults(rangeResults, loadingNode, options).then(function (rows) {
+									var gridRows = grid._rows;
+									if (gridRows && !('queryLevel' in options) && rows.length) {
+										// Update relevant observed range for top-level items
+										if (below) {
+											if (gridRows.max <= gridRows.min) {
+												// All rows were removed; update start of rendered range as well
+												gridRows.min = rows[0].rowIndex;
+											}
 											gridRows.max = rows[rows.length - 1].rowIndex;
 										}
-										gridRows.min = rows[0].rowIndex;
-									}
-								}
-
-								// can remove the loading node now
-								beforeNode = loadingNode.nextSibling;
-								domConstruct.destroy(loadingNode);
-								// beforeNode may have been removed if the query results loading node was removed
-								// as a distant node before rendering
-								if (keepScrollTo && beforeNode && beforeNode.offsetWidth) {
-									// if the preload area above the nodes is approximated based on average
-									// row height, we may need to adjust the scroll once they are filled in
-									// so we don't "jump" in the scrolling position
-									grid.scrollTo({
-										y: grid.bodyNode.scrollTop + beforeNode.offsetTop - keepScrollTo
-									});
-								}
-
-								rangeResults.totalLength.then(function (total) {
-									if (!('queryLevel' in options)) {
-										grid._total = total;
-										if (grid._rows && grid._rows.max >= grid._total - 1) {
-											grid._rows.max = Infinity;
+										else {
+											if (gridRows.max <= gridRows.min) {
+												// All rows were removed; update end of rendered range as well
+												gridRows.max = rows[rows.length - 1].rowIndex;
+											}
+											gridRows.min = rows[0].rowIndex;
 										}
 									}
-									if (below) {
-										// if it is below, we will use the total from the collection to update
-										// the count of the last preload in case the total changes as
-										// later pages are retrieved
 
-										// recalculate the count
-										below.count = total - below.node.rowIndex;
-										// readjust the height
-										grid._adjustPreloadHeight(below);
+									// can remove the loading node now
+									beforeNode = loadingNode.nextSibling;
+									domConstruct.destroy(loadingNode);
+									// beforeNode may have been removed if the query results loading node was removed
+									// as a distant node before rendering
+									if (keepScrollTo && beforeNode && beforeNode.offsetWidth) {
+										// if the preload area above the nodes is approximated based on average
+										// row height, we may need to adjust the scroll once they are filled in
+										// so we don't "jump" in the scrolling position
+										grid.scrollTo({
+											y: grid.bodyNode.scrollTop + beforeNode.offsetTop - keepScrollTo
+										});
 									}
-								});
 
-								// make sure we have covered the visible area
-								grid._processScroll();
-								return rows;
-							}, function (e) {
-								domConstruct.destroy(loadingNode);
-								throw e;
+									rangeResults.totalLength.then(function (total) {
+										if (!('queryLevel' in options)) {
+											grid._total = total;
+											if (grid._rows && grid._rows.max >= grid._total - 1) {
+												grid._rows.max = Infinity;
+											}
+										}
+										if (below) {
+											// if it is below, we will use the total from the collection to update
+											// the count of the last preload in case the total changes as
+											// later pages are retrieved
+
+											// recalculate the count
+											below.count = total - below.node.rowIndex;
+											// readjust the height
+											grid._adjustPreloadHeight(below);
+										}
+									});
+
+									// make sure we have covered the visible area
+									grid._processScroll();
+									return rows;
+								}, function (e) {
+									domConstruct.destroy(loadingNode);
+									throw e;
+								});
 							});
 						})(loadingNode, bottomPreload, keepScrollTo);
 					});
