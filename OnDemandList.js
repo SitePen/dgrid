@@ -95,13 +95,8 @@ define([
 
 		postCreate: function () {
 			this.inherited(arguments);
-			var self = this;
 			// check visibility on scroll events
-			on(this.bodyNode, 'scroll',
-				miscUtil[this.pagingMethod](function (event) {
-					self._processScroll(event);
-				}, null, this.pagingDelay)
-			);
+			this._scrollEvent();
 		},
 
 		renderQuery: function (query, options) {
@@ -415,6 +410,29 @@ define([
 		},
 
 		lastScrollTop: 0,
+		_hasAutoHeight: function () {
+		  return this._class && this._class.indexOf('dgrid-autoheight') >= 0;
+		},
+		_setClass: function () {
+			var before = this._hasAutoHeight();
+			this.inherited(arguments);
+			if (before !== this._hasAutoHeight()) //relink event
+				this._scrollEvent();
+		},
+		_scrollSignal: undefined,
+		_scrollEvent: function () {
+			var self = this;
+			if (this._scrollSignal)
+			  this._scrollSignal.remove();
+			var node = this.bodyNode;
+			if (this._hasAutoHeight())
+			  node = this.params.parentNode || window;
+			this._scrollSignal = on(node, 'scroll',
+				miscUtil[this.pagingMethod](function (event) {
+					self._processScroll(event);
+				}, null, this.pagingDelay)
+			);
+		},
 		_processScroll: function (evt) {
 			// summary:x
 			//		Checks to make sure that everything in the viewable area has been
@@ -440,7 +458,26 @@ define([
 				// References related to emitting dgrid-refresh-complete if applicable
 				lastRows,
 				preloadSearchNext = true;
-
+				
+			if (this._hasAutoHeight()){
+				var parentNode = this.params.parentNode||window;
+				var cumulativeOffset = function(element,parent) {
+    					var top = 0, left = 0;
+    					do {
+        					top += element.offsetTop  || 0;
+        					left += element.offsetLeft || 0;
+        					element = element.offsetParent;
+        					if (element == parent)
+        						break;
+    					} while(element);
+					return {
+        					top: top,
+        					left: left
+    					};
+				};
+				visibleTop = Math.max(0,parentNode.scrollY - cumulativeOffset(scrollNode,parentNode).top);
+				visibleBottom = parentNode.innerHeight + visibleTop;
+			}
 			// XXX: I do not know why this happens.
 			// munging the actual location of the viewport relative to the preload node by a few pixels in either
 			// direction is necessary because at least WebKit on Windows seems to have an error that causes it to
