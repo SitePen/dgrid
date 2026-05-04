@@ -277,7 +277,8 @@ define([
 			this.renderHeader();
 
 			this.contentNode = this.touchNode = domConstruct.create('div', {
-				className: 'dgrid-content' + (addUiClasses ? ' ui-widget-content' : '')
+				className: 'dgrid-content' + (addUiClasses ? ' ui-widget-content' : ''),
+				role: 'rowgroup'
 			}, this.bodyNode);
 
 			if (typeof this.resizeThrottleMethod === 'string' && miscUtil[this.resizeThrottleMethod]) {
